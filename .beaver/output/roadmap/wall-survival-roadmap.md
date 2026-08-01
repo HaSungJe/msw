@@ -21,7 +21,7 @@
 ### Phase 1 — RTS 기반 (탑다운 조작·그리드 토대가 서야 모든 게 올라간다)
 | # | Unit | Goal | Key decision | Depends | Status |
 |---|------|------|--------------|---------|--------|
-| 1 | 탑다운 맵·카메라 리그 | 중력 없는 탑다운 맵 + 카메라를 아바타에서 분리해 키/엣지 스크롤(`GetCursorPosition()` 폴링) + 창모드 커서 가두기(`CursorLockMode.Confined`, PC 전용). 아바타 숨김 처리 | 맵 크기·셀 크기(#6 길찾기 성능 실측 후 상한 확정 — 초기값으로 시작, 맵 영역은 `MapComponent.LeftBottom/RightTop`으로 가변) | — | in-progress |
+| 1 | 탑다운 맵·카메라 리그 | 중력 없는 탑다운 맵 + 카메라를 아바타에서 분리해 키/엣지 스크롤(`GetCursorPosition()` 폴링) + 창모드 커서 가두기(`CursorLockMode.Confined`, PC 전용). 아바타 숨김 처리 | 맵 크기·셀 크기(#6 길찾기 성능 실측 후 상한 확정 — 초기값으로 시작, 맵 영역은 `MapComponent.LeftBottom/RightTop`으로 가변) | — | done |
 | 14 | HUD·UI v1 (스타식 셸) | **[사용자 지정: #1 바로 다음]** 스타식 레이아웃 골격: 미니맵(좌하단 — 지형 + 카메라 뷰포트 표시 + 클릭 시 카메라 점프), 커맨드 카드 틀(우하단 버튼 슬롯), 선택 정보 패널 자리(중앙 하단), 상단 자원/시간 표시 자리. 유닛/건물 도트와 실버튼 연결은 #3·#4·#9에서 채움 | 미니맵 렌더 방식(월드 축소 캡처 vs 도트/색상 타일) | 1 | todo |
 | 2 | 논리 그리드 시스템 | 그리드 점유 관리(지형벽=불가침 셀, 건물=점유 셀), 배치 가능 검증 단일 소스 | 그리드 데이터 구조(크기·청크·동기화 범위) | 1 | todo |
 | 3 | RTS 선택·명령 입력 | 클릭/드래그 박스 선택, 부대지정(Ctrl+숫자→숫자 호출), 단축키, 명령 디스패처 | 이동 명령 입력 방식(우클릭 인식 가능 여부 → 대체 조작) | 1 | todo |
@@ -77,8 +77,8 @@
 | #15 | `DifficultyLogic` | 방 설정 | 난이도 스케일 |
 | #16 | (리소스 교체) | — | 테마 적용 |
 
-**Progress**: 0/16 done
-**Next up**: #14 HUD·UI v1 (스타식 셸) — 사용자 지정 순서. #1 완료(ship 대기) 직후 착수. `/beaver:direct 스타식 HUD 셸`로 시작.
+**Progress**: 1/16 done
+**Next up**: #14 HUD·UI v1 (스타식 셸) — 사용자 지정 순서, 의존(#1) 충족. `/beaver:direct 스타식 HUD 셸`로 시작. (근거: .beaver/output/report/rts-base/topdown-camera-rig-report.md)
 
 ## Cross-Cutting Rules
 - **모든 판정은 서버** — 자원 차감, 데미지, 사망, 승패, 몹 스폰은 `@ExecSpace("Server")`. 클라이언트는 입력·표시만 (WorldConfig AuthorityCheck 활성 상태).
