@@ -1,0 +1,122 @@
+-- rts-base #1: hidden-avatar camera anchor (rev3)
+@Component
+script RtsCameraAnchorComponent extends Component
+
+	property Vector2 InputDirection = Vector2(0, 0)
+
+	method void OnBeginPlay()
+		if self:IsServer() then
+			self:SetupServer()
+		else
+			self:SetupClient()
+		end
+	end
+
+	@ExecSpace("ServerOnly")
+	method void SetupServer()
+		local entity = self.Entity
+		entity.AvatarRendererComponent.Enable = false
+		entity.NameTagComponent.Enable = false
+		local body = entity.KinematicbodyComponent
+		body.EnableShadow = false
+		body.EnableJump = false
+	end
+
+	@ExecSpace("ClientOnly")
+	method void SetupClient()
+		if _UserService.LocalPlayer ~= self.Entity then return end
+
+		self.Entity.PlayerControllerComponent.Enable = false
+		self.Entity.KinematicbodyComponent.EnableTileCollision = false
+
+		_InputService:CursorLockMode(CursorLockMode.Confined)
+
+		local camera = self.Entity.CameraComponent
+		camera.DeadZone = Vector2(0, 0)
+		camera.IsAllowZoomInOut = true
+		camera.ZoomRatioMin = 100  -- 줌아웃 제한: 카메라 마진 계산이 기본 줌 기준이므로 그 이상 못 벌리게
+
+		local rt = _RtsConfigLogic:GetMapRightTop()
+		self.Entity.KinematicbodyComponent:SetWorldPosition(Vector2(rt.x * 0.5, rt.y * 0.5))
+	end
+
+	@ExecSpace("ClientOnly")
+	method void OnUpdate(number delta)
+		if _UserService.LocalPlayer ~= self.Entity then return end
+
+		local dir = Vector2(self.InputDirection.x, self.InputDirection.y)
+
+		local cursor = _InputService:GetCursorPosition()
+		local margin = _RtsConfigLogic:GetEdgeMarginPx()
+		local w = _UILogic.ScreenWidth
+		local h = _UILogic.ScreenHeight
+		-- 창(뷰포트) 밖 커서는 무시 — 창모드에서 커서가 밖에 있을 때 오동작 방지
+		if cursor.x >= 0 and cursor.x <= w and cursor.y >= 0 and cursor.y <= h then
+			if cursor.x <= margin then
+				dir.x = dir.x - 1
+			elseif cursor.x >= w - margin then
+				dir.x = dir.x + 1
+			end
+			if cursor.y <= margin then
+				dir.y = dir.y - 1
+			elseif cursor.y >= h - margin then
+				dir.y = dir.y + 1
+			end
+		end
+
+		local body = self.Entity.KinematicbodyComponent
+		if dir.x == 0 and dir.y == 0 then
+			body.MoveVelocity = Vector2(0, 0)
+			return
+		end
+
+		local len = math.sqrt(dir.x * dir.x + dir.y * dir.y)
+		local speed = _RtsConfigLogic:GetScrollSpeed()
+		body.MoveVelocity = Vector2(dir.x / len * speed, dir.y / len * speed)
+
+		-- 앵커 클램프: 뷰 절반(마진)만큼 안쪽까지만 — 카메라가 맵 밖을 비추지 않게 (스타식 경계 정지)
+		local pos = self.Entity.TransformComponent.WorldPosition
+		local lb = _RtsConfigLogic:GetMapLeftBottom()
+		local rt = _RtsConfigLogic:GetMapRightTop()
+		local mx = _RtsConfigLogic:GetCameraMarginX()
+		local my = _RtsConfigLogic:GetCameraMarginY()
+		local cx = math.max(lb.x + mx, math.min(pos.x, rt.x - mx))
+		local cy = math.max(lb.y + my, math.min(pos.y, rt.y - my))
+		if cx ~= pos.x or cy ~= pos.y then
+			body:SetWorldPosition(Vector2(cx, cy))
+		end
+	end
+
+	@ExecSpace("ClientOnly")
+	@EventSender("Service", "InputService")
+	handler HandleKeyDownEvent(KeyDownEvent event)
+		if _UserService.LocalPlayer ~= self.Entity then return end
+		local key = event.key
+		if key == KeyboardKey.RightArrow then
+			self.InputDirection.x = self.InputDirection.x + 1
+		elseif key == KeyboardKey.LeftArrow then
+			self.InputDirection.x = self.InputDirection.x - 1
+		elseif key == KeyboardKey.UpArrow then
+			self.InputDirection.y = self.InputDirection.y + 1
+		elseif key == KeyboardKey.DownArrow then
+			self.InputDirection.y = self.InputDirection.y - 1
+		end
+	end
+
+	@ExecSpace("ClientOnly")
+	@EventSender("Service", "InputService")
+	handler HandleKeyUpEvent(KeyUpEvent event)
+		if _UserService.LocalPlayer ~= self.Entity then return end
+		local key = event.key
+		if key == KeyboardKey.RightArrow then
+			self.InputDirection.x = self.InputDirection.x - 1
+		elseif key == KeyboardKey.LeftArrow then
+			self.InputDirection.x = self.InputDirection.x + 1
+		elseif key == KeyboardKey.UpArrow then
+			self.InputDirection.y = self.InputDirection.y - 1
+		elseif key == KeyboardKey.DownArrow then
+			self.InputDirection.y = self.InputDirection.y + 1
+		end
+	end
+
+end

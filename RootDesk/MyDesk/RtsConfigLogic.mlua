@@ -1,0 +1,50 @@
+@Logic
+script RtsConfigLogic extends Logic
+
+	property number MapCellsX = 256
+
+	property number MapCellsY = 256
+
+	property number CellSize = 1
+
+	property number ScrollSpeed = 8
+
+	property number EdgeMarginPx = 20
+
+	property number CameraMarginX = 26
+
+	property number CameraMarginY = 15
+
+	method number GetMapCellsX()
+		return self.MapCellsX
+	end
+
+	method number GetMapCellsY()
+		return self.MapCellsY
+	end
+
+	method number GetScrollSpeed()
+		return self.ScrollSpeed
+	end
+
+	method number GetCameraMarginX()
+		return self.CameraMarginX
+	end
+
+	method number GetCameraMarginY()
+		return self.CameraMarginY
+	end
+
+	method number GetEdgeMarginPx()
+		return self.EdgeMarginPx
+	end
+
+	method Vector2 GetMapLeftBottom()
+		return Vector2(0, 0)
+	end
+
+	method Vector2 GetMapRightTop()
+		return Vector2(self.MapCellsX * self.CellSize, self.MapCellsY * self.CellSize)
+	end
+
+end
