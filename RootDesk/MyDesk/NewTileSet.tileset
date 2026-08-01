@@ -1,0 +1,27 @@
+{
+  "Id": "",
+  "GameId": "",
+  "EntryKey": "tileset://f566daa2-a2de-48f3-9c98-5f155a444bb6",
+  "ContentType": "x-mod/tileset",
+  "Content": "",
+  "Usage": 0,
+  "UsePublish": 1,
+  "UseService": 0,
+  "CoreVersion": "26.7.0.0",
+  "StudioVersion": "0.1.0.0",
+  "DynamicLoading": 0,
+  "ContentProto": {
+    "Use": "Json",
+    "Json": {
+      "name": "NewTileSet",
+      "id": "tileset://f566daa2-a2de-48f3-9c98-5f155a444bb6",
+      "datas": [
+        {
+          "Id": "e9683cc55ec14f05b9c93a19f73fb74e",
+          "Name": "LimestoneFloor",
+          "IsCollidable": false
+        }
+      ]
+    }
+  }
+}

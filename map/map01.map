@@ -3404,7 +3404,7 @@
                   "tileIndex": 0
                 },
                 {
-                  "type": 8,
+                  "type": 6,
                   "position": {
                     "x": -5,
                     "y": -12

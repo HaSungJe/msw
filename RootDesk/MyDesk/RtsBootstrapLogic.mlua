@@ -1,0 +1,32 @@
+-- rts-base bootstrap (rev2)
+@Logic
+script RtsBootstrapLogic extends Logic
+
+	@ExecSpace("ServerOnly")
+	@EventSender("Service", "UserService")
+	handler HandleUserEnterEvent(UserEnterEvent event)
+		local userId = event.UserId
+		local userEntity = _UserService:GetUserEntityByUserId(userId)
+		if userEntity == nil then return end
+		if userEntity.RtsCameraAnchorComponent == nil then
+			userEntity:AddComponent("RtsCameraAnchorComponent")
+		end
+		self:EnsureGroundTiles()
+	end
+
+	-- 동굴 바닥 채우기: 타일이 없으면 맵 전체를 채운다 (멱등)
+	-- 타일맵 GridSize=8(타일 하나가 8×8유닛)라 256유닛 맵 = 32×32=1024타일. 대량(65k) 일괄 채우기는 에디터 프리즈 유발 금지.
+	@ExecSpace("ServerOnly")
+	method void EnsureGroundTiles()
+		local tm = _EntityService:GetEntityByPath("/maps/RtsMap/RectTileMap")
+		if tm == nil then return end
+		local tilemap = tm.RectTileMapComponent
+		if tilemap == nil then return end
+		if tilemap.TileCount > 0 then return end
+		local tileUnit = 8
+		local tilesX = _RtsConfigLogic:GetMapCellsX() / tileUnit
+		local tilesY = _RtsConfigLogic:GetMapCellsY() / tileUnit
+		tilemap:BoxFill(1, Vector2Int(0, 0), Vector2Int(tilesX - 1, tilesY - 1))
+	end
+
+end
