@@ -1,0 +1,19 @@
+{
+  "version": 3,
+  "packageVersion": "0.10.1",
+  "lastUpdated": "2026-07-31T01:59:01.832Z",
+  "files": {
+    "mcp": [
+      ".mcp.json"
+    ]
+  },
+  "agents": {
+    "claude-code": {
+      "mcp": "0.10.1"
+    }
+  },
+  "mcpServers": [
+    "msw-maker-mcp",
+    "msw-mcp"
+  ]
+}
