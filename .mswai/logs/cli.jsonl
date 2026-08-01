@@ -1,0 +1,2 @@
+{"ts":"2026-07-31T01:59:01.833Z","version":"0.10.1","command":"mcp","args":["--agent","claude-code","--workspace","C:\\workspace\\msw","--silent","--mcp-var","MSW_MAKER_MCP_PATH=<redacted>","--mcp-var","MSW_MCP_URL=<redacted>","--mcp-var","MSW_MCP_TOKEN=<redacted>"],"cwd":"C:\\workspace\\msw","exitCode":0,"durationMs":20}
+{"ts":"2026-07-31T03:04:57.194Z","version":"0.10.1","command":"status","args":["--workspace","C:\\workspace\\msw","--json"],"cwd":"C:\\workspace\\msw","exitCode":0,"durationMs":51}

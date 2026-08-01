@@ -1,0 +1,5 @@
+.beaver/.auto-branch-state.json
+.beaver/config.json
+.claude/worktrees/
+.claude/settings.json
+.mcp.json
