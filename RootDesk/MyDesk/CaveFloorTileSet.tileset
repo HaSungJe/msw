@@ -13,12 +13,12 @@
   "ContentProto": {
     "Use": "Json",
     "Json": {
-      "name": "NewTileSet",
+      "name": "CaveFloorTileSet",
       "id": "tileset://f566daa2-a2de-48f3-9c98-5f155a444bb6",
       "datas": [
         {
-          "Id": "e9683cc55ec14f05b9c93a19f73fb74e",
-          "Name": "LimestoneFloor",
+          "Id": "9bddf00f17224983b4037a1fe48986e0",
+          "Name": "CaveFloorBrown",
           "IsCollidable": false
         }
       ]

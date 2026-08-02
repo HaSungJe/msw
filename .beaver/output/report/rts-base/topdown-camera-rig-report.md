@@ -62,6 +62,6 @@ CLI 러너 없음(docs/testing.md) — 플랜의 Play Test 시나리오가 테�
 
 ## Remaining Issues
 1. ~~[경고] RectTileMapComponent 수동 추가 경고(LEA-3035)~~ — **해결됨(2026-08-01)**: 빈 타일맵 엔티티를 맵에서 제거(탑다운 이동은 MapComponent.TileMapMode=1로 동작, 실측 재확인: 스폰 128,128 · 좌이동 정상 · 경고 0건). 타일 시각화가 필요한 #2에서 Maker로 정식 생성 예정.
-2. **[수동 1클릭 필요] 릴리즈용 시작 맵 지정** — Maker Hierarchy에서 RtsMap 우클릭 → "시작 맵으로 설정". Play Test는 현재 열린 맵에서 시작하므로 개발 중엔 불필요.
+2. ~~[수동 1클릭 필요] 릴리즈용 시작 맵 지정~~ — **해결됨(2026-08-02)**: 사용자가 Maker에서 RtsMap을 시작 맵으로 설정(`Global/defaultuserenterleavelogic.logic` 생성, StartPoint=/maps/RtsMap). 불용 기본 맵 map01.map 삭제 + Play Test 정상 확인. — Maker Hierarchy에서 RtsMap 우클릭 → "시작 맵으로 설정". Play Test는 현재 열린 맵에서 시작하므로 개발 중엔 불필요.
 3. **[수동 확인 권장] 휠 줌·Confined·실마우스 엣지 스크롤** — MCP 입력 시뮬레이션 한계로 실제 마우스로 1회 확인 필요.
 4. 멀티(2클라) 동기화 검증은 로드맵 #13에서 정식 수행.
