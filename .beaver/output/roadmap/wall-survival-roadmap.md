@@ -1,3 +1,5 @@
+> **[SUPERSEDED 2026-08-02]** 컨셉 피벗(벽짓살 → 메이플 운빨 디펜스)으로 이 로드맵은 종료. 현행: [maple-luck-defense-roadmap.md](maple-luck-defense-roadmap.md) · 피벗 근거: [pivot-luck-defense.md](pivot-luck-defense.md)
+
 # Roadmap — 벽짓살 MSW판 (탑다운 풀 RTS 디펜스: 벽으로 막고, 경제 키우고, 제한시간 내 보스 처치)
 
 ## Direction
