@@ -8,9 +8,9 @@
 ---
 
 ## Prerequisites
-- [ ] **Maker 실행 + msw-maker-mcp 연결** (빌드 중 실증·Play Test)
-- [ ] **UI 기본 모델 entry id 실증** — Play 컨텍스트에서 `_EntryService:GetModelIdByName` 후보("MODImage"/"Image"/"MODButton"/"Button"/"MODText"/"Text") 프로브 → 성공 조합을 `RtsHudLogic.ResolveUIModelId`에 반영. 전부 실패 시 폴백: UI 에디터로 Image/Button/Text 1개씩 수작업 생성(사용자 1분) → 저장 파일에서 직렬화 스키마 학습 → 파일 조립 자동화(#1 타일셋 수법)
-- [ ] **런타임 스폰 버튼의 `ConnectEvent(ButtonClickEvent, fn)` 동작 실증** — 실패 시 폴백: 버튼별 KeyCode(단축키) 우회 + 클릭은 화면좌표 히트테스트로 자체 구현
+- [x] **Maker 실행 + msw-maker-mcp 연결** — 연결 확인(2026-08-02)
+- [x] **UI 기본 모델 entry id 실증(2026-08-02)** — Image=`model://uisprite`, Button=`model://uibutton`, Text=`model://uitext`, Group=`model://uigroup`. 클라 컨텍스트 SpawnByModelId 동작 확인. 주의: /ui/DefaultGroup은 존재하지 않음(지연 생성) → 런타임에 `RtsHudGroup`(uigroup) 스폰 + UIGroupComponent.DefaultShow. UISprite는 ImageRUID 지정 전까지 비가시.
+- [x] **ConnectEvent 실증(부분, 2026-08-02)** — 엔티티 레벨 `ConnectEvent(ButtonClickEvent, fn)` 호출 성공(컴포넌트 레벨은 nil이라 금지). 일회성 MakerScript 컨텍스트에선 발화 미확인 → 영속 Logic에서 연결해 Play Test로 최종 검증. 커맨드카드에 KeyCode 그리드 단축키(QWER/ASDF/ZXCV)를 병행 배선(검증 수단 겸 스타식 UX). 그래도 실패 시 화면좌표 히트테스트 폴백.
 
 ---
 

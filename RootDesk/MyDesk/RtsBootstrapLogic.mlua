@@ -22,10 +22,12 @@ script RtsBootstrapLogic extends Logic
 		if tm == nil then return end
 		local tilemap = tm.RectTileMapComponent
 		if tilemap == nil then return end
-		if tilemap.TileCount > 0 then return end
 		local tileUnit = 8
 		local tilesX = _RtsConfigLogic:GetMapCellsX() / tileUnit
 		local tilesY = _RtsConfigLogic:GetMapCellsY() / tileUnit
+		-- 기대 수보다 적으면(떠돌이 타일 포함) 전부 지우고 다시 채운다
+		if tilemap.TileCount >= tilesX * tilesY then return end
+		tilemap:Clear()
 		tilemap:BoxFill(1, Vector2Int(0, 0), Vector2Int(tilesX - 1, tilesY - 1))
 	end
 

@@ -15,6 +15,10 @@ script RtsConfigLogic extends Logic
 
 	property number CameraMarginY = 15
 
+	property number CameraViewWidth = 44.5
+
+	property number CameraViewHeight = 25
+
 	method number GetMapCellsX()
 		return self.MapCellsX
 	end
@@ -25,6 +29,14 @@ script RtsConfigLogic extends Logic
 
 	method number GetScrollSpeed()
 		return self.ScrollSpeed
+	end
+
+	method number GetCameraViewWidth()
+		return self.CameraViewWidth
+	end
+
+	method number GetCameraViewHeight()
+		return self.CameraViewHeight
 	end
 
 	method number GetCameraMarginX()

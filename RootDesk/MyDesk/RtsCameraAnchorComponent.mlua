@@ -1,4 +1,4 @@
--- rts-base #1: hidden-avatar camera anchor (rev3)
+-- rts-base #1: hidden-avatar camera anchor (rev4 — #14 HUD 훅)
 @Component
 script RtsCameraAnchorComponent extends Component
 
@@ -38,11 +38,15 @@ script RtsCameraAnchorComponent extends Component
 
 		local rt = _RtsConfigLogic:GetMapRightTop()
 		self.Entity.KinematicbodyComponent:SetWorldPosition(Vector2(rt.x * 0.5, rt.y * 0.5))
+
+		_RtsHudLogic:BuildHud(self.Entity)
 	end
 
 	@ExecSpace("ClientOnly")
 	method void OnUpdate(number delta)
 		if _UserService.LocalPlayer ~= self.Entity then return end
+
+		_RtsHudLogic:UpdateMinimapViewport(self.Entity.TransformComponent.WorldPosition)
 
 		local dir = Vector2(self.InputDirection.x, self.InputDirection.y)
 
@@ -50,8 +54,9 @@ script RtsCameraAnchorComponent extends Component
 		local margin = _RtsConfigLogic:GetEdgeMarginPx()
 		local w = _UILogic.ScreenWidth
 		local h = _UILogic.ScreenHeight
-		-- 창(뷰포트) 밖 커서는 무시 — 창모드에서 커서가 밖에 있을 때 오동작 방지
-		if cursor.x >= 0 and cursor.x <= w and cursor.y >= 0 and cursor.y <= h then
+		-- 창(뷰포트) 밖 커서 무시 + UI(콘솔 바 등) 위 커서면 엣지 스크롤 무시 (스타 동작)
+		if not _InputService:IsPointerOverUI()
+			and cursor.x >= 0 and cursor.x <= w and cursor.y >= 0 and cursor.y <= h then
 			if cursor.x <= margin then
 				dir.x = dir.x - 1
 			elseif cursor.x >= w - margin then
