@@ -1,34 +1,43 @@
 @Logic
 script RtsConfigLogic extends Logic
 
-	property number MapCellsX = 256
+	-- 구역: 2열×4행, 구역 = 카메라 한 화면(뷰 44.5×25 + 여유) — 운빨 디펜스 #3
+	property number ZoneCols = 2
 
-	property number MapCellsY = 256
+	property number ZoneRows = 4
+
+	property number ZoneWidth = 48
+
+	property number ZoneHeight = 28
 
 	property number CellSize = 1
-
-	property number ScrollSpeed = 8
-
-	property number EdgeMarginPx = 20
-
-	property number CameraMarginX = 26
-
-	property number CameraMarginY = 15
 
 	property number CameraViewWidth = 44.5
 
 	property number CameraViewHeight = 25
 
+	method number GetZoneCols()
+		return self.ZoneCols
+	end
+
+	method number GetZoneRows()
+		return self.ZoneRows
+	end
+
+	method number GetZoneWidth()
+		return self.ZoneWidth
+	end
+
+	method number GetZoneHeight()
+		return self.ZoneHeight
+	end
+
 	method number GetMapCellsX()
-		return self.MapCellsX
+		return self.ZoneCols * self.ZoneWidth
 	end
 
 	method number GetMapCellsY()
-		return self.MapCellsY
-	end
-
-	method number GetScrollSpeed()
-		return self.ScrollSpeed
+		return self.ZoneRows * self.ZoneHeight
 	end
 
 	method number GetCameraViewWidth()
@@ -39,16 +48,14 @@ script RtsConfigLogic extends Logic
 		return self.CameraViewHeight
 	end
 
-	method number GetCameraMarginX()
-		return self.CameraMarginX
-	end
-
-	method number GetCameraMarginY()
-		return self.CameraMarginY
-	end
-
-	method number GetEdgeMarginPx()
-		return self.EdgeMarginPx
+	-- 구역 n(1~8, 위에서부터 행 우선: 1·2 / 3·4 / 5·6 / 7·8) → 구역 중앙 월드 좌표
+	method Vector2 GetZoneCenter(number n)
+		local idx = n - 1
+		local col = idx % self.ZoneCols
+		local row = math.floor(idx / self.ZoneCols)
+		local cx = col * self.ZoneWidth + self.ZoneWidth * 0.5
+		local cy = (self.ZoneRows - 1 - row) * self.ZoneHeight + self.ZoneHeight * 0.5
+		return Vector2(cx, cy)
 	end
 
 	method Vector2 GetMapLeftBottom()
@@ -56,7 +63,7 @@ script RtsConfigLogic extends Logic
 	end
 
 	method Vector2 GetMapRightTop()
-		return Vector2(self.MapCellsX * self.CellSize, self.MapCellsY * self.CellSize)
+		return Vector2(self:GetMapCellsX(), self:GetMapCellsY())
 	end
 
 end
