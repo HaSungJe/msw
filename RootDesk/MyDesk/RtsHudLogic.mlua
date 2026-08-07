@@ -1,4 +1,4 @@
--- rts-base #14: 스타식 HUD 셸 v5
+-- rts-base #14: 스타식 HUD 셸 v6 (#3 구역 미니맵)
 -- (배경 패널 제거 — 프레임 오버레이만, 미니맵 340+초상화 240 밀착, 스킬칸 340(3×3 QWE/ASD/ZXC),
 --  호버 툴팁, 골드 좌상단 밀착(아이콘+수치), 시간 중앙, Ctrl+숫자 부대지정 골격.
 --  티어별(브론즈~챌린저) 프레임 차등은 로드맵 후순위 유닛)
@@ -11,6 +11,11 @@ script RtsHudLogic extends Logic
 
 	-- 레이아웃 상수 (UI 좌표 1920×1080)
 	property number MinimapSize = 340
+
+	-- 미니맵 셀 그리드: 미니맵 영역(340×340)을 꽉 채움 → 구역 셀 170×85 (2열×4행)
+	property number MinimapStripW = 340
+
+	property number MinimapStripH = 340
 
 	property number PortraitSize = 240
 
@@ -38,6 +43,8 @@ script RtsHudLogic extends Logic
 
 	property Entity SkillTooltip = nil
 
+	property Entity MinimapStrip = nil
+
 	@ExecSpace("ClientOnly")
 	method Entity SpawnUI(string modelId, string name, Entity parent, Vector2 anchor, Vector2 pivot, Vector2 pos, Vector2 size)
 		local e = _SpawnService:SpawnByModelId(modelId, name, Vector3.zero, parent)
@@ -48,6 +55,23 @@ script RtsHudLogic extends Logic
 		t.Pivot = pivot
 		t.anchoredPosition = pos
 		t.RectSize = size
+		local sr = e.SpriteGUIRendererComponent
+		if sr ~= nil then
+			sr.ImageRUID = DataRef(self.WhiteRUID)
+		end
+		return e
+	end
+
+	-- 스트레치 배치: 앵커 구간 + 오프셋(좌하/우상)으로 해상도 변화에 늘어나는 요소용
+	@ExecSpace("ClientOnly")
+	method Entity SpawnStretch(string modelId, string name, Entity parent, Vector2 aMin, Vector2 aMax, Vector2 offMin, Vector2 offMax)
+		local e = _SpawnService:SpawnByModelId(modelId, name, Vector3.zero, parent)
+		if e == nil then return nil end
+		local t = e.UITransformComponent
+		t.AnchorsMin = aMin
+		t.AnchorsMax = aMax
+		t.OffsetMin = offMin
+		t.OffsetMax = offMax
 		local sr = e.SpriteGUIRendererComponent
 		if sr ~= nil then
 			sr.ImageRUID = DataRef(self.WhiteRUID)
@@ -84,6 +108,16 @@ script RtsHudLogic extends Logic
 		sr.Color = Color(1, 1, 1, 1)
 	end
 
+	-- 프레임 오버레이(스트레치판) — 부모 rect를 그대로 덮음
+	@ExecSpace("ClientOnly")
+	method void AttachFrameStretch(Entity target, string frameRUID)
+		local f = self:SpawnStretch("model://uisprite", target.Name .. "Frame", target,
+			Vector2(0, 0), Vector2(1, 1), Vector2(0, 0), Vector2(0, 0))
+		local sr = f.SpriteGUIRendererComponent
+		sr.ImageRUID = DataRef(frameRUID)
+		sr.Color = Color(1, 1, 1, 1)
+	end
+
 	@ExecSpace("ClientOnly")
 	method void BuildHud(Entity anchorEntity)
 		if self.Built then return end
@@ -103,24 +137,56 @@ script RtsHudLogic extends Logic
 		grp:SetEnable(true)
 		self.HudGroup = grp
 
-		-- 레이아웃 컨테이너 (투명 — 배경 패널 없음)
-		local bar = self:SpawnUI("model://uisprite", "RtsHudBar", grp,
-			Vector2(0.5, 0), Vector2(0.5, 0), Vector2(0, 0), Vector2(1920, 340))
+		-- 레이아웃 컨테이너 (투명, 하단 가로 전체 스트레치 — 해상도 변화 대응)
+		local bar = self:SpawnStretch("model://uisprite", "RtsHudBar", grp,
+			Vector2(0, 0), Vector2(1, 0), Vector2(0, 0), Vector2(0, 340))
 		self:Tint(bar, 0, 0, 0, 0)
 
-		-- 미니맵 340 좌하단 플러시 + 장식 프레임
+		-- 미니맵 340 좌하단 플러시 — 구역 셀(2열×4행)이 영역을 꽉 채움. 셀 = 해당 구역 축소 화면 (#3 개편)
 		local mm = self:SpawnUI("model://uisprite", "RtsMinimap", bar,
 			Vector2(0, 0), Vector2(0, 0), Vector2(0, 0), Vector2(self.MinimapSize, self.MinimapSize))
-		local mmSprite = mm.SpriteGUIRendererComponent
-		mmSprite.ImageRUID = DataRef(self.FloorRUID)
-		mmSprite.Color = Color(0.85, 0.85, 0.88, 1)
+		self:Tint(mm, 0.13, 0.105, 0.075, 0.9)
 
-		local vw = self.MinimapSize * _RtsConfigLogic:GetCameraViewWidth() / _RtsConfigLogic:GetMapCellsX()
-		local vh = self.MinimapSize * _RtsConfigLogic:GetCameraViewHeight() / _RtsConfigLogic:GetMapCellsY()
-		local vp = self:SpawnUI("model://uisprite", "RtsMinimapViewport", mm,
-			Vector2(0, 0), Vector2(0.5, 0.5), Vector2(0, 0), Vector2(vw, vh))
-		self:Tint(vp, 1, 1, 1, 0.35)
+		local strip = self:SpawnUI("model://uisprite", "RtsMinimapStrip", mm,
+			Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2(0, 0), Vector2(self.MinimapStripW, self.MinimapStripH))
+		self:Tint(strip, 0, 0, 0, 0)
+		self.MinimapStrip = strip
+
+		local cols = _RtsConfigLogic:GetZoneCols()
+		local rows = _RtsConfigLogic:GetZoneRows()
+		local cellW = self.MinimapStripW / cols
+		local cellH = self.MinimapStripH / rows
+		local gap = 2
+
+		-- 구역 셀: 축소 화면(바닥 텍스처) + 좌상단 번호. 유닛/몹 도트는 #5~#7에서 이 셀 위에 추가
+		for n = 1, cols * rows do
+			local idx = n - 1
+			local col = idx % cols
+			local row = math.floor(idx / cols)
+			local cell = self:SpawnUI("model://uisprite", "RtsMmCell" .. tostring(n), strip,
+				Vector2(0, 0), Vector2(0.5, 0.5),
+				Vector2(col * cellW + cellW * 0.5, (rows - 1 - row) * cellH + cellH * 0.5),
+				Vector2(cellW - gap, cellH - gap))
+			cell.SpriteGUIRendererComponent.ImageRUID = DataRef(self.FloorRUID)
+			cell.SpriteGUIRendererComponent.Color = Color(0.8, 0.8, 0.84, 1)
+		end
+
+		-- 현재 구역 하이라이트 (구역 1칸 크기)
+		local vp = self:SpawnUI("model://uisprite", "RtsMinimapViewport", strip,
+			Vector2(0, 0), Vector2(0.5, 0.5), Vector2(cellW * 0.5, cellH * 0.5), Vector2(cellW, cellH))
+		self:Tint(vp, 1, 1, 1, 0.22)
 		self.ViewportRect = vp
+
+		-- 구역 번호: 셀 중앙. 하이라이트보다 나중에 생성해야 가려지지 않음
+		for n = 1, cols * rows do
+			local idx = n - 1
+			local col = idx % cols
+			local row = math.floor(idx / cols)
+			self:SpawnText("RtsMmZone" .. tostring(n), strip,
+				Vector2(0, 0), Vector2(0.5, 0.5),
+				Vector2(col * cellW + cellW * 0.5, (rows - 1 - row) * cellH + cellH * 0.5), Vector2(40, 30),
+				tostring(n), Color(0.98, 0.92, 0.6, 1))
+		end
 
 		self:AttachFrame(mm, self.Frame340RUID, Vector2(self.MinimapSize, self.MinimapSize))
 
@@ -138,12 +204,12 @@ script RtsHudLogic extends Logic
 		self:AttachFrame(portrait, self.Frame240RUID, Vector2(self.PortraitSize, self.PortraitSize))
 
 		-- 선택유닛 정보 영역 — 배경 없음 + 프레임만, 내용은 #3 (선택 없으면 공백)
+		-- 좌(미니맵+초상화)와 우(스킬칸) 사이를 스트레치 — 해상도 변화 대응
 		local infoX = self.MinimapSize + self.PortraitSize
-		local infoW = 1920 - infoX - 340
-		local info = self:SpawnUI("model://uisprite", "RtsSelectionArea", bar,
-			Vector2(0, 0), Vector2(0, 0), Vector2(infoX, 0), Vector2(infoW, 240))
+		local info = self:SpawnStretch("model://uisprite", "RtsSelectionArea", bar,
+			Vector2(0, 0), Vector2(1, 0), Vector2(infoX, 0), Vector2(-340, 240))
 		self:Tint(info, 0.13, 0.105, 0.075, 0.9)
-		self:AttachFrame(info, self.FrameInfoRUID, Vector2(infoW, 240))
+		self:AttachFrameStretch(info, self.FrameInfoRUID)
 
 		-- 스킬칸 340×340 (3×3, QWE/ASD/ZXC) — 우하단 플러시, 배경 없음 + 프레임, 빈 슬롯 숨김
 		local card = self:SpawnUI("model://uisprite", "RtsSkillCard", bar,
@@ -268,30 +334,41 @@ script RtsHudLogic extends Logic
 		log("RtsHud: skill slot " .. tostring(slot) .. " (미구현)")
 	end
 
-	-- ===== 미니맵 =====
+	-- ===== 미니맵 (#3: 구역 스냅) =====
 
+	-- 현재 구역 하이라이트 갱신 (JumpToZone에서 호출 — 매 프레임 아님)
 	@ExecSpace("ClientOnly")
-	method void UpdateMinimapViewport(Vector3 camPos)
+	method void UpdateMinimapZone(number n)
 		if not self.Built or self.ViewportRect == nil then return end
-		local mx = camPos.x / _RtsConfigLogic:GetMapCellsX() * self.MinimapSize
-		local my = camPos.y / _RtsConfigLogic:GetMapCellsY() * self.MinimapSize
-		self.ViewportRect.UITransformComponent.anchoredPosition = Vector2(mx, my)
+		local cols = _RtsConfigLogic:GetZoneCols()
+		local rows = _RtsConfigLogic:GetZoneRows()
+		local cellW = self.MinimapStripW / cols
+		local cellH = self.MinimapStripH / rows
+		local idx = n - 1
+		local col = idx % cols
+		local row = math.floor(idx / cols)
+		self.ViewportRect.UITransformComponent.anchoredPosition =
+			Vector2(col * cellW + cellW * 0.5, (rows - 1 - row) * cellH + cellH * 0.5)
 	end
 
+	-- 미니맵 클릭 → 클릭한 '구역'으로 스냅 이동 (자유 위치 이동 아님 — 사용자 확정)
 	@ExecSpace("ClientOnly")
 	method void OnMinimapClick()
-		if self.AnchorEntity == nil then return end
+		if self.AnchorEntity == nil or self.MinimapStrip == nil then return end
+		-- 해상도 무관: 스크린 좌표 → 미니맵 스트립 로컬 UI 좌표 (피벗 중앙 기준)
 		local cursor = _InputService:GetCursorPosition()
-		local uiX = cursor.x * 1920 / _UILogic.ScreenWidth
-		local uiY = cursor.y * 1080 / _UILogic.ScreenHeight
-		local relX = uiX / self.MinimapSize
-		local relY = uiY / self.MinimapSize
+		local localPos = _UILogic:ScreenToLocalUIPosition(cursor, self.MinimapStrip.UITransformComponent)
+		local relX = (localPos.x + self.MinimapStripW * 0.5) / self.MinimapStripW
+		local relY = (localPos.y + self.MinimapStripH * 0.5) / self.MinimapStripH
 		if relX < 0 or relX > 1 or relY < 0 or relY > 1 then return end
-		local mx = _RtsConfigLogic:GetCameraMarginX()
-		local my = _RtsConfigLogic:GetCameraMarginY()
-		local wx = math.max(mx, math.min(relX * _RtsConfigLogic:GetMapCellsX(), _RtsConfigLogic:GetMapCellsX() - mx))
-		local wy = math.max(my, math.min(relY * _RtsConfigLogic:GetMapCellsY(), _RtsConfigLogic:GetMapCellsY() - my))
-		self.AnchorEntity.KinematicbodyComponent:SetWorldPosition(Vector2(wx, wy))
+		local cols = _RtsConfigLogic:GetZoneCols()
+		local rows = _RtsConfigLogic:GetZoneRows()
+		local col = math.min(cols - 1, math.floor(relX * cols))
+		local rowFromBottom = math.min(rows - 1, math.floor(relY * rows))
+		local row = rows - 1 - rowFromBottom
+		local zone = row * cols + col + 1
+		local anchor = self.AnchorEntity.RtsCameraAnchorComponent
+		if anchor ~= nil then anchor:JumpToZone(zone) end
 	end
 
 	-- ===== Ctrl+숫자(숫자열 전용) 부대지정 골격 — 유닛 바인딩은 #3 =====
