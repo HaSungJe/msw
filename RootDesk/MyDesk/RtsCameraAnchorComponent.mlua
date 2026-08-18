@@ -1,8 +1,11 @@
--- rts-base #3(운빨 디펜스): 숨긴 아바타 = 카메라 앵커, F1~F8 구역 시점 전환 전용 (자유 카메라 없음) (rev2)
+-- rts-base #4b(운빨 디펜스): 숨긴 아바타 = 카메라 앵커, F1~F8 구역 시점 전환 전용 (자유 카메라 없음)
+--   구역이 HUD 위 밴드에 꽉 차도록 최대 줌아웃 + 앵커 Y 오프셋 적용
 @Component
 script RtsCameraAnchorComponent extends Component
 
 	property number CurrentZone = 1
+
+	property number MyZone = 1
 
 	method void OnBeginPlay()
 		if self:IsServer() then
@@ -31,21 +34,62 @@ script RtsCameraAnchorComponent extends Component
 
 		local camera = self.Entity.CameraComponent
 		camera.DeadZone = Vector2(0, 0)
-		camera.IsAllowZoomInOut = false  -- 줌 제거 (자유 카메라 금지)
+		camera.SoftZone = Vector2(0, 0)
+		camera.IsAllowZoomInOut = false
+		-- 앵커를 화면 정중앙에 고정: 맵 영역 클램프 해제 + ScreenOffset 중앙(실측 2026-08-18,
+		--   기본값이면 뷰 중심이 앵커보다 +12.4유닛 위로 어긋난다)
+		camera.ConfineCameraArea = false
+		camera.ScreenOffset = Vector2(0.5, 0.5)
+
+		_CameraService.TransitionBlendTime = 0
 
 		_RtsHudLogic:BuildHud(self.Entity)
+		self:JumpToZone(self.MyZone)
 
-		-- 입장 시 자기 구역으로 (배정은 #4 — 1차는 구역 1 스텁. HUD 조립 후 호출해야 하이라이트 반영)
-		self:JumpToZone(1)
+		-- 구역 시각화용으로 스폰한 프롭(defaultplayer 복제)이 활성 카메라를 가져가는 경우가 있어
+		--   내 카메라를 명시적으로 되찾은 뒤 줌을 건다(2026-08-18 실측: 되찾지 않으면 ZoomTo가 무시됨)
+		self:ClaimCamera()
+		_TimerService:SetTimerOnce(function()
+			self:ClaimCamera()
+		end, 0.5)
 	end
 
+	-- 활성 카메라를 내 것으로 고정 + 줌 적용
+	@ExecSpace("ClientOnly")
+	method void ClaimCamera()
+		if _UserService.LocalPlayer ~= self.Entity then return end
+		local camera = self.Entity.CameraComponent
+		if camera == nil then return end
+		if _CameraService:GetCurrentCameraComponent() ~= camera then
+			_CameraService:SwitchCameraTo(camera)
+		end
+		_CameraService:ZoomTo(_RtsConfigLogic:GetCameraZoomPercent(), 0)
+	end
+
+	-- 다른 엔티티가 카메라를 가져가면 즉시 되찾는다
+	@ExecSpace("ClientOnly")
+	@EventSender("Service", "CameraService")
+	handler HandleCameraSwitchEvent(CameraSwitchEvent event)
+		if _UserService.LocalPlayer ~= self.Entity then return end
+		if event.SwitchedComponent == self.Entity.CameraComponent then return end
+		self:ClaimCamera()
+	end
+
+	-- 구역 중앙 + Y 오프셋(HUD에 가리지 않도록 위로 밀어올림)
 	@ExecSpace("ClientOnly")
 	method void JumpToZone(number n)
 		if n < 1 or n > _RtsConfigLogic:GetZoneCols() * _RtsConfigLogic:GetZoneRows() then return end
 		self.CurrentZone = n
 		local c = _RtsConfigLogic:GetZoneCenter(n)
-		self.Entity.KinematicbodyComponent:SetWorldPosition(c)
+		self.Entity.KinematicbodyComponent:SetWorldPosition(Vector2(c.x, c.y + _RtsConfigLogic:GetCameraOffsetY()))
 		_RtsHudLogic:UpdateMinimapZone(n)
+	end
+
+	-- 서버가 배정한 구역 통지 (마지막 파라미터 UserId = 해당 클라에만 전송)
+	@ExecSpace("Client")
+	method void ApplyAssignedZone(number zone, string userId)
+		self.MyZone = zone
+		self:JumpToZone(zone)
 	end
 
 	@ExecSpace("ClientOnly")

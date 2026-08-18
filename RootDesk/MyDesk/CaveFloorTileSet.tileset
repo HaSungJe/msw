@@ -17,8 +17,8 @@
       "id": "tileset://f566daa2-a2de-48f3-9c98-5f155a444bb6",
       "datas": [
         {
-          "Id": "9bddf00f17224983b4037a1fe48986e0",
-          "Name": "CaveFloorBrown",
+          "Id": "df8df44de6e64c25a74f465ef88ef4c8",
+          "Name": "ElnathSnowFloor",
           "IsCollidable": false
         }
       ]

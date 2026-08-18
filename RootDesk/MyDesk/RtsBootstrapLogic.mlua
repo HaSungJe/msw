@@ -1,4 +1,4 @@
--- rts-base bootstrap (rev2)
+-- rts-base bootstrap (rev3b — #4 구역 배정/시각화)
 @Logic
 script RtsBootstrapLogic extends Logic
 
@@ -12,10 +12,23 @@ script RtsBootstrapLogic extends Logic
 			userEntity:AddComponent("RtsCameraAnchorComponent")
 		end
 		self:EnsureGroundTiles()
+		_RtsZoneLogic:EnsureZoneVisuals()
+
+		-- 구역 배정 후 해당 클라에만 통지
+		local zone = _RtsZoneLogic:AssignZone(userId)
+		if zone > 0 then
+			userEntity.RtsCameraAnchorComponent:ApplyAssignedZone(zone, userId)
+		end
 	end
 
-	-- 동굴 바닥 채우기: 타일이 없으면 맵 전체를 채운다 (멱등)
-	-- 타일맵 GridSize=8(타일 하나가 8×8유닛)라 256유닛 맵 = 32×32=1024타일. 대량(65k) 일괄 채우기는 에디터 프리즈 유발 금지.
+	@ExecSpace("ServerOnly")
+	@EventSender("Service", "UserService")
+	handler HandleUserLeaveEvent(UserLeaveEvent event)
+		_RtsZoneLogic:ReleaseZone(event.UserId)
+	end
+
+	-- 동굴 바닥 채우기 (멱등). 타일 8유닛 → 맵 80×64 = 10×8 타일
+	--   가장자리 구역에서 뷰(42.66×24)가 맵 밖으로 최대 ~12유닛 넘어가므로 사방 1타일씩 여유를 둔다
 	@ExecSpace("ServerOnly")
 	method void EnsureGroundTiles()
 		local tm = _EntityService:GetEntityByPath("/maps/RtsMap/RectTileMap")
@@ -25,10 +38,11 @@ script RtsBootstrapLogic extends Logic
 		local tileUnit = 8
 		local tilesX = _RtsConfigLogic:GetMapCellsX() / tileUnit
 		local tilesY = _RtsConfigLogic:GetMapCellsY() / tileUnit
-		-- 기대 수보다 적으면(떠돌이 타일 포함) 전부 지우고 다시 채운다
-		if tilemap.TileCount >= tilesX * tilesY then return end
+		local pad = 2
+		local need = (tilesX + pad * 2) * (tilesY + pad * 2)
+		if tilemap.TileCount >= need then return end
 		tilemap:Clear()
-		tilemap:BoxFill(1, Vector2Int(0, 0), Vector2Int(tilesX - 1, tilesY - 1))
+		tilemap:BoxFill(1, Vector2Int(0 - pad, 0 - pad), Vector2Int(tilesX - 1 + pad, tilesY - 1 + pad))
 	end
 
 end

@@ -1,0 +1,264 @@
+-- rts-base #4: 구역 시스템 — 배정(서버 권위) + 스타디움 트랙/배치 슬롯 좌표(단일 소스) + 시각화(서버 1회)
+-- 트랙: 라운드 사각형(스타디움). t=0 이 11시(좌상단), t 증가 = 반시계
+-- 트랙 색은 전 구역 동일(사용자 지시 2026-08-18). 점유 여부는 IsZoneOccupied로 조회한다.
+@Logic
+script RtsZoneLogic extends Logic
+
+	property SyncTable<string, number> ZoneByUser
+
+	property boolean VisualsBuilt = false
+
+	property string TrackRUID = "faf04ce588484d07847a8b34f13f4b9e"
+
+	property string WhiteRUID = "47b5e516b27d4625abffe8db398cd8c2"
+
+	-- ===== 트랙 형상 (중심선 스타디움 반치수) =====
+
+	method number GetZoneCount()
+		return _RtsConfigLogic:GetZoneCols() * _RtsConfigLogic:GetZoneRows()
+	end
+
+	-- 중심선 직선부 반길이(가로)
+	method number GetTrackHalfW()
+		local inset = _RtsConfigLogic:GetTrackLaneHalf() + 0.1
+		return (_RtsConfigLogic:GetTrackOuterW() - inset * 2) * 0.5 - _RtsConfigLogic:GetTrackCornerR()
+	end
+
+	-- 중심선 직선부 반길이(세로)
+	method number GetTrackHalfH()
+		local inset = _RtsConfigLogic:GetTrackLaneHalf() + 0.1
+		return (_RtsConfigLogic:GetTrackOuterH() - inset * 2) * 0.5 - _RtsConfigLogic:GetTrackCornerR()
+	end
+
+	method number GetTrackPerimeter()
+		local r = _RtsConfigLogic:GetTrackCornerR()
+		return 4 * self:GetTrackHalfW() + 4 * self:GetTrackHalfH() + 2 * math.pi * r
+	end
+
+	-- 트랙 위 점: t∈[0,1), t=0 = 11시(좌상단 코너 진입), t 증가 = 반시계
+	--   경로: 좌상 코너호 → 좌변(아래로) → 좌하 코너호 → 아랫변(오른쪽) → 우하 코너호 → 우변(위로) → 우상 코너호 → 윗변(왼쪽)
+	method Vector2 GetTrackPoint(number zone, number t)
+		local c = _RtsConfigLogic:GetZoneCenter(zone)
+		local hw = self:GetTrackHalfW()
+		local hh = self:GetTrackHalfH()
+		local r = _RtsConfigLogic:GetTrackCornerR()
+		local arc = math.pi * r * 0.5
+		local perim = self:GetTrackPerimeter()
+
+		local u = t - math.floor(t)
+		local d = u * perim
+		local x = 0
+		local y = 0
+
+		if d < arc then
+			local a = math.pi * 0.5 + (d / arc) * (math.pi * 0.5)
+			x = 0 - hw + r * math.cos(a)
+			y = hh + r * math.sin(a)
+		else
+			d = d - arc
+			if d < 2 * hh then
+				x = 0 - hw - r
+				y = hh - d
+			else
+				d = d - 2 * hh
+				if d < arc then
+					local a = math.pi + (d / arc) * (math.pi * 0.5)
+					x = 0 - hw + r * math.cos(a)
+					y = 0 - hh + r * math.sin(a)
+				else
+					d = d - arc
+					if d < 2 * hw then
+						x = 0 - hw + d
+						y = 0 - hh - r
+					else
+						d = d - 2 * hw
+						if d < arc then
+							local a = math.pi * 1.5 + (d / arc) * (math.pi * 0.5)
+							x = hw + r * math.cos(a)
+							y = 0 - hh + r * math.sin(a)
+						else
+							d = d - arc
+							if d < 2 * hh then
+								x = hw + r
+								y = 0 - hh + d
+							else
+								d = d - 2 * hh
+								if d < arc then
+									local a = (d / arc) * (math.pi * 0.5)
+									x = hw + r * math.cos(a)
+									y = hh + r * math.sin(a)
+								else
+									d = d - arc
+									x = hw - d
+									y = hh + r
+								end
+							end
+						end
+					end
+				end
+			end
+		end
+		return Vector2(c.x + x, c.y + y)
+	end
+
+	method number GetSpawnT()
+		return 0
+	end
+
+	method Vector2 GetSpawnPoint(number zone)
+		return self:GetTrackPoint(zone, self:GetSpawnT())
+	end
+
+	-- ===== 배치 슬롯 (트랙 안쪽 10×3 그리드, 바깥 줄부터) =====
+
+	method number GetPlacementSlotCount()
+		return 30
+	end
+
+	method Vector2 GetPlacementSlot(number zone, number index)
+		local c = _RtsConfigLogic:GetZoneCenter(zone)
+		local r = _RtsConfigLogic:GetTrackCornerR()
+		local margin = _RtsConfigLogic:GetTrackLaneHalf() + 0.5
+		local innerW = (self:GetTrackHalfW() + r) * 2 - margin * 2
+		local innerH = (self:GetTrackHalfH() + r) * 2 - margin * 2
+		local cols = 10
+		local rows = 3
+		local stepX = innerW / cols
+		local stepY = innerH / rows
+		-- 채우기 순서: 윗줄 → 아랫줄 → 가운데줄 (트랙에 가까운 쪽 우선)
+		local order = { 2, 0, 1 }
+		local i = index - 1
+		if i < 0 then i = 0 end
+		local rowIdx = order[math.floor(i / cols) % rows + 1]
+		local colIdx = i % cols
+		local x = 0 - innerW * 0.5 + stepX * (colIdx + 0.5)
+		local y = 0 - innerH * 0.5 + stepY * (rowIdx + 0.5)
+		return Vector2(c.x + x, c.y + y)
+	end
+
+	-- 중심선 스타디움까지의 부호 있는 거리(<0 = 안쪽)
+	method number TrackSignedDistance(number zone, Vector2 pos)
+		local c = _RtsConfigLogic:GetZoneCenter(zone)
+		local hw = self:GetTrackHalfW()
+		local hh = self:GetTrackHalfH()
+		local r = _RtsConfigLogic:GetTrackCornerR()
+		local dx = math.abs(pos.x - c.x) - hw
+		local dy = math.abs(pos.y - c.y) - hh
+		local qx = math.max(dx, 0)
+		local qy = math.max(dy, 0)
+		local outside = math.sqrt(qx * qx + qy * qy)
+		local inside = math.min(math.max(dx, dy), 0)
+		return outside + inside - r
+	end
+
+	method boolean IsInPlacementArea(number zone, Vector2 pos)
+		local margin = _RtsConfigLogic:GetTrackLaneHalf() + 0.5
+		return self:TrackSignedDistance(zone, pos) < 0 - margin
+	end
+
+	-- ===== 배정 (서버 권위) =====
+
+	@ExecSpace("ServerOnly")
+	method number AssignZone(string userId)
+		local exist = self.ZoneByUser[userId]
+		if exist ~= nil then return exist end
+		for n = 1, self:GetZoneCount() do
+			if not self:IsZoneOccupied(n) then
+				self.ZoneByUser[userId] = n
+				return n
+			end
+		end
+		return 0
+	end
+
+	@ExecSpace("ServerOnly")
+	method void ReleaseZone(string userId)
+		local n = self.ZoneByUser[userId]
+		if n == nil then return end
+		self.ZoneByUser[userId] = nil
+	end
+
+	method number GetZoneOfUser(string userId)
+		local n = self.ZoneByUser[userId]
+		if n == nil then return 0 end
+		return n
+	end
+
+	method boolean IsZoneOccupied(number zone)
+		for userId, n in pairs(self.ZoneByUser) do
+			if n == zone then return true end
+		end
+		return false
+	end
+
+	-- ===== 시각화 (서버 1회 생성 — EnsureGroundTiles 형제 패턴) =====
+
+	-- 월드 스프라이트 엔티티: 전용 빈 모델이 없어 defaultplayer 복제 + 렌더러/카메라 비활성
+	--   ※ CameraComponent를 끄지 않으면 카메라가 이 엔티티로 넘어감(2026-08-18 실측)
+	@ExecSpace("ServerOnly")
+	method Entity SpawnProp(string name, Entity parent, Vector2 at, string ruid)
+		local e = _SpawnService:SpawnByModelId("model://defaultplayer", name, Vector3(at.x, at.y, 0), parent)
+		if e == nil then return nil end
+		if e.CameraComponent ~= nil then e.CameraComponent.Enable = false end
+		if e.AvatarRendererComponent ~= nil then e.AvatarRendererComponent.Enable = false end
+		if e.NameTagComponent ~= nil then e.NameTagComponent.Enable = false end
+		if e.PlayerControllerComponent ~= nil then e.PlayerControllerComponent.Enable = false end
+		if e.KinematicbodyComponent ~= nil then
+			e.KinematicbodyComponent.EnableShadow = false
+			e.KinematicbodyComponent.EnableTileCollision = false
+		end
+		if e.SpriteRendererComponent == nil then e:AddComponent("SpriteRendererComponent") end
+		local sr = e.SpriteRendererComponent
+		sr.SpriteRUID = ruid
+		sr.SortingLayer = "MapLayer0"
+		sr.OrderInLayer = 100
+		return e
+	end
+
+	@ExecSpace("ServerOnly")
+	method void EnsureZoneVisuals()
+		if self.VisualsBuilt then return end
+		local mapRoot = _EntityService:GetEntityByPath("/maps/RtsMap")
+		if mapRoot == nil then return end
+		if _EntityService:GetEntityByPath("/maps/RtsMap/ZoneTrack1") ~= nil then
+			self.VisualsBuilt = true
+			return
+		end
+
+		local w = _RtsConfigLogic:GetZoneWidth()
+		local h = _RtsConfigLogic:GetZoneHeight()
+		local scale = _RtsConfigLogic:GetTrackTextureScale()
+
+		for n = 1, self:GetZoneCount() do
+			local c = _RtsConfigLogic:GetZoneCenter(n)
+
+			-- 스타디움 트랙 (단일 스프라이트)
+			local track = self:SpawnProp("ZoneTrack" .. tostring(n), mapRoot, c, self.TrackRUID)
+			if track ~= nil then
+				track.TransformComponent.Scale = Vector3(scale, scale, 1)
+			end
+
+			-- 구역 경계 4선 (얇은 흰 스프라이트, 8px=0.08유닛 기준 스케일)
+			local thin = 0.12 / 0.08
+			local lenX = w / 0.08
+			local lenY = h / 0.08
+			local edges = { "T", "B", "L", "R" }
+			local ex = { 0, 0, 0 - w * 0.5, w * 0.5 }
+			local ey = { h * 0.5, 0 - h * 0.5, 0, 0 }
+			local sx = { lenX, lenX, thin, thin }
+			local sy = { thin, thin, lenY, lenY }
+			for i = 1, 4 do
+				local line = self:SpawnProp("ZoneEdge" .. tostring(n) .. edges[i], mapRoot,
+					Vector2(c.x + ex[i], c.y + ey[i]), self.WhiteRUID)
+				if line ~= nil then
+					line.TransformComponent.Scale = Vector3(sx[i], sy[i], 1)
+					line.SpriteRendererComponent.Color = Color(0.42, 0.48, 0.58, 0.5)
+					line.SpriteRendererComponent.OrderInLayer = 90
+				end
+			end
+		end
+		self.VisualsBuilt = true
+		log("RtsZone: visuals built (stadium track x" .. tostring(self:GetZoneCount()) .. ")")
+	end
+
+end

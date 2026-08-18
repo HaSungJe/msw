@@ -24,7 +24,7 @@ script RtsHudLogic extends Logic
 	-- 스프라이트 RUID
 	property string WhiteRUID = "47b5e516b27d4625abffe8db398cd8c2"
 
-	property string FloorRUID = "9bddf00f17224983b4037a1fe48986e0"
+	property string FloorRUID = "df8df44de6e64c25a74f465ef88ef4c8"
 
 	property string CoinRUID = "288ed505d45844c3b717ec9072738b64"
 
@@ -168,13 +168,14 @@ script RtsHudLogic extends Logic
 				Vector2(col * cellW + cellW * 0.5, (rows - 1 - row) * cellH + cellH * 0.5),
 				Vector2(cellW - gap, cellH - gap))
 			cell.SpriteGUIRendererComponent.ImageRUID = DataRef(self.FloorRUID)
-			cell.SpriteGUIRendererComponent.Color = Color(0.8, 0.8, 0.84, 1)
+			cell.SpriteGUIRendererComponent.Color = Color(0.86, 0.88, 0.92, 1)
 		end
 
 		-- 현재 구역 하이라이트 (구역 1칸 크기)
 		local vp = self:SpawnUI("model://uisprite", "RtsMinimapViewport", strip,
 			Vector2(0, 0), Vector2(0.5, 0.5), Vector2(cellW * 0.5, cellH * 0.5), Vector2(cellW, cellH))
-		self:Tint(vp, 1, 1, 1, 0.22)
+		-- 흰 눈 미니맵에서는 흰 오버레이가 안 보여 호박색으로(2026-08-18 눈 타일 교체 후)
+		self:Tint(vp, 1, 0.72, 0.15, 0.45)
 		self.ViewportRect = vp
 
 		-- 구역 번호: 셀 중앙. 하이라이트보다 나중에 생성해야 가려지지 않음
@@ -185,7 +186,7 @@ script RtsHudLogic extends Logic
 			self:SpawnText("RtsMmZone" .. tostring(n), strip,
 				Vector2(0, 0), Vector2(0.5, 0.5),
 				Vector2(col * cellW + cellW * 0.5, (rows - 1 - row) * cellH + cellH * 0.5), Vector2(40, 30),
-				tostring(n), Color(0.98, 0.92, 0.6, 1))
+				tostring(n), Color(0.16, 0.2, 0.28, 1))
 		end
 
 		self:AttachFrame(mm, self.Frame340RUID, Vector2(self.MinimapSize, self.MinimapSize))

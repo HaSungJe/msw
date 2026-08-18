@@ -1,20 +1,48 @@
 @Logic
 script RtsConfigLogic extends Logic
 
-	-- 구역: 2열×4행, 구역 = 카메라 한 화면(뷰 44.5×25 + 여유) — 운빨 디펜스 #3
+	-- 구역: 2열×4행. 구역 = HUD에 가리지 않는 화면 영역(실측 기반) — 운빨 디펜스 #4
+	-- 실측(2026-08-18): 최대 줌아웃 뷰 = 42.66×24.00, HUD 하단 바가 화면의 31.5%를 가림
+	--   → 가려지지 않는 밴드 = 42.66 × 16.44 → 구역 40×16 (타일 8단위로 나누어떨어짐)
+	-- 구역 배치는 여백 포함 피치 48×32 → 맵 96×128
 	property number ZoneCols = 2
 
 	property number ZoneRows = 4
 
-	property number ZoneWidth = 48
+	property number ZoneWidth = 40
 
-	property number ZoneHeight = 28
+	property number ZoneHeight = 16
+
+	-- 구역 사이 여백. 뷰(42.66×24)가 구역(40×16)보다 커서 간격이 0이면 이웃 구역이 화면에 들어온다.
+	--   세로: 앵커가 구역 중앙보다 3.8 아래 → 아래로 15.8 / 위로 8.2가 보임.
+	--         간격 16(피치 32)이면 이웃 구역 경계가 아래 24 / 위 24 지점 → 각각 8.2 / 15.8 여유로 가려짐.
+	--   가로: 뷰 반폭 21.33, 이웃 구역 경계는 피치 48 기준 28 지점 → 6.67 여유
+	property number ZoneGapX = 8
+
+	property number ZoneGapY = 16
 
 	property number CellSize = 1
 
-	property number CameraViewWidth = 44.5
+	-- 카메라: 최대 줌아웃 + 앵커를 아래로 내려 구역이 HUD 위 밴드에 들어오게
+	--   엔진 하한이 30%(그 미만 값은 30으로 클램프, 실측 2026-08-18) → 뷰 42.66×24
+	property number CameraZoomPercent = 30
 
-	property number CameraViewHeight = 25
+	property number CameraOffsetY = -3.8
+
+	property number CameraViewWidth = 42.66
+
+	property number CameraViewHeight = 24
+
+	-- 스타디움 트랙 (사용자 스케치 기준). 텍스처 740×270(PPU 100) × scale 4.73 = 35.0 × 12.77
+	property number TrackOuterW = 35
+
+	property number TrackOuterH = 12.77
+
+	property number TrackTextureScale = 4.73
+
+	property number TrackCornerR = 2.37
+
+	property number TrackLaneHalf = 0.8
 
 	method number GetZoneCols()
 		return self.ZoneCols
@@ -32,12 +60,21 @@ script RtsConfigLogic extends Logic
 		return self.ZoneHeight
 	end
 
+	-- 구역 배치 간격(구역 크기 + 여백). 구역 중앙 좌표와 맵 크기의 기준
+	method number GetZonePitchX()
+		return self.ZoneWidth + self.ZoneGapX
+	end
+
+	method number GetZonePitchY()
+		return self.ZoneHeight + self.ZoneGapY
+	end
+
 	method number GetMapCellsX()
-		return self.ZoneCols * self.ZoneWidth
+		return self.ZoneCols * self:GetZonePitchX()
 	end
 
 	method number GetMapCellsY()
-		return self.ZoneRows * self.ZoneHeight
+		return self.ZoneRows * self:GetZonePitchY()
 	end
 
 	method number GetCameraViewWidth()
@@ -48,13 +85,43 @@ script RtsConfigLogic extends Logic
 		return self.CameraViewHeight
 	end
 
+	method number GetCameraZoomPercent()
+		return self.CameraZoomPercent
+	end
+
+	method number GetCameraOffsetY()
+		return self.CameraOffsetY
+	end
+
+	method number GetTrackOuterW()
+		return self.TrackOuterW
+	end
+
+	method number GetTrackOuterH()
+		return self.TrackOuterH
+	end
+
+	method number GetTrackTextureScale()
+		return self.TrackTextureScale
+	end
+
+	method number GetTrackCornerR()
+		return self.TrackCornerR
+	end
+
+	method number GetTrackLaneHalf()
+		return self.TrackLaneHalf
+	end
+
 	-- 구역 n(1~8, 위에서부터 행 우선: 1·2 / 3·4 / 5·6 / 7·8) → 구역 중앙 월드 좌표
 	method Vector2 GetZoneCenter(number n)
 		local idx = n - 1
 		local col = idx % self.ZoneCols
 		local row = math.floor(idx / self.ZoneCols)
-		local cx = col * self.ZoneWidth + self.ZoneWidth * 0.5
-		local cy = (self.ZoneRows - 1 - row) * self.ZoneHeight + self.ZoneHeight * 0.5
+		local pitchX = self:GetZonePitchX()
+		local pitchY = self:GetZonePitchY()
+		local cx = col * pitchX + pitchX * 0.5
+		local cy = (self.ZoneRows - 1 - row) * pitchY + pitchY * 0.5
 		return Vector2(cx, cy)
 	end
 
