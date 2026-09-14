@@ -19,8 +19,6 @@ script RtsZoneLogic extends Logic
 
 	property table PadList = {}
 
-	property string GridRUID = "f8bf4274602c4d22b2e6643e114fbc5f"
-
 	method number GetZoneCount()
 		return _RtsConfigLogic:GetZoneCols() * _RtsConfigLogic:GetZoneRows()
 	end
@@ -243,7 +241,7 @@ script RtsZoneLogic extends Logic
 		return e
 	end
 
-	-- 구역마다 그리드 텍스처 1장 (트랙+발판+S/E+복귀 화살표). 경계선 없음 — 구역 = 화면
+	-- 구역마다 그리드 텍스처 1장 (트랙+발판+S/E+복귀 화살표). 경계선 없음 — 구역 = 화면. 텍스처는 테마 프리셋이 정한다
 	@ExecSpace("ServerOnly")
 	method void EnsureZoneVisuals()
 		if self.VisualsBuilt then return end
@@ -258,16 +256,28 @@ script RtsZoneLogic extends Logic
 		local offX = _RtsConfigLogic:GetGridLeft() + _RtsConfigLogic:GetGridCols() * cell * 0.5
 		local offY = _RtsConfigLogic:GetGridTop() - _RtsConfigLogic:GetGridRows() * cell * 0.5
 		local scale = _RtsConfigLogic:GetGridTextureScale()
+		local ruid = _RtsThemeLogic:GetGridRUID()
 
 		for n = 1, self:GetZoneCount() do
 			local c = _RtsConfigLogic:GetZoneCenter(n)
-			local grid = self:SpawnProp("ZoneGrid" .. tostring(n), mapRoot, Vector2(c.x + offX, c.y + offY), self.GridRUID)
+			local grid = self:SpawnProp("ZoneGrid" .. tostring(n), mapRoot, Vector2(c.x + offX, c.y + offY), ruid)
 			if grid ~= nil then
 				grid.TransformComponent.Scale = Vector3(scale, scale, 1)
 			end
 		end
 		self.VisualsBuilt = true
 		log("RtsZone: visuals built (grid track x" .. tostring(self:GetZoneCount()) .. ")")
+	end
+
+	-- 테마 전환: 이미 세워진 8구역 그리드 스프라이트의 텍스처만 바꾼다 (RtsThemeLogic.ApplyPreset)
+	@ExecSpace("ServerOnly")
+	method void SetGridRUID(string ruid)
+		for n = 1, self:GetZoneCount() do
+			local grid = _EntityService:GetEntityByPath("/maps/RtsMap/ZoneGrid" .. tostring(n))
+			if grid ~= nil and grid.SpriteRendererComponent ~= nil then
+				grid.SpriteRendererComponent.SpriteRUID = ruid
+			end
+		end
 	end
 
 end

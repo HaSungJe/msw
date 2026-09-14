@@ -51,8 +51,8 @@ script RtsBootstrapLogic extends Logic
 		_RtsHudLogic:RefreshPlayerList(packed)
 	end
 
-	-- 동굴 바닥 채우기 (멱등). 타일 8유닛 → 맵 80×64 = 10×8 타일
-	--   가장자리 구역에서 뷰(42.66×24)가 맵 밖으로 최대 ~12유닛 넘어가므로 사방 1타일씩 여유를 둔다
+	-- 바닥 채우기 (멱등). 타일 8유닛 → 맵 96×128 = 12×16 타일, 사방 2타일 여유
+	--   어떤 타일로 채울지는 테마 프리셋(RtsThemeLogic)이 정한다
 	@ExecSpace("ServerOnly")
 	method void EnsureGroundTiles()
 		local tm = _EntityService:GetEntityByPath("/maps/RtsMap/RectTileMap")
@@ -65,8 +65,22 @@ script RtsBootstrapLogic extends Logic
 		local pad = 2
 		local need = (tilesX + pad * 2) * (tilesY + pad * 2)
 		if tilemap.TileCount >= need then return end
+		self:FillGroundTiles(_RtsThemeLogic:GetFloorTileName())
+	end
+
+	-- 바닥 전체를 주어진 타일(타일셋의 Name)로 다시 채운다 — 테마 전환도 이걸 쓴다
+	@ExecSpace("ServerOnly")
+	method void FillGroundTiles(string tileName)
+		local tm = _EntityService:GetEntityByPath("/maps/RtsMap/RectTileMap")
+		if tm == nil then return end
+		local tilemap = tm.RectTileMapComponent
+		if tilemap == nil then return end
+		local tileUnit = 8
+		local tilesX = _RtsConfigLogic:GetMapCellsX() / tileUnit
+		local tilesY = _RtsConfigLogic:GetMapCellsY() / tileUnit
+		local pad = 2
 		tilemap:Clear()
-		tilemap:BoxFill(1, Vector2Int(0 - pad, 0 - pad), Vector2Int(tilesX - 1 + pad, tilesY - 1 + pad))
+		tilemap:BoxFill(tileName, Vector2Int(0 - pad, 0 - pad), Vector2Int(tilesX - 1 + pad, tilesY - 1 + pad))
 	end
 
 end

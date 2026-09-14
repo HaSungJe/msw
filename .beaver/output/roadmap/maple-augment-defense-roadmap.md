@@ -48,7 +48,7 @@ flowchart LR
 
 동시 가능: Phase 5·Phase 7
 
-지금: **Phase 1 재작업 — 화면 v2**(#2·#4 교체 + #18/#23 팝업 껍데기 선행) · plan: `.beaver/output/plan/rts-base/screen-v2-plan.md` · Next up: Phase 2
+지금: 진행 중 없음 (Phase 1 화면 v2 완료 2026-09-14 — 이후 화면 요소는 이 위에 추가) · Next up: Phase 2
 
 ## Scope & Actors
 - **플레이어(1~8)** — 자기 구역에서 유닛 영입·배치·레벨업, 증강 선택(전부 팝업). F1~F8로 다른 유저 구역 관전. **탈락 후에는 관전을 계속하거나 방을 나가 새 판을 시작할 수 있다.**
@@ -71,18 +71,18 @@ flowchart LR
 | # | Unit | Goal | Key decision | Depends | Status |
 |---|------|------|--------------|---------|--------|
 | 1 | 탑다운 맵·타일 기반 | RectTile 탑다운 + 커스텀 바닥 타일 파이프라인 | — | — | done |
-| 2 | HUD v2 (구 스타식 HUD 셸) | ~~미니맵·초상화·유닛정보·스킬칸 3×3·툴팁·부대탭~~ → **하단 전부 제거**, 좌상단 시간·메소 칩, 좌측 플레이어 목록(n/8·생존/탈락·나 표시·클릭→그 구역), 우측 영입 버튼 + 유닛 슬롯 6, 좌하단 증강 버튼. 팝업 공통 셸(#18)도 여기서 선행. 목업: `.info/artifacts/hud-layout.html` v16 | — | 1 | **in-progress**(2026-09-14 화면 v2 재작업 — v1 done이었음. build 완료 — report: `.beaver/output/report/rts-base/screen-v2-report.md`, 사용자 확인 루프 중) |
+| 2 | HUD v2 (구 스타식 HUD 셸) | ~~미니맵·초상화·유닛정보·스킬칸 3×3·툴팁·부대탭~~ → **하단 전부 제거**, 좌상단 시간·메소 칩, 좌측 플레이어 목록(n/8·생존/탈락·나 표시·클릭→그 구역), 우측 영입 버튼 + 유닛 슬롯 6, 좌하단 증강 버튼. 팝업 공통 셸(#18)도 여기서 선행. 목업: `.info/artifacts/hud-layout.html` v16 | — | 1 | **done**(2026-09-14 화면 v2 — 사용자 확인 "프로토타입 완료". report: `.beaver/output/report/rts-base/screen-v2-report.md`. 이후 요소는 이 화면 위에 추가) |
 | 3 | 구역 카메라(F1~F8) | 구역 시점 전환 전용 카메라, 자유 카메라 제거, 미니맵 2×4 | — | 1, 2 | done |
-| 4 | 구역 시스템 | 8구역 구획·배정(서버 권위) 유지. ~~스타디움 트랙~~ → **그리드 트랙 18×12**(칸 1.78유닛, 목업 경로 그대로 — 트랙 65칸·발판 81칸·교차 2, S→E 후 S로 순간이동, t=0~1 구간 정규화), 발판 = 트랙 4방향 면접 칸, 8방향 칸 거리, 보스 자리 = 구역 중앙. 구역 = 화면(42.66×24), 경계선 제거 | — | 3 | **in-progress**(2026-09-14 화면 v2 재작업 — v1 done이었음. build 완료 — 같은 report, 사용자 확인 루프 중) |
+| 4 | 구역 시스템 | 8구역 구획·배정(서버 권위) 유지. ~~스타디움 트랙~~ → **그리드 트랙 18×12**(칸 1.78유닛, 목업 경로 그대로 — 트랙 65칸·발판 81칸·교차 2, S→E 후 S로 순간이동, t=0~1 구간 정규화), 발판 = 트랙 4방향 면접 칸, 8방향 칸 거리, 보스 자리 = 구역 중앙. 구역 = 화면(42.66×24), 경계선 제거 | — | 3 | **done**(2026-09-14 화면 v2 — 그리드 트랙 + **트랙/타일 테마 프리셋**(`RtsThemeLogic`, 기본 헤네시스·보관 엘나스). 같은 report) |
 
 **Expected scenes/systems**:
 
 | Unit | Scene·System | Trigger | Purpose |
 |------|--------------|---------|---------|
 | #1 | `RtsMap` + `CaveFloorTileSet` + `RtsBootstrapLogic` | 입장 | 탑다운 무대·바닥 |
-| #2 | `RtsHudLogic` (`SetSkillSlot`/`ClearSkillSlots`/`UpdateMinimapZone`) | 입장 | HUD 전체 |
+| #2 | `RtsHudLogic` (`SetTime`/`SetMeso`/`RefreshPlayerList`/`SetPlayerAlive`/`SetWatchedZone`/`SetUnitSlot`) + `RtsPopupLogic` (`Open`/`Close`) | 입장 · 버튼 | HUD 전체 + 팝업 셸 |
 | #3 | `RtsCameraAnchorComponent` + `RtsConfigLogic` | F1~F8 / 미니맵 클릭 | 구역 시점 전환 |
-| #4 | `RtsZoneLogic` (`GetTrackPoint(zone,t)`/`GetSpawnPoint`/`GetPlacementSlot`/`AssignZone`) | 입장 | 구역·트랙 좌표계 |
+| #4 | `RtsZoneLogic` (`GetTrackPoint(zone,t)`/`GetSpawnPoint`/`GetPlacementSlot`/`CellDistance`/`AssignZone`) + `RtsThemeLogic` (`GetPresets`/`ApplyPreset`) | 입장 · 테마 전환 | 구역·트랙 좌표계 · 트랙/타일 테마 프리셋 |
 
 > 근거: `.beaver/output/report/rts-base/{topdown-camera-rig,hud-shell,zone-camera,zone-system}-report.md`
 
@@ -251,7 +251,7 @@ flowchart LR
 |---|------|------|--------------|---------|--------|
 | 33 | 유닛·보스 비주얼 정리 | 10직업 비주얼(4차 고정이라 직업당 1종), 보스 스프라이트 | 소싱 방식(공식 리소스 vs 자체 생성) | 25 | todo |
 | 34 | HUD 테마 재조정 | 눈 테마에 맞춘 프레임 톤, **티어별(브론즈~챌린저) 프레임** | 랭크 시스템 도입 여부 | 2 | todo |
-| 35 | ~~지역별 풍경 전환~~ | — | — | — | dropped(2026-09-14 — 스테이지에 따른 트랙/맵 컨셉 변경 없음. **맵 컨셉은 나중에 과금 요소**로 검토) |
+| 35 | ~~지역별 풍경 전환~~ | — | — | — | dropped(2026-09-14 — 스테이지에 따른 트랙/맵 컨셉 변경 없음. **맵 컨셉은 나중에 과금 요소**로 검토 — 그때 `RtsThemeLogic` 프리셋에 테마를 추가하고 선택 UI만 붙이면 됨) |
 | 36 | 스테이지별 BGM·몬스터 스킨 | 스테이지(맵)마다 BGM 1곡 + 몬스터별 이동/사망 스킨(애니메이션 클립 RUID 2개)을 테이블에 연결. 원본 목록은 사용자가 정리 중 | 스테이지 전환 시 BGM 크로스페이드 여부 | 7, 9 | todo |
 
 ### Dropped (이전 컨셉 잔재 — 기록용)
@@ -261,7 +261,7 @@ flowchart LR
 | — | 조합/합성 | dropped(2026-08-07 합성 없음 확정) |
 | — | 밭(수익건물) 경제 | dropped(2026-09-09 — 메소는 몬스터 스테이지·보스 보상으로 확정) |
 
-**Progress**: 4/34 units done (1/10 phases, dropped 제외)
+**Progress**: 4/34 units done (1/10 phases, dropped 제외) — Phase 1은 화면 v2로 재작업 후 2026-09-14 재확인
 **Next up**: Phase 2 전투 데이터 테이블 — Phase 1 완료로 의존 충족. 속성·직업·스테이지·경제 네 테이블이 Phase 3~6 전부의 선행 조건이라 여기부터 열어야 뒤가 병렬로 풀린다. 시작: `/beaver:direct 전투 데이터 테이블`
 
 ## 결정 대기 → 확정 (2026-09-14, 아티팩트 v16으로 #1~#3 확정 → 화면 v2 착수)
@@ -282,7 +282,8 @@ flowchart LR
 - **모든 판정은 서버** — 메소, 영입가·레벨업가, 증강 결정, 몹 스폰·누적, 탈락, 클리어는 `@ExecSpace("Server")`. 클라는 입력·표시만.
 - **밸런스 수치는 Phase 2 테이블 일원화** — 어떤 Phase도 스탯·가격·확률·배율을 코드에 하드코딩하지 않는다. 난이도 %는 테이블 위에 곱한다.
 - **메소는 처치에서만** — 시간 경과·스테이지 클리어·보스로는 메소가 들어오지 않는다. 드랍은 100%.
-- **구역 좌표는 `RtsZoneLogic` 경유** — 구역 인덱스↔월드 좌표, 트랙 위치(`t`), 배치 슬롯은 단일 소스.
+- **구역 좌표는 `RtsZoneLogic` 경유** — 구역 인덱스↔월드 좌표, 트랙 위치(`t`), 발판(배치 슬롯)은 단일 소스.
+- **트랙/타일은 테마 프리셋** — 바닥 타일 + 그리드 트랙 텍스처 묶음을 `RtsThemeLogic` 프리셋 표에서만 정의·전환한다(기본 헤네시스, 보관 엘나스). 코드 어디에도 타일 이름·트랙 RUID를 직접 쓰지 않는다. 프리셋 선택 UI·과금은 나중(맵 컨셉 과금 검토와 함께).
 - **HUD 갱신은 `RtsHudLogic` API 경유** — 스킬칸/초상화/유닛정보/골드·시간 직접 UI 조작 금지.
 - **데미지는 단일 경로** — 모든 피해는 `RtsCombatLogic:ResolveDamage`를 통과(공격력 → 증강 modifier). 상성 계산 없음. 우회 계산 금지.
 - **특수 행동은 전부 팝업** — 영입·레벨업·증강 등은 화면 옆 버튼 또는 유닛 클릭으로 여는 팝업에서 처리. 상시 노출 패널을 늘리지 않는다(#18의 공통 셸 재사용).

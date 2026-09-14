@@ -55,3 +55,9 @@ Play Test(2026-09-14, 콜드 스타트 3회) — `maker_logs(build)` 0건, 런�
 - **변경**: 바닥 타일 엘나스 눈 → **헤네시스 잔디**(`tools/gen-henesys-floor.js` → `assets/textures/henesys-grass.png`, RUID `d908c425553c42c5b11016ab40b306f4`, `CaveFloorTileSet.tileset` datas[0] 교체). 트랙은 헤네시스 포석 유지, 잔디 위에서 읽히도록 그리드 텍스처 색만 재생성(빈 칸 선 짙은 초록·발판 흰 반투명, RUID `f8bf4274602c4d22b2e6643e114fbc5f` → `RtsZoneLogic.GridRUID`). 아티팩트 v17(`.ground` 잔디 톤·`.cell/.pad` 색) 같은 URL로 재발행, `.info/artifacts/hud-layout.html` 동기화. README 갱신(눈·회청판은 보관).
 - **검증**: Play Test 콜드 스타트 — 잔디 바닥 + 포석 트랙, 그리드 위치·크기 불변, 빌드/런타임 에러 없음. 스크린샷이 아티팩트 v17과 같은 톤.
 - **남은 것**: 없음(사용자 확인 대기).
+
+## Change - 260914-2 · 트랙/타일 테마 프리셋 + 프로토타입 완료
+- **요청**: "화면은 일단 만족. 추가 요소는 저기서 추가. 프로토타입 완료. 단, 트랙/타일은 프리셋 가능하도록"
+- **변경**: `RtsThemeLogic`(신규) — 프리셋 표 `{key, name, floorTile, gridRUID}`(henesys 기본·elnath 보관), `GetPreset/GetFloorTileName/GetGridRUID`, 서버 `ApplyPreset(key)`(바닥 재채움 + 8구역 그리드 스프라이트 RUID 교체, 없는 키는 false). `CaveFloorTileSet`에 잔디·눈 타일 둘 다 등록, `RtsBootstrapLogic.EnsureGroundTiles`는 프리셋 타일 **이름**으로 채움(`FillGroundTiles(name)` 분리), `RtsZoneLogic`의 `GridRUID` 프로퍼티 삭제 → 프리셋에서 읽고 `SetGridRUID`로 교체. 아티팩트 v18 — 헤더 "테마" 선택(헤네시스/엘나스), `.stage[data-theme]` 변수 한 벌씩. 로드맵 #2·#4 done, Cross-Cutting에 "트랙/타일은 테마 프리셋" 규칙 추가, README에 새 테마 추가 절차.
+- **검증**: Play Test — 기본 헤네시스로 시작 → 서버 `ApplyPreset("elnath")` → 눈 바닥 + 회청 그리드로 즉시 전환(스크린샷) → `ApplyPreset("henesys")` 복귀 → 알 수 없는 키 `ludibrium`은 false + 로그. 빌드/런타임 에러 없음.
+- **남은 것**: 프리셋 선택 UI·과금 연결(로드맵 #35 메모대로 나중). 새 테마는 README "테마 프리셋" 절차대로 4곳에 한 줄씩.

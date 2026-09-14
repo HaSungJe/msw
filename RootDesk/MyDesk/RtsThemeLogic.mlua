@@ -1,0 +1,61 @@
+-- rts-base: 트랙/타일 테마 프리셋 (2026-09-14 사용자 지시 — "트랙/타일은 프리셋 가능하도록")
+--   프리셋 = 바닥 타일 이름(CaveFloorTileSet 안의 Name) + 그리드 트랙 텍스처 RUID 묶음.
+--   기본은 헤네시스. 프리셋 선택 UI·과금은 나중(로드맵 Phase 10 이후) — 여기는 단일 소스와 적용 함수만.
+--   적용은 서버가 한다(타일·프롭이 서버 소유). 클라는 GetActiveKey/GetPreset로 읽기만.
+@Logic
+script RtsThemeLogic extends Logic
+
+	property string ActiveKey = "henesys"
+
+	-- 프리셋 표. 새 테마 = 여기 한 줄 + 타일셋에 타일 1개 + 그리드 텍스처 1장(assets/textures/README.md 절차)
+	method table GetPresets()
+		return {
+			{ key = "henesys", name = "헤네시스", floorTile = "HenesysGrassFloor", gridRUID = "f8bf4274602c4d22b2e6643e114fbc5f" },
+			{ key = "elnath", name = "엘나스", floorTile = "ElnathSnowFloor", gridRUID = "651583e1c1ee44cdb6d2a891755ab528" },
+		}
+	end
+
+	method table GetPresetKeys()
+		local keys = {}
+		local list = self:GetPresets()
+		for i = 1, #list do keys[i] = list[i].key end
+		return keys
+	end
+
+	-- 없는 키면 첫 번째(기본) 프리셋
+	method table GetPreset(string key)
+		local list = self:GetPresets()
+		for i = 1, #list do
+			if list[i].key == key then return list[i] end
+		end
+		return list[1]
+	end
+
+	method string GetActiveKey()
+		return self.ActiveKey
+	end
+
+	method string GetFloorTileName()
+		return self:GetPreset(self.ActiveKey).floorTile
+	end
+
+	method string GetGridRUID()
+		return self:GetPreset(self.ActiveKey).gridRUID
+	end
+
+	-- 프리셋 전환: 바닥 타일 다시 채우고 8구역 그리드 스프라이트 교체. 입장 전(시각화 전)에 불러도 안전
+	@ExecSpace("ServerOnly")
+	method boolean ApplyPreset(string key)
+		local preset = self:GetPreset(key)
+		if preset.key ~= key then
+			log("RtsTheme: unknown preset " .. key)
+			return false
+		end
+		self.ActiveKey = preset.key
+		_RtsBootstrapLogic:FillGroundTiles(preset.floorTile)
+		_RtsZoneLogic:SetGridRUID(preset.gridRUID)
+		log("RtsTheme: applied " .. preset.key)
+		return true
+	end
+
+end
