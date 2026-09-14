@@ -1,4 +1,4 @@
--- rts-base bootstrap (rev3b — #4 구역 배정/시각화)
+-- rts-base bootstrap (화면 v2 — 구역 배정/그리드 시각화/플레이어 목록 통지)
 @Logic
 script RtsBootstrapLogic extends Logic
 
@@ -14,17 +14,41 @@ script RtsBootstrapLogic extends Logic
 		self:EnsureGroundTiles()
 		_RtsZoneLogic:EnsureZoneVisuals()
 
-		-- 구역 배정 후 해당 클라에만 통지
+		-- 구역 배정 후 해당 클라에만 통지, 플레이어 목록은 전 클라에 통지
 		local zone = _RtsZoneLogic:AssignZone(userId)
 		if zone > 0 then
 			userEntity.RtsCameraAnchorComponent:ApplyAssignedZone(zone, userId)
 		end
+		self:BroadcastPlayerList()
 	end
 
 	@ExecSpace("ServerOnly")
 	@EventSender("Service", "UserService")
 	handler HandleUserLeaveEvent(UserLeaveEvent event)
 		_RtsZoneLogic:ReleaseZone(event.UserId)
+		self:BroadcastPlayerList()
+	end
+
+	-- 배정 현황 → "userId(탭)닉네임(탭)구역(탭)생존" 줄바꿈 구분(구역순) → 모든 클라의 HUD 플레이어 목록 갱신
+	--   생존은 탈락 판정(Phase 3 #13)이 생기기 전까지 항상 1
+	@ExecSpace("ServerOnly")
+	method void BroadcastPlayerList()
+		local rows = {}
+		for userId, zone in pairs(_RtsZoneLogic.ZoneByUser) do
+			local nick = userId
+			local e = _UserService:GetUserEntityByUserId(userId)
+			if e ~= nil and e.PlayerComponent ~= nil and e.PlayerComponent.Nickname ~= "" then
+				nick = e.PlayerComponent.Nickname
+			end
+			rows[#rows + 1] = { zone = zone, line = userId .. "\t" .. nick .. "\t" .. tostring(zone) .. "\t1" }
+		end
+		table.sort(rows, function(a, b) return a.zone < b.zone end)
+		local packed = ""
+		for i = 1, #rows do
+			if i > 1 then packed = packed .. "\n" end
+			packed = packed .. rows[i].line
+		end
+		_RtsHudLogic:RefreshPlayerList(packed)
 	end
 
 	-- 동굴 바닥 채우기 (멱등). 타일 8유닛 → 맵 80×64 = 10×8 타일

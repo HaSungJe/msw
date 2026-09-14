@@ -1,0 +1,434 @@
+-- rts-base 화면 v2: 팝업 공통 셸 + 영입/증강/보스 3택1 껍데기 (아티팩트 v16)
+--   셸: 딤(클릭=닫기) + 중앙 패널(금색 테두리·제목·닫기 X). ESC로 닫힘. 한 번에 하나.
+--   내용은 보이는 것만 — 영입·증강 로직은 Phase 5·6. 3택1은 트리거가 없어 B 키 미리보기(Phase 6에서 제거).
+--   UI 헬퍼는 RtsHudLogic 것을 쓴다. 좌표는 1920×1080 기준(목업 1cqw = 19.2px).
+@Logic
+script RtsPopupLogic extends Logic
+
+	property boolean Built = false
+
+	property Entity Group = nil
+
+	property Entity Dim = nil
+
+	property Entity Panel = nil
+
+	property Entity PanelOuter = nil
+
+	property Entity Title = nil
+
+	property Entity CloseBtn = nil
+
+	property Entity Body = nil
+
+	property string Kind = ""
+
+	property number PanelW = 1114
+
+	-- 3택1 카드 상태: 카드 i → {chips, chosen, btn, btnText, units}
+	property table Pick = {}
+
+	-- 증강 탭 상태
+	property table AugTabs = {}
+
+	-- ===== 셸 =====
+
+	@ExecSpace("ClientOnly")
+	method void Build(Entity ui)
+		if self.Built then return end
+		local H = _RtsHudLogic
+		local grp = _SpawnService:SpawnByModelId("model://uigroup", "RtsPopupGroup", Vector3.zero, ui)
+		if grp == nil then
+			log("RtsPopup: group spawn failed")
+			return
+		end
+		if grp.UIGroupComponent ~= nil then grp.UIGroupComponent.DefaultShow = true end
+		self.Group = grp
+
+		local dim = H:SpawnStretch("model://uibutton", "RtsPopupDim", grp, Vector2(0, 0), Vector2(1, 1), Vector2(0, 0), Vector2(0, 0))
+		H:Tint(dim, 0.039, 0.047, 0.063, 0.45)
+		dim:ConnectEvent(ButtonClickEvent, function(event)
+			if self.Kind ~= "pick" then self:Close() end
+		end)
+		self.Dim = dim
+
+		local panel = H:SpawnPanel("RtsPopupPanel", grp, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2(0, 0), Vector2(self.PanelW, 500),
+			Color(0.11, 0.094, 0.075, 0.96), Color(0.788, 0.635, 0.29, 1), 2.3)
+		self.Panel = panel
+		self.PanelOuter = panel.Parent
+
+		self.Title = H:SpawnLabel("RtsPopupTitle", panel, Vector2(0, 1), Vector2(0, 1), Vector2(27, -20), Vector2(600, 36),
+			"", H:ColInk(), 27, TextAlignmentType.MiddleLeft, true)
+		local x = H:SpawnPanel("RtsPopupClose", panel, Vector2(1, 1), Vector2(1, 1), Vector2(-27, -20), Vector2(38, 38),
+			self:Base(), self:Mix(H:ColGold(), 0.5), 1.5)
+		H:SpawnLabel("RtsPopupCloseX", x, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2(0, 0), Vector2(36, 36),
+			"X", H:ColInk(), 20, TextAlignmentType.MiddleCenter, true)
+		local xc = H:SpawnClick("RtsPopupCloseClick", x)
+		xc:ConnectEvent(ButtonClickEvent, function(event)
+			self:Close()
+		end)
+		self.CloseBtn = x.Parent
+
+		grp:SetEnable(false)
+		self.Built = true
+	end
+
+	method boolean IsOpen()
+		return self.Kind ~= ""
+	end
+
+	@ExecSpace("ClientOnly")
+	method void Open(string kind)
+		if not self.Built then return end
+		if self.Kind ~= "" then self:Close() end
+		if kind ~= "recruit" and kind ~= "augment" and kind ~= "pick" then
+			log("RtsPopup: unknown kind " .. kind)
+			return
+		end
+		self.Kind = kind
+		local H = _RtsHudLogic
+		local height = 500
+		local title = ""
+		if kind == "recruit" then
+			height = 430
+			title = "영입"
+		elseif kind == "augment" then
+			height = 960
+			title = "증강"
+		else
+			height = 520
+			title = "보스 처치 — 증강 선택"
+		end
+		self.PanelOuter.UITransformComponent.RectSize = Vector2(self.PanelW, height)
+		self.Title.TextComponent.Text = title
+		self.CloseBtn:SetEnable(kind ~= "pick")
+
+		-- body는 열 때마다 새로 만든다 (닫을 때 통째로 제거)
+		local body = H:SpawnStretch("model://uisprite", "RtsPopupBody", self.Panel, Vector2(0, 0), Vector2(1, 1), Vector2(0, 0), Vector2(0, -70))
+		H:Tint(body, 0, 0, 0, 0)
+		self.Body = body
+
+		if kind == "recruit" then
+			self:BuildRecruit(body)
+		elseif kind == "augment" then
+			self:BuildAugment(body)
+		else
+			self:BuildPick(body)
+		end
+		self.Group:SetEnable(true)
+	end
+
+	@ExecSpace("ClientOnly")
+	method void Close()
+		if self.Kind == "" then return end
+		self.Kind = ""
+		self.Pick = {}
+		self.AugTabs = {}
+		if self.Body ~= nil then
+			self.Body:Destroy()
+			self.Body = nil
+		end
+		if self.Group ~= nil then self.Group:SetEnable(false) end
+	end
+
+	@ExecSpace("ClientOnly")
+	@EventSender("Service", "InputService")
+	handler HandleKeyDownEvent(KeyDownEvent event)
+		if not self.Built then return end
+		if event.key == KeyboardKey.Escape then
+			if self.Kind ~= "" and self.Kind ~= "pick" then self:Close() end
+		elseif event.key == KeyboardKey.B then
+			-- 3택1 미리보기 (트리거는 Phase 6/7 — 그때 이 키는 제거)
+			if self.Kind ~= "pick" then self:Open("pick") end
+		end
+	end
+
+	-- ===== 공용 조각 =====
+
+	-- 작은 탭/버튼 (테두리 + 배경 + 글자). on이면 금색
+	@ExecSpace("ClientOnly")
+	method Entity SpawnTab(string name, Entity parent, Vector2 pos, Vector2 size, string text, boolean on, number fontSize)
+		local H = _RtsHudLogic
+		local bg = self:Mix(Color.white, 0.04)
+		local border = self:Mix(Color.white, 0.12)
+		local ink = Color(0.851, 0.796, 0.651, 1)
+		if on then
+			bg = self:Mix(H:ColGold(), 0.18)
+			border = H:ColGold()
+			ink = Color(0.973, 0.925, 0.784, 1)
+		end
+		local t = H:SpawnPanel(name, parent, Vector2(0, 1), Vector2(0, 1), pos, size, bg, border, 1.5)
+		H:SpawnLabel(name .. "Text", t, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2(0, 0), Vector2(size.x - 6, size.y - 4),
+			text, ink, fontSize, TextAlignmentType.MiddleCenter, true)
+		return t
+	end
+
+	-- 패널 배경색 위에 반투명 색을 미리 합성한 불투명 색 (테두리 백킹이 비쳐 보이지 않게)
+	method Color Base()
+		return Color(0.11, 0.094, 0.075, 1)
+	end
+
+	method Color Mix(Color top, number a)
+		local b = self:Base()
+		return Color(b.r + (top.r - b.r) * a, b.g + (top.g - b.g) * a, b.b + (top.b - b.b) * a, 1)
+	end
+
+	method Color GradeColor(string g)
+		if g == "bronze" then return Color(0.722, 0.451, 0.2, 1) end
+		if g == "silver" then return Color(0.725, 0.761, 0.8, 1) end
+		if g == "gold" then return Color(0.878, 0.725, 0.353, 1) end
+		if g == "prism" then return Color(0.769, 0.549, 0.941, 1) end
+		return Color(0.541, 0.498, 0.439, 1)
+	end
+
+	method string GradeName(string g)
+		if g == "bronze" then return "브론즈" end
+		if g == "silver" then return "실버" end
+		if g == "gold" then return "골드" end
+		if g == "prism" then return "프리즘" end
+		return "전체"
+	end
+
+	-- 등급 배지
+	@ExecSpace("ClientOnly")
+	method Entity SpawnBadge(string name, Entity parent, Vector2 pos, string g)
+		local H = _RtsHudLogic
+		local c = self:GradeColor(g)
+		local b = H:SpawnUI("model://uisprite", name, parent, Vector2(0, 1), Vector2(0, 1), pos, Vector2(64, 22))
+		b.SpriteGUIRendererComponent.Color = Color(c.r, c.g, c.b, 0.3)
+		local ink = Color(1, 1, 1, 1)
+		if g == "bronze" then ink = Color(0.886, 0.627, 0.416, 1) end
+		if g == "silver" then ink = Color(0.875, 0.902, 0.933, 1) end
+		if g == "gold" then ink = Color(0.953, 0.851, 0.541, 1) end
+		H:SpawnLabel(name .. "Text", b, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2(0, 0), Vector2(62, 20),
+			self:GradeName(g), ink, 13, TextAlignmentType.MiddleCenter, true)
+		return b
+	end
+
+	-- ===== 영입: 직업군 탭 + 계열 4묶음 × 직업 10종 + 보유 0/6 =====
+
+	@ExecSpace("ClientOnly")
+	method void BuildRecruit(Entity body)
+		local H = _RtsHudLogic
+		self:SpawnTab("RtsRcCatAdv", body, Vector2(27, -10), Vector2(100, 36), "모험가", true, 17)
+		local ph = self:SpawnTab("RtsRcCatPh", body, Vector2(137, -10), Vector2(60, 36), "…", false, 17)
+		ph.SpriteGUIRendererComponent.Color = self:Mix(Color.white, 0.02)
+		ph.Parent.SpriteGUIRendererComponent.Color = self:Mix(H:ColGold(), 0.2)
+
+		local groups = {
+			{ "전사", { "히어로", "팔라딘", "다크나이트" } },
+			{ "궁수", { "보우마스터", "신궁" } },
+			{ "마법사", { "아크메이지(썬·콜)", "아크메이지(불·독)", "비숍" } },
+			{ "도적", { "나이트로드", "섀도어" } },
+		}
+		local colW = 250
+		local gap = 19
+		local top = -66
+		for gi = 1, #groups do
+			local gx = 27 + (gi - 1) * (colW + gap)
+			local g = groups[gi]
+			H:SpawnLabel("RtsRcGroup" .. tostring(gi), body, Vector2(0, 1), Vector2(0, 1), Vector2(gx, top), Vector2(colW, 26),
+				g[1], H:ColGold(), 18, TextAlignmentType.MiddleLeft, true)
+			local line = H:SpawnUI("model://uisprite", "RtsRcGroupLine" .. tostring(gi), body, Vector2(0, 1), Vector2(0, 1), Vector2(gx, top - 30), Vector2(colW, 1.5))
+			line.SpriteGUIRendererComponent.Color = H:ColBorderSoft()
+			local jobs = g[2]
+			for ji = 1, #jobs do
+				local jy = top - 42 - (ji - 1) * 48
+				local card = H:SpawnPanel("RtsRcJob" .. tostring(gi) .. "_" .. tostring(ji), body, Vector2(0, 1), Vector2(0, 1), Vector2(gx, jy), Vector2(colW, 40),
+					self:Mix(Color.white, 0.04), self:Mix(Color.white, 0.08), 1.5)
+				H:SpawnLabel("RtsRcJobName", card, Vector2(0, 0.5), Vector2(0, 0.5), Vector2(13, 0), Vector2(170, 30),
+					jobs[ji], H:ColInk(), 19, TextAlignmentType.MiddleLeft, false)
+				-- 다음 영입가: 1기 무료 → 500 → 2,000 → 5,000 → 10,000 → 30,000 (Phase 2 테이블로 교체 예정)
+				H:SpawnLabel("RtsRcJobPrice", card, Vector2(1, 0.5), Vector2(1, 0.5), Vector2(-13, 0), Vector2(70, 30),
+					"무료", H:ColMuted(), 15, TextAlignmentType.MiddleRight, false)
+				local jobName = jobs[ji]
+				local click = H:SpawnClick("RtsRcJobClick", card)
+				click:ConnectEvent(ButtonClickEvent, function(event)
+					log("RtsPopup: recruit " .. jobName .. " (영입 로직은 Phase 5)")
+				end)
+			end
+		end
+		H:SpawnLabel("RtsRcFoot", body, Vector2(1, 0), Vector2(1, 0), Vector2(-27, 22), Vector2(300, 26),
+			"보유 0 / 6", Color(0.851, 0.796, 0.651, 1), 16, TextAlignmentType.MiddleRight, false)
+	end
+
+	-- ===== 증강: 등급 탭 5 + 목록(비어 있음) + 상세 =====
+
+	@ExecSpace("ClientOnly")
+	method void BuildAugment(Entity body)
+		local H = _RtsHudLogic
+		local grades = { "all", "bronze", "silver", "gold", "prism" }
+		self.AugTabs = {}
+		for i = 1, #grades do
+			local g = grades[i]
+			local tab = self:SpawnTab("RtsAugTab" .. g, body, Vector2(27 + (i - 1) * 118, -10), Vector2(110, 34),
+				self:GradeName(g) .. " 0", i == 1, 16)
+			self.AugTabs[i] = tab
+			local click = H:SpawnClick("RtsAugTabClick", tab)
+			local idx = i
+			click:ConnectEvent(ButtonClickEvent, function(event)
+				self:SelectAugTab(idx)
+			end)
+		end
+
+		local listW = 567
+		local top = -60
+		local list = H:SpawnStretch("model://uisprite", "RtsAugList", body, Vector2(0, 0), Vector2(0, 1), Vector2(27, 27), Vector2(27 + listW, top))
+		list.SpriteGUIRendererComponent.Color = self:Mix(Color.white, 0.02)
+		H:SpawnLabel("RtsAugEmpty", list, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2(0, 0), Vector2(400, 40),
+			"아직 얻은 증강이 없어요", H:ColMuted(), 17, TextAlignmentType.MiddleCenter, false)
+
+		local dx = 27 + listW + 23
+		local detail = H:SpawnPanel("RtsAugDetail", body, Vector2(0, 1), Vector2(0, 1), Vector2(dx, top), Vector2(self.PanelW - dx - 27, 960 - 70 - 60 - 27),
+			self:Mix(Color.white, 0.03), self:Mix(H:ColGold(), 0.25), 1.5)
+		H:SpawnLabel("RtsAugDetailK1", detail, Vector2(0, 1), Vector2(0, 1), Vector2(19, -17), Vector2(200, 20),
+			"증강", H:ColMuted(), 13, TextAlignmentType.MiddleLeft, false)
+		H:SpawnLabel("RtsAugDetailT", detail, Vector2(0, 1), Vector2(0, 1), Vector2(19, -42), Vector2(420, 32),
+			"—", H:ColInk(), 23, TextAlignmentType.MiddleLeft, true)
+		H:SpawnLabel("RtsAugDetailD", detail, Vector2(0, 1), Vector2(0, 1), Vector2(19, -84), Vector2(420, 60),
+			"증강을 얻으면 여기에 등급·효과가 보여요", Color(0.902, 0.863, 0.769, 1), 16, TextAlignmentType.UpperLeft, false)
+		H:SpawnLabel("RtsAugDetailK2", detail, Vector2(0, 1), Vector2(0, 1), Vector2(19, -160), Vector2(200, 20),
+			"적용 유닛", H:ColMuted(), 13, TextAlignmentType.MiddleLeft, false)
+		H:SpawnLabel("RtsAugDetailU", detail, Vector2(0, 1), Vector2(0, 1), Vector2(19, -185), Vector2(420, 26),
+			"— (미지정은 등급 뒤 빨간 !, 1번만 지정 가능)", H:ColMuted(), 14, TextAlignmentType.MiddleLeft, false)
+
+		H:SpawnLabel("RtsAugFoot", body, Vector2(1, 0), Vector2(1, 0), Vector2(-27, 4), Vector2(600, 22),
+			"전체 0개 · 목록은 스크롤 · 증강 내용은 Phase 6", Color(0.851, 0.796, 0.651, 1), 14, TextAlignmentType.MiddleRight, false)
+	end
+
+	@ExecSpace("ClientOnly")
+	method void SelectAugTab(number idx)
+		local H = _RtsHudLogic
+		local grades = { "all", "bronze", "silver", "gold", "prism" }
+		for i = 1, #self.AugTabs do
+			local t = self.AugTabs[i]
+			local on = (i == idx)
+			local c = self:GradeColor(grades[i])
+			if grades[i] == "all" then c = H:ColGold() end
+			if on then
+				t.SpriteGUIRendererComponent.Color = self:Mix(c, 0.18)
+				t.Parent.SpriteGUIRendererComponent.Color = c
+			else
+				t.SpriteGUIRendererComponent.Color = self:Mix(Color.white, 0.04)
+				t.Parent.SpriteGUIRendererComponent.Color = self:Mix(Color.white, 0.12)
+			end
+		end
+	end
+
+	-- ===== 보스 처치 3택1: 카드 3장, 대상 칩(선택), 대상 없이 수령 =====
+
+	@ExecSpace("ClientOnly")
+	method void BuildPick(Entity body)
+		local H = _RtsHudLogic
+		H:SpawnLabel("RtsPickSub", body, Vector2(0, 1), Vector2(0, 1), Vector2(27, -4), Vector2(900, 24),
+			"3개 중 1개. 대상 유닛은 지금 골라도 되고, 안 고르고 받아도 됨 (나중에 증강창에서 1번 지정)", H:ColMuted(), 15, TextAlignmentType.MiddleLeft, false)
+
+		-- 예시 후보(내용은 Phase 6 증강 설계)
+		local offers = {
+			{ g = "silver", t = "공격력 +12%", d = "이 유닛의 공격력이 12% 오른다." },
+			{ g = "bronze", t = "드랍 메소 +3%", d = "이 유닛이 처치한 몹의 메소가 3% 늘어난다." },
+			{ g = "gold", t = "광역 스킬 사거리 +1", d = "제네시스·블리자드 등 광역 스킬 범위가 6칸에서 7칸으로." },
+		}
+		-- 예시 유닛(영입된 유닛 목록은 Phase 4/5)
+		local units = {
+			{ no = 1, name = "히어로", s = "war" }, { no = 2, name = "보우마스터", s = "arc" }, { no = 3, name = "비숍", s = "mag" },
+			{ no = 4, name = "나이트로드", s = "thf" }, { no = 5, name = "보우마스터", s = "arc" },
+		}
+		local cardW = 340
+		local gap = 19
+		self.Pick = {}
+		for ci = 1, #offers do
+			local o = offers[ci]
+			local cx = 27 + (ci - 1) * (cardW + gap)
+			local card = H:SpawnPanel("RtsPickCard" .. tostring(ci), body, Vector2(0, 1), Vector2(0, 1), Vector2(cx, -40), Vector2(cardW, 340),
+				self:Mix(Color.white, 0.04), self:Mix(Color.white, 0.1), 1.5)
+			local band = H:SpawnStretch("model://uisprite", "RtsPickBand", card, Vector2(0, 1), Vector2(1, 1), Vector2(0, -6), Vector2(0, 0))
+			band.SpriteGUIRendererComponent.Color = self:GradeColor(o.g)
+			self:SpawnBadge("RtsPickBadge", card, Vector2(19, -22), o.g)
+			H:SpawnLabel("RtsPickT", card, Vector2(0, 1), Vector2(0, 1), Vector2(19, -54), Vector2(300, 30),
+				o.t, H:ColInk(), 21, TextAlignmentType.MiddleLeft, true)
+			H:SpawnLabel("RtsPickD", card, Vector2(0, 1), Vector2(0, 1), Vector2(19, -90), Vector2(300, 70),
+				o.d, Color(0.902, 0.863, 0.769, 1), 15, TextAlignmentType.UpperLeft, false)
+			H:SpawnLabel("RtsPickK", card, Vector2(0, 1), Vector2(0, 1), Vector2(19, -172), Vector2(300, 20),
+				"대상 유닛 (선택)", H:ColMuted(), 13, TextAlignmentType.MiddleLeft, false)
+
+			local state = { chips = {}, chosen = 0, units = units }
+			for ui = 1, #units do
+				local u = units[ui]
+				local col = (ui - 1) % 3
+				local row = math.floor((ui - 1) / 3)
+				local chip = H:SpawnPanel("RtsPickChip" .. tostring(ui), card, Vector2(0, 1), Vector2(0, 1),
+					Vector2(19 + col * 102, -198 - row * 36), Vector2(96, 30),
+					self:Mix(Color(0.094, 0.082, 0.071, 1), 0.9), self:Mix(H:ColGold(), 0.3), 1.5)
+				local bar = H:SpawnStretch("model://uisprite", "RtsPickChipBar", chip, Vector2(0, 0), Vector2(0, 1), Vector2(0, 0), Vector2(4, 0))
+				bar.SpriteGUIRendererComponent.Color = H:SeriesColor(u.s)
+				local lbl = H:SpawnLabel("RtsPickChipText", chip, Vector2(0, 0.5), Vector2(0, 0.5), Vector2(9, 0), Vector2(84, 26),
+					"<color=#c9b58a>" .. tostring(u.no) .. ".</color> " .. u.name, H:ColInk(), 13, TextAlignmentType.MiddleLeft, false)
+				lbl.TextComponent.IsRichText = true
+				state.chips[ui] = chip
+				local click = H:SpawnClick("RtsPickChipClick", chip)
+				local cardIdx = ci
+				local unitIdx = ui
+				click:ConnectEvent(ButtonClickEvent, function(event)
+					self:TogglePickChip(cardIdx, unitIdx)
+				end)
+			end
+
+			local btn = H:SpawnPanel("RtsPickTake", card, Vector2(0, 1), Vector2(0, 1), Vector2(19, -290), Vector2(180, 38),
+				self:Mix(Color.white, 0.04), self:Mix(H:ColGold(), 0.5), 1.5)
+			local btnText = H:SpawnLabel("RtsPickTakeText", btn, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2(0, 0), Vector2(176, 34),
+				"대상 없이 수령", Color(0.851, 0.796, 0.651, 1), 16, TextAlignmentType.MiddleCenter, true)
+			state.btn = btn
+			state.btnText = btnText
+			local takeIdx = ci
+			local takeClick = H:SpawnClick("RtsPickTakeClick", btn)
+			takeClick:ConnectEvent(ButtonClickEvent, function(event)
+				self:TakePick(takeIdx)
+			end)
+			self.Pick[ci] = state
+		end
+
+		H:SpawnLabel("RtsPickFoot", body, Vector2(1, 0), Vector2(1, 0), Vector2(-27, 4), Vector2(600, 22),
+			"닫기 없음 — 하나를 받아야 진행 (미리보기: B)", Color(0.851, 0.796, 0.651, 1), 14, TextAlignmentType.MiddleRight, false)
+	end
+
+	@ExecSpace("ClientOnly")
+	method void TogglePickChip(number cardIdx, number unitIdx)
+		local H = _RtsHudLogic
+		local st = self.Pick[cardIdx]
+		if st == nil then return end
+		if st.chosen == unitIdx then st.chosen = 0 else st.chosen = unitIdx end
+		for i = 1, #st.chips do
+			local chip = st.chips[i]
+			if i == st.chosen then
+				chip.SpriteGUIRendererComponent.Color = self:Mix(H:ColGold(), 0.2)
+				chip.Parent.SpriteGUIRendererComponent.Color = H:ColGold()
+			else
+				chip.SpriteGUIRendererComponent.Color = self:Mix(Color(0.094, 0.082, 0.071, 1), 0.9)
+				chip.Parent.SpriteGUIRendererComponent.Color = self:Mix(H:ColGold(), 0.3)
+			end
+		end
+		if st.chosen > 0 then
+			local u = st.units[st.chosen]
+			st.btnText.TextComponent.Text = tostring(u.no) .. ". " .. u.name .. "에 수령"
+			st.btnText.TextComponent.FontColor = Color(0.133, 0.114, 0.09, 1)
+			st.btn.SpriteGUIRendererComponent.Color = self:Mix(H:ColGold(), 0.9)
+			st.btn.Parent.SpriteGUIRendererComponent.Color = H:ColGold()
+		else
+			st.btnText.TextComponent.Text = "대상 없이 수령"
+			st.btnText.TextComponent.FontColor = Color(0.851, 0.796, 0.651, 1)
+			st.btn.SpriteGUIRendererComponent.Color = self:Mix(Color.white, 0.04)
+			st.btn.Parent.SpriteGUIRendererComponent.Color = self:Mix(H:ColGold(), 0.5)
+		end
+	end
+
+	@ExecSpace("ClientOnly")
+	method void TakePick(number cardIdx)
+		local st = self.Pick[cardIdx]
+		local target = "없음"
+		if st ~= nil and st.chosen > 0 then target = tostring(st.units[st.chosen].no) .. ". " .. st.units[st.chosen].name end
+		log("RtsPopup: pick card " .. tostring(cardIdx) .. " / 대상 " .. target .. " (지급은 Phase 6)")
+		self:Close()
+	end
+
+end

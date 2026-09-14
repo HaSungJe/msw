@@ -1,6 +1,8 @@
--- rts-base #4: 구역 시스템 — 배정(서버 권위) + 스타디움 트랙/배치 슬롯 좌표(단일 소스) + 시각화(서버 1회)
--- 트랙: 라운드 사각형(스타디움). t=0 이 11시(좌상단), t 증가 = 반시계
--- 트랙 색은 전 구역 동일(사용자 지시 2026-08-18). 점유 여부는 IsZoneOccupied로 조회한다.
+-- rts-base #4 (화면 v2): 구역 시스템 — 배정(서버 권위) + 그리드 트랙/발판 좌표(단일 소스) + 시각화(서버 1회)
+-- 트랙: 18×12 그리드 위 경로(아티팩트 v16). t=0 = S(3열 6행), t=1 = E(3열 12행), 등속(경로 길이 비례).
+--   E에 닿은 몹은 S로 되돌린다(순환은 몹 로직이 t를 0으로 — Phase 3).
+-- 발판: 트랙 칸에 상하좌우로 면한 칸(81개). 유닛은 발판에만 1기씩.
+-- 칸 좌표는 1-기반 (col 1~18, row 1~12, row는 위에서 아래로).
 @Logic
 script RtsZoneLogic extends Logic
 
@@ -8,97 +10,134 @@ script RtsZoneLogic extends Logic
 
 	property boolean VisualsBuilt = false
 
-	property string TrackRUID = "faf04ce588484d07847a8b34f13f4b9e"
+	property boolean PathBuilt = false
 
-	property string WhiteRUID = "47b5e516b27d4625abffe8db398cd8c2"
+	-- 경로 칸 목록(순서 보존, 교차 칸은 두 번 등장) / 트랙 칸 집합 / 발판 목록(행 우선)
+	property table PathCells = {}
 
-	-- ===== 트랙 형상 (중심선 스타디움 반치수) =====
+	property table RoadSet = {}
+
+	property table PadList = {}
+
+	property string GridRUID = "f8bf4274602c4d22b2e6643e114fbc5f"
 
 	method number GetZoneCount()
 		return _RtsConfigLogic:GetZoneCols() * _RtsConfigLogic:GetZoneRows()
 	end
 
-	-- 중심선 직선부 반길이(가로)
-	method number GetTrackHalfW()
-		local inset = _RtsConfigLogic:GetTrackLaneHalf() + 0.1
-		return (_RtsConfigLogic:GetTrackOuterW() - inset * 2) * 0.5 - _RtsConfigLogic:GetTrackCornerR()
+	-- ===== 경로 정의 =====
+
+	-- 꺾임점 17개 (1-기반 {col,row}). 아티팩트 seq와 0/1-기반만 다르다.
+	method table GetTurnPoints()
+		return {
+			{3, 6}, {3, 2}, {14, 2}, {14, 6}, {9, 6}, {9, 8}, {14, 8}, {14, 10}, {12, 10},
+			{12, 4}, {7, 4}, {7, 8}, {3, 8}, {3, 10}, {7, 10}, {7, 12}, {3, 12},
+		}
 	end
 
-	-- 중심선 직선부 반길이(세로)
-	method number GetTrackHalfH()
-		local inset = _RtsConfigLogic:GetTrackLaneHalf() + 0.1
-		return (_RtsConfigLogic:GetTrackOuterH() - inset * 2) * 0.5 - _RtsConfigLogic:GetTrackCornerR()
+	method string CellKey(number col, number row)
+		return tostring(col) .. "," .. tostring(row)
 	end
 
-	method number GetTrackPerimeter()
-		local r = _RtsConfigLogic:GetTrackCornerR()
-		return 4 * self:GetTrackHalfW() + 4 * self:GetTrackHalfH() + 2 * math.pi * r
-	end
+	method void EnsurePath()
+		if self.PathBuilt then return end
+		local turns = self:GetTurnPoints()
+		local cells = {}
+		local road = {}
+		local first = turns[1]
+		cells[#cells + 1] = { first[1], first[2] }
+		road[self:CellKey(first[1], first[2])] = true
+		for i = 1, #turns - 1 do
+			local a = turns[i]
+			local b = turns[i + 1]
+			local dc = 0
+			local dr = 0
+			if b[1] > a[1] then dc = 1 elseif b[1] < a[1] then dc = -1 end
+			if b[2] > a[2] then dr = 1 elseif b[2] < a[2] then dr = -1 end
+			local c = a[1]
+			local r = a[2]
+			while c ~= b[1] or r ~= b[2] do
+				c = c + dc
+				r = r + dr
+				cells[#cells + 1] = { c, r }
+				road[self:CellKey(c, r)] = true
+			end
+		end
+		self.PathCells = cells
+		self.RoadSet = road
 
-	-- 트랙 위 점: t∈[0,1), t=0 = 11시(좌상단 코너 진입), t 증가 = 반시계
-	--   경로: 좌상 코너호 → 좌변(아래로) → 좌하 코너호 → 아랫변(오른쪽) → 우하 코너호 → 우변(위로) → 우상 코너호 → 윗변(왼쪽)
-	method Vector2 GetTrackPoint(number zone, number t)
-		local c = _RtsConfigLogic:GetZoneCenter(zone)
-		local hw = self:GetTrackHalfW()
-		local hh = self:GetTrackHalfH()
-		local r = _RtsConfigLogic:GetTrackCornerR()
-		local arc = math.pi * r * 0.5
-		local perim = self:GetTrackPerimeter()
-
-		local u = t - math.floor(t)
-		local d = u * perim
-		local x = 0
-		local y = 0
-
-		if d < arc then
-			local a = math.pi * 0.5 + (d / arc) * (math.pi * 0.5)
-			x = 0 - hw + r * math.cos(a)
-			y = hh + r * math.sin(a)
-		else
-			d = d - arc
-			if d < 2 * hh then
-				x = 0 - hw - r
-				y = hh - d
-			else
-				d = d - 2 * hh
-				if d < arc then
-					local a = math.pi + (d / arc) * (math.pi * 0.5)
-					x = 0 - hw + r * math.cos(a)
-					y = 0 - hh + r * math.sin(a)
-				else
-					d = d - arc
-					if d < 2 * hw then
-						x = 0 - hw + d
-						y = 0 - hh - r
-					else
-						d = d - 2 * hw
-						if d < arc then
-							local a = math.pi * 1.5 + (d / arc) * (math.pi * 0.5)
-							x = hw + r * math.cos(a)
-							y = 0 - hh + r * math.sin(a)
-						else
-							d = d - arc
-							if d < 2 * hh then
-								x = hw + r
-								y = 0 - hh + d
-							else
-								d = d - 2 * hh
-								if d < arc then
-									local a = (d / arc) * (math.pi * 0.5)
-									x = hw + r * math.cos(a)
-									y = hh + r * math.sin(a)
-								else
-									d = d - arc
-									x = hw - d
-									y = hh + r
-								end
-							end
-						end
-					end
+		-- 발판: 트랙에 4방향으로 면한 비트랙 칸, 행 우선(위→아래, 왼→오른)
+		local pads = {}
+		for r = 1, _RtsConfigLogic:GetGridRows() do
+			for c = 1, _RtsConfigLogic:GetGridCols() do
+				if road[self:CellKey(c, r)] == nil then
+					local adj = road[self:CellKey(c + 1, r)] or road[self:CellKey(c - 1, r)]
+						or road[self:CellKey(c, r + 1)] or road[self:CellKey(c, r - 1)]
+					if adj then pads[#pads + 1] = { c, r } end
 				end
 			end
 		end
-		return Vector2(c.x + x, c.y + y)
+		self.PadList = pads
+		self.PathBuilt = true
+	end
+
+	-- ===== 칸 ↔ 월드 =====
+
+	method Vector2 GetCellCenter(number zone, number col, number row)
+		local c = _RtsConfigLogic:GetZoneCenter(zone)
+		local cell = _RtsConfigLogic:GetGridCell()
+		local x = c.x + _RtsConfigLogic:GetGridLeft() + (col - 0.5) * cell
+		local y = c.y + _RtsConfigLogic:GetGridTop() - (row - 0.5) * cell
+		return Vector2(x, y)
+	end
+
+	method boolean IsRoadCell(number col, number row)
+		self:EnsurePath()
+		return self.RoadSet[self:CellKey(col, row)] == true
+	end
+
+	method boolean IsPadCell(number col, number row)
+		self:EnsurePath()
+		if self.RoadSet[self:CellKey(col, row)] then return false end
+		return self.RoadSet[self:CellKey(col + 1, row)] == true or self.RoadSet[self:CellKey(col - 1, row)] == true
+			or self.RoadSet[self:CellKey(col, row + 1)] == true or self.RoadSet[self:CellKey(col, row - 1)] == true
+	end
+
+	-- 8방향 칸 거리 = 열·행 차이 중 큰 값 (사거리 판정의 기준)
+	method number CellDistance(number c1, number r1, number c2, number r2)
+		return math.max(math.abs(c1 - c2), math.abs(r1 - r2))
+	end
+
+	-- ===== 트랙 =====
+
+	-- 경로 칸 수 − 1 = 이동 칸 수(66)
+	method number GetTrackSteps()
+		self:EnsurePath()
+		return #self.PathCells - 1
+	end
+
+	method number GetTrackLength()
+		return self:GetTrackSteps() * _RtsConfigLogic:GetGridCell()
+	end
+
+	-- 트랙 위 점: t∈[0,1], 0=S, 1=E, 경로 길이 비례. 범위 밖은 양끝으로 고정
+	method Vector2 GetTrackPoint(number zone, number t)
+		self:EnsurePath()
+		local steps = self:GetTrackSteps()
+		if t < 0 then t = 0 end
+		if t > 1 then t = 1 end
+		local d = t * steps
+		local i = math.floor(d)
+		if i >= steps then
+			local last = self.PathCells[steps + 1]
+			return self:GetCellCenter(zone, last[1], last[2])
+		end
+		local frac = d - i
+		local a = self.PathCells[i + 1]
+		local b = self.PathCells[i + 2]
+		local pa = self:GetCellCenter(zone, a[1], a[2])
+		local pb = self:GetCellCenter(zone, b[1], b[2])
+		return Vector2(pa.x + (pb.x - pa.x) * frac, pa.y + (pb.y - pa.y) * frac)
 	end
 
 	method number GetSpawnT()
@@ -106,54 +145,43 @@ script RtsZoneLogic extends Logic
 	end
 
 	method Vector2 GetSpawnPoint(number zone)
-		return self:GetTrackPoint(zone, self:GetSpawnT())
+		return self:GetTrackPoint(zone, 0)
 	end
 
-	-- ===== 배치 슬롯 (트랙 안쪽 10×3 그리드, 바깥 줄부터) =====
+	method Vector2 GetEndPoint(number zone)
+		return self:GetTrackPoint(zone, 1)
+	end
 
+	-- 보스 자리: 별도 맵 없이 구역 화면 중앙 (Phase 7)
+	method Vector2 GetBossPoint(number zone)
+		return _RtsConfigLogic:GetZoneCenter(zone)
+	end
+
+	-- ===== 발판 (배치 슬롯) =====
+
+	method number GetPadCount()
+		self:EnsurePath()
+		return #self.PadList
+	end
+
+	-- 이름 유지(로드맵 #14 참조) — 값은 발판 수
 	method number GetPlacementSlotCount()
-		return 30
+		return self:GetPadCount()
+	end
+
+	-- index번째 발판 칸 (1~81, 범위 밖은 양끝으로 고정). x=col, y=row
+	method Vector2 GetPadCell(number index)
+		self:EnsurePath()
+		local n = #self.PadList
+		if index < 1 then index = 1 end
+		if index > n then index = n end
+		local p = self.PadList[index]
+		return Vector2(p[1], p[2])
 	end
 
 	method Vector2 GetPlacementSlot(number zone, number index)
-		local c = _RtsConfigLogic:GetZoneCenter(zone)
-		local r = _RtsConfigLogic:GetTrackCornerR()
-		local margin = _RtsConfigLogic:GetTrackLaneHalf() + 0.5
-		local innerW = (self:GetTrackHalfW() + r) * 2 - margin * 2
-		local innerH = (self:GetTrackHalfH() + r) * 2 - margin * 2
-		local cols = 10
-		local rows = 3
-		local stepX = innerW / cols
-		local stepY = innerH / rows
-		-- 채우기 순서: 윗줄 → 아랫줄 → 가운데줄 (트랙에 가까운 쪽 우선)
-		local order = { 2, 0, 1 }
-		local i = index - 1
-		if i < 0 then i = 0 end
-		local rowIdx = order[math.floor(i / cols) % rows + 1]
-		local colIdx = i % cols
-		local x = 0 - innerW * 0.5 + stepX * (colIdx + 0.5)
-		local y = 0 - innerH * 0.5 + stepY * (rowIdx + 0.5)
-		return Vector2(c.x + x, c.y + y)
-	end
-
-	-- 중심선 스타디움까지의 부호 있는 거리(<0 = 안쪽)
-	method number TrackSignedDistance(number zone, Vector2 pos)
-		local c = _RtsConfigLogic:GetZoneCenter(zone)
-		local hw = self:GetTrackHalfW()
-		local hh = self:GetTrackHalfH()
-		local r = _RtsConfigLogic:GetTrackCornerR()
-		local dx = math.abs(pos.x - c.x) - hw
-		local dy = math.abs(pos.y - c.y) - hh
-		local qx = math.max(dx, 0)
-		local qy = math.max(dy, 0)
-		local outside = math.sqrt(qx * qx + qy * qy)
-		local inside = math.min(math.max(dx, dy), 0)
-		return outside + inside - r
-	end
-
-	method boolean IsInPlacementArea(number zone, Vector2 pos)
-		local margin = _RtsConfigLogic:GetTrackLaneHalf() + 0.5
-		return self:TrackSignedDistance(zone, pos) < 0 - margin
+		local p = self:GetPadCell(index)
+		return self:GetCellCenter(zone, p.x, p.y)
 	end
 
 	-- ===== 배정 (서버 권위) =====
@@ -215,50 +243,31 @@ script RtsZoneLogic extends Logic
 		return e
 	end
 
+	-- 구역마다 그리드 텍스처 1장 (트랙+발판+S/E+복귀 화살표). 경계선 없음 — 구역 = 화면
 	@ExecSpace("ServerOnly")
 	method void EnsureZoneVisuals()
 		if self.VisualsBuilt then return end
 		local mapRoot = _EntityService:GetEntityByPath("/maps/RtsMap")
 		if mapRoot == nil then return end
-		if _EntityService:GetEntityByPath("/maps/RtsMap/ZoneTrack1") ~= nil then
+		if _EntityService:GetEntityByPath("/maps/RtsMap/ZoneGrid1") ~= nil then
 			self.VisualsBuilt = true
 			return
 		end
 
-		local w = _RtsConfigLogic:GetZoneWidth()
-		local h = _RtsConfigLogic:GetZoneHeight()
-		local scale = _RtsConfigLogic:GetTrackTextureScale()
+		local cell = _RtsConfigLogic:GetGridCell()
+		local offX = _RtsConfigLogic:GetGridLeft() + _RtsConfigLogic:GetGridCols() * cell * 0.5
+		local offY = _RtsConfigLogic:GetGridTop() - _RtsConfigLogic:GetGridRows() * cell * 0.5
+		local scale = _RtsConfigLogic:GetGridTextureScale()
 
 		for n = 1, self:GetZoneCount() do
 			local c = _RtsConfigLogic:GetZoneCenter(n)
-
-			-- 스타디움 트랙 (단일 스프라이트)
-			local track = self:SpawnProp("ZoneTrack" .. tostring(n), mapRoot, c, self.TrackRUID)
-			if track ~= nil then
-				track.TransformComponent.Scale = Vector3(scale, scale, 1)
-			end
-
-			-- 구역 경계 4선 (얇은 흰 스프라이트, 8px=0.08유닛 기준 스케일)
-			local thin = 0.12 / 0.08
-			local lenX = w / 0.08
-			local lenY = h / 0.08
-			local edges = { "T", "B", "L", "R" }
-			local ex = { 0, 0, 0 - w * 0.5, w * 0.5 }
-			local ey = { h * 0.5, 0 - h * 0.5, 0, 0 }
-			local sx = { lenX, lenX, thin, thin }
-			local sy = { thin, thin, lenY, lenY }
-			for i = 1, 4 do
-				local line = self:SpawnProp("ZoneEdge" .. tostring(n) .. edges[i], mapRoot,
-					Vector2(c.x + ex[i], c.y + ey[i]), self.WhiteRUID)
-				if line ~= nil then
-					line.TransformComponent.Scale = Vector3(sx[i], sy[i], 1)
-					line.SpriteRendererComponent.Color = Color(0.42, 0.48, 0.58, 0.5)
-					line.SpriteRendererComponent.OrderInLayer = 90
-				end
+			local grid = self:SpawnProp("ZoneGrid" .. tostring(n), mapRoot, Vector2(c.x + offX, c.y + offY), self.GridRUID)
+			if grid ~= nil then
+				grid.TransformComponent.Scale = Vector3(scale, scale, 1)
 			end
 		end
 		self.VisualsBuilt = true
-		log("RtsZone: visuals built (stadium track x" .. tostring(self:GetZoneCount()) .. ")")
+		log("RtsZone: visuals built (grid track x" .. tostring(self:GetZoneCount()) .. ")")
 	end
 
 end

@@ -1,5 +1,5 @@
--- rts-base #4b(운빨 디펜스): 숨긴 아바타 = 카메라 앵커, F1~F8 구역 시점 전환 전용 (자유 카메라 없음)
---   구역이 HUD 위 밴드에 꽉 차도록 최대 줌아웃 + 앵커 Y 오프셋 적용
+-- rts-base #3: 숨긴 아바타 = 카메라 앵커, F1~F8 구역 시점 전환 전용 (자유 카메라 없음)
+--   화면 v2: 구역 = 뷰 한 장. 최대 줌아웃 + 앵커를 구역 정중앙에 고정
 @Component
 script RtsCameraAnchorComponent extends Component
 
@@ -55,6 +55,7 @@ script RtsCameraAnchorComponent extends Component
 	end
 
 	-- 활성 카메라를 내 것으로 고정 + 줌 적용
+	--   IsAllowZoomInOut=false 상태에서는 ZoomTo가 무시된다(2026-09-14 실측) → 줌 거는 동안만 허용하고 바로 잠근다
 	@ExecSpace("ClientOnly")
 	method void ClaimCamera()
 		if _UserService.LocalPlayer ~= self.Entity then return end
@@ -63,7 +64,11 @@ script RtsCameraAnchorComponent extends Component
 		if _CameraService:GetCurrentCameraComponent() ~= camera then
 			_CameraService:SwitchCameraTo(camera)
 		end
+		camera.IsAllowZoomInOut = true
 		_CameraService:ZoomTo(_RtsConfigLogic:GetCameraZoomPercent(), 0)
+		_TimerService:SetTimerOnce(function()
+			camera.IsAllowZoomInOut = false
+		end, 0.2)
 	end
 
 	-- 다른 엔티티가 카메라를 가져가면 즉시 되찾는다
@@ -75,14 +80,14 @@ script RtsCameraAnchorComponent extends Component
 		self:ClaimCamera()
 	end
 
-	-- 구역 중앙 + Y 오프셋(HUD에 가리지 않도록 위로 밀어올림)
+	-- 구역 중앙(+Y 오프셋, 화면 v2에서는 0) + 플레이어 목록의 "보는 중" 표시 갱신
 	@ExecSpace("ClientOnly")
 	method void JumpToZone(number n)
 		if n < 1 or n > _RtsConfigLogic:GetZoneCols() * _RtsConfigLogic:GetZoneRows() then return end
 		self.CurrentZone = n
 		local c = _RtsConfigLogic:GetZoneCenter(n)
 		self.Entity.KinematicbodyComponent:SetWorldPosition(Vector2(c.x, c.y + _RtsConfigLogic:GetCameraOffsetY()))
-		_RtsHudLogic:UpdateMinimapZone(n)
+		_RtsHudLogic:SetWatchedZone(n)
 	end
 
 	-- 서버가 배정한 구역 통지 (마지막 파라미터 UserId = 해당 클라에만 전송)

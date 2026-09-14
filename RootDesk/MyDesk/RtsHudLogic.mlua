@@ -1,49 +1,49 @@
--- rts-base #14: 스타식 HUD 셸 v6 (#3 구역 미니맵)
--- (배경 패널 제거 — 프레임 오버레이만, 미니맵 340+초상화 240 밀착, 스킬칸 340(3×3 QWE/ASD/ZXC),
---  호버 툴팁, 골드 좌상단 밀착(아이콘+수치), 시간 중앙, Ctrl+숫자 부대지정 골격.
---  티어별(브론즈~챌린저) 프레임 차등은 로드맵 후순위 유닛)
+-- rts-base #2: HUD v2 (화면 v2 — 아티팩트 v16)
+--   하단 바(미니맵·초상화·정보·스킬칸·부대지정) 전부 제거.
+--   좌상단 시간·메소 칩 / 좌측 플레이어 목록(n/8, 생존·탈락, 나, 클릭→그 구역) /
+--   우측 영입 버튼 + 유닛 슬롯 6 / 좌하단 증강 버튼. 팝업은 RtsPopupLogic.
+--   UI 좌표는 1920×1080 기준(목업 1cqw = 19.2px).
 @Logic
 script RtsHudLogic extends Logic
 
 	property boolean Built = false
 
-	property boolean CtrlHeld = false
-
-	-- 레이아웃 상수 (UI 좌표 1920×1080)
-	property number MinimapSize = 340
-
-	-- 미니맵 셀 그리드: 미니맵 영역(340×340)을 꽉 채움 → 구역 셀 170×85 (2열×4행)
-	property number MinimapStripW = 340
-
-	property number MinimapStripH = 340
-
-	property number PortraitSize = 240
-
-	property number FrameThick = 10
-
 	-- 스프라이트 RUID
 	property string WhiteRUID = "47b5e516b27d4625abffe8db398cd8c2"
 
-	property string FloorRUID = "df8df44de6e64c25a74f465ef88ef4c8"
-
 	property string CoinRUID = "288ed505d45844c3b717ec9072738b64"
-
-	property string Frame340RUID = "3c4c2394686a46cf86a34f520d31c3f0"
-
-	property string Frame240RUID = "3c81e689753f4c0eb2a58418963fdf2f"
-
-	property string FrameInfoRUID = "28511390f76c42c08a9105751ced4051"
 
 	-- 런타임 참조
 	property Entity HudGroup = nil
 
-	property Entity ViewportRect = nil
-
 	property Entity AnchorEntity = nil
 
-	property Entity SkillTooltip = nil
+	property Entity TimeText = nil
 
-	property Entity MinimapStrip = nil
+	property Entity MesoText = nil
+
+	property Entity PlayersBox = nil
+
+	property Entity PlayerHead = nil
+
+	-- 플레이어 목록 상태: userId → {row, bar, dot, tomb, name, zone, alive, nick, isMe} / 표시 순서
+	property table Players = {}
+
+	property table PlayerOrder = {}
+
+	-- HUD 생성 전에 도착한 목록 통지
+	property string PendingPlayers = ""
+
+	property number WatchedZone = 0
+
+	property string MyUserId = ""
+
+	-- 유닛 슬롯 6: i → {box, bar, name, lv, filled}
+	property table UnitSlots = {}
+
+	property number SelectedSlot = 0
+
+	-- ===== UI 헬퍼 (RtsPopupLogic도 사용) =====
 
 	@ExecSpace("ClientOnly")
 	method Entity SpawnUI(string modelId, string name, Entity parent, Vector2 anchor, Vector2 pivot, Vector2 pos, Vector2 size)
@@ -62,7 +62,7 @@ script RtsHudLogic extends Logic
 		return e
 	end
 
-	-- 스트레치 배치: 앵커 구간 + 오프셋(좌하/우상)으로 해상도 변화에 늘어나는 요소용
+	-- 스트레치 배치: 앵커 구간 + 오프셋(좌하/우상)으로 부모에 맞춰 늘어나는 요소용
 	@ExecSpace("ClientOnly")
 	method Entity SpawnStretch(string modelId, string name, Entity parent, Vector2 aMin, Vector2 aMax, Vector2 offMin, Vector2 offMax)
 		local e = _SpawnService:SpawnByModelId(modelId, name, Vector3.zero, parent)
@@ -98,25 +98,75 @@ script RtsHudLogic extends Logic
 		return e
 	end
 
-	-- 장식 프레임 오버레이 (중앙 투명 텍스처) — 영역과 동일 rect에 얹음
+	-- 글자 크기·정렬·굵기까지 한 번에
 	@ExecSpace("ClientOnly")
-	method void AttachFrame(Entity target, string frameRUID, Vector2 size)
-		local f = self:SpawnUI("model://uisprite", target.Name .. "Frame", target,
-			Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2(0, 0), size)
-		local sr = f.SpriteGUIRendererComponent
-		sr.ImageRUID = DataRef(frameRUID)
-		sr.Color = Color(1, 1, 1, 1)
+	method Entity SpawnLabel(string name, Entity parent, Vector2 anchor, Vector2 pivot, Vector2 pos, Vector2 size, string text, Color color, number fontSize, any align, boolean bold)
+		local e = self:SpawnText(name, parent, anchor, pivot, pos, size, text, color)
+		if e == nil then return nil end
+		local tc = e.TextComponent
+		if tc ~= nil then
+			tc.FontSize = fontSize
+			tc.Alignment = align
+			tc.Bold = bold
+		end
+		return e
 	end
 
-	-- 프레임 오버레이(스트레치판) — 부모 rect를 그대로 덮음
+	-- 테두리 있는 패널: 바깥(테두리색) + 안쪽(배경색, thick만큼 안으로). 자식은 안쪽에 붙인다
 	@ExecSpace("ClientOnly")
-	method void AttachFrameStretch(Entity target, string frameRUID)
-		local f = self:SpawnStretch("model://uisprite", target.Name .. "Frame", target,
-			Vector2(0, 0), Vector2(1, 1), Vector2(0, 0), Vector2(0, 0))
-		local sr = f.SpriteGUIRendererComponent
-		sr.ImageRUID = DataRef(frameRUID)
-		sr.Color = Color(1, 1, 1, 1)
+	method Entity SpawnPanel(string name, Entity parent, Vector2 anchor, Vector2 pivot, Vector2 pos, Vector2 size, Color bg, Color border, number thick)
+		local outer = self:SpawnUI("model://uisprite", name, parent, anchor, pivot, pos, size)
+		if outer == nil then return nil end
+		outer.SpriteGUIRendererComponent.Color = border
+		local inner = self:SpawnStretch("model://uisprite", name .. "In", outer,
+			Vector2(0, 0), Vector2(1, 1), Vector2(thick, thick), Vector2(0 - thick, 0 - thick))
+		inner.SpriteGUIRendererComponent.Color = bg
+		return inner
 	end
+
+	-- 투명 클릭 영역 (부모 rect 전체)
+	@ExecSpace("ClientOnly")
+	method Entity SpawnClick(string name, Entity parent)
+		local b = self:SpawnStretch("model://uibutton", name, parent, Vector2(0, 0), Vector2(1, 1), Vector2(0, 0), Vector2(0, 0))
+		if b ~= nil then self:Tint(b, 1, 1, 1, 0.01) end
+		return b
+	end
+
+	-- 팔레트
+	method Color ColInk()
+		return Color(0.957, 0.914, 0.812, 1)
+	end
+
+	method Color ColMuted()
+		return Color(0.788, 0.710, 0.541, 1)
+	end
+
+	method Color ColGold()
+		return Color(0.878, 0.725, 0.353, 1)
+	end
+
+	method Color ColPanel()
+		return Color(0.094, 0.082, 0.071, 0.86)
+	end
+
+	method Color ColBorder()
+		return Color(0.788, 0.635, 0.290, 0.55)
+	end
+
+	method Color ColBorderSoft()
+		return Color(0.788, 0.635, 0.290, 0.35)
+	end
+
+	-- 계열 색 (좌측 세로 바)
+	method Color SeriesColor(string series)
+		if series == "war" then return Color(0.839, 0.471, 0.353, 1) end
+		if series == "arc" then return Color(0.310, 0.604, 0.388, 1) end
+		if series == "mag" then return Color(0.357, 0.525, 0.847, 1) end
+		if series == "thf" then return Color(0.557, 0.357, 0.847, 1) end
+		return Color(0.541, 0.498, 0.439, 1)
+	end
+
+	-- ===== HUD 생성 =====
 
 	@ExecSpace("ClientOnly")
 	method void BuildHud(Entity anchorEntity)
@@ -127,6 +177,8 @@ script RtsHudLogic extends Logic
 			log("RtsHud: /ui not found")
 			return
 		end
+		local lp = _UserService.LocalPlayer
+		if lp ~= nil and lp.PlayerComponent ~= nil then self.MyUserId = lp.PlayerComponent.UserId end
 
 		local grp = _SpawnService:SpawnByModelId("model://uigroup", "RtsHudGroup", Vector3.zero, ui)
 		if grp == nil then
@@ -137,301 +189,301 @@ script RtsHudLogic extends Logic
 		grp:SetEnable(true)
 		self.HudGroup = grp
 
-		-- 레이아웃 컨테이너 (투명, 하단 가로 전체 스트레치 — 해상도 변화 대응)
-		local bar = self:SpawnStretch("model://uisprite", "RtsHudBar", grp,
-			Vector2(0, 0), Vector2(1, 0), Vector2(0, 0), Vector2(0, 340))
-		self:Tint(bar, 0, 0, 0, 0)
+		-- 좌상단: 시간 칩 → 메소 칩
+		local timeChip = self:SpawnPanel("RtsTimeChip", grp, Vector2(0, 1), Vector2(0, 1), Vector2(16, -16), Vector2(170, 44),
+			self:ColPanel(), self:ColBorder(), 1.5)
+		self:SpawnLabel("RtsTimeKey", timeChip, Vector2(0, 0.5), Vector2(0, 0.5), Vector2(12, 0), Vector2(40, 30),
+			"시간", self:ColMuted(), 15, TextAlignmentType.MiddleLeft, false)
+		self.TimeText = self:SpawnLabel("RtsTimeText", timeChip, Vector2(0, 0.5), Vector2(0, 0.5), Vector2(58, 0), Vector2(100, 34),
+			"--:--", self:ColInk(), 28, TextAlignmentType.MiddleLeft, true)
 
-		-- 미니맵 340 좌하단 플러시 — 구역 셀(2열×4행)이 영역을 꽉 채움. 셀 = 해당 구역 축소 화면 (#3 개편)
-		local mm = self:SpawnUI("model://uisprite", "RtsMinimap", bar,
-			Vector2(0, 0), Vector2(0, 0), Vector2(0, 0), Vector2(self.MinimapSize, self.MinimapSize))
-		self:Tint(mm, 0.13, 0.105, 0.075, 0.9)
-
-		local strip = self:SpawnUI("model://uisprite", "RtsMinimapStrip", mm,
-			Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2(0, 0), Vector2(self.MinimapStripW, self.MinimapStripH))
-		self:Tint(strip, 0, 0, 0, 0)
-		self.MinimapStrip = strip
-
-		local cols = _RtsConfigLogic:GetZoneCols()
-		local rows = _RtsConfigLogic:GetZoneRows()
-		local cellW = self.MinimapStripW / cols
-		local cellH = self.MinimapStripH / rows
-		local gap = 2
-
-		-- 구역 셀: 축소 화면(바닥 텍스처) + 좌상단 번호. 유닛/몹 도트는 #5~#7에서 이 셀 위에 추가
-		for n = 1, cols * rows do
-			local idx = n - 1
-			local col = idx % cols
-			local row = math.floor(idx / cols)
-			local cell = self:SpawnUI("model://uisprite", "RtsMmCell" .. tostring(n), strip,
-				Vector2(0, 0), Vector2(0.5, 0.5),
-				Vector2(col * cellW + cellW * 0.5, (rows - 1 - row) * cellH + cellH * 0.5),
-				Vector2(cellW - gap, cellH - gap))
-			cell.SpriteGUIRendererComponent.ImageRUID = DataRef(self.FloorRUID)
-			cell.SpriteGUIRendererComponent.Color = Color(0.86, 0.88, 0.92, 1)
-		end
-
-		-- 현재 구역 하이라이트 (구역 1칸 크기)
-		local vp = self:SpawnUI("model://uisprite", "RtsMinimapViewport", strip,
-			Vector2(0, 0), Vector2(0.5, 0.5), Vector2(cellW * 0.5, cellH * 0.5), Vector2(cellW, cellH))
-		-- 흰 눈 미니맵에서는 흰 오버레이가 안 보여 호박색으로(2026-08-18 눈 타일 교체 후)
-		self:Tint(vp, 1, 0.72, 0.15, 0.45)
-		self.ViewportRect = vp
-
-		-- 구역 번호: 셀 중앙. 하이라이트보다 나중에 생성해야 가려지지 않음
-		for n = 1, cols * rows do
-			local idx = n - 1
-			local col = idx % cols
-			local row = math.floor(idx / cols)
-			self:SpawnText("RtsMmZone" .. tostring(n), strip,
-				Vector2(0, 0), Vector2(0.5, 0.5),
-				Vector2(col * cellW + cellW * 0.5, (rows - 1 - row) * cellH + cellH * 0.5), Vector2(40, 30),
-				tostring(n), Color(0.16, 0.2, 0.28, 1))
-		end
-
-		self:AttachFrame(mm, self.Frame340RUID, Vector2(self.MinimapSize, self.MinimapSize))
-
-		local mmBtn = self:SpawnUI("model://uibutton", "RtsMinimapClick", mm,
-			Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2(0, 0), Vector2(self.MinimapSize, self.MinimapSize))
-		self:Tint(mmBtn, 1, 1, 1, 0.02)
-		mmBtn:ConnectEvent(ButtonClickEvent, function(event)
-			self:OnMinimapClick()
-		end)
-
-		-- 초상화 240 — 미니맵 오른쪽 밀착 (배경 없음, 프레임만. 초상화는 #3)
-		local portrait = self:SpawnUI("model://uisprite", "RtsPortrait", bar,
-			Vector2(0, 0), Vector2(0, 0), Vector2(self.MinimapSize, 0), Vector2(self.PortraitSize, self.PortraitSize))
-		self:Tint(portrait, 0.13, 0.105, 0.075, 0.9)
-		self:AttachFrame(portrait, self.Frame240RUID, Vector2(self.PortraitSize, self.PortraitSize))
-
-		-- 선택유닛 정보 영역 — 배경 없음 + 프레임만, 내용은 #3 (선택 없으면 공백)
-		-- 좌(미니맵+초상화)와 우(스킬칸) 사이를 스트레치 — 해상도 변화 대응
-		local infoX = self.MinimapSize + self.PortraitSize
-		local info = self:SpawnStretch("model://uisprite", "RtsSelectionArea", bar,
-			Vector2(0, 0), Vector2(1, 0), Vector2(infoX, 0), Vector2(-340, 240))
-		self:Tint(info, 0.13, 0.105, 0.075, 0.9)
-		self:AttachFrameStretch(info, self.FrameInfoRUID)
-
-		-- 스킬칸 340×340 (3×3, QWE/ASD/ZXC) — 우하단 플러시, 배경 없음 + 프레임, 빈 슬롯 숨김
-		local card = self:SpawnUI("model://uisprite", "RtsSkillCard", bar,
-			Vector2(1, 0), Vector2(1, 0), Vector2(0, 0), Vector2(340, 340))
-		self:Tint(card, 0.13, 0.105, 0.075, 0.9)
-		local keys = { "Q", "W", "E", "A", "S", "D", "Z", "X", "C" }
-		for row = 0, 2 do
-			for col = 0, 2 do
-				local slot = row * 3 + col + 1
-				local btn = self:SpawnUI("model://uibutton", "RtsSkill" .. tostring(slot), card,
-					Vector2(0, 0), Vector2(0, 0),
-					Vector2(16 + col * 106, 16 + (2 - row) * 106), Vector2(96, 96))
-				self:Tint(btn, 0.22, 0.25, 0.31, 1)
-				self:SpawnText("RtsSkillKey" .. tostring(slot), btn, Vector2(1, 0), Vector2(1, 0), Vector2(-5, 3), Vector2(26, 24),
-					keys[slot], Color(0.55, 0.6, 0.68, 1))
-				self:SpawnText("RtsSkillName" .. tostring(slot), btn, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2(0, 8), Vector2(88, 46),
-					"", Color(0.85, 0.88, 0.95, 1))
-				local desc = self:SpawnText("RtsSkillDesc" .. tostring(slot), btn, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2(0, 0), Vector2(10, 10),
-					"", Color(1, 1, 1, 1))
-				desc:SetEnable(false)
-				local bc = btn.ButtonComponent
-				if bc ~= nil then bc.KeyCode = KeyboardKey.CastFrom(keys[slot]) end
-				btn:ConnectEvent(ButtonClickEvent, function(event)
-					self:OnSkillSlot(slot)
-				end)
-				btn:ConnectEvent(ButtonStateChangeEvent, function(event)
-					if event.state == ButtonState.Hover then
-						self:ShowSkillTooltip(slot)
-					elseif event.state == ButtonState.Normal then
-						self:HideSkillTooltip()
-					end
-				end)
-				btn:SetEnable(false)
-			end
-		end
-		self:AttachFrame(card, self.Frame340RUID, Vector2(340, 340))
-
-		-- 스킬 설명 툴팁 (스킬칸 위)
-		local tip = self:SpawnUI("model://uisprite", "RtsSkillTooltip", bar,
-			Vector2(1, 0), Vector2(1, 0), Vector2(0, 346), Vector2(340, 110))
-		self:Tint(tip, 0.06, 0.07, 0.1, 0.95)
-		self:SpawnText("RtsSkillTooltipText", tip, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2(0, 0), Vector2(320, 96),
-			"", Color(0.85, 0.88, 0.95, 1))
-		tip:SetEnable(false)
-		self.SkillTooltip = tip
-
-		-- 부대지정 탭 10개 (선택영역 위 — 지정 전 숨김. 유닛 바인딩은 #3)
-		for n = 0, 9 do
-			local tab = self:SpawnUI("model://uisprite", "RtsGroupTab" .. tostring(n), grp,
-				Vector2(0.5, 0), Vector2(0, 0), Vector2(-580 + n * 78, 246), Vector2(72, 60))
-			self:Tint(tab, 0.1, 0.12, 0.16, 0.95)
-			self:SpawnText("RtsGroupTabNum" .. tostring(n), tab, Vector2(0, 1), Vector2(0, 1), Vector2(4, -2), Vector2(24, 22),
-				tostring(n), Color(0.9, 0.85, 0.5, 1))
-			self:SpawnText("RtsGroupTabCount" .. tostring(n), tab, Vector2(0.5, 0), Vector2(0.5, 0), Vector2(0, 2), Vector2(60, 22),
-				"0", Color(0.75, 0.78, 0.85, 1))
-			tab:SetEnable(false)
-		end
-
-		-- 골드: 좌상단 플러시, 아이콘+수치 밀착
-		local gold = self:SpawnUI("model://uisprite", "RtsGoldPanel", grp,
-			Vector2(0, 1), Vector2(0, 1), Vector2(0, 0), Vector2(150, 46))
-		self:Tint(gold, 0.08, 0.09, 0.12, 0.85)
-		local coin = self:SpawnUI("model://uisprite", "RtsGoldIcon", gold,
-			Vector2(0, 0.5), Vector2(0, 0.5), Vector2(6, 0), Vector2(34, 34))
+		local mesoChip = self:SpawnPanel("RtsMesoChip", grp, Vector2(0, 1), Vector2(0, 1), Vector2(16, -68), Vector2(170, 44),
+			self:ColPanel(), self:ColBorder(), 1.5)
+		local coin = self:SpawnUI("model://uisprite", "RtsMesoCoin", mesoChip, Vector2(0, 0.5), Vector2(0, 0.5), Vector2(12, 0), Vector2(26, 26))
 		coin.SpriteGUIRendererComponent.ImageRUID = DataRef(self.CoinRUID)
 		coin.SpriteGUIRendererComponent.Color = Color(1, 1, 1, 1)
-		self:SpawnText("RtsGoldText", gold, Vector2(0, 0.5), Vector2(0, 0.5), Vector2(44, 0), Vector2(100, 34),
-			"0", Color(0.95, 0.85, 0.4, 1))
+		self.MesoText = self:SpawnLabel("RtsMesoText", mesoChip, Vector2(0, 0.5), Vector2(0, 0.5), Vector2(48, 0), Vector2(110, 34),
+			"0", self:ColInk(), 28, TextAlignmentType.MiddleLeft, true)
 
-		-- 시간: 상단 중앙
-		local time = self:SpawnUI("model://uisprite", "RtsTimePanel", grp,
-			Vector2(0.5, 1), Vector2(0.5, 1), Vector2(0, 0), Vector2(160, 48))
-		self:Tint(time, 0.08, 0.09, 0.12, 0.85)
-		self:SpawnText("RtsTimeText", time, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2(0, 0), Vector2(140, 36),
-			"--:--", Color(0.85, 0.88, 0.95, 1))
+		-- 좌측 플레이어 목록 (행은 RefreshPlayerList가 채움)
+		local box = self:SpawnUI("model://uisprite", "RtsPlayers", grp, Vector2(0, 1), Vector2(0, 1), Vector2(16, -123), Vector2(221, 400))
+		self:Tint(box, 0, 0, 0, 0)
+		self.PlayersBox = box
+		self.PlayerHead = self:SpawnLabel("RtsPlayerHead", box, Vector2(0, 1), Vector2(0, 1), Vector2(6, 0), Vector2(200, 20),
+			"0 / 8", Color(0.49, 0.525, 0.584, 1), 13, TextAlignmentType.MiddleLeft, false)
+
+		-- 우측: 영입 버튼 + 유닛 슬롯 6
+		local recruit = self:SpawnPanel("RtsRecruitBtn", grp, Vector2(1, 1), Vector2(1, 1), Vector2(-16, -104), Vector2(130, 50),
+			self:ColPanel(), self:ColBorder(), 1.5)
+		self:SpawnLabel("RtsRecruitLabel", recruit, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2(0, 0), Vector2(120, 40),
+			"영입", self:ColInk(), 20, TextAlignmentType.MiddleCenter, true)
+		local recruitClick = self:SpawnClick("RtsRecruitClick", recruit)
+		recruitClick:ConnectEvent(ButtonClickEvent, function(event)
+			_RtsPopupLogic:Open("recruit")
+		end)
+
+		for i = 1, 6 do
+			local y = -168 - (i - 1) * 50
+			local slot = self:SpawnPanel("RtsUnitSlot" .. tostring(i), grp, Vector2(1, 1), Vector2(1, 1), Vector2(-16, y), Vector2(130, 44),
+				self:ColPanel(), self:ColBorderSoft(), 1.5)
+			local bar = self:SpawnStretch("model://uisprite", "RtsUnitSlotBar" .. tostring(i), slot,
+				Vector2(0, 0), Vector2(0, 1), Vector2(0, 0), Vector2(4, 0))
+			bar.SpriteGUIRendererComponent.Color = self:SeriesColor("")
+			local name = self:SpawnLabel("RtsUnitSlotName" .. tostring(i), slot, Vector2(0, 0.5), Vector2(0, 0.5), Vector2(10, 0), Vector2(110, 30),
+				"빈 자리", self:ColMuted(), 14, TextAlignmentType.MiddleCenter, false)
+			-- 긴 직업명은 잘라낸다 (ellipsis 모드는 안 맞는 글이 오면 이전 글을 그대로 보여주는 문제가 있어 Truncate)
+			name.TextComponent.Overflow = OverflowType.Truncate
+			name.TextComponent.UseNBSP = true
+			local lv = self:SpawnLabel("RtsUnitSlotLv" .. tostring(i), slot, Vector2(1, 0.5), Vector2(1, 0.5), Vector2(-8, 0), Vector2(40, 30),
+				"", self:ColMuted(), 12, TextAlignmentType.MiddleRight, false)
+			local click = self:SpawnClick("RtsUnitSlotClick" .. tostring(i), slot)
+			click:ConnectEvent(ButtonClickEvent, function(event)
+				self:OnUnitSlotClick(i)
+			end)
+			self.UnitSlots[i] = { box = slot, bar = bar, name = name, lv = lv, filled = false }
+			self:ApplySlotLook(i)
+		end
+
+		-- 좌하단: 증강 버튼
+		local aug = self:SpawnPanel("RtsAugBtn", grp, Vector2(0, 0), Vector2(0, 0), Vector2(16, 16), Vector2(100, 50),
+			self:ColPanel(), self:ColBorder(), 1.5)
+		self:SpawnLabel("RtsAugLabel", aug, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2(0, 0), Vector2(96, 40),
+			"증강", self:ColInk(), 20, TextAlignmentType.MiddleCenter, true)
+		local augClick = self:SpawnClick("RtsAugClick", aug)
+		augClick:ConnectEvent(ButtonClickEvent, function(event)
+			_RtsPopupLogic:Open("augment")
+		end)
 
 		self.Built = true
-		log("RtsHud: built v5")
-	end
+		log("RtsHud: built v2")
 
-	-- ===== 스킬칸 API (#4 건설/#9 스킬이 호출) =====
-
-	@ExecSpace("ClientOnly")
-	method void SetSkillSlot(number slot, string name, string desc)
-		local btn = _EntityService:GetEntityByPath("/ui/RtsHudGroup/RtsHudBar/RtsSkillCard/RtsSkill" .. tostring(slot))
-		if btn == nil then return end
-		btn:SetEnable(true)
-		local nameText = _EntityService:GetEntityByPath(btn.Path .. "/RtsSkillName" .. tostring(slot))
-		if nameText ~= nil and nameText.TextComponent ~= nil then nameText.TextComponent.Text = name end
-		local descText = _EntityService:GetEntityByPath(btn.Path .. "/RtsSkillDesc" .. tostring(slot))
-		if descText ~= nil and descText.TextComponent ~= nil then descText.TextComponent.Text = desc end
-	end
-
-	@ExecSpace("ClientOnly")
-	method void ClearSkillSlots()
-		for slot = 1, 9 do
-			local btn = _EntityService:GetEntityByPath("/ui/RtsHudGroup/RtsHudBar/RtsSkillCard/RtsSkill" .. tostring(slot))
-			if btn ~= nil then btn:SetEnable(false) end
+		_RtsPopupLogic:Build(ui)
+		if self.PendingPlayers ~= "" then
+			local packed = self.PendingPlayers
+			self.PendingPlayers = ""
+			self:RefreshPlayerList(packed)
 		end
-		self:HideSkillTooltip()
+	end
+
+	-- ===== 시간·메소 =====
+
+	@ExecSpace("ClientOnly")
+	method void SetTime(string text)
+		if self.TimeText == nil or self.TimeText.TextComponent == nil then return end
+		self.TimeText.TextComponent.Text = text
+	end
+
+	method string FormatNumber(number n)
+		local s = tostring(math.floor(n))
+		local out = ""
+		local len = string.len(s)
+		for i = 1, len do
+			out = out .. string.sub(s, i, i)
+			local rest = len - i
+			if rest > 0 and rest % 3 == 0 then out = out .. "," end
+		end
+		return out
 	end
 
 	@ExecSpace("ClientOnly")
-	method void ShowSkillTooltip(number slot)
-		if self.SkillTooltip == nil then return end
-		local descText = _EntityService:GetEntityByPath("/ui/RtsHudGroup/RtsHudBar/RtsSkillCard/RtsSkill" .. tostring(slot) .. "/RtsSkillDesc" .. tostring(slot))
-		local text = ""
-		if descText ~= nil and descText.TextComponent ~= nil then text = descText.TextComponent.Text end
-		if text == "" then return end
-		local tipText = _EntityService:GetEntityByPath("/ui/RtsHudGroup/RtsHudBar/RtsSkillTooltip/RtsSkillTooltipText")
-		if tipText ~= nil and tipText.TextComponent ~= nil then tipText.TextComponent.Text = text end
-		self.SkillTooltip:SetEnable(true)
+	method void SetMeso(number n)
+		if self.MesoText == nil or self.MesoText.TextComponent == nil then return end
+		self.MesoText.TextComponent.Text = self:FormatNumber(n)
 	end
 
-	@ExecSpace("ClientOnly")
-	method void HideSkillTooltip()
-		if self.SkillTooltip ~= nil then self.SkillTooltip:SetEnable(false) end
-	end
+	-- ===== 플레이어 목록 =====
 
-	@ExecSpace("ClientOnly")
-	method void OnSkillSlot(number slot)
-		log("RtsHud: skill slot " .. tostring(slot) .. " (미구현)")
-	end
-
-	-- ===== 미니맵 (#3: 구역 스냅) =====
-
-	-- 현재 구역 하이라이트 갱신 (JumpToZone에서 호출 — 매 프레임 아님)
-	@ExecSpace("ClientOnly")
-	method void UpdateMinimapZone(number n)
-		if not self.Built or self.ViewportRect == nil then return end
-		local cols = _RtsConfigLogic:GetZoneCols()
-		local rows = _RtsConfigLogic:GetZoneRows()
-		local cellW = self.MinimapStripW / cols
-		local cellH = self.MinimapStripH / rows
-		local idx = n - 1
-		local col = idx % cols
-		local row = math.floor(idx / cols)
-		self.ViewportRect.UITransformComponent.anchoredPosition =
-			Vector2(col * cellW + cellW * 0.5, (rows - 1 - row) * cellH + cellH * 0.5)
-	end
-
-	-- 미니맵 클릭 → 클릭한 '구역'으로 스냅 이동 (자유 위치 이동 아님 — 사용자 확정)
-	@ExecSpace("ClientOnly")
-	method void OnMinimapClick()
-		if self.AnchorEntity == nil or self.MinimapStrip == nil then return end
-		-- 해상도 무관: 스크린 좌표 → 미니맵 스트립 로컬 UI 좌표 (피벗 중앙 기준)
-		local cursor = _InputService:GetCursorPosition()
-		local localPos = _UILogic:ScreenToLocalUIPosition(cursor, self.MinimapStrip.UITransformComponent)
-		local relX = (localPos.x + self.MinimapStripW * 0.5) / self.MinimapStripW
-		local relY = (localPos.y + self.MinimapStripH * 0.5) / self.MinimapStripH
-		if relX < 0 or relX > 1 or relY < 0 or relY > 1 then return end
-		local cols = _RtsConfigLogic:GetZoneCols()
-		local rows = _RtsConfigLogic:GetZoneRows()
-		local col = math.min(cols - 1, math.floor(relX * cols))
-		local rowFromBottom = math.min(rows - 1, math.floor(relY * rows))
-		local row = rows - 1 - rowFromBottom
-		local zone = row * cols + col + 1
-		local anchor = self.AnchorEntity.RtsCameraAnchorComponent
-		if anchor ~= nil then anchor:JumpToZone(zone) end
-	end
-
-	-- ===== Ctrl+숫자(숫자열 전용) 부대지정 골격 — 유닛 바인딩은 #3 =====
-
-	@ExecSpace("ClientOnly")
-	method number KeyToDigit(any key)
-		if key == KeyboardKey.Alpha1 then return 1 end
-		if key == KeyboardKey.Alpha2 then return 2 end
-		if key == KeyboardKey.Alpha3 then return 3 end
-		if key == KeyboardKey.Alpha4 then return 4 end
-		if key == KeyboardKey.Alpha5 then return 5 end
-		if key == KeyboardKey.Alpha6 then return 6 end
-		if key == KeyboardKey.Alpha7 then return 7 end
-		if key == KeyboardKey.Alpha8 then return 8 end
-		if key == KeyboardKey.Alpha9 then return 9 end
-		if key == KeyboardKey.Alpha0 then return 0 end
-		return -1
-	end
-
-	@ExecSpace("ClientOnly")
-	method void AssignControlGroup(number n)
-		local tab = _EntityService:GetEntityByPath("/ui/RtsHudGroup/RtsGroupTab" .. tostring(n))
-		if tab == nil then return end
-		tab:SetEnable(true)
-		log("RtsHud: control group " .. tostring(n) .. " assigned (유닛 바인딩은 #3)")
-	end
-
-	@ExecSpace("ClientOnly")
-	method void SelectControlGroup(number n)
-		local tab = _EntityService:GetEntityByPath("/ui/RtsHudGroup/RtsGroupTab" .. tostring(n))
-		if tab == nil or not tab.Enable then return end
-		log("RtsHud: control group " .. tostring(n) .. " selected")
-	end
-
-	@ExecSpace("ClientOnly")
-	@EventSender("Service", "InputService")
-	handler HandleKeyDownEvent(KeyDownEvent event)
-		local key = event.key
-		if key == KeyboardKey.LeftControl or key == KeyboardKey.RightControl then
-			self.CtrlHeld = true
+	-- 서버 통지(전 클라). packed = "userId\t닉네임\t구역\t생존(1/0)\n..." (구역순)
+	@ExecSpace("Client")
+	method void RefreshPlayerList(string packed)
+		if not self.Built or self.PlayersBox == nil then
+			self.PendingPlayers = packed
 			return
 		end
-		if not self.Built then return end
-		local num = self:KeyToDigit(key)
-		if num < 0 then return end
-		local ctrl = self.CtrlHeld
-			or _InputService:IsKeyPressed(KeyboardKey.LeftControl)
-			or _InputService:IsKeyPressed(KeyboardKey.RightControl)
-		if ctrl then
-			self:AssignControlGroup(num)
+		-- 기존 행 제거
+		for i = 1, #self.PlayerOrder do
+			local p = self.Players[self.PlayerOrder[i]]
+			if p ~= nil and p.row ~= nil and p.row.Parent ~= nil then p.row.Parent:Destroy() end
+		end
+		self.Players = {}
+		self.PlayerOrder = {}
+
+		local count = 0
+		for line in string.gmatch(packed, "[^\n]+") do
+			local f = {}
+			for field in string.gmatch(line .. "\t", "([^\t]*)\t") do f[#f + 1] = field end
+			if #f >= 4 then
+				count = count + 1
+				local userId = f[1]
+				local zone = tonumber(f[3]) or 0
+				local alive = f[4] == "1"
+				self:AddPlayerRow(count, userId, f[2], zone, alive)
+			end
+		end
+		if self.PlayerHead ~= nil and self.PlayerHead.TextComponent ~= nil then
+			self.PlayerHead.TextComponent.Text = string.format("%d / %d", count, _RtsZoneLogic:GetZoneCount())
+		end
+		self:ApplyWatchLook()
+	end
+
+	@ExecSpace("ClientOnly")
+	method void AddPlayerRow(number index, string userId, string nick, number zone, boolean alive)
+		local y = -24 - (index - 1) * 37
+		local row = self:SpawnPanel("RtsPlayerRow" .. tostring(index), self.PlayersBox, Vector2(0, 1), Vector2(0, 1), Vector2(0, y), Vector2(221, 32),
+			self:ColPanel(), self:ColBorderSoft(), 1.5)
+		local bar = self:SpawnStretch("model://uisprite", "RtsPlayerBar", row, Vector2(0, 0), Vector2(0, 1), Vector2(0, 0), Vector2(5, 0))
+		local dot = self:SpawnUI("model://uisprite", "RtsPlayerDot", row, Vector2(0, 0.5), Vector2(0.5, 0.5), Vector2(20, 0), Vector2(13, 13))
+		local tomb = self:SpawnUI("model://uisprite", "RtsPlayerTomb", row, Vector2(0, 0.5), Vector2(0.5, 0.5), Vector2(20, 0), Vector2(14, 17))
+		local tombIn = self:SpawnStretch("model://uisprite", "RtsPlayerTombIn", tomb, Vector2(0, 0), Vector2(1, 1), Vector2(1.5, 1.5), Vector2(-1.5, -1.5))
+		self:Tint(tomb, 0.29, 0.27, 0.235, 1)
+		self:Tint(tombIn, 0.55, 0.51, 0.45, 1)
+		local name = self:SpawnLabel("RtsPlayerName", row, Vector2(0, 0.5), Vector2(0, 0.5), Vector2(36, 0), Vector2(180, 28),
+			nick, self:ColInk(), 16, TextAlignmentType.MiddleLeft, false)
+		if name.TextComponent ~= nil then name.TextComponent.IsRichText = true end
+		local click = self:SpawnClick("RtsPlayerClick", row)
+		click:ConnectEvent(ButtonClickEvent, function(event)
+			self:OnPlayerRowClick(userId)
+		end)
+		local p = { row = row, bar = bar, dot = dot, tomb = tomb, name = name, zone = zone, alive = alive, nick = nick,
+			isMe = (userId == self.MyUserId) }
+		self.Players[userId] = p
+		self.PlayerOrder[#self.PlayerOrder + 1] = userId
+		self:ApplyPlayerLook(userId)
+	end
+
+	-- 행 모양: 생존(초록 점) / 탈락(회색 테두리 + 비석 + 취소선) / 나(금색 바 + (나)) / 보는 중(밝게)
+	@ExecSpace("ClientOnly")
+	method void ApplyPlayerLook(string userId)
+		local p = self.Players[userId]
+		if p == nil then return end
+		local watching = (p.zone == self.WatchedZone)
+		local label = p.nick
+		if p.isMe then label = label .. " <color=#e0b95a><b>(나)</b></color>" end
+		if p.alive then
+			p.dot:SetEnable(true)
+			p.tomb:SetEnable(false)
+			self:Tint(p.dot, 0.247, 0.643, 0.435, 1)
+			p.name.TextComponent.FontColor = self:ColInk()
+			p.name.TextComponent.Text = label
+			if watching then
+				p.row.SpriteGUIRendererComponent.Color = Color(0.22, 0.185, 0.118, 0.92)
+				p.row.Parent.SpriteGUIRendererComponent.Color = self:ColGold()
+			else
+				p.row.SpriteGUIRendererComponent.Color = self:ColPanel()
+				p.row.Parent.SpriteGUIRendererComponent.Color = self:ColBorderSoft()
+			end
+			if p.isMe then
+				p.bar.SpriteGUIRendererComponent.Color = self:ColGold()
+			else
+				p.bar.SpriteGUIRendererComponent.Color = Color(0.788, 0.635, 0.290, 0.6)
+			end
 		else
-			self:SelectControlGroup(num)
+			p.dot:SetEnable(false)
+			p.tomb:SetEnable(true)
+			p.name.TextComponent.FontColor = Color(0.604, 0.561, 0.502, 1)
+			p.name.TextComponent.Text = label
+			p.row.SpriteGUIRendererComponent.Color = Color(0.094, 0.082, 0.071, 0.7)
+			local grey = Color(0.42, 0.388, 0.341, 1)
+			if watching then grey = self:ColGold() end
+			p.row.Parent.SpriteGUIRendererComponent.Color = grey
+			p.bar.SpriteGUIRendererComponent.Color = Color(0.42, 0.388, 0.341, 1)
 		end
 	end
 
 	@ExecSpace("ClientOnly")
-	@EventSender("Service", "InputService")
-	handler HandleKeyUpEvent(KeyUpEvent event)
-		local key = event.key
-		if key == KeyboardKey.LeftControl or key == KeyboardKey.RightControl then
-			self.CtrlHeld = false
+	method void ApplyWatchLook()
+		for i = 1, #self.PlayerOrder do
+			self:ApplyPlayerLook(self.PlayerOrder[i])
 		end
+	end
+
+	@ExecSpace("ClientOnly")
+	method void SetPlayerAlive(string userId, boolean alive)
+		local p = self.Players[userId]
+		if p == nil then return end
+		p.alive = alive
+		self:ApplyPlayerLook(userId)
+	end
+
+	-- 지금 보고 있는 구역 (JumpToZone에서 호출)
+	@ExecSpace("ClientOnly")
+	method void SetWatchedZone(number n)
+		self.WatchedZone = n
+		if not self.Built then return end
+		self:ApplyWatchLook()
+	end
+
+	@ExecSpace("ClientOnly")
+	method void OnPlayerRowClick(string userId)
+		local p = self.Players[userId]
+		if p == nil or p.zone < 1 or self.AnchorEntity == nil then return end
+		local anchor = self.AnchorEntity.RtsCameraAnchorComponent
+		if anchor ~= nil then anchor:JumpToZone(p.zone) end
+	end
+
+	-- ===== 유닛 슬롯 (내용은 Phase 4 #14/#17이 채움) =====
+
+	@ExecSpace("ClientOnly")
+	method void SetUnitSlot(number i, number no, string jobName, number level, string series)
+		local s = self.UnitSlots[i]
+		if s == nil then return end
+		s.filled = true
+		-- 리치텍스트 태그는 말줄임(ellipsis)에 잘려 그대로 노출되므로 평문으로
+		s.name.TextComponent.Text = tostring(no) .. ". " .. jobName
+		s.name.TextComponent.Alignment = TextAlignmentType.MiddleLeft
+		s.name.UITransformComponent.RectSize = Vector2(80, 30)
+		s.name.TextComponent.FontSize = 13
+		s.lv.TextComponent.Text = "Lv " .. tostring(level)
+		s.bar.SpriteGUIRendererComponent.Color = self:SeriesColor(series)
+		self:ApplySlotLook(i)
+	end
+
+	@ExecSpace("ClientOnly")
+	method void ClearUnitSlot(number i)
+		local s = self.UnitSlots[i]
+		if s == nil then return end
+		s.filled = false
+		s.name.TextComponent.Text = "빈 자리"
+		s.name.TextComponent.Alignment = TextAlignmentType.MiddleCenter
+		s.name.UITransformComponent.RectSize = Vector2(110, 30)
+		s.name.TextComponent.FontSize = 14
+		s.lv.TextComponent.Text = ""
+		s.bar.SpriteGUIRendererComponent.Color = self:SeriesColor("")
+		if self.SelectedSlot == i then self.SelectedSlot = 0 end
+		self:ApplySlotLook(i)
+	end
+
+	@ExecSpace("ClientOnly")
+	method void ApplySlotLook(number i)
+		local s = self.UnitSlots[i]
+		if s == nil then return end
+		local outer = s.box.Parent
+		if not s.filled then
+			s.box.SpriteGUIRendererComponent.Color = Color(0.094, 0.082, 0.071, 0.35)
+			outer.SpriteGUIRendererComponent.Color = Color(0.788, 0.635, 0.290, 0.2)
+			s.name.TextComponent.FontColor = Color(0.788, 0.710, 0.541, 0.5)
+			s.bar.SpriteGUIRendererComponent.Color = Color(0.541, 0.498, 0.439, 0.35)
+			return
+		end
+		s.name.TextComponent.FontColor = self:ColInk()
+		if self.SelectedSlot == i then
+			s.box.SpriteGUIRendererComponent.Color = Color(0.22, 0.185, 0.118, 0.92)
+			outer.SpriteGUIRendererComponent.Color = self:ColGold()
+		else
+			s.box.SpriteGUIRendererComponent.Color = self:ColPanel()
+			outer.SpriteGUIRendererComponent.Color = self:ColBorderSoft()
+		end
+	end
+
+	-- 슬롯 클릭 = 선택 표시. 발판 금색 링은 Phase 4에서 연결
+	@ExecSpace("ClientOnly")
+	method void OnUnitSlotClick(number i)
+		local s = self.UnitSlots[i]
+		if s == nil or not s.filled then return end
+		local prev = self.SelectedSlot
+		if prev == i then self.SelectedSlot = 0 else self.SelectedSlot = i end
+		if prev > 0 then self:ApplySlotLook(prev) end
+		self:ApplySlotLook(i)
 	end
 
 end
