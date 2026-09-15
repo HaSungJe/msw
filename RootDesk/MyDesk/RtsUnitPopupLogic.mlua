@@ -1,6 +1,7 @@
 -- Phase 5 #19·#20 + Phase 4 #14 (부분, 2026-09-15): 유닛 정보 팝업 (아티팩트 v27 #unitModal 그대로)
 --   열기: 우측 유닛 슬롯 클릭 / 캐릭터 클릭 메뉴의 상세정보. 셸(딤·패널·제목·X·ESC)은 RtsPopupLogic("unit").
---   좌: 외형(스킨 2 — 기본 세트 / 월드 아바타 = 월드코인 1,600으로 30일 해금, 잠기면 클릭 → 구매창) + 능력치(RtsJobTableLogic.Calc). 우: 스킬 목록(미획득 흐림, 액티브/패시브).
+--   좌: 외형(스킨 2 — 기본 세트 / 월드 아바타 = 월드코인 1,600으로 30일 해금, 잠기면 클릭 → 구매창) + 능력치(RtsJobTableLogic.Calc, 파티 버프 반영 행은 ▲).
+--   우: 탭 3개 — 스킬(미획득 흐림, 액티브/패시브) / 증강 n(이 유닛에 지정된 증강, Phase 6 전엔 빈 목록) / 적용 중인 버프 n(RtsUnitBuffLogic). 증강·버프는 ScrollLayoutGroup 스크롤 목록.
 --   대상 지정 스킬(결속) 행에는 셀렉트 박스(미지정 / 내 다른 유닛). 하단: 누적 투자·보유 메소·[레벨업].
 --   위치 이동은 여기 없음 — 캐릭터 클릭 메뉴(RtsUnitSelectLogic)에서. 대상 변경·위치 이동은 유닛마다 3분 쿨.
 --   좌표는 1920×1080 기준(목업 1cqw = 19.2px). 값은 서버가 바꾸고(RtsUnitLogic) 동기화가 오면 다시 그린다.
@@ -19,6 +20,9 @@ script RtsUnitPopupLogic extends Logic
 	property Entity Content = nil
 
 	property Entity Dropdown = nil
+
+	-- 우측 탭: skill / aug / buff (팝업을 닫아도 유지)
+	property string Tab = "skill"
 
 	property Entity BondCoolText = nil
 
@@ -111,8 +115,13 @@ script RtsUnitPopupLogic extends Logic
 		self.Content = content
 
 		local jobName = T:GetJobName(u.JobId)
-		local c = T:Calc(u.JobId, u.Level)
-		local s = c.st
+		-- 버프 없는 원값(s0)과 버프 반영값(s) — 달라진 행은 ▲
+		local B = _RtsUnitBuffLogic
+		local s0 = T:GetStat(u.JobId, u.Level)
+		local buffs = B:GetBuffsFor(u.Zone, u.No)
+		local s = T:GetStat(u.JobId, u.Level)
+		B:ApplyToStat(s, buffs)
+		local c = T:CalcStat(u.JobId, u.Level, s)
 
 		-- 제목: "2. 팔라딘  Lv 40 · 모험가 · 전사"
 		P.Title.TextComponent.IsRichText = true
@@ -173,7 +182,7 @@ script RtsUnitPopupLogic extends Logic
 			"월드 아바타는 구매할 때마다 30일 연장", H:ColMuted(), 11, TextAlignmentType.MiddleLeft, false)
 
 		-- ----- 좌: 능력치 -----
-		local stats = H:SpawnPanel("RtsUnitStats", content, Vector2(0, 1), Vector2(0, 1), Vector2(27, -256), Vector2(365, 318),
+		local stats = H:SpawnPanel("RtsUnitStats", content, Vector2(0, 1), Vector2(0, 1), Vector2(27, -256), Vector2(365, 348),
 			P:Mix(Color.white, 0.03), P:Mix(H:ColGold(), 0.25), 1.5)
 		H:SpawnLabel("RtsUnitStatsK", stats, Vector2(0, 1), Vector2(0, 1), Vector2(14, -10), Vector2(200, 18),
 			"능력치", H:ColMuted(), 13, TextAlignmentType.MiddleLeft, false)
@@ -182,18 +191,25 @@ script RtsUnitPopupLogic extends Logic
 		if s.flat > 0 then atkNote = atkNote .. " + " .. H:Int(s.flat) end
 		local ignText = H:Int(s.ign) .. "%"
 		if s.ignBoss >= 0 then ignText = ignText .. " " .. muted .. "· 보스 " .. H:Int(s.ignBoss) .. "%</color>" end
+		local up = " <color=#9fd39a>▲</color>"
 		local finText = H:Int(s.fin) .. "%"
 		if s.finBoss ~= s.fin then finText = finText .. " " .. muted .. "· 보스 " .. H:Int(s.finBoss) .. "%</color>" end
+		if s.fin ~= s0.fin or s.finBoss ~= s0.finBoss then finText = finText .. up end
+		local critText = "확률 " .. H:Int(s.crit) .. "% · 데미지 " .. H:Int(s.critDmg) .. "%"
+		if s.crit ~= s0.crit or s.critDmg ~= s0.critDmg then critText = critText .. up end
+		local dpsUp = ""
+		if #buffs > 0 then dpsUp = up end
 		local rows = {
 			{ "공격속도", s.speed .. " <b>" .. tostring(c.period) .. "초</b>당 1회" },
 			{ "공격력", "<b>" .. self:Fmt(c.atk) .. "</b> " .. muted .. "(" .. atkNote .. ")</color>" },
 			{ "공격력 %", H:Int(s.pct) .. "%" },
 			{ "방어율 무시", ignText },
 			{ "최종 데미지", finText },
+			{ "크리티컬", critText },
 			{ "sep", "" },
 			{ "기본 공격", H:Int(s.ratio) .. "% × " .. H:Int(s.targets) .. "마리 × " .. H:Int(s.hits) .. "회" },
-			{ "보스 DPS", "<b>" .. self:Fmt(c.boss) .. "</b>" },
-			{ "몬스터 DPS", "<b>" .. self:Fmt(c.mob) .. "</b> " .. muted .. "(" .. H:Int(s.targets) .. "마리 합)</color>" },
+			{ "보스 DPS", "<b>" .. self:Fmt(c.boss) .. "</b>" .. dpsUp },
+			{ "몬스터 DPS", "<b>" .. self:Fmt(c.mob) .. "</b> " .. muted .. "(" .. H:Int(s.targets) .. "마리 합)</color>" .. dpsUp },
 		}
 		local y = -34
 		for i = 1, #rows do
@@ -211,54 +227,37 @@ script RtsUnitPopupLogic extends Logic
 			end
 		end
 
-		-- ----- 우: 스킬 목록 -----
+		-- ----- 우: 탭(스킬 / 증강 n / 적용 중인 버프 n) + 목록 -----
 		local rx = 411
 		local rw = self.PanelW - rx - 27
-		local skills = T:GetSkills(u.JobId)
-		local sy = -10
-		self.BondCoolText = nil
-		self.BondBtn = nil
-		self.BondLocked = false
-		for i = 1, #skills do
-			local k = skills[i]
-			local got = u.Level >= k.lv
-			local isTarget = k.target and got
-			local rh = 64
-			if isTarget then rh = 100 end
-			local bg = P:Mix(Color.white, 0.04)
-			local border = P:Mix(Color.white, 0.1)
-			if not got then
-				bg = P:Mix(Color.white, 0.02)
-				border = P:Mix(Color.white, 0.06)
+		local augs = B:GetAugmentsFor(u.Zone, u.No)
+		local tabs = {
+			{ id = "skill", text = "스킬", w = 120 },
+			{ id = "aug", text = "증강 " .. H:Int(#augs), w = 130 },
+			{ id = "buff", text = "적용 중인 버프 " .. H:Int(#buffs), w = 190 },
+		}
+		local tx = rx
+		for i = 1, #tabs do
+			local tb = tabs[i]
+			local on = (self.Tab == tb.id)
+			local tab = P:SpawnTab("RtsUnitTab" .. tb.id, content, Vector2(tx, -10), Vector2(tb.w, 34), tb.text, on, 15)
+			if not on then
+				local id = tb.id
+				local click = H:SpawnClick("RtsUnitTabClick", tab)
+				click:ConnectEvent(ButtonClickEvent, function(event)
+					self.Tab = id
+					self:Render()
+				end)
 			end
-			local row = H:SpawnPanel("RtsUnitSkill" .. tostring(i), content, Vector2(0, 1), Vector2(0, 1), Vector2(rx, sy), Vector2(rw, rh), bg, border, 1.5)
-			local bar = H:SpawnStretch("model://uisprite", "RtsUnitSkillBar", row, Vector2(0, 0), Vector2(0, 1), Vector2(0, 0), Vector2(4, 0))
-			local barColor = Color(0.541, 0.498, 0.439, 1)
-			if k.kind == "액티브" then barColor = H:ColGold() end
-			if not got then barColor = Color(0.4, 0.37, 0.33, 0.6) end
-			bar.SpriteGUIRendererComponent.Color = barColor
-			local ink = H:ColInk()
-			local desc = Color(0.902, 0.863, 0.769, 1)
-			local mutedC = H:ColMuted()
-			if not got then
-				ink = Color(0.55, 0.51, 0.45, 1)
-				desc = Color(0.5, 0.46, 0.41, 1)
-				mutedC = Color(0.45, 0.42, 0.37, 1)
-			end
-			local lvLbl = H:SpawnLabel("RtsUnitSkillLv", row, Vector2(0, 0.5), Vector2(0, 0.5), Vector2(12, 0), Vector2(50, 40),
-				"Lv\n<b><size=17>" .. H:Int(k.lv) .. "</size></b>", mutedC, 12, TextAlignmentType.MiddleCenter, false)
-			lvLbl.TextComponent.IsRichText = true
-			local nameText = k.name .. "  <size=11><color=#d9cba6>" .. k.kind .. "</color></size>"
-			if not got then nameText = nameText .. "  <size=12><color=#8a8072>미획득</color></size>" end
-			local nameLbl = H:SpawnLabel("RtsUnitSkillName", row, Vector2(0, 1), Vector2(0, 1), Vector2(70, -8), Vector2(rw - 90, 24),
-				nameText, ink, 17, TextAlignmentType.MiddleLeft, true)
-			nameLbl.TextComponent.IsRichText = true
-			H:SpawnLabel("RtsUnitSkillDesc", row, Vector2(0, 1), Vector2(0, 1), Vector2(70, -34), Vector2(rw - 90, 22),
-				k.desc, desc, 14, TextAlignmentType.MiddleLeft, false)
-			if isTarget then
-				self:BuildTargetRow(row, u, rx, sy)
-			end
-			sy = sy - rh - 6
+			tx = tx + tb.w + 8
+		end
+		local top = -54
+		if self.Tab == "aug" then
+			self:BuildAugTab(content, rx, rw, top, augs)
+		elseif self.Tab == "buff" then
+			self:BuildBuffTab(content, rx, rw, top, buffs)
+		else
+			self:BuildSkillTab(content, u, rx, rw, top)
 		end
 
 		-- ----- 하단: 누적 투자 · 보유 메소 · 위치 이동 · 레벨업 -----
@@ -345,6 +344,148 @@ script RtsUnitPopupLogic extends Logic
 			click:ConnectEvent(ButtonClickEvent, function(event)
 				self:ToggleDropdown(listX, listY)
 			end)
+		end
+	end
+
+	-- 스킬 탭: 획득 레벨 순으로 쌓는다(7행까지라 스크롤 없음 — 결속 드롭다운이 행 위치로 자리를 잡기 때문)
+	@ExecSpace("ClientOnly")
+	method void BuildSkillTab(Entity content, any u, number rx, number rw, number top)
+		local H = _RtsHudLogic
+		local P = _RtsPopupLogic
+		local skills = _RtsJobTableLogic:GetSkills(u.JobId)
+		local sy = top
+		self.BondCoolText = nil
+		self.BondBtn = nil
+		self.BondLocked = false
+		for i = 1, #skills do
+			local k = skills[i]
+			local got = u.Level >= k.lv
+			local isTarget = k.target and got
+			local rh = 64
+			if isTarget then rh = 100 end
+			local bg = P:Mix(Color.white, 0.04)
+			local border = P:Mix(Color.white, 0.1)
+			if not got then
+				bg = P:Mix(Color.white, 0.02)
+				border = P:Mix(Color.white, 0.06)
+			end
+			local row = H:SpawnPanel("RtsUnitSkill" .. tostring(i), content, Vector2(0, 1), Vector2(0, 1), Vector2(rx, sy), Vector2(rw, rh), bg, border, 1.5)
+			local bar = H:SpawnStretch("model://uisprite", "RtsUnitSkillBar", row, Vector2(0, 0), Vector2(0, 1), Vector2(0, 0), Vector2(4, 0))
+			local barColor = Color(0.541, 0.498, 0.439, 1)
+			if k.kind == "액티브" then barColor = H:ColGold() end
+			if not got then barColor = Color(0.4, 0.37, 0.33, 0.6) end
+			bar.SpriteGUIRendererComponent.Color = barColor
+			local ink = H:ColInk()
+			local desc = Color(0.902, 0.863, 0.769, 1)
+			local mutedC = H:ColMuted()
+			if not got then
+				ink = Color(0.55, 0.51, 0.45, 1)
+				desc = Color(0.5, 0.46, 0.41, 1)
+				mutedC = Color(0.45, 0.42, 0.37, 1)
+			end
+			local lvLbl = H:SpawnLabel("RtsUnitSkillLv", row, Vector2(0, 0.5), Vector2(0, 0.5), Vector2(12, 0), Vector2(50, 40),
+				"Lv\n<b><size=17>" .. H:Int(k.lv) .. "</size></b>", mutedC, 12, TextAlignmentType.MiddleCenter, false)
+			lvLbl.TextComponent.IsRichText = true
+			local nameText = k.name .. "  <size=11><color=#d9cba6>" .. k.kind .. "</color></size>"
+			if not got then nameText = nameText .. "  <size=12><color=#8a8072>미획득</color></size>" end
+			local nameLbl = H:SpawnLabel("RtsUnitSkillName", row, Vector2(0, 1), Vector2(0, 1), Vector2(70, -8), Vector2(rw - 90, 24),
+				nameText, ink, 17, TextAlignmentType.MiddleLeft, true)
+			nameLbl.TextComponent.IsRichText = true
+			H:SpawnLabel("RtsUnitSkillDesc", row, Vector2(0, 1), Vector2(0, 1), Vector2(70, -34), Vector2(rw - 90, 22),
+				k.desc, desc, 14, TextAlignmentType.MiddleLeft, false)
+			if isTarget then
+				self:BuildTargetRow(row, u, rx, sy)
+			end
+			sy = sy - rh - 6
+		end
+	end
+
+	-- 스크롤 목록 컨테이너(세로 레이아웃, 자식 행을 위에서부터 쌓고 넘치면 스크롤). 하단 66px는 누적 투자·레벨업 자리
+	--   rows = 64px 행 수(간격 6). 다 들어가면 스크롤 자체를 끈다 — AutoHide는 내용이 짧아도 핸들이 그대로 보이고, Hide는 트랙이 흰 띠로 남음(2026-09-16 실측)
+	@ExecSpace("ClientOnly")
+	method Entity SpawnScrollList(Entity content, string name, number rx, number rw, number top, number rows)
+		local H = _RtsHudLogic
+		local list = H:SpawnStretch("model://uisprite", name, content, Vector2(0, 0), Vector2(0, 1), Vector2(rx, 66), Vector2(rx + rw, top))
+		if list == nil then return nil end
+		H:Tint(list, 1, 1, 1, 0)
+		local viewH = (self.PanelH - 70) - 66 + top
+		local fits = rows * 70 - 6 <= viewH
+		local sg = list:AddComponent("ScrollLayoutGroupComponent")
+		if sg ~= nil then
+			sg.Type = LayoutGroupType.Vertical
+			sg.ChildAlignment = ChildAlignmentType.UpperLeft
+			sg.Spacing = 6
+			sg.UseScroll = not fits
+			-- 스크롤바 프로퍼티 이름은 d.mlua(Visible·Thickness…)와 달리 런타임엔 ScrollBar* (2026-09-16 실측: "cannot set Visible")
+			sg.ScrollBarVisible = ScrollBarVisibility.AlwaysShow
+			sg.ScrollBarThickness = 8
+			sg.ScrollBarHandleColor = H:ColGold()
+			sg.ScrollBarBackgroundColor = Color(1, 1, 1, 0.06)
+		end
+		return list
+	end
+
+	-- 빈 목록 안내(목록의 유일한 행)
+	@ExecSpace("ClientOnly")
+	method void SpawnEmptyRow(Entity list, number rw, string text)
+		local H = _RtsHudLogic
+		local row = H:SpawnUI("model://uisprite", "RtsUnitEmptyRow", list, Vector2(0, 1), Vector2(0, 1), Vector2(0, 0), Vector2(rw - 12, 200))
+		H:Tint(row, 1, 1, 1, 0)
+		H:SpawnLabel("RtsUnitEmptyText", row, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2(0, 0), Vector2(rw - 40, 60),
+			text, H:ColMuted(), 15, TextAlignmentType.MiddleCenter, false)
+	end
+
+	-- 증강 탭: 이 유닛에 지정된 증강(등급 배지 · 이름 · 효과). Phase 6 전엔 빈 목록
+	@ExecSpace("ClientOnly")
+	method void BuildAugTab(Entity content, number rx, number rw, number top, table augs)
+		local H = _RtsHudLogic
+		local P = _RtsPopupLogic
+		local list = self:SpawnScrollList(content, "RtsUnitAugList", rx, rw, top, #augs)
+		if list == nil then return end
+		if #augs == 0 then
+			self:SpawnEmptyRow(list, rw, "적용 중인 증강이 없어요.")
+			return
+		end
+		for i = 1, #augs do
+			local a = augs[i]
+			local row = H:SpawnPanel("RtsUnitAug" .. tostring(i), list, Vector2(0, 1), Vector2(0, 1), Vector2(0, 0), Vector2(rw - 12, 64),
+				P:Mix(Color.white, 0.04), P:Mix(Color.white, 0.1), 1.5)
+			local band = H:SpawnStretch("model://uisprite", "RtsUnitAugBand", row, Vector2(0, 0), Vector2(0, 1), Vector2(0, 0), Vector2(4, 0))
+			band.SpriteGUIRendererComponent.Color = P:GradeColor(a.g)
+			P:SpawnBadge("RtsUnitAugBadge", row, Vector2(14, -20), a.g)
+			H:SpawnLabel("RtsUnitAugT", row, Vector2(0, 1), Vector2(0, 1), Vector2(92, -8), Vector2(rw - 120, 24),
+				a.t, H:ColInk(), 17, TextAlignmentType.MiddleLeft, true)
+			H:SpawnLabel("RtsUnitAugD", row, Vector2(0, 1), Vector2(0, 1), Vector2(92, -34), Vector2(rw - 120, 22),
+				a.d, Color(0.902, 0.863, 0.769, 1), 14, TextAlignmentType.MiddleLeft, false)
+		end
+	end
+
+	-- 적용 중인 버프 탭: 아이콘 · 이름 + 범위 · 효과 (출처 유닛은 안 씀)
+	@ExecSpace("ClientOnly")
+	method void BuildBuffTab(Entity content, number rx, number rw, number top, table buffs)
+		local H = _RtsHudLogic
+		local P = _RtsPopupLogic
+		local B = _RtsUnitBuffLogic
+		local list = self:SpawnScrollList(content, "RtsUnitBuffList", rx, rw, top, #buffs)
+		if list == nil then return end
+		if #buffs == 0 then
+			self:SpawnEmptyRow(list, rw, "적용 중인 버프가 없어요.")
+			return
+		end
+		for i = 1, #buffs do
+			local b = buffs[i]
+			local row = H:SpawnPanel("RtsUnitBuff" .. tostring(i), list, Vector2(0, 1), Vector2(0, 1), Vector2(0, 0), Vector2(rw - 12, 64),
+				P:Mix(Color.white, 0.04), P:Mix(Color.white, 0.1), 1.5)
+			local ic = H:SpawnUI("model://uisprite", "RtsUnitBuffIcon", row, Vector2(0, 0.5), Vector2(0, 0.5), Vector2(14, 0), Vector2(40, 40))
+			if ic ~= nil and ic.SpriteGUIRendererComponent ~= nil then
+				ic.SpriteGUIRendererComponent.ImageRUID = DataRef(b.def.icon)
+				ic.SpriteGUIRendererComponent.Color = Color.white
+			end
+			local name = H:SpawnLabel("RtsUnitBuffName", row, Vector2(0, 1), Vector2(0, 1), Vector2(70, -8), Vector2(rw - 100, 24),
+				b.def.name .. "  <size=11><color=#d9cba6>" .. B:ScopeText(b.def) .. "</color></size>", H:ColInk(), 17, TextAlignmentType.MiddleLeft, true)
+			name.TextComponent.IsRichText = true
+			H:SpawnLabel("RtsUnitBuffEff", row, Vector2(0, 1), Vector2(0, 1), Vector2(70, -34), Vector2(rw - 100, 22),
+				B:EffectText(b.def), Color(0.624, 0.827, 0.604, 1), 14, TextAlignmentType.MiddleLeft, false)
 		end
 	end
 

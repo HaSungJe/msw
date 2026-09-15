@@ -64,3 +64,10 @@ MSW(Maker 26.7) 실측으로 확인한 엔진 동작. 다시 실측하면 30분�
 - Rationale: 실측 2026-09-15
 - CLAUDE.md application: not needed
 - Priority: takes precedence over defaults
+
+## 스크롤 목록 = uisprite + ScrollLayoutGroupComponent (프로퍼티 이름은 ScrollBar*)
+- Rule: 스크립트로 스크롤 목록을 만들 땐 `model://uisprite`를 스폰해 `AddComponent("ScrollLayoutGroupComponent")` → `Type = LayoutGroupType.Vertical`, `ChildAlignment`, `Spacing`, `UseScroll`. 자식은 그냥 스폰하면 위에서부터 쌓이고(RectSize 높이 사용) 넘치면 휠 스크롤·핸들이 생긴다. 스크롤바 프로퍼티 이름은 로컬 d.mlua(`Visible`·`Thickness`·`HandleColor`·`BackgroundColor`)와 달리 런타임엔 **`ScrollBarVisible`·`ScrollBarThickness`·`ScrollBarHandleColor`·`ScrollBarBackgroundColor`**(d.mlua 이름으로 쓰면 "cannot set Visible, no such field"). `ScrollBarVisibility.AutoHide`는 내용이 짧아도 핸들이 트랙을 꽉 채운 채 보이고, `Hide`는 흰 트랙 띠가 남는다 → 내용이 다 들어가면 `UseScroll = false`로 끈다. 스크롤 위치는 `SetScrollNormalizedPosition(UITransformAxis.Vertical, v)`. 예: `RtsUnitPopupLogic.SpawnScrollList`.
+- Scope: project
+- Rationale: 2026-09-16 유닛 팝업 증강·버프 탭 실측(d.mlua 이름 실패 → mlua_api_retriever로 확인)
+- CLAUDE.md application: not needed
+- Priority: takes precedence over defaults

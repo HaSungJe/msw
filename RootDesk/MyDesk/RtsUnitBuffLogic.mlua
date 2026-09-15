@@ -1,0 +1,175 @@
+-- Phase 5 #19·#20 (부분, 2026-09-16): 유닛 간 파티 버프 — 캐릭터 밑 아이콘 + 유닛 정보 팝업의 "적용 중인 버프".
+--   버프는 동기화된 RtsUnitComponent 값(직업·레벨·칸·BondNo)만으로 클라가 계산한다(서버 상태 없음).
+--   정의 = .info/character.md의 "모든 유닛 / 주변 n타일 / 유닛 1개 지정" 스킬. 시전자 자신도 포함(결속 제외) —
+--   그래서 RtsJobTableLogic.GetStatRaw에는 파티 버프를 넣지 않는다(이중 적용 방지).
+--   합산 규칙(damage.md): 최종 데미지는 서로 곱, 크리 확률·크리 데미지는 각각 합. 같은 버프(id)는 출처가 여럿이어도 1개만.
+@Logic
+script RtsUnitBuffLogic extends Logic
+
+	-- 캐릭터 밑 아이콘: 유닛 엔티티의 자식(유닛이 움직이거나 사라지면 같이). 유닛 스케일 2라 로컬 값은 절반.
+	--   32px 아이콘 × 2.2 = 0.7유닛 ≈ 칸(1.78)의 40% — 카메라가 멀어서 이보다 작으면 안 보인다(2026-09-16 실측)
+	property number IconScale = 2.2
+
+	property number IconGap = 0.75
+
+	property number IconDy = -0.52
+
+	-- 구역별 갱신 예약(동기화가 프로퍼티마다 오므로 0.2초 모아서 한 번에)
+	property table Dirty = {}
+
+	property number FlushId = 0
+
+	-- 유닛별 아이콘 세대(이름 충돌 방지 — 클라 스폰/파괴는 프레임에 걸쳐 처리된다)
+	property table IconGen = {}
+
+	-- ===== 정의 =====
+
+	-- id 같으면 중복 적용 안 함. scope: all(구역 전체) / target(BondNo 지정 유닛) / near(주변 range칸, 대각선 포함)
+	--   fin 최종 데미지 +% / crit 크리 확률 +% / critDmg 크리 데미지 +%. 아이콘은 메이플 원작 스킬 아이콘 RUID
+	method table GetDefs()
+		return {
+			{ id = "bond", name = "결속", job = "paladin", lv = 40, scope = "target", icon = "e4b1179780154997a33a1ea985acefd0", fin = 20 },
+			{ id = "sharpeyes", name = "샤프아이즈", job = "bow", lv = 40, scope = "all", icon = "4cd1961bc55b47cb80e1a7f8843e225e", crit = 20, critDmg = 20 },
+			{ id = "sharpeyes", name = "샤프아이즈", job = "marks", lv = 20, scope = "all", icon = "4cd1961bc55b47cb80e1a7f8843e225e", crit = 20, critDmg = 20 },
+			{ id = "pray", name = "프레이", job = "bishop", lv = 30, scope = "near", range = 1, icon = "39b3159efcc74334b875c94c64a74243", fin = 15 },
+			{ id = "joker", name = "조커: 날카로운 검", job = "phantom", lv = 10, scope = "all", icon = "f1575f7842c740a49f9e19c2514de64e", fin = 5 },
+		}
+	end
+
+	-- 효과 글자: "최종 데미지 +20%" / "크리티컬 확률 +20% · 크리티컬 데미지 +20%"
+	method string EffectText(table def)
+		local parts = {}
+		local I = _RtsHudLogic
+		if def.fin ~= nil then parts[#parts + 1] = "최종 데미지 +" .. I:Int(def.fin) .. "%" end
+		if def.crit ~= nil then parts[#parts + 1] = "크리티컬 확률 +" .. I:Int(def.crit) .. "%" end
+		if def.critDmg ~= nil then parts[#parts + 1] = "크리티컬 데미지 +" .. I:Int(def.critDmg) .. "%" end
+		return table.concat(parts, " · ")
+	end
+
+	-- 범위 글자: "모든 유닛" / "지정 유닛 1개" / "주변 1타일"
+	method string ScopeText(table def)
+		if def.scope == "target" then return "지정 유닛 1개" end
+		if def.scope == "near" then return "주변 " .. _RtsHudLogic:Int(def.range) .. "타일" end
+		return "모든 유닛"
+	end
+
+	-- ===== 계산 =====
+
+	-- 구역 zone의 유닛 no에 걸린 버프 목록: { def, srcNo, srcJob, srcLevel }. 출처 유닛 번호 순, id 중복 제거(출처는 화면에 안 씀)
+	@ExecSpace("ClientOnly")
+	method table GetBuffsFor(number zone, number no)
+		local out = {}
+		local seen = {}
+		local me = _RtsUnitLogic:GetZoneUnit(zone, no)
+		if me == nil then return out end
+		local defs = self:GetDefs()
+		for srcNo = 1, _RtsUnitLogic:GetMaxUnits() do
+			local src = _RtsUnitLogic:GetZoneUnit(zone, srcNo)
+			if src ~= nil then
+				for i = 1, #defs do
+					local d = defs[i]
+					if d.job == src.JobId and src.Level >= d.lv and seen[d.id] == nil and self:InScope(d, src, me) then
+						seen[d.id] = true
+						out[#out + 1] = { def = d, srcNo = srcNo, srcJob = src.JobId, srcLevel = src.Level }
+					end
+				end
+			end
+		end
+		return out
+	end
+
+	method boolean InScope(table def, any src, any me)
+		if def.scope == "target" then return src.BondNo == me.No end
+		if def.scope == "near" then
+			return _RtsZoneLogic:CellDistance(src.Col, src.Row, me.Col, me.Row) <= def.range
+		end
+		return true
+	end
+
+	-- 능력치 표(RtsJobTableLogic.GetStat 결과)에 버프 반영. 최종 데미지는 곱, 크리는 합(확률 상한 100)
+	method void ApplyToStat(table st, table buffs)
+		for i = 1, #buffs do
+			local d = buffs[i].def
+			if d.fin ~= nil then
+				st.fin = st.fin * (100 + d.fin) / 100
+				st.finBoss = st.finBoss * (100 + d.fin) / 100
+			end
+			if d.crit ~= nil then st.crit = st.crit + d.crit end
+			if d.critDmg ~= nil then st.critDmg = st.critDmg + d.critDmg end
+		end
+		if st.crit > 100 then st.crit = 100 end
+	end
+
+	-- 이 유닛에 지정된 증강 목록 { g 등급(bronze/silver/gold/prism), t 이름, d 효과 }. Phase 6 증강 시스템(RtsAugmentLogic)이 생기면 거기서 채운다 — 지금은 빈 목록
+	@ExecSpace("ClientOnly")
+	method table GetAugmentsFor(number zone, number no)
+		return {}
+	end
+
+	-- ===== 캐릭터 밑 아이콘 =====
+
+	-- RtsUnitComponent 동기화마다 호출 — 구역 단위로 모아서 곧 다시 그린다
+	@ExecSpace("ClientOnly")
+	method void MarkDirty(number zone)
+		if zone < 1 then return end
+		self.Dirty[zone] = true
+		if self.FlushId ~= 0 then return end
+		self.FlushId = _TimerService:SetTimerOnce(function()
+			self:Flush()
+		end, 0.2)
+	end
+
+	@ExecSpace("ClientOnly")
+	method void Flush()
+		self.FlushId = 0
+		local zones = self.Dirty
+		self.Dirty = {}
+		for zone, _ in pairs(zones) do
+			self:RefreshZone(zone)
+		end
+	end
+
+	@ExecSpace("ClientOnly")
+	method void RefreshZone(number zone)
+		for no = 1, _RtsUnitLogic:GetMaxUnits() do
+			local u = _RtsUnitLogic:GetZoneUnit(zone, no)
+			if u ~= nil then self:RefreshUnitIcons(u) end
+		end
+	end
+
+	-- 유닛 1기의 아이콘을 전부 지우고 다시 만든다 (발 아래 가로로 나열, 가운데 정렬)
+	@ExecSpace("ClientOnly")
+	method void RefreshUnitIcons(any u)
+		local e = u.Entity
+		if e == nil then return end
+		local key = _RtsHudLogic:Int(u.Zone) .. "_" .. _RtsHudLogic:Int(u.No)
+		local kids = e.Children:ToTable()
+		for i = 1, #kids do
+			local k = kids[i]
+			if k ~= nil and string.sub(k.Name, 1, 11) == "RtsBuffIcon" then k:Destroy() end
+		end
+		local buffs = self:GetBuffsFor(u.Zone, u.No)
+		if #buffs == 0 then return end
+		local gen = (self.IconGen[key] or 0) + 1
+		self.IconGen[key] = gen
+		local n = #buffs
+		for i = 1, n do
+			local dx = (i - (n + 1) / 2) * self.IconGap
+			local name = "RtsBuffIcon" .. _RtsHudLogic:Int(gen) .. "_" .. _RtsHudLogic:Int(i)
+			local m = _SpawnService:SpawnByModelId("model://MapObject", name, Vector3.zero, e)
+			if m ~= nil then
+				local sr = m.SpriteRendererComponent
+				if sr == nil then sr = m:AddComponent("SpriteRendererComponent") end
+				if sr ~= nil then
+					sr.SpriteRUID = buffs[i].def.icon
+					sr.SortingLayer = "MapLayer0"
+					sr.OrderInLayer = 210
+				end
+				-- 부모(유닛) 스케일 2 → 로컬은 절반
+				m.TransformComponent.Position = Vector3(dx / 2, self.IconDy / 2, 0)
+				m.TransformComponent.Scale = Vector3(self.IconScale / 2, self.IconScale / 2, 1)
+			end
+		end
+	end
+
+end

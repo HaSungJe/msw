@@ -57,6 +57,7 @@ script RtsUnitComponent extends Component
 			self:OnTouched()
 		end)
 		_RtsHudLogic:RefreshMyUnits()
+		_RtsUnitBuffLogic:MarkDirty(self.Zone)
 	end
 
 	-- 캐릭터 클릭 = 우측 작은 메뉴(위치 이동 / 상세정보). 내 유닛만. 이동 모드 중엔 발판 클릭이 우선이라 무시
@@ -66,9 +67,10 @@ script RtsUnitComponent extends Component
 		_RtsUnitSelectLogic:OnUnitClicked(self.No)
 	end
 
-	-- 서버가 바꾼 값이 도착하면 열려 있는 팝업·슬롯을 다시 그린다
+	-- 서버가 바꾼 값이 도착하면 열려 있는 팝업·슬롯을 다시 그린다. 버프 아이콘은 남의 유닛도(구역 단위로 모아서)
 	method void OnSyncProperty(string name, any value)
 		if not self:IsClient() then return end
+		_RtsUnitBuffLogic:MarkDirty(self.Zone)
 		if not _RtsUnitLogic:IsMine(self.Owner) then return end
 		_RtsHudLogic:RefreshMyUnits()
 		_RtsUnitPopupLogic:OnUnitSynced(self.No)

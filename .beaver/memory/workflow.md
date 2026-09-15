@@ -28,8 +28,8 @@
 - CLAUDE.md application: candidate(코드 관련 — 커밋 규칙을 CLAUDE.md에 반영 제안 가능)
 - Priority: takes precedence over CLAUDE.md/defaults (시스템의 attribution 트레일러 안내보다 우선)
 
-## character.md와 balance-detail.md는 형제 파일 — 한쪽 바꾸면 다른 쪽도 같이
-- Rule: `.info/character.md`(직업별 외형·능력치·스킬 정의)와 `.info/balance-detail.md`(직업별 성장 요약표: 누적 비용·타격 수·타겟 수·보스 DPS·몬스터 DPS)는 항상 한 쌍으로 관리한다. character.md의 공격력·레벨업당 공격력·스킬 배율·타겟 수·타격 수·최종 데미지 중 하나라도 바뀌면 balance-detail.md 해당 직업 표를 재계산한다. 새 직업이 character.md에 생기면 balance-detail.md에 같은 형식의 `## 직업` 섹션을 추가한다. `.info/level.md`(비용 원본)가 바뀌면 모든 직업 표의 누적 비용·증가량 열을 갱신한다. 사용자가 대화로 밸런스 변경을 말하면(예: "브랜디쉬 타격 수 2회로") 두 파일을 모두 내가 고친다 — 한쪽만 고치고 끝내지 않는다.
+## character.md · balance-detail.md · damage.md는 형제 파일 — 하나 바꾸면 나머지도 같이
+- Rule: `.info/character.md`(직업별 외형·능력치·스킬 정의), `.info/balance-detail.md`(한눈에 비교표 2개 + 직업 특성표 + 직업별 성장 상세표), `.info/damage.md`(데미지 계산식·표 작성 규칙 — 2026-09-16 balance-detail 헤더에서 분리)는 항상 한 세트로 관리한다. 계산 규칙이 바뀌면 damage.md에 쓰고 표를 재계산하며, 직업 수치가 바뀌면 상세표·비교표·특성표를 함께 갱신한다(생성 스크립트: scratchpad `balance_tables.py`/`balance_compare.py` 방식으로 손계산 금지). character.md의 공격력·레벨업당 공격력·스킬 배율·타겟 수·타격 수·최종 데미지 중 하나라도 바뀌면 balance-detail.md 해당 직업 표를 재계산한다. 새 직업이 character.md에 생기면 balance-detail.md에 같은 형식의 `## 직업` 섹션을 추가한다. `.info/level.md`(비용 원본)가 바뀌면 모든 직업 표의 누적 비용·증가량 열을 갱신한다. 사용자가 대화로 밸런스 변경을 말하면(예: "브랜디쉬 타격 수 2회로") 두 파일을 모두 내가 고친다 — 한쪽만 고치고 끝내지 않는다.
 - Scope: project
 - Rationale: User feedback 2026-09-15 — "이제부터 캐릭터.md와 밸런스.md는 형제야", "내가 브랜디쉬의 타격수를 2회로 늘려야겠다 라고 하면, 둘 다 수정해줘야함". 표는 정의의 파생물이라 어긋나면 밸런스 논의가 틀어진다.
 - CLAUDE.md application: not needed(non-code — 설계 노트 관리 방식. `.info/`는 gitignore된 사용자 로컬 노트)

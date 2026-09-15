@@ -94,14 +94,19 @@ script RtsUnitLogic extends Logic
 		return lp.RtsCameraAnchorComponent.MyZone
 	end
 
-	-- 내 유닛 no의 상태 컴포넌트 (없으면 nil)
+	-- 구역 zone의 유닛 no 상태 컴포넌트 (없으면 nil). 남의 구역도 읽을 수 있다(버프 아이콘)
 	@ExecSpace("ClientOnly")
-	method any GetMyUnit(number no)
-		local zone = self:MyZone()
+	method any GetZoneUnit(number zone, number no)
 		if zone < 1 then return nil end
 		local e = _EntityService:GetEntityByPath("/maps/RtsMap/" .. self:UnitName(zone, no))
 		if e == nil then return nil end
 		return e.RtsUnitComponent
+	end
+
+	-- 내 유닛 no의 상태 컴포넌트 (없으면 nil)
+	@ExecSpace("ClientOnly")
+	method any GetMyUnit(number no)
+		return self:GetZoneUnit(self:MyZone(), no)
 	end
 
 	@ExecSpace("ClientOnly")

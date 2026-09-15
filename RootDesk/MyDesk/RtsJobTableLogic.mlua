@@ -6,6 +6,11 @@ script RtsJobTableLogic extends Logic
 
 	property number MaxLevel = 50
 
+	-- 크리티컬 기본값: 확률 0%, 크리티컬 데미지 20%(원작 메이플 기본). 스킬·증강의 크리 확률/데미지는 각각 합연산
+	property number BaseCritRate = 0
+
+	property number BaseCritDamage = 20
+
 	-- 레벨 L→L+1 비용(level.md 블록). 인덱스 = 도달 레벨(2~50)
 	property table Costs = {}
 
@@ -78,14 +83,15 @@ script RtsJobTableLogic extends Logic
 	end
 
 	method number GetBaseAttack(string jobId)
-		if jobId == "paladin" then return 100 end
+		if jobId == "paladin" then return 80 end
+		if jobId == "hero" then return 40 end
 		if jobId == "bow" then return 40 end
 		return 50
 	end
 
 	method number GetAttackPerLevel(string jobId)
-		if jobId == "hero" then return 15 end
-		if jobId == "paladin" then return 12 end
+		if jobId == "hero" then return 12 end
+		if jobId == "paladin" then return 10 end
 		if jobId == "dk" then return 10 end
 		if jobId == "bow" then return 12 end
 		return 10
@@ -122,7 +128,7 @@ script RtsJobTableLogic extends Logic
 				{ lv = 20, kind = "패시브", name = "어드벤스드 콤보 어택", desc = "몬스터 방어율 10% 무시", target = false },
 				{ lv = 40, kind = "패시브", name = "어드벤스드 콤보 어택 강화", desc = "공격력을 200%로 변경, 몬스터 방어율 20% 무시", target = false },
 				{ lv = 40, kind = "패시브", name = "브랜디쉬 강화", desc = "브랜디쉬의 능력치 변경. 200% 데미지로 6마리를 1회 타격", target = false },
-				{ lv = 50, kind = "패시브", name = "발할라", desc = "보스 공격 시 최종 데미지 200% 증가, 몬스터 방어율 100% 무시", target = false },
+				{ lv = 50, kind = "패시브", name = "발할라", desc = "몬스터 방어율 100% 무시", target = false },
 			}
 		end
 		if jobId == "paladin" then
@@ -159,7 +165,17 @@ script RtsJobTableLogic extends Logic
 
 	-- 레벨 L의 전투 계수: pct 공격력%(합연산 결과) / flat 추가 공격력 / ratio 기본 공격 데미지% / hits 타격 수 / targets 타겟 수
 	--   ign 방어율 무시% / fin 최종 데미지%(몬스터) / finBoss 최종 데미지%(보스) / ignBoss 보스 방무%(-1 = 별도 없음) / speed 공격속도 이름
+	--   crit 크리티컬 확률%(합연산) / critDmg 크리티컬 데미지%(합연산) — 크리 발생 시 최종 데미지에 ×(1 + critDmg)
+	--   파티 버프(모든 유닛 / 주변 n타일 / 지정 유닛)는 여기 넣지 않는다 — 시전자 자신 포함 RtsUnitBuffLogic이 얹는다
 	method table GetStat(string jobId, number L)
+		local s = self:GetStatRaw(jobId, L)
+		if s.crit == nil then s.crit = self.BaseCritRate end
+		if s.critDmg == nil then s.critDmg = self.BaseCritDamage end
+		if s.crit > 100 then s.crit = 100 end
+		return s
+	end
+
+	method table GetStatRaw(string jobId, number L)
 		if jobId == "hero" then
 			local ign = 0
 			if L >= 40 then ign = 20 elseif L >= 20 then ign = 10 elseif L >= 10 then ign = 5 end
@@ -169,10 +185,7 @@ script RtsJobTableLogic extends Logic
 				s.ratio = 200
 				s.targets = 6
 			end
-			if L >= 50 then
-				s.finBoss = 300
-				s.ignBoss = 100
-			end
+			if L >= 50 then s.ignBoss = 100 end
 			return s
 		end
 		if jobId == "paladin" then
@@ -194,20 +207,27 @@ script RtsJobTableLogic extends Logic
 			if L >= 40 then s.speed = "보통" end
 			return s
 		end
-		return { pct = 100, flat = 0, ratio = 100, hits = 1, targets = 1, ign = 0, fin = 100, finBoss = 100, ignBoss = -1, speed = "빠름" }
+		local s = { pct = 100, flat = 0, ratio = 100, hits = 1, targets = 1, ign = 0, fin = 100, finBoss = 100, ignBoss = -1, speed = "빠름", crit = self.BaseCritRate, critDmg = self.BaseCritDamage }
+		if L >= 10 then s.crit = s.crit + 30 end
+		return s
 	end
 
-	-- 원값 = (기본 + 레벨업 + 추가) × 공격력% × 스킬% → 보스 DPS = 1타 × 타격 수 × 보스 최종 ÷ 주기, 몬스터 DPS = × 타겟 수 × 최종
+	-- 원값 = (기본 + 레벨업 + 추가) × 공격력% × 스킬% → 최종 데미지(곱) → 크리티컬(기대값 = 1 + 확률 × 크리뎀) → 보스 DPS = 1타 × 타격 수 ÷ 주기, 몬스터 DPS = × 타겟 수
+	--   버프 없는 자기 능력치만. 파티 버프(결속·샤프아이즈·프레이·조커)는 RtsUnitBuffLogic.ApplyToStat으로 st를 바꾼 뒤 CalcStat
 	method table Calc(string jobId, number L)
-		local st = self:GetStat(jobId, L)
+		return self:CalcStat(jobId, L, self:GetStat(jobId, L))
+	end
+
+	method table CalcStat(string jobId, number L, table st)
 		local base = self:GetBaseAttack(jobId)
 		local per = self:GetAttackPerLevel(jobId)
 		local atk = base + per * (L - 1) + st.flat
 		local one = atk * (st.pct / 100) * (st.ratio / 100)
 		local period = self:GetSpeedSec(st.speed)
-		local boss = one * st.hits * (st.finBoss / 100) / period
-		local mob = one * st.hits * st.targets * (st.fin / 100) / period
-		return { st = st, base = base, per = per, atk = atk, one = one, period = period, boss = boss, mob = mob }
+		local critMul = 1 + (st.crit / 100) * (st.critDmg / 100)
+		local boss = one * st.hits * (st.finBoss / 100) * critMul / period
+		local mob = one * st.hits * st.targets * (st.fin / 100) * critMul / period
+		return { st = st, base = base, per = per, atk = atk, one = one, period = period, critMul = critMul, boss = boss, mob = mob }
 	end
 
 end
