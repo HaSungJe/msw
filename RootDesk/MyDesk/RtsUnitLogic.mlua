@@ -1,0 +1,350 @@
+-- Phase 4 #14 / Phase 5 #19 (부분, 2026-09-15): 유닛 보유·조작의 서버 권위.
+--   유저별 유닛 6기(번호 1~6 = HUD 슬롯), 메소, 레벨업·대상 지정·스킨·위치 이동 요청 처리.
+--   위치 이동과 대상 변경은 유닛마다 3분 쿨타임(고정). 영입 로직(Phase 5 #18)이 생기기 전까지는 입장 시 시범 편성 3기를 지급한다.
+--   유닛 엔티티 이름 = "Unit<구역>_<번호>" (/maps/RtsMap 아래) — 클라는 이 이름으로 내 유닛을 찾는다.
+@Logic
+script RtsUnitLogic extends Logic
+
+	-- 유저별 보유 메소 (경제 테이블 전까지 시범값)
+	@Sync
+	property SyncTable<string, number> MesoByUser
+
+	property number DemoMeso = 12400
+
+	-- 위치 이동·대상 변경 쿨타임(초) — 유닛마다 3분 고정
+	property number CooldownSec = 180
+
+	property number MaxUnits = 6
+
+	-- 서버: userId → { [no] = entity }
+	property table UnitsByUser = {}
+
+	-- 월드 아바타 이용권: 월드 상점 아이템 "월드 아바타 30일"(1,600 월드코인, 아이템 타입 = 재구매하면 30일 연장). 2026-09-15 비공개 등록, 출시 때 공개
+	property string AvatarProductId = "QK03ZI15E"
+
+	property number AvatarDays = 30
+
+	-- 유저별 해금 만료(UTC ms, DateTime.UtcNow.Elapsed 기준). 0 = 잠김. 원본은 유저 DataStorage "avatarUntil"
+	@Sync
+	property SyncTable<string, number> AvatarUntilByUser
+
+	property string AvatarKey = "avatarUntil"
+
+	method void OnBeginPlay()
+		if self:IsServer() then
+			_WorldShopService:SetProcessPurchaseCallback(self.ProcessPurchase)
+			-- 해금이 만료된 유닛은 기본 세트로 되돌린다(1분마다)
+			_TimerService:SetTimerRepeat(function()
+				self:ExpireAvatars()
+			end, 60)
+		end
+	end
+
+	-- ===== 공통 =====
+
+	method string UnitName(number zone, number no)
+		return "Unit" .. string.format("%d", math.floor(zone + 0.5)) .. "_" .. string.format("%d", math.floor(no + 0.5))
+	end
+
+	method number GetCooldownSec()
+		return self.CooldownSec
+	end
+
+	method number GetMaxUnits()
+		return self.MaxUnits
+	end
+
+	-- ===== 월드 아바타 해금 (양쪽) =====
+
+	method number GetAvatarUntil(string userId)
+		local v = self.AvatarUntilByUser[userId]
+		if v == nil then return 0 end
+		return v
+	end
+
+	method boolean IsAvatarUnlocked(string userId)
+		return self:GetAvatarUntil(userId) > DateTime.UtcNow.Elapsed
+	end
+
+	-- 남은 일수(올림). 잠김이면 0
+	method number AvatarDaysLeft(string userId)
+		local left = self:GetAvatarUntil(userId) - DateTime.UtcNow.Elapsed
+		if left <= 0 then return 0 end
+		return math.ceil(left / 86400000)
+	end
+
+	-- ===== 클라 =====
+
+	@ExecSpace("ClientOnly")
+	method string MyUserId()
+		local lp = _UserService.LocalPlayer
+		if lp == nil or lp.PlayerComponent == nil then return "" end
+		return lp.PlayerComponent.UserId
+	end
+
+	@ExecSpace("ClientOnly")
+	method boolean IsMine(string userId)
+		return userId ~= "" and userId == self:MyUserId()
+	end
+
+	@ExecSpace("ClientOnly")
+	method number MyZone()
+		local lp = _UserService.LocalPlayer
+		if lp == nil or lp.RtsCameraAnchorComponent == nil then return 0 end
+		return lp.RtsCameraAnchorComponent.MyZone
+	end
+
+	-- 내 유닛 no의 상태 컴포넌트 (없으면 nil)
+	@ExecSpace("ClientOnly")
+	method any GetMyUnit(number no)
+		local zone = self:MyZone()
+		if zone < 1 then return nil end
+		local e = _EntityService:GetEntityByPath("/maps/RtsMap/" .. self:UnitName(zone, no))
+		if e == nil then return nil end
+		return e.RtsUnitComponent
+	end
+
+	@ExecSpace("ClientOnly")
+	method number GetMyMeso()
+		local v = self.MesoByUser[self:MyUserId()]
+		if v == nil then return 0 end
+		return v
+	end
+
+	-- 내 유닛 중 (col,row)에 서 있는 유닛 번호. 없으면 0
+	@ExecSpace("ClientOnly")
+	method number MyUnitAt(number col, number row)
+		for no = 1, self.MaxUnits do
+			local u = self:GetMyUnit(no)
+			if u ~= nil and u.Col == col and u.Row == row then return no end
+		end
+		return 0
+	end
+
+	method void OnSyncProperty(string name, any value)
+		if not self:IsClient() then return end
+		_RtsHudLogic:SetMeso(self:GetMyMeso())
+		_RtsUnitPopupLogic:OnUnitSynced(0)
+	end
+
+	-- 월드 상점 구매창 (Maker에선 코인 차감 없이 테스트 구매)
+	@ExecSpace("ClientOnly")
+	method void RequestBuyAvatar()
+		if self.AvatarProductId == "" then return end
+		_WorldShopService:PromptPurchase(self.AvatarProductId)
+	end
+
+	-- 서버 처리 결과 통지 (마지막 파라미터 = 그 클라에만)
+	@ExecSpace("Client")
+	method void OnChanged(number no, number meso, string userId)
+		_RtsHudLogic:SetMeso(meso)
+		_RtsHudLogic:RefreshMyUnits()
+		_RtsUnitPopupLogic:OnUnitSynced(no)
+	end
+
+	-- ===== 서버: 지급·스폰 =====
+
+	@ExecSpace("ServerOnly")
+	method Entity GetUnit(string userId, number no)
+		local list = self.UnitsByUser[userId]
+		if list == nil then return nil end
+		return list[no]
+	end
+
+	@ExecSpace("ServerOnly")
+	method number GetMeso(string userId)
+		local v = self.MesoByUser[userId]
+		if v == nil then return 0 end
+		return v
+	end
+
+	-- 시범 편성(아티팩트 v27과 동일): 1. 히어로 Lv12 / 2. 팔라딘 Lv40(결속 → 1) / 3. 다크나이트 Lv20. 영입(Phase 5 #18)이 생기면 제거
+	@ExecSpace("ServerOnly")
+	method void EnsureDemoUnits(string userId, number zone)
+		if self.UnitsByUser[userId] ~= nil then return end
+		self.UnitsByUser[userId] = {}
+		self.MesoByUser[userId] = self.DemoMeso
+		self:LoadAvatarPass(userId)
+		self:SpawnUnit(userId, zone, 1, "hero", 12, 13, 7)
+		self:SpawnUnit(userId, zone, 2, "paladin", 40, 6, 3)
+		self:SpawnUnit(userId, zone, 3, "dk", 20, 5, 9)
+		local pal = self:GetUnit(userId, 2)
+		if pal ~= nil then pal.RtsUnitComponent.BondNo = 1 end
+		self:OnChanged(0, self.DemoMeso, userId)
+		log("RtsUnit: demo units x3 for zone " .. tostring(zone))
+	end
+
+	-- 유닛 엔티티 = MapObject + AvatarRenderer + CostumeManager(직업 세트) + TouchReceive + RtsUnitComponent. 스케일 2 = 칸 80px
+	@ExecSpace("ServerOnly")
+	method Entity SpawnUnit(string userId, number zone, number no, string jobId, number level, number col, number row)
+		local mapRoot = _EntityService:GetEntityByPath("/maps/RtsMap")
+		if mapRoot == nil then return nil end
+		local at = _RtsZoneLogic:GetCellCenter(zone, col, row)
+		local e = _SpawnService:SpawnByModelId("model://MapObject", self:UnitName(zone, no), Vector3(at.x, at.y - 0.75, 0), mapRoot)
+		if e == nil then return nil end
+		e:RemoveComponent("SpriteRendererComponent")
+		local ar = e:AddComponent("AvatarRendererComponent")
+		if ar ~= nil then ar.OrderInLayer = 200 end
+		e:AddComponent("CostumeManagerComponent")
+		local touch = e:AddComponent("TouchReceiveComponent")
+		if touch ~= nil then touch.AutoFitToSize = true end
+		e.TransformComponent.Scale = Vector3(2, 2, 1)
+		local u = e:AddComponent("RtsUnitComponent")
+		u.Owner = userId
+		u.Zone = zone
+		u.No = no
+		u.JobId = jobId
+		u.Level = level
+		u.Skin = 0
+		u.Col = col
+		u.Row = row
+		u:ApplyLook()
+		self.UnitsByUser[userId][no] = e
+		return e
+	end
+
+	@ExecSpace("ServerOnly")
+	method void RemoveUnits(string userId)
+		local list = self.UnitsByUser[userId]
+		if list == nil then return end
+		for no, e in pairs(list) do
+			if e ~= nil then e:Destroy() end
+		end
+		self.UnitsByUser[userId] = nil
+		self.MesoByUser[userId] = nil
+		self.AvatarUntilByUser[userId] = nil
+	end
+
+	-- 유저 DataStorage에서 해금 만료 시각을 읽는다(없으면 0)
+	@ExecSpace("ServerOnly")
+	method void LoadAvatarPass(string userId)
+		local ds = _DataStorageService:GetUserDataStorage(userId)
+		if ds == nil then return end
+		local code, value = ds:GetAndWait(self.AvatarKey)
+		local untilMs = 0
+		if code == 0 and value ~= nil and value ~= "" then untilMs = tonumber(value) or 0 end
+		self.AvatarUntilByUser[userId] = untilMs
+	end
+
+	-- 월드 상점 지급 콜백: 구매 1건 = 만료(또는 지금)부터 30일 연장. true를 돌려줘야 구매 완료
+	@ExecSpace("ServerOnly")
+	method boolean ProcessPurchase(any info)
+		if info == nil or info.ProductId ~= self.AvatarProductId then
+			log("RtsUnit: unknown product " .. tostring(info ~= nil and info.ProductId or "nil"))
+			return false
+		end
+		local userId = info.UserId
+		local now = DateTime.UtcNow.Elapsed
+		local base = self:GetAvatarUntil(userId)
+		if base < now then base = now end
+		local untilMs = base + self.AvatarDays * 86400000
+		local ds = _DataStorageService:GetUserDataStorage(userId)
+		if ds ~= nil then
+			local code = ds:SetAndWait(self.AvatarKey, string.format("%d", untilMs))
+			if code ~= 0 then
+				log("RtsUnit: avatar pass save failed code=" .. tostring(code))
+				return false
+			end
+		end
+		self.AvatarUntilByUser[userId] = untilMs
+		log("RtsUnit: avatar pass +" .. tostring(self.AvatarDays) .. "d for " .. userId .. " (order " .. tostring(info.OrderNumber) .. ")")
+		self:OnChanged(0, self:GetMeso(userId), userId)
+		return true
+	end
+
+	-- 만료된 유저의 월드 아바타 스킨을 기본 세트로
+	@ExecSpace("ServerOnly")
+	method void ExpireAvatars()
+		for userId, list in pairs(self.UnitsByUser) do
+			if not self:IsAvatarUnlocked(userId) then
+				local changed = false
+				for no, e in pairs(list) do
+					local u = e.RtsUnitComponent
+					if u ~= nil and u.Skin == 1 then
+						u.Skin = 0
+						u:ApplyLook()
+						changed = true
+					end
+				end
+				if changed then self:OnChanged(0, self:GetMeso(userId), userId) end
+			end
+		end
+	end
+
+	-- ===== 서버: 요청 처리 (클라에서 호출, senderUserId로 소유 검증) =====
+
+	@ExecSpace("Server")
+	method void RequestLevelUp(number no)
+		local userId = senderUserId
+		local e = self:GetUnit(userId, no)
+		if e == nil then return end
+		local u = e.RtsUnitComponent
+		if u.Level >= _RtsJobTableLogic:GetMaxLevel() then return end
+		local cost = _RtsJobTableLogic:GetLevelCost(u.Level + 1)
+		local meso = self:GetMeso(userId)
+		if meso < cost then return end
+		self.MesoByUser[userId] = meso - cost
+		u.Level = u.Level + 1
+		self:OnChanged(no, meso - cost, userId)
+	end
+
+	-- 대상 지정(결속): 대상 지정 스킬을 가진 직업·레벨이어야 하고, 대상은 내 다른 유닛 또는 0(미지정). 바꾸면 3분 쿨
+	@ExecSpace("Server")
+	method void RequestBond(number no, number targetNo)
+		local userId = senderUserId
+		local e = self:GetUnit(userId, no)
+		if e == nil then return end
+		local u = e.RtsUnitComponent
+		local need = _RtsJobTableLogic:GetTargetSkillLevel(u.JobId)
+		if need <= 0 or u.Level < need then return end
+		if targetNo == no then return end
+		if targetNo ~= 0 and self:GetUnit(userId, targetNo) == nil then return end
+		if u.BondNo == targetNo then return end
+		if u:BondCoolLeft() > 0 then return end
+		u.BondNo = targetNo
+		u.BondReadyAt = _UtilLogic.ServerElapsedSeconds + self.CooldownSec
+		self:OnChanged(no, self:GetMeso(userId), userId)
+	end
+
+	-- 스킨: 0 기본 세트 / 1 월드 아바타(해금 중일 때만)
+	@ExecSpace("Server")
+	method void RequestSkin(number no, number skin)
+		local userId = senderUserId
+		local e = self:GetUnit(userId, no)
+		if e == nil then return end
+		if skin ~= 0 and skin ~= 1 then return end
+		if skin == 1 and not self:IsAvatarUnlocked(userId) then return end
+		local u = e.RtsUnitComponent
+		if u.Skin == skin then return end
+		u.Skin = skin
+		u:ApplyLook()
+		self:OnChanged(no, self:GetMeso(userId), userId)
+	end
+
+	-- 위치 이동: 발판 칸이어야 하고, 내 다른 유닛이 있으면 자리를 맞바꾼다(둘 다 3분 쿨)
+	@ExecSpace("Server")
+	method void RequestMove(number no, number col, number row)
+		local userId = senderUserId
+		local e = self:GetUnit(userId, no)
+		if e == nil then return end
+		local u = e.RtsUnitComponent
+		if u:MoveCoolLeft() > 0 then return end
+		if not _RtsZoneLogic:IsPadCell(col, row) then return end
+		if u.Col == col and u.Row == row then return end
+		local now = _UtilLogic.ServerElapsedSeconds
+		local list = self.UnitsByUser[userId]
+		for otherNo, oe in pairs(list) do
+			local o = oe.RtsUnitComponent
+			if otherNo ~= no and o.Col == col and o.Row == row then
+				if o:MoveCoolLeft() > 0 then return end
+				o:PlaceAt(u.Col, u.Row)
+				o.MoveReadyAt = now + self.CooldownSec
+			end
+		end
+		u:PlaceAt(col, row)
+		u.MoveReadyAt = now + self.CooldownSec
+		log("RtsUnit: move " .. string.format("%d", no) .. " -> (" .. string.format("%d,%d", col, row) .. ")")
+		self:OnChanged(no, self:GetMeso(userId), userId)
+	end
+
+end

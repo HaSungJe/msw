@@ -1,0 +1,462 @@
+-- Phase 5 #19·#20 + Phase 4 #14 (부분, 2026-09-15): 유닛 정보 팝업 (아티팩트 v27 #unitModal 그대로)
+--   열기: 우측 유닛 슬롯 클릭 / 캐릭터 클릭 메뉴의 상세정보. 셸(딤·패널·제목·X·ESC)은 RtsPopupLogic("unit").
+--   좌: 외형(스킨 2 — 기본 세트 / 월드 아바타 = 월드코인 1,600으로 30일 해금, 잠기면 클릭 → 구매창) + 능력치(RtsJobTableLogic.Calc). 우: 스킬 목록(미획득 흐림, 액티브/패시브).
+--   대상 지정 스킬(결속) 행에는 셀렉트 박스(미지정 / 내 다른 유닛). 하단: 누적 투자·보유 메소·[레벨업].
+--   위치 이동은 여기 없음 — 캐릭터 클릭 메뉴(RtsUnitSelectLogic)에서. 대상 변경·위치 이동은 유닛마다 3분 쿨.
+--   좌표는 1920×1080 기준(목업 1cqw = 19.2px). 값은 서버가 바꾸고(RtsUnitLogic) 동기화가 오면 다시 그린다.
+@Logic
+script RtsUnitPopupLogic extends Logic
+
+	property number PanelW = 1229
+
+	property number PanelH = 720
+
+	-- 지금 보고 있는 유닛 번호(0 = 닫힘)
+	property number CurNo = 0
+
+	property Entity Body = nil
+
+	property Entity Content = nil
+
+	property Entity Dropdown = nil
+
+	property Entity BondCoolText = nil
+
+	property Entity BondBtn = nil
+
+	property number TickId = 0
+
+	property boolean BondLocked = false
+
+	-- ===== 열기·닫기 =====
+
+	method boolean IsOpen()
+		return self.CurNo > 0
+	end
+
+	@ExecSpace("ClientOnly")
+	method void OpenUnit(number no)
+		if _RtsUnitLogic:GetMyUnit(no) == nil then return end
+		if _RtsUnitSelectLogic:IsMoveMode() then _RtsUnitSelectLogic:EndMove() end
+		_RtsUnitSelectLogic:CloseMenu()
+		-- 이미 열려 있으면(같은 유닛을 다시 클릭 등) 먼저 닫는다 — Open 안의 Close가 CurNo를 지우기 때문
+		if _RtsPopupLogic:IsOpen() then _RtsPopupLogic:Close() end
+		self.CurNo = no
+		_RtsPopupLogic:Open("unit")
+	end
+
+	-- RtsPopupLogic.Open("unit")이 body를 만든 뒤 호출
+	@ExecSpace("ClientOnly")
+	method void BuildBody(Entity body)
+		self.Body = body
+		self:Render()
+		if self.TickId == 0 then
+			self.TickId = _TimerService:SetTimerRepeat(function()
+				self:Tick()
+			end, 1)
+		end
+	end
+
+	-- RtsPopupLogic.Close()가 호출
+	@ExecSpace("ClientOnly")
+	method void OnClosed()
+		self.CurNo = 0
+		self.Body = nil
+		self.Content = nil
+		self.Dropdown = nil
+		self.BondCoolText = nil
+		self.BondBtn = nil
+		if self.TickId ~= 0 then
+			_TimerService:ClearTimer(self.TickId)
+			self.TickId = 0
+		end
+	end
+
+	-- 서버 값이 바뀌어 도착했을 때 (RtsUnitComponent.OnSyncProperty / RtsUnitLogic.OnChanged)
+	@ExecSpace("ClientOnly")
+	method void OnUnitSynced(number no)
+		if self.CurNo == 0 or self.Body == nil then return end
+		self:Render()
+	end
+
+	-- ===== 그리기 =====
+
+	method string FmtSec(number s)
+		local m = math.floor(s / 60)
+		local r = math.floor(s - m * 60)
+		local rs = _RtsHudLogic:Int(r)
+		if r < 10 then rs = "0" .. rs end
+		return _RtsHudLogic:Int(m) .. ":" .. rs
+	end
+
+	method string Fmt(number n)
+		return _RtsHudLogic:FormatNumber(n)
+	end
+
+	@ExecSpace("ClientOnly")
+	method void Render()
+		if self.Body == nil then return end
+		local u = _RtsUnitLogic:GetMyUnit(self.CurNo)
+		if u == nil then
+			_RtsPopupLogic:Close()
+			return
+		end
+		local H = _RtsHudLogic
+		local P = _RtsPopupLogic
+		local T = _RtsJobTableLogic
+		if self.Content ~= nil then self.Content:Destroy() end
+		self.Dropdown = nil
+		local content = H:SpawnStretch("model://uisprite", "RtsUnitContent", self.Body, Vector2(0, 0), Vector2(1, 1), Vector2(0, 0), Vector2(0, 0))
+		H:Tint(content, 0, 0, 0, 0)
+		self.Content = content
+
+		local jobName = T:GetJobName(u.JobId)
+		local c = T:Calc(u.JobId, u.Level)
+		local s = c.st
+
+		-- 제목: "2. 팔라딘  Lv 40 · 모험가 · 전사"
+		P.Title.TextComponent.IsRichText = true
+		P.Title.TextComponent.Text = H:Int(u.No) .. ". " .. jobName .. "  <size=18><color=#c9b58a>Lv " .. H:Int(u.Level) .. " · " .. T:GetJobGroup(u.JobId) .. "</color></size>"
+
+		-- ----- 좌: 외형 + 스킨 -----
+		local look = H:SpawnPanel("RtsUnitLook", content, Vector2(0, 1), Vector2(0, 1), Vector2(27, -10), Vector2(365, 236),
+			P:Mix(Color.white, 0.03), P:Mix(H:ColGold(), 0.25), 1.5)
+		H:SpawnLabel("RtsUnitLookK", look, Vector2(0, 1), Vector2(0, 1), Vector2(14, -10), Vector2(200, 18),
+			"외형", H:ColMuted(), 13, TextAlignmentType.MiddleLeft, false)
+		self:SpawnPreview(look, u)
+		local skins = T:GetSkinNames(u.JobId)
+		local unlocked = _RtsUnitLogic:IsAvatarUnlocked(u.Owner)
+		local daysLeft = _RtsUnitLogic:AvatarDaysLeft(u.Owner)
+		for i = 1, 2 do
+			local on = (u.Skin == i - 1)
+			local locked = (i == 2 and not unlocked)
+			local bg = P:Mix(Color.white, 0.04)
+			local border = P:Mix(Color.white, 0.12)
+			if on then
+				bg = P:Mix(H:ColGold(), 0.18)
+				border = H:ColGold()
+			end
+			if locked then
+				bg = P:Mix(Color.white, 0.03)
+				border = P:Mix(H:ColGold(), 0.55)
+			end
+			local b = H:SpawnPanel("RtsUnitSkin" .. tostring(i), look, Vector2(0, 1), Vector2(0, 1), Vector2(146, -34 - (i - 1) * 64), Vector2(205, 58), bg, border, 1.5)
+			H:SpawnLabel("RtsUnitSkinName", b, Vector2(0, 1), Vector2(0, 1), Vector2(10, -6), Vector2(190, 22),
+				skins[i], H:ColInk(), 15, TextAlignmentType.MiddleLeft, true)
+			local subText = "기본"
+			local subColor = H:ColMuted()
+			if i == 2 then
+				if locked then
+					subText = "1,600 월드코인 · 30일 해금"
+					subColor = H:ColGold()
+				else
+					subText = "내 메이플월드 코디 · D-" .. H:Int(daysLeft)
+				end
+			end
+			H:SpawnLabel("RtsUnitSkinSub", b, Vector2(0, 1), Vector2(0, 1), Vector2(10, -30), Vector2(190, 18),
+				subText, subColor, 12, TextAlignmentType.MiddleLeft, false)
+			if locked then
+				-- 잠김: 클릭 → 월드 상점 구매창
+				local buy = H:SpawnClick("RtsUnitSkinBuy", b)
+				buy:ConnectEvent(ButtonClickEvent, function(event)
+					_RtsUnitLogic:RequestBuyAvatar()
+				end)
+			elseif not on then
+				local skinIdx = i - 1
+				local click = H:SpawnClick("RtsUnitSkinClick", b)
+				click:ConnectEvent(ButtonClickEvent, function(event)
+					_RtsUnitLogic:RequestSkin(self.CurNo, skinIdx)
+				end)
+			end
+		end
+		H:SpawnLabel("RtsUnitSkinNote", look, Vector2(0, 1), Vector2(0, 1), Vector2(146, -164), Vector2(205, 18),
+			"월드 아바타는 구매할 때마다 30일 연장", H:ColMuted(), 11, TextAlignmentType.MiddleLeft, false)
+
+		-- ----- 좌: 능력치 -----
+		local stats = H:SpawnPanel("RtsUnitStats", content, Vector2(0, 1), Vector2(0, 1), Vector2(27, -256), Vector2(365, 318),
+			P:Mix(Color.white, 0.03), P:Mix(H:ColGold(), 0.25), 1.5)
+		H:SpawnLabel("RtsUnitStatsK", stats, Vector2(0, 1), Vector2(0, 1), Vector2(14, -10), Vector2(200, 18),
+			"능력치", H:ColMuted(), 13, TextAlignmentType.MiddleLeft, false)
+		local muted = "<color=#a3957a>"
+		local atkNote = H:Int(c.base) .. " + " .. H:Int(c.per) .. "×" .. H:Int(u.Level - 1)
+		if s.flat > 0 then atkNote = atkNote .. " + " .. H:Int(s.flat) end
+		local ignText = H:Int(s.ign) .. "%"
+		if s.ignBoss >= 0 then ignText = ignText .. " " .. muted .. "· 보스 " .. H:Int(s.ignBoss) .. "%</color>" end
+		local finText = H:Int(s.fin) .. "%"
+		if s.finBoss ~= s.fin then finText = finText .. " " .. muted .. "· 보스 " .. H:Int(s.finBoss) .. "%</color>" end
+		local rows = {
+			{ "공격속도", s.speed .. " <b>" .. tostring(c.period) .. "초</b>당 1회" },
+			{ "공격력", "<b>" .. self:Fmt(c.atk) .. "</b> " .. muted .. "(" .. atkNote .. ")</color>" },
+			{ "공격력 %", H:Int(s.pct) .. "%" },
+			{ "방어율 무시", ignText },
+			{ "최종 데미지", finText },
+			{ "sep", "" },
+			{ "기본 공격", H:Int(s.ratio) .. "% × " .. H:Int(s.targets) .. "마리 × " .. H:Int(s.hits) .. "회" },
+			{ "보스 DPS", "<b>" .. self:Fmt(c.boss) .. "</b>" },
+			{ "몬스터 DPS", "<b>" .. self:Fmt(c.mob) .. "</b> " .. muted .. "(" .. H:Int(s.targets) .. "마리 합)</color>" },
+		}
+		local y = -34
+		for i = 1, #rows do
+			if rows[i][1] == "sep" then
+				local line = H:SpawnUI("model://uisprite", "RtsUnitStatSep", stats, Vector2(0, 1), Vector2(0, 1), Vector2(14, y - 4), Vector2(337, 1.5))
+				line.SpriteGUIRendererComponent.Color = H:ColBorderSoft()
+				y = y - 14
+			else
+				H:SpawnLabel("RtsUnitStatK", stats, Vector2(0, 1), Vector2(0, 1), Vector2(14, y), Vector2(120, 26),
+					rows[i][1], H:ColMuted(), 14, TextAlignmentType.MiddleLeft, false)
+				local v = H:SpawnLabel("RtsUnitStatV", stats, Vector2(1, 1), Vector2(1, 1), Vector2(-14, y), Vector2(230, 26),
+					rows[i][2], H:ColInk(), 15, TextAlignmentType.MiddleRight, false)
+				v.TextComponent.IsRichText = true
+				y = y - 30
+			end
+		end
+
+		-- ----- 우: 스킬 목록 -----
+		local rx = 411
+		local rw = self.PanelW - rx - 27
+		local skills = T:GetSkills(u.JobId)
+		local sy = -10
+		self.BondCoolText = nil
+		self.BondBtn = nil
+		self.BondLocked = false
+		for i = 1, #skills do
+			local k = skills[i]
+			local got = u.Level >= k.lv
+			local isTarget = k.target and got
+			local rh = 64
+			if isTarget then rh = 100 end
+			local bg = P:Mix(Color.white, 0.04)
+			local border = P:Mix(Color.white, 0.1)
+			if not got then
+				bg = P:Mix(Color.white, 0.02)
+				border = P:Mix(Color.white, 0.06)
+			end
+			local row = H:SpawnPanel("RtsUnitSkill" .. tostring(i), content, Vector2(0, 1), Vector2(0, 1), Vector2(rx, sy), Vector2(rw, rh), bg, border, 1.5)
+			local bar = H:SpawnStretch("model://uisprite", "RtsUnitSkillBar", row, Vector2(0, 0), Vector2(0, 1), Vector2(0, 0), Vector2(4, 0))
+			local barColor = Color(0.541, 0.498, 0.439, 1)
+			if k.kind == "액티브" then barColor = H:ColGold() end
+			if not got then barColor = Color(0.4, 0.37, 0.33, 0.6) end
+			bar.SpriteGUIRendererComponent.Color = barColor
+			local ink = H:ColInk()
+			local desc = Color(0.902, 0.863, 0.769, 1)
+			local mutedC = H:ColMuted()
+			if not got then
+				ink = Color(0.55, 0.51, 0.45, 1)
+				desc = Color(0.5, 0.46, 0.41, 1)
+				mutedC = Color(0.45, 0.42, 0.37, 1)
+			end
+			local lvLbl = H:SpawnLabel("RtsUnitSkillLv", row, Vector2(0, 0.5), Vector2(0, 0.5), Vector2(12, 0), Vector2(50, 40),
+				"Lv\n<b><size=17>" .. H:Int(k.lv) .. "</size></b>", mutedC, 12, TextAlignmentType.MiddleCenter, false)
+			lvLbl.TextComponent.IsRichText = true
+			local nameText = k.name .. "  <size=11><color=#d9cba6>" .. k.kind .. "</color></size>"
+			if not got then nameText = nameText .. "  <size=12><color=#8a8072>미획득</color></size>" end
+			local nameLbl = H:SpawnLabel("RtsUnitSkillName", row, Vector2(0, 1), Vector2(0, 1), Vector2(70, -8), Vector2(rw - 90, 24),
+				nameText, ink, 17, TextAlignmentType.MiddleLeft, true)
+			nameLbl.TextComponent.IsRichText = true
+			H:SpawnLabel("RtsUnitSkillDesc", row, Vector2(0, 1), Vector2(0, 1), Vector2(70, -34), Vector2(rw - 90, 22),
+				k.desc, desc, 14, TextAlignmentType.MiddleLeft, false)
+			if isTarget then
+				self:BuildTargetRow(row, u, rx, sy)
+			end
+			sy = sy - rh - 6
+		end
+
+		-- ----- 하단: 누적 투자 · 보유 메소 · 위치 이동 · 레벨업 -----
+		local T2 = _RtsJobTableLogic
+		local invest = "누적 투자 <b>" .. self:Fmt(T2:GetCumCost(u.Level)) .. "</b>"
+		if u.Level < T2:GetMaxLevel() then
+			local wall = (math.floor(u.Level / 10) + 1) * 10
+			invest = invest .. " · 다음 벽 Lv" .. H:Int(wall) .. " 까지 <b>" .. self:Fmt(T2:GetCumCost(wall) - T2:GetCumCost(u.Level)) .. "</b>"
+		end
+		local investLbl = H:SpawnLabel("RtsUnitInvest", content, Vector2(0, 0), Vector2(0, 0), Vector2(27, 14), Vector2(560, 26),
+			invest, H:ColMuted(), 14, TextAlignmentType.MiddleLeft, false)
+		investLbl.TextComponent.IsRichText = true
+		local meso = _RtsUnitLogic:GetMyMeso()
+		local mesoLbl = H:SpawnLabel("RtsUnitMeso", content, Vector2(1, 0), Vector2(1, 0), Vector2(-300, 14), Vector2(260, 26),
+			"보유 <b>" .. self:Fmt(meso) .. "</b> 메소", Color(0.851, 0.796, 0.651, 1), 15, TextAlignmentType.MiddleRight, false)
+		mesoLbl.TextComponent.IsRichText = true
+
+		-- 레벨업 → Lv n (벽은 붉게, 메소 부족·최대 레벨은 비활성)
+		local nextLv = u.Level + 1
+		local maxed = u.Level >= T2:GetMaxLevel()
+		local cost = T2:GetLevelCost(nextLv)
+		local wall = (not maxed) and T2:IsWallLevel(nextLv)
+		local can = (not maxed) and meso >= cost
+		local lbg = P:Mix(H:ColGold(), 0.92)
+		local lborder = H:ColGold()
+		local lInk = Color(0.133, 0.114, 0.09, 1)
+		if wall then
+			lbg = P:Mix(Color(0.839, 0.471, 0.353, 1), 0.85)
+			lborder = Color(0.839, 0.471, 0.353, 1)
+		end
+		if not can then
+			lbg = P:Mix(lbg, 0.4)
+			lborder = P:Mix(lborder, 0.4)
+			lInk = Color(0.45, 0.4, 0.33, 1)
+		end
+		local lbtn = H:SpawnPanel("RtsUnitLvUp", content, Vector2(1, 0), Vector2(1, 0), Vector2(-27, 10), Vector2(260, 44), lbg, lborder, 1.5)
+		local mainText = "레벨업 → Lv " .. H:Int(nextLv)
+		if wall then mainText = mainText .. " (벽)" end
+		local costText = self:Fmt(cost) .. " 메소"
+		if maxed then
+			mainText = "레벨업"
+			costText = "최대 레벨"
+		end
+		H:SpawnLabel("RtsUnitLvUpText", lbtn, Vector2(0, 0.5), Vector2(0, 0.5), Vector2(14, 0), Vector2(150, 40),
+			mainText, lInk, 16, TextAlignmentType.MiddleLeft, true)
+		H:SpawnLabel("RtsUnitLvUpCost", lbtn, Vector2(1, 0.5), Vector2(1, 0.5), Vector2(-12, 0), Vector2(100, 40),
+			costText, lInk, 13, TextAlignmentType.MiddleRight, false)
+		if can then
+			local lclick = H:SpawnClick("RtsUnitLvUpClick", lbtn)
+			lclick:ConnectEvent(ButtonClickEvent, function(event)
+				_RtsUnitLogic:RequestLevelUp(self.CurNo)
+			end)
+		end
+	end
+
+	-- 결속 행의 대상 지정: "대상:" + 셀렉트 박스 + 쿨타임
+	@ExecSpace("ClientOnly")
+	method void BuildTargetRow(Entity row, any u, number rx, number sy)
+		local H = _RtsHudLogic
+		local P = _RtsPopupLogic
+		H:SpawnLabel("RtsUnitTgtK", row, Vector2(0, 1), Vector2(0, 1), Vector2(70, -62), Vector2(50, 30),
+			"대상:", H:ColMuted(), 14, TextAlignmentType.MiddleLeft, false)
+		self.BondLocked = u:BondCoolLeft() > 0
+		local bg = P:Mix(Color(0, 0, 0, 1), 0.35)
+		local border = P:Mix(Color.white, 0.28)
+		if self.BondLocked then border = P:Mix(Color.white, 0.12) end
+		local btn = H:SpawnPanel("RtsUnitTgtSel", row, Vector2(0, 1), Vector2(0, 1), Vector2(118, -62), Vector2(250, 30), bg, border, 1.5)
+		self.BondBtn = btn
+		local ink = H:ColInk()
+		if self.BondLocked then ink = Color(0.6, 0.56, 0.5, 1) end
+		H:SpawnLabel("RtsUnitTgtCur", btn, Vector2(0, 0.5), Vector2(0, 0.5), Vector2(10, 0), Vector2(200, 26),
+			self:TargetLabel(u.BondNo), ink, 14, TextAlignmentType.MiddleLeft, false)
+		H:SpawnLabel("RtsUnitTgtArrow", btn, Vector2(1, 0.5), Vector2(1, 0.5), Vector2(-8, 0), Vector2(20, 26),
+			"▼", H:ColMuted(), 11, TextAlignmentType.MiddleCenter, false)
+		local cool = H:SpawnLabel("RtsUnitTgtCool", row, Vector2(0, 1), Vector2(0, 1), Vector2(380, -62), Vector2(320, 30),
+			"", H:ColMuted(), 13, TextAlignmentType.MiddleLeft, false)
+		self.BondCoolText = cool
+		self:ApplyBondCool(u)
+		if not self.BondLocked then
+			local click = H:SpawnClick("RtsUnitTgtClick", btn)
+			-- 드롭다운은 body에 마지막으로 만들어 다른 행 위에 그린다. 위치 = 행 위치 + 버튼 오프셋 + 버튼 높이
+			local listX = rx + 118
+			local listY = sy - 62 - 30 - 2
+			click:ConnectEvent(ButtonClickEvent, function(event)
+				self:ToggleDropdown(listX, listY)
+			end)
+		end
+	end
+
+	method string TargetLabel(number no)
+		if no <= 0 then return "미지정" end
+		local o = _RtsUnitLogic:GetMyUnit(no)
+		if o == nil then return "미지정" end
+		return _RtsHudLogic:Int(o.No) .. ". " .. _RtsJobTableLogic:GetJobName(o.JobId) .. " Lv" .. _RtsHudLogic:Int(o.Level)
+	end
+
+	@ExecSpace("ClientOnly")
+	method void ToggleDropdown(number x, number y)
+		if self.Dropdown ~= nil then
+			self.Dropdown:Destroy()
+			self.Dropdown = nil
+			return
+		end
+		local H = _RtsHudLogic
+		local P = _RtsPopupLogic
+		local u = _RtsUnitLogic:GetMyUnit(self.CurNo)
+		if u == nil then return end
+		local options = { { no = 0, text = "미지정" } }
+		for no = 1, _RtsUnitLogic:GetMaxUnits() do
+			if no ~= self.CurNo then
+				local o = _RtsUnitLogic:GetMyUnit(no)
+				if o ~= nil then options[#options + 1] = { no = no, text = self:TargetLabel(no) } end
+			end
+		end
+		local rowH = 30
+		local list = H:SpawnPanel("RtsUnitTgtList", self.Content, Vector2(0, 1), Vector2(0, 1), Vector2(x, y), Vector2(250, rowH * #options + 4),
+			P:Mix(Color(0, 0, 0, 1), 0.6), H:ColGold(), 1.5)
+		self.Dropdown = list
+		for i = 1, #options do
+			local o = options[i]
+			local on = (o.no == u.BondNo)
+			local bg = P:Mix(Color(0, 0, 0, 1), 0.6)
+			if on then bg = P:Mix(H:ColGold(), 0.2) end
+			local item = H:SpawnUI("model://uisprite", "RtsUnitTgtItem" .. tostring(i), list, Vector2(0, 1), Vector2(0, 1), Vector2(2, -2 - (i - 1) * rowH), Vector2(246, rowH))
+			item.SpriteGUIRendererComponent.Color = bg
+			H:SpawnLabel("RtsUnitTgtItemText", item, Vector2(0, 0.5), Vector2(0, 0.5), Vector2(10, 0), Vector2(230, 26),
+				o.text, H:ColInk(), 14, TextAlignmentType.MiddleLeft, false)
+			local pick = o.no
+			local click = H:SpawnClick("RtsUnitTgtItemClick", item)
+			click:ConnectEvent(ButtonClickEvent, function(event)
+				if self.Dropdown ~= nil then
+					self.Dropdown:Destroy()
+					self.Dropdown = nil
+				end
+				if pick ~= u.BondNo then _RtsUnitLogic:RequestBond(self.CurNo, pick) end
+			end)
+		end
+	end
+
+	@ExecSpace("ClientOnly")
+	method void ApplyBondCool(any u)
+		if self.BondCoolText == nil or self.BondCoolText.TextComponent == nil then return end
+		local left = u:BondCoolLeft()
+		if left > 0 then
+			self.BondCoolText.TextComponent.Text = "재지정까지 " .. self:FmtSec(left)
+			self.BondCoolText.TextComponent.FontColor = Color(0.91, 0.635, 0.416, 1)
+		else
+			self.BondCoolText.TextComponent.Text = "변경 가능 · 쿨타임 3분"
+			self.BondCoolText.TextComponent.FontColor = Color(0.624, 0.827, 0.604, 1)
+		end
+	end
+
+	-- 1초마다: 쿨타임 글자 갱신, 쿨이 끝나는 순간 전체 다시 그림(버튼 활성)
+	@ExecSpace("ClientOnly")
+	method void Tick()
+		if self.CurNo == 0 or self.Body == nil then return end
+		local u = _RtsUnitLogic:GetMyUnit(self.CurNo)
+		if u == nil then return end
+		if self.BondLocked and u:BondCoolLeft() <= 0 then
+			self:Render()
+			return
+		end
+		self:ApplyBondCool(u)
+	end
+
+	-- 외형 미리보기: UI 아바타(UIEmpty + CostumeManager + AvatarGUIRenderer). 모델이 없으면 조용히 건너뛴다
+	@ExecSpace("ClientOnly")
+	method void SpawnPreview(Entity parent, any u)
+		local H = _RtsHudLogic
+		local e = _SpawnService:SpawnByModelId("model://uiempty", "RtsUnitPreview", Vector3.zero, parent)
+		if e == nil then
+			H:SpawnLabel("RtsUnitPreviewText", parent, Vector2(0, 1), Vector2(0, 1), Vector2(14, -34), Vector2(120, 190),
+				_RtsJobTableLogic:GetJobName(u.JobId), H:ColMuted(), 14, TextAlignmentType.MiddleCenter, false)
+			return
+		end
+		local t = e.UITransformComponent
+		t.AnchorsMin = Vector2(0, 1)
+		t.AnchorsMax = Vector2(0, 1)
+		t.Pivot = Vector2(0.5, 0.5)
+		t.anchoredPosition = Vector2(92, -128)
+		t.RectSize = Vector2(120, 190)
+		local cm = e:AddComponent("CostumeManagerComponent")
+		local ar = e:AddComponent("AvatarGUIRendererComponent")
+		if cm == nil or ar == nil then return end
+		ar.PreserveAvatar = PreserveSpriteType.AspectOnly
+		local set = _RtsJobTableLogic:GetCostume(u.JobId)
+		if set == nil then return end
+		if u.Skin == 1 then
+			cm.UseCustomEquipOnly = false
+			cm.DefaultEquipUserId = u.Owner
+			cm.CustomTwoHandedWeaponEquip = set.weapon2h
+		else
+			cm.UseCustomEquipOnly = true
+			cm.CustomLongcoatEquip = set.longcoat
+			cm.CustomTwoHandedWeaponEquip = set.weapon2h
+			cm.CustomShoesEquip = set.shoes
+			cm.CustomHairEquip = set.hair
+		end
+	end
+
+end

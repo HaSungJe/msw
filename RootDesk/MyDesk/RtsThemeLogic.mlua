@@ -1,5 +1,5 @@
 -- rts-base: 트랙/타일 테마 프리셋 (2026-09-14 사용자 지시 — "트랙/타일은 프리셋 가능하도록")
---   프리셋 = 바닥 타일 이름(CaveFloorTileSet 안의 Name) + 그리드 트랙 텍스처 RUID 묶음.
+--   프리셋 = 바닥 타일 이름(+변형 타일·비율) + 그리드 트랙 텍스처 RUID + 배경 사물 목록(공식 스프라이트, 칸 좌표) 묶음. 타일은 CaveFloorTileSet 안의 Name.
 --   기본은 헤네시스. 프리셋 선택 UI·과금은 나중(로드맵 Phase 10 이후) — 여기는 단일 소스와 적용 함수만.
 --   적용은 서버가 한다(타일·프롭이 서버 소유). 클라는 GetActiveKey/GetPreset로 읽기만.
 @Logic
@@ -7,11 +7,64 @@ script RtsThemeLogic extends Logic
 
 	property string ActiveKey = "henesys"
 
-	-- 프리셋 표. 새 테마 = 여기 한 줄 + 타일셋에 타일 1개 + 그리드 텍스처 1장(assets/textures/README.md 절차)
+	-- 배경 사물: 공식 MSW 탑뷰 헤네시스 오브젝트(maplestory/map/obj/msw/topview_henesys/*)를 **트랙·발판 영역 바깥**에만
+	--   (2026-09-14 사용자: 안쪽은 유닛 자리라 배경과 겹치면 안 됨). 왼쪽 여백·오른쪽 16~18열·위쪽 띠. 불투명, 그리드 위(OrderInLayer 110).
+	--   {ruid, col, row} — 그리드 칸 좌표(1-기반, 소수 허용). 화면은 열 -2.75~20.25 / 행 0~12.5
+	method table GetHenesysDecor()
+		return {
+			{ ruid = "6776ca0ef83c4e64b94e1a1818295bbe", col = -1.3, row = 6.0 },  -- building/2
+			{ ruid = "f333071fcb09429fb8b5615fcf90a957", col = -1.3, row = 9.2 },  -- building/4
+			{ ruid = "a9144c7f9fb04f9281c0f1df560db3e1", col = -0.9, row = 11.3 },  -- building/7
+			{ ruid = "b71bcab7f8a74573ad8c85c81c64036a", col = -2.3, row = 7.6 },  -- tree/0
+			{ ruid = "5cd0f21502dd41bc8db9bc933d7b609c", col = -0.4, row = 7.8 },  -- tree/1
+			{ ruid = "3a2c81b1fd684b0d82482d9677572285", col = -2.2, row = 10.7 },  -- tree/3
+			{ ruid = "c7f0b7d9751e4c07bc14315983232dbe", col = -0.3, row = 10.3 },  -- tree/2
+			{ ruid = "5b2061db8fa24cfdbcd7742a6128690a", col = -2.0, row = 5.0 },  -- hay
+			{ ruid = "2d93a94442c747b7a53bd849ad757f61", col = -0.5, row = 5.1 },  -- bush
+			{ ruid = "b7f991fecbe04454bc8d97df629aca55", col = -2.4, row = 12.2 },  -- flag
+			{ ruid = "3e79cbf6ae7643bc91d2a527a6b35ff3", col = -2.0, row = 2.6 },  -- bush
+			{ ruid = "2d93a94442c747b7a53bd849ad757f61", col = -0.5, row = 3.5 },  -- bush
+			{ ruid = "3a2c81b1fd684b0d82482d9677572285", col = -1.6, row = 3.9 },  -- tree/3
+			{ ruid = "44dbaa45a1b34854a581ec90253aefef", col = 17.2, row = 2.2 },  -- building/1
+			{ ruid = "27104f25e3784ba6be376ee17b200451", col = 17.2, row = 5.4 },  -- building/6
+			{ ruid = "a8165f6fa7a8458190fff745e9d4ebbd", col = 17.2, row = 8.4 },  -- building/9
+			{ ruid = "3cf6b9e903e645c295fadfa6bb0548b0", col = 17.2, row = 11.3 },  -- building/3
+			{ ruid = "c7f0b7d9751e4c07bc14315983232dbe", col = 16.3, row = 3.9 },  -- tree/2
+			{ ruid = "5cd0f21502dd41bc8db9bc933d7b609c", col = 18.2, row = 3.8 },  -- tree/1
+			{ ruid = "b71bcab7f8a74573ad8c85c81c64036a", col = 16.3, row = 6.9 },  -- tree/0
+			{ ruid = "3a2c81b1fd684b0d82482d9677572285", col = 18.2, row = 7.0 },  -- tree/3
+			{ ruid = "5cd0f21502dd41bc8db9bc933d7b609c", col = 16.3, row = 9.9 },  -- tree/1
+			{ ruid = "c7f0b7d9751e4c07bc14315983232dbe", col = 18.2, row = 9.9 },  -- tree/2
+			{ ruid = "3e79cbf6ae7643bc91d2a527a6b35ff3", col = 16.2, row = 1.0 },  -- bush
+			{ ruid = "2d93a94442c747b7a53bd849ad757f61", col = 18.3, row = 1.0 },  -- bush
+			{ ruid = "ebcdd844b63043d1a755c2fd1511e986", col = 16.4, row = 12.3 },  -- hay
+			{ ruid = "d1a0f546529540dca4f00bc2c8a3cf7f", col = 18.3, row = 12.3 },  -- flag
+			{ ruid = "2e2fdcacb22d4d59877d4a7ca1469ef2", col = 16.2, row = 12.3 },  -- bench
+			{ ruid = "2d93a94442c747b7a53bd849ad757f61", col = 3, row = 0.3 },  -- bush
+			{ ruid = "ebcdd844b63043d1a755c2fd1511e986", col = 5.5, row = 0.3 },  -- hay
+			{ ruid = "3e79cbf6ae7643bc91d2a527a6b35ff3", col = 8, row = 0.3 },  -- bush
+			{ ruid = "5b2061db8fa24cfdbcd7742a6128690a", col = 10.5, row = 0.25 },  -- hay
+			{ ruid = "2d93a94442c747b7a53bd849ad757f61", col = 13, row = 0.3 },  -- bush
+			{ ruid = "b7f991fecbe04454bc8d97df629aca55", col = 15, row = 0.3 },  -- flag
+		}
+	end
+
+	-- 배경 사물 공통: 그리드 위·불투명 (유닛·몹은 200~)
+	method number GetDecorOrder()
+		return 110
+	end
+
+	method number GetDecorAlpha()
+		return 1
+	end
+
+	-- 프리셋 표. 새 테마 = 여기 한 줄 + 타일셋에 타일 1개 + 그리드 텍스처 1장(assets/textures/README.md 절차) + 장식물 목록
 	method table GetPresets()
 		return {
-			{ key = "henesys", name = "헤네시스", floorTile = "HenesysGrassFloor", gridRUID = "f8bf4274602c4d22b2e6643e114fbc5f" },
-			{ key = "elnath", name = "엘나스", floorTile = "ElnathSnowFloor", gridRUID = "651583e1c1ee44cdb6d2a891755ab528" },
+			{ key = "henesys", name = "헤네시스", floorTile = "HenesysGrass1", floorVariants = { "HenesysGrass2", "HenesysGrass3" }, variantRatio = 0.12,
+				gridRUID = "f8bf4274602c4d22b2e6643e114fbc5f", decor = self:GetHenesysDecor() },
+			{ key = "elnath", name = "엘나스", floorTile = "ElnathSnowFloor", floorVariants = {}, variantRatio = 0,
+				gridRUID = "651583e1c1ee44cdb6d2a891755ab528", decor = {} },
 		}
 	end
 
@@ -39,11 +92,28 @@ script RtsThemeLogic extends Logic
 		return self:GetPreset(self.ActiveKey).floorTile
 	end
 
+	-- 바닥 변형 타일(꽃 등)과 비율 — FillGroundTiles가 무작위 칸에 섞는다
+	method table GetFloorVariants()
+		local v = self:GetPreset(self.ActiveKey).floorVariants
+		if v == nil then return {} end
+		return v
+	end
+
+	method number GetFloorVariantRatio()
+		local r = self:GetPreset(self.ActiveKey).variantRatio
+		if r == nil then return 0 end
+		return r
+	end
+
 	method string GetGridRUID()
 		return self:GetPreset(self.ActiveKey).gridRUID
 	end
 
-	-- 프리셋 전환: 바닥 타일 다시 채우고 8구역 그리드 스프라이트 교체. 입장 전(시각화 전)에 불러도 안전
+	method table GetDecor()
+		return self:GetPreset(self.ActiveKey).decor
+	end
+
+	-- 프리셋 전환: 바닥 타일 다시 채우고 8구역 그리드 스프라이트·장식물 교체. 입장 전(시각화 전)에 불러도 안전
 	@ExecSpace("ServerOnly")
 	method boolean ApplyPreset(string key)
 		local preset = self:GetPreset(key)
@@ -52,8 +122,9 @@ script RtsThemeLogic extends Logic
 			return false
 		end
 		self.ActiveKey = preset.key
-		_RtsBootstrapLogic:FillGroundTiles(preset.floorTile)
+		_RtsBootstrapLogic:FillGroundTiles(preset.floorTile, preset.floorVariants, preset.variantRatio)
 		_RtsZoneLogic:SetGridRUID(preset.gridRUID)
+		_RtsZoneLogic:SetDecor(preset.decor)
 		log("RtsTheme: applied " .. preset.key)
 		return true
 	end

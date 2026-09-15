@@ -48,10 +48,27 @@ script RtsCameraAnchorComponent extends Component
 
 		-- 구역 시각화용으로 스폰한 프롭(defaultplayer 복제)이 활성 카메라를 가져가는 경우가 있어
 		--   내 카메라를 명시적으로 되찾은 뒤 줌을 건다(2026-08-18 실측: 되찾지 않으면 ZoomTo가 무시됨)
+		-- 플레이 시작 직후엔 엔진이 뒤늦게 기본 줌을 덮어써서 첫 ZoomTo가 사라지는 경우가 있다(2026-09-15 실측)
+		--   → 실제 ZoomRatio가 목표에 도달할 때까지 0.3초 간격으로 다시 건다(최대 10회)
 		self:ClaimCamera()
+		self:EnsureZoom(0)
+	end
+
+	-- 줌이 목표(30%)에 도달했는지 확인하고 아니면 다시 건다
+	@ExecSpace("ClientOnly")
+	method void EnsureZoom(number attempt)
+		if _UserService.LocalPlayer ~= self.Entity then return end
+		if attempt >= 10 then return end
 		_TimerService:SetTimerOnce(function()
-			self:ClaimCamera()
-		end, 0.5)
+			local camera = self.Entity.CameraComponent
+			if camera == nil then return end
+			local target = _RtsConfigLogic:GetCameraZoomPercent()
+			if math.abs(camera.ZoomRatio - target) > 0.5 or _CameraService:GetCurrentCameraComponent() ~= camera then
+				log("RtsCamera: zoom retry " .. tostring(attempt + 1) .. " (ratio=" .. tostring(camera.ZoomRatio) .. ")")
+				self:ClaimCamera()
+				self:EnsureZoom(attempt + 1)
+			end
+		end, 0.3)
 	end
 
 	-- 활성 카메라를 내 것으로 고정 + 줌 적용

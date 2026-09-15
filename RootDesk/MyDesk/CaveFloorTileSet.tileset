@@ -25,6 +25,41 @@
           "Id": "df8df44de6e64c25a74f465ef88ef4c8",
           "Name": "ElnathSnowFloor",
           "IsCollidable": false
+        },
+        {
+          "Id": "05811c7d61494f3aa21cd988e8148456",
+          "Name": "HenesysGrass1",
+          "IsCollidable": false
+        },
+        {
+          "Id": "6cdc56a545584ea3bd2926bba7e9554a",
+          "Name": "HenesysGrass2",
+          "IsCollidable": false
+        },
+        {
+          "Id": "bc54942ec23a4adb9cc254686936aeeb",
+          "Name": "HenesysGrass3",
+          "IsCollidable": false
+        },
+        {
+          "Id": "4f09484468844d48a960919d6319f9b2",
+          "Name": "HenesysSoil",
+          "IsCollidable": false
+        },
+        {
+          "Id": "d668295c9a6747a5920ebbbb2f36eb78",
+          "Name": "HenesysStone1",
+          "IsCollidable": false
+        },
+        {
+          "Id": "a621d070b302450eadc9f976f6270577",
+          "Name": "HenesysStone3",
+          "IsCollidable": false
+        },
+        {
+          "Id": "82350139e9cc4b2f973123cb89997c39",
+          "Name": "HenesysStone4",
+          "IsCollidable": false
         }
       ]
     }

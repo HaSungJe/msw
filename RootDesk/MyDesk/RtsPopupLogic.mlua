@@ -1,4 +1,4 @@
--- rts-base 화면 v2: 팝업 공통 셸 + 영입/증강/보스 3택1 껍데기 (아티팩트 v16)
+-- rts-base 화면 v2: 팝업 공통 셸 + 영입/증강/보스 3택1 껍데기 (아티팩트 v16) + 유닛 정보(v27, 내용은 RtsUnitPopupLogic)
 --   셸: 딤(클릭=닫기) + 중앙 패널(금색 테두리·제목·닫기 X). ESC로 닫힘. 한 번에 하나.
 --   내용은 보이는 것만 — 영입·증강 로직은 Phase 5·6. 3택1은 트리거가 없어 B 키 미리보기(Phase 6에서 제거).
 --   UI 헬퍼는 RtsHudLogic 것을 쓴다. 좌표는 1920×1080 기준(목업 1cqw = 19.2px).
@@ -81,12 +81,13 @@ script RtsPopupLogic extends Logic
 	method void Open(string kind)
 		if not self.Built then return end
 		if self.Kind ~= "" then self:Close() end
-		if kind ~= "recruit" and kind ~= "augment" and kind ~= "pick" then
+		if kind ~= "recruit" and kind ~= "augment" and kind ~= "pick" and kind ~= "unit" then
 			log("RtsPopup: unknown kind " .. kind)
 			return
 		end
 		self.Kind = kind
 		local H = _RtsHudLogic
+		local width = self.PanelW
 		local height = 500
 		local title = ""
 		if kind == "recruit" then
@@ -95,11 +96,16 @@ script RtsPopupLogic extends Logic
 		elseif kind == "augment" then
 			height = 960
 			title = "증강"
+		elseif kind == "unit" then
+			width = _RtsUnitPopupLogic.PanelW
+			height = _RtsUnitPopupLogic.PanelH
+			title = "유닛"
 		else
 			height = 520
 			title = "보스 처치 — 증강 선택"
 		end
-		self.PanelOuter.UITransformComponent.RectSize = Vector2(self.PanelW, height)
+		self.PanelOuter.UITransformComponent.RectSize = Vector2(width, height)
+		self.Title.TextComponent.IsRichText = false
 		self.Title.TextComponent.Text = title
 		self.CloseBtn:SetEnable(kind ~= "pick")
 
@@ -112,6 +118,8 @@ script RtsPopupLogic extends Logic
 			self:BuildRecruit(body)
 		elseif kind == "augment" then
 			self:BuildAugment(body)
+		elseif kind == "unit" then
+			_RtsUnitPopupLogic:BuildBody(body)
 		else
 			self:BuildPick(body)
 		end
@@ -121,6 +129,7 @@ script RtsPopupLogic extends Logic
 	@ExecSpace("ClientOnly")
 	method void Close()
 		if self.Kind == "" then return end
+		if self.Kind == "unit" then _RtsUnitPopupLogic:OnClosed() end
 		self.Kind = ""
 		self.Pick = {}
 		self.AugTabs = {}

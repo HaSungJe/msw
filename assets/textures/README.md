@@ -37,9 +37,23 @@
 ## HUD 프레임 (폐기 — 화면 v2에서 미니맵/초상화/정보창 제거)
 `tools/gen-hud-frame.js` — 구 스타식 HUD 프레임. RUID `3c4c2394686a46cf86a34f520d31c3f0`(340) · `3c81e689753f4c0eb2a58418963fdf2f`(240) · `28511390f76c42c08a9105751ced4051`(info). 보관.
 
+## 발판 강조 틀 (2026-09-15 — 위치 이동 모드)
+
+| 파일 | 내용 | 생성 | RUID | 상태 |
+|---|---|---|---|---|
+| `pad-frame.png` | 80px, 흰 테두리 6px + 안쪽 흰 알파 70. 색은 `SpriteRenderer.Color` 틴트(빈 발판 금색 / 내 유닛 자리 파랑). PPU 100 → 스케일 2.222 = 한 칸, 코드는 2.12 | PIL 한 줄(`RtsUnitSelectLogic` 주석) | `2c03a06fb9ee495e80e3935eb033bccf` (RtsPadFrame, sprite/object) | **적용 중** |
+
+## 월드 상점 상품 썸네일 (2026-09-15)
+
+| 파일 | 내용 | RUID / 상품 | 상태 |
+|---|---|---|---|
+| `world-avatar-30d.png` | 120px, 금색 틀 + 아바타 실루엣 + "월드 아바타 30일" | 썸네일 RUID `46652e80572242ec96ae94c3088b4a15`, 상품 `QK03ZI15E`(아이템, 1,600 월드코인, **비공개**) | 적용 중 |
+
 ## 테마 프리셋 (2026-09-14)
 바닥 타일 + 그리드 트랙 텍스처는 `RootDesk/MyDesk/RtsThemeLogic.mlua`의 프리셋 표로 묶어서 고른다(기본 `henesys`, 보관 `elnath`). `CaveFloorTileSet`에는 두 타일이 모두 들어 있다(HenesysGrassFloor·ElnathSnowFloor).
-**새 테마 추가** = ① 바닥 256px 타일 생성·업로드 → 타일셋 `datas`에 항목 추가 ② `gen-track-grid.js`의 선/발판 색을 그 배경에 맞춰 생성·업로드 ③ `RtsThemeLogic.GetPresets`에 한 줄 ④ 아티팩트 `.stage[data-theme=…]` 변수 한 벌. 런타임 전환은 서버에서 `_RtsThemeLogic:ApplyPreset(key)`.
+**새 테마 추가** = ① 바닥 256px 타일 생성·업로드 → 타일셋 `datas`에 항목 추가 ② `gen-track-grid.js`의 선/발판 색을 그 배경에 맞춰 생성·업로드 ③ `RtsThemeLogic.GetPresets`에 한 줄 + 장식물 목록(`decor`: 공식 스프라이트 RUID + 칸 좌표) ④ 아티팩트 `.stage[data-theme=…]` 변수 한 벌 + `DECOR` 목록. 런타임 전환은 서버에서 `_RtsThemeLogic:ApplyPreset(key)`.
+
+헤네시스 배경 마을(그리드 아래 반투명 58개)은 공식 MSW 탑뷰 오브젝트 `maplestory/map/obj/msw/topview_henesys/{building,tree,acc,flag}/N/0`(msw-mcp `asset_search_resources` 쿼리 `*topview_henesys`). 월드 프롭 엔티티는 네이티브 모델 `model://MapObject`(Transform + SpriteRenderer).
 
 ## 교체 절차 (공통)
 1. 생성기의 색/파라미터 수정 → PNG 생성

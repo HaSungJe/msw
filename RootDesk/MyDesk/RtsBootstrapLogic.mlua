@@ -13,11 +13,14 @@ script RtsBootstrapLogic extends Logic
 		end
 		self:EnsureGroundTiles()
 		_RtsZoneLogic:EnsureZoneVisuals()
+		_RtsDemoLogic:EnsureWalkers()
 
 		-- 구역 배정 후 해당 클라에만 통지, 플레이어 목록은 전 클라에 통지
 		local zone = _RtsZoneLogic:AssignZone(userId)
 		if zone > 0 then
 			userEntity.RtsCameraAnchorComponent:ApplyAssignedZone(zone, userId)
+			-- 영입(Phase 5 #18) 전까지 시범 편성 3기 + 시범 메소
+			_RtsUnitLogic:EnsureDemoUnits(userId, zone)
 		end
 		self:BroadcastPlayerList()
 	end
@@ -25,6 +28,7 @@ script RtsBootstrapLogic extends Logic
 	@ExecSpace("ServerOnly")
 	@EventSender("Service", "UserService")
 	handler HandleUserLeaveEvent(UserLeaveEvent event)
+		_RtsUnitLogic:RemoveUnits(event.UserId)
 		_RtsZoneLogic:ReleaseZone(event.UserId)
 		self:BroadcastPlayerList()
 	end
@@ -51,7 +55,7 @@ script RtsBootstrapLogic extends Logic
 		_RtsHudLogic:RefreshPlayerList(packed)
 	end
 
-	-- 바닥 채우기 (멱등). 타일 8유닛 → 맵 96×128 = 12×16 타일, 사방 2타일 여유
+	-- 바닥 채우기 (멱등). 타일 크기는 RtsConfigLogic.FloorTileUnit, 사방 16유닛 여유
 	--   어떤 타일로 채울지는 테마 프리셋(RtsThemeLogic)이 정한다
 	@ExecSpace("ServerOnly")
 	method void EnsureGroundTiles()
@@ -59,28 +63,40 @@ script RtsBootstrapLogic extends Logic
 		if tm == nil then return end
 		local tilemap = tm.RectTileMapComponent
 		if tilemap == nil then return end
-		local tileUnit = 8
+		local tileUnit = _RtsConfigLogic:GetFloorTileUnit()
 		local tilesX = _RtsConfigLogic:GetMapCellsX() / tileUnit
 		local tilesY = _RtsConfigLogic:GetMapCellsY() / tileUnit
-		local pad = 2
+		local pad = 16 / tileUnit
 		local need = (tilesX + pad * 2) * (tilesY + pad * 2)
 		if tilemap.TileCount >= need then return end
-		self:FillGroundTiles(_RtsThemeLogic:GetFloorTileName())
+		self:FillGroundTiles(_RtsThemeLogic:GetFloorTileName(), _RtsThemeLogic:GetFloorVariants(), _RtsThemeLogic:GetFloorVariantRatio())
 	end
 
 	-- 바닥 전체를 주어진 타일(타일셋의 Name)로 다시 채운다 — 테마 전환도 이걸 쓴다
+	--   variants가 있으면 ratio 비율만큼 무작위 칸을 변형 타일(꽃 등)로 바꿔 반복감을 줄인다(결정적 해시 → 매번 같은 자리)
 	@ExecSpace("ServerOnly")
-	method void FillGroundTiles(string tileName)
+	method void FillGroundTiles(string tileName, table variants, number ratio)
 		local tm = _EntityService:GetEntityByPath("/maps/RtsMap/RectTileMap")
 		if tm == nil then return end
 		local tilemap = tm.RectTileMapComponent
 		if tilemap == nil then return end
-		local tileUnit = 8
+		local tileUnit = _RtsConfigLogic:GetFloorTileUnit()
+		tilemap.GridSize = Vector2(tileUnit, tileUnit)
 		local tilesX = _RtsConfigLogic:GetMapCellsX() / tileUnit
 		local tilesY = _RtsConfigLogic:GetMapCellsY() / tileUnit
-		local pad = 2
+		local pad = 16 / tileUnit
 		tilemap:Clear()
 		tilemap:BoxFill(tileName, Vector2Int(0 - pad, 0 - pad), Vector2Int(tilesX - 1 + pad, tilesY - 1 + pad))
+		if variants == nil or #variants == 0 or ratio <= 0 then return end
+		for y = 0 - pad, tilesY - 1 + pad do
+			for x = 0 - pad, tilesX - 1 + pad do
+				local h = ((x + 97) * 374761393 + (y + 89) * 668265263) % 1000003
+				if (h % 1000) / 1000 < ratio then
+					local v = variants[(h % #variants) + 1]
+					tilemap:SetTile(v, x, y)
+				end
+			end
+		end
 	end
 
 end

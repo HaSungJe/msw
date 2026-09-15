@@ -19,6 +19,13 @@ script RtsConfigLogic extends Logic
 
 	property number CellSize = 1
 
+	-- 이동 속도 수치: 속도 100 = 초당 3.5유닛(2026-09-14 사용자 확정 — 달팽이 시연 속도를 100으로). 실제 속도 = 수치/100 × 이 값
+	--   칸 1개 ≈ 0.5초, 트랙 한 바퀴(117.3유닛) ≈ 33.5초
+	property number SpeedUnitPerSec = 3.5
+
+	-- 바닥 타일 한 칸(유닛). 공식 헤네시스 RectTile은 4가 선명(8은 흐림 — 2026-09-14 실측). 맵 크기(96×128)는 4·8 모두 나누어떨어짐
+	property number FloorTileUnit = 4
+
 	-- 카메라: 최대 줌아웃, 앵커 = 구역 정중앙(오프셋 없음)
 	property number CameraZoomPercent = 30
 
@@ -91,6 +98,15 @@ script RtsConfigLogic extends Logic
 
 	method number GetCameraOffsetY()
 		return self.CameraOffsetY
+	end
+
+	-- 속도 수치(100 기준) → 유닛/초
+	method number SpeedToUnitsPerSec(number speed)
+		return speed / 100 * self.SpeedUnitPerSec
+	end
+
+	method number GetFloorTileUnit()
+		return self.FloorTileUnit
 	end
 
 	method number GetGridCols()

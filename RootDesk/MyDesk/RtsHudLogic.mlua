@@ -43,6 +43,14 @@ script RtsHudLogic extends Logic
 
 	property number SelectedSlot = 0
 
+	-- HUD 생성 전에 유닛이 먼저 동기화된 경우 표시 예약
+	property boolean PendingUnits = false
+
+	-- 상단 중앙 안내(위치 이동 모드 등)
+	property Entity Hint = nil
+
+	property Entity HintText = nil
+
 	-- ===== UI 헬퍼 (RtsPopupLogic도 사용) =====
 
 	@ExecSpace("ClientOnly")
@@ -254,6 +262,14 @@ script RtsHudLogic extends Logic
 			_RtsPopupLogic:Open("augment")
 		end)
 
+		-- 상단 중앙 안내(기본 숨김)
+		local hint = self:SpawnPanel("RtsHint", grp, Vector2(0.5, 1), Vector2(0.5, 1), Vector2(0, -16), Vector2(720, 44),
+			Color(0.22, 0.185, 0.118, 0.94), self:ColGold(), 1.5)
+		self.HintText = self:SpawnLabel("RtsHintText", hint, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2(0, 0), Vector2(700, 36),
+			"", self:ColInk(), 17, TextAlignmentType.MiddleCenter, true)
+		self.Hint = hint.Parent
+		self.Hint:SetEnable(false)
+
 		self.Built = true
 		log("RtsHud: built v2")
 
@@ -263,6 +279,21 @@ script RtsHudLogic extends Logic
 			self.PendingPlayers = ""
 			self:RefreshPlayerList(packed)
 		end
+		self:RefreshMyUnits()
+		self:SetMeso(_RtsUnitLogic:GetMyMeso())
+	end
+
+	@ExecSpace("ClientOnly")
+	method void ShowHint(string text)
+		if self.Hint == nil then return end
+		self.HintText.TextComponent.Text = text
+		self.Hint:SetEnable(true)
+	end
+
+	@ExecSpace("ClientOnly")
+	method void HideHint()
+		if self.Hint == nil then return end
+		self.Hint:SetEnable(false)
 	end
 
 	-- ===== 시간·메소 =====
@@ -271,6 +302,11 @@ script RtsHudLogic extends Logic
 	method void SetTime(string text)
 		if self.TimeText == nil or self.TimeText.TextComponent == nil then return end
 		self.TimeText.TextComponent.Text = text
+	end
+
+	-- 프로퍼티·동기화 값은 실수(1.0)로 오므로 표시용 정수 문자열은 이걸로
+	method string Int(number n)
+		return tostring(math.floor(n + 0.5))
 	end
 
 	method string FormatNumber(number n)
@@ -421,7 +457,25 @@ script RtsHudLogic extends Logic
 		if anchor ~= nil then anchor:JumpToZone(p.zone) end
 	end
 
-	-- ===== 유닛 슬롯 (내용은 Phase 4 #14/#17이 채움) =====
+	-- ===== 유닛 슬롯 (내 유닛 = RtsUnitLogic, 번호 = 슬롯) =====
+
+	-- 내 유닛 6칸을 다시 채운다. HUD가 아직 없으면 생성 뒤에 한 번
+	@ExecSpace("ClientOnly")
+	method void RefreshMyUnits()
+		if not self.Built then
+			self.PendingUnits = true
+			return
+		end
+		self.PendingUnits = false
+		for i = 1, _RtsUnitLogic:GetMaxUnits() do
+			local u = _RtsUnitLogic:GetMyUnit(i)
+			if u ~= nil then
+				self:SetUnitSlot(i, u.No, _RtsJobTableLogic:GetJobName(u.JobId), u.Level, _RtsJobTableLogic:GetSeries(u.JobId))
+			else
+				self:ClearUnitSlot(i)
+			end
+		end
+	end
 
 	@ExecSpace("ClientOnly")
 	method void SetUnitSlot(number i, number no, string jobName, number level, string series)
@@ -429,11 +483,11 @@ script RtsHudLogic extends Logic
 		if s == nil then return end
 		s.filled = true
 		-- 리치텍스트 태그는 말줄임(ellipsis)에 잘려 그대로 노출되므로 평문으로
-		s.name.TextComponent.Text = tostring(no) .. ". " .. jobName
+		s.name.TextComponent.Text = self:Int(no) .. ". " .. jobName
 		s.name.TextComponent.Alignment = TextAlignmentType.MiddleLeft
 		s.name.UITransformComponent.RectSize = Vector2(80, 30)
 		s.name.TextComponent.FontSize = 13
-		s.lv.TextComponent.Text = "Lv " .. tostring(level)
+		s.lv.TextComponent.Text = "Lv " .. self:Int(level)
 		s.bar.SpriteGUIRendererComponent.Color = self:SeriesColor(series)
 		self:ApplySlotLook(i)
 	end
@@ -475,15 +529,16 @@ script RtsHudLogic extends Logic
 		end
 	end
 
-	-- 슬롯 클릭 = 선택 표시. 발판 금색 링은 Phase 4에서 연결
+	-- 슬롯 클릭 = 선택 표시 + 유닛 정보 팝업
 	@ExecSpace("ClientOnly")
 	method void OnUnitSlotClick(number i)
 		local s = self.UnitSlots[i]
 		if s == nil or not s.filled then return end
 		local prev = self.SelectedSlot
-		if prev == i then self.SelectedSlot = 0 else self.SelectedSlot = i end
+		self.SelectedSlot = i
 		if prev > 0 then self:ApplySlotLook(prev) end
 		self:ApplySlotLook(i)
+		_RtsUnitPopupLogic:OpenUnit(i)
 	end
 
 end

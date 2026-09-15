@@ -19,6 +19,9 @@ script RtsZoneLogic extends Logic
 
 	property table PadList = {}
 
+	-- 구역별 장식물 수(테마 전환 시 제거용)
+	property number DecorCount = 0
+
 	method number GetZoneCount()
 		return _RtsConfigLogic:GetZoneCols() * _RtsConfigLogic:GetZoneRows()
 	end
@@ -33,8 +36,9 @@ script RtsZoneLogic extends Logic
 		}
 	end
 
+	-- 프로퍼티·동기화·RPC로 온 칸 번호는 실수(4.0)일 수 있어 정수로 맞춘다 ("4.0,3.0" ≠ "4,3" — 2026-09-15 실측)
 	method string CellKey(number col, number row)
-		return tostring(col) .. "," .. tostring(row)
+		return string.format("%d,%d", math.floor(col + 0.5), math.floor(row + 0.5))
 	end
 
 	method void EnsurePath()
@@ -219,25 +223,17 @@ script RtsZoneLogic extends Logic
 
 	-- ===== 시각화 (서버 1회 생성 — EnsureGroundTiles 형제 패턴) =====
 
-	-- 월드 스프라이트 엔티티: 전용 빈 모델이 없어 defaultplayer 복제 + 렌더러/카메라 비활성
-	--   ※ CameraComponent를 끄지 않으면 카메라가 이 엔티티로 넘어감(2026-08-18 실측)
+	-- 월드 스프라이트 엔티티: 네이티브 모델 MapObject(Transform + SpriteRenderer, 카메라 없음 — 2026-09-14 실측)
+	--   (이전의 defaultplayer 복제 + 카메라 비활성 우회는 폐기)
 	@ExecSpace("ServerOnly")
-	method Entity SpawnProp(string name, Entity parent, Vector2 at, string ruid)
-		local e = _SpawnService:SpawnByModelId("model://defaultplayer", name, Vector3(at.x, at.y, 0), parent)
+	method Entity SpawnProp(string name, Entity parent, Vector2 at, string ruid, number order)
+		local e = _SpawnService:SpawnByModelId("model://MapObject", name, Vector3(at.x, at.y, 0), parent)
 		if e == nil then return nil end
-		if e.CameraComponent ~= nil then e.CameraComponent.Enable = false end
-		if e.AvatarRendererComponent ~= nil then e.AvatarRendererComponent.Enable = false end
-		if e.NameTagComponent ~= nil then e.NameTagComponent.Enable = false end
-		if e.PlayerControllerComponent ~= nil then e.PlayerControllerComponent.Enable = false end
-		if e.KinematicbodyComponent ~= nil then
-			e.KinematicbodyComponent.EnableShadow = false
-			e.KinematicbodyComponent.EnableTileCollision = false
-		end
 		if e.SpriteRendererComponent == nil then e:AddComponent("SpriteRendererComponent") end
 		local sr = e.SpriteRendererComponent
 		sr.SpriteRUID = ruid
 		sr.SortingLayer = "MapLayer0"
-		sr.OrderInLayer = 100
+		sr.OrderInLayer = order
 		return e
 	end
 
@@ -260,13 +256,44 @@ script RtsZoneLogic extends Logic
 
 		for n = 1, self:GetZoneCount() do
 			local c = _RtsConfigLogic:GetZoneCenter(n)
-			local grid = self:SpawnProp("ZoneGrid" .. tostring(n), mapRoot, Vector2(c.x + offX, c.y + offY), ruid)
+			local grid = self:SpawnProp("ZoneGrid" .. tostring(n), mapRoot, Vector2(c.x + offX, c.y + offY), ruid, 100)
 			if grid ~= nil then
 				grid.TransformComponent.Scale = Vector3(scale, scale, 1)
 			end
 		end
+		self:SetDecor(_RtsThemeLogic:GetDecor())
 		self.VisualsBuilt = true
 		log("RtsZone: visuals built (grid track x" .. tostring(self:GetZoneCount()) .. ")")
+	end
+
+	-- 배경 사물: 테마 프리셋의 목록을 8구역 모두에 같은 자리로. 기존 것은 지우고 다시 세운다
+	--   자리·층·투명도는 프리셋이 정한다(지금은 트랙 바깥, 그리드 위 110, 불투명). 유닛·몹(200~)은 더 위
+	@ExecSpace("ServerOnly")
+	method void SetDecor(table list)
+		local mapRoot = _EntityService:GetEntityByPath("/maps/RtsMap")
+		if mapRoot == nil then return end
+		for n = 1, self:GetZoneCount() do
+			for i = 1, self.DecorCount do
+				local old = _EntityService:GetEntityByPath("/maps/RtsMap/ZoneDecor" .. tostring(n) .. "_" .. tostring(i))
+				if old ~= nil then old:Destroy() end
+			end
+		end
+		self.DecorCount = #list
+		local order = _RtsThemeLogic:GetDecorOrder()
+		local alpha = _RtsThemeLogic:GetDecorAlpha()
+		for n = 1, self:GetZoneCount() do
+			for i = 1, #list do
+				local d = list[i]
+				local at = self:GetCellCenter(n, d.col, d.row)
+				local e = self:SpawnProp("ZoneDecor" .. tostring(n) .. "_" .. tostring(i), mapRoot, at, d.ruid, order)
+				if e ~= nil then
+					e.SpriteRendererComponent.Color = Color(1, 1, 1, alpha)
+					if d.scale ~= nil and d.scale ~= 1 then
+						e.TransformComponent.Scale = Vector3(d.scale, d.scale, 1)
+					end
+				end
+			end
+		end
 	end
 
 	-- 테마 전환: 이미 세워진 8구역 그리드 스프라이트의 텍스처만 바꾼다 (RtsThemeLogic.ApplyPreset)

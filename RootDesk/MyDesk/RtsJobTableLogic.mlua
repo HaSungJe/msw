@@ -1,0 +1,213 @@
+-- Phase 2 #6 (부분, 2026-09-15): 직업 정의 단일 소스 — .info/character.md의 히어로·팔라딘·다크나이트 그대로.
+--   비용 곡선은 .info/level.md, DPS 계산은 .info/balance-detail.md 규칙(방어율 제외)과 동일. 목업(hud-layout.html v27)의 JOBS/COST와 1:1.
+--   궁수 이하 나머지 직업은 정의가 생기면 여기에 추가한다(외형 세트가 없는 직업은 스폰하지 않는다).
+@Logic
+script RtsJobTableLogic extends Logic
+
+	property number MaxLevel = 50
+
+	-- 레벨 L→L+1 비용(level.md 블록). 인덱스 = 도달 레벨(2~50)
+	property table Costs = {}
+
+	method void EnsureCosts()
+		if #self.Costs > 0 then return end
+		local c = { 0 }
+		local blocks = { { 100, 8, 200 }, { 250, 9, 750 }, { 600, 9, 1600 }, { 1700, 9, 7700 }, { 6000, 9, 40000 } }
+		for b = 1, #blocks do
+			for i = 1, blocks[b][2] do c[#c + 1] = blocks[b][1] end
+			c[#c + 1] = blocks[b][3]
+		end
+		self.Costs = c
+	end
+
+	-- 다음 레벨(nextLevel)에 도달하는 비용. 범위 밖은 0
+	method number GetLevelCost(number nextLevel)
+		self:EnsureCosts()
+		local v = self.Costs[nextLevel]
+		if v == nil then return 0 end
+		return v
+	end
+
+	-- 1레벨부터 level까지 누적 투자
+	method number GetCumCost(number level)
+		self:EnsureCosts()
+		local t = 0
+		for i = 2, level do t = t + self:GetLevelCost(i) end
+		return t
+	end
+
+	-- 10·20·30·40·50 = 벽(구간 마지막 칸이 비싸다)
+	method boolean IsWallLevel(number level)
+		return level % 10 == 0
+	end
+
+	method number GetMaxLevel()
+		return self.MaxLevel
+	end
+
+	-- 공격속도 이름 → 주기(초)
+	method number GetSpeedSec(string speed)
+		if speed == "매우느림" then return 1.5 end
+		if speed == "느림" then return 1.25 end
+		if speed == "빠름" then return 0.75 end
+		if speed == "매우빠름" then return 0.5 end
+		return 1.0
+	end
+
+	method boolean HasJob(string jobId)
+		return jobId == "hero" or jobId == "paladin" or jobId == "dk" or jobId == "bow"
+	end
+
+	method string GetJobName(string jobId)
+		if jobId == "hero" then return "히어로" end
+		if jobId == "paladin" then return "팔라딘" end
+		if jobId == "dk" then return "다크나이트" end
+		if jobId == "bow" then return "보우마스터" end
+		return jobId
+	end
+
+	method string GetJobGroup(string jobId)
+		if jobId == "bow" then return "모험가 · 궁수" end
+		return "모험가 · 전사"
+	end
+
+	-- 계열 키(HUD 슬롯 색): war/arc/mag/thf
+	method string GetSeries(string jobId)
+		if jobId == "bow" then return "arc" end
+		return "war"
+	end
+
+	method number GetBaseAttack(string jobId)
+		if jobId == "paladin" then return 100 end
+		if jobId == "bow" then return 40 end
+		return 50
+	end
+
+	method number GetAttackPerLevel(string jobId)
+		if jobId == "hero" then return 15 end
+		if jobId == "paladin" then return 12 end
+		if jobId == "dk" then return 10 end
+		if jobId == "bow" then return 12 end
+		return 10
+	end
+
+	-- 기본 외형 = 공식 "모험가 ○○" 세트(아바타 아이템 RUID). 없는 직업은 nil
+	method table GetCostume(string jobId)
+		if jobId == "hero" then
+			return { longcoat = "c92ab70d7a064aafaa34298c2e9890e3", weapon2h = "c4f9b9c993754161816092e680584ce3",
+				shoes = "186a55d192d24b4da5201801422bebf7", hair = "931c0ed47c3e4df69734fe19247a7b33" }
+		end
+		if jobId == "paladin" then
+			return { longcoat = "3db1f00384854ab6aa9e6148efa942d9", weapon2h = "ba9a04c1dc1f42049f0ec88e95052c76",
+				shoes = "790ae27c0b30414eb369bda472df4799", hair = "9188a9716ae947b5a1e518bd0d1c0252" }
+		end
+		if jobId == "dk" then
+			return { longcoat = "a529865cf7be417c97b7855eed344004", weapon2h = "acd581b759f2425282961a4486550006",
+				shoes = "f6f89e92db4f498e9b5fb6ec7ee81dda", hair = "e8d9dda3dfd34b68b62426838e951723" }
+		end
+		return nil
+	end
+
+	-- 스킨 2종: 1 기본 세트 / 2 월드 아바타(내 메이플월드 코디 — 월드코인 결제로 30일 해금). 인덱스는 0-기반 값 Skin(0/1)+1
+	method table GetSkinNames(string jobId)
+		return { "모험가 " .. self:GetJobName(jobId), "월드 아바타" }
+	end
+
+	-- 스킬 목록(획득 레벨 순). kind = 액티브/패시브, target = 대상 지정 스킬
+	method table GetSkills(string jobId)
+		if jobId == "hero" then
+			return {
+				{ lv = 1, kind = "액티브", name = "브랜디쉬", desc = "사거리 1. 100%의 데미지로 3마리를 1회 타격", target = false },
+				{ lv = 10, kind = "패시브", name = "콤보 어택", desc = "몬스터 방어율 5% 무시", target = false },
+				{ lv = 20, kind = "패시브", name = "어드벤스드 콤보 어택", desc = "몬스터 방어율 10% 무시", target = false },
+				{ lv = 40, kind = "패시브", name = "어드벤스드 콤보 어택 강화", desc = "공격력을 200%로 변경, 몬스터 방어율 20% 무시", target = false },
+				{ lv = 40, kind = "패시브", name = "브랜디쉬 강화", desc = "브랜디쉬의 능력치 변경. 200% 데미지로 6마리를 1회 타격", target = false },
+				{ lv = 50, kind = "패시브", name = "발할라", desc = "보스 공격 시 최종 데미지 200% 증가, 몬스터 방어율 100% 무시", target = false },
+			}
+		end
+		if jobId == "paladin" then
+			return {
+				{ lv = 1, kind = "액티브", name = "디바인 차지", desc = "사거리 1, 200%의 데미지로 4마리를 1회 타격", target = false },
+				{ lv = 10, kind = "패시브", name = "매직 크러쉬", desc = "사거리 4 이내의 적 방어율 10% 감소", target = false },
+				{ lv = 20, kind = "액티브", name = "생츄어리", desc = "사거리 4, 100%의 데미지로 15마리를 1회 타격. 쿨타임 15초", target = false },
+				{ lv = 30, kind = "패시브", name = "디바인 블레싱", desc = "최종 데미지 20% 증가", target = false },
+				{ lv = 40, kind = "패시브", name = "매직 크러쉬 강화", desc = "매직 크러쉬의 방어율 감소를 20%로 변경", target = false },
+				{ lv = 40, kind = "패시브", name = "결속", desc = "유닛 1개 지정. 그 유닛의 최종 데미지를 20% 증가", target = true },
+				{ lv = 50, kind = "패시브", name = "디바인 차지 강화", desc = "사거리 2, 200%의 데미지로 6마리를 2회 타격", target = false },
+			}
+		end
+		if jobId == "dk" then
+			return {
+				{ lv = 1, kind = "액티브", name = "다크 임페일", desc = "사거리 1, 70% 데미지로 3마리를 3회 타격", target = false },
+				{ lv = 10, kind = "패시브", name = "비홀더", desc = "공격력 +100", target = false },
+				{ lv = 20, kind = "패시브", name = "버서크", desc = "공격력을 200%로 변경", target = false },
+				{ lv = 40, kind = "패시브", name = "비홀더 강화", desc = "공격속도를 보통으로 변경", target = false },
+				{ lv = 50, kind = "액티브", name = "드래곤 로어", desc = "사거리 4, 300%의 데미지로 15마리를 1회 타격. 쿨타임 10초", target = false },
+			}
+		end
+		return { { lv = 1, kind = "액티브", name = "(미정)", desc = "궁수 스킬은 아직 정의 전", target = false } }
+	end
+
+	-- 대상 지정 스킬의 획득 레벨(없으면 0)
+	method number GetTargetSkillLevel(string jobId)
+		local list = self:GetSkills(jobId)
+		for i = 1, #list do
+			if list[i].target then return list[i].lv end
+		end
+		return 0
+	end
+
+	-- 레벨 L의 전투 계수: pct 공격력%(합연산 결과) / flat 추가 공격력 / ratio 기본 공격 데미지% / hits 타격 수 / targets 타겟 수
+	--   ign 방어율 무시% / fin 최종 데미지%(몬스터) / finBoss 최종 데미지%(보스) / ignBoss 보스 방무%(-1 = 별도 없음) / speed 공격속도 이름
+	method table GetStat(string jobId, number L)
+		if jobId == "hero" then
+			local ign = 0
+			if L >= 40 then ign = 20 elseif L >= 20 then ign = 10 elseif L >= 10 then ign = 5 end
+			local s = { pct = 100, flat = 0, ratio = 100, hits = 1, targets = 3, ign = ign, fin = 100, finBoss = 100, ignBoss = -1, speed = "보통" }
+			if L >= 40 then
+				s.pct = 200
+				s.ratio = 200
+				s.targets = 6
+			end
+			if L >= 50 then
+				s.finBoss = 300
+				s.ignBoss = 100
+			end
+			return s
+		end
+		if jobId == "paladin" then
+			local s = { pct = 100, flat = 0, ratio = 200, hits = 1, targets = 4, ign = 0, fin = 100, finBoss = 100, ignBoss = -1, speed = "느림" }
+			if L >= 30 then
+				s.fin = 120
+				s.finBoss = 120
+			end
+			if L >= 50 then
+				s.hits = 2
+				s.targets = 6
+			end
+			return s
+		end
+		if jobId == "dk" then
+			local s = { pct = 100, flat = 0, ratio = 70, hits = 3, targets = 3, ign = 0, fin = 100, finBoss = 100, ignBoss = -1, speed = "느림" }
+			if L >= 10 then s.flat = 100 end
+			if L >= 20 then s.pct = 200 end
+			if L >= 40 then s.speed = "보통" end
+			return s
+		end
+		return { pct = 100, flat = 0, ratio = 100, hits = 1, targets = 1, ign = 0, fin = 100, finBoss = 100, ignBoss = -1, speed = "빠름" }
+	end
+
+	-- 원값 = (기본 + 레벨업 + 추가) × 공격력% × 스킬% → 보스 DPS = 1타 × 타격 수 × 보스 최종 ÷ 주기, 몬스터 DPS = × 타겟 수 × 최종
+	method table Calc(string jobId, number L)
+		local st = self:GetStat(jobId, L)
+		local base = self:GetBaseAttack(jobId)
+		local per = self:GetAttackPerLevel(jobId)
+		local atk = base + per * (L - 1) + st.flat
+		local one = atk * (st.pct / 100) * (st.ratio / 100)
+		local period = self:GetSpeedSec(st.speed)
+		local boss = one * st.hits * (st.finBoss / 100) / period
+		local mob = one * st.hits * st.targets * (st.fin / 100) / period
+		return { st = st, base = base, per = per, atk = atk, one = one, period = period, boss = boss, mob = mob }
+	end
+
+end
