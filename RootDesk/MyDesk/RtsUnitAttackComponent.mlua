@@ -1,0 +1,43 @@
+-- Phase 3 #15·#16 (2026-09-17, 시험대): 유닛의 공격 = MSW 기본 AttackComponent를 확장. 데미지 수치·크리·표시 타격 수는
+--   RtsCombatLogic이 공격 직전에 여기 프로퍼티로 넣어 주고(damage.md 7단계 계산은 그쪽), 이 컴포넌트는 그 값을 돌려주기만 한다.
+--   IsAttackTarget으로 이름이 TargetName인 몬스터만 맞는다(타겟은 사거리·가까운 순 규칙으로 RtsCombatLogic이 고른다 — 판정 박스로 고르지 않음).
+--   데미지 스킨(숫자)은 같은 엔티티의 DamageSkinSettingComponent + 몬스터의 DamageSkinSpawnerComponent가 그린다.
+@Component
+script RtsUnitAttackComponent extends AttackComponent
+
+	-- 이번 공격의 총 데미지(1회 타격 × 타격 수, 크리 전). CalcDamage가 그대로 반환
+	property number Dmg = 1
+
+	-- 이번 공격이 크리티컬인가(RtsCombatLogic이 확률로 굴려 넣음)
+	property boolean Crit = false
+
+	-- 크리 배율 = 1 + 크리티컬 데미지%/100 (damage.md 4단계)
+	property number CritRate = 1.2
+
+	-- 화면에 나눠 보일 타격 수(레이징 블로우 2, 스피어 버스터 3 …)
+	property number Hits = 1
+
+	-- 이번 공격이 맞혀야 하는 몬스터 엔티티 이름
+	property string TargetName = ""
+
+	method integer CalcDamage(Entity attacker, Entity defender, string attackInfo)
+		return math.floor(self.Dmg)
+	end
+
+	method boolean CalcCritical(Entity attacker, Entity defender, string attackInfo)
+		return self.Crit
+	end
+
+	method float GetCriticalDamageRate()
+		return self.CritRate
+	end
+
+	method int32 GetDisplayHitCount(string attackInfo)
+		return math.floor(self.Hits)
+	end
+
+	method boolean IsAttackTarget(Entity defender, string attackInfo)
+		return defender ~= nil and defender.Name == self.TargetName
+	end
+
+end

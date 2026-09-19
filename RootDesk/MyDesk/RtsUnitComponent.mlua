@@ -29,7 +29,7 @@ script RtsUnitComponent extends Component
 	@Sync
 	property number Row = 0
 
-	-- 대상 지정 스킬(결속)의 대상 유닛 번호. 0 = 미지정
+	-- 대상 지정 스킬(홀리 유니티)의 대상 유닛 번호. 0 = 미지정
 	@Sync
 	property number BondNo = 0
 
@@ -39,6 +39,15 @@ script RtsUnitComponent extends Component
 
 	@Sync
 	property number BondReadyAt = 0
+
+	-- 액티브 스킬 잠금 설정: 스킬 목록 순서대로 한 글자씩 0 사용 / 1 보스전 잠금 / 2 잠금 / 3 영구 잠금(프리즘 증강, 강제·해제 불가) (RtsJobTableLogic.DefaultLocks/GetLock). 변경 쿨타임 없음
+	@Sync
+	property string SkillLocks = ""
+
+	-- 보는 방향: -1 왼쪽(메이플 아바타 기본 = 스케일 양수), +1 오른쪽. 서버 FaceTo가 정하고 클라가 아바타 루트 스케일 x 부호로 그린다(유닛 엔티티 스케일은 안 건드려 자식 아이콘이 뒤집히지 않음).
+	--   마지막 공격 방향을 유지한다(공격 끝나도 되돌리지 않음 — 사용자 2026-09-18)
+	@Sync
+	property number FaceDir = -1
 
 	method void OnBeginPlay()
 		if self:IsClient() then self:SetupClient() end
@@ -54,22 +63,53 @@ script RtsUnitComponent extends Component
 			touch.Offset = Vector2(0, 1.1)
 		end
 		self.Entity:ConnectEvent(TouchEvent, function(event)
-			self:OnTouched()
+			self:OnTouched(event.TouchPoint)
 		end)
 		_RtsHudLogic:RefreshMyUnits()
 		_RtsUnitBuffLogic:MarkDirty(self.Zone)
+		self:ApplyFace()
+		-- 아바타 루트가 아직 없을 수 있어 잠시 뒤 한 번 더
+		_TimerService:SetTimerOnce(function() if isvalid(self.Entity) then self:ApplyFace() end end, 0.3)
+		-- 이 직업의 스킬 연출 클립을 미리 올려 첫 시전 로딩 끊김을 없앤다
+		local skills = _RtsJobTableLogic:GetSkills(self.JobId)
+		for i = 1, #skills do
+			if skills[i].fx ~= nil then _RtsSkillFxLogic:Preload(skills[i].fx) end
+		end
 	end
 
-	-- 캐릭터 클릭 = 우측 작은 메뉴(위치 이동 / 상세정보). 내 유닛만. 이동 모드 중엔 발판 클릭이 우선이라 무시
+	-- 보는 방향을 아바타에 반영(클라). 메이플 아바타는 기본이 왼쪽 보기라 오른쪽을 볼 때 루트 스케일 x = -1
 	@ExecSpace("ClientOnly")
-	method void OnTouched()
+	method void ApplyFace()
+		local ar = self.Entity.AvatarRendererComponent
+		if ar == nil then return end
+		local root = ar:GetAvatarRootEntity()
+		if root == nil or not isvalid(root) then return end
+		local sx = 1
+		if self.FaceDir > 0 then sx = -1 end
+		local s = root.TransformComponent.Scale
+		if s.x ~= sx then root.TransformComponent.Scale = Vector3(sx, s.y, s.z) end
+	end
+
+	method boolean IsFacingRight()
+		return self.FaceDir > 0
+	end
+
+	-- 캐릭터 클릭 = 우측 작은 메뉴(위치 이동 / 상세정보). 내 유닛만. 이동 모드 중엔 발판 클릭이 우선이라 무시.
+	--   UI가 항상 우선: 열린 메뉴 위를 눌렀으면(월드 TouchEvent가 UI 버튼과 같이 발화한다 — 2026-09-17 실측: 나로 메뉴의 '상세정보' 자리에 선 섀도어가 클릭됨) 유닛 클릭으로 안 본다
+	@ExecSpace("ClientOnly")
+	method void OnTouched(Vector2 screen)
 		if not _RtsUnitLogic:IsMine(self.Owner) then return end
+		if _RtsUnitSelectLogic:IsOverMenu(screen) then return end
 		_RtsUnitSelectLogic:OnUnitClicked(self.No)
 	end
 
 	-- 서버가 바꾼 값이 도착하면 열려 있는 팝업·슬롯을 다시 그린다. 버프 아이콘은 남의 유닛도(구역 단위로 모아서)
 	method void OnSyncProperty(string name, any value)
 		if not self:IsClient() then return end
+		if name == "FaceDir" then
+			self:ApplyFace()
+			return
+		end
 		_RtsUnitBuffLogic:MarkDirty(self.Zone)
 		if not _RtsUnitLogic:IsMine(self.Owner) then return end
 		_RtsHudLogic:RefreshMyUnits()
@@ -99,20 +139,37 @@ script RtsUnitComponent extends Component
 		local set = _RtsJobTableLogic:GetCostume(self.JobId)
 		if set == nil then return end
 		if self.Skin == 1 then
+			-- 월드 아바타: 유저 본인 아바타 + 직업 무기만. 세트로 넣었던 모자·얼굴 장식·얼굴도 비워야 본인 것이 보인다(2026-09-18 사용자: 보우마스터 깃털 모자가 남아 있었음)
 			cm.UseCustomEquipOnly = false
 			cm.DefaultEquipUserId = self.Owner
 			cm.CustomLongcoatEquip = ""
 			cm.CustomShoesEquip = ""
 			cm.CustomHairEquip = ""
-			cm.CustomTwoHandedWeaponEquip = set.weapon2h
+			cm.CustomCapEquip = ""
+			cm.CustomFaceAccessoryEquip = ""
+			cm.CustomFaceEquip = ""
+			cm.CustomTwoHandedWeaponEquip = set.weapon2h or ""
+			cm.CustomOneHandedWeaponEquip = set.weapon1h or ""
 		else
 			cm.UseCustomEquipOnly = true
 			cm.DefaultEquipUserId = ""
 			cm.CustomLongcoatEquip = set.longcoat
-			cm.CustomTwoHandedWeaponEquip = set.weapon2h
+			cm.CustomTwoHandedWeaponEquip = set.weapon2h or ""
+			cm.CustomOneHandedWeaponEquip = set.weapon1h or ""
 			cm.CustomShoesEquip = set.shoes
 			cm.CustomHairEquip = set.hair
+			cm.CustomCapEquip = set.cap or ""
+			cm.CustomFaceAccessoryEquip = set.faceAcc or ""
+			cm.CustomFaceEquip = set.face or ""
 		end
+	end
+
+	-- 메인 대상 쪽을 본다: dirX > 0 오른쪽, < 0 왼쪽. FaceDir 동기화 → 클라 ApplyFace. 이후 되돌리지 않는다
+	@ExecSpace("ServerOnly")
+	method void FaceTo(number dirX)
+		local d = -1
+		if dirX > 0 then d = 1 end
+		if self.FaceDir ~= d then self.FaceDir = d end
 	end
 
 	-- 발판 칸에 세운다 (아바타 발 위치 = 칸 중앙 −0.75)

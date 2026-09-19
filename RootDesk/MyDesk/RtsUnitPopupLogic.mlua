@@ -2,7 +2,7 @@
 --   열기: 우측 유닛 슬롯 클릭 / 캐릭터 클릭 메뉴의 상세정보. 셸(딤·패널·제목·X·ESC)은 RtsPopupLogic("unit").
 --   좌: 외형(스킨 2 — 기본 세트 / 월드 아바타 = 월드코인 1,600으로 30일 해금, 잠기면 클릭 → 구매창) + 능력치(RtsJobTableLogic.Calc, 파티 버프 반영 행은 ▲).
 --   우: 탭 3개 — 스킬(미획득 흐림, 액티브/패시브) / 증강 n(이 유닛에 지정된 증강, Phase 6 전엔 빈 목록) / 적용 중인 버프 n(RtsUnitBuffLogic). 증강·버프는 ScrollLayoutGroup 스크롤 목록.
---   대상 지정 스킬(결속) 행에는 셀렉트 박스(미지정 / 내 다른 유닛). 하단: 누적 투자·보유 메소·[레벨업].
+--   대상 지정 스킬(홀리 유니티) 행에는 셀렉트 박스(미지정 / 내 다른 유닛). 하단: [레벨업] 버튼만(2026-09-16 — 누적 투자·다음 벽·보유 메소·'(벽)' 문구는 유저에게 필요 없는 내부 정보라 삭제. 메소는 HUD 좌상단).
 --   위치 이동은 여기 없음 — 캐릭터 클릭 메뉴(RtsUnitSelectLogic)에서. 대상 변경·위치 이동은 유닛마다 3분 쿨.
 --   좌표는 1920×1080 기준(목업 1cqw = 19.2px). 값은 서버가 바꾸고(RtsUnitLogic) 동기화가 오면 다시 그린다.
 @Logic
@@ -182,34 +182,43 @@ script RtsUnitPopupLogic extends Logic
 			"월드 아바타는 구매할 때마다 30일 연장", H:ColMuted(), 11, TextAlignmentType.MiddleLeft, false)
 
 		-- ----- 좌: 능력치 -----
-		local stats = H:SpawnPanel("RtsUnitStats", content, Vector2(0, 1), Vector2(0, 1), Vector2(27, -256), Vector2(365, 348),
+		local statsH = 34 + 30 * 8 + 16
+		local stats = H:SpawnPanel("RtsUnitStats", content, Vector2(0, 1), Vector2(0, 1), Vector2(27, -256), Vector2(365, statsH),
 			P:Mix(Color.white, 0.03), P:Mix(H:ColGold(), 0.25), 1.5)
 		H:SpawnLabel("RtsUnitStatsK", stats, Vector2(0, 1), Vector2(0, 1), Vector2(14, -10), Vector2(200, 18),
 			"능력치", H:ColMuted(), 13, TextAlignmentType.MiddleLeft, false)
 		local muted = "<color=#a3957a>"
-		local atkNote = H:Int(c.base) .. " + " .. H:Int(c.per) .. "×" .. H:Int(u.Level - 1)
-		if s.flat > 0 then atkNote = atkNote .. " + " .. H:Int(s.flat) end
 		local ignText = H:Int(s.ign) .. "%"
 		if s.ignBoss >= 0 then ignText = ignText .. " " .. muted .. "· 보스 " .. H:Int(s.ignBoss) .. "%</color>" end
 		local up = " <color=#9fd39a>▲</color>"
-		local finText = H:Int(s.fin) .. "%"
-		if s.finBoss ~= s.fin then finText = finText .. " " .. muted .. "· 보스 " .. H:Int(s.finBoss) .. "%</color>" end
+		-- 최종 데미지는 배율(120%)이 아니라 추가분만(+20%; 기본 0%) — 2026-09-18 사용자 "이거는 +만 표시"
+		local function plusPct(v)
+			local d = v - 100
+			if d > 0 then return "+" .. H:Int(d) .. "%" end
+			return H:Int(d) .. "%"
+		end
+		local finText = plusPct(s.fin)
+		if s.finBoss ~= s.fin then finText = finText .. " " .. muted .. "· 보스 " .. plusPct(s.finBoss) .. "</color>" end
 		if s.fin ~= s0.fin or s.finBoss ~= s0.finBoss then finText = finText .. up end
-		local critText = "확률 " .. H:Int(s.crit) .. "% · 데미지 " .. H:Int(s.critDmg) .. "%"
-		if s.crit ~= s0.crit or s.critDmg ~= s0.critDmg then critText = critText .. up end
-		local dpsUp = ""
-		if #buffs > 0 then dpsUp = up end
+		-- 보스 공격시 데미지 증가(킷 티어 + 증강 + 프리즘, 합연산) — 기본 0%라 +n%만
+		local bossText = "+" .. H:Int(s.bossAdd or 0) .. "%"
+		if (s.bossAdd or 0) ~= (s0.bossAdd or 0) then bossText = bossText .. up end
+		-- 크리티컬은 확률/데미지 두 줄, 적용 중인 총합만(버프 포함 값 하나)
+		local critText = H:Int(s.crit) .. "%"
+		if s.crit ~= s0.crit then critText = critText .. up end
+		local critDmgText = H:Int(s.critDmg) .. "%"
+		if s.critDmg ~= s0.critDmg then critDmgText = critDmgText .. up end
+		-- 기본 공격 구성·보스 DPS·몬스터 DPS 줄은 2026-09-18 사용자 요청으로 제거(설계 수치 — 유저에게 불필요)
+		-- 공격속도는 등급만(보통·빠름…; n초당 1회 없음), 공격력은 총합만(구성식 없음), 공격력 %는 추가되는 %의 합(+n%) — 2026-09-18 사용자
 		local rows = {
-			{ "공격속도", s.speed .. " <b>" .. tostring(c.period) .. "초</b>당 1회" },
-			{ "공격력", "<b>" .. self:Fmt(c.atk) .. "</b> " .. muted .. "(" .. atkNote .. ")</color>" },
-			{ "공격력 %", H:Int(s.pct) .. "%" },
+			{ "공격속도", s.speed },
+			{ "공격력", "<b>" .. self:Fmt(c.atk) .. "</b>" },
+			{ "공격력 %", plusPct(s.pct) },
 			{ "방어율 무시", ignText },
 			{ "최종 데미지", finText },
-			{ "크리티컬", critText },
-			{ "sep", "" },
-			{ "기본 공격", H:Int(s.ratio) .. "% × " .. H:Int(s.targets) .. "마리 × " .. H:Int(s.hits) .. "회" },
-			{ "보스 DPS", "<b>" .. self:Fmt(c.boss) .. "</b>" .. dpsUp },
-			{ "몬스터 DPS", "<b>" .. self:Fmt(c.mob) .. "</b> " .. muted .. "(" .. H:Int(s.targets) .. "마리 합)</color>" .. dpsUp },
+			{ "보스 데미지", bossText },
+			{ "크리티컬 확률", critText },
+			{ "크리티컬 데미지", critDmgText },
 		}
 		local y = -34
 		for i = 1, #rows do
@@ -260,34 +269,20 @@ script RtsUnitPopupLogic extends Logic
 			self:BuildSkillTab(content, u, rx, rw, top)
 		end
 
-		-- ----- 하단: 누적 투자 · 보유 메소 · 위치 이동 · 레벨업 -----
+		-- ----- 하단: 레벨업 버튼만 -----
+		--   누적 투자·다음 벽까지 비용·보유 메소는 안 보인다(2026-09-16 사용자: 유저에게 필요 없는 내부 정보. 메소는 HUD 좌상단에 있음).
+		--   벽 레벨(10·20·…)도 유저에겐 그냥 다음 레벨 — 비용만 보여 주고 '(벽)' 문구·붉은색 없음
 		local T2 = _RtsJobTableLogic
-		local invest = "누적 투자 <b>" .. self:Fmt(T2:GetCumCost(u.Level)) .. "</b>"
-		if u.Level < T2:GetMaxLevel() then
-			local wall = (math.floor(u.Level / 10) + 1) * 10
-			invest = invest .. " · 다음 벽 Lv" .. H:Int(wall) .. " 까지 <b>" .. self:Fmt(T2:GetCumCost(wall) - T2:GetCumCost(u.Level)) .. "</b>"
-		end
-		local investLbl = H:SpawnLabel("RtsUnitInvest", content, Vector2(0, 0), Vector2(0, 0), Vector2(27, 14), Vector2(560, 26),
-			invest, H:ColMuted(), 14, TextAlignmentType.MiddleLeft, false)
-		investLbl.TextComponent.IsRichText = true
 		local meso = _RtsUnitLogic:GetMyMeso()
-		local mesoLbl = H:SpawnLabel("RtsUnitMeso", content, Vector2(1, 0), Vector2(1, 0), Vector2(-300, 14), Vector2(260, 26),
-			"보유 <b>" .. self:Fmt(meso) .. "</b> 메소", Color(0.851, 0.796, 0.651, 1), 15, TextAlignmentType.MiddleRight, false)
-		mesoLbl.TextComponent.IsRichText = true
 
-		-- 레벨업 → Lv n (벽은 붉게, 메소 부족·최대 레벨은 비활성)
+		-- 레벨업 → Lv n (메소 부족·최대 레벨은 비활성)
 		local nextLv = u.Level + 1
 		local maxed = u.Level >= T2:GetMaxLevel()
 		local cost = T2:GetLevelCost(nextLv)
-		local wall = (not maxed) and T2:IsWallLevel(nextLv)
 		local can = (not maxed) and meso >= cost
 		local lbg = P:Mix(H:ColGold(), 0.92)
 		local lborder = H:ColGold()
 		local lInk = Color(0.133, 0.114, 0.09, 1)
-		if wall then
-			lbg = P:Mix(Color(0.839, 0.471, 0.353, 1), 0.85)
-			lborder = Color(0.839, 0.471, 0.353, 1)
-		end
 		if not can then
 			lbg = P:Mix(lbg, 0.4)
 			lborder = P:Mix(lborder, 0.4)
@@ -295,7 +290,6 @@ script RtsUnitPopupLogic extends Logic
 		end
 		local lbtn = H:SpawnPanel("RtsUnitLvUp", content, Vector2(1, 0), Vector2(1, 0), Vector2(-27, 10), Vector2(260, 44), lbg, lborder, 1.5)
 		local mainText = "레벨업 → Lv " .. H:Int(nextLv)
-		if wall then mainText = mainText .. " (벽)" end
 		local costText = self:Fmt(cost) .. " 메소"
 		if maxed then
 			mainText = "레벨업"
@@ -313,7 +307,7 @@ script RtsUnitPopupLogic extends Logic
 		end
 	end
 
-	-- 결속 행의 대상 지정: "대상:" + 셀렉트 박스 + 쿨타임
+	-- 홀리 유니티 행의 대상 지정: "대상:" + 셀렉트 박스 + 쿨타임
 	@ExecSpace("ClientOnly")
 	method void BuildTargetRow(Entity row, any u, number rx, number sy)
 		local H = _RtsHudLogic
@@ -347,7 +341,7 @@ script RtsUnitPopupLogic extends Logic
 		end
 	end
 
-	-- 스킬 탭: 획득 레벨 순으로 쌓는다(7행까지라 스크롤 없음 — 결속 드롭다운이 행 위치로 자리를 잡기 때문)
+	-- 스킬 탭: 획득 레벨 순으로 쌓는다(7행까지라 스크롤 없음 — 홀리 유니티 드롭다운이 행 위치로 자리를 잡기 때문)
 	@ExecSpace("ClientOnly")
 	method void BuildSkillTab(Entity content, any u, number rx, number rw, number top)
 		local H = _RtsHudLogic
@@ -388,11 +382,19 @@ script RtsUnitPopupLogic extends Logic
 			lvLbl.TextComponent.IsRichText = true
 			local nameText = k.name .. "  <size=11><color=#d9cba6>" .. k.kind .. "</color></size>"
 			if not got then nameText = nameText .. "  <size=12><color=#8a8072>미획득</color></size>" end
-			local nameLbl = H:SpawnLabel("RtsUnitSkillName", row, Vector2(0, 1), Vector2(0, 1), Vector2(70, -8), Vector2(rw - 90, 24),
+			-- 획득한 액티브는 우측에 잠금 설정 토글(사용 / 보스전 잠금 / 잠금)이 붙어 글자 폭을 그만큼 줄인다. 영구 잠금(3)은 미획득이어도 표시
+			local lockMode = _RtsJobTableLogic:GetLock(u.SkillLocks, i)
+			local isLockable = k.kind == "액티브" and (got or lockMode == 3)
+			local textW = rw - 90
+			if isLockable then textW = textW - 236 end
+			local nameLbl = H:SpawnLabel("RtsUnitSkillName", row, Vector2(0, 1), Vector2(0, 1), Vector2(70, -8), Vector2(textW, 24),
 				nameText, ink, 17, TextAlignmentType.MiddleLeft, true)
 			nameLbl.TextComponent.IsRichText = true
-			H:SpawnLabel("RtsUnitSkillDesc", row, Vector2(0, 1), Vector2(0, 1), Vector2(70, -34), Vector2(rw - 90, 22),
+			H:SpawnLabel("RtsUnitSkillDesc", row, Vector2(0, 1), Vector2(0, 1), Vector2(70, -34), Vector2(textW, 22),
 				k.desc, desc, 14, TextAlignmentType.MiddleLeft, false)
+			if isLockable then
+				self:BuildLockToggle(row, u, i, rh)
+			end
 			if isTarget then
 				self:BuildTargetRow(row, u, rx, sy)
 			end
@@ -400,7 +402,52 @@ script RtsUnitPopupLogic extends Logic
 		end
 	end
 
-	-- 스크롤 목록 컨테이너(세로 레이아웃, 자식 행을 위에서부터 쌓고 넘치면 스크롤). 하단 66px는 누적 투자·레벨업 자리
+	-- 액티브 스킬 잠금 설정(2026-09-16): 행 우측 상단에 3분할 토글 [사용 | 보스전 잠금 | 잠금]. 선택 = 초록/주황/빨강, 나머지는 흐림. 클릭 즉시 서버 요청(쿨타임 없음)
+	--   영구 잠금(3, 프리즘 증강)은 토글 대신 프리즘색 알약 "영구 잠금" 하나 — 클릭 없음(풀 수 없음)
+	--   대상 지정 행(높이 100)도 토글은 위 64px 안에 둔다
+	@ExecSpace("ClientOnly")
+	method void BuildLockToggle(Entity row, any u, number idx, number rh)
+		local H = _RtsHudLogic
+		local P = _RtsPopupLogic
+		local cur = _RtsJobTableLogic:GetLock(u.SkillLocks, idx)
+		if cur == 3 then
+			local pc = P:GradeColor("prism")
+			local pill = H:SpawnPanel("RtsUnitLock" .. H:Int(idx) .. "_3", row, Vector2(1, 1), Vector2(1, 1), Vector2(-12, -(64 - 28) / 2), Vector2(120, 28), P:Mix(pc, 0.22), pc, 1.5)
+			H:SpawnLabel("RtsUnitLockText", pill, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2(0, 0), Vector2(116, 24),
+				"영구 잠금", Color(0.973, 0.925, 0.784, 1), 12, TextAlignmentType.MiddleCenter, true)   -- 이모지(🔒)는 게임 폰트에 없어 안 그려진다(실측)
+			return
+		end
+		local opts = { { m = 0, w = 56, c = Color(0.624, 0.827, 0.604, 1) }, { m = 1, w = 100, c = Color(0.91, 0.635, 0.416, 1) }, { m = 2, w = 56, c = Color(0.86, 0.47, 0.44, 1) } }
+		local total = 0
+		for i = 1, #opts do total = total + opts[i].w end
+		total = total + 4 * (#opts - 1)
+		local x = -12 - total
+		for i = 1, #opts do
+			local o = opts[i]
+			local on = (o.m == cur)
+			local bg = P:Mix(Color.white, 0.04)
+			local border = P:Mix(Color.white, 0.12)
+			local ink = Color(0.6, 0.56, 0.5, 1)
+			if on then
+				bg = P:Mix(o.c, 0.22)
+				border = o.c
+				ink = Color(0.973, 0.925, 0.784, 1)
+			end
+			local btn = H:SpawnPanel("RtsUnitLock" .. H:Int(idx) .. "_" .. H:Int(o.m), row, Vector2(1, 1), Vector2(0, 1), Vector2(x, -(64 - 28) / 2), Vector2(o.w, 28), bg, border, 1.5)
+			H:SpawnLabel("RtsUnitLockText", btn, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2(0, 0), Vector2(o.w - 4, 24),
+				_RtsJobTableLogic:LockName(o.m), ink, 12, TextAlignmentType.MiddleCenter, on)
+			if not on then
+				local mode = o.m
+				local click = H:SpawnClick("RtsUnitLockClick", btn)
+				click:ConnectEvent(ButtonClickEvent, function(event)
+					_RtsUnitLogic:RequestSkillLock(self.CurNo, idx, mode)
+				end)
+			end
+			x = x + o.w + 4
+		end
+	end
+
+	-- 스크롤 목록 컨테이너(세로 레이아웃, 자식 행을 위에서부터 쌓고 넘치면 스크롤). 하단 66px는 레벨업 버튼 자리
 	--   rows = 64px 행 수(간격 6). 다 들어가면 스크롤 자체를 끈다 — AutoHide는 내용이 짧아도 핸들이 그대로 보이고, Hide는 트랙이 흰 띠로 남음(2026-09-16 실측)
 	@ExecSpace("ClientOnly")
 	method Entity SpawnScrollList(Entity content, string name, number rx, number rw, number top, number rows)
@@ -590,13 +637,18 @@ script RtsUnitPopupLogic extends Logic
 		if u.Skin == 1 then
 			cm.UseCustomEquipOnly = false
 			cm.DefaultEquipUserId = u.Owner
-			cm.CustomTwoHandedWeaponEquip = set.weapon2h
+			cm.CustomTwoHandedWeaponEquip = set.weapon2h or ""
+			cm.CustomOneHandedWeaponEquip = set.weapon1h or ""
 		else
 			cm.UseCustomEquipOnly = true
 			cm.CustomLongcoatEquip = set.longcoat
-			cm.CustomTwoHandedWeaponEquip = set.weapon2h
+			cm.CustomTwoHandedWeaponEquip = set.weapon2h or ""
+			cm.CustomOneHandedWeaponEquip = set.weapon1h or ""
 			cm.CustomShoesEquip = set.shoes
 			cm.CustomHairEquip = set.hair
+			cm.CustomCapEquip = set.cap or ""
+			cm.CustomFaceAccessoryEquip = set.faceAcc or ""
+			cm.CustomFaceEquip = set.face or ""
 		end
 	end
 

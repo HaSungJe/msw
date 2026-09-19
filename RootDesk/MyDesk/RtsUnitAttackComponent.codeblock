@@ -1,0 +1,33 @@
+{
+  "Id": "",
+  "GameId": "",
+  "EntryKey": "codeblock://fe0f6b2b-e18f-4764-9e55-c64eabcb819b",
+  "ContentType": "x-mod/codeblock",
+  "Content": "",
+  "Usage": 0,
+  "UsePublish": 1,
+  "UseService": 0,
+  "CoreVersion": "26.7.0.0",
+  "StudioVersion": "",
+  "DynamicLoading": 0,
+  "ContentProto": {
+    "Use": "Json",
+    "Json": {
+      "CoreVersion": {
+        "Major": 0,
+        "Minor": 2
+      },
+      "ScriptVersion": {
+        "Major": 1,
+        "Minor": 1
+      },
+      "Description": "",
+      "Id": "fe0f6b2b-e18f-4764-9e55-c64eabcb819b",
+      "Language": 1,
+      "Name": "RtsUnitAttackComponent",
+      "Type": 1,
+      "Source": 0,
+      "Target": null
+    }
+  }
+}

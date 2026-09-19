@@ -1,0 +1,911 @@
+-- Phase 3 #15 선행 (2026-09-16): 스킬 연출 재생기(클라). RtsJobTableLogic.GetSkills(...)[i].fx 정의를 읽어
+--   아바타 모션 + 플립북 이펙트(스프라이트 RUID를 frameSec마다 교체 — 애니메이션 클립 리소스는 API로 못 만든다) + 시전음을 한 번 재생한다.
+--   전투 루프(Phase 3)가 공격 타이밍마다 PlayCast를 부르면 되고, 그 전까진 DemoLoop로 눌러 볼 수 있다.
+--   플립북 프레임은 처음 표시할 때 로딩이 걸리므로(첫 재생 1초+), Preload로 화면 밖에 한 번 올려 둔다.
+@Logic
+script RtsSkillFxLogic extends Logic
+
+	-- 미리 올린 RUID 집합
+	property table Preloaded = {}
+
+	-- 유닛 번호별 진행 중인 이펙트 엔티티(다음 시전 때 정리)
+	property table Active = {}
+
+	-- 데모 반복 타이머(유닛 번호별)
+	property table DemoTimers = {}
+
+	-- 유닛 번호별 진행 중인 몸 덧그림(effect0) 엔티티
+	property table ActiveBody = {}
+
+	-- 유닛 번호별 루프로 유지 중인 액션 이름(motionLoop — 폭풍의 시처럼 공격하는 동안 같은 자세를 유지)
+	property table LoopMotion = {}
+
+	-- 유닛 번호별 공격 중 계속 도는 이펙트(loopClip) 엔티티 / 마지막 시전 시각(ms) / 유닛 엔티티. 공격이 LoopTimeout초 끊기면 이펙트와 자세를 정리
+	property table ActiveLoop = {}
+
+	property table LoopLast = {}
+
+	property table LoopUnit = {}
+
+	property number LoopTimeout = 0.6
+
+	-- 구역별 맹독지대(zoneClips) 엔티티 목록(포이즌 리전 — 다시 깔면 이전 것을 지운다)
+	property table ActiveZone = {}
+
+	property any LoopWatch = nil
+
+	-- 아바타 body 엔티티 Id별 마지막으로 보낸 액션 이름 / 그 1회성 액션이 끝나는 클라 시각(초). 같은 액션 반복일 때만 stand를 거치고, 클립이 끝나도 모션이 남아 있으면 그 뒤에 stand로 되돌린다
+	property table LastMotion = {}
+
+	property table MotionUntil = {}
+
+	-- 유닛 엔티티 Id별 무기 복구 타이머(hideWeapon)
+	property table HideTimer = {}
+
+	@ExecSpace("ClientOnly")
+	method void Preload(table fx)
+		if fx == nil then return end
+		local mapRoot = _EntityService:GetEntityByPath("/maps/RtsMap")
+		if mapRoot == nil then return end
+		local list = {}
+		if fx.frames ~= nil then for i = 1, #fx.frames do list[#list + 1] = fx.frames[i] end end
+		-- 클립(시전·몸 덧그림·타격)도 첫 표시에 로딩이 걸린다(생츄어리 0.6초) → 같이 올려 둔다
+		if fx.clip ~= nil and fx.clip ~= "" then list[#list + 1] = fx.clip end
+		if fx.clips ~= nil then
+			for i = 1, #fx.clips do
+				local it = fx.clips[i]
+				if type(it) == "table" then it = it[1] or it.ruid end
+				if it ~= nil then list[#list + 1] = it end
+			end
+		end
+		if fx.bodyClip ~= nil and fx.bodyClip ~= "" then list[#list + 1] = fx.bodyClip end
+		if fx.hitClip ~= nil and fx.hitClip ~= "" then list[#list + 1] = fx.hitClip end
+		if fx.proj ~= nil and fx.proj ~= "" then list[#list + 1] = fx.proj end
+		if fx.projFlySprites ~= nil then for i = 1, #fx.projFlySprites do list[#list + 1] = fx.projFlySprites[i] end end
+		if fx.projHitSprites ~= nil then for i = 1, #fx.projHitSprites do list[#list + 1] = fx.projHitSprites[i] end end
+		if fx.loopClip ~= nil and fx.loopClip ~= "" then list[#list + 1] = fx.loopClip end
+		if fx.markClip ~= nil and fx.markClip ~= "" then list[#list + 1] = fx.markClip end
+		if fx.beam ~= nil and fx.beam ~= "" then list[#list + 1] = fx.beam end
+		if fx.backClip ~= nil and fx.backClip ~= "" then list[#list + 1] = fx.backClip end
+		if fx.markClips ~= nil then for i = 1, #fx.markClips do list[#list + 1] = fx.markClips[i] end end
+		if fx.zoneClips ~= nil then for i = 1, #fx.zoneClips do list[#list + 1] = fx.zoneClips[i] end end
+		for i = 1, #list do
+			local ruid = list[i]
+			if self.Preloaded[ruid] == nil then
+				self.Preloaded[ruid] = true
+				local p = _SpawnService:SpawnByModelId("model://MapObject", "RtsFxPre_" .. ruid, Vector3(-100, -100, 0), mapRoot)
+				if p ~= nil and p.SpriteRendererComponent ~= nil then p.SpriteRendererComponent.SpriteRUID = ruid end
+			end
+		end
+	end
+
+	-- 유닛 엔티티(발 위치 = 엔티티 위치)에 fx 한 번 재생. target = 메인 대상(투사체·빔의 기준), targets = 이번 공격의 대상 전부(없으면 {target}) — 빔은 대상들을 차례로 잇고, 표식·타격은 대상마다, 구체(projFrom around)는 대상들에 돌아가며
+	@ExecSpace("ClientOnly")
+	method void PlayCast(Entity unitEntity, number no, table fx, Entity target, table targets)
+		if unitEntity == nil or fx == nil then return end
+		local mapRoot = _EntityService:GetEntityByPath("/maps/RtsMap")
+		if mapRoot == nil then return end
+		if targets == nil or #targets == 0 then
+			targets = {}
+			if target ~= nil then targets[1] = target end
+		end
+		-- 모션: motion 하나 또는 motions 여러 개를 motionGap 간격으로 이어 재생(레이징 블로우 = swingT3 → swingTF).
+		--   아바타 swing 액션은 마지막 프레임 진입까지 약 0.44~0.49초(2026-09-18 측정: T1 0.45 / T2 0.44 / T3 0.44 / TF 0.49)
+		local ar = unitEntity.AvatarRendererComponent
+		local body = nil
+		if ar ~= nil then body = ar:GetBodyEntity() end
+		-- hideWeapon: 스킬 동안 캐릭터의 무기(와 무기 잔상)를 투명하게 — 원작 레이징 블로우 이펙트는 금색 대검을 포함해서 실제 검이 옆에 따로 튀어나오면 어색(사용자 2026-09-19 "기본 칼이 애니메이션에 가려지는 게 맞다"). hideWeaponSec(없으면 clipLife, 없으면 0.9초) 뒤 복구
+		if fx.hideWeapon and ar ~= nil then self:HideWeapon(unitEntity, fx.hideWeaponSec or fx.clipLife or 0.9) end
+		local motions = fx.motions
+		if motions == nil and fx.motion ~= nil then motions = { fx.motion } end
+		local stand = self:StandName(unitEntity)
+		if body ~= nil and fx.motionLoop and fx.motion ~= nil then
+			-- 루프 유지: 이미 그 액션이면 건드리지 않는다(0.2초마다 다시 보내면 첫 프레임으로 튄다)
+			if self.LoopMotion[no] ~= fx.motion then
+				local key = body.Id
+				local loopName = fx.motion
+				if self.LastMotion[key] == loopName then
+					body:SendEvent(ActionStateChangedEvent(stand, stand, 1, SpriteAnimClipPlayType.Loop))
+					_TimerService:SetTimerOnce(function()
+						if isvalid(body) then body:SendEvent(ActionStateChangedEvent(loopName, loopName, 1, SpriteAnimClipPlayType.Loop)) end
+					end, 0.05)
+				else
+					body:SendEvent(ActionStateChangedEvent(loopName, loopName, 1, SpriteAnimClipPlayType.Loop))
+				end
+				self.LastMotion[key] = loopName
+				self.LoopMotion[no] = fx.motion
+			end
+		elseif body ~= nil and motions ~= nil then
+			self.LoopMotion[no] = nil
+			-- motionDelay(초): 첫 모션을 늦게(스피어 버스터 — 마법진 충전 뒤 0.5초에 찌르기)
+			local md = fx.motionDelay or 0
+			if md > 0 then
+				local first = motions[1]
+				_TimerService:SetTimerOnce(function()
+					if isvalid(body) then self:PlayMotion(body, first, stand, fx.motionRate) end
+				end, md)
+			else
+				self:PlayMotion(body, motions[1], stand, fx.motionRate)
+			end
+			for i = 2, #motions do
+				local name = motions[i]
+				_TimerService:SetTimerOnce(function()
+					if isvalid(body) then self:PlayMotion(body, name, stand, fx.motionRate) end
+				end, md + (fx.motionGap or 0.4) * (i - 1))
+			end
+		end
+		if fx.sound ~= nil and fx.sound ~= "" then
+			-- soundDelay = 시전음을 그 초 뒤에(레이징 블로우: 초승달 참격 시작 0.24초에 맞춤)
+			if fx.soundDelay ~= nil and fx.soundDelay > 0 then
+				local snd = fx.sound
+				_TimerService:SetTimerOnce(function() _SoundService:PlaySound(snd, 1) end, fx.soundDelay)
+			else
+				_SoundService:PlaySound(fx.sound, 1)
+			end
+		end
+		if fx.backClip ~= nil and fx.backClip ~= "" then self:PlayBack(unitEntity, no, fx) end
+		if fx.bodyClip ~= nil and fx.bodyClip ~= "" then self:PlayBody(unitEntity, no, fx) end
+		if fx.loopClip ~= nil and fx.loopClip ~= "" then self:EnsureLoopFx(unitEntity, no, fx) end
+		if fx.proj ~= nil and fx.proj ~= "" and target ~= nil and isvalid(target) then self:PlayProjectile(unitEntity, fx, target, targets) end
+		if (fx.markClip ~= nil and fx.markClip ~= "") or fx.markClips ~= nil then
+			for j = 1, #targets do
+				local t = targets[j]
+				if isvalid(t) then
+					local md = fx.markDelay or 0
+					if md > 0 then
+						_TimerService:SetTimerOnce(function()
+							if isvalid(t) then self:PlayMark(fx, t) end
+						end, md)
+					else
+						self:PlayMark(fx, t)
+					end
+				end
+			end
+		end
+		if fx.beam ~= nil and fx.beam ~= "" and #targets > 0 then
+			local bd = fx.beamDelay or 0
+			if bd > 0 then
+				_TimerService:SetTimerOnce(function()
+					if isvalid(unitEntity) then self:PlayBeam(unitEntity, fx, targets) end
+				end, bd)
+			else
+				self:PlayBeam(unitEntity, fx, targets)
+			end
+		end
+		if fx.zoneClips ~= nil and #fx.zoneClips > 0 then self:PlayZone(unitEntity, fx) end
+		-- clips = { ruid 또는 { ruid, dx, dy, scale, delay } … }: 같은 원점에 동시에 띄우는 추가 클립들(스피어 버스터 80003291 — 마법진·용머리 + 시차 찌르기 3개가 각각 빈 프레임으로 자기 시작 시각을 갖고 있음)
+		if fx.clips ~= nil and #fx.clips > 0 then self:PlayExtraClips(unitEntity, no, fx) end
+		if fx.clip ~= nil and fx.clip ~= "" then
+			-- clipDelay(초)가 있으면 그만큼 늦게(두 번째 모션에 맞추기 등)
+			local d = fx.clipDelay or 0
+			if d > 0 then
+				_TimerService:SetTimerOnce(function()
+					if isvalid(unitEntity) then self:PlayClip(unitEntity, no, fx, body) end
+				end, d)
+			else
+				self:PlayClip(unitEntity, no, fx, body)
+			end
+			return
+		end
+		if fx.frames == nil or #fx.frames == 0 then return end
+		-- 이전 이펙트가 남아 있으면 정리
+		local old = self.Active[no]
+		if old ~= nil and isvalid(old) then old:Destroy() end
+		local s = fx.scale or 1
+		local pos = unitEntity.TransformComponent.WorldPosition
+		local facingRight = self:FacingRight(unitEntity)
+		local flip = self:FlipFor(fx, facingRight, "frames")
+		local dir = 1
+		if flip then dir = -1 end
+		local at = Vector3(pos.x + (fx.feetDx or 0) * s * dir, pos.y + (fx.feetDy or 0) * s, 0)
+		local e = _SpawnService:SpawnByModelId("model://MapObject", "RtsFx" .. _RtsHudLogic:Int(no) .. "_" .. tostring(math.floor(DateTime.UtcNow.Elapsed)), at, mapRoot)
+		if e == nil then return end
+		self.Active[no] = e
+		local sr = e.SpriteRendererComponent
+		if sr == nil then sr = e:AddComponent("SpriteRendererComponent") end
+		sr.SortingLayer = "Default"
+		sr.OrderInLayer = 300
+		sr.FlipX = flip
+		sr.SpriteRUID = fx.frames[1]
+		e.TransformComponent.Scale = Vector3(s, s, 1)
+		local step = fx.frameSec or 0.09
+		for i = 2, #fx.frames do
+			local k = i
+			_TimerService:SetTimerOnce(function()
+				if isvalid(e) then e.SpriteRendererComponent.SpriteRUID = fx.frames[k] end
+			end, step * (k - 1))
+		end
+		_TimerService:SetTimerOnce(function()
+			if isvalid(e) then e:Destroy() end
+			if self.Active[no] == e then self.Active[no] = nil end
+			self:ReturnStand(body, stand)
+		end, step * #fx.frames)
+	end
+
+	-- 공격 중 계속 도는 이펙트(원작 keydown 클립): 없으면 유닛 위에 루프로 띄우고, 시전마다 시각만 갱신. 감시 타이머가 LoopTimeout초 동안 시전이 없으면 이펙트를 지우고 유지 자세(motionLoop)도 stand2로 되돌린다
+	@ExecSpace("ClientOnly")
+	method void EnsureLoopFx(Entity unitEntity, number no, table fx)
+		self.LoopLast[no] = DateTime.UtcNow.Elapsed
+		self.LoopUnit[no] = unitEntity
+		if self.LoopWatch == nil then
+			self.LoopWatch = _TimerService:SetTimerRepeat(function() self:CheckLoops() end, 0.25)
+		end
+		local old = self.ActiveLoop[no]
+		if old ~= nil and isvalid(old) then return end
+		local mapRoot = _EntityService:GetEntityByPath("/maps/RtsMap")
+		if mapRoot == nil then return end
+		local pos = unitEntity.TransformComponent.WorldPosition
+		local facingRight = self:FacingRight(unitEntity)
+		-- 루프 클립은 loopFacesLeft로 따로 정할 수 있다(폭풍의 시 keydown은 다른 클립과 반대로 그려져 있음 — 2026-09-18 사용자 "반대로 나온다")
+		local flip = self:FlipFor(fx, facingRight, "loop")
+		local s = fx.loopScale or 1.5
+		local dir = 1
+		if flip then dir = -1 end
+		local at = Vector3(pos.x + (fx.loopDx or 0) * s * dir, pos.y + (fx.loopDy or 0), 0)
+		local e = _SpawnService:SpawnByModelId("model://MapObject", "RtsLoopFx" .. _RtsHudLogic:Int(no), at, mapRoot)
+		if e == nil then return end
+		local sr = e.SpriteRendererComponent
+		if sr == nil then sr = e:AddComponent("SpriteRendererComponent") end
+		sr.SortingLayer = "Default"
+		sr.OrderInLayer = 300
+		sr.FlipX = flip
+		sr.SpriteRUID = fx.loopClip
+		if fx.loopAlpha ~= nil then sr.Color = Color(1, 1, 1, fx.loopAlpha) end
+		e.TransformComponent.Scale = Vector3(s, s, 1)
+		self.ActiveLoop[no] = e
+	end
+
+	@ExecSpace("ClientOnly")
+	method void CheckLoops()
+		local now = DateTime.UtcNow.Elapsed
+		for no, e in pairs(self.ActiveLoop) do
+			local last = self.LoopLast[no] or 0
+			if now - last > self.LoopTimeout * 1000 then
+				if e ~= nil and isvalid(e) then e:Destroy() end
+				self.ActiveLoop[no] = nil
+				-- 유지 자세도 내려놓는다
+				local u = self.LoopUnit[no]
+				if self.LoopMotion[no] ~= nil and u ~= nil and isvalid(u) and u.AvatarRendererComponent ~= nil then
+					local body = u.AvatarRendererComponent:GetBodyEntity()
+					local stand = self:StandName(u)
+					if body ~= nil then
+						body:SendEvent(ActionStateChangedEvent(stand, stand, 1, SpriteAnimClipPlayType.Loop))
+						self.LastMotion[body.Id] = stand
+					end
+				end
+				self.LoopMotion[no] = nil
+			end
+		end
+	end
+
+	-- 투사체: 유닛 손 높이(projDy)에서 대상(+hitDy)까지 projSec 동안 직선 비행 후 제거. 원작 ball 클립은 왼쪽으로 나는 그림(assetFacesLeft)이라 오른쪽으로 날 때 반전.
+	--   대각선 대상이면 비행 방향으로 회전(ZRotation) — 오른쪽으로 갈 땐 반전 뒤 각도 그대로, 왼쪽으로 갈 땐 반전 없이 각도−180 (위아래가 뒤집히지 않게). 사용자 2026-09-18 "투사체가 가로/세로만? 너무 일직선"
+	--   projCount개를 projStagger초 간격으로(도트 퍼니셔 구체 10개). projFrom = "around"면 유닛 손이 아니라 대상 주변 projSpread 반지름 안 무작위 지점에서 출발("구체가 맵에 랜덤 생성돼 가장 가까운 적에게").
+	--   projLife가 있으면 도착 뒤에도 그때까지 남긴다(클립 뒷부분이 폭발인 구체)
+	--   targets가 여럿이면 projEach = 대상마다 1발, projFrom "around"(구체)는 유닛 손 높이 주위 반지름 projSpread에 각도 2π(i-1)/n + π/n로 골고루 생성돼 targets[i](서버가 구체마다 정한 대상 — 가까운 적, 보스 우선)로 달려든다, 그 외는 메인 대상 1발
+	@ExecSpace("ClientOnly")
+	method void PlayProjectile(Entity unitEntity, table fx, Entity target, table targets)
+		local mapRoot = _EntityService:GetEntityByPath("/maps/RtsMap")
+		if mapRoot == nil then return end
+		if targets == nil or #targets == 0 then targets = { target } end
+		local up = unitEntity.TransformComponent.WorldPosition
+		local count = fx.projCount or 1
+		local list = { target }
+		if fx.projEach then list = targets end
+		for j = 1, #list do
+			for i = 1, count do
+				local t = list[j]
+				if fx.projFrom == "around" then t = targets[((i - 1) % #targets) + 1] end
+				if t ~= nil and isvalid(t) then
+					local tp = t.TransformComponent.WorldPosition
+					local to = Vector2(tp.x, tp.y + (fx.hitDy or 0.6))
+					-- 피격 박스가 있으면 그 정중앙으로(구체가 몬스터 중앙에 박치기)
+					if t.HitComponent ~= nil then
+						local sc = t.TransformComponent.Scale
+						to = Vector2(tp.x + t.HitComponent.ColliderOffset.x * math.abs(sc.x), tp.y + t.HitComponent.ColliderOffset.y * sc.y)
+					end
+					local from = Vector3(up.x, up.y + (fx.projDy or 0.9), 0)
+					if fx.projFrom == "around" then
+						local o = _RtsJobTableLogic:OrbSpawnOffset(i, count, fx)
+						from = Vector3(up.x + o.x, up.y + (fx.projDy or 0.9) + o.y, 0)
+					end
+					local d = (fx.projStagger or 0) * (i - 1)
+					if d > 0 then
+						_TimerService:SetTimerOnce(function()
+							if isvalid(t) then self:SpawnProjectile(fx, from, to, mapRoot) end
+						end, d)
+					else
+						self:SpawnProjectile(fx, from, to, mapRoot)
+					end
+				end
+			end
+		end
+	end
+
+	--   projHover가 있으면 그 시간 동안 생성 자리에 떠 있다가(비행 프레임 projFlySprites 루프) 날아간다. projSpeed(유닛/초)가 있으면 비행 시간 = 거리÷속도(서버 판정 시각과 같은 식). 닿으면 projHitSprites(폭발 프레임)를 한 번 돌리고 제거
+	@ExecSpace("ClientOnly")
+	method void SpawnProjectile(table fx, Vector3 from, Vector2 to, Entity mapRoot)
+		local goingRight = to.x >= from.x
+		local flip = self:FlipFor(fx, goingRight, "proj")
+		local dx = to.x - from.x
+		local dy = to.y - from.y
+		local ang = self:AngleDeg(dx, dy)
+		local rot = ang
+		if not goingRight then rot = ang - 180 end
+		if rot > 180 then rot = rot - 360 elseif rot < -180 then rot = rot + 360 end
+		local e = _SpawnService:SpawnByModelId("model://MapObject", "RtsProj_" .. tostring(math.floor(DateTime.UtcNow.Elapsed)) .. "_" .. tostring(math.random(1000, 9999)), from, mapRoot)
+		if e == nil then return end
+		local sr = e.SpriteRendererComponent
+		if sr == nil then sr = e:AddComponent("SpriteRendererComponent") end
+		sr.SortingLayer = "Default"
+		sr.OrderInLayer = 310
+		sr.FlipX = flip
+		-- 비행 그림: projFlySprites(개별 프레임 sprite GUID 목록)가 있으면 클립 대신 그 프레임들을 projFrameSec마다 돌린다(StartFrameIndex/EndFrameIndex는 이 클립에 안 먹음 — 2026-09-18 실측: 떠 있는 동안 폭발·파편 프레임까지 돌아 "접시처럼 깨진" 모양)
+		local flyIdx = 1
+		local flyTimer = nil
+		local spinTimer = nil
+		local function stopFly()
+			if flyTimer ~= nil then
+				_TimerService:ClearTimer(flyTimer)
+				flyTimer = nil
+			end
+			if spinTimer ~= nil then
+				_TimerService:ClearTimer(spinTimer)
+				spinTimer = nil
+			end
+		end
+		-- projSpin(도/초)이 있으면 떠 있는 동안·날아가는 동안 계속 회전(불구슬). 회전 방향은 구체마다 엇갈리게(홀짝)
+		if fx.projSpin ~= nil and fx.projSpin ~= 0 then
+			local dirSpin = 1
+			if math.random(0, 1) == 1 then dirSpin = -1 end
+			spinTimer = _TimerService:SetTimerRepeat(function()
+				if not isvalid(e) then
+					stopFly()
+					return
+				end
+				e.TransformComponent.ZRotation = e.TransformComponent.ZRotation + fx.projSpin * dirSpin * 0.03
+			end, 0.03)
+		end
+		if fx.projFlySprites ~= nil and #fx.projFlySprites > 0 then
+			sr.SpriteRUID = fx.projFlySprites[1]
+			flyTimer = _TimerService:SetTimerRepeat(function()
+				-- 엔티티가 먼저 사라졌으면(Play 종료 등) 타이머도 정리 — 안 하면 LEA-3051 타이머 누수 경고
+				if not isvalid(e) then
+					stopFly()
+					return
+				end
+				flyIdx = (flyIdx % #fx.projFlySprites) + 1
+				local r0 = e.SpriteRendererComponent
+				if r0 ~= nil then r0.SpriteRUID = fx.projFlySprites[flyIdx] end
+			end, fx.projFrameSec or 0.09)
+		else
+			sr.SpriteRUID = fx.proj
+		end
+		local s = fx.projScale or 1.5
+		e.TransformComponent.Scale = Vector3(s, s, 1)
+		if not fx.projNoRotate then e.TransformComponent.ZRotation = rot end
+		local dist = math.sqrt(dx * dx + dy * dy)
+		local sec = fx.projSec or 0.15
+		if fx.projSpeed ~= nil and fx.projSpeed > 0 then sec = dist / fx.projSpeed end
+		local hover = fx.projHover or 0
+		local function fly()
+			if not isvalid(e) then return end
+			_TweenLogic:MoveTo(e, to, sec, EaseType.Linear)
+			_TimerService:SetTimerOnce(function()
+				stopFly()
+				if not isvalid(e) then return end
+				if fx.projHitSprites ~= nil and #fx.projHitSprites > 0 then
+					-- 닿음: 폭발 프레임들을 한 번 돌리고 제거(회전은 그대로)
+					local step = fx.projFrameSec or 0.09
+					local r2 = e.SpriteRendererComponent
+					if r2 ~= nil then r2.SpriteRUID = fx.projHitSprites[1] end
+					for hi = 2, #fx.projHitSprites do
+						local kk = hi
+						_TimerService:SetTimerOnce(function()
+							if isvalid(e) and e.SpriteRendererComponent ~= nil then e.SpriteRendererComponent.SpriteRUID = fx.projHitSprites[kk] end
+						end, step * (kk - 1))
+					end
+					_TimerService:SetTimerOnce(function()
+						if isvalid(e) then e:Destroy() end
+					end, step * #fx.projHitSprites)
+				else
+					_TimerService:SetTimerOnce(function()
+						if isvalid(e) then e:Destroy() end
+					end, math.max(0.02, (fx.projLife or (sec + 0.02)) - sec))
+				end
+			end, sec)
+		end
+		if hover > 0 then
+			_TimerService:SetTimerOnce(fly, hover)
+		else
+			fly()
+		end
+	end
+
+	-- 빔(체인 라이트닝 ball — 원작은 몬스터 사이를 잇는 번개 조각): 유닛 손(beamDx·beamDy)에서 대상 피격 박스 중심까지 클립을 조각으로 이어 붙이고 비행 각도로 회전.
+	--   beamSeg = 클립 1장의 자연 길이(유닛, 스케일 1; 2221006/ball 50px = 0.5) × beamScale 마다 한 조각, 마지막 조각은 남는 길이만큼 x 스케일을 줄인다. 좌우 대칭 그림이라 반전 없음. beamLife초 뒤(또는 클립 끝) 제거
+	--   targets가 여럿이면 유닛 → 1번 → 2번 … 차례로 잇는다(체인 라이트닝 — 가까운 순이라 자연스럽게 번진다)
+	@ExecSpace("ClientOnly")
+	method void PlayBeam(Entity unitEntity, table fx, table targets)
+		local mapRoot = _EntityService:GetEntityByPath("/maps/RtsMap")
+		if mapRoot == nil then return end
+		local up = unitEntity.TransformComponent.WorldPosition
+		local dir = -1
+		if self:FacingRight(unitEntity) then dir = 1 end
+		local fromX = up.x + (fx.beamDx or 0.3) * dir
+		local fromY = up.y + (fx.beamDy or 0.9)
+		for j = 1, #targets do
+			local t = targets[j]
+			if t ~= nil and isvalid(t) then
+				local tp = t.TransformComponent.WorldPosition
+				local tx = tp.x
+				local ty = tp.y + (fx.hitDy or 0.6)
+				local hit = t.HitComponent
+				if hit ~= nil then
+					local sc = t.TransformComponent.Scale
+					tx = tp.x + hit.ColliderOffset.x * math.abs(sc.x)
+					ty = tp.y + hit.ColliderOffset.y * sc.y
+				end
+				self:PlayBeamBetween(fx, fromX, fromY, tx, ty, mapRoot, j)
+				fromX = tx
+				fromY = ty
+			end
+		end
+	end
+
+	@ExecSpace("ClientOnly")
+	method void PlayBeamBetween(table fx, number fromX, number fromY, number tx, number ty, Entity mapRoot, number link)
+		local dx = tx - fromX
+		local dy = ty - fromY
+		local dist = math.sqrt(dx * dx + dy * dy)
+		if dist < 0.05 then return end
+		local s = fx.beamScale or 1.5
+		local segLen = (fx.beamSeg or 0.5) * s
+		local n = math.max(1, math.ceil(dist / segLen - 0.01))
+		local ang = self:AngleDeg(dx, dy)
+		local ux = dx / dist
+		local uy = dy / dist
+		local stamp = tostring(math.floor(DateTime.UtcNow.Elapsed)) .. "_" .. tostring(math.floor(link))
+		for i = 1, n do
+			local len = segLen
+			if i == n then len = dist - segLen * (n - 1) end
+			local along = segLen * (i - 1) + len / 2
+			local at = Vector3(fromX + ux * along, fromY + uy * along, 0)
+			local e = _SpawnService:SpawnByModelId("model://MapObject", "RtsBeam_" .. stamp .. "_" .. tostring(i), at, mapRoot)
+			if e ~= nil then
+				local sr = e.SpriteRendererComponent
+				if sr == nil then sr = e:AddComponent("SpriteRendererComponent") end
+				sr.SortingLayer = "Default"
+				sr.OrderInLayer = 320
+				sr.SpriteRUID = fx.beam
+				e.TransformComponent.Scale = Vector3(s * math.max(0.3, len / segLen), s, 1)
+				e.TransformComponent.ZRotation = ang
+				local function finish()
+					if isvalid(e) then e:Destroy() end
+				end
+				e:ConnectEvent(SpriteAnimPlayerEndFrameEvent, function(ev)
+					_TimerService:SetTimerOnce(finish, 0.03)
+				end)
+				_TimerService:SetTimerOnce(finish, fx.beamLife or 0.6)
+			end
+		end
+	end
+
+	-- 맹독지대(포이즌 리전 — "모든 타일에 10초간"): 유닛 구역의 트랙 칸 전부에 zoneClips 중 하나를 zoneLife초 동안 루프(원작 2111003/tile 독안개, 반투명·무작위 반전). 같은 구역에 이미 있으면 갈아 끼운다.
+	--   피해는 서버(RtsCombatLogic.DoAttack의 dot)가 따로 준다 — 이 클립은 그림만
+	@ExecSpace("ClientOnly")
+	method void PlayZone(Entity unitEntity, table fx)
+		local mapRoot = _EntityService:GetEntityByPath("/maps/RtsMap")
+		if mapRoot == nil then return end
+		local u = unitEntity.RtsUnitComponent
+		if u == nil then return end
+		local zone = u.Zone
+		local key = _RtsHudLogic:Int(zone)
+		local old = self.ActiveZone[key]
+		if old ~= nil then
+			for i = 1, #old do
+				if isvalid(old[i]) then old[i]:Destroy() end
+			end
+		end
+		_RtsZoneLogic:EnsurePath()
+		local cells = _RtsZoneLogic.PathCells
+		local list = {}
+		local seen = {}
+		local s = fx.zoneScale or 1.6
+		for i = 1, #cells do
+			local c = cells[i]
+			local ck = _RtsZoneLogic:CellKey(c[1], c[2])
+			if seen[ck] == nil then
+				seen[ck] = true
+				local at2 = _RtsZoneLogic:GetCellCenter(zone, c[1], c[2])
+				local e = _SpawnService:SpawnByModelId("model://MapObject", "RtsZone" .. key .. "_" .. string.format("%d_%d", math.floor(c[1] + 0.5), math.floor(c[2] + 0.5)), Vector3(at2.x, at2.y, 0), mapRoot)
+				if e ~= nil then
+					local sr = e.SpriteRendererComponent
+					if sr == nil then sr = e:AddComponent("SpriteRendererComponent") end
+					sr.SortingLayer = "Default"
+					sr.OrderInLayer = fx.zoneOrder or 260
+					sr.SpriteRUID = fx.zoneClips[math.random(1, #fx.zoneClips)]
+					sr.Color = Color(1, 1, 1, fx.zoneAlpha or 0.7)
+					sr.FlipX = math.random(0, 1) == 1
+					e.TransformComponent.Scale = Vector3(s, s, 1)
+					list[#list + 1] = e
+				end
+			end
+		end
+		self.ActiveZone[key] = list
+		_TimerService:SetTimerOnce(function()
+			for i = 1, #list do
+				if isvalid(list[i]) then list[i]:Destroy() end
+			end
+			if self.ActiveZone[key] == list then self.ActiveZone[key] = nil end
+		end, fx.zoneLife or 10)
+	end
+
+	-- 대상 표식: 시전 순간 대상 몬스터 위에 클립 1회(스나이핑 조준 표식 3221007/mob — 사용자 2026-09-18 "화살이 아니라 표식이 뜨면서 데미지"). 방향 무관.
+	--   위치 = 몬스터 피격 박스(HitComponent ColliderOffset×스케일)의 정중앙, 크기 = 박스의 긴 쪽 × markFit(몬스터가 커져도 전부 감싼다 — 사용자 "정중앙, 몬스터 크기 커져도 다 감싸게"). HitComponent가 없으면 markDy·markScale
+	@ExecSpace("ClientOnly")
+	--   markClips = {…}면 무작위 1개(블리자드 얼음 tile 9종). markAt = "feet"면 피격 박스 대신 몬스터 발 위치(+markDx·markDy)에 markScale로 — 원점이 땅인 낙하 클립(블리자드 얼음·제네시스 빛기둥)
+	method void PlayMark(table fx, Entity target)
+		local mapRoot = _EntityService:GetEntityByPath("/maps/RtsMap")
+		if mapRoot == nil then return end
+		local clip = fx.markClip
+		if fx.markClips ~= nil and #fx.markClips > 0 then clip = fx.markClips[math.random(1, #fx.markClips)] end
+		if clip == nil or clip == "" then return end
+		local p = target.TransformComponent.WorldPosition
+		local sc = target.TransformComponent.Scale
+		local cx = p.x + (fx.markDx or 0)
+		local cy = p.y + (fx.markDy or 0.6)
+		local s = fx.markScale or 1.6
+		local hit = target.HitComponent
+		if fx.markAt == "feet" then
+			cy = p.y + (fx.markDy or 0)
+		elseif hit ~= nil then
+			cx = p.x + hit.ColliderOffset.x * math.abs(sc.x)
+			cy = p.y + hit.ColliderOffset.y * sc.y
+			local w = hit.BoxSize.x * math.abs(sc.x)
+			local h = hit.BoxSize.y * sc.y
+			if fx.markFit ~= nil then s = math.max(w, h) * fx.markFit end
+		end
+		-- 클립 원점이 아래쪽이면 그림 중심이 위로 뜬다 → markPivotDy(스케일 1당 유닛) 만큼 내려 정중앙에 맞춘다
+		cy = cy - (fx.markPivotDy or 0) * s
+		local e = _SpawnService:SpawnByModelId("model://MapObject", "RtsMark_" .. target.Name .. "_" .. tostring(math.floor(DateTime.UtcNow.Elapsed)), Vector3(cx, cy, 0), mapRoot)
+		if e == nil then return end
+		local sr = e.SpriteRendererComponent
+		if sr == nil then sr = e:AddComponent("SpriteRendererComponent") end
+		sr.SortingLayer = "Default"
+		sr.OrderInLayer = 330
+		sr.SpriteRUID = clip
+		-- markScaleX = 가로만 따로 배율(제네시스 빛기둥 넓이 2배 — 사용자 2026-09-19)
+		e.TransformComponent.Scale = Vector3(s * (fx.markScaleX or 1), s, 1)
+		local function finish()
+			if isvalid(e) then e:Destroy() end
+		end
+		if not fx.markLoop then
+			e:ConnectEvent(SpriteAnimPlayerEndFrameEvent, function(ev)
+				_TimerService:SetTimerOnce(finish, 0.03)
+			end)
+		end
+		_TimerService:SetTimerOnce(finish, fx.markLife or 1.5)
+	end
+
+	-- (dx, dy) 방향의 각도(도, 0 = +x, 반시계 양수). atan2 유무에 기대지 않고 직접 구한다
+	method number AngleDeg(number dx, number dy)
+		if math.abs(dx) < 0.000001 then
+			if dy >= 0 then return 90 end
+			return -90
+		end
+		local a = math.deg(math.atan(dy / dx))
+		if dx < 0 then a = a + 180 end
+		if a > 180 then a = a - 360 end
+		return a
+	end
+
+	-- 유닛이 오른쪽을 보는가 (RtsUnitComponent.FaceDir — 메이플 아바타 기본은 왼쪽)
+	@ExecSpace("ClientOnly")
+	method boolean FacingRight(Entity unitEntity)
+		local u = unitEntity.RtsUnitComponent
+		return u ~= nil and u.FaceDir > 0
+	end
+
+	-- 이펙트를 좌우 반전할지: 원작 스킬 클립(assetFacesLeft)은 왼쪽 보기로 그려져 있어 오른쪽을 볼 때 반전, 오른쪽 보기 자산은 왼쪽을 볼 때 반전.
+	--   which = "clip"/"frames"/"body"/"loop"/"proj"/"back" — 같은 스킬 폴더 안에서도 요소마다 그림 방향이 다를 수 있어(폭풍의 시 keydown, 피어싱 effect) fx.<which>FacesLeft가 있으면 그것을 우선.
+	--   noFlip = 좌우 대칭 오라처럼 방향과 무관한 클립(반전하면 피벗 오프셋 때문에 자리가 튄다)
+	@ExecSpace("ClientOnly")
+	method boolean FlipFor(table fx, boolean facingRight, string which)
+		if fx.noFlip then return false end
+		local facesLeft = fx.assetFacesLeft
+		if which ~= nil and fx[which .. "FacesLeft"] ~= nil then facesLeft = fx[which .. "FacesLeft"] end
+		if facesLeft then return facingRight end
+		return not facingRight
+	end
+
+	-- 아바타 액션 1회. 같은 액션을 연달아 보내면 재생되지 않으므로 그때만 대기 자세(stand)를 거친다 — stand와 액션을 같은 프레임에 보내면 액션이 한 프레임 늦거나 무시돼(2026-09-19 캡처 실측)
+	--   클립이 먼저 나오고 캐릭터가 늦게 따라오는 싱크 어긋남·팔이 겹쳐 보이는 현상이 났다(사용자 지적). 다른 액션에서 넘어올 때는 바로 보낸다
+	--   rate = 재생 속도(1 = 원속. 레이징 블로우는 0.56으로 늘려 0.44초 swingT3를 클립 길이 0.78초에 맞춤 — 사용자 2026-09-19 "첫 모션만 늘려서 싱크"). 같은 액션은 끝난 뒤 다시 보내도 재생되지 않는다(팔라딘 실측) →
+	--   그 경우만 stand → 0.15초 뒤 액션(0.05초는 무시됨). 평소엔 모션이 끝나는 즉시 ReturnStand가 stand를 보내 두므로 다음 공격은 지연 0으로 바로 재생된다
+	@ExecSpace("ClientOnly")
+	method void PlayMotion(Entity body, string name, string stand, any rate)
+		if body == nil or name == nil or name == "" then return end
+		if stand == nil then stand = "stand2" end
+		local r = 1
+		if rate ~= nil and rate > 0 then r = rate end
+		local key = body.Id
+		if self.LastMotion[key] == name then
+			body:SendEvent(ActionStateChangedEvent(stand, stand, 1, SpriteAnimClipPlayType.Loop))
+			_TimerService:SetTimerOnce(function()
+				if isvalid(body) then body:SendEvent(ActionStateChangedEvent(name, name, r, SpriteAnimClipPlayType.Onetime)) end
+			end, 0.15)
+		else
+			body:SendEvent(ActionStateChangedEvent(name, name, r, SpriteAnimClipPlayType.Onetime))
+		end
+		self.LastMotion[key] = name
+		-- swing/stab 액션은 마지막 프레임까지 약 0.45초(원속) — 끝나면 stand로 되돌려 다음 재생을 준비
+		local dur = 0.45 / r
+		self.MotionUntil[key] = _UtilLogic.ElapsedSeconds + dur
+		_TimerService:SetTimerOnce(function()
+			self:ReturnStand(body, stand)
+		end, dur + 0.02)
+	end
+
+	-- 대기 자세로 복귀. 1회성 모션이 아직 재생 중이면(레이징 블로우 2타 stabT1은 0.5초에 시작해 클립 0.78초보다 늦게 끝남) 끝나는 시각에 보낸다
+	@ExecSpace("ClientOnly")
+	method void ReturnStand(Entity body, string stand)
+		if body == nil or not isvalid(body) then return end
+		if stand == nil then stand = "stand2" end
+		local key = body.Id
+		local wait = (self.MotionUntil[key] or 0) - _UtilLogic.ElapsedSeconds
+		local function send()
+			if not isvalid(body) then return end
+			-- 그 사이 새 모션이 시작됐으면 건너뛴다
+			if (self.MotionUntil[key] or 0) - _UtilLogic.ElapsedSeconds > 0.02 then return end
+			body:SendEvent(ActionStateChangedEvent(stand, stand, 1, SpriteAnimClipPlayType.Loop))
+			self.LastMotion[key] = stand
+		end
+		if wait > 0.02 then
+			_TimerService:SetTimerOnce(send, wait)
+		else
+			send()
+		end
+	end
+
+	-- 무기 파츠를 sec초 동안 투명하게(무기 잔상도 끔). 두손/한손은 GetCostume(weapon1h)로 구분.
+	--   연속 공격 중엔 시전마다 복구 타이머를 미뤄 무기가 깜빡이지 않고, 공격이 sec초 끊겼을 때만 다시 보인다
+	@ExecSpace("ClientOnly")
+	method void HideWeapon(Entity unitEntity, number sec)
+		local ar = unitEntity.AvatarRendererComponent
+		if ar == nil then return end
+		local key = unitEntity.Id
+		local cat = MapleAvatarItemCategory.TwoHandedWeapon
+		if unitEntity.RtsUnitComponent ~= nil then
+			local c = _RtsJobTableLogic:GetCostume(unitEntity.RtsUnitComponent.JobId)
+			if c ~= nil and c.weapon1h ~= nil and c.weapon1h ~= "" then cat = MapleAvatarItemCategory.OneHandedWeapon end
+		end
+		if self.HideTimer[key] ~= nil then
+			_TimerService:ClearTimer(self.HideTimer[key])
+			self.HideTimer[key] = nil
+		else
+			ar:SetAvatarPartColor(cat, 1, 1, 1, 0)
+			ar.ShowDefaultWeaponEffects = false
+		end
+		self.HideTimer[key] = _TimerService:SetTimerOnce(function()
+			self.HideTimer[key] = nil
+			if not isvalid(unitEntity) then return end
+			local ar2 = unitEntity.AvatarRendererComponent
+			if ar2 == nil then return end
+			ar2:SetAvatarPartColor(cat, 1, 1, 1, 1)
+			ar2.ShowDefaultWeaponEffects = true
+		end, sec)
+	end
+
+	-- 직업의 대기 자세: 한손 무기(마법사·나이트로드·섀도어 — GetCostume weapon1h)는 stand1, 두손은 stand2. 사용자 2026-09-18 "썬콜이 스킬 뒤 두손 모션으로 돌아간다"
+	@ExecSpace("ClientOnly")
+	method string StandName(Entity unitEntity)
+		if unitEntity ~= nil and isvalid(unitEntity) and unitEntity.RtsUnitComponent ~= nil then
+			local c = _RtsJobTableLogic:GetCostume(unitEntity.RtsUnitComponent.JobId)
+			if c ~= nil and c.weapon1h ~= nil and c.weapon1h ~= "" then return "stand1" end
+		end
+		return "stand2"
+	end
+
+	-- 캐릭터 뒤 이펙트(블리자드 80003323/effect — 캐릭터 등 뒤로 솟는 얼음 결정 군집): 아바타 Body/Face 스프라이트는 "Default" 레이어 order 0(실측 2026-09-18 — SpawnUnit의 ar.OrderInLayer 200은 클라에 0으로 읽힘)이라 그보다 아래 −10에. 발 위치 + backDy, backScale. 방향은 backFacesLeft/assetFacesLeft/noFlip 규칙
+	@ExecSpace("ClientOnly")
+	method void PlayBack(Entity unitEntity, number no, table fx)
+		local mapRoot = _EntityService:GetEntityByPath("/maps/RtsMap")
+		if mapRoot == nil then return end
+		local pos = unitEntity.TransformComponent.WorldPosition
+		local facingRight = self:FacingRight(unitEntity)
+		local flip = self:FlipFor(fx, facingRight, "back")
+		local s = fx.backScale or 1.5
+		local dir = 1
+		if flip then dir = -1 end
+		local at = Vector3(pos.x + (fx.backDx or 0) * s * dir, pos.y + (fx.backDy or 0), 0)
+		local e = _SpawnService:SpawnByModelId("model://MapObject", "RtsBackFx" .. _RtsHudLogic:Int(no) .. "_" .. tostring(math.floor(DateTime.UtcNow.Elapsed)), at, mapRoot)
+		if e == nil then return end
+		local sr = e.SpriteRendererComponent
+		if sr == nil then sr = e:AddComponent("SpriteRendererComponent") end
+		sr.SortingLayer = "Default"
+		sr.OrderInLayer = -10
+		sr.FlipX = flip
+		sr.SpriteRUID = fx.backClip
+		if fx.backAlpha ~= nil then sr.Color = Color(1, 1, 1, fx.backAlpha) end
+		e.TransformComponent.Scale = Vector3(s, s, 1)
+		local function finish()
+			if isvalid(e) then e:Destroy() end
+		end
+		e:ConnectEvent(SpriteAnimPlayerEndFrameEvent, function(ev)
+			_TimerService:SetTimerOnce(finish, 0.03)
+		end)
+		_TimerService:SetTimerOnce(finish, fx.backLife or 1.5)
+	end
+
+	-- 추가 클립들(fx.clips): 각각 독립 엔티티로 같은 원점(발 + feetDx/feetDy, 항목별 dx/dy 추가)에 띄우고 마지막 프레임에서 지운다. 방향 반전은 clip과 같은 규칙. Active 슬롯·stand 복귀는 건드리지 않음
+	@ExecSpace("ClientOnly")
+	method void PlayExtraClips(Entity unitEntity, number no, table fx)
+		local mapRoot = _EntityService:GetEntityByPath("/maps/RtsMap")
+		if mapRoot == nil then return end
+		local base = fx.scale or 1
+		local pos = unitEntity.TransformComponent.WorldPosition
+		local facingRight = self:FacingRight(unitEntity)
+		local flip = self:FlipFor(fx, facingRight, "clip")
+		local dir = 1
+		if flip then dir = -1 end
+		for i = 1, #fx.clips do
+			local item = fx.clips[i]
+			local ruid = item
+			local dx = 0
+			local dy = 0
+			local sc = base
+			local delay = 0
+			local life = nil
+			if type(item) == "table" then
+				ruid = item[1] or item.ruid
+				dx = item.dx or 0
+				dy = item.dy or 0
+				sc = item.scale or base
+				delay = item.delay or 0
+				life = item.life
+			end
+			local function spawn()
+				if not isvalid(unitEntity) then return end
+				local at = Vector3(pos.x + ((fx.feetDx or 0) + dx) * sc * dir, pos.y + ((fx.feetDy or 0) + dy) * sc, 0)
+				local e = _SpawnService:SpawnByModelId("model://MapObject", "RtsFxX" .. _RtsHudLogic:Int(no) .. "_" .. tostring(i) .. "_" .. tostring(math.floor(DateTime.UtcNow.Elapsed)), at, mapRoot)
+				if e == nil then return end
+				local sr = e.SpriteRendererComponent
+				if sr == nil then sr = e:AddComponent("SpriteRendererComponent") end
+				sr.SortingLayer = "Default"
+				sr.OrderInLayer = 300 + i
+				sr.FlipX = flip
+				sr.SpriteRUID = ruid
+				e.TransformComponent.Scale = Vector3(sc, sc, 1)
+				local function finish()
+					if isvalid(e) then e:Destroy() end
+				end
+				-- life(초)가 있으면 그 시각에 제거(마지막 프레임이 긴 클립 — 80003291 용머리 0.2초·찌르기 0.12초는 EndFrame 정리로 잘림). 없으면 마지막 프레임 진입에서 제거
+				if life ~= nil then
+					_TimerService:SetTimerOnce(finish, life)
+				else
+					e:ConnectEvent(SpriteAnimPlayerEndFrameEvent, function(ev)
+						_TimerService:SetTimerOnce(finish, 0.03)
+					end)
+					_TimerService:SetTimerOnce(finish, fx.clipLife or 1.5)
+				end
+			end
+			if delay > 0 then
+				_TimerService:SetTimerOnce(spawn, delay)
+			else
+				spawn()
+			end
+		end
+	end
+
+	-- 애니메이션 클립 이펙트 1회: SpriteRUID에 클립을 넣으면 Loop라 마지막 프레임 진입(SpriteAnimPlayerEndFrameEvent)에서 제거 (msw-engine 메모)
+	@ExecSpace("ClientOnly")
+	method void PlayClip(Entity unitEntity, number no, table fx, Entity body)
+		local mapRoot = _EntityService:GetEntityByPath("/maps/RtsMap")
+		if mapRoot == nil then return end
+		local old = self.Active[no]
+		if old ~= nil and isvalid(old) then old:Destroy() end
+		local s = fx.scale or 1
+		local pos = unitEntity.TransformComponent.WorldPosition
+		-- 유닛이 보는 방향(RtsUnitComponent.FaceDir)에 이펙트를 맞춘다. 원작 스킬 클립(assetFacesLeft/clipFacesLeft)은 왼쪽 보기로 그려져 있어 오른쪽을 볼 때 반전
+		local facingRight = self:FacingRight(unitEntity)
+		local flip = self:FlipFor(fx, facingRight, "clip")
+		local dir = 1
+		if flip then dir = -1 end
+		local at = Vector3(pos.x + (fx.feetDx or 0) * s * dir, pos.y + (fx.feetDy or 0) * s, 0)
+		local e = _SpawnService:SpawnByModelId("model://MapObject", "RtsFx" .. _RtsHudLogic:Int(no) .. "_" .. tostring(math.floor(DateTime.UtcNow.Elapsed)), at, mapRoot)
+		if e == nil then return end
+		self.Active[no] = e
+		local sr = e.SpriteRendererComponent
+		if sr == nil then sr = e:AddComponent("SpriteRendererComponent") end
+		sr.SortingLayer = "Default"
+		sr.OrderInLayer = 300
+		sr.FlipX = flip
+		sr.SpriteRUID = fx.clip
+		e.TransformComponent.Scale = Vector3(s, s, 1)
+		local stand = self:StandName(unitEntity)
+		local function finish()
+			if isvalid(e) then e:Destroy() end
+			if self.Active[no] == e then self.Active[no] = nil end
+			self:ReturnStand(body, stand)
+		end
+		-- clipHold = true: 마지막 프레임이 긴 클립은 EndFrame 정리를 끄고 clipLife까지 둔다
+		if not fx.clipHold then
+			e:ConnectEvent(SpriteAnimPlayerEndFrameEvent, function(ev)
+				_TimerService:SetTimerOnce(finish, 0.03)
+			end)
+		end
+		_TimerService:SetTimerOnce(finish, fx.clipLife or 1.5)
+	end
+
+	-- 몸 덧그림(원작 skill/<id>/effect0 — 캐릭터 실루엣이 빛나는 클립)을 아바타 위(200 < 250 < 이펙트 300)에 유닛과 같은 크기로 1회.
+	--   발 위치 기준(원작 origin = 발), 유닛이 보는 방향에 맞춰 반전. bodyScale 없으면 유닛 스케일, bodyDy로 높이 보정
+	@ExecSpace("ClientOnly")
+	method void PlayBody(Entity unitEntity, number no, table fx)
+		local mapRoot = _EntityService:GetEntityByPath("/maps/RtsMap")
+		if mapRoot == nil then return end
+		local old = self.ActiveBody[no]
+		if old ~= nil and isvalid(old) then old:Destroy() end
+		local us = unitEntity.TransformComponent.Scale
+		local s = fx.bodyScale or math.abs(us.x)
+		local facingRight = self:FacingRight(unitEntity)
+		local flip = self:FlipFor(fx, facingRight, "body")
+		local pos = unitEntity.TransformComponent.WorldPosition
+		local at = Vector3(pos.x, pos.y + (fx.bodyDy or 0), 0)
+		local e = _SpawnService:SpawnByModelId("model://MapObject", "RtsFxBody" .. _RtsHudLogic:Int(no) .. "_" .. tostring(math.floor(DateTime.UtcNow.Elapsed)), at, mapRoot)
+		if e == nil then return end
+		self.ActiveBody[no] = e
+		local sr = e.SpriteRendererComponent
+		if sr == nil then sr = e:AddComponent("SpriteRendererComponent") end
+		sr.SortingLayer = "Default"
+		sr.OrderInLayer = 250
+		sr.FlipX = flip
+		sr.SpriteRUID = fx.bodyClip
+		e.TransformComponent.Scale = Vector3(s, s, 1)
+		local function finish()
+			if isvalid(e) then e:Destroy() end
+			if self.ActiveBody[no] == e then self.ActiveBody[no] = nil end
+		end
+		e:ConnectEvent(SpriteAnimPlayerEndFrameEvent, function(ev)
+			_TimerService:SetTimerOnce(finish, 0.03)
+		end)
+		_TimerService:SetTimerOnce(finish, fx.bodyLife or 1.2)
+	end
+
+	-- 내 유닛 no의 1레벨 액티브(기본 공격)를 한 번 재생
+	@ExecSpace("ClientOnly")
+	method void PlayBasic(number no)
+		local u = _RtsUnitLogic:GetMyUnit(no)
+		if u == nil then return end
+		local skills = _RtsJobTableLogic:GetSkills(u.JobId)
+		local fx = nil
+		for i = 1, #skills do
+			if skills[i].fx ~= nil then
+				fx = skills[i].fx
+				break
+			end
+		end
+		if fx == nil then return end
+		self:Preload(fx)
+		self:PlayCast(u.Entity, no, fx, nil, nil)
+	end
+
+	-- 데모: 유닛 no가 공격 주기마다 기본 공격을 반복 (on=false로 정지). 전투 루프가 생기기 전 눌러 보기용
+	@ExecSpace("ClientOnly")
+	method void DemoLoop(number no, boolean on)
+		local t = self.DemoTimers[no]
+		if t ~= nil then
+			_TimerService:ClearTimer(t)
+			self.DemoTimers[no] = nil
+		end
+		if not on then return end
+		local u = _RtsUnitLogic:GetMyUnit(no)
+		if u == nil then return end
+		local st = _RtsJobTableLogic:GetStat(u.JobId, u.Level)
+		local period = _RtsJobTableLogic:GetPeriod(st)
+		self.DemoTimers[no] = _TimerService:SetTimerRepeat(function()
+			self:PlayBasic(no)
+		end, period, 0.5)
+	end
+
+end

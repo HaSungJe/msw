@@ -1,0 +1,81 @@
+{
+ "frames": [
+  "crusher_frames\\crusher_01.png",
+  "crusher_frames\\crusher_02.png",
+  "crusher_frames\\crusher_03.png",
+  "crusher_frames\\crusher_04.png",
+  "crusher_frames\\crusher_05.png",
+  "crusher_frames\\crusher_06.png",
+  "crusher_frames\\crusher_07.png",
+  "crusher_frames\\crusher_08.png",
+  "crusher_frames\\crusher_09.png",
+  "crusher_frames\\crusher_10.png",
+  "crusher_frames\\crusher_11.png"
+ ],
+ "crop": [
+  4,
+  14,
+  296,
+  264
+ ],
+ "feet": [
+  157,
+  208
+ ],
+ "size": [
+  292,
+  250
+ ],
+ "fps": 11.11,
+ "sound_use": "fcac442d953049d980da4b8d7bd766d8",
+ "ingame": {
+  "scale": 1.7,
+  "feet_offset_units_at_scale1": [
+   -0.11,
+   0.83
+  ],
+  "frame_sec": 0.09,
+  "sorting": "Default/300",
+  "motion": "stabT1"
+ },
+ "ruids_v1_outline": [
+  "cfbb29c1bc164b1f9fcd7172a48edd84",
+  "01785f5c43984033a3b01349f2577a5e",
+  "512cf540171a479499f1e29954c26b6e",
+  "85ce003c137347f2b2951a157b6e542c",
+  "364932f1809b4c8298974d0aeaf7b151",
+  "6bb848a925174ef58436b4f474e1ed14",
+  "b93ed9948ce4456e87ffb0f1f7809a3f",
+  "5a7d68c91f5e40dfa0e5cd82cefc1cfc",
+  "c9cb83a286f241aab46823416c819a9b",
+  "9ebbdf97148d48db9ca76af0dd9b4372",
+  "3718a78d28b341f2822c207baa5c65c9"
+ ],
+ "ruids": [
+  "b309f1e7214b4e9e89a4f6e4723b83b7",
+  "1e6c979f19284367b72202698a3b363d",
+  "604d91e682cf441b933eb67cb39e9d4a",
+  "bb095aa0a2a947c3a6abac91064125b9",
+  "68207aec54c04854ad797515f915a62c",
+  "235439d907c744b9ac675de5b00ffd76",
+  "5bd4c80075e547df964df1612b45d0e3",
+  "6a7c4bd172f64c65816ea7995effa0b5",
+  "1c5f1554e9a24052b1d3a43b241e72ef",
+  "a85b6c0641844edcb678ba6cf0692549",
+  "c3f2bfe37e654d419b72b50843ce6e7e"
+ ],
+ "note": "ruids = v2(속 채움 시안 α0.55) — 사용자 최종 선택(2026-09-16: v3 '진하게'는 '너무 어색' → v2로 복귀). v1 외곽선만 / v3 진하게는 보관",
+ "ruids_v3_dense": [
+  "f6d768b53c554fe2a6ed2913412a4fee",
+  "ae9a3c5572f14b848690deaf3a570572",
+  "c17fbedb21f74b3aae656adea246ef2e",
+  "87df851621f8432689cc661f4334c260",
+  "66d116b9f63744a4af38b08d524d1af4",
+  "d261f046b44843339e5e298591ddc85e",
+  "0cf525179e0a42a990c70ed6bf3647b4",
+  "19586ebb8b5a48458d9d9befc658dd79",
+  "e64ff88c1a544762a512024dde25fd1c",
+  "0035fab4c8e44d15b02dd6af72397381",
+  "294a6dfc541a459db478ebfe676c3ad2"
+ ]
+}

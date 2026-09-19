@@ -1,0 +1,429 @@
+-- Phase 3 #15·#16 (2026-09-17, 시험대): 유닛 자동 공격 + 데미지 계산 + 피격 연출의 첫 조각.
+--   시험대(TestBench): 순회 몬스터를 멈추고 체력 무제한 허수아비 1기를 (DummyCol,DummyRow) 트랙 칸에 세운 뒤,
+--   유닛 1(히어로)을 인접 발판 (UnitCol,UnitRow)에 놓고 공격 주기마다 기본 공격을 반복한다. 사용자가 고정 위치에서
+--   데미지 숫자(MSW 데미지 스킨)와 몬스터 피격 연출을 본다. 사거리·타겟 선택·웨이브는 아직 없음(#15 본편).
+--   데미지 = damage.md 7단계(RtsJobTableLogic.Calc: ① 공격력 ② 공격력% ⑤ 스킬 비율 → 1회 타격, ⑥ 최종(몬스터), ④ 크리 확률로 굴림).
+--   파티 버프(홀리 유니티 등)는 아직 서버 계산에 안 넣음(RtsUnitBuffLogic이 클라 전용) — 본편에서 서버 계산으로 옮긴다.
+@Logic
+script RtsCombatLogic extends Logic
+
+	-- 시험대 켜기(입장 시 자동). 웨이브(#10)가 생기면 false
+	property boolean TestBench = true
+
+	-- 허수아비 트랙 칸 / 유닛 1 발판 칸 (우상단 안쪽 줄 끝 — 몬스터가 유닛 오른쪽에 인접)
+	property number DummyCol = 14
+
+	property number DummyRow = 3
+
+	-- 시험대 허수아비 추가 2기(사용자 2026-09-18 "주변에 똑같은 무적몹 2마리 더, 좌측 말고 우측 위/아래"): 기존 (14,3)의 위 (14,2)·아래 (14,4) — 유닛(13,4) 오른쪽 트랙 세로줄에 3기
+	property table DummyExtra = { { 14, 2 }, { 14, 4 } }
+
+	property number UnitCol = 13
+
+	property number UnitRow = 4
+
+	-- 시험대에 세울 유닛 번호(1 히어로 → 2 팔라딘 → 3 다크나이트 → 4 보우마스터 → 5 신궁 → 6 썬콜 → 7 불독 → 8 비숍 순으로 확인)
+	property number UnitNo = 3
+
+	property string DummyName = "RtsDummy"
+
+	-- 시험대 전용: 매 공격 뒤 허수아비에 이 데미지로 추가 타격 1회(0이면 없음). 데미지 스킨 단위(만/억) 표기 확인용 — 2026-09-18 "100만" 확인 뒤 0으로 끔
+	property number TestBigHit = 0
+
+	-- 공격 반복 타이머: key = userId .. "_" .. no
+	property table Loops = {}
+
+	-- 쿨타임 스킬 준비 시각: key = userId .. "_" .. no .. "_" .. idx → ServerElapsedSeconds
+	property table ReadyAt = {}
+
+	-- 후딜(큰 스킬 뒤 다음 공격까지 쉬는 시각): key = userId .. "_" .. no → ServerElapsedSeconds. 사용자 2026-09-18 "생츄어리·블리자드·제네시스·드래곤 로어 후딜 1.5초"
+	property table BusyUntil = {}
+
+	-- 데미지 스킨 = 메이플스토리 기본 데미지 스킨 (유닛) — effect/damageskin/208 (기본 스킨과 같은 주황·빨강 숫자 + 만/억 글리프, 엔진이 10000000 → 1000만으로 포맷).
+	--   유닛 없는 기본 스킨은 3271c3e79bf04ecba9a107d55495970d(effect/damageskin/0). MSW 기본값 6ba67548…(픽셀 숫자)은 사용자 2026-09-18 "너무 인위적" → 교체.
+	--   배율은 줌 30% 화면에서 읽히는 크기(원작 숫자가 커서 2.4 → 2.0)
+	property string DamageSkinId = "7e39645af9454fffb17a5451e9194dda"
+
+	property number DamageSkinScale = 2.0
+
+	@ExecSpace("ServerOnly")
+	method void SetupTestBench(string userId, number zone)
+		if not self.TestBench then return end
+		_RtsDemoLogic:StopWalkers()
+		local name = self.DummyName .. string.format("%d", zone)
+		if _EntityService:GetEntityByPath("/maps/RtsMap/" .. name) == nil then
+			self:SpawnMonster(name, zone, self.DummyCol, self.DummyRow, "M001", true)
+		end
+		for i = 1, #self.DummyExtra do
+			local nm = name .. "_" .. string.format("%d", i)
+			if _EntityService:GetEntityByPath("/maps/RtsMap/" .. nm) == nil then
+				self:SpawnMonster(nm, zone, self.DummyExtra[i][1], self.DummyExtra[i][2], "M001", true)
+			end
+		end
+		local e = _RtsUnitLogic:GetUnit(userId, self.UnitNo)
+		if e ~= nil and e.RtsUnitComponent ~= nil then
+			e.RtsUnitComponent:PlaceAt(self.UnitCol, self.UnitRow)
+			self:StartLoop(userId, self.UnitNo)
+		end
+		log("RtsCombat: test bench — dummy " .. name .. " at (" .. string.format("%d", self.DummyCol) .. "," .. string.format("%d", self.DummyRow) .. "), unit " .. string.format("%d", self.UnitNo) .. " at (" .. string.format("%d", self.UnitCol) .. "," .. string.format("%d", self.UnitRow) .. ")")
+	end
+
+	-- 몬스터 엔티티 = 스프라이트(이동 클립) + HitComponent(피격 박스) + DamageSkinSpawner(데미지 숫자) + RtsMonsterComponent(HP)
+	--   스프라이트 기본은 왼쪽 보기 → 유닛이 왼쪽에 있으니 그대로
+	@ExecSpace("ServerOnly")
+	method Entity SpawnMonster(string name, number zone, number col, number row, string monsterId, boolean invincible)
+		local mapRoot = _EntityService:GetEntityByPath("/maps/RtsMap")
+		if mapRoot == nil then return nil end
+		local at = _RtsZoneLogic:GetCellCenter(zone, col, row)
+		local e = _RtsZoneLogic:SpawnProp(name, mapRoot, at, _RtsDemoLogic.WalkRUID, 200)
+		if e == nil then return nil end
+		local s = _RtsDemoLogic.WalkerScale
+		e.TransformComponent.Scale = Vector3(s, s, 1)
+		-- 피격 박스 = 스프라이트 크기에 맞춤(달팽이 ≈ 가로 0.48·세로 0.4 로컬 × 스케일 2.5 = 1.2×1.0 유닛, 발 기준 중심 +0.2×스케일). 표식·타격 이펙트가 이 박스 중심을 쓴다
+		local hit = e:AddComponent("HitComponent")
+		if hit ~= nil then
+			hit.BoxSize = Vector2(0.48, 0.4)
+			hit.ColliderOffset = Vector2(0, 0.2)
+		end
+		local skin = e:AddComponent("DamageSkinSpawnerComponent")
+		-- 데미지 숫자 시작 높이: 체력바(RtsMonsterComponent.BarY 1.15) 위
+		if skin ~= nil then skin.DamageSkinOffset = Vector2(0, 1.35) end
+		local m = e:AddComponent("RtsMonsterComponent")
+		if m ~= nil then
+			m.MonsterId = monsterId
+			m.Invincible = invincible
+			m.Zone = zone
+		end
+		return e
+	end
+
+	-- 구역 zone의 살아 있는 몬스터 전부(구역 전체 지속 피해용). RtsMonsterComponent.Zone으로 고른다
+	@ExecSpace("ServerOnly")
+	method table GetZoneMonsters(number zone)
+		local out = {}
+		local mapRoot = _EntityService:GetEntityByPath("/maps/RtsMap")
+		if mapRoot == nil then return out end
+		local comps = mapRoot:GetChildComponentsByTypeName("RtsMonsterComponent", false)
+		for i = 1, #comps do
+			local m = comps[i]
+			if m ~= nil and m.Entity ~= nil and isvalid(m.Entity) and math.floor(m.Zone + 0.5) == math.floor(zone + 0.5) then
+				out[#out + 1] = m.Entity
+			end
+		end
+		return out
+	end
+
+	-- 유닛 no가 공격 주기마다 공격을 반복(시험). 첫 공격은 1초 뒤. 대상은 매번 DoAttack이 사거리 안 가까운 순으로 고른다
+	@ExecSpace("ServerOnly")
+	method void StartLoop(string userId, number no)
+		local key = userId .. "_" .. string.format("%d", no)
+		if self.Loops[key] ~= nil then
+			_TimerService:ClearTimer(self.Loops[key])
+			self.Loops[key] = nil
+		end
+		local e = _RtsUnitLogic:GetUnit(userId, no)
+		if e == nil then return end
+		local u = e.RtsUnitComponent
+		local st = _RtsJobTableLogic:GetStat(u.JobId, u.Level)
+		local period = _RtsJobTableLogic:GetPeriod(st)
+		self.Loops[key] = _TimerService:SetTimerRepeat(function()
+			self:DoAttack(userId, no)
+		end, period, 1.0)
+	end
+
+	@ExecSpace("ServerOnly")
+	method void StopLoop(string userId, number no)
+		local key = userId .. "_" .. string.format("%d", no)
+		if self.Loops[key] ~= nil then
+			_TimerService:ClearTimer(self.Loops[key])
+			self.Loops[key] = nil
+		end
+	end
+
+	-- 사거리 range칸 안의 구역 몬스터를 가까운 순으로 최대 n마리(character.md 헤더: 패드 기준 주변 n칸·대각선 포함 = 체비셰프 칸 거리, 살짝 걸쳐도 안 → +0.25칸 여유)
+	@ExecSpace("ServerOnly")
+	--   aoe(칸)가 있으면(2026-09-19 사용자 "메인 대상 가까운 기준 범위 1 이내로, 체인 라이트닝은 3"): 메인 대상 = 사거리 안 가장 가까운 적 1마리,
+	--   나머지 = 메인 대상에서 aoe칸(+0.25) 안의 적을 가까운 것부터 이어 가는 순서(직전 대상에서 가장 가까운 미타격 적 — 빔·타격 순서가 한 줄로 이어짐). 유닛 사거리 밖이어도 메인 대상 곁이면 맞는다.
+	--   aoe가 nil이면 예전 규칙(유닛 중심 사거리 안 가까운 순 n마리) — 지금은 지대(dot) 외엔 항상 aoe를 준다.
+	--   randomPick(전체 광역기 k.area — 제네시스·생츄어리·블리자드·드래곤 로어, 2026-09-19 사용자 "메인 타겟 없음, 사거리 안 모든 적 중 n마리를 우선순위 없이 랜덤으로"): aoe 없이 사거리 안 후보를 섞어 n마리
+	method table PickTargets(Entity unitEntity, number zone, number range, number n, any aoe, any randomPick)
+		local out = {}
+		if n <= 0 then return out end
+		local up = unitEntity.TransformComponent.WorldPosition
+		local cell = _RtsConfigLogic:GetGridCell()
+		local list = self:GetZoneMonsters(zone)
+		local cands = {}
+		for i = 1, #list do
+			local m = list[i]
+			local p = m.TransformComponent.WorldPosition
+			local dc = math.abs(p.x - up.x) / cell
+			local dr = math.abs(p.y - up.y) / cell
+			if math.max(dc, dr) <= range + 0.25 then cands[#cands + 1] = { e = m, d = dc * dc + dr * dr } end
+		end
+		table.sort(cands, function(a, b) return a.d < b.d end)
+		if aoe == nil then
+			if randomPick == true and #cands > 1 then
+				-- 피셔-예이츠 섞기
+				for i = #cands, 2, -1 do
+					local j = _UtilLogic:RandomIntegerRange(1, i)
+					cands[i], cands[j] = cands[j], cands[i]
+				end
+			end
+			for i = 1, math.min(n, #cands) do out[#out + 1] = cands[i].e end
+			return out
+		end
+		if #cands == 0 then return out end
+		local main = cands[1].e
+		out[1] = main
+		local mp = main.TransformComponent.WorldPosition
+		-- 메인 대상 aoe칸 안의 후보(메인 제외, 유닛 사거리 무관)
+		local near = {}
+		for i = 1, #list do
+			local m = list[i]
+			if m ~= main then
+				local p = m.TransformComponent.WorldPosition
+				local dc = math.abs(p.x - mp.x) / cell
+				local dr = math.abs(p.y - mp.y) / cell
+				if math.max(dc, dr) <= aoe + 0.25 then near[#near + 1] = m end
+			end
+		end
+		-- 직전 대상에서 가장 가까운 것부터 이어 붙인다
+		local last = main
+		while #out < n and #near > 0 do
+			local lp = last.TransformComponent.WorldPosition
+			local bi = 1
+			local bd = nil
+			for i = 1, #near do
+				local p = near[i].TransformComponent.WorldPosition
+				local d = (p.x - lp.x) * (p.x - lp.x) + (p.y - lp.y) * (p.y - lp.y)
+				if bd == nil or d < bd then bd = d; bi = i end
+			end
+			last = near[bi]
+			out[#out + 1] = last
+			table.remove(near, bi)
+		end
+		return out
+	end
+
+	-- 공격 1회: 스킬표의 액티브 중 쓸 것을 고르고(쿨타임 스킬이 준비됐고 사거리 안에 대상이 있으면 우선, 아니면 기본 공격), 대상 = 사거리 안 가까운 순 n마리.
+	--   사거리 안에 1마리도 없으면 공격(모션·이펙트·사운드) 자체를 안 하고 쿨타임도 안 쓴다(character.md 헤더). 시전 연출은 즉시 전 클라에(대상 전부 전달), 판정은 fx.hitDelay 뒤 대상마다
+	@ExecSpace("ServerOnly")
+	method void DoAttack(string userId, number no)
+		local e = _RtsUnitLogic:GetUnit(userId, no)
+		if e == nil or not isvalid(e) then return end
+		local bkey = userId .. "_" .. string.format("%d", no)
+		if (self.BusyUntil[bkey] or 0) > _UtilLogic.ServerElapsedSeconds then return end
+		local u = e.RtsUnitComponent
+		local skills = _RtsJobTableLogic:GetSkills(u.JobId)
+		-- 파티 버프(샤프아이즈 크리 / 홀리 유니티·프레이·조커 최종) 반영값으로 싸운다 — 2026-09-19 사용자: "샤프아이즈로 크확 20%인데 크리가 안 뜬다"(전엔 기본값 Calc만 써서 서버 크리 0%)
+		local st = _RtsJobTableLogic:GetStat(u.JobId, u.Level)
+		_RtsUnitBuffLogic:ApplyToStat(st, _RtsUnitBuffLogic:GetBuffsFor(u.Zone, u.No))
+		local c = _RtsJobTableLogic:CalcStat(u.JobId, u.Level, st)
+		-- 쓸 스킬: 획득한 액티브(fx 있음) 중 잠금 2·3이 아닌 것. 쿨타임 스킬(cd)은 준비됐으면 기본 공격보다 우선(뒤에 있는 = 높은 레벨 스킬 먼저 본다)
+		--   사거리 = 스킬 range(기본 공격은 레벨 강화 st.range가 있으면 그것), 타겟 수 = 스킬 targets(없으면 st.targets). 지속 피해 지대(dot)는 구역 어디든 몬스터가 있으면
+		local now = _UtilLogic.ServerElapsedSeconds
+		local idx = 0
+		local targets = {}
+		for i = #skills, 1, -1 do
+			local k = skills[i]
+			if k.kind == "액티브" and k.fx ~= nil and u.Level >= k.lv and _RtsJobTableLogic:GetLock(u.SkillLocks, i) < 2 then
+				local rk = userId .. "_" .. string.format("%d", no) .. "_" .. string.format("%d", i)
+				local ready = k.cd == nil or (self.ReadyAt[rk] or 0) <= now
+				if ready then
+					local range = k.range or 2
+					if k.cd == nil and st.range ~= nil then range = st.range end
+					local count = k.targets or st.targets
+					-- 지대(dot)와 구체 스킬(spread = 도트 퍼니셔)은 사거리 제한 없음 — 구역의 몬스터 전부가 후보(도트 퍼니셔는 구체마다 자기 자리에서 가장 가까운 적을 따라간다, 2026-09-19 사용자 "예외")
+					if k.dot ~= nil or k.spread then
+						range = 999
+						count = 999
+					end
+					-- 다수 타격 범위(2026-09-19 사용자): 모든 범위 공격은 메인 대상 1마리 곁 1칸 안(k.aoe, 기본 1)만 — 트랙이 2칸 이상 벌어진 몬스터는 사거리 안이라도 안 맞는다. 체인 라이트닝만 aoe 3. 지대·구체는 예외
+					--   전체 광역기(k.area)는 메인 대상 없이 사거리 안 전부가 후보 → n마리 랜덤
+					local aoe = k.aoe
+					if aoe == nil and k.dot == nil and not k.spread and not k.area then aoe = 1 end
+					local list = self:PickTargets(e, u.Zone, range, count, aoe, k.area == true)
+					if #list > 0 then
+						idx = i
+						targets = list
+						if k.cd ~= nil then self.ReadyAt[rk] = now + k.cd end
+						break
+					end
+				end
+			end
+		end
+		if idx == 0 then return end
+		local k = skills[idx]
+		local fx = k.fx
+		local target = targets[1]
+		-- 후딜: 이 스킬 뒤 k.after초 동안은 다음 공격을 건너뛴다(공격 주기 타이머는 그대로 돈다)
+		if k.after ~= nil then self.BusyUntil[bkey] = now + k.after end
+		-- 쿨타임 스킬은 자기 비율·타격 수(k.ratio / hits, 없으면 기본 공격 값)
+		local ratio = k.ratio or st.ratio
+		-- 실수 오차(340×2×0.7 = 475.999…)로 한 끗 깎이지 않게 아주 작은 값을 더해 내림
+		local perHit = math.floor(c.atk * (st.pct / 100) * (ratio / 100) * (st.fin / 100) + 0.0001)
+		if perHit < 1 then perHit = 1 end
+		local hits = k.hits or st.hits
+		local atk = e.RtsUnitAttackComponent
+		if atk == nil then return end
+		atk.CritRate = 1 + st.critDmg / 100
+		-- 메인 대상(가장 가까운 1마리) 쪽을 본다 — 규칙은 character.md 헤더
+		local tp = target.TransformComponent.WorldPosition
+		local up = e.TransformComponent.WorldPosition
+		if tp.x < up.x - 0.05 then u:FaceTo(-1) elseif tp.x > up.x + 0.05 then u:FaceTo(1) end
+		-- 구체 분배(도트 퍼니셔: k.spread + fx.projFrom "around" — 사용자 2026-09-18 "캐릭터 주변에 골고루 흩뿌려지듯 생성돼 가장 가까운 적에게, 보스 우선"):
+		--   구체 h는 유닛 손 높이 주위 반지름 projSpread, 각도 2π(h-1)/hits + π/hits 지점에서 생성돼 그 지점에서 가장 가까운 대상으로(보스가 사거리 안에 있으면 보스만). 클라 PlayProjectile도 같은 식으로 출발점을 잡아 그림과 판정이 맞는다
+		local orbTargets = nil
+		local orbDelay = nil
+		if k.spread and fx.projFrom == "around" and hits > 0 then
+			orbTargets = {}
+			orbDelay = {}
+			local hy = up.y + (fx.projDy or 0.9)
+			local bossOnly = false
+			for j = 1, #targets do
+				if targets[j].RtsMonsterComponent ~= nil and targets[j].RtsMonsterComponent.IsBoss then bossOnly = true end
+			end
+			for h = 1, hits do
+				local o = _RtsJobTableLogic:OrbSpawnOffset(h, hits, fx)
+				local ox = up.x + o.x
+				local oy = hy + o.y
+				local best = nil
+				local bestD = 1e18
+				for j = 1, #targets do
+					local tj = targets[j]
+					if not bossOnly or (tj.RtsMonsterComponent ~= nil and tj.RtsMonsterComponent.IsBoss) then
+						local p = tj.TransformComponent.WorldPosition
+						local ty = p.y + (fx.hitDy or 0.6)
+						local tx = p.x
+						if tj.HitComponent ~= nil then
+							local sc = tj.TransformComponent.Scale
+							tx = p.x + tj.HitComponent.ColliderOffset.x * math.abs(sc.x)
+							ty = p.y + tj.HitComponent.ColliderOffset.y * sc.y
+						end
+						local d = (tx - ox) * (tx - ox) + (ty - oy) * (ty - oy)
+						if d < bestD then
+							bestD = d
+							best = tj
+						end
+					end
+				end
+				orbTargets[h] = best or targets[1]
+				-- 도착 시각 = 생성(stagger) + 떠 있기(projHover) + 거리 ÷ 속도(projSpeed) — 클라 SpawnProjectile과 같은 식. projSpeed가 없으면 hitDelay + (h-1)×hitGap
+				if fx.projSpeed ~= nil and fx.projSpeed > 0 then
+					orbDelay[h] = (fx.projStagger or 0) * (h - 1) + (fx.projHover or 0) + math.sqrt(bestD) / fx.projSpeed
+				else
+					orbDelay[h] = (fx.hitDelay or 0.3) + (h - 1) * (fx.hitGap or 0.1)
+				end
+			end
+		end
+		local nameList = targets
+		if orbTargets ~= nil then nameList = orbTargets end
+		local names = nameList[1].Name
+		for j = 2, #nameList do names = names .. "," .. nameList[j].Name end
+		self:CastFx(u.Zone, no, idx, names)
+		-- 타격 수만큼 따로 판정한다(엔진의 GetDisplayHitCount 분할은 총합을 무작위로 나눠 1회당 비율과 어긋남) — 타격마다 크리 따로, 간격 hitGap.
+		--   보통은 대상마다 hits회씩, k.spread(도트 퍼니셔 구체 10개)는 hits회를 대상들에 돌아가며 1회씩 나눈다
+		local delay = fx.hitDelay or 0.3
+		local gap = fx.hitGap or 0.1
+		for h = 1, hits do
+			local tlist = targets
+			local when = delay + (h - 1) * gap
+			if k.spread then
+				if orbTargets ~= nil then
+					tlist = { orbTargets[h] }
+					when = orbDelay[h]
+				else
+					tlist = { targets[((h - 1) % #targets) + 1] }
+				end
+			end
+			_TimerService:SetTimerOnce(function()
+				if not isvalid(e) then return end
+				for j = 1, #tlist do
+					local t = tlist[j]
+					if isvalid(t) then
+						local crit = (_UtilLogic:RandomDouble() * 100) < st.crit
+						-- 무기 데미지(weapon.md): 타격마다 무기별 최소~최대 비율을 굴려 곱한다(최종 데미지 뒤, 방어 전)
+						atk.Dmg = math.max(1, math.floor(perHit * _RtsJobTableLogic:RollWeapon(u.JobId) + 0.0001))
+						atk.Hits = 1
+						atk.Crit = crit
+						atk.TargetName = t.Name
+						local p = t.TransformComponent.WorldPosition
+						atk:AttackFrom(Vector2(0.6, 0.6), Vector2(p.x, p.y + 0.3), u.JobId .. ":" .. string.format("%d", idx), CollisionGroups.HitBox)
+						self:HitFx(t.Name, u.JobId, idx, crit)
+						-- 빙결(블리자드): 맞은 몬스터를 k.freeze초 얼린다
+						if k.freeze ~= nil and t.RtsMonsterComponent ~= nil then t.RtsMonsterComponent:Freeze(k.freeze) end
+					end
+				end
+			end, when)
+		end
+		-- 지속 피해 지대(포이즌 리전): dot = { pct, period, dur } — period초마다 구역 안 모든 몬스터에 공격력 × pct%(강화면 st.dotPct)를 dur초 동안. 직접 타격은 없음(hits 0).
+		--   "타일이 중첩돼도 디버프라 중복 없음" = 몬스터 1마리에 틱당 1회. 그림(맹독지대 타일)은 클라 CastFx가 zoneClips로 깐다
+		if k.dot ~= nil then
+			local dotPct = st.dotPct or k.dot.pct
+			local perTick = math.floor(c.atk * (st.pct / 100) * (dotPct / 100) * (st.fin / 100) + 0.0001)
+			if perTick < 1 then perTick = 1 end
+			local ticks = math.floor(k.dot.dur / k.dot.period + 0.5)
+			for t = 1, ticks do
+				_TimerService:SetTimerOnce(function()
+					if not isvalid(e) then return end
+					local list = self:GetZoneMonsters(u.Zone)
+					for j = 1, #list do
+						local m = list[j]
+						if isvalid(m) then
+							local crit = (_UtilLogic:RandomDouble() * 100) < st.crit
+							atk.Dmg = math.max(1, math.floor(perTick * _RtsJobTableLogic:RollWeapon(u.JobId) + 0.0001))
+							atk.Hits = 1
+							atk.Crit = crit
+							atk.TargetName = m.Name
+							local p = m.TransformComponent.WorldPosition
+							atk:AttackFrom(Vector2(0.6, 0.6), Vector2(p.x, p.y + 0.3), u.JobId .. ":" .. string.format("%d", idx), CollisionGroups.HitBox)
+							self:HitFx(m.Name, u.JobId, idx, crit)
+						end
+					end
+				end, t * k.dot.period)
+			end
+		end
+		-- 시험대: 큰 숫자 표기 확인용 추가 타격(마지막 타격 0.25초 뒤, 크리 아님)
+		if self.TestBench and self.TestBigHit > 0 then
+			_TimerService:SetTimerOnce(function()
+				if not isvalid(e) or not isvalid(target) then return end
+				atk.Dmg = self.TestBigHit
+				atk.Hits = 1
+				atk.Crit = false
+				atk.TargetName = target.Name
+				local p = target.TransformComponent.WorldPosition
+				atk:AttackFrom(Vector2(0.6, 0.6), Vector2(p.x, p.y + 0.3), "test", CollisionGroups.HitBox)
+			end, delay + (hits - 1) * gap + 0.25)
+		end
+	end
+
+	-- 전 클라: 유닛 시전 연출(모션 + 이펙트 + 시전음 + 투사체·빔·표식은 대상들 쪽으로). targetNames = 쉼표로 이은 대상 이름(첫 = 메인 대상)
+	@ExecSpace("Client")
+	method void CastFx(number zone, number no, number idx, string targetNames)
+		local u = _RtsUnitLogic:GetZoneUnit(zone, no)
+		if u == nil then return end
+		local skills = _RtsJobTableLogic:GetSkills(u.JobId)
+		local k = skills[math.floor(idx)]
+		if k == nil or k.fx == nil then return end
+		local targets = {}
+		for nm in string.gmatch(targetNames, "[^,]+") do
+			local t = _EntityService:GetEntityByPath("/maps/RtsMap/" .. nm)
+			if t ~= nil then targets[#targets + 1] = t end
+		end
+		_RtsSkillFxLogic:Preload(k.fx)
+		_RtsSkillFxLogic:PlayCast(u.Entity, no, k.fx, targets[1], targets)
+	end
+
+	-- 전 클라: 몬스터 피격 연출(번쩍임 + 타격 클립 + 타격음). 데미지 숫자는 엔진 데미지 스킨이 따로 그린다
+	@ExecSpace("Client")
+	method void HitFx(string targetName, string jobId, number idx, boolean crit)
+		local t = _EntityService:GetEntityByPath("/maps/RtsMap/" .. targetName)
+		if t == nil or t.RtsMonsterComponent == nil then return end
+		local skills = _RtsJobTableLogic:GetSkills(jobId)
+		local k = skills[math.floor(idx)]
+		local fx = nil
+		if k ~= nil then fx = k.fx end
+		t.RtsMonsterComponent:PlayHitFx(fx, crit)
+	end
+
+end

@@ -14,6 +14,9 @@ script RtsUnitSelectLogic extends Logic
 
 	property Entity Menu = nil
 
+	-- 열린 메뉴의 UI 좌표 사각형 {x0,y0,x1,y1} (중앙 원점) — 유닛 TouchEvent가 메뉴 위에서 났는지 판정용
+	property table MenuRect = nil
+
 	-- 위치 이동 모드: 이동 중인 유닛 번호(0 = 아님) + 발판 표시 엔티티들
 	property number MoveNo = 0
 
@@ -120,10 +123,12 @@ script RtsUnitSelectLogic extends Logic
 		local ui = _UILogic:ScreenToUIPosition(screen)
 		local W = 170
 		local rowH = 40
-		local menu = H:SpawnPanel("RtsUnitMenu", H.HudGroup, Vector2(0.5, 0.5), Vector2(0, 0.5), Vector2(ui.x, ui.y), Vector2(W, rowH * 2 + 14),
+		local menuH = rowH * 2 + 14
+		local menu = H:SpawnPanel("RtsUnitMenu", H.HudGroup, Vector2(0.5, 0.5), Vector2(0, 0.5), Vector2(ui.x, ui.y), Vector2(W, menuH),
 			Color(0.11, 0.094, 0.075, 0.97), H:ColGold(), 1.5)
 		self.Menu = menu.Parent
 		self.MenuNo = no
+		self.MenuRect = { x0 = ui.x - 6, y0 = ui.y - menuH / 2 - 6, x1 = ui.x + W + 6, y1 = ui.y + menuH / 2 + 6 }
 
 		-- 1) 위치 이동 (쿨타임 중이면 남은 시간, 비활성)
 		local left = u:MoveCoolLeft()
@@ -159,9 +164,19 @@ script RtsUnitSelectLogic extends Logic
 		end)
 	end
 
+	-- 화면 좌표가 열린 메뉴 위인가 (여백 6px 포함). 유닛 클릭보다 UI가 우선이어야 하므로 RtsUnitComponent.OnTouched가 먼저 묻는다
+	@ExecSpace("ClientOnly")
+	method boolean IsOverMenu(Vector2 screen)
+		local r = self.MenuRect
+		if r == nil or self.Menu == nil then return false end
+		local p = _UILogic:ScreenToUIPosition(screen)
+		return p.x >= r.x0 and p.x <= r.x1 and p.y >= r.y0 and p.y <= r.y1
+	end
+
 	@ExecSpace("ClientOnly")
 	method void CloseMenu()
 		self.MenuNo = 0
+		self.MenuRect = nil
 		if self.Menu ~= nil then
 			self.Menu:Destroy()
 			self.Menu = nil

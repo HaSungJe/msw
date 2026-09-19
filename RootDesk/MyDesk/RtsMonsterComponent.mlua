@@ -1,0 +1,256 @@
+-- Phase 3 (2026-09-17, 시험대): 트랙 위 몬스터 1기의 상태. 같은 엔티티에 SpriteRenderer(이동 클립) + HitComponent(피격 판정 박스)
+--   + DamageSkinSpawnerComponent(데미지 숫자)가 붙는다. HP는 서버가 깎고 동기화. 피격 연출(번쩍임·타격 이펙트·타격음)은 클라 PlayHitFx.
+--   지금은 체력 무제한 허수아비(Invincible)로 유닛 공격을 시험한다 — 몬스터 스폰·순환(#10)·사망(#13)은 나중.
+@Component
+script RtsMonsterComponent extends Component
+
+	@Sync
+	property string MonsterId = "M001"
+
+	@Sync
+	property number MaxHp = 100
+
+	@Sync
+	property number Hp = 100
+
+	-- 시험용 허수아비: 데미지를 받아도 HP가 줄지 않는다
+	@Sync
+	property boolean Invincible = false
+
+	-- 이 몬스터가 걷는 구역(포이즌 리전 같은 구역 전체 지속 피해가 이 값으로 고른다)
+	@Sync
+	property number Zone = 0
+
+	-- 빙결(블리자드) 끝나는 서버 시각(ServerElapsedSeconds). 이동(#10)이 생기면 이 동안 이동속도 50% — 지금은 클라 파란 틴트만
+	@Sync
+	property number FrozenUntil = 0
+
+	-- 피격 번쩍임 중인가(클라) / 빙결 틴트 중인가(클라)
+	property boolean Flashing = false
+
+	property boolean Frozen = false
+
+	-- 체력바(클라, 몬스터 자식): 배경·채움 엔티티 = 흰 사각 스프라이트(RtsHudLogic.WhiteRUID, 원본 ≈0.08유닛 — 2026-09-18 실측: 스케일 10 → 0.8유닛; TiledSize는 이 스프라이트에 안 먹음)를 Scale로 늘린다.
+	--   크기는 **세계 단위로 고정**(몬스터 스프라이트·스케일이 달라도 같은 폭 — 사용자 2026-09-18 "모든 몬스터 체력바 크기 통일, 보스만 길게"): 일반 BarW 1.4 × BarH 0.12, 보스는 BossBarW. 발 위 BarY(세계)
+	property any HpBack = nil
+
+	property any HpFill = nil
+
+	property number WhiteUnit = 0.08
+
+	property number BarW = 1.4
+
+	property number BossBarW = 2.6
+
+	property number BarH = 0.12
+
+	property number BarY = 1.15
+
+	-- 보스면 긴 체력바(몬스터 표(#10)에서 넣는다)
+	@Sync
+	property boolean IsBoss = false
+
+	-- 빙결 표시(클라, 몬스터 자식, 피격 박스 우측 위) — 빛나는 눈꽃 클립 21001008/mob(43px, 루프; 사용자 2026-09-18 지정. 이전: 블리자드 스킬 아이콘 a05d1321…)
+	property any FreezeIcon = nil
+
+	property string FreezeIconRUID = "21628ca112484e70a5cd41a2e9e9cf91"
+
+	-- 빙결 갱신 세대(겹쳐 맞으면 마지막 것만 해제)
+	property number FreezeGen = 0
+
+	method void OnBeginPlay()
+		if self:IsServer() then
+			self.Entity:ConnectEvent(HitEvent, function(event)
+				self:OnHitServer(event.TotalDamage)
+			end)
+		else
+			-- 스프라이트·스케일이 잡힌 뒤 체력바(0.2초 뒤 한 번 더 — 동기화 지연 대비)
+			_TimerService:SetTimerOnce(function() self:EnsureHpBar() end, 0.1)
+			_TimerService:SetTimerOnce(function() self:RefreshHpBar() end, 0.5)
+		end
+	end
+
+	method void OnSyncProperty(string name, any value)
+		if not self:IsClient() then return end
+		if name == "Hp" or name == "MaxHp" then self:RefreshHpBar() end
+	end
+
+	-- 체력바 만들기(한 번). 배경 = 어두운 회색(테두리 느낌으로 살짝 크게), 채움 = 빨강(HP 비율만큼 왼쪽 정렬). 몬스터 스프라이트와 같은 SortingLayer, 순서 +5/+6.
+	--   자식이라 부모 스케일이 곱해지므로 로컬 값 = 세계 값 ÷ 부모 스케일
+	@ExecSpace("ClientOnly")
+	method void EnsureHpBar()
+		local e = self.Entity
+		if e == nil or not isvalid(e) then return end
+		if self.HpBack ~= nil and isvalid(self.HpBack) then return end
+		local layer = "MapLayer0"
+		local order = 200
+		if e.SpriteRendererComponent ~= nil then
+			layer = e.SpriteRendererComponent.SortingLayer
+			order = e.SpriteRendererComponent.OrderInLayer
+		end
+		local function bar(nm, col, ord)
+			local b = _SpawnService:SpawnByModelId("model://MapObject", nm, Vector3.zero, e)
+			if b == nil then return nil end
+			local sr = b.SpriteRendererComponent
+			if sr == nil then sr = b:AddComponent("SpriteRendererComponent") end
+			sr.SpriteRUID = _RtsHudLogic.WhiteRUID
+			sr.Color = col
+			sr.SortingLayer = layer
+			sr.OrderInLayer = ord
+			return b
+		end
+		self.HpBack = bar("RtsHpBack", Color(0.1, 0.1, 0.1, 0.9), order + 5)
+		self.HpFill = bar("RtsHpFill", Color(0.92, 0.18, 0.18, 1), order + 6)
+		self:RefreshHpBar()
+	end
+
+	@ExecSpace("ClientOnly")
+	method number BarWidth()
+		if self.IsBoss then return self.BossBarW end
+		return self.BarW
+	end
+
+	-- 배경은 전체 폭(+테두리 0.04), 채움은 비율만큼 폭을 줄이고 왼쪽 끝을 배경 왼쪽에 맞춘다(스프라이트 중심 기준)
+	@ExecSpace("ClientOnly")
+	method void RefreshHpBar()
+		if self.HpFill == nil or not isvalid(self.HpFill) or self.HpBack == nil or not isvalid(self.HpBack) then
+			self:EnsureHpBar()
+			return
+		end
+		local e = self.Entity
+		local ps = 1
+		if e ~= nil and isvalid(e) then ps = math.abs(e.TransformComponent.Scale.x) end
+		if ps < 0.01 then ps = 1 end
+		local W = self:BarWidth()
+		local H = self.BarH
+		local r = 1
+		if self.MaxHp > 0 then r = self.Hp / self.MaxHp end
+		if r < 0 then r = 0 elseif r > 1 then r = 1 end
+		local w = W * r
+		local unit = self.WhiteUnit
+		self.HpBack.TransformComponent.Position = Vector3(0, self.BarY / ps, 0)
+		self.HpBack.TransformComponent.Scale = Vector3((W + 0.04) / unit / ps, (H + 0.04) / unit / ps, 1)
+		self.HpFill.TransformComponent.Position = Vector3(-(W - w) / 2 / ps, self.BarY / ps, 0)
+		self.HpFill.TransformComponent.Scale = Vector3(math.max(w, 0.001) / unit / ps, H / unit / ps, 1)
+		local sr = self.HpFill.SpriteRendererComponent
+		if sr ~= nil then sr.Enable = r > 0 end
+	end
+
+	-- 빙결 아이콘 켜고 끄기(피격 박스 우측 위 — 사용자 2026-09-18 "몬스터 우측 위에 빙결 표시")
+	@ExecSpace("ClientOnly")
+	method void SetFreezeIcon(boolean on)
+		local e = self.Entity
+		if e == nil or not isvalid(e) then return end
+		if not on then
+			if self.FreezeIcon ~= nil and isvalid(self.FreezeIcon) then self.FreezeIcon:Destroy() end
+			self.FreezeIcon = nil
+			return
+		end
+		if self.FreezeIcon ~= nil and isvalid(self.FreezeIcon) then return end
+		local x = 0.3
+		local y = 0.42
+		if e.HitComponent ~= nil then
+			x = e.HitComponent.ColliderOffset.x + e.HitComponent.BoxSize.x / 2 + 0.08
+			y = e.HitComponent.ColliderOffset.y + e.HitComponent.BoxSize.y / 2 + 0.06
+		end
+		local layer = "MapLayer0"
+		local order = 200
+		if e.SpriteRendererComponent ~= nil then
+			layer = e.SpriteRendererComponent.SortingLayer
+			order = e.SpriteRendererComponent.OrderInLayer
+		end
+		local ic = _SpawnService:SpawnByModelId("model://MapObject", "RtsFreezeIcon", Vector3(x, y, 0), e)
+		if ic == nil then return end
+		local sr = ic.SpriteRendererComponent
+		if sr == nil then sr = ic:AddComponent("SpriteRendererComponent") end
+		sr.SpriteRUID = self.FreezeIconRUID
+		sr.SortingLayer = layer
+		sr.OrderInLayer = order + 8
+		ic.TransformComponent.Position = Vector3(x, y, 0)
+		-- 눈꽃 43px = 0.43유닛 × 로컬 0.65 × 부모 2.5 ≈ 세계 0.7유닛
+		ic.TransformComponent.Scale = Vector3(0.65, 0.65, 1)
+		self.FreezeIcon = ic
+	end
+
+	@ExecSpace("ServerOnly")
+	method void OnHitServer(number total)
+		if self.Invincible then return end
+		self.Hp = self.Hp - total
+		if self.Hp < 0 then self.Hp = 0 end
+	end
+
+	-- 빙결 sec초(블리자드 1초 — character.md "이동속도 감소 50%"). 서버는 끝 시각만 기록, 전 클라에 틴트
+	@ExecSpace("ServerOnly")
+	method void Freeze(number sec)
+		self.FrozenUntil = _UtilLogic.ServerElapsedSeconds + sec
+		self:ShowFreeze(sec)
+	end
+
+	@ExecSpace("Client")
+	method void ShowFreeze(number sec)
+		local e = self.Entity
+		if e == nil or not isvalid(e) or e.SpriteRendererComponent == nil then return end
+		self.Frozen = true
+		self.FreezeGen = (self.FreezeGen or 0) + 1
+		local gen = self.FreezeGen
+		if not self.Flashing then e.SpriteRendererComponent.Color = self:RestColor() end
+		self:SetFreezeIcon(true)
+		_TimerService:SetTimerOnce(function()
+			if not isvalid(e) or self.FreezeGen ~= gen then return end
+			self.Frozen = false
+			self:SetFreezeIcon(false)
+			if e.SpriteRendererComponent ~= nil and not self.Flashing then e.SpriteRendererComponent.Color = self:RestColor() end
+		end, sec)
+	end
+
+	-- 번쩍임이 끝났을 때 돌아갈 색(빙결 중이면 옅은 파랑)
+	@ExecSpace("ClientOnly")
+	method any RestColor()
+		if self.Frozen then return Color(0.55, 0.8, 1, 1) end
+		return Color.white
+	end
+
+	-- 피격 연출(클라): 스프라이트를 흰빛으로 번쩍 → 0.12초 뒤 원색, 스킬 타격 클립을 몸 위에 1회, 타격음.
+	--   fx = RtsJobTableLogic 스킬 fx(hitClip / hitScale / hitSound / hitDy)
+	@ExecSpace("ClientOnly")
+	method void PlayHitFx(table fx, boolean crit)
+		local e = self.Entity
+		if e == nil or not isvalid(e) then return end
+		local sr = e.SpriteRendererComponent
+		if sr ~= nil and not self.Flashing then
+			self.Flashing = true
+			sr.Color = Color(1, 0.55, 0.55, 1)
+			_TimerService:SetTimerOnce(function()
+				self.Flashing = false
+				if isvalid(e) and e.SpriteRendererComponent ~= nil then e.SpriteRendererComponent.Color = self:RestColor() end
+			end, 0.12)
+		end
+		if fx == nil then return end
+		if fx.hitSound ~= nil and fx.hitSound ~= "" then _SoundService:PlaySound(fx.hitSound, 1) end
+		if fx.hitClip == nil or fx.hitClip == "" then return end
+		local mapRoot = _EntityService:GetEntityByPath("/maps/RtsMap")
+		if mapRoot == nil then return end
+		local p = e.TransformComponent.WorldPosition
+		local s = fx.hitScale or 2
+		local at = Vector3(p.x, p.y + (fx.hitDy or 0.6), 0)
+		local h = _SpawnService:SpawnByModelId("model://MapObject", "RtsHitFx_" .. e.Name .. "_" .. tostring(math.floor(DateTime.UtcNow.Elapsed)), at, mapRoot)
+		if h == nil then return end
+		local hs = h.SpriteRendererComponent
+		if hs == nil then hs = h:AddComponent("SpriteRendererComponent") end
+		hs.SortingLayer = "Default"
+		hs.OrderInLayer = 320
+		hs.SpriteRUID = fx.hitClip
+		h.TransformComponent.Scale = Vector3(s, s, 1)
+		-- 클립은 기본 Loop라 마지막 프레임 진입 이벤트에서 한 프레임 뒤 제거 (msw-engine 메모)
+		h:ConnectEvent(SpriteAnimPlayerEndFrameEvent, function(ev)
+			_TimerService:SetTimerOnce(function()
+				if isvalid(h) then h:Destroy() end
+			end, 0.03)
+		end)
+		-- 이벤트가 안 오는 경우 대비 상한
+		_TimerService:SetTimerOnce(function()
+			if isvalid(h) then h:Destroy() end
+		end, fx.hitLife or 1.2)
+	end
+
+end

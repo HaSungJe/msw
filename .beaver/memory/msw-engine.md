@@ -71,3 +71,60 @@ MSW(Maker 26.7) 실측으로 확인한 엔진 동작. 다시 실측하면 30분�
 - Rationale: 2026-09-16 유닛 팝업 증강·버프 탭 실측(d.mlua 이름 실패 → mlua_api_retriever로 확인)
 - CLAUDE.md application: not needed
 - Priority: takes precedence over defaults
+
+## 월드 TouchEvent는 UI 버튼과 같이 발화한다 — UI 우선은 코드로 사각형 판정
+- Rule: 유닛(TouchReceiveComponent)의 `TouchEvent`는 그 위에 UI(uigroup 패널·버튼)가 있어도 함께 발화한다(2026-09-17 실측: 나이트로드 컨텍스트 메뉴의 '상세정보' 자리에 선 섀도어가 클릭돼 메뉴가 바뀜). 팝업이 열려 있을 땐 `_RtsPopupLogic:IsOpen()`으로 무시하고, 작은 메뉴는 `RtsUnitSelectLogic.MenuRect`(UI 중앙 원점 좌표, 여백 6px)에 `event.TouchPoint`를 `_UILogic:ScreenToUIPosition`으로 바꿔 넣어 `IsOverMenu`면 유닛 클릭을 버린다(`RtsUnitComponent.OnTouched(screen)`). 새 월드 클릭 대상이 생기면 같은 판정을 붙일 것.
+- Scope: project
+- Rationale: User bug report 2026-09-17 "상세보기가 클릭이 아니라 섀도어 클릭이 우선시됨. 팝업이 항상 클릭 우선이어야"
+- CLAUDE.md application: not needed
+- Priority: takes precedence over defaults
+
+## 전투 = 엔진 AttackComponent/HitComponent + 데미지 스킨 파이프라인 위에 얹는다
+- Rule: 유닛에 `RtsUnitAttackComponent extends AttackComponent`(CalcDamage/CalcCritical/GetCriticalDamageRate/GetDisplayHitCount/IsAttackTarget을 같은 시그니처로 정의 = override, 값은 프로퍼티 Dmg/Crit/CritRate/Hits/TargetName으로 공격 직전 주입) + `DamageSkinSettingComponent`; 몬스터에 `HitComponent`(BoxSize·ColliderOffset, 기본 CollisionGroups.HitBox) + `DamageSkinSpawnerComponent` + `RtsMonsterComponent`(서버 HitEvent로 HP). 판정은 `atk:AttackFrom(Vector2 size, Vector2 worldPos, attackInfo, CollisionGroups.HitBox)` — 대상은 IsAttackTarget에서 이름으로 고른다(박스로 고르지 않음). 데미지 숫자는 엔진이 알아서 그림(크리는 CalcCritical true면 GetCriticalDamageRate 배). 새 스크립트의 .codeblock은 기존 것을 복제해 EntryKey/Id 새 GUID, Name, Type(Logic 5 / Component 1)만 바꾸면 Maker가 인식. 1회 재생 클립 이펙트 = SpriteRUID에 클립 + `SpriteAnimPlayerEndFrameEvent` 뒤 Destroy(`RtsSkillFxLogic.PlayClip`). 원작 스킬 클립은 왼쪽 보기 → `assetFacesLeft`로 유닛 방향에 맞춰 `FlipX`. **아바타 좌우: 메이플 아바타 기본은 왼쪽 보기(스케일 양수 = 왼쪽)**. 반전은 클라에서 `AvatarRendererComponent:GetAvatarRootEntity().TransformComponent.Scale.x = -1`(유닛 엔티티 스케일을 뒤집으면 자식 버프 아이콘까지 뒤집힌다). 서버는 `RtsUnitComponent.FaceDir`(@Sync, -1 왼쪽/+1 오른쪽)만 정하고 클라 `OnSyncProperty("FaceDir")` → `ApplyFace`. 이펙트 반전은 `RtsSkillFxLogic.FlipFor(fx, facingRight, which)`(assetFacesLeft를 기본으로, `clip/frames/body/loop/projFacesLeft`가 요소별 우선 / noFlip). 투사체는 `PlayProjectile`이 `_TweenLogic:MoveTo`로 직선 비행 + `ZRotation`을 비행 각도로(오른쪽: 반전+각도, 왼쪽: 무반전+각도−180). 2026-09-18 전까지 반대로(스케일 양수 = 오른쪽 가정) 돼 있어 팔라딘이 등 뒤로 이펙트를 쏨 — 사용자 지적으로 수정. 마지막 공격 방향 유지(되돌리지 않음). 시험대는 `RtsCombatLogic.TestBench`(입장 시 순회 정지 `RtsDemoLogic.StopWalkers` + 허수아비 `RtsDummy<zone>` (14,3) 체력 무제한 + 유닛 1을 (13,3)에 놓고 공격 반복) — 웨이브(#10)가 생기면 false.
+- Scope: project
+- Rationale: 실측 2026-09-17 — 히어로 레이징 블로우 시험대에서 데미지 86×2 표시·타격 클립·번쩍임·좌우 반전 확인
+- CLAUDE.md application: not needed
+- Priority: takes precedence over defaults
+
+## 데미지 스킨 리소스 = 숫자 글리프 아틀라스. **(유닛) 스킨은 만/억 글리프를 갖고 엔진이 자동 포맷한다**
+- Rule: 데미지 스킨은 `resourceType damageskin`, 경로 `maplestory/effect/damageskin/<원작 id>`. 확인된 것: 0 = 기본 `3271c3e79bf04ecba9a107d55495970d` / 1 = MSW 컴포넌트 기본값 `6ba67548…`(픽셀 숫자) / 3 `1e08a7b6…` / 10001 `02c22d93…`(보라) / **208 = 기본 데미지 스킨 (유닛) `7e39645af9454fffb17a5451e9194dda`** — 기본 스킨 숫자 + 만·억 글리프(일반·크리 색), `DamageSkinSettingComponent.DamageSkinId = DataRef(...)`만 바꾸면 엔진이 10000000 → `1000만`, 123456789 → `1억2345만6789`로 찍어 준다(2026-09-18 실전 AttackFrom 경로로 확인) / 322 `bfd6e8bb…` 고딕 유닛 스킨. **현재 게임 = 208**(`RtsCombatLogic.DamageSkinId`, 스케일 2.0, Blade).
+- 찾는 법: `asset_search_resources`는 damageskin 카테고리를 못 받고, Maker 리소스 피커도 아이콘+RUID만 보여 준다(설명 없음). 대신 **피커에서 눌러 본 스킨은 `%LocalLow%/nexon/MapleStory Worlds/resource_cache/msw/<xx>-damageskin/`에 캐시**로 떨어지므로 그 RUID를 `asset_get_account_resource_metadata_bulk`로 정체 확인 → `.dxt.mod`(protobuf: 서브 스프라이트 GUID 목록(.NET 혼합 엔디안, `effect/damageskin/<id>/nored0/0` 같은 개별 sprite) + DDS DXT5 아틀라스, 오프셋 = "DXT5" 위치 − 84, 세로 반전)를 Python으로 디코드하면 만/억 글리프 유무가 바로 보인다. 아이템 아이콘(`item/consume/0243/<id>/info/iconraw`, 예: 02438872 = 기본 데미지 스킨 (유닛) 아이콘 `c2d12933…`)은 스킨 데이터가 아니다. 스킨 id는 32자 RUID만(원작 "000000" 로드 실패). 클라 미리보기: `_DamageSkinService:PreloadAsync(id, cb)` 뒤 `Play(entity, id, delay, {dmg…}, tween, {crit…}, offset, scale)`.
+- Rationale: 사용자 2026-09-18 "10000000이 1000만으로 뜨는 기본 데미지 스킨(유닛) 있을 것" → 처음엔 캐시 4개만 보고 "없다"고 했다가 틀림. 사용자가 피커에서 눌러 본 208번이 캐시에 남아 확인. **API로 못 세는 리소스는 "확인한 범위에선 없음"으로만 말할 것.**
+- Rule: `maker_execute_script`의 서버 실행 인자는 `context = "server_main"`(`execSpace`가 아님 — 잘못 주면 조용히 클라에서 돈다). Maker UI 자동화(마우스 이동·클릭)는 사용자 데스크톱을 가로채므로 하지 않는다 — 2026-09-18 사용자 게임 창 위에 클릭이 들어간 사고. 읽기 전용 화면 캡처(`System.Drawing.CopyFromScreen`)는 무해.
+
+## CostumeManager 커스텀 슬롯은 비우지 않으면 남는다
+- Rule: 유닛 외형을 세트(Skin 0) → 월드 아바타(Skin 1, `UseCustomEquipOnly=false` + `DefaultEquipUserId`)로 바꿀 때 `CustomLongcoat/Shoes/Hair`뿐 아니라 **`CustomCapEquip`·`CustomFaceAccessoryEquip`·`CustomFaceEquip`도 ""로** 비워야 유저 본인 모자·얼굴이 나온다(2026-09-18 보우마스터 깃털 모자가 남아 있던 버그). 무기만 직업 것으로 유지. 캐시 무기(01703xxx·cashweapon49 등)는 afterImage가 검/폭발이라 공격 연출과 겹침 → 진짜 무기로: DK 타임리스 알슈피스 `164067c8…`, 보우마스터 타임리스 엔가우 `9e8fe977…`(afterImage bow).
+
+## 원작 클립 프레임은 (ox 왼쪽에서, oy **아래**에서) px 원점을 엔티티 위치에 맞춰 그린다 — 원점·프레임 시간은 .win.mod에서 읽을 수 있다
+- Rule: MSW SpriteRenderer는 메이플 클립의 각 프레임을 **원점 기준**으로 놓는다(중앙 정렬이 아님). 스프라이트 캐시 `<xx>-sprite/<yy>/<guid>.win.mod` 헤더 = `14 0a 10 <guid> 10 01 <len> 08 <w> 10 <h> 1a <len> 08 <ox> 10 <oy>`(varint, 음수는 10바이트) — oy는 **바닥에서** 위로 px. oy ≈ 0~20 = 땅에 서는 그림(아이스 스트라이크 기둥 11, 썬더볼트 hit 19 = 타격점), 큰 양수 = 몸 중심(2221012 결정 123), 음수 = 원점 위에 떠 있음(블리자드 tile −118 → 링이 2유닛 위). ox가 폭의 79%면 그림이 원점 왼쪽으로 뻗는다(2221012 결정 → assetFacesLeft + feetDx 0.9로 정중앙). 프레임마다 크기가 달라도 원점 기준이라 튀지 않는다. 클립 `<xx>-animationclip/<yy>/<ruid>.win.mod`의 프레임 메시지(`0a <len>`)에서 field 2 f32 = 그 프레임 시간(초) — 합이 클립 길이(예: 아이스 스트라이크 0.66, 제네시스 tile 1.9~3.1 + 빈 꼬리 프레임 0.7~2.1초). 타격 타이밍(hitDelay)·표식 수명은 이걸로 계산. 마지막 빈 꼬리 프레임이 길면 `SpriteAnimPlayerEndFrameEvent`가 그 프레임 시작에 와서 일찍 지워진다(원하면 markLife로).
+- 정렬: 아바타 Body/Face 스프라이트는 **"Default" 레이어 order 0**(SpawnUnit의 `ar.OrderInLayer = 200`은 클라에서 0으로 읽힘) → 캐릭터 뒤 이펙트는 같은 레이어 order 음수(`PlayBack` −10), 위는 250(몸 덧그림)·300(이펙트)·330(표식). 몬스터는 MapLayer0 200이라 Default 이펙트가 항상 위.
+- 실측 방법(2026-09-18): 프레임 sprite GUID를 `SpriteRUID`로 스폰하고 옆에 표식(스나이핑 조준 0c76a3bd… 0.35배)을 같은 자리에 놓아 스크린샷 — 원점 위치가 바로 보인다. 연출 확인은 **슬로모 미리보기**: 시험대 루프를 `StopLoop`으로 멈추고 클라에서 `PlayCast(unit, no, fxCopy, target, targets)`(fx 복사본에 clipLife·markLife 60, sound nil) 직후 `mapRoot:GetChildComponentsByTypeName("SpriteRendererComponent")` 중 이름 `RtsFx*/RtsMark*/RtsBeam*`의 `PlayRate = 0.05` → 1초 연출이 20초로 늘어나 스크린샷(도구 지연 1~2초)으로 잡힌다. 몬스터 타격 클립(`RtsHitFx_*`)은 1초 뒤 지워지는 타이머가 있어 슬로모가 안 먹음.
+- Scope: project
+- Rationale: 2026-09-18 블리자드 tile이 위로 떠 보이고, 2221012 결정이 캐릭터 등 뒤에 그려진 원인 = 원점. 스크린샷 도구 지연으로 1초 연출을 못 잡아 헤맴 → 슬로모로 해결
+- CLAUDE.md application: not needed(non-code 절차)
+- Priority: takes precedence over defaults
+
+## 흰 사각 스프라이트 바(체력바)는 Scale로 늘린다 — TiledSize는 안 먹고, 자식은 부모 스케일을 나눠야 세계 크기가 고정된다
+- Rule: `RtsHudLogic.WhiteRUID`(47b5e516…)를 `SpriteRendererComponent.SpriteRUID`로 쓰면 ≈0.08유닛(스케일 10 → 0.8유닛 실측) 사각. `DrawMode = Tiled` + `TiledSize`는 이 스프라이트에 효과 없음(점만 그려짐) → `TransformComponent.Scale = (W/0.08, H/0.08)`. 몬스터 자식 엔티티(`SpawnByModelId(..., parent)`, 로컬 Position/Scale)로 붙이면 따라다니지만 부모 스케일(2.5)이 곱해지므로 로컬 = 세계 값 ÷ 부모 스케일 → 몬스터 크기가 달라도 같은 폭(사용자 "체력바 크기 통일, 보스만 길게"). 채움은 중심 기준이라 왼쪽 정렬 = Position.x −(W−w)/2. 상태 아이콘(빙결)은 HitComponent 박스 우측 위(ColliderOffset + BoxSize/2 + 여유)에 자식으로, 스킬 아이콘 sprite(32px → 로컬 0.8 × 부모 2.5 ≈ 0.64유닛)를 쓰면 딱 보인다. 색 틴트는 `sr.Color`(빙결 0.55/0.8/1) — 피격 번쩍임이 되돌릴 색은 `RestColor()`로 상태에 따라.
+- Scope: project
+- Rationale: 실측 2026-09-18 몬스터 체력바·빙결 표시 구현
+- CLAUDE.md application: not needed
+- Priority: takes precedence over defaults
+
+## 아바타 ActionStateChangedEvent — 같은 프레임에 두 번 보내면 뒤 액션이 늦거나 무시된다 / PlayRate로 슬로모 캡처
+- Rule: **같은 액션은 끝난 뒤 다시 보내도 재생되지 않는다**(팔라딘 실측 2026-09-19 — Onetime이 끝나면 화면은 이전 Loop 자세(stand2)로 돌아가지만 상태는 그 액션). 사이에 stand를 보내야 하며 stand→액션 간격 0.05초는 무시, 0.15~0.2초는 재생. 같은 프레임에 두 이벤트를 보내면 뒤 것이 늦거나 무시. 그래서 `RtsSkillFxLogic.PlayMotion`은 (1) 다른 액션이면 바로 보내고, (2) 같은 액션이면 stand → 0.15초 뒤, (3) 액션이 끝나는 시각(0.45초 ÷ motionRate)에 `ReturnStand`로 stand를 보내 `LastMotion`을 stand로 만들어 다음 공격이 지연 0으로 재생되게 한다. `ActionStateChangedEvent` 세 번째 인자 = 재생 속도(`fx.motionRate`): 0.56이면 0.44초 swing이 0.78초 — 클립 길이에 모션을 맞추는 수단. 세 번째 인자 playRate 0.1로 액션을 느리게 재생하면 스크린샷 1장으로 자세를 잡을 수 있다(모션 캡처 절차).
+- Scope: project
+- Rationale: 사용자 2026-09-19 "스킬 애니메이션이 먼저 나오고 캐릭터가 늦게 따라가서 싱크가 안 맞고 팔이 여러 개처럼 겹쳐 보임" — 원인이 stand+액션 동시 전송과 클립 종료 시 stand 강제 복귀(0.78초, 2타 stabT1은 0.95초까지)였음.
+- Priority: takes precedence over defaults
+
+## 이펙트에 무기가 그려진 스킬은 시전 중 캐릭터 무기를 숨긴다 (hideWeapon)
+- Rule: 원작 스킬 이펙트 중엔 검·창 같은 무기 그림이 이펙트 안에 들어 있는 것이 있다(레이징 블로우 1121008/effect — 금색 대검). 이런 스킬은 캐릭터의 실제 무기가 옆에 따로 튀어나와 어색하므로 fx에 `hideWeapon = true`(+ `hideWeaponSec`, 없으면 clipLife → 0.9)를 주면 `RtsSkillFxLogic.HideWeapon`이 `AvatarRendererComponent:SetAvatarPartColor(MapleAvatarItemCategory.TwoHandedWeapon/OneHandedWeapon, 1,1,1, 0)`로 무기 파츠를 투명하게 하고 `ShowDefaultWeaponEffects = false`로 무기 잔상(노란 궤적)도 끈다. 한손/두손 구분은 `GetCostume(jobId).weapon1h`. 연속 공격 중엔 복구 타이머를 매 시전마다 미뤄 깜빡이지 않고, 공격이 끊긴 뒤 hideWeaponSec 지나면 alpha 1·잔상 on으로 복구(`HideTimer[unit.Id]`).
+- Scope: project
+- Rationale: User 2026-09-19 — "캐릭터의 기본 칼이 저 레이징 블로우 애니메이션에 가려지는 게 맞는 것 같아" → 적용 후 "지금 딱 좋아. 스킬 애니메이션 발동 시 무기 가림 처리 필요한 것도 나중에 있을 수 있겠네, 메모리에 적어놔". 새 스킬 이펙트를 등록할 때 클립 썸네일에 무기 그림이 있으면 hideWeapon 후보로 검토.
+- Priority: takes precedence over defaults
+
+## 파티 버프는 서버 전투에도 적용해야 한다 — GetBuffsFor를 ClientOnly로 두면 실전 크리 0%
+- Rule: RtsUnitBuffLogic.GetBuffsFor/ApplyToStat은 서버(RtsCombatLogic.DoAttack)와 클라(팝업) 양쪽에서 부른다. 유닛 조회는 ClientOnly인 RtsUnitLogic.GetZoneUnit 대신 RtsUnitBuffLogic.UnitAt(엔티티 경로 조회, ExecSpace 없음). DoAttack은 `GetStat → ApplyToStat(buffs) → CalcStat` 순으로 버프 반영 st를 쓴다(Calc()는 기본값만).
+- Scope: project
+- Rationale: 2026-09-19 사용자 "DK 샤프아이즈로 크확 20%인데 크리가 안 뜬다" — 팝업은 버프 반영값(20%)을 보여줬지만 서버 DoAttack은 Calc(기본값, 크리 0%)로 굴려 크리가 한 번도 안 났다. 수정 후 벤치에서 분홍 크리 스킨(1705 vs 836) 확인.
+- Priority: takes precedence over defaults

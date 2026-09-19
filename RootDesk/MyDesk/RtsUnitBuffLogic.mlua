@@ -1,6 +1,6 @@
 -- Phase 5 #19·#20 (부분, 2026-09-16): 유닛 간 파티 버프 — 캐릭터 밑 아이콘 + 유닛 정보 팝업의 "적용 중인 버프".
 --   버프는 동기화된 RtsUnitComponent 값(직업·레벨·칸·BondNo)만으로 클라가 계산한다(서버 상태 없음).
---   정의 = .info/character.md의 "모든 유닛 / 주변 n타일 / 유닛 1개 지정" 스킬. 시전자 자신도 포함(결속 제외) —
+--   정의 = .info/character.md의 "모든 유닛 / 주변 n타일 / 유닛 1개 지정" 스킬. 시전자 자신도 포함(홀리 유니티 제외) —
 --   그래서 RtsJobTableLogic.GetStatRaw에는 파티 버프를 넣지 않는다(이중 적용 방지).
 --   합산 규칙(damage.md): 최종 데미지는 서로 곱, 크리 확률·크리 데미지는 각각 합. 같은 버프(id)는 출처가 여럿이어도 1개만.
 @Logic
@@ -24,15 +24,15 @@ script RtsUnitBuffLogic extends Logic
 
 	-- ===== 정의 =====
 
-	-- id 같으면 중복 적용 안 함. scope: all(구역 전체) / target(BondNo 지정 유닛) / near(주변 range칸, 대각선 포함)
+	-- id 같으면 중복 적용 안 함. scope: all(구역 전체, 자신 포함) / target(BondNo 지정 유닛) / near(주변 range칸, 대각선 포함, 자신 제외 — 지금은 안 씀; 프레이는 2026-09-19부터 all)
 	--   fin 최종 데미지 +% / crit 크리 확률 +% / critDmg 크리 데미지 +%. 아이콘은 메이플 원작 스킬 아이콘 RUID
 	method table GetDefs()
 		return {
-			{ id = "bond", name = "결속", job = "paladin", lv = 40, scope = "target", icon = "e4b1179780154997a33a1ea985acefd0", fin = 20 },
+			{ id = "bond", name = "홀리 유니티", job = "paladin", lv = 40, scope = "target", icon = "53a38855164a4b64accf68785761c283", fin = 20 },
 			{ id = "sharpeyes", name = "샤프아이즈", job = "bow", lv = 40, scope = "all", icon = "4cd1961bc55b47cb80e1a7f8843e225e", crit = 20, critDmg = 20 },
 			{ id = "sharpeyes", name = "샤프아이즈", job = "marks", lv = 20, scope = "all", icon = "4cd1961bc55b47cb80e1a7f8843e225e", crit = 20, critDmg = 20 },
-			{ id = "pray", name = "프레이", job = "bishop", lv = 30, scope = "near", range = 1, icon = "39b3159efcc74334b875c94c64a74243", fin = 15 },
-			{ id = "joker", name = "조커: 날카로운 검", job = "phantom", lv = 10, scope = "all", icon = "f1575f7842c740a49f9e19c2514de64e", fin = 5 },
+			{ id = "pray", name = "프레이", job = "bishop", lv = 30, scope = "all", icon = "39b3159efcc74334b875c94c64a74243", fin = 10 }, -- 2026-09-19: 주변 1타일·자신 미적용 → 구역 전체(자신 포함)·+10%
+			{ id = "joker", name = "조커: 날카로운 검", job = "phantom", lv = 10, scope = "all", icon = "f1575f7842c740a49f9e19c2514de64e", fin = 3 }, -- 2026-09-19 3차: 5 → 3
 		}
 	end
 
@@ -55,16 +55,24 @@ script RtsUnitBuffLogic extends Logic
 
 	-- ===== 계산 =====
 
+	-- 구역 zone의 유닛 no의 상태 컴포넌트 — 서버·클라 어디서든(엔티티 경로 조회). 2026-09-19: 전투(서버)도 버프를 써야 해서 ClientOnly인 RtsUnitLogic.GetZoneUnit 대신
+	method any UnitAt(number zone, number no)
+		if zone < 1 then return nil end
+		local e = _EntityService:GetEntityByPath("/maps/RtsMap/" .. _RtsUnitLogic:UnitName(zone, no))
+		if e == nil or not isvalid(e) then return nil end
+		return e.RtsUnitComponent
+	end
+
 	-- 구역 zone의 유닛 no에 걸린 버프 목록: { def, srcNo, srcJob, srcLevel }. 출처 유닛 번호 순, id 중복 제거(출처는 화면에 안 씀)
-	@ExecSpace("ClientOnly")
+	--   서버(RtsCombatLogic.DoAttack — 실제 크리·최종 데미지)와 클라(팝업·발 아래 아이콘) 둘 다 부른다
 	method table GetBuffsFor(number zone, number no)
 		local out = {}
 		local seen = {}
-		local me = _RtsUnitLogic:GetZoneUnit(zone, no)
+		local me = self:UnitAt(zone, no)
 		if me == nil then return out end
 		local defs = self:GetDefs()
 		for srcNo = 1, _RtsUnitLogic:GetMaxUnits() do
-			local src = _RtsUnitLogic:GetZoneUnit(zone, srcNo)
+			local src = self:UnitAt(zone, srcNo)
 			if src ~= nil then
 				for i = 1, #defs do
 					local d = defs[i]
@@ -81,12 +89,13 @@ script RtsUnitBuffLogic extends Logic
 	method boolean InScope(table def, any src, any me)
 		if def.scope == "target" then return src.BondNo == me.No end
 		if def.scope == "near" then
+			if src.No == me.No then return false end
 			return _RtsZoneLogic:CellDistance(src.Col, src.Row, me.Col, me.Row) <= def.range
 		end
 		return true
 	end
 
-	-- 능력치 표(RtsJobTableLogic.GetStat 결과)에 버프 반영. 최종 데미지는 곱, 크리는 합(확률 상한 100)
+	-- 능력치 표(RtsJobTableLogic.GetStat 결과)에 버프 반영. 최종 데미지는 곱, 크리는 합(확률만 상한 100, 크리 데미지는 상한 없음)
 	method void ApplyToStat(table st, table buffs)
 		for i = 1, #buffs do
 			local d = buffs[i].def

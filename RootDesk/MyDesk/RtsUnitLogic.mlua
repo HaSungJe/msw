@@ -163,7 +163,7 @@ script RtsUnitLogic extends Logic
 		return v
 	end
 
-	-- 시범 편성(아티팩트 v27과 동일): 1. 히어로 Lv12 / 2. 팔라딘 Lv40(결속 → 1) / 3. 다크나이트 Lv20. 영입(Phase 5 #18)이 생기면 제거
+	-- 시범 편성(아티팩트 v27과 동일): 1. 히어로 Lv12 / 2. 팔라딘 Lv40(홀리 유니티 → 1) / 3. 다크나이트 Lv20. 영입(Phase 5 #18)이 생기면 제거
 	@ExecSpace("ServerOnly")
 	method void EnsureDemoUnits(string userId, number zone)
 		if self.UnitsByUser[userId] ~= nil then return end
@@ -173,10 +173,17 @@ script RtsUnitLogic extends Logic
 		self:SpawnUnit(userId, zone, 1, "hero", 12, 13, 7)
 		self:SpawnUnit(userId, zone, 2, "paladin", 40, 6, 3)
 		self:SpawnUnit(userId, zone, 3, "dk", 20, 5, 9)
+		-- 2026-09-18 시험대용 4번 = 보우마스터(폭풍의 시), 5번 = 신궁(피어싱·스나이핑)
+		self:SpawnUnit(userId, zone, 4, "bow", 30, 4, 6)
+		self:SpawnUnit(userId, zone, 5, "marks", 30, 5, 6)
+		-- 6번 = 썬콜(체인 라이트닝·블리자드), 7번 = 불독(포이즌 리전·도트 퍼니셔), 8번 = 비숍(엔젤레이·제네시스) — 모두 Lv30(두 번째 액티브까지)
+		self:SpawnUnit(userId, zone, 6, "il", 30, 9, 5)
+		self:SpawnUnit(userId, zone, 7, "fp", 30, 10, 5)
+		self:SpawnUnit(userId, zone, 8, "bishop", 30, 10, 9)
 		local pal = self:GetUnit(userId, 2)
 		if pal ~= nil then pal.RtsUnitComponent.BondNo = 1 end
 		self:OnChanged(0, self.DemoMeso, userId)
-		log("RtsUnit: demo units x3 for zone " .. tostring(zone))
+		log("RtsUnit: demo units x8 for zone " .. tostring(zone))
 	end
 
 	-- 유닛 엔티티 = MapObject + AvatarRenderer + CostumeManager(직업 세트) + TouchReceive + RtsUnitComponent. 스케일 2 = 칸 80px
@@ -193,6 +200,16 @@ script RtsUnitLogic extends Logic
 		e:AddComponent("CostumeManagerComponent")
 		local touch = e:AddComponent("TouchReceiveComponent")
 		if touch ~= nil then touch.AutoFitToSize = true end
+		-- 공격(Phase 3): 확장 AttackComponent + 데미지 스킨 형식(숫자는 몬스터의 DamageSkinSpawner가 그림)
+		e:AddComponent("RtsUnitAttackComponent")
+		local skin = e:AddComponent("DamageSkinSettingComponent")
+		if skin ~= nil then
+			-- 스킨 = 메이플 기본 데미지 스킨(RtsCombatLogic.DamageSkinId). 카메라 줌 30%라 기본 크기는 안 보인다(사용자 2026-09-17 "너무 작음") → 배율 RtsCombatLogic.DamageSkinScale. Default 트윈은 흔들려 보여 Blade(같은 자리에서 위로)
+			skin.DamageSkinId = DataRef(_RtsCombatLogic.DamageSkinId)
+			skin.DamageSkinScale = Vector2(_RtsCombatLogic.DamageSkinScale, _RtsCombatLogic.DamageSkinScale)
+			skin.TweenType = DamageSkinTweenType.Blade
+			skin.DelayPerAttack = 0.08
+		end
 		e.TransformComponent.Scale = Vector3(2, 2, 1)
 		local u = e:AddComponent("RtsUnitComponent")
 		u.Owner = userId
@@ -203,6 +220,7 @@ script RtsUnitLogic extends Logic
 		u.Skin = 0
 		u.Col = col
 		u.Row = row
+		u.SkillLocks = _RtsJobTableLogic:DefaultLocks(jobId)
 		u:ApplyLook()
 		self.UnitsByUser[userId][no] = e
 		return e
@@ -293,7 +311,7 @@ script RtsUnitLogic extends Logic
 		self:OnChanged(no, meso - cost, userId)
 	end
 
-	-- 대상 지정(결속): 대상 지정 스킬을 가진 직업·레벨이어야 하고, 대상은 내 다른 유닛 또는 0(미지정). 바꾸면 3분 쿨
+	-- 대상 지정(홀리 유니티): 대상 지정 스킬을 가진 직업·레벨이어야 하고, 대상은 내 다른 유닛 또는 0(미지정). 바꾸면 3분 쿨
 	@ExecSpace("Server")
 	method void RequestBond(number no, number targetNo)
 		local userId = senderUserId
@@ -308,6 +326,38 @@ script RtsUnitLogic extends Logic
 		if u:BondCoolLeft() > 0 then return end
 		u.BondNo = targetNo
 		u.BondReadyAt = _UtilLogic.ServerElapsedSeconds + self.CooldownSec
+		self:OnChanged(no, self:GetMeso(userId), userId)
+	end
+
+	-- 액티브 스킬 잠금 설정(2026-09-16): 획득한 액티브 스킬만, mode 0 사용 / 1 보스전 잠금 / 2 잠금. 쿨타임 없음. 영구 잠금(3)인 스킬은 못 바꾸고, 3으로 바꿀 수도 없다
+	@ExecSpace("Server")
+	method void RequestSkillLock(number no, number idx, number mode)
+		local userId = senderUserId
+		local e = self:GetUnit(userId, no)
+		if e == nil then return end
+		if mode ~= 0 and mode ~= 1 and mode ~= 2 then return end
+		local u = e.RtsUnitComponent
+		local skills = _RtsJobTableLogic:GetSkills(u.JobId)
+		local k = skills[idx]
+		if k == nil or k.kind ~= "액티브" or u.Level < k.lv then return end
+		local cur = _RtsJobTableLogic:GetLock(u.SkillLocks, idx)
+		if cur == 3 or cur == mode then return end
+		u.SkillLocks = _RtsJobTableLogic:SetLock(u.SkillLocks, idx, mode)
+		self:OnChanged(no, self:GetMeso(userId), userId)
+	end
+
+	-- 영구 잠금(프리즘 증강 "영구적 잠금" — 광전사의 드래곤 로어, 일격필살의 피어싱, 나도 던진다!의 새비지 블로우·메소 익스플로전).
+	--   증강 시스템(Phase 6)이 부른다. 획득 전 스킬도 잠근다(획득해도 잠긴 채). 풀 수 없음
+	@ExecSpace("ServerOnly")
+	method void SetPermaLock(string userId, number no, number idx)
+		local e = self:GetUnit(userId, no)
+		if e == nil then return end
+		local u = e.RtsUnitComponent
+		local skills = _RtsJobTableLogic:GetSkills(u.JobId)
+		local k = skills[idx]
+		if k == nil or k.kind ~= "액티브" then return end
+		if _RtsJobTableLogic:GetLock(u.SkillLocks, idx) == 3 then return end
+		u.SkillLocks = _RtsJobTableLogic:SetLock(u.SkillLocks, idx, 3)
 		self:OnChanged(no, self:GetMeso(userId), userId)
 	end
 

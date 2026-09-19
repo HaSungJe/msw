@@ -1,0 +1,25 @@
+{
+ "source_icons": {
+  "icon": "d998c591786d40cebb85a06b6eed9e6b",
+  "iconmouseover": "20a649456c64426fb226bf61bbce2453"
+ },
+ "mask": {
+  "center": 32,
+  "radius": 26.5,
+  "blur": 0.8
+ },
+ "frames": [
+  "dotorb_01.png",
+  "dotorb_02.png",
+  "dotorb_03.png",
+  "dotorb_04.png"
+ ],
+ "ruids": [
+  "3769c672d4f94a2e9f37b2477ab66d5b",
+  "b0b300d3c83749198c5c146ab1ac5e84",
+  "da5ad791c75e4ef4941d722d39e1f334",
+  "b0b300d3c83749198c5c146ab1ac5e84"
+ ],
+ "loop_sec": 0.12,
+ "scale": 1.25
+}

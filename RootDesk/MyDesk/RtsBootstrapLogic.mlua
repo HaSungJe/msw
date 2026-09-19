@@ -21,6 +21,8 @@ script RtsBootstrapLogic extends Logic
 			userEntity.RtsCameraAnchorComponent:ApplyAssignedZone(zone, userId)
 			-- 영입(Phase 5 #18) 전까지 시범 편성 3기 + 시범 메소
 			_RtsUnitLogic:EnsureDemoUnits(userId, zone)
+			-- Phase 3 시험대(2026-09-17): 순회 정지 + 허수아비 + 유닛 1 자동 공격 (RtsCombatLogic.TestBench)
+			_RtsCombatLogic:SetupTestBench(userId, zone)
 		end
 		self:BroadcastPlayerList()
 	end
