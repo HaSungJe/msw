@@ -21,7 +21,7 @@ script RtsMonsterComponent extends Component
 	@Sync
 	property number Zone = 0
 
-	-- 빙결(블리자드) 끝나는 서버 시각(ServerElapsedSeconds). 이동(#10)이 생기면 이 동안 이동속도 50% — 지금은 클라 파란 틴트만
+	-- 빙결(블리자드) 끝나는 서버 시각(ServerElapsedSeconds). 이 동안 RtsTrackWalkerComponent가 이동속도 × FreezeSlow(0.5), 클라는 파란 틴트 + 결정체 오버레이(SetFrozenFx)
 	@Sync
 	property number FrozenUntil = 0
 
@@ -50,13 +50,25 @@ script RtsMonsterComponent extends Component
 	@Sync
 	property boolean IsBoss = false
 
-	-- 빙결 표시(클라, 몬스터 자식, 피격 박스 우측 위) — 빛나는 눈꽃 클립 21001008/mob(43px, 루프; 사용자 2026-09-18 지정. 이전: 블리자드 스킬 아이콘 a05d1321…)
-	property any FreezeIcon = nil
+	-- 빙결 표시(클라, 몬스터 자식) = 얼음 결정체 아이콘: 원작 2221012/effect 223e1ac7…(얼음 결정이 뭉쳐 결정체가 되는 18프레임 — 0~12 형성, 13~17 부서짐).
+	--   켤 때 0→12를 한 번 돌려 12번(완성된 결정체)에 멈춰 두고, 풀릴 때 13→17(부서짐)을 돌린 뒤 제거. 위치 = 몬스터 정중앙, 체력바 바로 위(머리 위 — 2026-09-20 사용자 "정중앙 머리 위, 지금보다 작게"),
+	--   크기 = 세계 FrozenWorld. 2026-09-20 사용자 "새로 추가된 아이콘을 기존 것의 대체제로" — 이전 표시: 피격 박스 우측 위 빛나는 눈꽃 21001008/mob 21628ca1…(09-18), 그 전 블리자드 스킬 아이콘 a05d1321…
+	property any FrozenFx = nil
 
-	property string FreezeIconRUID = "21628ca112484e70a5cd41a2e9e9cf91"
+	property string FrozenFxRUID = "223e1ac78340484f9a013d7eb81d9982"
+
+	property number FrozenHold = 12
+
+	property number FrozenLast = 17
+
+	-- 결정체 세계 크기(가로 ≈ FrozenWorld 유닛; 원본 결정체 ≈ 250px = 2.5유닛 → 0.7유닛이면 0.28배, 부모 스케일로 나눠 로컬 값). 처음 1.7(몸을 덮는 오버레이)은 사용자 "작게" → 0.7
+	property number FrozenWorld = 0.7
 
 	-- 빙결 갱신 세대(겹쳐 맞으면 마지막 것만 해제)
 	property number FreezeGen = 0
+
+	-- 빙결 중 이동속도 배율(스킬 설명 "이동속도 감소 50%") — RtsTrackWalkerComponent가 FrozenUntil 동안 곱한다(2026-09-20)
+	property number FreezeSlow = 0.5
 
 	method void OnBeginPlay()
 		if self:IsServer() then
@@ -136,40 +148,75 @@ script RtsMonsterComponent extends Component
 		if sr ~= nil then sr.Enable = r > 0 end
 	end
 
-	-- 빙결 아이콘 켜고 끄기(피격 박스 우측 위 — 사용자 2026-09-18 "몬스터 우측 위에 빙결 표시")
+	-- 빙결 오버레이 켜고 끄기. on: 결정체 형성(0→12, 2배속) 후 12번 프레임 유지 / off: 부서짐(13→17) 재생 후 제거.
+	--   프레임 구간(StartFrameIndex·EndFrameIndex)은 **SpriteRUID를 넣은 뒤에** 줘야 남는다(RUID 대입이 구간을 기본값으로 되돌림) — 재생 중 구간을 바꾸면 다음 프레임부터 새 구간으로 넘어가고,
+	--   EndFrameEvent는 구간의 마지막 프레임에서 온다(2026-09-20 프로브: 1…12,E12 → 멈춤 / 13…17,E17 반복)
 	@ExecSpace("ClientOnly")
-	method void SetFreezeIcon(boolean on)
+	method void SetFrozenFx(boolean on)
 		local e = self.Entity
 		if e == nil or not isvalid(e) then return end
+		local old = self.FrozenFx
 		if not on then
-			if self.FreezeIcon ~= nil and isvalid(self.FreezeIcon) then self.FreezeIcon:Destroy() end
-			self.FreezeIcon = nil
+			self.FrozenFx = nil
+			if old ~= nil and isvalid(old) then self:ShatterFrozenFx(old) end
 			return
 		end
-		if self.FreezeIcon ~= nil and isvalid(self.FreezeIcon) then return end
-		local x = 0.3
-		local y = 0.42
-		if e.HitComponent ~= nil then
-			x = e.HitComponent.ColliderOffset.x + e.HitComponent.BoxSize.x / 2 + 0.08
-			y = e.HitComponent.ColliderOffset.y + e.HitComponent.BoxSize.y / 2 + 0.06
-		end
+		if old ~= nil and isvalid(old) then return end
+		local ps = math.abs(e.TransformComponent.Scale.x)
+		if ps < 0.01 then ps = 1 end
+		-- 정중앙(피격 박스 x), 체력바(세계 BarY ± BarH/2) 바로 위에 결정체 중심 — 로컬 값 = 세계 ÷ 부모 스케일
+		local x = 0
+		if e.HitComponent ~= nil then x = e.HitComponent.ColliderOffset.x end
+		local y = (self.BarY + self.BarH / 2 + 0.05 + self.FrozenWorld / 2) / ps
 		local layer = "MapLayer0"
 		local order = 200
 		if e.SpriteRendererComponent ~= nil then
 			layer = e.SpriteRendererComponent.SortingLayer
 			order = e.SpriteRendererComponent.OrderInLayer
 		end
-		local ic = _SpawnService:SpawnByModelId("model://MapObject", "RtsFreezeIcon", Vector3(x, y, 0), e)
-		if ic == nil then return end
-		local sr = ic.SpriteRendererComponent
-		if sr == nil then sr = ic:AddComponent("SpriteRendererComponent") end
-		sr.SpriteRUID = self.FreezeIconRUID
+		local fx = _SpawnService:SpawnByModelId("model://MapObject", "RtsFrozenFx", Vector3(x, y, 0), e)
+		if fx == nil then return end
+		local sr = fx.SpriteRendererComponent
+		if sr == nil then sr = fx:AddComponent("SpriteRendererComponent") end
 		sr.SortingLayer = layer
+		-- 체력바(+5·+6) 위
 		sr.OrderInLayer = order + 8
-		ic.TransformComponent.Position = Vector3(x, y, 0)
-		-- 눈꽃 43px = 0.43유닛 × 로컬 0.65 × 부모 2.5 ≈ 세계 0.7유닛
-		ic.TransformComponent.Scale = Vector3(0.65, 0.65, 1)
-		self.FreezeIcon = ic
+		sr.Color = Color(1, 1, 1, 0.9)
+		sr.PlayRate = 2
+		sr.SpriteRUID = self.FrozenFxRUID
+		sr.StartFrameIndex = 0
+		sr.EndFrameIndex = self.FrozenHold
+		fx.TransformComponent.Position = Vector3(x, y, 0)
+		local sc = self.FrozenWorld / 2.5 / ps
+		fx.TransformComponent.Scale = Vector3(sc, sc, 1)
+		fx:ConnectEvent(SpriteAnimPlayerEndFrameEvent, function(ev)
+			if not isvalid(fx) or sr == nil then return end
+			if self.FrozenFx == fx then
+				-- 결정체 완성(12) → 그 프레임에 멈춘다(Start = End). 이미 멈춰 있으면 건드리지 않는다
+				if sr.StartFrameIndex ~= self.FrozenHold then
+					sr.StartFrameIndex = self.FrozenHold
+					sr.EndFrameIndex = self.FrozenHold
+				end
+			elseif ev.FrameIndex >= self.FrozenLast then
+				-- 부서짐 끝(17) → 한 프레임 뒤 제거(기본 Loop라 안 지우면 13→17을 다시 돈다)
+				_TimerService:SetTimerOnce(function() if isvalid(fx) then fx:Destroy() end end, 0.03)
+			end
+		end)
+		self.FrozenFx = fx
+	end
+
+	@ExecSpace("ClientOnly")
+	method void ShatterFrozenFx(Entity fx)
+		local sr = fx.SpriteRendererComponent
+		if sr == nil then
+			fx:Destroy()
+			return
+		end
+		sr.PlayRate = 1.5
+		sr.StartFrameIndex = self.FrozenHold + 1
+		sr.EndFrameIndex = self.FrozenLast
+		-- 이벤트가 안 오는 경우 대비 상한(5프레임 ÷ 1.5배속 ≈ 0.4초)
+		_TimerService:SetTimerOnce(function() if isvalid(fx) then fx:Destroy() end end, 0.8)
 	end
 
 	@ExecSpace("ServerOnly")
@@ -179,7 +226,7 @@ script RtsMonsterComponent extends Component
 		if self.Hp < 0 then self.Hp = 0 end
 	end
 
-	-- 빙결 sec초(블리자드 1초 — character.md "이동속도 감소 50%"). 서버는 끝 시각만 기록, 전 클라에 틴트
+	-- 빙결 sec초(블리자드 5초 — character.md "이동속도 감소 50%"). 서버는 끝 시각만 기록(걷기 감속은 FrozenUntil로), 전 클라에 틴트·결정체
 	@ExecSpace("ServerOnly")
 	method void Freeze(number sec)
 		self.FrozenUntil = _UtilLogic.ServerElapsedSeconds + sec
@@ -194,13 +241,18 @@ script RtsMonsterComponent extends Component
 		self.FreezeGen = (self.FreezeGen or 0) + 1
 		local gen = self.FreezeGen
 		if not self.Flashing then e.SpriteRendererComponent.Color = self:RestColor() end
-		self:SetFreezeIcon(true)
+		self:SetFrozenFx(true)
 		_TimerService:SetTimerOnce(function()
 			if not isvalid(e) or self.FreezeGen ~= gen then return end
 			self.Frozen = false
-			self:SetFreezeIcon(false)
+			self:SetFrozenFx(false)
 			if e.SpriteRendererComponent ~= nil and not self.Flashing then e.SpriteRendererComponent.Color = self:RestColor() end
 		end, sec)
+	end
+
+	-- 빙결 중인가(서버·클라 공용 — 걷기 감속은 서버가 FrozenUntil로 본다)
+	method boolean IsFrozenNow()
+		return self.FrozenUntil > _UtilLogic.ServerElapsedSeconds
 	end
 
 	-- 번쩍임이 끝났을 때 돌아갈 색(빙결 중이면 옅은 파랑)
@@ -227,7 +279,10 @@ script RtsMonsterComponent extends Component
 		end
 		if fx == nil then return end
 		if fx.hitSound ~= nil and fx.hitSound ~= "" then _SoundService:PlaySound(fx.hitSound, 1) end
-		if fx.hitClip == nil or fx.hitClip == "" then return end
+		-- hitClips = {…}: 타격마다 무작위 1개(조커 — 원작 hit/0·1·2 세 색). 없으면 hitClip
+		local clip = fx.hitClip
+		if fx.hitClips ~= nil and #fx.hitClips > 0 then clip = fx.hitClips[math.random(1, #fx.hitClips)] end
+		if clip == nil or clip == "" then return end
 		local mapRoot = _EntityService:GetEntityByPath("/maps/RtsMap")
 		if mapRoot == nil then return end
 		local p = e.TransformComponent.WorldPosition
@@ -239,7 +294,7 @@ script RtsMonsterComponent extends Component
 		if hs == nil then hs = h:AddComponent("SpriteRendererComponent") end
 		hs.SortingLayer = "Default"
 		hs.OrderInLayer = 320
-		hs.SpriteRUID = fx.hitClip
+		hs.SpriteRUID = clip
 		h.TransformComponent.Scale = Vector3(s, s, 1)
 		-- 클립은 기본 Loop라 마지막 프레임 진입 이벤트에서 한 프레임 뒤 제거 (msw-engine 메모)
 		h:ConnectEvent(SpriteAnimPlayerEndFrameEvent, function(ev)

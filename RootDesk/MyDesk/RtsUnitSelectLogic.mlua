@@ -45,7 +45,9 @@ script RtsUnitSelectLogic extends Logic
 	@ExecSpace("ClientOnly")
 	method number UnitAtScreen(Vector2 screen)
 		local w = _UILogic:ScreenToWorldPosition(screen)
-		for no = 1, _RtsUnitLogic:GetMaxUnits() do
+		local nos = _RtsUnitLogic:ListZoneUnits(_RtsUnitLogic:MyZone())
+		for i0 = 1, #nos do
+			local no = nos[i0]
 			local u = _RtsUnitLogic:GetMyUnit(no)
 			if u ~= nil then
 				local p = u.Entity.TransformComponent.WorldPosition

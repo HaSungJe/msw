@@ -36,19 +36,20 @@ script RtsConfigLogic extends Logic
 	property number CameraViewHeight = 24
 
 	-- 그리드 트랙 (아티팩트 v16). 1유닛 = 45px(1920/42.66) → 칸 80px = 16/9 유닛
-	--   그리드 좌상단 = 구역 중앙 + (GridLeft, GridTop)  ← 목업 OX=300px, OY=80px
-	--   행(row)은 위에서 아래로 센다(목업과 동일)
-	property number GridCols = 18
+	--   2026-09-20 사용자: 18×12 → **16×13**(우측 2열 삭제로 좌우 대칭, 아래 1행 추가). 그리드 폭 28.44 = 뷰 42.66 − 여백 7.11×2 → GridLeft = −14.22.
+	--   높이 23.11 = 뷰 24 − 위아래 0.44씩 → GridTop = 11.56("위에 남는 공간 활용해 위로 살짝 당김"). 텍스처 1280×1040은 tools/gen-track-grid.js
+	--   그리드 좌상단 = 구역 중앙 + (GridLeft, GridTop). 행(row)은 위에서 아래로 센다
+	property number GridCols = 16
 
-	property number GridRows = 12
+	property number GridRows = 13
 
 	property number GridCell = 1.7777778
 
-	property number GridLeft = -14.6666667
+	property number GridLeft = -14.2222222
 
-	property number GridTop = 10.2222222
+	property number GridTop = 11.5555556
 
-	-- 그리드 텍스처 1440×960(PPU 100 = 14.4×9.6유닛) → 32유닛 폭에 맞추는 스케일
+	-- 그리드 텍스처 1280×1040(PPU 100 = 12.8×10.4유닛) → 28.44유닛 폭(16칸)에 맞추는 스케일(칸 80px → 1.7778유닛이면 항상 2.2222)
 	property number GridTextureScale = 2.2222222
 
 	method number GetZoneCols()

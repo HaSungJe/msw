@@ -17,7 +17,7 @@ MSW(Maker 26.7) 실측으로 확인한 엔진 동작. 다시 실측하면 30분�
 - Priority: takes precedence over defaults
 
 ## 스프라이트 애니메이션 끝은 SpriteAnimPlayerEndFrameEvent로 잡는다
-- Rule: SpriteRenderer에 클립을 넣으면 기본 Loop라 `SpriteAnimPlayerEndEvent`는 **오지 않는다**. 1회 재생 후 제거하려면 `SpriteAnimPlayerEndFrameEvent`(마지막 프레임 진입)를 받고 한 프레임 뒤 Destroy. `StartFrameIndex/EndFrameIndex`로 구간 재생, `PlayRate`로 배속. `PlayRate=0`은 렌더 자체가 안 됨(정지 프레임은 Start=End 같은 값으로). 프레임 길이는 프로브(`SpriteAnimPlayerChangeFrameEvent` + 50ms tick 카운트)로 실측. `wait(0.02)`는 실제로 한 프레임(≈0.034초) 단위로 돈다.
+- Rule: SpriteRenderer에 클립을 넣으면 기본 Loop라 `SpriteAnimPlayerEndEvent`는 **오지 않는다**. 1회 재생 후 제거하려면 `SpriteAnimPlayerEndFrameEvent`(마지막 프레임 진입)를 받고 한 프레임 뒤 Destroy. `StartFrameIndex/EndFrameIndex`로 구간 재생, `PlayRate`로 배속. `PlayRate=0`은 렌더 자체가 안 됨(정지 프레임은 Start=End 같은 값으로). **구간은 SpriteRUID를 넣은 뒤에 줘야 남는다** — RUID 대입이 Start/End를 기본값(0/2147483647)으로 되돌린다(2026-09-20 프로브; 09-18 "카드 클립에 구간이 안 먹음"도 이것). 재생 중 구간을 바꾸면 다음 프레임부터 새 구간, EndFrameEvent는 구간의 마지막 프레임에서(1…12,E12 → Start=End=12로 멈춤 / 13…17,E17 반복 → E17에서 Destroy), ChangeFrameEvent는 1부터 온다. 빙결 결정체(RtsMonsterComponent.SetFrozenFx)가 이 방식(2026-09-20 실측). 프레임 길이는 프로브(`SpriteAnimPlayerChangeFrameEvent` + 50ms tick 카운트)로 실측. `wait(0.02)`는 실제로 한 프레임(≈0.034초) 단위로 돈다.
 - Scope: project
 - Rationale: 실측 2026-09-14 — EndEvent를 기다리다 타임아웃까지 늘어져 사이클이 1.5초가 되고 이펙트가 두 바퀴 돈 원인.
 - CLAUDE.md application: candidate(코드 관련)
@@ -127,4 +127,64 @@ MSW(Maker 26.7) 실측으로 확인한 엔진 동작. 다시 실측하면 30분�
 - Rule: RtsUnitBuffLogic.GetBuffsFor/ApplyToStat은 서버(RtsCombatLogic.DoAttack)와 클라(팝업) 양쪽에서 부른다. 유닛 조회는 ClientOnly인 RtsUnitLogic.GetZoneUnit 대신 RtsUnitBuffLogic.UnitAt(엔티티 경로 조회, ExecSpace 없음). DoAttack은 `GetStat → ApplyToStat(buffs) → CalcStat` 순으로 버프 반영 st를 쓴다(Calc()는 기본값만).
 - Scope: project
 - Rationale: 2026-09-19 사용자 "DK 샤프아이즈로 크확 20%인데 크리가 안 뜬다" — 팝업은 버프 반영값(20%)을 보여줬지만 서버 DoAttack은 Calc(기본값, 크리 0%)로 굴려 크리가 한 번도 안 났다. 수정 후 벤치에서 분홍 크리 스킨(1705 vs 836) 확인.
+- Priority: takes precedence over defaults
+
+## shootF는 활 쏘는 자세(기본 활 잔상까지 그림) — 표창 던지기는 swingO1 + hideWeapon
+- Rule: 아바타 액션 `shootF`는 표창 직업에 써도 활 쏘는 자세가 나오고 무기 슬롯과 무관하게 기본 활 잔상이 그려진다. 표창·투척 연출은 `swingO1`(한손 머리 위→앞)에 `hideWeapon`(잔상·무기 숨김)을 켜서 팔 움직임만 보이게 한다(나이트로드 쿼드러플 스로우 확정). 모션 후보 비교는 Play 중 `_RtsJobTableLogic.FxOverrides["<job>:<i>"] = fx`(client 컨텍스트, maker_execute_script)로 재시작 없이 바꿔 보여준다.
+- Scope: project
+- Rationale: 2026-09-20 사용자 "표창 던지는 모션인데 왜 활이 나오지?" → hideWeapon으로 활은 사라졌지만 "캐릭터 모션이 활쏘기 모션" → swingO1로 교체하니 "지금 좋은데 / 던지기 모션이잖아".
+- Priority: takes precedence over defaults
+
+## 유닛 부속 그림자(분신)는 자식 스프라이트 + 액션 이름 릴레이 — 아바타 복제·any 타입 파라미터 금지
+- Rule: 캐릭터를 따라 움직이는 부속(쉐도우 파트너)은 유닛 엔티티의 자식 MapObject 스프라이트로 만들고, 본체에 ActionStateChangedEvent를 보내는 유일한 통로(RtsSkillFxLogic.SendAction)에서 같은 이름의 클립을 스프라이트에 넣는다(SpriteRUID 교체 + PlayRate). 아바타 부품은 order 0에 그려지므로 뒤에 둘 것은 OrderInLayer 음수. 아바타를 하나 더 붙여 SetColor로 검게 하는 방식은 원작과 다르고(사용자 거부), 서버 메서드 파라미터를 `any cm`으로 받아 CostumeManager 속성을 쓰면 **본체 옷이 안 입혀진다**(타입을 `CostumeManagerComponent`로 명시해야 함 — 2026-09-20 실측).
+- Scope: project
+- Rationale: 2026-09-20 나이트로드 쉐도우 파트너 1차(아바타 복제)에서 본체가 기본 아바타로 보이는 사고 + 사용자 "똑같은 실루엣이면 안 될 것 같은데" → 원작 4111002/special 클립 방식으로 교체.
+- Priority: takes precedence over defaults
+
+## 녹화 영상에서 스킬 사운드 추출 + 사용자 리소스 오디오 업로드는 OGG로(wav·mp3는 msw-mcp 2단계 오류)
+- Rule: 사용자가 준 게임 녹화(mp4)에서 효과음을 뽑을 땐 ffmpeg로 wav 추출 → BGM만 있는 구간(RMS 바닥)을 노이즈 프로파일로 STFT 스펙트럼 게이팅(임계 = 평균 + 2.5σ, 소프트 마스크) → 시전 1회 구간을 잘라 페이드·정규화(스크립트 scratchpad/audio/clean.py, 결과 `assets/audio/<skill>/`). 뒤에 남는 잔음은 끝점을 앞당겨 자른다. **오디오는 OGG(Vorbis)로 올려야 한다** — msw-mcp `asset_create_account_resource_storage_item` 2단계 완료 호출이 wav·mp3(44.1k 모노·48k 스테레오)는 전부 'unexpected error', `.ogg`(libvorbis q5)는 즉시 성공(2026-09-20 실측, 사용자 힌트 "오디오클립 확장자가 아니라서"). ffmpeg `-codec:a libvorbis -q:a 5`로 변환 → PUT(put_upload.py) → 2단계. 결과 파일은 SendUserFile + `assets/` 복사 + reveal_path로 전달.
+- Scope: project
+- Rationale: 2026-09-20 인레이지 레이징 블로우 사운드 — 라이브러리 1120017/hit가 RED 시절 소리라 사용자가 현재 버전 녹화를 제공. BGM 잔량 3%로 정리, 사용자 enrage_sfx2c 확정.
+- Priority: takes precedence over defaults
+
+## 유닛 순회는 1~6 고정이 아니라 RtsUnitLogic.ListZoneUnits(구역 엔티티 스캔)
+- Rule: 구역의 유닛을 도는 코드(버프 출처·아이콘 갱신·클릭 판정·대상 드롭다운·칸 점유)는 `_RtsUnitLogic:ListZoneUnits(zone)`(맵 루트 자식 이름 `Unit<구역>_<번호>` 스캔, 서버·클라 공용, 오름차순)을 쓴다. `GetMaxUnits()`(6)는 영입 상한·HUD 슬롯 수에만 쓴다 — 시험대 7·8번(불독·비숍)이나 초과 영입 유닛이 순회에서 빠지면 안 된다. HUD 슬롯은 아직 6칸 고정(7번 이상은 HUD에 안 뜸).
+- Scope: project
+- Rationale: 2026-09-20 사용자 "불독/비숍은 왜 적용 중인 버프와 아이콘이 표시 안 되지? 유닛 6개까지만 적용되게 해둔 것 같은데 제한 있으면 없애" — GetBuffsFor·RefreshZone이 1~6만 돌아 8번 비숍의 프레이가 아무에게도 안 걸리고 7·8번은 아이콘도 못 받았다.
+- Priority: takes precedence over defaults
+
+## 라이브러리 sprite 원본 PNG는 mod-resource CDN에서 받는다(썸네일 64px 말고)
+- Rule: `asset_get_account_resource_metadata_bulk`의 `files.png.path`(예 `b8-sprite/2d/<ruid>.png.mod`)를 `https://mod-resource.dn.nexoncdn.co.kr/<path>`로 GET하면 .mod 컨테이너가 오고, 그 안의 `PNG…IEND` 구간을 잘라내면 원본 PNG(원 크기)다(스크립트 scratchpad/joker9 fetch). 64px 썸네일(`mod-thumbnail…/<ruid>_64.png`)은 후보 훑기용, 자르기·색 변형·크기 판단은 원본으로. 원본에서 잘라 만든 sprite(카드 1장 등)는 `asset_create_account_resource_storage_item(category sprite, subcategory skill)` 2단계 업로드로 내 리소스가 된다(PNG는 바로 성공).
+- Scope: project
+- Rationale: 2026-09-20 조커 카드 — 썸네일로는 카드 구분이 안 돼 원본을 받아 400041009/screen/3(104×176 카드 덱)을 찾고 분홍 변형을 만들어 올렸다.
+- Priority: takes precedence over defaults
+
+## 유닛에 붙는 지속 연출(loopClip 등)은 유닛 엔티티의 자식으로 스폰한다 — 월드 좌표에 두면 위치 이동 때 남는다
+- Rule: 공격 중 캐릭터에 계속 붙어 있는 연출(`RtsSkillFxLogic.EnsureLoopFx`의 loopClip, 버프 아이콘, 그림자)은 `SpawnByModelId(…, unitEntity)`로 유닛의 자식에 두고 로컬 값은 절반(부모 스케일 2)으로 준다. 유닛의 보는 방향은 아바타 루트 자식의 스케일만 뒤집으므로 유닛 엔티티 자식은 영향 없음 — 반전은 `FlipX`로 직접, 방향이 바뀌면 기존 루프 엔티티의 FlipX·Position만 갱신(`RefreshLoopFacing(key)` — 시전마다 + `RtsUnitComponent.ApplyFace`(FaceDir 동기화)에서도 호출: 시전 RPC가 FaceDir 동기화보다 먼저 올 수 있어 시전 때만 맞추면 한 주기 어긋난다). 루프·모션 상태 표의 키는 `LoopKey(zone, no)` = 구역×100+번호(시전 연출은 전 클라에 오므로 유닛 번호만으론 다른 구역과 겹침). 1회성 연출(clip·투사체·타격)은 월드(mapRoot)에 둬도 된다. 클립 방향 플래그는 반드시 원본 PNG로 정한다(폭풍의 시 keydown = 왼쪽 보기 → loopFacesLeft true; 09-18엔 동기화 타이밍 버그를 플래그로 덮어 반대로 넣었었다).
+- Scope: project
+- Rationale: 2026-09-20 사용자 "조커 애니메이션이 캐릭터 위치 이동해도 안 따라간다" — loopClip을 mapRoot 아래 월드 좌표에 스폰해서 유닛을 옮겨도 제자리에 남았다.
+- Priority: takes precedence over defaults
+
+## 투사체 옵션 확장(2026-09-20): projs 무작위·projArc 포물선 — 그리고 proj 게이트 주의
+- Rule: `RtsSkillFxLogic.SpawnProjectile`은 `projs = {…}`(발마다 차례로 — 라운드 로빈, 순번 키는 **첫 RUID + 개수** 문자열; fx 테이블은 GetSkills가 부를 때마다 새로 만들어져 테이블을 키로 쓰면 매 공격 1번부터 다시 돌아 2색만 나온다)와 `projArc = h`(직선 보간 + 비행 방향에 수직인 4t(1−t)·h 튀어오름, 수직 벡터는 y≥0으로 맞춰 **항상 위로 볼록**(왼쪽으로 날 때 부호가 뒤집히던 것 수정), 발마다 50~100%, `projArcRandom=true`면 위/아래 무작위, `projArcByDist = { 1칸, 2칸, 3칸, 4칸+ }`가 있으면 PlayProjectile이 넘긴 칸 거리(체비쇼프, 반올림)로 고른 값 그대로; 0.03초 타이머로 WorldPosition 갱신, TweenLogic 대신)를 지원한다. **PlayCast의 투사체 게이트는 `proj` 또는 `projs`가 있어야 열린다** — 새 투사체 키를 추가하면 그 게이트(`if ((fx.proj…) or (fx.projs…)) and target`)와 `Preload`에도 넣을 것. 카드처럼 자전(`projSpin`)하는 투사체는 `projNoRotate=true`.
+- Scope: project
+- Rationale: 조커 3차에서 `projs`만 주고 `proj`를 빼자 게이트가 닫혀 "카드가 안 날아가잖아". 포물선은 사용자 요구("포물선 그리면서 날아가야 하는 투사체").
+- Priority: takes precedence over defaults
+
+## 모션 옵션(2026-09-20): motionCycle 순환·motionFrame 프레임 고정 — 그리고 SendAction 인자 수
+- Rule: `fx.motions = {…}, motionCycle = true, motionGap`은 공격이 이어지는 동안 액션을 차례로 반복(RtsSkillFxLogic.CycleTimer, 0.6초 끊기면 CheckLoops가 대기 자세로). `motionLoop` + `motionFrame`/`motionFrameEnd`는 한 액션의 프레임 구간만 루프(ActionStateChangedEvent 5·6번째 인자). `SendAction(body, name, rate, playType, frameA, frameB)`는 6인자라 **모든 호출이 nil, nil까지 넘겨야** 빌드 Error(LEA-1121 인자 수 불일치)가 안 난다. 아바타 액션 전체 목록은 msw 문서 'Controlling Avatar Animations'(35종: stand1/2·walk1/2·alert·prone·proneStab·jump·fly·sit·ladder·rope·dead·heal·blink·swingO1/O2/O3/OF·swingT1/T2/T3/TF·swingP1/P2/PF·stabO1/O2/OF·stabT1/T2/TF·shoot1/shoot2/shootF) — 회전(spin) 액션은 없다.
+- Scope: project
+- Rationale: 조커 캐릭터 모션 — 사용자가 AvatarItem Editor로 35종을 훑고 "마음에 드는 게 없다" → 3종+찌르기 순환으로 확정.
+- Priority: takes precedence over defaults
+
+## 구역 그리드 16×13(2026-09-20) — 칸 수를 바꾸면 5곳을 같이
+- Rule: 그리드 = 16열×13행, 칸 1.7778유닛, `GridLeft −14.2222`(뷰 42.66 폭에 좌우 7.11 여백 = 대칭), `GridTop 11.5556`(위아래 0.44 여백). 텍스처 = `tools/gen-track-grid.js`(COLS/ROWS) → 1280×1040 PNG → 내 리소스 sprite 업로드(PPU 100, `GridTextureScale 2.2222`) → `RtsThemeLogic` 프리셋 gridRUID(헤네시스 `95b3ec9d377e46ecb9d394467d27dada`; 엘나스 `651583e1…`는 아직 18×12). 장식물(`GetHenesysDecor`)은 **좌우 여백에만**(col ≤ −0.6 / ≥ 16.9; 위아래 여백은 0.25칸뿐), 오른쪽 x 18칸 이후는 영입 HUD 밑이라 큰 건물은 8행 아래. 트랙 경로(GetTurnPoints·SEQ)는 최대 14열이라 그대로.
+- Scope: project
+- Rationale: 사용자 "맨 우측 2줄 타일 삭제(좌우 대칭), 맨 아래 한 줄 추가(위 공간 활용해 위로 당김), 타일에 오브젝트 안 겹치게".
+- Priority: takes precedence over defaults
+
+## 공격 루프는 유닛마다(SpawnUnit → StartLoop), 메인 대상은 Focus로 고정 — 규칙 원문 .info/attack.md
+- Rule: 시험대(개발용)는 2026-09-20부터 무적 순회 몬스터 100기(`RtsCombatLogic.BenchMonsters`, RtsTrackWalkerComponent 루프) — 웨이브 #10이 오면 TestBench 코드째 삭제. `RtsUnitLogic.SpawnUnit`·`RequestLevelUp`이 `_RtsCombatLogic:StartLoop`를 걸어 모든 유닛이 각자 공격한다(시험대 UnitNo만 돌던 것 폐기). `RtsCombatLogic.Focus[userId_no]` = 메인 대상 엔티티 — `PickTargets(…, focus)`가 후보 안에 있으면 맨 앞으로 올려 유지, 죽거나(엔티티 소멸·`GetZoneMonsters`가 HP 0 제외) 사거리 밖이면 가장 가까운 적으로. area·dot·spread는 Focus를 안 쓴다. 공격 규칙 문서는 `.info/attack.md`(사용자가 만든 파일 — 룰 바뀌면 여기 갱신).
+- Scope: project
+- Rationale: 2026-09-20 사용자 "유닛이 한 마리만 공격하는데 정상임? 모든 유닛이 개별적으로·자율적으로", "메인 대상은 죽거나 거리 밖으로 나가기 전까지 쭉".
 - Priority: takes precedence over defaults

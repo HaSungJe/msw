@@ -49,6 +49,9 @@ script RtsUnitComponent extends Component
 	@Sync
 	property number FaceDir = -1
 
+	-- 클라: 그림자 분신 스타일 재시도 횟수(엔티티가 늦게 올 때)
+	property number ShadowTries = 0
+
 	method void OnBeginPlay()
 		if self:IsClient() then self:SetupClient() end
 	end
@@ -88,6 +91,38 @@ script RtsUnitComponent extends Component
 		if self.FaceDir > 0 then sx = -1 end
 		local s = root.TransformComponent.Scale
 		if s.x ~= sx then root.TransformComponent.Scale = Vector3(sx, s.y, s.z) end
+		self:ApplyShadow()
+		-- 공격 중 도는 루프 클립(폭풍의 시 keydown·조커 리본)은 유닛 엔티티의 자식이라 아바타 루트 스케일을 안 타므로 따로 반전 — 2026-09-20 사용자 "모든 캐릭터 애니메이션은 보는 방향 따라가야"
+		_RtsSkillFxLogic:RefreshLoopFacing(_RtsSkillFxLogic:LoopKey(self.Zone, self.No))
+	end
+
+	-- 쉐도우 파트너 그림자(서버가 30레벨부터 자식 "Shadow" 스프라이트로 세움 — 원작 4111002/special 검은 실루엣): 등 뒤(보는 방향 반대) 0.22(로컬, 부모 스케일 2라 세계 0.44)에 두고
+	--   본체와 같은 쪽을 보게 뒤집는다(원작 그림은 왼쪽 보기 → 오른쪽 볼 땐 스케일 x −1). 동작은 RtsSkillFxLogic.SendAction이 같은 이름의 그림자 클립으로 따라 보낸다.
+	--   엔티티가 늦게 올 수 있어 없으면 잠시 뒤 다시(최대 8회)
+	@ExecSpace("ClientOnly")
+	method void ApplyShadow()
+		local sh = self.Entity:GetChildByName("Shadow")
+		if sh == nil or not isvalid(sh) then
+			if self.ShadowTries < 8 and (_RtsJobTableLogic:GetStat(self.JobId, self.Level).halfHits or 0) > 0 then
+				self.ShadowTries = self.ShadowTries + 1
+				_TimerService:SetTimerOnce(function() if isvalid(self.Entity) then self:ApplyShadow() end end, 0.5)
+			end
+			return
+		end
+		local back = 0.22
+		local sx = 1
+		if self.FaceDir > 0 then
+			back = -0.22
+			sx = -1
+		end
+		sh.TransformComponent.Position = Vector3(back, 0, 0)
+		local sc = sh.TransformComponent.Scale
+		if sc.x ~= sx then sh.TransformComponent.Scale = Vector3(sx, 1, 1) end
+		local sr = sh.SpriteRendererComponent
+		if sr ~= nil then
+			sr.Color = Color(1, 1, 1, 0.9)
+			if sr.SpriteRUID == "" then sr.SpriteRUID = _RtsSkillFxLogic:ShadowClip("stand1") end
+		end
 	end
 
 	method boolean IsFacingRight()
@@ -109,6 +144,11 @@ script RtsUnitComponent extends Component
 		if name == "FaceDir" then
 			self:ApplyFace()
 			return
+		end
+		if name == "Level" then
+			-- 30레벨 도달 → 서버가 그림자 분신을 세우므로 스타일 적용(엔티티 동기화가 늦을 수 있어 재시도)
+			self.ShadowTries = 0
+			_TimerService:SetTimerOnce(function() if isvalid(self.Entity) then self:ApplyShadow() end end, 0.3)
 		end
 		_RtsUnitBuffLogic:MarkDirty(self.Zone)
 		if not _RtsUnitLogic:IsMine(self.Owner) then return end

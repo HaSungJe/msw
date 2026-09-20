@@ -14,16 +14,17 @@
 
 > 타일셋 파일명·EntryKey는 `CaveFloorTileSet`인 채로 두었습니다(맵이 `tileset://` GUID로 참조 중이라 이름을 바꾸면 참조가 깨집니다). 이름 정리가 필요하면 별도로 요청해 주세요.
 
-## 구역 그리드 트랙 (화면 v2 — 18×12칸, 칸 80px, 1440×960, 투명 배경)
+## 구역 그리드 트랙 (화면 v2 — **16×13칸**, 칸 80px, 1280×1040, 투명 배경. 2026-09-20: 18×12에서 우측 2열 삭제·아래 1행 추가 — 좌우 대칭)
 
-현재 적용: **track-grid**
+현재 적용: **track-grid**(16×13). 이전 18×12는 `track-grid-18x12.png`로 보관
 
 | 파일 | 내용 | 생성기 | RUID | 상태 |
 |---|---|---|---|---|
-| `track-grid.png` | 아티팩트 v17 경로 그대로. 트랙 칸 = 헤네시스 포석 + 연석 + 흰 점선 진행선, 발판 = 흰 반투명 칸(잔디 위), 빈 칸 = 짙은 초록 선, S/E 원 + 글자, E→S 복귀 화살표 | `tools/gen-track-grid.js` | `f8bf4274602c4d22b2e6643e114fbc5f` (ZoneTrackGridHenesys) | **적용 중** |
-| (눈 배경판) | 같은 경로, 회청 선·회청 발판(엘나스 눈 위 용) | `tools/gen-track-grid.js` (색만 다름) | `651583e1c1ee44cdb6d2a891755ab528` (ZoneTrackGrid) | 프리셋 `elnath` |
+| `track-grid.png` | 아티팩트 v17 경로 그대로(16×13). 트랙 칸 = 헤네시스 포석 + 연석 + 흰 점선 진행선, 발판 = 흰 반투명 칸(잔디 위), 빈 칸 = 짙은 초록 선, S/E 원 + 글자, E→S 복귀 화살표 | `tools/gen-track-grid.js` | `95b3ec9d377e46ecb9d394467d27dada` (ZoneTrackGridHenesys16) | **적용 중** |
+| `track-grid-18x12.png` | 이전 18×12 판 | 같은 생성기(COLS 18·ROWS 12) | `f8bf4274602c4d22b2e6643e114fbc5f` (ZoneTrackGridHenesys) | 보관 |
+| (눈 배경판) | 같은 경로, 회청 선·회청 발판(엘나스 눈 위 용) — **아직 18×12**, 다시 쓰려면 16×13 재생성 | `tools/gen-track-grid.js` (색만 다름) | `651583e1c1ee44cdb6d2a891755ab528` (ZoneTrackGrid) | 프리셋 `elnath` |
 
-구역마다 스프라이트 1장(업로드 PPU 30 실측 → 스케일 0.667 = 32×21.33유닛). 경로를 바꾸면 생성기의 `SEQ`와 `RtsZoneLogic.GetTurnPoints`를 같이 고친다.
+구역마다 스프라이트 1장(PPU 100 → 스케일 2.2222 = 28.44×23.11유닛, RtsConfigLogic.GridTextureScale). 경로를 바꾸면 생성기의 `SEQ`와 `RtsZoneLogic.GetTurnPoints`를 같이 고친다. 칸 수를 바꾸면 생성기 COLS/ROWS + RtsConfigLogic GridCols/GridRows/GridLeft/GridTop + 장식물 자리(RtsThemeLogic)도 같이.
 
 ## 구역 트랙 — 스타디움 (폐기, 2026-09-14 화면 v2로 교체)
 

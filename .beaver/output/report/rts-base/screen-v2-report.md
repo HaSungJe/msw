@@ -371,3 +371,92 @@ Play Test(2026-09-14, 콜드 스타트 3회) — `maker_logs(build)` 0건, 런�
 - **결과(50레벨 보스, 브7·실6·골4)**: 프리즘 전 나로 24,293 / 히어로 27,967 / 불독 20,015 / 섀도어 12,070 / 신궁 22,149 / 보우 18,041 / DK 20,092 / 비숍 3,737 / 썬콜 6,340 / 팔라딘 11,895 / 팬텀 93,946. 프리즘 후 나로 123,843 / 히어로 98,402 / 팬텀 93,946 / 불독 87,786 / 섀도어 75,666 / 신궁 62,459 / 보우 53,491 / DK 52,066 / 비숍 46,028 / 썬콜 11,997 / 팔라딘 11,895. 사냥 ×1.15~1.18(신궁 ×0.24·썬콜 ×2.8 예외).
 - **검증**: stop → refresh → save → play 2회, 빌드 Info만, 런타임 에러 없음. DK 벤치에서 분홍 크리 스킨(1705) 확인 — 이전엔 서버 크리 확률 0%.
 - **남은 것**: 증강·프리즘 코드 반영, 영입 중복 금지·프리즘 중복 제외, 도적 3직업 코드 등록. 미커밋.
+
+## Change - 260920-1 · 나이트로드 등록(쿼드러플 스로우 + 쉐도우 파트너 그림자)
+- **요청**: 도적 3직업 스킬 등록 시작 — 나이트로드부터. 진행 중 사용자 지시: 활 자세 → 던지기 모션, 표창 출발 위치 배 앞, 쉐도우 파트너 등 뒤 그림자(원작 4111002 실루엣, 캐릭터가 항상 앞), 표창 = 뇌전수리검, 사거리 2.
+- **변경(코드)**: `RtsJobTableLogic` GetSkillsRaw/GetStatRaw("nl") — 쿼드러플 스로우 110%×4·사거리 2·빠름, 자벨린 마스터리 10/40, 크리 마스터리 20, 쉐도우 파트너 30(`halfHits = 4`), 레디 투 다이 50; fx = swingO1 + hideWeapon + 4121013 effect/hit/sound + 뇌전수리검 bullet 4발(projDx/projDy) + projShadow*(그림자 표창). CalcStat `hitsEff = hits + halfHits×0.5`. `RtsCombatLogic.DoAttack` halfHits 추가 타격(½). `RtsSkillFxLogic` SendAction/ShadowSpriteOf/ShadowClip(33종) + projDx. `RtsUnitLogic.EnsureShadow`(자식 "Shadow" 스프라이트, 30레벨~, 레벨업 시 갱신) + 시험대 3번 = 나이트로드 Lv30. `RtsUnitComponent.ApplyShadow`(등 뒤 0.22·방향 뒤집기·재시도).
+- **버림**: 아바타 복제 그림자(SetColor) — 본체 옷이 안 입혀지는 사고(`any` 파라미터) + 사용자 "똑같은 실루엣이면 안 될 것 같다".
+- **문서**: character.md 나이트로드 자산·규칙, motion.md shootF 실측, balance-detail 사거리 2, 메모리(assets·msw-engine).
+- **검증**: 벤치 Lv30 — 던지기 모션(swingO1) 확인(사용자 "지금 좋은데 / 던지기 모션이잖아"), 199×4 + ½ 110×4, 크리 스킨, 그림자 실루엣이 등 뒤에서 같은 동작, 캐릭터 항상 앞.
+- **남은 것**: 풍마수리검(프리즘) 자산, 섀도어·팬텀 등록. 미커밋.
+
+## Change - 260920-2 · 인레이지 정의·사운드 추출·업로드, 프리즘 스킬 → character.md 이동, 섀도어 프리즘 2개 분리
+- **요청**: 인레이지(히어로 프리즘) 항목 채우기 + 타격 3에 맞춘 밸런스, 원작 녹화에서 인레이지 사운드 추출(BGM 제거·부드럽게), 내 리소스 업로드, 사거리 +1, 나머지 프리즘 스킬을 character.md로 이동하고 augmentation.md는 한 줄로, 섀도어 프리즘을 블레이드 토네이도·카르마 퓨리 2개로 분리(둘 다 = 나로 ×1.10, 비중 55/45).
+- **변경**: character.md — 인레이지(타격 3·사거리 +1·보스 +200%·1120017 자산·추출 사운드 RUID e794c138…) + 10개 프리즘 스킬 항목(홀리 유니티 강화·거대화·설치 딸깍·집중·엘릭서·초월·만능·풍마수리검·블레이드 토네이도·카르마 퓨리, 자산 RUID 포함). augmentation.md — 프리즘 줄 `[직업 전용] X 스킬을 획득한다.` + 이동 안내 헤더, 섀도어 2개(각 보스 +575%, 블토 39%×24·카르마 51%×15). balance-detail 증강 절 재생성(프리즘 새 이름, 섀도어 136,606·히어로 98,564). `assets/audio/enrage/enrage_sfx2c.mp3/.ogg`(BGM 게이팅 제거 + 80Hz HPF·2~4kHz −5.5dB·6.8kHz LPF·피크 −7dB, 5회 청취 조정).
+- **발견**: msw-mcp 오디오 업로드는 **OGG만** 2단계 통과(wav·mp3 실패) — 메모리. 블레이드 토네이도 = 듀블 하이퍼 4341054 확인, 카르마 퓨리 자산은 미확정(후보 기재), 풍마수리검 bullet 미발견.
+- **남은 것**: 카르마 퓨리·풍마수리검 자산 확정, 거대화 연출(스케일 3.0) 확인, 섀도어·팬텀 코드 등록, 프리즘 코드(Phase 6). 미커밋.
+
+## Change - 260920-3 · 섀도어·팬텀 등록, 홀리 유니티 프리즘화, 프리즘 이름 개편, 인레이지 사운드 업로드
+- **변경(코드)**: `RtsJobTableLogic` GetSkillsRaw/GetStatRaw("shad") 새비지 17.5%×8·매우빠름·메소 익스플로전(cd 8) + 대거 마스터리/크마/대거 익스퍼트/레디 투 다이(보스 +30); ("phantom") 조커 385%·0.2초·사거리 5 + 문라이트/프레이 오브 아리아/케인 엑스퍼트/블스아이(크확 50·크뎀 30·방무 100·보스 60·최종 20). 팔라딘 홀리 유니티(40) 삭제, `RtsUnitBuffLogic` bond lv 99·fin 100, 시범 팔라딘 BondNo 해제. 시험대 3번 = 팬텀 Lv30.
+- **문서**: character.md 섀도어·팬텀 자산, 홀리 유니티 프리즘 항목, 애로우 레인/트루 스나이핑/디바인 퍼니시먼트 이름·설명(기존 스킬 잠금 + 신규 스킬, 데미지 동일), 인레이지 사운드 RUID e794c138…(OGG 업로드) + 사거리 +1; augmentation.md 이름; balance-detail 증강 절; 메모리(assets·balance·msw-engine).
+- **검증**: 벤치 섀도어 77×8(크리 108, 붉은 참격 선), 팬텀 1,848(크리 2,842) 0.2초마다. 빌드·런타임 에러 없음.
+- **남은 것**: 프리즘 스킬 자산(사용자 제공 대기), 카르마 퓨리·풍마수리검 자산, 프리즘 코드(Phase 6), 로드맵 갱신. 미커밋.
+
+## Change - 260920-4 · 조커 2차(400041010), 유닛 순회 6기 제한 해제, 팬텀 = 영웅
+- **변경(코드)**: `RtsUnitLogic.ListZoneUnits(zone)` 신설(맵 루트 자식 스캔) → `RtsUnitBuffLogic.GetBuffsFor/RefreshZone`, `RtsUnitLogic.MyUnitAt`, `RtsUnitPopupLogic.ToggleDropdown`, `RtsUnitSelectLogic.UnitAtScreen`이 1~6 대신 실제 유닛 목록을 돈다. `RtsMonsterComponent.PlayHitFx` `hitClips` 무작위 지원(+Preload). 조커 fx: alert 루프 + 24101000 카드 프레임 투사체(0.3초) + 400041010 hit 3종·타격음. `GetJobGroup("phantom")` = "영웅 · 도적", 기본 스킨 이름 "영웅 팬텀". `PlayProjectile`의 SpawnProjectile 호출에 shadow 인자 명시(빌드 LEA-1121 제거).
+- **검증**: BUFFCHECK — units 1~8 열거, 3·7·8번 모두 조커(3)·샤프아이즈(5)·프레이(8) 수신; 화면에서 8기 전부 발 아래 아이콘 3개. 조커 카드가 손 앞에서 대상까지 흐르고 1,934~2,403(프레이 포함). 빌드 Error 0, 런타임 에러 없음.
+- **남은 것**: HUD 슬롯 6칸 고정(7번 이상 미표시) — 초과 영입 설계가 정해지면 확장. 미커밋.
+
+## Change - 260920-5 · 조커 3차(원작 400041009 keydown 리본 + 카드 덱 투사체), loopClip을 유닛 자식으로
+- **변경(코드)**: `RtsSkillFxLogic` — `projs = {…}` 발마다 무작위 투사체(+Preload), `loopOrder`(루프 클립 OrderInLayer, 190 = 아바타 뒤), **EnsureLoopFx가 루프 클립을 mapRoot가 아니라 유닛 엔티티의 자식으로 스폰**(로컬 값 ½, 방향 바뀌면 FlipX·Position만 갱신) — 사용자 "조커 애니메이션이 캐릭터 위치 이동해도 안 따라간다". `RtsJobTableLogic` 조커 fx: alert 루프 + keydown 01eff730… loopClip(0.9배·+0.55·α0.9·뒤) + projs {screen/3 금 덱 74e2716e…, 분홍 덱 0c3d81a6…} 0.6배·자전 720°·2장/공격·0.35초 + hit 3색.
+- **자산**: 내 리소스 업로드 RtsJokerDeckPink `0c3d81a68fe54b20bb1ec72375f0100d`(screen/3 색상환 −60°), 예비 RtsJokerCardGold `d77f86ea…`/RtsJokerCardPink `73d3cffa…`(미사용). 원본 PNG는 `mod-resource.dn.nexoncdn.co.kr/<files.png.path>`의 .mod에서 PNG 구간 추출(메모리 msw-engine).
+- **검증**: 서버 스크립트로 3번을 (11,5)로 옮기자 리본 잔상이 같이 이동, 캐릭터가 리본 앞에 보임, 카드가 대상까지 날아가고 1,974~2,388. 빌드 Error 0, 런타임 에러 없음. 미커밋.
+
+## Change - 260920-6 · 조커 카드 포물선 투사체(projArc) + projs 게이트 버그
+- **버그**: 3차에서 조커 fx를 `projs`만으로 바꾸자 `PlayCast`의 `if fx.proj ~= nil …` 게이트가 닫혀 투사체가 전혀 안 나갔다(사용자 "카드가 안 날아가잖아") → 게이트를 `proj or projs`로.
+- **변경(코드)**: `SpawnProjectile`에 `projArc`(포물선, 발마다 높이 50~100%·위/아래 무작위, 0.03초 타이머) 추가. 조커: 3장/공격(0.06초), 0.4배, 0.4초, projArc 1.0.
+- **검증**: 금·분홍 덱이 손 앞에서 위·아래 포물선을 그리며 튀어 대상에 닿고 hit 3색 스파크. 0.6배는 캐릭터만 해서 0.4배로(FxOverrides로 비교 후 표에 반영). 빌드 Error 0, 런타임 에러 없음. 미커밋.
+
+## Change - 260920-7 · 조커 카드 — 머리 위에서 항상 위로 포물선, 갈색 덱 하나, 회전 없음
+- **변경(코드)**: `SpawnProjectile` projArc의 수직 벡터를 y≥0으로 정규화(왼쪽 사격 때 아래로 튀던 것) + 기본 항상 위(`projArcRandom=true`일 때만 위/아래 무작위). 조커 fx: `proj` = screen/3 금·갈색 덱만, projDx 0·projDy 1.35(머리), projSpin 제거·projNoRotate, 3장·0.4배·projArc 1.0.
+- **근거**: 사용자 "포물선 무조건 캐릭터 머리쪽에서 적으로, 항상 위쪽으로", "카드는 색상 하나로 고정, 갈색", "카드는 회전하지 않고 그대로 날아감".
+- **검증**: 아래 스크린샷. 미커밋.
+
+## Change - 260920-8 · 조커 0.1초·192.5%(DPS 동일), 카드 ×1.3
+- **변경(코드)**: `RtsJobTableLogic` 팬텀 ratio 385 → 192.5, period 0.2 → 0.1, 설명문 갱신; 조커 fx projCount 3 → 2(0.05초), projScale 0.4 → 0.52.
+- **문서**: character.md 조커 설명·자산, balance-detail.md 헤더·요약 표·팬텀 절(표 수치는 DPS 동일이라 그대로), balcalc.py(per 0.1·ratio 1.925), 메모리 balance·assets.
+- **근거**: 사용자 "조커를 0.1초당 1회로 변경, 스킬 데미지 반토막", "카드 크기 1.3배". 미커밋.
+
+## Change - 260920-9 · 조커 카드 4종 라운드 로빈
+- **변경(코드)**: `SpawnProjectile` `projs`를 무작위 → 라운드 로빈(`ProjIdx[fx.projs]`). 조커 fx `projs` = 사용자 지정 4장(400041015/screen/6·400041011/screen/5·400041013/screen/3·400041011/screen/4), 0.55배(원본 스프라이트의 절반이 투명 잔상 테두리라 0.3배는 너무 작음 — FxOverrides 비교 후 확정).
+- **근거**: 사용자 "조커의 투사체를 저 4개 골고루 나가게". 미커밋.
+
+## Change - 260920-10 · 조커 카드 5색(빨강·초록·파랑·검정·노랑) + 포물선 1.4
+- **변경(코드)**: 조커 `projs` = 사용자 지정 5장(400041011/screen/6 · 400041012/screen/5 · 400041014/screen/4 · 400041015/screen/4 · 400041013/screen/5) 라운드 로빈, projArc 1.0 → 1.4, 비행 0.4 → 0.65 → 0.55초 → **0.4초로 원복**(사용자 "너무 답답하네")·hitDelay 0.35.
+- **버그**: 라운드 로빈 순번을 fx.projs 테이블 자체를 키로 기억했는데 GetSkills가 매번 새 테이블을 만들어 공격마다 1·2번(빨강·초록)만 나옴(사용자 "색상 두 개밖에 없는 것 같은데") → 키를 첫 RUID+개수 문자열로. 미커밋.
+
+## Change - 260920-11 · 조커 포물선 높이를 거리별로(1.0/1.1/1.2/1.3)
+- **변경(코드)**: `PlayProjectile`이 대상까지 칸 거리(체비쇼프, 반올림)를 `SpawnProjectile(…, cells)`로 넘기고, `projArcByDist = {…}`가 있으면 그 칸 거리의 높이를 무작위 없이 쓴다. 조커: { 1.0, 1.1, 1.2, 1.3 }.
+- **근거**: 사용자 "포물선 높이는 거리에 따라서 1칸 1.0 / 2칸 1.1 / 3칸 1.2 / 4칸 이상 1.3". 미커밋.
+
+## Change - 260920-12 · 조커 모션 순환(swingOF→swingO1→swingO1→stabO1) — 사용자 확정
+- **변경(코드)**: `RtsSkillFxLogic` `motionCycle`(CycleTimer, CheckLoops 정리), `motionFrame`/`motionFrameEnd`(SendAction 6인자 — 호출부 전부 nil,nil), 조커 fx `motions = { "swingOF", "swingO1", "swingO1", "stabO1" }, motionCycle = true, motionGap = 0.45`.
+
+## Change - 260920-13 · 모든 유닛 자율 공격 + 메인 대상 고정 + attack.md
+- **변경(코드)**: `RtsUnitLogic.SpawnUnit`/`RequestLevelUp` → `StartLoop`; `RtsCombatLogic.Focus` + `PickTargets(…, focus)`; `GetZoneMonsters`가 HP 0 몬스터 제외. 문서 `.info/attack.md`(사용자 파일) 작성 — 루프·스킬 선택·사거리/대상/고정·판정·시험대(개발용, 나중에 삭제).
+- **검증**: 재시작 후 사거리 안 유닛들이 각자 허수아비를 침(불독 지대 89/86, 팬텀 1,732 등), 사용자가 유닛 6기를 허수아비 곁으로 옮겨 동시 공격 확인.
+
+## Change - 260920-14 · 그리드 16×13(우측 2열 삭제·아래 1행 추가·위로 당김) + 장식물 여백 재배치
+- **변경**: `tools/gen-track-grid.js` COLS 16·ROWS 13 → `assets/textures/track-grid.png` 1280×1040(이전 판 `track-grid-18x12.png`), 업로드 `ZoneTrackGridHenesys16 95b3ec9d377e46ecb9d394467d27dada`; `RtsConfigLogic` GridCols 16·GridRows 13·GridLeft −14.2222·GridTop 11.5556; `RtsThemeLogic` 헤네시스 gridRUID 교체, `GetHenesysDecor` 전부 좌우 여백으로(윗줄 덤불·건초 제거, 오른쪽 큰 건물은 HUD 밑 피해 8행 아래). `RtsZoneLogic` 주석, `assets/textures/README.md` 갱신. 엘나스 프리셋 텍스처는 아직 18×12.
+- **검증**: 스크린샷 — 좌우 여백 대칭, 13행 발판 생김, 장식물이 타일과 안 겹침, 유닛 배치·공격 정상. 빌드 Error 0, 런타임 에러 없음. 미커밋.
+
+## Change - 260920-15 · 시험대 = 무적 순회 몬스터 100기
+- **변경(코드)**: `RtsCombatLogic.SetupTestBench` — 고정 허수아비 3기(DummyCol/Row·DummyExtra) 삭제 → `BenchMonsters`(100)기를 `SpawnMonster(무적)` + `RtsTrackWalkerComponent`(t = (i−1)/N, Loop)로 트랙에 고르게 세워 순회. attack.md §5 갱신(개발용, 웨이브 오면 삭제).
+- **검증**: 100기가 트랙을 따라 돌고 8기 전원이 사거리 안 몬스터를 각자 침(포이즌 리전 틱 8x~9x 전 트랙, 근접 유닛 100~500). 빌드 Error 0, 런타임 에러 없음. 미커밋.
+
+## Change - 260920-16 · 루프 클립이 보는 방향을 따라가게(폭풍의 시 keydown) + 루프 키 구역 분리
+- **변경(코드)**: `RtsJobTableLogic` 폭풍의 시 `loopFacesLeft = false → true`(keydown/0~2 원본 PNG 실측: 마법진 왼쪽·날개 오른쪽 = 왼쪽 보기); `RtsSkillFxLogic` `LoopFx[key]` + `RefreshLoopFacing(key)`(반전·위치 재계산) — `EnsureLoopFx`(시전마다)와 `RtsUnitComponent.ApplyFace`(FaceDir 동기화 순간) 양쪽에서 호출; `LoopKey(zone, no)` = 구역×100+번호를 `CastFx`/`PlayBasic`이 PlayCast에 넘김(전 클라 시전 연출이라 유닛 번호만으론 다른 구역과 충돌).
+- **원인**: HEAD까진 루프를 첫 시전 때 한 번만 반전하고 갱신하지 않았고(방향 바뀌면 그대로), 09-18에 FaceDir 동기화가 늦어 반대로 보인 걸 플래그 false로 덮어 실제 그림 방향과 반대가 돼 있었다.
+- **검증**: 재시작 후 보우마스터 (4,4) — FaceDir +1·loopFlip true(날개 뒤·마법진 앞), 이전 (6,4) 오른쪽 볼 때 flip true / 왼쪽 볼 때 false 확인(FACECHECK3·4). 빌드 Error 0. 미커밋.
+- **문서**: character.md 폭풍의 시 루프 항목, 메모리 msw-engine 루프 규칙.
+
+## Change - 260920-17 · 블리자드 타격 클립 + 빙결 결정체 오버레이 + 빙결 이동 50% 감속
+- **변경(코드)**: `RtsJobTableLogic` 블리자드 `hitClip = 2221007/hit/0 99a29e16…`(1.6배 — 광역 4종 전부 몬스터 위 타격 클립); `RtsMonsterComponent` `SetFrozenFx`/`ShatterFrozenFx`(2221012/effect 223e1ac7… 자식 오버레이: 0→12 2배속 형성 → EndFrameEvent(12)에서 Start=End=12 유지 → 풀릴 때 13→17 1.5배속 → E17 뒤 Destroy, 상한 0.8초), `IsFrozenNow`, `FreezeSlow 0.5`, `FrozenWorld 1.7`; `RtsTrackWalkerComponent.OnUpdate` 빙결 중 속도 × FreezeSlow.
+- **실측(프로브)**: SpriteRUID 대입이 StartFrameIndex/EndFrameIndex를 기본값으로 되돌림 → 구간은 RUID 뒤에 설정. 재생 중 구간 변경은 다음 프레임부터 적용, EndFrameEvent는 구간 끝 프레임에서.
+- **검증**: 블리자드 강제 시전 → 15기 빙결 5초 동안 오버레이 st=12/en=12 유지(FRZTICK), 풀린 뒤 잔여 엔티티 0; 서버 FrozenUntil 15/100; 빙결 몬스터 트랙 이동 ≈1.75유닛/초(기준 3.5) = 50%. 스크린샷에 몬스터 위 파란 결정체·눈꽃 확인. 빌드 Error 0. 미커밋.
+- **근거**: 사용자 "얼어붙은 유닛은 스킨도 다르면 좋겠다", "블리자드 타격감 문제" → 선택: 타격 순간 몬스터 위 이펙트(광역 전부) + 결정체 오버레이 + 이동 감속.
+
+## Change - 260920-18 · 빙결 표시 = 결정체 아이콘이 눈꽃 아이콘을 대체(머리 위 정중앙, 세계 0.7)
+- **변경(코드)**: `RtsMonsterComponent` 눈꽃 `SetFreezeIcon`/FreezeIcon/FreezeIconRUID(21628ca1…) 삭제, `ShowFreeze`는 틴트 + `SetFrozenFx`(결정체)만. 결정체는 x = 피격 박스 중심, y = 체력바 위(BarY + BarH/2 + 0.05 + FrozenWorld/2, 로컬 = ÷부모 스케일), 순서 +8, `FrozenWorld` 1.7 → 0.7. `FreezeSlow`·워커 감속, 블리자드 `hitClip`(2221007/hit/0) 유지.
+- **근거**: 사용자 "빙결 결정체가 2종류잖아" → "새로 추가된 아이콘을 기존 것의 대체제로 쓰자, 저게 더 낫다" → "정중앙 머리 위에 나와야 하고 지금보다 작아야 함" → "ㅇㅋ".
+- **검증**: 재시작 후 강제 빙결 — 눈꽃 엔티티 0, 결정체 15/15, 스크린샷에서 체력바 위 정중앙에 작은 파란 결정체. 빌드 Error 0. 미커밋.

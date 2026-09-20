@@ -555,7 +555,9 @@ script RtsUnitPopupLogic extends Logic
 		local u = _RtsUnitLogic:GetMyUnit(self.CurNo)
 		if u == nil then return end
 		local options = { { no = 0, text = "미지정" } }
-		for no = 1, _RtsUnitLogic:GetMaxUnits() do
+		local nos = _RtsUnitLogic:ListZoneUnits(_RtsUnitLogic:MyZone())
+		for i0 = 1, #nos do
+			local no = nos[i0]
 			if no ~= self.CurNo then
 				local o = _RtsUnitLogic:GetMyUnit(no)
 				if o ~= nil then options[#options + 1] = { no = no, text = self:TargetLabel(no) } end

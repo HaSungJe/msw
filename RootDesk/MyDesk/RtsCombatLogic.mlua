@@ -1,7 +1,8 @@
 -- Phase 3 #15·#16 (2026-09-17, 시험대): 유닛 자동 공격 + 데미지 계산 + 피격 연출의 첫 조각.
---   시험대(TestBench): 순회 몬스터를 멈추고 체력 무제한 허수아비 1기를 (DummyCol,DummyRow) 트랙 칸에 세운 뒤,
---   유닛 1(히어로)을 인접 발판 (UnitCol,UnitRow)에 놓고 공격 주기마다 기본 공격을 반복한다. 사용자가 고정 위치에서
---   데미지 숫자(MSW 데미지 스킨)와 몬스터 피격 연출을 본다. 사거리·타겟 선택·웨이브는 아직 없음(#15 본편).
+--   시험대(TestBench, 개발용 — 웨이브 #10이 생기면 삭제): 시연 순회 몬스터를 지우고 **체력 무한(무적) 몬스터 BenchMonsters(100)기를 트랙에 고르게 세워 순회**시킨다
+--   (2026-09-20 사용자 "체력 무한의 몬스터가 100마리 순회하도록" — 그 전엔 고정 허수아비 3기).
+--   시험대 유닛(UnitNo)을 인접 발판 (UnitCol,UnitRow)에 놓는다. 공격 루프는 2026-09-20부터 **모든 유닛이 각자** 돈다(RtsUnitLogic.SpawnUnit → StartLoop) —
+--   사거리 안에 적이 있는 유닛만 공격하고, 메인 대상은 죽거나 사거리를 벗어나기 전까지 고정(Focus). 규칙 원문 = .info/attack.md. 웨이브는 아직 없음(#10).
 --   데미지 = damage.md 7단계(RtsJobTableLogic.Calc: ① 공격력 ② 공격력% ⑤ 스킬 비율 → 1회 타격, ⑥ 최종(몬스터), ④ 크리 확률로 굴림).
 --   파티 버프(홀리 유니티 등)는 아직 서버 계산에 안 넣음(RtsUnitBuffLogic이 클라 전용) — 본편에서 서버 계산으로 옮긴다.
 @Logic
@@ -10,14 +11,10 @@ script RtsCombatLogic extends Logic
 	-- 시험대 켜기(입장 시 자동). 웨이브(#10)가 생기면 false
 	property boolean TestBench = true
 
-	-- 허수아비 트랙 칸 / 유닛 1 발판 칸 (우상단 안쪽 줄 끝 — 몬스터가 유닛 오른쪽에 인접)
-	property number DummyCol = 14
+	-- 시험대 순회 몬스터 수: 트랙(66칸)에 t = (i−1)/N 간격으로 고르게 세워 루프(RtsTrackWalkerComponent). 무적이라 안 죽는다
+	property number BenchMonsters = 100
 
-	property number DummyRow = 3
-
-	-- 시험대 허수아비 추가 2기(사용자 2026-09-18 "주변에 똑같은 무적몹 2마리 더, 좌측 말고 우측 위/아래"): 기존 (14,3)의 위 (14,2)·아래 (14,4) — 유닛(13,4) 오른쪽 트랙 세로줄에 3기
-	property table DummyExtra = { { 14, 2 }, { 14, 4 } }
-
+	-- 시험대 유닛 발판 칸(우상단 안쪽 줄 끝 — 트랙 세로줄(14열)이 오른쪽에 인접)
 	property number UnitCol = 13
 
 	property number UnitRow = 4
@@ -39,6 +36,9 @@ script RtsCombatLogic extends Logic
 	-- 후딜(큰 스킬 뒤 다음 공격까지 쉬는 시각): key = userId .. "_" .. no → ServerElapsedSeconds. 사용자 2026-09-18 "생츄어리·블리자드·제네시스·드래곤 로어 후딜 1.5초"
 	property table BusyUntil = {}
 
+	-- 메인 대상 고정(2026-09-20 사용자 "그 대상이 죽거나 거리 밖으로 나가기 전까진 쭉 때린다"): key = userId .. "_" .. no → 몬스터 엔티티. 죽거나(엔티티 소멸·HP 0) 스킬 사거리 밖이면 가장 가까운 적으로 갈아탄다
+	property table Focus = {}
+
 	-- 데미지 스킨 = 메이플스토리 기본 데미지 스킨 (유닛) — effect/damageskin/208 (기본 스킨과 같은 주황·빨강 숫자 + 만/억 글리프, 엔진이 10000000 → 1000만으로 포맷).
 	--   유닛 없는 기본 스킨은 3271c3e79bf04ecba9a107d55495970d(effect/damageskin/0). MSW 기본값 6ba67548…(픽셀 숫자)은 사용자 2026-09-18 "너무 인위적" → 교체.
 	--   배율은 줌 30% 화면에서 읽히는 크기(원작 숫자가 커서 2.4 → 2.0)
@@ -51,13 +51,18 @@ script RtsCombatLogic extends Logic
 		if not self.TestBench then return end
 		_RtsDemoLogic:StopWalkers()
 		local name = self.DummyName .. string.format("%d", zone)
-		if _EntityService:GetEntityByPath("/maps/RtsMap/" .. name) == nil then
-			self:SpawnMonster(name, zone, self.DummyCol, self.DummyRow, "M001", true)
-		end
-		for i = 1, #self.DummyExtra do
+		-- 무적 순회 몬스터 N기: 스폰 칸은 S(경로 첫 칸)로 두고 RtsTrackWalkerComponent가 첫 프레임에 자기 t 자리로 옮긴다
+		for i = 1, self.BenchMonsters do
 			local nm = name .. "_" .. string.format("%d", i)
 			if _EntityService:GetEntityByPath("/maps/RtsMap/" .. nm) == nil then
-				self:SpawnMonster(nm, zone, self.DummyExtra[i][1], self.DummyExtra[i][2], "M001", true)
+				local m = self:SpawnMonster(nm, zone, 3, 6, "M001", true)
+				if m ~= nil then
+					local w = m:AddComponent("RtsTrackWalkerComponent")
+					if w ~= nil then
+						w.Zone = zone
+						w.T = (i - 1) / self.BenchMonsters
+					end
+				end
 			end
 		end
 		local e = _RtsUnitLogic:GetUnit(userId, self.UnitNo)
@@ -65,7 +70,7 @@ script RtsCombatLogic extends Logic
 			e.RtsUnitComponent:PlaceAt(self.UnitCol, self.UnitRow)
 			self:StartLoop(userId, self.UnitNo)
 		end
-		log("RtsCombat: test bench — dummy " .. name .. " at (" .. string.format("%d", self.DummyCol) .. "," .. string.format("%d", self.DummyRow) .. "), unit " .. string.format("%d", self.UnitNo) .. " at (" .. string.format("%d", self.UnitCol) .. "," .. string.format("%d", self.UnitRow) .. ")")
+		log("RtsCombat: test bench — " .. string.format("%d", self.BenchMonsters) .. " invincible walkers on track, unit " .. string.format("%d", self.UnitNo) .. " at (" .. string.format("%d", self.UnitCol) .. "," .. string.format("%d", self.UnitRow) .. ")")
 	end
 
 	-- 몬스터 엔티티 = 스프라이트(이동 클립) + HitComponent(피격 박스) + DamageSkinSpawner(데미지 숫자) + RtsMonsterComponent(HP)
@@ -106,7 +111,8 @@ script RtsCombatLogic extends Logic
 		local comps = mapRoot:GetChildComponentsByTypeName("RtsMonsterComponent", false)
 		for i = 1, #comps do
 			local m = comps[i]
-			if m ~= nil and m.Entity ~= nil and isvalid(m.Entity) and math.floor(m.Zone + 0.5) == math.floor(zone + 0.5) then
+			-- 죽은 몬스터(HP 0, 무적 아님)는 대상에서 뺀다 — 웨이브(#10)가 시체를 치우기 전까지의 안전장치
+			if m ~= nil and m.Entity ~= nil and isvalid(m.Entity) and math.floor(m.Zone + 0.5) == math.floor(zone + 0.5) and (m.Invincible or m.Hp > 0) then
 				out[#out + 1] = m.Entity
 			end
 		end
@@ -146,7 +152,8 @@ script RtsCombatLogic extends Logic
 	--   나머지 = 메인 대상에서 aoe칸(+0.25) 안의 적을 가까운 것부터 이어 가는 순서(직전 대상에서 가장 가까운 미타격 적 — 빔·타격 순서가 한 줄로 이어짐). 유닛 사거리 밖이어도 메인 대상 곁이면 맞는다.
 	--   aoe가 nil이면 예전 규칙(유닛 중심 사거리 안 가까운 순 n마리) — 지금은 지대(dot) 외엔 항상 aoe를 준다.
 	--   randomPick(전체 광역기 k.area — 제네시스·생츄어리·블리자드·드래곤 로어, 2026-09-19 사용자 "메인 타겟 없음, 사거리 안 모든 적 중 n마리를 우선순위 없이 랜덤으로"): aoe 없이 사거리 안 후보를 섞어 n마리
-	method table PickTargets(Entity unitEntity, number zone, number range, number n, any aoe, any randomPick)
+	--   focus(엔티티)가 있고 살아 있으며 사거리 안이면 메인 대상으로 고정(가장 가까운 적보다 우선 — attack.md '메인 대상 고정'). 전체 광역·지대·구체엔 안 쓴다
+	method table PickTargets(Entity unitEntity, number zone, number range, number n, any aoe, any randomPick, any focus)
 		local out = {}
 		if n <= 0 then return out end
 		local up = unitEntity.TransformComponent.WorldPosition
@@ -161,6 +168,16 @@ script RtsCombatLogic extends Logic
 			if math.max(dc, dr) <= range + 0.25 then cands[#cands + 1] = { e = m, d = dc * dc + dr * dr } end
 		end
 		table.sort(cands, function(a, b) return a.d < b.d end)
+		-- 고정 대상이 후보 안에 있으면 맨 앞으로(메인 대상 유지)
+		if focus ~= nil and isvalid(focus) then
+			for i = 2, #cands do
+				if cands[i].e == focus then
+					local f = table.remove(cands, i)
+					table.insert(cands, 1, f)
+					break
+				end
+			end
+		end
 		if aoe == nil then
 			if randomPick == true and #cands > 1 then
 				-- 피셔-예이츠 섞기
@@ -242,10 +259,14 @@ script RtsCombatLogic extends Logic
 					--   전체 광역기(k.area)는 메인 대상 없이 사거리 안 전부가 후보 → n마리 랜덤
 					local aoe = k.aoe
 					if aoe == nil and k.dot == nil and not k.spread and not k.area then aoe = 1 end
-					local list = self:PickTargets(e, u.Zone, range, count, aoe, k.area == true)
+					-- 메인 대상 고정: 메인 대상이 있는 스킬(aoe 규칙)만. 전체 광역(area)·지대(dot)·구체(spread)는 매번 새로 고른다
+					local focus = nil
+					if aoe ~= nil then focus = self.Focus[bkey] end
+					local list = self:PickTargets(e, u.Zone, range, count, aoe, k.area == true, focus)
 					if #list > 0 then
 						idx = i
 						targets = list
+						if aoe ~= nil then self.Focus[bkey] = list[1] end
 						if k.cd ~= nil then self.ReadyAt[rk] = now + k.cd end
 						break
 					end
@@ -356,6 +377,28 @@ script RtsCombatLogic extends Logic
 				end
 			end, when)
 		end
+		-- 쉐도우 파트너(나이트로드 30): 기본 공격 뒤에 st.halfHits회를 데미지 ½로 이어서(같은 간격, 대상 같음). 쿨타임 스킬엔 없음
+		local halfHits = 0
+		if k.cd == nil and k.hits == nil then halfHits = st.halfHits or 0 end
+		for h = 1, halfHits do
+			local when = delay + (hits + h - 1) * gap
+			_TimerService:SetTimerOnce(function()
+				if not isvalid(e) then return end
+				for j = 1, #targets do
+					local t = targets[j]
+					if isvalid(t) then
+						local crit = (_UtilLogic:RandomDouble() * 100) < st.crit
+						atk.Dmg = math.max(1, math.floor(perHit * 0.5 * _RtsJobTableLogic:RollWeapon(u.JobId) + 0.0001))
+						atk.Hits = 1
+						atk.Crit = crit
+						atk.TargetName = t.Name
+						local p = t.TransformComponent.WorldPosition
+						atk:AttackFrom(Vector2(0.6, 0.6), Vector2(p.x, p.y + 0.3), u.JobId .. ":" .. string.format("%d", idx), CollisionGroups.HitBox)
+						self:HitFx(t.Name, u.JobId, idx, crit)
+					end
+				end
+			end, when)
+		end
 		-- 지속 피해 지대(포이즌 리전): dot = { pct, period, dur } — period초마다 구역 안 모든 몬스터에 공격력 × pct%(강화면 st.dotPct)를 dur초 동안. 직접 타격은 없음(hits 0).
 		--   "타일이 중첩돼도 디버프라 중복 없음" = 몬스터 1마리에 틱당 1회. 그림(맹독지대 타일)은 클라 CastFx가 zoneClips로 깐다
 		if k.dot ~= nil then
@@ -411,7 +454,7 @@ script RtsCombatLogic extends Logic
 			if t ~= nil then targets[#targets + 1] = t end
 		end
 		_RtsSkillFxLogic:Preload(k.fx)
-		_RtsSkillFxLogic:PlayCast(u.Entity, no, k.fx, targets[1], targets)
+		_RtsSkillFxLogic:PlayCast(u.Entity, _RtsSkillFxLogic:LoopKey(zone, no), k.fx, targets[1], targets)
 	end
 
 	-- 전 클라: 몬스터 피격 연출(번쩍임 + 타격 클립 + 타격음). 데미지 숫자는 엔진 데미지 스킨이 따로 그린다

@@ -50,8 +50,28 @@ script RtsUnitLogic extends Logic
 		return self.CooldownSec
 	end
 
+	-- 영입 상한(HUD 슬롯 수). 열거에는 쓰지 않는다 — 2026-09-20 사용자: 초과 영입이 생길 수 있으니 유닛 순회는 실제 엔티티 기준(ListZoneUnits)
 	method number GetMaxUnits()
 		return self.MaxUnits
+	end
+
+	-- 구역 zone에 실제로 있는 유닛 번호 목록(오름차순). 서버·클라 모두 맵 루트 자식 이름 "Unit<구역>_<번호>"를 스캔한다 — 6기 상한 없음
+	method table ListZoneUnits(number zone)
+		local out = {}
+		if zone < 1 then return out end
+		local mapRoot = _EntityService:GetEntityByPath("/maps/RtsMap")
+		if mapRoot == nil then return out end
+		local prefix = "Unit" .. string.format("%d", math.floor(zone + 0.5)) .. "_"
+		local kids = mapRoot.Children:ToTable()
+		for i = 1, #kids do
+			local k = kids[i]
+			if k ~= nil and isvalid(k) and string.sub(k.Name, 1, #prefix) == prefix then
+				local n = tonumber(string.sub(k.Name, #prefix + 1))
+				if n ~= nil and k.RtsUnitComponent ~= nil then out[#out + 1] = n end
+			end
+		end
+		table.sort(out)
+		return out
 	end
 
 	-- ===== 월드 아바타 해금 (양쪽) =====
@@ -119,7 +139,9 @@ script RtsUnitLogic extends Logic
 	-- 내 유닛 중 (col,row)에 서 있는 유닛 번호. 없으면 0
 	@ExecSpace("ClientOnly")
 	method number MyUnitAt(number col, number row)
-		for no = 1, self.MaxUnits do
+		local nos = self:ListZoneUnits(self:MyZone())
+		for i = 1, #nos do
+			local no = nos[i]
 			local u = self:GetMyUnit(no)
 			if u ~= nil and u.Col == col and u.Row == row then return no end
 		end
@@ -163,7 +185,7 @@ script RtsUnitLogic extends Logic
 		return v
 	end
 
-	-- 시범 편성(아티팩트 v27과 동일): 1. 히어로 Lv12 / 2. 팔라딘 Lv40(홀리 유니티 → 1) / 3. 다크나이트 Lv20. 영입(Phase 5 #18)이 생기면 제거
+	-- 시범 편성(아티팩트 v27과 동일): 1. 히어로 Lv12 / 2. 팔라딘 Lv40 / 3. 시험대 유닛. 영입(Phase 5 #18)이 생기면 제거
 	@ExecSpace("ServerOnly")
 	method void EnsureDemoUnits(string userId, number zone)
 		if self.UnitsByUser[userId] ~= nil then return end
@@ -172,7 +194,8 @@ script RtsUnitLogic extends Logic
 		self:LoadAvatarPass(userId)
 		self:SpawnUnit(userId, zone, 1, "hero", 12, 13, 7)
 		self:SpawnUnit(userId, zone, 2, "paladin", 40, 6, 3)
-		self:SpawnUnit(userId, zone, 3, "dk", 20, 5, 9)
+		-- 2026-09-20 시험대: 3번 = 팬텀 Lv30(조커). 이전: 섀도어 Lv30·나이트로드 Lv30(확인 끝), 다크나이트 Lv20 — 되돌리려면 "shad", 30 / "nl", 30 / "dk", 20
+		self:SpawnUnit(userId, zone, 3, "phantom", 30, 5, 9)
 		-- 2026-09-18 시험대용 4번 = 보우마스터(폭풍의 시), 5번 = 신궁(피어싱·스나이핑)
 		self:SpawnUnit(userId, zone, 4, "bow", 30, 4, 6)
 		self:SpawnUnit(userId, zone, 5, "marks", 30, 5, 6)
@@ -180,8 +203,7 @@ script RtsUnitLogic extends Logic
 		self:SpawnUnit(userId, zone, 6, "il", 30, 9, 5)
 		self:SpawnUnit(userId, zone, 7, "fp", 30, 10, 5)
 		self:SpawnUnit(userId, zone, 8, "bishop", 30, 10, 9)
-		local pal = self:GetUnit(userId, 2)
-		if pal ~= nil then pal.RtsUnitComponent.BondNo = 1 end
+		-- 시범 팔라딘의 홀리 유니티 대상(1번)은 2026-09-20 삭제 — 홀리 유니티가 프리즘 스킬이 되어 기본 킷엔 대상 지정 스킬이 없음
 		self:OnChanged(0, self.DemoMeso, userId)
 		log("RtsUnit: demo units x8 for zone " .. tostring(zone))
 	end
@@ -222,8 +244,38 @@ script RtsUnitLogic extends Logic
 		u.Row = row
 		u.SkillLocks = _RtsJobTableLogic:DefaultLocks(jobId)
 		u:ApplyLook()
+		self:EnsureShadow(e)
 		self.UnitsByUser[userId][no] = e
+		-- 모든 유닛은 스폰 즉시 자기 공격 루프를 돈다(2026-09-20 사용자 "모든 유닛이 개별적으로 동작하고 공격도 자율적으로" — 전엔 시험대 유닛 1기만). 사거리 안에 적이 없으면 DoAttack이 그냥 넘어간다
+		_RtsCombatLogic:StartLoop(userId, no)
 		return e
+	end
+
+	-- 쉐도우 파트너 그림자(2026-09-20 사용자 "쉐도우 파트너 배우면 등 뒤에 나타나야 해" / "그림자가 캐릭터랑 똑같은 실루엣이면 안 될 것 같은데" → 원작 skill/4111002/special 검은 실루엣 클립):
+	--   능력치에 halfHits(그림자 표창)가 있으면 유닛 자식 "Shadow" 스프라이트(stand1 클립)를 세운다. 위치·방향은 클라 RtsUnitComponent.ApplyShadow, 동작 따라가기는 RtsSkillFxLogic.SendAction(같은 이름의 special 클립).
+	--   그리기 순서 −5(아바타 부품은 order 0 — 항상 캐릭터 뒤). 부모 스케일 2를 그대로 받아 캐릭터 크기
+	@ExecSpace("ServerOnly")
+	method void EnsureShadow(Entity e)
+		if e == nil or not isvalid(e) then return end
+		local u = e.RtsUnitComponent
+		if u == nil then return end
+		local want = (_RtsJobTableLogic:GetStat(u.JobId, u.Level).halfHits or 0) > 0
+		local sh = e:GetChildByName("Shadow")
+		if not want then
+			if sh ~= nil and isvalid(sh) then sh:Destroy() end
+			return
+		end
+		if sh ~= nil and isvalid(sh) then return end
+		local wp = e.TransformComponent.WorldPosition
+		sh = _SpawnService:SpawnByModelId("model://MapObject", "Shadow", Vector3(wp.x, wp.y, 0), e)
+		if sh == nil then return end
+		local sr = sh.SpriteRendererComponent
+		if sr ~= nil then
+			sr.SpriteRUID = _RtsSkillFxLogic:ShadowClip("stand1")
+			sr.OrderInLayer = -5 -- 아바타 부품은 order 0에 그려지므로 그 뒤(사용자 2026-09-20 "그림자보다 캐릭터가 항상 우선")
+		end
+		sh.TransformComponent.Scale = Vector3(1, 1, 1)
+		sh.TransformComponent.Position = Vector3(0.22, 0, 0)
 	end
 
 	@ExecSpace("ServerOnly")
@@ -308,6 +360,9 @@ script RtsUnitLogic extends Logic
 		if meso < cost then return end
 		self.MesoByUser[userId] = meso - cost
 		u.Level = u.Level + 1
+		self:EnsureShadow(e)
+		-- 레벨로 공격 주기가 바뀔 수 있어(공격속도 강화·period) 루프를 새 주기로 다시 건다
+		_RtsCombatLogic:StartLoop(userId, no)
 		self:OnChanged(no, meso - cost, userId)
 	end
 

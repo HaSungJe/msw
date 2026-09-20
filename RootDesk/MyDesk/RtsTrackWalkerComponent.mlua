@@ -20,7 +20,11 @@ script RtsTrackWalkerComponent extends Component
 		local len = _RtsZoneLogic:GetTrackLength()
 		if len <= 0 then return end
 		local before = _RtsZoneLogic:GetTrackPoint(self.Zone, self.T)
-		self.T = self.T + _RtsConfigLogic:SpeedToUnitsPerSec(self.Speed) * delta / len
+		local spd = self.Speed
+		-- 빙결(블리자드) 중이면 이동속도 × RtsMonsterComponent.FreezeSlow(0.5) — 2026-09-20 사용자 "이동속도 감속도 구현"
+		local m = self.Entity.RtsMonsterComponent
+		if m ~= nil and m:IsFrozenNow() then spd = spd * m.FreezeSlow end
+		self.T = self.T + _RtsConfigLogic:SpeedToUnitsPerSec(spd) * delta / len
 		if self.T >= 1 then
 			if self.Loop then
 				self.T = self.T - 1

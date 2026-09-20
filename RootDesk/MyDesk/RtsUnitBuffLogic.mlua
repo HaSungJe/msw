@@ -28,7 +28,8 @@ script RtsUnitBuffLogic extends Logic
 	--   fin 최종 데미지 +% / crit 크리 확률 +% / critDmg 크리 데미지 +%. 아이콘은 메이플 원작 스킬 아이콘 RUID
 	method table GetDefs()
 		return {
-			{ id = "bond", name = "홀리 유니티", job = "paladin", lv = 40, scope = "target", icon = "53a38855164a4b64accf68785761c283", fin = 20 },
+			-- 홀리 유니티 = 프리즘 스킬(2026-09-20: 40레벨 패시브 +20% 삭제, 지정 유닛 최종 +100%). lv 99 = 프리즘 획득 전엔 비활성 — 증강 시스템(Phase 6)이 획득 시 lv를 낮추거나 별도 플래그로 켠다
+			{ id = "bond", name = "홀리 유니티", job = "paladin", lv = 99, scope = "target", icon = "53a38855164a4b64accf68785761c283", fin = 100 },
 			{ id = "sharpeyes", name = "샤프아이즈", job = "bow", lv = 40, scope = "all", icon = "4cd1961bc55b47cb80e1a7f8843e225e", crit = 20, critDmg = 20 },
 			{ id = "sharpeyes", name = "샤프아이즈", job = "marks", lv = 20, scope = "all", icon = "4cd1961bc55b47cb80e1a7f8843e225e", crit = 20, critDmg = 20 },
 			{ id = "pray", name = "프레이", job = "bishop", lv = 30, scope = "all", icon = "39b3159efcc74334b875c94c64a74243", fin = 10 }, -- 2026-09-19: 주변 1타일·자신 미적용 → 구역 전체(자신 포함)·+10%
@@ -71,7 +72,10 @@ script RtsUnitBuffLogic extends Logic
 		local me = self:UnitAt(zone, no)
 		if me == nil then return out end
 		local defs = self:GetDefs()
-		for srcNo = 1, _RtsUnitLogic:GetMaxUnits() do
+		-- 2026-09-20: 1~6 고정 순회 → 구역의 실제 유닛(7·8번 불독·비숍이 출처·대상에서 빠져 있었다)
+		local nos = _RtsUnitLogic:ListZoneUnits(zone)
+		for i0 = 1, #nos do
+			local srcNo = nos[i0]
 			local src = self:UnitAt(zone, srcNo)
 			if src ~= nil then
 				for i = 1, #defs do
@@ -140,8 +144,9 @@ script RtsUnitBuffLogic extends Logic
 
 	@ExecSpace("ClientOnly")
 	method void RefreshZone(number zone)
-		for no = 1, _RtsUnitLogic:GetMaxUnits() do
-			local u = _RtsUnitLogic:GetZoneUnit(zone, no)
+		local nos = _RtsUnitLogic:ListZoneUnits(zone)
+		for i = 1, #nos do
+			local u = _RtsUnitLogic:GetZoneUnit(zone, nos[i])
 			if u ~= nil then self:RefreshUnitIcons(u) end
 		end
 	end
