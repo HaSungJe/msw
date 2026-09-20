@@ -215,8 +215,8 @@
 - Priority: takes precedence over defaults
 
 
-## 다음 작업(2026-09-20 저녁, 사용자): 프리즘 스킬 마무리(09-21) → 로드맵 갱신 → 로드맵 절차로 개발
-- Rule: 사용자가 2026-09-20 저녁에 정리한 상태 — augmentation.md 증강 세분화(I/II/III)·확률 완료, 스킬(character.md)은 **프리즘 제외 전부 마무리**. 계획: 09-21 사용자가 프리즘 스킬을 마무리 → `/beaver:roadmap`으로 진행 상황 반영(Phase 4~6 done/in-progress 정리, 프리즘/증강 = Phase 6) → 로드맵 절차(direct → build → ship)대로 개발. 그 전엔 밸런스 표 재계산·증강 코드를 먼저 손대지 않는다.
+## 다음 작업(2026-09-20 저녁, 사용자): 09-21 프리즘 스킬 정의 마무리 → Phase 4 증강·프리즘부터 로드맵 사이클로 개발
+- Rule: 로드맵은 2026-09-20 재정리 완료(`.beaver/output/roadmap/maple-augment-defense-roadmap.md`): Phase 1~3 done(무대 / 직업·스킬 표+연출 / 유닛 전투 코어), 남은 순서는 사용자 지시로 **Phase 4 증강·프리즘 → Phase 5 유닛 관리(영입·레벨) → Phase 6 스테이지·몬스터 웨이브(라운드 진행·몬스터 RUID 매칭) → 7 보스 → 8 방 → 9 밸런싱 → 10 아트**. 착수 조건: 09-21 사용자가 character.md 프리즘 11종 정의를 끝냄 → `/beaver:direct 증강·프리즘`(plan 하나가 #14~#18: 증강 테이블·지급/결정(개발용 트리거)·효과+프리즘 스킬·팝업·밸런스 재계산) → build → ship. augmentation.md는 I/II/III·확률 완료. 그 전엔 밸런스 표 재계산·증강 코드를 먼저 손대지 않는다.
 - Scope: project
 - Rationale: 사용자 메시지 "증강도 좀 더 세분화해서 넣어놨어. 확률도 채워놨고, 스킬쪽도 이제 프리즘 제외하곤 다 마무리됐네. 내일 프리즘 스킬쪽 마무리 한 후에 로드맵에 진행상황 반영하고 로드맵 절차대로 개발 시작하면 될 것 같아"
 - Priority: takes precedence over defaults
