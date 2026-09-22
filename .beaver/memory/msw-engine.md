@@ -52,7 +52,7 @@ MSW(Maker 26.7) 실측으로 확인한 엔진 동작. 다시 실측하면 30분�
 - Priority: takes precedence over defaults
 
 ## 클라 입력·터치·UI 좌표 실측
-- Rule: 월드 클릭은 `@EventSender("Service","InputService") handler HandleScreenTouchEvent` + `_UILogic:ScreenToWorldPosition(event.TouchPoint)`(화면 1920×1080 기준, 좌하 원점), UI 위 클릭은 `_InputService:IsPointerOverUI()`로 거른다. 엔티티 클릭은 `TouchReceiveComponent` + `entity:ConnectEvent(TouchEvent, fn)`인데 **`AutoFitToSize`·`TouchArea`는 동기화되지 않아 클라에서 직접** 설정한다(아바타 스케일 2 = `TouchArea(1.4, 2.2)`, `Offset(0, 1.1)`). 마우스 오버는 `MouseMoveEvent` + `_InputService:GetCursorPosition()`으로 직접 판정, 커서 교체는 `_InputService:SetCursor(ruid, Vector2.zero)` / `ResetCursor()`(메이플 손 커서 `3930c5d2e85b4bff8467aada64fda7f5`). 월드→UI 배치는 `_UILogic:ScreenToUIPosition(_UILogic:WorldToScreenPosition(v))` = 화면 중앙 원점이라 HUD 그룹 자식은 anchor (0.5,0.5)에 그 값을 그대로. 서버가 클라 한 명에게만 보내려면 `@ExecSpace("Client")` 메서드의 **마지막 파라미터 = userId**, 클라가 부른 `@ExecSpace("Server")` 메서드에선 `senderUserId`로 검증. 양쪽 공통 시계는 `_UtilLogic.ServerElapsedSeconds`.
+- Rule: 월드 클릭은 `@EventSender("Service","InputService") handler HandleScreenTouchEvent` + `_UILogic:ScreenToWorldPosition(event.TouchPoint)`(화면 1920×1080 기준, 좌하 원점), UI 위 클릭은 `_InputService:IsPointerOverUI()`로 거른다. 엔티티 클릭에 `TouchReceiveComponent` + `TouchEvent`는 **쓰지 않는다** — 2026-09-22 실측: 유닛 엔티티(서버 AddComponent + 클라 TouchArea 지정)에 클릭 지점이 판정 상자 안인데도 TouchEvent가 오지 않았고 클라에서 넣은 TouchArea도 반영되지 않았다(서버 자동값 0.5×0.8만 남음). 월드 엔티티 클릭은 전부 `ScreenTouchEvent` + 자체 상자 판정(`RtsUnitSelectLogic.UnitAtScreen` 폭 1.4·높이 2.2 발 기준, `CellAtScreen`)으로 한다. 마우스 오버는 `MouseMoveEvent` + `_InputService:GetCursorPosition()`으로 직접 판정, 커서 교체는 `_InputService:SetCursor(ruid, Vector2.zero)` / `ResetCursor()`(메이플 손 커서 `3930c5d2e85b4bff8467aada64fda7f5`). 월드→UI 배치는 `_UILogic:ScreenToUIPosition(_UILogic:WorldToScreenPosition(v))` = 화면 중앙 원점이라 HUD 그룹 자식은 anchor (0.5,0.5)에 그 값을 그대로. 서버가 클라 한 명에게만 보내려면 `@ExecSpace("Client")` 메서드의 **마지막 파라미터 = userId**, 클라가 부른 `@ExecSpace("Server")` 메서드에선 `senderUserId`로 검증. 양쪽 공통 시계는 `_UtilLogic.ServerElapsedSeconds`.
 - Scope: project
 - Rationale: 실측 2026-09-15 (유닛 팝업·캐릭터 메뉴·위치 이동)
 - CLAUDE.md application: candidate(코드 관련)
@@ -72,8 +72,8 @@ MSW(Maker 26.7) 실측으로 확인한 엔진 동작. 다시 실측하면 30분�
 - CLAUDE.md application: not needed
 - Priority: takes precedence over defaults
 
-## 월드 TouchEvent는 UI 버튼과 같이 발화한다 — UI 우선은 코드로 사각형 판정
-- Rule: 유닛(TouchReceiveComponent)의 `TouchEvent`는 그 위에 UI(uigroup 패널·버튼)가 있어도 함께 발화한다(2026-09-17 실측: 나이트로드 컨텍스트 메뉴의 '상세정보' 자리에 선 섀도어가 클릭돼 메뉴가 바뀜). 팝업이 열려 있을 땐 `_RtsPopupLogic:IsOpen()`으로 무시하고, 작은 메뉴는 `RtsUnitSelectLogic.MenuRect`(UI 중앙 원점 좌표, 여백 6px)에 `event.TouchPoint`를 `_UILogic:ScreenToUIPosition`으로 바꿔 넣어 `IsOverMenu`면 유닛 클릭을 버린다(`RtsUnitComponent.OnTouched(screen)`). 새 월드 클릭 대상이 생기면 같은 판정을 붙일 것.
+## 월드 클릭은 ScreenTouchEvent 한 곳에서 — UI 우선은 IsPointerOverUI + 메뉴 사각형 판정
+- Rule: 유닛·발판 클릭은 전부 `RtsUnitSelectLogic.HandleScreenTouchEvent`(배치 모드 → 이동 모드 → 유닛 상자 → 빈 곳 순)에서 판정한다. UI 위 클릭은 `_InputService:IsPointerOverUI()`로 먼저 버리고, 팝업이 열려 있으면 `_RtsPopupLogic:IsOpen()`, 작은 메뉴는 `MenuRect`(UI 중앙 원점, 여백 6px) `IsOverMenu`로 한 번 더 거른다. 엔티티 `TouchEvent`는 2026-09-17엔 UI와 같이 발화하는 문제, 09-22엔 아예 안 오는 문제가 있어 폐기했다 — 새 월드 클릭 대상이 생기면 이 핸들러에 상자 판정을 추가할 것.
 - Scope: project
 - Rationale: User bug report 2026-09-17 "상세보기가 클릭이 아니라 섀도어 클릭이 우선시됨. 팝업이 항상 클릭 우선이어야"
 - CLAUDE.md application: not needed

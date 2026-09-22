@@ -42,6 +42,7 @@ script RtsUnitPopupLogic extends Logic
 	method void OpenUnit(number no)
 		if _RtsUnitLogic:GetMyUnit(no) == nil then return end
 		if _RtsUnitSelectLogic:IsMoveMode() then _RtsUnitSelectLogic:EndMove() end
+		_RtsUnitSelectLogic:EndPlace()
 		_RtsUnitSelectLogic:CloseMenu()
 		-- 이미 열려 있으면(같은 유닛을 다시 클릭 등) 먼저 닫는다 — Open 안의 Close가 CurNo를 지우기 때문
 		if _RtsPopupLogic:IsOpen() then _RtsPopupLogic:Close() end

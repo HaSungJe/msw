@@ -193,7 +193,7 @@ script RtsUnitLogic extends Logic
 		self.MesoByUser[userId] = self.DemoMeso
 		self:LoadAvatarPass(userId)
 		if _RtsCombatLogic.TestBench then
-			-- 개발모드(2026-09-22 사용자 "유닛 영입도 자유롭게", "100만 메소 빼자"): 시범 메소 그대로, 유닛 없이 시작 — 우측 영입 팝업에서 직업을 누르면 Lv50 1기가 보스 곁 빈 발판에 서고(RequestRecruit),
+			-- 개발모드(2026-09-22 사용자 "유닛 영입도 자유롭게", "100만 메소 빼자"): 시범 메소 그대로, 유닛 없이 시작 — 우측 영입 팝업에서 직업을 누르고 발판을 골라 Lv50 1기를 세우고(RequestRecruitAt),
 			--   우측 하단 '테스트 프리즘' 팝업에서 프리즘을 고른다(RequestDevPrism — 다시 누르면 해제). 이동 쿨타임은 0(RequestMove)
 			self:OnChanged(0, self.DemoMeso, userId)
 			log("RtsUnit: dev mode — no units (recruit from popup)")
@@ -215,7 +215,7 @@ script RtsUnitLogic extends Logic
 		log("RtsUnit: demo units x8 for zone " .. tostring(zone))
 	end
 
-	-- 유닛 엔티티 = MapObject + AvatarRenderer + CostumeManager(직업 세트) + TouchReceive + RtsUnitComponent. 스케일 2 = 칸 80px
+	-- 유닛 엔티티 = MapObject + AvatarRenderer + CostumeManager(직업 세트) + RtsUnitComponent. 스케일 2 = 칸 80px. 클릭 판정은 RtsUnitSelectLogic(화면 터치 상자) — TouchReceive 없음
 	@ExecSpace("ServerOnly")
 	method Entity SpawnUnit(string userId, number zone, number no, string jobId, number level, number col, number row)
 		local mapRoot = _EntityService:GetEntityByPath("/maps/RtsMap")
@@ -234,8 +234,6 @@ script RtsUnitLogic extends Logic
 		local ar = e:AddComponent("AvatarRendererComponent")
 		if ar ~= nil then ar.OrderInLayer = 200 end
 		e:AddComponent("CostumeManagerComponent")
-		local touch = e:AddComponent("TouchReceiveComponent")
-		if touch ~= nil then touch.AutoFitToSize = true end
 		-- 공격(Phase 3): 확장 AttackComponent + 데미지 스킨 형식(숫자는 몬스터의 DamageSkinSpawner가 그림)
 		e:AddComponent("RtsUnitAttackComponent")
 		local skin = e:AddComponent("DamageSkinSettingComponent")
@@ -327,15 +325,16 @@ script RtsUnitLogic extends Logic
 	end
 
 	-- ===== 영입(개발모드 선행, 2026-09-22 사용자 "유닛 영입도 내가 자유롭게") =====
-	--   영입 팝업의 직업 카드 → 빈 번호(1~MaxUnits)에 그 직업 유닛을 보스 곁 가장 가까운 빈 발판에 세운다. 개발모드: 무료·Lv50·동일 직업 중복 허용.
-	--   본편(Phase 5): 영입가 차감·동일 직업 불가·Lv1·발판 선택 — 그때 이 메서드에 규칙을 얹는다. 지금은 TestBench가 아니면 무시
+	--   영입 팝업의 직업 카드 → 클라 배치 모드(RtsUnitSelectLogic.BeginPlace)에서 고른 빈 발판 (col,row)에 빈 번호(1~MaxUnits)로 세운다(2026-09-22 사용자 "중앙에 생성하지 말고 위치 선택, 취소하면 영입도 취소").
+	--   발판이 아니거나 내 유닛이 서 있으면 거부. 개발모드: 무료·Lv50. 본편(Phase 5): 영입가 차감·Lv1 — 그때 이 메서드에 규칙을 얹는다. 지금은 TestBench가 아니면 무시
 	@ExecSpace("Server")
-	method void RequestRecruit(string jobId)
+	method void RequestRecruitAt(string jobId, number col, number row)
 		local userId = senderUserId
 		if not _RtsCombatLogic.TestBench then return end
 		if not _RtsJobTableLogic:HasJob(jobId) then return end
 		local zone = _RtsZoneLogic:GetZoneOfUser(userId)
 		if zone < 1 then return end
+		if not _RtsZoneLogic:IsPadCell(col, row) then return end
 		if self.UnitsByUser[userId] == nil then self.UnitsByUser[userId] = {} end
 		local list = self.UnitsByUser[userId]
 		-- 동일 직업 중복 영입 불가(character.md 헤더 규칙; 2026-09-22 사용자 "듀얼블레이더로 전직했어도 섀도어 영입 추가 안 되어야 하는 건 당연" — 프리즘으로 이름이 바뀌어도 JobId는 그대로라 막힌다). 개발모드도 같음
@@ -352,8 +351,12 @@ script RtsUnitLogic extends Logic
 			end
 		end
 		if no == 0 then return end
-		local col, row = self:FreePadNear(userId, _RtsCombatLogic.BossCol, _RtsCombatLogic.BossRow)
-		if col == 0 then return end
+		for _, oe in pairs(list) do
+			if oe ~= nil and isvalid(oe) and oe.RtsUnitComponent ~= nil and oe.RtsUnitComponent.Col == col and oe.RtsUnitComponent.Row == row then
+				log("RtsUnit: recruit " .. jobId .. " refused — pad (" .. string.format("%d,%d", col, row) .. ") occupied")
+				return
+			end
+		end
 		self:SpawnUnit(userId, zone, no, jobId, 50, col, row)
 		self:OnChanged(no, self:GetMeso(userId), userId)
 		log("RtsUnit: recruit " .. jobId .. " -> unit " .. string.format("%d", no) .. " at (" .. string.format("%d,%d", col, row) .. ")")
@@ -368,32 +371,6 @@ script RtsUnitLogic extends Logic
 			if e ~= nil and isvalid(e) and e.RtsUnitComponent ~= nil and e.RtsUnitComponent.JobId == jobId then return true end
 		end
 		return false
-	end
-
-	-- (col,row)에서 체비셰프 거리가 가장 가까운, 내 유닛이 서 있지 않은 발판. 없으면 0,0
-	@ExecSpace("ServerOnly")
-	method any FreePadNear(string userId, number col, number row)
-		local list = self.UnitsByUser[userId] or {}
-		local used = {}
-		for _, e in pairs(list) do
-			if e ~= nil and isvalid(e) and e.RtsUnitComponent ~= nil then
-				used[string.format("%d_%d", e.RtsUnitComponent.Col, e.RtsUnitComponent.Row)] = true
-			end
-		end
-		local best = nil
-		local bc, br = 0, 0
-		for r = 1, _RtsConfigLogic:GetGridRows() do
-			for c = 1, _RtsConfigLogic:GetGridCols() do
-				if _RtsZoneLogic:IsPadCell(c, r) and used[string.format("%d_%d", c, r)] == nil then
-					local d = math.max(math.abs(c - col), math.abs(r - row)) * 10 + math.abs(c - col) + math.abs(r - row)
-					if best == nil or d < best then
-						best = d
-						bc, br = c, r
-					end
-				end
-			end
-		end
-		return bc, br
 	end
 
 	-- 방출 환급률: 그 유닛의 레벨업에 쓴 메소(SpentMeso)의 30%(2026-09-22 사용자 "증강 소멸 / 메소 사용한 것의 30% 회수(레벨업에 사용한)")

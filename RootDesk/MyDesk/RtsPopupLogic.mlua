@@ -84,6 +84,8 @@ script RtsPopupLogic extends Logic
 	method void Open(string kind)
 		if not self.Built then return end
 		if self.Kind ~= "" then self:Close() end
+		-- 팝업이 열리면 영입 배치 모드는 취소(= 영입 취소)
+		_RtsUnitSelectLogic:EndPlace()
 		if kind ~= "recruit" and kind ~= "augment" and kind ~= "pick" and kind ~= "unit" and kind ~= "devprism" and kind ~= "dismiss" then
 			log("RtsPopup: unknown kind " .. kind)
 			return
@@ -247,7 +249,7 @@ script RtsPopupLogic extends Logic
 		ph.SpriteGUIRendererComponent.Color = self:Mix(Color.white, 0.02)
 		ph.Parent.SpriteGUIRendererComponent.Color = self:Mix(H:ColGold(), 0.2)
 
-		-- 직업 id 기준(2026-09-22): 카드 클릭 → 서버 RequestRecruit(개발모드: 무료·Lv50·중복 허용. 본편 규칙은 Phase 5). 팬텀은 개발모드에서만 카드로 노출(본편은 프리즘 해금)
+		-- 직업 id 기준(2026-09-22): 카드 클릭 → 팝업 닫고 배치 모드(RtsUnitSelectLogic.BeginPlace — 빈 발판 클릭 → 서버 RequestRecruitAt, ESC = 영입 취소). 개발모드: 무료·Lv50. 본편 규칙은 Phase 5. 팬텀은 개발모드에서만 카드로 노출(본편은 프리즘 해금)
 		local groups = {
 			{ "전사", { "hero", "paladin", "dk" } },
 			{ "궁수", { "bow", "marks" } },
@@ -293,15 +295,15 @@ script RtsPopupLogic extends Logic
 				if not ownedJob then
 					local click = H:SpawnClick("RtsRcJobClick", card)
 					click:ConnectEvent(ButtonClickEvent, function(event)
-						_RtsUnitLogic:RequestRecruit(jid)
 						self:Close()
+						_RtsUnitSelectLogic:BeginPlace(jid)
 					end)
 				end
 			end
 		end
 		local owned = #_RtsUnitLogic:ListZoneUnits(_RtsUnitLogic:MyZone())
 		H:SpawnLabel("RtsRcFoot", body, Vector2(1, 0), Vector2(1, 0), Vector2(-27, 22), Vector2(400, 26),
-			"보유 " .. H:Int(owned) .. " / " .. H:Int(_RtsUnitLogic:GetMaxUnits()) .. " · 개발모드: 무료·Lv50, 보스 곁 빈 발판에", Color(0.851, 0.796, 0.651, 1), 15, TextAlignmentType.MiddleRight, false)
+			"보유 " .. H:Int(owned) .. " / " .. H:Int(_RtsUnitLogic:GetMaxUnits()) .. " · 직업을 고른 뒤 세울 발판을 클릭 (개발모드: 무료·Lv50)", Color(0.851, 0.796, 0.651, 1), 15, TextAlignmentType.MiddleRight, false)
 	end
 
 	-- ===== 테스트 프리즘(개발모드, 2026-09-22 사용자 "우측 하단에 테스트 프리즘 증강 버튼 … 거기서 선택"): 프리즘 12종을 직업별로 나열, 누르면 그 직업인 내 유닛에 적용 =====

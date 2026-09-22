@@ -74,3 +74,9 @@
 - Scope: project
 - Rationale: 사용자 "커밋+푸쉬 진행하자"(2026-09-22 저녁).
 - Priority: takes precedence over defaults
+
+## .info/ 문서는 로컬 전용(gitignore) — 절대 커밋하지 않지만, 개발할 때는 반드시 읽고 따른다 (2026-09-22 사용자)
+- Rule: `.info/*.md`(character·skill·balance-detail·damage·augmentation·weapon·attack 등)는 설계의 원본이고 로컬에만 둔다. 커밋·푸시 대상에서 제외(ignore 예외 제안 금지). 대신 스킬·증강·밸런스·연출 관련 작업을 시작할 때 해당 .info 문서를 먼저 읽고, 수치·문구는 거기서 가져오며, 바뀌면 형제 문서와 코드(예: RtsJobTableLogic desc)에 반영한다.
+- Scope: project
+- Rationale: 사용자 "이 내용들은 전부 다 로컬 전용이고 안 올릴 거야. 하지만 개발할 때 너가 참고는 해야 해".
+- Priority: takes precedence over defaults

@@ -435,6 +435,11 @@ script RtsSkillFxLogic extends Logic
 		sr.OrderInLayer = fx.loopOrder or 300
 		sr.FlipX = flip
 		sr.SpriteRUID = fx.loopClip
+		-- loopFrameA·loopFrameB: 루프 클립의 그 프레임 구간(0부터)만 돌린다 — RUID 대입 뒤에 줘야 남는다(애로우 레인: effect 클립의 큰 활 구간 4~12 — 2026-09-22 사용자 "처음의 큰 애니메이션이 계속 유지되어야")
+		if fx.loopFrameA ~= nil then
+			sr.StartFrameIndex = fx.loopFrameA
+			sr.EndFrameIndex = fx.loopFrameB or fx.loopFrameA
+		end
 		if fx.loopAlpha ~= nil then sr.Color = Color(1, 1, 1, fx.loopAlpha) end
 		e.TransformComponent.Position = Vector3((fx.loopDx or 0) * s * dir / pscale, (baseY + (fx.loopDy or 0)) / pscale, 0)
 		e.TransformComponent.Scale = Vector3(s / pscale, s / pscale, 1)

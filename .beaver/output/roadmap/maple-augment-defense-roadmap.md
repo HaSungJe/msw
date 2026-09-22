@@ -23,14 +23,13 @@
 flowchart LR
   P1["Phase 1 · 무대 기반 (4)"]:::done --> P2["Phase 2 · 직업·스킬 표 + 연출 (4)"]:::done
   P2 --> P3["Phase 3 · 유닛 전투 코어 (5)"]:::done
-  P3 --> P4["Phase 4 · 증강·프리즘 (5)"]:::inprogress
-  P4 --> P5["Phase 5 · 유닛 관리 — 영입·레벨 (3)"]:::todo
-  P5 --> P6["Phase 6 · 스테이지·몬스터 웨이브 (5)"]:::todo
+  P3 --> P6["Phase 6 · 스테이지·몬스터 웨이브 (5)"]:::todo
   P6 --> P7["Phase 7 · 보스·클리어·결과 (4)"]:::todo
-  P7 --> P8["Phase 8 · 방·멀티 (2)"]:::todo
-  P8 --> P9["Phase 9 · 밸런싱 (2)"]:::todo
-  P6 --> P10["Phase 10 · 테마·아트 (3)"]:::inprogress
-  P7 --> P10
+  P7 --> P5["Phase 5 · 유닛 관리 — 영입·레벨 (3)"]:::todo
+  P5 --> P4["Phase 4 · 증강·프리즘 (5)"]:::inprogress
+  P4 --> P8["Phase 8 · 방·멀티 + 로비 전광판 (3)"]:::todo
+  P8 --> P10["Phase 10 · 테마·아바타·아이콘 프리셋·아트 (7)"]:::inprogress
+  P10 --> P9["Phase 9 · 밸런싱 (2)"]:::todo
   classDef done stroke:#3fa46f,stroke-width:2px
   classDef inprogress stroke:#d9a300,stroke-width:3px
   classDef todo stroke:#8a949c,stroke-width:1px,stroke-dasharray:4 3
@@ -39,17 +38,17 @@ flowchart LR
 - Phase 1 — 무대 기반 · 유닛 4개 · 의존: — · 푼다: Phase 2 · 파일 집합: RtsMap, RtsConfigLogic, RtsHudLogic, RtsCameraAnchorComponent, RtsZoneLogic, RtsThemeLogic · **done**
 - Phase 2 — 직업·스킬 표 + 연출 · 유닛 4개 · 의존: Phase 1 · 푼다: Phase 3 · 파일 집합: RtsJobTableLogic, RtsSkillFxLogic, RtsUnitBuffLogic, `.info/character·balance-detail·damage·weapon.md` · **done**(프리즘 스킬 정의만 사용자가 09-21 마무리 → Phase 4에서 구현)
 - Phase 3 — 유닛 전투 코어 · 유닛 5개 · 의존: Phase 2 · 푼다: Phase 4 · 파일 집합: RtsUnitLogic, RtsUnitComponent, RtsUnitSelectLogic, RtsUnitPopupLogic, RtsUnitAttackComponent, RtsCombatLogic, RtsMonsterComponent, RtsTrackWalkerComponent · **done**(시험대 위에서 검증 — 실제 웨이브는 Phase 6)
-- Phase 4 — 증강·프리즘 · 유닛 5개 · 의존: Phase 3 · 푼다: Phase 5 · 파일 집합: RtsAugmentTableLogic(신규), RtsAugmentLogic(신규), RtsAugmentPopupLogic(신규), RtsUnitBuffLogic(효과·증강 탭), RtsJobTableLogic(프리즘 증강 11종 → 스킬 12종), RtsSkillFxLogic(프리즘 연출), RtsHudLogic(증강 버튼) · in-progress(#16 프리즘 효과만 개발모드로 선행 구현 2026-09-22; 나머지는 자산 선별 뒤 `/beaver:direct`부터 — 규칙은 `.beaver/memory/balance.md` '증강 3택1·대상 지정 규칙')
-- Phase 5 — 유닛 관리(영입·레벨) · 유닛 3개 · 의존: Phase 4 · 푼다: Phase 6 · 파일 집합: RtsRecruitLogic(신규)·영입 팝업, RtsUnitLogic(메소·영입·레벨업가), RtsUnitPopupLogic(레벨업 가격), RtsHudLogic(영입 패널·슬롯), RtsJobTableLogic(영입가) · todo
-- Phase 6 — 스테이지·몬스터 웨이브 · 유닛 5개 · 의존: Phase 5 · 푼다: Phase 7, Phase 10 · 파일 집합: RtsStageTableLogic(신규 — 몬스터 RUID 매칭 포함), RtsStageLogic(신규), RtsWaveLogic(신규), RtsMonsterComponent, RtsTrackWalkerComponent, RtsAugmentLogic(라운드 트리거 연결), RtsCombatLogic(시험대 제거), RtsDemoLogic(제거), RtsHudLogic(시간 칩) · todo
+- Phase 4 — 증강·프리즘 · 유닛 5개 · 의존: Phase 5(영입·레벨이 있어야 대상 지정·밸런스가 실전값; 지급 라운드 = Phase 6·7 이벤트) · 푼다: Phase 8 · 파일 집합: RtsAugmentTableLogic(신규), RtsAugmentLogic(신규), RtsAugmentPopupLogic(신규), RtsUnitBuffLogic(효과·증강 탭), RtsJobTableLogic(프리즘 증강 11종 → 스킬 12종), RtsSkillFxLogic(프리즘 연출), RtsHudLogic(증강 버튼) · in-progress(#16 프리즘 효과·연출 done 2026-09-22; #14·#15·#17·#18은 `/beaver:direct`부터 — 규칙은 `.beaver/memory/balance.md` '증강 3택1·대상 지정 규칙' + `.info/augmentation.md`)
+- Phase 5 — 유닛 관리(영입·레벨) · 유닛 3개 · 의존: Phase 7(드랍 메소·라운드가 있어야 영입가·레벨업가가 실전) · 푼다: Phase 4 · 파일 집합: RtsRecruitLogic(신규)·영입 팝업, RtsUnitLogic(메소·영입·레벨업가), RtsUnitPopupLogic(레벨업 가격), RtsHudLogic(영입 패널·슬롯), RtsJobTableLogic(영입가) · todo
+- Phase 6 — 스테이지·몬스터 웨이브 · 유닛 5개 · 의존: Phase 3(영입은 개발모드 무료 영입으로 대신) · 푼다: Phase 7, Phase 10 · 파일 집합: RtsStageTableLogic(신규 — 몬스터 RUID 매칭 포함), RtsStageLogic(신규), RtsWaveLogic(신규), RtsMonsterComponent, RtsTrackWalkerComponent, RtsAugmentLogic(라운드 트리거 연결), RtsCombatLogic(시험대 제거), RtsDemoLogic(제거), RtsHudLogic(시간 칩) · todo
 - Phase 7 — 보스·클리어·결과 · 유닛 4개 · 의존: Phase 6 · 푼다: Phase 8, Phase 10 · 파일 집합: RtsBossComponent(신규), RtsBossLogic(신규), RtsRunResultLogic(신규), RtsStageLogic(보스 스테이지) · todo
-- Phase 8 — 방·멀티 동기화 · 유닛 2개 · 의존: Phase 7 · 푼다: Phase 9 · 파일 집합: RtsRoomLogic(신규), RtsBootstrapLogic · todo
-- Phase 9 — 밸런싱 · 유닛 2개 · 의존: Phase 8 · 푼다: — · 파일 집합: `Rts*TableLogic.mlua`(수치 튜닝), `.info/balance-detail.md` · todo
-- Phase 10 — 테마·아트 · 유닛 3개 · 의존: Phase 6, Phase 7 · 푼다: — · 파일 집합: assets/, tools/gen-*.js, RtsHudLogic(프레임), RtsStageTableLogic(BGM 컬럼) · in-progress(유닛 비주얼만 done)
+- Phase 8 — 방·멀티 동기화 · 유닛 3개 · 의존: Phase 4 · 푼다: Phase 10 · 파일 집합: RtsRoomLogic(신규), RtsBootstrapLogic, RtsLeaderboardLogic(신규 — 로비 전광판, 점수 등록은 Phase 7 RtsRunResultLogic) · todo
+- Phase 9 — 밸런싱 · 유닛 2개 · 의존: Phase 10 · 푼다: — · 파일 집합: `Rts*TableLogic.mlua`(수치 튜닝), `.info/balance-detail.md` · todo
+- Phase 10 — 테마·아바타·아이콘 프리셋·아트 · 유닛 7개 · 의존: Phase 8 · 푼다: Phase 9 · 파일 집합: RtsThemeLogic(테마 프리셋 확장 — 시간의 신전·소멸의 여로·레헬른…), RtsAvatarPresetLogic(신규 — 유저 아바타 프리셋, 영구 이용권), RtsIconCollectionLogic(신규 — 몬스터 아이콘 컬렉션·드랍·프리셋), RtsUnitPopupLogic(스킨), 월드 상품, assets/, tools/gen-*.js, RtsHudLogic(프레임·좌측 플레이어 목록 확장), RtsStageTableLogic(BGM 컬럼), RtsCombatLogic/RtsMonsterComponent(처치 시 아이콘 드랍 훅) · in-progress(유닛 비주얼만 done)
 
 동시 가능: 없음 (Phase 4·5는 RtsUnitPopupLogic·RtsHudLogic을 같이 건드려 순서대로)
 
-지금: **개발모드로 프리즘 자산 선별 중**(Phase 4 #16 효과는 구현됨 — 직업·프리즘을 개발 팝업에서 골라 보스 상대 확인, 사용자가 스킨·애니메이션을 하나씩 정하면 `GetSkillsFor` 오버레이의 fx만 교체. **통과(2026-09-22): 전사 3(인레이지·홀리 유니티·거대화)·보우마스터(애로우 레인)·신궁(트루 스나이핑)·썬콜(엘릭서+블리자드 템페스트)** / 남음: 엘릭서+템페스트·불독 초월·비숍 디바인 퍼니시먼트·나로 풍마수리검·섀도어 듀얼블레이더·팬텀) · Next up: **Phase 4 나머지(#14·#15·#17·#18)** — 자산이 모이면 `/beaver:direct 증강·프리즘`
+지금: **프리즘 자산 선별 완료(2026-09-22 — 11직업 전부 통과, Phase 4 #16 효과·연출 구현됨)** · **순서 확정(2026-09-22 사용자)**: ① Phase 6 스테이지·몬스터 웨이브 → Phase 7 보스·클리어·결과 → ② Phase 5 유닛 관리 → ③ Phase 4 증강(얻기·부여, #14·#15·#17·#18) → ④ Phase 8 방·멀티(로비 전광판 — 최대 클리어 라운드 → 보스 HP 깎은 비율 순 Top 10~100) → ⑤ Phase 10 테마 프리셋(시간의 신전·소멸의 여로·레헬른…)·아바타 프리셋(자유이용권 영구, 유저 설정)·아이콘 프리셋(몬스터 컬렉션 — 처치 시 일반 1%·보스 5% 획득, 기본 초록달팽이) → Phase 9 밸런싱 · Next up: **Phase 6 스테이지·몬스터 웨이브** — `/beaver:direct 스테이지·몬스터 웨이브`
 
 ## Scope & Actors
 - **플레이어(1~8)** — 자기 구역에서 유닛 영입·배치·레벨업, 증강 선택(전부 팝업). F1~F8로 다른 유저 구역 관전. **탈락 후에는 관전을 계속하거나 방을 나가 새 판을 시작할 수 있다.** **관전(타 유저 구역 보기)은 읽기 전용(2026-09-19)**: 우측 영입 패널이 그 유저 유닛의 직업·레벨 목록으로 바뀌고, 유닛 클릭 → 상세정보 팝업(증강·버프 보기 포함)만 가능. 증강·영입·위치 이동·스킬 잠금·레벨업 등 조작은 전부 비활성(서버도 소유자 검증).
@@ -101,20 +100,20 @@ flowchart LR
 
 **Scenes/systems**: `RtsUnitLogic`(`SpawnUnit`·`RequestMove`·`RequestLevelUp`·`ListZoneUnits`) / `RtsUnitComponent`(FaceDir·SkillLocks·BondNo) / `RtsUnitSelectLogic` / `RtsUnitPopupLogic` / `RtsCombatLogic`(`StartLoop`·`DoAttack`·`PickTargets`·`CastFx`·`HitFx`) / `RtsUnitAttackComponent` / `RtsMonsterComponent` / `RtsTrackWalkerComponent`
 
-### Phase 4 — 증강·프리즘 (판을 가르는 랜덤 축 — 사용자 지시로 최우선) · depends: Phase 3
-> 정의는 `.info/augmentation.md`(2026-09-20 사용자 확정, 09-22 개수 확대): 한 판 **32개** = 브론즈 10 / 실버 10 / 골드 7 / 프리즘 5. 브론즈~골드 = **능력치만**(약점 찾기 = 크확, 급소 찌르기 = 크뎀, 무기 연마 = 공격력 +n, 전투 감각 = 공격력 %, 실버·골드는 보스 사냥꾼/거인 학살자) — 등급마다 I/II/III 3단계, 항목별 확률 [n/100] 기입 완료, **전부 합연산·중복 허용**. 프리즘 = 자쿰·핑크빈·시그너스·루시드·진 힐라 라운드, 후보 = 영웅 팬텀 영입 + 직업 전용 프리즘 증강 11종(썬콜 2개: 엘릭서·블리자드 템페스트 / 섀도어 '자유전직 - 듀얼블레이더' 1개가 블레이드 토네이도·카르마 퓨리 2스킬 + 직업명 변경·새비지·메익 영구 잠금), **한 번 고른 프리즘은 다시 안 나옴**. 프리즘 스킬 정의·수치·자산은 character.md '종류: 프리즘'(**사용자 09-21 마무리 — 이 페이즈 착수 조건**). 스테이지가 아직 없으므로 지급 트리거는 **개발용(증강 버튼에서 라운드 강제 지급)**으로 두고 Phase 6에서 스테이지 전환 이벤트에 연결한다.
+### Phase 4 — 증강·프리즘 (판을 가르는 랜덤 축) · depends: Phase 5 (2026-09-22 순서 확정 — 스테이지·보스 → 유닛 관리 → 증강; 지급 트리거는 실제 라운드 이벤트, #16 프리즘 효과·연출은 개발모드로 선행 완료)
+> 정의는 `.info/augmentation.md`(2026-09-20 사용자 확정, 09-22 개수 확대): 한 판 **32개** = 브론즈 10 / 실버 10 / 골드 7 / 프리즘 5. 브론즈~골드 = **능력치만**(약점 찾기 = 크확, 급소 찌르기 = 크뎀, 무기 연마 = 공격력 +n, 전투 감각 = 공격력 %, 실버·골드는 보스 사냥꾼/거인 학살자) — 등급마다 I/II/III 3단계, 항목별 확률 [n/100] 기입 완료, **전부 합연산·중복 허용**. 프리즘 = 자쿰·핑크빈·시그너스·루시드·진 힐라 라운드, 후보 = 영웅 팬텀 영입 + 직업 전용 프리즘 증강 11종(썬콜 2개: 엘릭서·블리자드 템페스트 / 섀도어 '자유전직 - 듀얼블레이더' 1개가 블레이드 토네이도·카르마 퓨리 2스킬 + 직업명 변경·새비지·메익 영구 잠금), **한 번 고른 프리즘은 다시 안 나옴**. 프리즘 스킬 정의·수치·자산은 character.md '종류: 프리즘'(**사용자 09-21 마무리 — 이 페이즈 착수 조건**). 지급 트리거는 Phase 6·7의 스테이지 전환·보스 처치 이벤트에 바로 붙인다(순서 변경으로 개발용 강제 지급은 불필요).
 
 | # | Unit | Goal | Key decision | Depends | Status |
 |---|------|------|--------------|---------|--------|
 | 14 (신규) | 증강 테이블 | augmentation.md → `RtsAugmentTableLogic`(등급·이름·효과·확률·프리즘 전용 직업·지급 라운드표 32개) | 라운드표(등간격·브실골 혼합) — 확정 | — | todo |
-| 15 (옛 21·22) | 지급·결정(서버) | 라운드 등급 지급 → 서버가 확률대로 **후보 3개**(프리즘은 이미 고른 것 제외) → 선택 1개를 유저 보유에 추가. 지금은 개발용 트리거(시험대), Phase 6에서 스테이지 이벤트로 교체. 보스 라운드는 못 잡으면 탈락이라 분기 없음 | 후보 3개 안 중복 허용 여부 · 미보유 직업 전용 프리즘 노출 여부 | 14 | todo |
-| 16 (옛 24 + 프리즘) | 효과 적용 + 프리즘 증강 11종(스킬 12종) | 능력치 4계열·보스% → `ApplyToStat` 합연산(스킬 공격력%·보스%와 합), 팬텀 영입 해금 플래그, 프리즘 스킬(인레이지·홀리 유니티 ×1.4·거대화·엘릭서·블리자드 템페스트(보스전 15타 집중·×0.9)·초월·디바인 퍼니시먼트·애로우 레인·트루 스나이핑·풍마수리검·자유전직-듀얼블레이더(블레이드 토네이도 + 카르마 퓨리, 직업명 변경, 새비지·메익 영구 잠금)) = 스킬 표 항목(영구 잠금 3) + 연출(Phase 2 장치 재사용, 자산은 사용자가 하나씩 지정) | 프리즘 스킬별 자산·연출 확정 루프 | 7, 8, 15 | **in-progress**(2026-09-22 개발모드 선행: 프리즘 12종 효과·영구 잠금·보스 15타·보스 배율 = `GetSkillsFor/GetStatFor`·`ApplyPrism` 구현, 연출 자산은 사용자 선별 대기 — 증강 능력치 합산은 미착수) |
-| 17 (옛 23) | 증강 팝업 | (a) 3택1 팝업(닫기 없음, 카드마다 대상 유닛 칩 또는 대상 없이 수령) (b) 좌하단 버튼 → 보유 목록(등급 탭·상세·미지정 ! → 1회 지정·🔒). 유닛 팝업 증강 탭 채움. 관전 시 읽기 전용 | 대상 없는 증강의 적용 시점 | 15 | todo |
+| 15 (옛 21·22) | 지급·결정(서버) | 라운드 등급 지급 → 서버가 확률대로 **후보 3개**(서로 다른 항목, 프리즘은 이미 고른 것 제외) → 선택 1개를 유저 보유에 **대상 미지정**으로 추가. 트리거 = Phase 6 스테이지 전환·Phase 7 보스 처치 이벤트. 보스 라운드는 못 잡으면 탈락이라 분기 없음 | 후보 3개 안 중복 허용 여부 · 미보유 직업 전용 프리즘 노출 여부 | 14 | todo |
+| 16 (옛 24 + 프리즘) | 효과 적용 + 프리즘 증강 11종(스킬 12종) | 능력치 4계열·보스% → `ApplyToStat` 합연산(스킬 공격력%·보스%와 합), 팬텀 영입 해금 플래그, 프리즘 스킬(인레이지·홀리 유니티 ×1.4·거대화·엘릭서·블리자드 템페스트(보스전 15타 집중·×0.9)·초월·디바인 퍼니시먼트·애로우 레인·트루 스나이핑·풍마수리검·자유전직-듀얼블레이더(블레이드 토네이도 + 카르마 퓨리, 직업명 변경, 새비지·메익 영구 잠금)) = 스킬 표 항목(영구 잠금 3) + 연출(Phase 2 장치 재사용, 자산은 사용자가 하나씩 지정) | 프리즘 스킬별 자산·연출 확정 루프 | 7, 8, 15 | **in-progress**(2026-09-22: 프리즘 12종 효과·영구 잠금·보스 15타·보스 배율 = `GetSkillsFor/GetStatFor`·`ApplyPrism` + 연출 자산 11직업 전부 확정 — 남은 건 브~골 능력치 증강의 `ApplyToStat` 합산) |
+| 17 (옛 23) | 증강 팝업 | (a) 3택1 팝업(닫기 없음, 카드엔 대상 칩 없음 — 미지정으로 수령) (b) 좌하단 버튼 라벨 `증강(n)`(n = 미지정 개수, 없으면 `증강`) → 보유 목록(등급 탭·상세·미지정 → **1회 대상 지정**·🔒). 유닛 팝업 증강 탭 채움. 관전 시 읽기 전용 | — (2026-09-22 사용자 확정) | 15 | todo |
 | 18 (신규) | 증강 밸런스 재계산 | I/II/III 값·**개수 10/10/7/5**·프리즘 5(썬콜 2개 = 나로 ×1.31 허용) 반영해 balance-detail '증강 반영' 절·augcalc 재생성, 최고점 순위 재확인 | — | 14 | todo |
 
 **Expected scenes/systems**: `RtsAugmentTableLogic`(`GetGrade(round)`·`GetPool(grade)`·`Roll`) / `RtsAugmentLogic:Grant/Choose/GetModifiers` / `RtsAugmentPopupLogic` / `RtsUnitBuffLogic.GetAugmentsFor`(스텁 → 실제) / `RtsJobTableLogic`(프리즘 스킬 항목·`HasPrism`)
 
-### Phase 5 — 유닛 관리(영입·레벨) (메소로 영입하고 레벨을 산다) · depends: Phase 4
+### Phase 5 — 유닛 관리(영입·레벨) (메소로 영입하고 레벨을 산다) · depends: Phase 7 (2026-09-22 순서 확정: 스테이지·보스 뒤, 증강 앞)
 | # | Unit | Goal | Key decision | Depends | Status |
 |---|------|------|--------------|---------|--------|
 | 19 (옛 8 일부) | 영입가·레벨업가 표 | 영입가(1기 무료 → 5단계 상승, 값 미정), 레벨업가 = `GetLevelCost`(10레벨 1,000 / 20 4,000 / 30 11,000 / 40 34,000 / 50 128,000 누적) — 30만 예산 안에서 목표 빌드 A) 50×1 + 40×5, B) 50×2 + 30×4 검산 | **영입가 5단계 값**(사용자) | — | todo |
@@ -123,12 +122,12 @@ flowchart LR
 
 **Expected scenes/systems**: `RtsRecruitLogic:Recruit`(가격·중복·상한·지급) + 영입 팝업(`RtsPopupLogic` 셸) / `RtsUnitLogic`(메소 차감·`SpawnUnit` 레벨 1) / `RtsHudLogic`(영입 패널·슬롯)
 
-### Phase 6 — 스테이지·몬스터 웨이브 (라운드 진행 + 몬스터 RUID 매칭 — 시험대를 대체) · depends: Phase 5
+### Phase 6 — 스테이지·몬스터 웨이브 (라운드 진행 + 몬스터 RUID 매칭 — 시험대를 대체) · depends: Phase 3 (2026-09-22 사용자 "몬스터 웨이브/보스 스테이지를 먼저" — 영입·레벨은 개발모드 무료 영입(Lv50)으로 대신, 실제 영입가는 Phase 5)
 | # | Unit | Goal | Key decision | Depends | Status |
 |---|------|------|--------------|---------|--------|
 | 22 (옛 7·36 일부) | 스테이지·몬스터 편성 테이블 + **몬스터 RUID 매칭** | `.info/monster-wave.md`의 **132 스테이지**(몬스터 115 + 보스 17)를 테이블화. 월드지역>지역>맵>몹 계층, 종류 3종, 몹 풀 참조형([73] 59~65 균등), 다중 보스. 몹마다 HP·드랍 메소·**자산 3개 RUID**(이동 클립·사망 클립·사망 효과음 — 공식 라이브러리에서 매칭) — 속도는 전부 동일 | 쉬는 스테이지 지속 시간 · 몹 HP 첫 값(임시) | — | todo |
 | 23 (옛 9) | 스테이지 진행·타이머(**방 전역**) | 방 하나에 타이머 하나 — 전원 같은 스테이지 번호로 시간순 진행. 몬스터 20초 / 보스 60초 / 쉬는. 시간 칩에 스테이지 번호·지역명·남은 시간, 전환 이벤트 발행 → **증강 라운드 지급(#15)·BGM이 여기에 붙음** | 시작 시점(전원 준비 vs 방장 시작) · 준비시간 유무 | 22 | todo |
-| 24 (옛 10·12) | 몹 스폰·트랙 순환(**구역별**) | 스테이지 시작 시 살아 있는 구역마다 초당 2마리(40) 스폰 → 이동 클립으로 등속 순환(`RtsTrackWalkerComponent` 재사용). 시연 몬스터·시험대 제거 | — | 4, 23 | todo |
+| 24 (옛 10·12) | 몹 스폰·트랙 순환(**구역별**) | 스테이지 시작 시 살아 있는 구역마다 초당 2마리(40) 스폰 → 이동 클립으로 등속 순환(`RtsTrackWalkerComponent` 재사용). 시연 몬스터 제거, 시험대(주니어 발록·테스트 프리즘)는 개발모드 토글로 남긴다 | — | 4, 23 | todo |
 | 25 (옛 11 + 경제 배분) | 처치·드랍·정리 | HP 0 → 사망 클립·사망음 → 제거, **드랍 100% 지급** — 총 30만을 지역별 분포(아케인리버 이전 20% … 리멘 20%)로 스테이지별 드랍에 배분·검산, 시체는 대상에서 제외 | 사망 클립 길이만큼 대기 | 24 | todo |
 | 26 (옛 13) | 누적·탈락 판정 | 처리 못 한 몹 누적 카운트 표시, **110 도달 시** 내 구역 유닛 전멸 + 비석 + 관전 전환(F1~F8 유지) 또는 방 나가기 | 탈락 직후 선택 UI 형태 | 25 | todo |
 
@@ -140,28 +139,33 @@ flowchart LR
 | 27 (옛 25) | 보스 개체·보스 스테이지 | 60초, 보스 HP·긴 체력바(2.6), 메소 없음, **못 잡으면 탈락**. 다중 보스(아이온+얄다바오트)·연속 3연전 | 보스 패턴 범위(고HP만 vs 행동) | 22, 23 | todo |
 | 28 (옛 26) | 보스 등장·타격(구역 내) | 보스 스테이지가 되면 **각 구역 중앙에 그 유저의 보스** 생성, 배치 유닛이 타격(보스전 잠금 스킬 제외), 종료 시 제거 | **보스전 사거리**(전원 vs 사거리 안) | 9, 27 | todo |
 | 29 (옛 27) | 클리어·탈락 판정(유저별) | 검은 마법사 3연전 격파 = 클리어, 누적 110 또는 보스 시간 초과 = 탈락. 방은 마지막 스테이지 종료 또는 전원 탈락/퇴장까지 유지 | — | 26, 28 | todo |
-| 30 (옛 28) | 결과 화면·기록 | 도달 스테이지·처치 수·클리어 여부(유저별) | 기록 저장 범위(로컬 vs DataStorage) | 29 | todo |
+| 30 (옛 28) | 결과 화면·기록 | 도달 스테이지·처치 수·클리어 여부(유저별). 런이 끝나면 **최종 등수용 점수 등록**: `점수 = 최대 클리어 라운드 × 100,000 + 탈락한 보스전에서 깎은 보스 HP 비율(0~10,000 = 0.00~100.00%)` → 개인 최고만 갱신(`LeaderboardScoringStrategy.High`), extras에 닉네임·클리어 여부·날짜 | 기록 저장 범위(로컬 vs DataStorage) · 클리어자끼리의 2차 기준(클리어 시간?) | 29 | todo |
 
-**Expected scenes/systems**: `RtsBossComponent` / `RtsBossLogic:Spawn/Despawn` / `RtsRunResultLogic:Judge` / `RtsResultUiLogic`
+**Expected scenes/systems**: `RtsBossComponent` / `RtsBossLogic:Spawn/Despawn` / `RtsRunResultLogic:Judge/RegisterScore` / `RtsResultUiLogic`
 
-### Phase 8 — 방·멀티 동기화 (여럿이 실제로 돌린다) · depends: Phase 7
+### Phase 8 — 방·멀티 동기화 (여럿이 실제로 돌린다) · depends: Phase 4
 | # | Unit | Goal | Key decision | Depends | Status |
 |---|------|------|--------------|---------|--------|
 | 31 (옛 29) | 방 시스템 | 방 생성/입장/시작(1~8인), 세션 격리, 전원 동시 시작. 탈락자는 관전 또는 나가기 | 인스턴스 맵 구조 · 난이도는 방 단위 | 29 | todo |
 | 32 (옛 30) | 멀티 동기화·권위 재점검 | 방 전역(스테이지)과 유저별 상태 분리, 서버 권위 전수 점검, 8구역 동시 웨이브·연출 키(구역×100+번호) 검증 | 동기화 범위 | 31 | todo |
+| 42 (신규) | 로비 전광판(최종 등수 Top 10~100) | 로비 성격의 방(매칭 / 방 만들기 / 혼자 시작)에 **전광판**: #30이 등록한 점수로 **최대 클리어 라운드 → 보스 HP 깎은 비율** 순 랭킹, Top 10 기본 표시·스크롤로 100위까지, 내 등수는 하단 고정. 엔진 `_MatchmakingService` 리더보드(`CreateLeaderboardAndWait` 1회 → `SetScoreAndWait`(High, extras) → `GetRankInfosAndWait` 100건, 동점은 FirstHigh)로 서버 집계 — **ReleaseOnly**라 Maker 테스트는 로컬 SortableDataStorage 대체 경로 필요 | 시즌(무한 vs 월간 리셋) · 표시 항목(아이콘·닉네임·라운드·보스% — #40 아이콘 재사용) · 클리어자 동점 처리 | 30, 31 | todo |
 
-### Phase 9 — 밸런싱 (수치 튜닝 패스) · depends: Phase 8
+### Phase 9 — 밸런싱 (수치 튜닝 패스) · depends: Phase 10
 | # | Unit | Goal | Key decision | Depends | Status |
 |---|------|------|--------------|---------|--------|
 | 33 (옛 31) | 난이도 스케일 | 난이도 %로 몹 HP·속도 일괄 배율 | 난이도 단계 | 32 | todo |
 | 34 (옛 32) | 테이블 튜닝 패스 | 몹 HP 곡선을 "예산으로 살 수 있는 전력이 20초에 40마리를 딱 잡는 수준"으로 역산, 영입가·드랍·증강 실측 튜닝 | — | 33 | todo |
 
-### Phase 10 — 테마·아트 (보는 맛) · depends: Phase 6, Phase 7
+### Phase 10 — 테마 프리셋·아바타 프리셋·아이콘 프리셋·아트 (보는 맛 + 꾸미기) · depends: Phase 8 (2026-09-22 사용자: 방/멀티 뒤에 "테마 프리셋, 아바타 프리셋 기능 추가" + "프리셋에 아이콘도 같이 — 몬스터 컬렉션")
 | # | Unit | Goal | Key decision | Depends | Status |
 |---|------|------|--------------|---------|--------|
 | 35 (옛 33) | 유닛 비주얼 | 11직업 아바타 세트 | — | — | done(Phase 2 #6과 동일 — 여기선 기록) |
 | 36 (옛 34) | HUD 테마 재조정 | 프레임 톤, 티어별 프레임 | 랭크 시스템 도입 여부 | 2 | todo |
 | 37 (옛 36) | 스테이지별 BGM·보스 비주얼 | 스테이지(맵)마다 BGM 1곡 + 보스 17종 스프라이트·자산(몬스터 자산 3개 규칙 동일). 스테이지 전환 이벤트에 크로스페이드 | 크로스페이드 여부 | 22, 27 | todo |
+| 38 (신규) | 테마 프리셋 확장 | `RtsThemeLogic` 프리셋에 헤네시스 외 **시간의 신전·소멸의 여로·레헬른 등** 추가(트랙·타일·장식·BGM 세트, `.info/view.md`). **테마는 유료**(월드 상품, 헤네시스만 기본) — 구매 내역·선택 테마는 서버 DataStorage(계정)에 영구 저장, 좌측 플레이어 카드(#41)의 수정 버튼에서 선택 | 테마 적용 범위(내 구역만 vs 방 전체) · 테마별 자산 목록 · 상품 가격 | 36 | todo |
+| 39 (신규) | 아바타 프리셋(영구 자유이용권) | '월드 아바타 30일 1,600코인'을 **영구 이용권**으로 변경(상품 QK03ZI15E 갱신). 유저가 직업마다 원하는 아바타(내 메이플월드 코디 + 직업 무기)를 프리셋으로 저장·선택 — 유닛 정보 팝업 외형 탭에서 설정, 서버 저장(DataStorage) | 프리셋 슬롯 수 · 저장 단위(계정/직업) · 무기 고정 여부 | 35 | todo |
+| 40 (신규) | 아이콘 프리셋·몬스터 컬렉션 | 유저 아이콘(프로필) = 몬스터 얼굴. **기본 제공 초록달팽이**. 몬스터 처치 시 그 몬스터 아이콘을 **일반 1% · 보스 5%** 확률로 획득(중복 획득은 무효) → 컬렉션(계정 DataStorage — 다음 접속에도 유지)에 쌓이고, 좌측 플레이어 카드(#41)의 수정 버튼에서 선택(프리셋 버튼의 아바타·테마·아이콘 3종과 같은 저장소). 컬렉션 화면 = 132 스테이지 몬스터 + 보스 17종 격자, 미획득은 실루엣 | 획득 판정 주체(막타 유저 vs 그 구역 주인) · 관전 중 획득 여부 · 아이콘 자산(몬스터 stand 1프레임 크롭 vs 별도 얼굴 자산) | 22, 27 | todo |
+| 41 (신규) | 좌측 플레이어 목록 확장 | `RtsHudLogic` 좌측 유저 칸(지금 221×32, 37 간격)을 **넓고 높게** 바꿔 칸마다 유저 아이콘(#40) + 선택한 테마(#38)를 닉네임·생존과 함께 보인다. **레이아웃(2026-09-22 사용자 스케치 `.info/artifacts/player-slot-sketch-260922.png`)**: 가로 카드 1장 = 왼쪽 큰 **원형 아이콘**, 오른쪽 위 작은 **테마 이름** 라벨, 그 아래 **닉네임 박스**, 우상단 **수정 버튼**(**내 카드에만 출력, 남의 카드엔 없음** — 2026-09-22 사용자; 누르면 아이콘/테마 변경 팝업: 아이콘 = 컬렉션에서 선택, 테마 = 구매한 것 중 선택·미구매는 구매 유도); 카드 배경 = 그 유저의 테마 배경. 선택값은 **서버 DataStorage(계정)** 에 저장해 다음 접속에도 유지·전원에게 동기화. 8명 기준 세로 공간 재배치, 관전 클릭은 유지 | 칸 크기(8칸이 화면에 다 들어가는 높이) · 테마 배경 자산(카드용 썸네일) | 38, 40 | todo |
 
 ### Dropped (기록용)
 | # | Unit | 사유 |
@@ -172,8 +176,8 @@ flowchart LR
 | — | 조합/합성 | dropped(2026-08-07) |
 | — | 밭(수익건물) 경제 | dropped(2026-09-09) |
 
-**Progress**: 14/37 units done (3/10 phases; Phase 10은 1/3)
-**Next up**: **Phase 4 증강·프리즘** — 사용자 지시(2026-09-20)로 최우선. Phase 3 완료로 의존 충족, 착수 조건(character.md 프리즘 정의)도 2026-09-22 충족. 시작: `/beaver:direct 증강·프리즘` (한 plan이 #14~#18 전부; 지급 트리거는 개발용, 스테이지 연결은 Phase 6). 그다음 Phase 5 유닛 관리 → Phase 6 스테이지·몬스터 웨이브(라운드 진행·몬스터 RUID 매칭).
+**Progress**: 14/42 units done (3/10 phases; Phase 10은 1/7)
+**Next up**: **Phase 6 스테이지·몬스터 웨이브** — 2026-09-22 사용자 확정 순서(스테이지/몬스터 웨이브 → 유닛 관리 → 증강 → 방/멀티 → 테마·아바타 프리셋). 의존 Phase 3 충족, 정의는 `.info/monster-wave.md`(132 스테이지)·`.info/monster.md`. 시작: `/beaver:direct 스테이지·몬스터 웨이브` (한 plan이 #22~#26 전부). 그다음 Phase 7 보스·클리어·결과 → Phase 5 유닛 관리 → Phase 4 증강(#14·#15·#17·#18) → Phase 8 방·멀티(+로비 전광판 Top 10~100) → Phase 10 테마·아바타·아이콘 프리셋(+좌측 플레이어 목록 확장) → Phase 9 밸런싱.
 
 ## Cross-Cutting Rules
 - **스테이지는 방 전역, 나머지는 유저(구역) 단위** — 스테이지 번호·타이머·전환 이벤트는 방 하나에 하나(전원 동기). 누적·메소·유닛·증강·보스·클리어/탈락은 유저별. 유저 간 경쟁 판정은 없다.
@@ -201,6 +205,8 @@ flowchart LR
 - [x] **증강** — 32개(10/10/7/5, 2026-09-22), 브~골 능력치 I/II/III + 확률, 프리즘 5 = 자쿰·핑크빈·시그너스·루시드·진 힐라(팬텀 영입 + 직업 전용 스킬 12종, 재출현 없음), 전부 합연산. **브~골 27개 라운드 지급표 = augmentation.md**(몬스터 스테이지 등간격 4.2칸, 브·실·골 비례 혼합 — 2026-09-22 사용자 "골고루")
 - [ ] **후보 3개 규칙** — 같은 증강 중복 노출 허용 여부, 미보유 직업 전용 프리즘 노출 여부. (Phase 4 #15 전)
 - [ ] **보스전 사거리** — 화면 중앙 보스를 배치 유닛 전원이 때리는지, 사거리 안 유닛만인지. (Phase 7 전)
+- [x] **최종 등수 기준** — 최대 클리어 라운드 → 보스 HP 깎은 비율(2026-09-22 사용자). 로비(매칭·방 만들기·혼자 시작) 전광판 Top 10~100. **시즌 리셋 여부·클리어자 동점 2차 기준은 미정** (Phase 8 #42 전)
+- [x] **아이콘 컬렉션 확률** — 몬스터 처치 시 일반 1% · 보스 5%, 기본 초록달팽이(2026-09-22 사용자). **획득 판정 주체·아이콘 자산 형태는 미정** (Phase 10 #40 전)
 
 ## Notes / Risks
 - **순서 변경(2026-09-20 사용자)**: "프리즘 증강 및 유닛 관리를 제일 앞으로 — 그거부터 하고 라운드 진행·몬스터 RUID 매칭". 스테이지가 없는 동안 증강 지급은 개발용 트리거(시험대)로 검증하고, Phase 6에서 스테이지 전환 이벤트에 붙인다.
