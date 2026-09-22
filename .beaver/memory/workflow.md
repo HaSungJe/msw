@@ -68,3 +68,9 @@
 - Scope: project
 - Rationale: 2026-09-19 balance-detail.md — 사거리 표를 겨냥한 정규식이 위쪽 직업 특성 표 행을 먼저 매치해 공격속도·역할 칸을 DPS 숫자로 덮어씀. 두 번의 패치를 거친 뒤에야 발견해 11행을 원문에서 다시 써야 했다.
 - Priority: takes precedence over defaults
+
+## 2026-09-22 커밋 정리: 자동 커밋 2건(39ddeca·cef9743) 위에 cd19489로 덮음 — plan/spec 파일은 그 커밋에서 삭제
+- Rule: 원격에 남아 있던 사용자 측 자동 커밋(plan/spec 포함)은 force push가 막혀 되돌리지 못했고, `git reset --soft origin/main` 뒤 작업 트리 전체를 cd19489로 커밋해 내용만 바로잡았다(역사엔 남음). 스킬 문구는 `.info/skill.md` 인게임 설명 → 스크래치 `sync_desc.py`로 RtsJobTableLogic desc 65+11+5개 일괄 반영(2026-09-22). 팔라딘 매직 크러쉬 → 가드 크러쉬(사용자 개명).
+- Scope: project
+- Rationale: 사용자 "커밋+푸쉬 진행하자"(2026-09-22 저녁).
+- Priority: takes precedence over defaults
