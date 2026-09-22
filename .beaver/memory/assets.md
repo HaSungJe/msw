@@ -100,3 +100,46 @@
 - Scope: project
 - Rationale: 2026-09-20 조커(400041010)를 sprite로만 검색해 "타격 클립 없음"으로 잘못 판단 → animationclip으로 다시 찾으니 hit/0·1·2 클립이 있었다.
 - Priority: takes precedence over defaults
+
+## 애로우 레인 프리즘 자산 = skill/400031002 effect(활 소환 1회) + repeat(루프) + use 소리, 화살은 하늘에서 낙하 (2026-09-22)
+- Rule: 애로우 레인(보우마스터 프리즘) 연출은 원작 400031002의 `effect` 586154fb…(활 소환, loopIntro 1.1×1.5초 + loopIntroSound 6b7b47d8… 1.9초) → `repeat` f7b71339…(루프, 머리 위 1.1·스케일 1.2). 400031002에는 hit·화살 클립이 없어 타격 클립·발마다 소리·화살 그림은 폭풍의 시 것을 쓰고, 화살만 `projFrom = "sky"`(대상 머리 위 4칸에서 ±0.5 흩어져 0.2초 수직 낙하)로. 새 fx 키: loopIntro·loopIntroScale·loopIntroDy·loopIntroLife·loopIntroSound(RtsSkillFxLogic.EnsureLoopFx, 루프 엔티티의 자식이라 루프와 함께 정리), projFrom "sky"·projSkyHeight·projSkySpread(PlayProjectile).
+- Scope: project
+- Rationale: 사용자 2026-09-22 "사운드는 폭풍의 시 그대로, 발사 애니메이션 등은 교체" → "ㅇㅇ 일단 해보자" → "사운드도 바꿔보자, 좀 더 임팩트 있게"(활 소환음 추가; 발마다 소리 후보는 .info/character.md 애로우 레인 항목).
+- Priority: takes precedence over defaults
+
+## 트루 스나이핑 프리즘 자산 = skill/400031006 special(십자선 표식) + use 소리, 나머지는 스나이핑 것 (2026-09-22 확인) · 클립 프레임 시간은 .win.mod의 `<float>`
+- Rule: 트루 스나이핑 fx = 스나이핑 fx 복사 + markClip 64224b19…(markFit 0.45·markLife 0.85·markPivotDy 0) + sound 1fa8bbf7…(1.44초) + hitDelay 0.36·hitGap 0.05·hitScale 2.0. 400031006에는 effect/hit/화살 클립이 없다. 클립 총길이는 `full/<ruid>.clip.mod`에서 프레임마다 `` 뒤 float(초)를 더해 구한다(트루 스나이핑 7×0.12 = 0.84초, 애로우 레인 effect 0.03×2 + 0.06×13 = 0.84초 → loopIntroLife는 그 길이로).
+- Scope: project
+- Rationale: 사용자 2026-09-22 "트루스나이핑 skillname#400031006" → "ㅇㅋ 트루스나이핑 확인".
+- Priority: takes precedence over defaults
+
+## 블리자드 템페스트 프리즘 자산 = skill/2221007 세트(effect 등 뒤·effect0 발밑·tile/0~8 낙하 좌우 번갈아) (2026-09-22)
+- Rule: 템페스트 fx = 기본 블리자드 fx 복사 + backClip 2221007/effect 81280c08…(1.5, 1.2초) + clip effect0 f0f59236…(1.4, clipOrder −10 아바타 뒤) + markClips tile/0~8(markAt feet, 1.6, markDelay 0.4, markStagger 0.07, markPattern "alternate", markLife 1.5) + hitDelay 1.2·hitStagger 0.07. 새 fx 키: markStagger(클라)·hitStagger(서버, 대상 j마다 지연)·markPattern "alternate"·markAltDists·clipOrder. 프리즘 변형 fx는 유닛 생성 시 `RtsJobTableLogic.PreloadJobFx`로 선로드 — 안 하면 프리즘을 켠 뒤 첫 시전들이 자산 다운로드 중이라 빈 표식으로 나온다(사용자가 "적용 안 됨"으로 봄).
+- Scope: project
+- Rationale: 사용자 2026-09-22 "썬콜의 블리자드 템페스트는 skill/2221007", "좌우 각각 7~8개씩 번갈아 파바박", "캐릭터 애니메이션은 캐릭터 뒤".
+- Priority: takes precedence over defaults
+
+## 초월(불독 프리즘) = 도트 퍼니셔 연출 2배(구체·폭발·고리 간격·속도), 구체 30개 동시 생성은 기본과 공통 (2026-09-22)
+- Rule: ApplyPrismSkills transcend — cd 15 → 3, ratio 281(= (965+169)÷5 × 445÷360), ApplyPrismStat bossAdd +250(2026-09-22 사용자 세 번 조정: 1/5 → 보스 제거 → 보스 250 + 비율로 상쇄; 보스 DPS는 항상 15초·+335% 시절과 동일), fx 복사 후 projScale ×2(3.6)·hitScale ×2(1.4)·projSpread ×2(4.0)·projGap ×2(2.4)·projSpeed ×2(8.8). 자산 교체 없음(400021001엔 클립이 없음). 기본 도트 퍼니셔 projStagger 0.03 → 0(동시 생성, 사용자 "일반도 포함 공통").
+- Scope: project
+- Rationale: 사용자 2026-09-22 "초월은 도트 퍼니셔의 크기 2배로", "구체가 한번에 모두 생성", "커진만큼 간격도, 속도도 2배. 초월 전용", "동시 생성은 일반도 포함".
+- Priority: takes precedence over defaults
+
+## 디바인 퍼니시먼트 프리즘 자산 = skill/400021086 세트, 루프를 대상 몬스터 머리 위에 (2026-09-22 통과)
+- Rule: fx = motion swingO1 루프(noFlip) + loopAt "target"·loopAtTop + loopIntro prepare 1aa895b1…(0.36초, loopIntroSound pre be4fe115…) → loopClip keydown 85964d2e…(17프레임 1.02초, 0.6배, loopDx 2.63·loopDy −0.3 — 피벗 (0.88, 0.08)이라 오른쪽으로 밀어 중앙) + loopSound loop ac773384…(0.73초 반복, 0.8) → loopEnd keydownend b4134c02…(0.72초) + loopEndSound end 8ee2522b…. 발마다 hitClip hit/0 2655e0dc…(1.6) + hitSound hit 7d2e6a98…(0.7). 타겟 6. 새 fx 키: loopAt·loopAtTop·loopSound·loopSoundVol·loopEnd·loopEndLife·loopEndSound. 클립 피벗은 sprite .png.mod 헤더 `22 0a 0d <float x> 15 <float y>`(폭·높이 비율, 아래 기준)에서 읽는다.
+- Scope: project
+- Rationale: 사용자 2026-09-22 "skillname#400021086, 애니메이션은 85964d2e…" → "몬스터 위에 나와야" → "몬스터 중앙 기준 머리 위에, 지금 너무 왼쪽" + "캐릭터 모션 복구" → "통과".
+- Priority: takes precedence over defaults
+
+## 풍마수리검 프리즘 = 쿼드러플 스로우 잠금 + 대체 액티브, 자산 skill/400041020 c1·hit/0·special/hit, 수리검 1.6배 (2026-09-22 통과)
+- Rule: ApplyPrismSkills fuma — 쿼드러플 스로우 fx 복사: proj 6214486b…(shootobj/layerlist/c1, projScale 1.6 ≈ 7.3유닛, projNoRotate), sound bdb2a84f…(special), hitClip cd78f86b…(hit/0, 0.8), hitSound f05a290c…(0.6). 표 끝에 '풍마수리검' 액티브(range 3, cd·hits 없음 → st.ratio 130·hits 4·halfHits 그대로), locks 쿼드러플 스로우. ApplyPrismStat: ratio +20, range 3, bossAdd +360. 쉐도우 파트너: projShadowDelay 0.5(본체 4발 뒤 이어서) + RtsSkillFxLogic.ShadowActionDelay 0.5 — 쿼드러플 스로우 공통.
+- Scope: project
+- Rationale: 사용자 2026-09-22 "skillname#400041020, 투사체 6214486b…, 사운드 bdb2a84f…, 피격 f05a290c…" → "쉐도우 파트너는 본체 뒤에 이어서, 살짝 느리게" → "잠금하고 대신 쓰는 스킬로" → "졸라 커" → "사거리 1 추가, 2배 더" → "통과".
+- Priority: takes precedence over defaults
+
+## 섀도어 자유전직 - 듀얼블레이더 자산 = 400041043 b1(토네이도 투사체) + 400041021 effect(카르마 등 뒤), 117타 섞어서 동시 (2026-09-22 통과)
+- Rule: fx = motions swingD1→swingD2(0.3) + sound 950234be…(토네이도 loop) + sound2 b634a62d…(카르마 use, 0.3) + proj d91e6752…(2.0, projHover 0.3·projSpeed 25·projLife 2.9·projDy 1.0·noRotate) + backClip 643c9e8d…(1.5, backDelay 0.3·backLife 2.9) + hitPhases {토네이도: hit/1 f5a6d5aa… + 소리 341c155e…} {카르마: hit/1 6eab154e…·hit/0 089ce476… + 소리 23250468…} + hitKinds(117타에 토네이도 72·카르마 45 오차 누적 분산) + hitSoundEvery 3. 스킬: cd 5·hits 117·hitRatios 13×72/17×45·range 3. 새 fx 키: marks(표식 여러 벌), sound2·sound2Delay·sound2Vol·sound2Pitch, backDelay, hitPhases{upto, clips, scale, sound, vol}, hitKinds, hitSoundEvery; RtsMonsterComponent.PlayHitFxAt(fx, crit, hitNo)(HitFx가 타격 번호를 넘김).
+- Rule(소리): 0.02초 간격 수십 타에 SoundService.PlaySound를 타격마다 부르면 동시 재생 제한으로 앞 몇십 개만 나고 잘린다; SoundComponent 풀 재시작은 "하나 끝나고 다음"처럼 들려 겹침이 없다 → 3타마다 SoundService(겹침 ~20개)가 절충.
+- Scope: project
+- Rationale: 사용자 2026-09-22 자산 지정 6건 → 크기·동시·유지·타수 3배·타격음 조정 → "됐어 이대로 하자. 팬텀은 굳이 바꿀 거 없어".
+- Priority: takes precedence over defaults

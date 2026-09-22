@@ -205,13 +205,14 @@ script RtsHudLogic extends Logic
 		self.TimeText = self:SpawnLabel("RtsTimeText", timeChip, Vector2(0, 0.5), Vector2(0, 0.5), Vector2(58, 0), Vector2(100, 34),
 			"--:--", self:ColInk(), 28, TextAlignmentType.MiddleLeft, true)
 
-		local mesoChip = self:SpawnPanel("RtsMesoChip", grp, Vector2(0, 1), Vector2(0, 1), Vector2(16, -68), Vector2(170, 44),
+		-- 메소 칩은 7자리(1,000,000 — 개발모드 100만·후반 누적)까지 한 줄에 들어가게 시간 칩보다 넓게(2026-09-22: 170 → 221 = 플레이어 목록 폭)
+		local mesoChip = self:SpawnPanel("RtsMesoChip", grp, Vector2(0, 1), Vector2(0, 1), Vector2(16, -68), Vector2(221, 44),
 			self:ColPanel(), self:ColBorder(), 1.5)
 		local coin = self:SpawnUI("model://uisprite", "RtsMesoCoin", mesoChip, Vector2(0, 0.5), Vector2(0, 0.5), Vector2(12, 0), Vector2(26, 26))
 		coin.SpriteGUIRendererComponent.ImageRUID = DataRef(self.CoinRUID)
 		coin.SpriteGUIRendererComponent.Color = Color(1, 1, 1, 1)
-		self.MesoText = self:SpawnLabel("RtsMesoText", mesoChip, Vector2(0, 0.5), Vector2(0, 0.5), Vector2(48, 0), Vector2(110, 34),
-			"0", self:ColInk(), 28, TextAlignmentType.MiddleLeft, true)
+		self.MesoText = self:SpawnLabel("RtsMesoText", mesoChip, Vector2(0, 0.5), Vector2(0, 0.5), Vector2(48, 0), Vector2(165, 34),
+			"0", self:ColInk(), 26, TextAlignmentType.MiddleLeft, true)
 
 		-- 좌측 플레이어 목록 (행은 RefreshPlayerList가 채움)
 		local box = self:SpawnUI("model://uisprite", "RtsPlayers", grp, Vector2(0, 1), Vector2(0, 1), Vector2(16, -123), Vector2(221, 400))
@@ -261,6 +262,18 @@ script RtsHudLogic extends Logic
 		augClick:ConnectEvent(ButtonClickEvent, function(event)
 			_RtsPopupLogic:Open("augment")
 		end)
+
+		-- 우측 하단: 테스트 프리즘 버튼(개발모드 전용, 2026-09-22 사용자 "우측 하단에 테스트 프리즘 증강 버튼") → 프리즘 선택 팝업
+		if _RtsCombatLogic.TestBench then
+			local dev = self:SpawnPanel("RtsDevBtn", grp, Vector2(1, 0), Vector2(1, 0), Vector2(-16, 16), Vector2(160, 50),
+				self:ColPanel(), Color(0.55, 0.75, 1, 1), 1.5)
+			self:SpawnLabel("RtsDevLabel", dev, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2(0, 0), Vector2(156, 40),
+				"테스트 프리즘", self:ColInk(), 19, TextAlignmentType.MiddleCenter, true)
+			local devClick = self:SpawnClick("RtsDevClick", dev)
+			devClick:ConnectEvent(ButtonClickEvent, function(event)
+				_RtsPopupLogic:Open("devprism")
+			end)
+		end
 
 		-- 상단 중앙 안내(기본 숨김)
 		local hint = self:SpawnPanel("RtsHint", grp, Vector2(0.5, 1), Vector2(0.5, 1), Vector2(0, -16), Vector2(720, 44),
@@ -470,7 +483,7 @@ script RtsHudLogic extends Logic
 		for i = 1, _RtsUnitLogic:GetMaxUnits() do
 			local u = _RtsUnitLogic:GetMyUnit(i)
 			if u ~= nil then
-				self:SetUnitSlot(i, u.No, _RtsJobTableLogic:GetJobName(u.JobId), u.Level, _RtsJobTableLogic:GetSeries(u.JobId))
+				self:SetUnitSlot(i, u.No, _RtsJobTableLogic:GetJobNameFor(u), u.Level, _RtsJobTableLogic:GetSeries(u.JobId))
 			else
 				self:ClearUnitSlot(i)
 			end

@@ -125,7 +125,9 @@ script RtsUnitSelectLogic extends Logic
 		local ui = _UILogic:ScreenToUIPosition(screen)
 		local W = 170
 		local rowH = 40
-		local menuH = rowH * 2 + 14
+		-- 3번째 줄 '방출'(2026-09-22 사용자): 증강 소멸 + 레벨업 메소 30% 환급. 누르면 메뉴를 닫고 확인 팝업(RtsPopupLogic 'dismiss')을 연다
+		local rows = 3
+		local menuH = rowH * rows + 14
 		local menu = H:SpawnPanel("RtsUnitMenu", H.HudGroup, Vector2(0.5, 0.5), Vector2(0, 0.5), Vector2(ui.x, ui.y), Vector2(W, menuH),
 			Color(0.11, 0.094, 0.075, 0.97), H:ColGold(), 1.5)
 		self.Menu = menu.Parent
@@ -163,6 +165,18 @@ script RtsUnitSelectLogic extends Logic
 			local target = self.MenuNo
 			self:CloseMenu()
 			_RtsUnitPopupLogic:OpenUnit(target)
+		end)
+
+		-- 3) 방출 — 붉은 테두리. 누르면 메뉴 닫고 확인 팝업(정말 방출하시겠습니까?) → 팝업의 '방출'이 RtsUnitLogic.RequestDismiss
+		local b3 = H:SpawnPanel("RtsUnitMenuDismiss", menu, Vector2(0, 1), Vector2(0, 1), Vector2(6, -6 - rowH * 2), Vector2(W - 12, rowH - 4),
+			P:Mix(Color.white, 0.05), Color(0.8, 0.35, 0.3, 1), 1.5)
+		H:SpawnLabel("RtsUnitMenuDismissText", b3, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2(0, 0), Vector2(W - 20, 30),
+			"방출", Color(0.95, 0.6, 0.55, 1), 16, TextAlignmentType.MiddleCenter, true)
+		local c3 = H:SpawnClick("RtsUnitMenuDismissClick", b3)
+		c3:ConnectEvent(ButtonClickEvent, function(event)
+			local target = self.MenuNo
+			self:CloseMenu()
+			P:OpenDismiss(target)
 		end)
 	end
 

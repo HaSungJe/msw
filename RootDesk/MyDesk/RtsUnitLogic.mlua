@@ -192,6 +192,13 @@ script RtsUnitLogic extends Logic
 		self.UnitsByUser[userId] = {}
 		self.MesoByUser[userId] = self.DemoMeso
 		self:LoadAvatarPass(userId)
+		if _RtsCombatLogic.TestBench then
+			-- 개발모드(2026-09-22 사용자 "유닛 영입도 자유롭게", "100만 메소 빼자"): 시범 메소 그대로, 유닛 없이 시작 — 우측 영입 팝업에서 직업을 누르면 Lv50 1기가 보스 곁 빈 발판에 서고(RequestRecruit),
+			--   우측 하단 '테스트 프리즘' 팝업에서 프리즘을 고른다(RequestDevPrism — 다시 누르면 해제). 이동 쿨타임은 0(RequestMove)
+			self:OnChanged(0, self.DemoMeso, userId)
+			log("RtsUnit: dev mode — no units (recruit from popup)")
+			return
+		end
 		self:SpawnUnit(userId, zone, 1, "hero", 12, 13, 7)
 		self:SpawnUnit(userId, zone, 2, "paladin", 40, 6, 3)
 		-- 2026-09-20 시험대: 3번 = 팬텀 Lv30(조커). 이전: 섀도어 Lv30·나이트로드 Lv30(확인 끝), 다크나이트 Lv20 — 되돌리려면 "shad", 30 / "nl", 30 / "dk", 20
@@ -213,6 +220,13 @@ script RtsUnitLogic extends Logic
 	method Entity SpawnUnit(string userId, number zone, number no, string jobId, number level, number col, number row)
 		local mapRoot = _EntityService:GetEntityByPath("/maps/RtsMap")
 		if mapRoot == nil then return nil end
+		-- 같은 슬롯에 이미 유닛이 있으면 먼저 지운다(2026-09-22: 개발 스크립트 스폰과 영입이 같은 순간 겹쳐 슬롯 1에 엔티티가 둘 → 방출 뒤 유령 유닛이 남아 계속 공격). 루프도 정지
+		local old = nil
+		if self.UnitsByUser[userId] ~= nil then old = self.UnitsByUser[userId][no] end
+		if old ~= nil and isvalid(old) then
+			_RtsCombatLogic:StopLoop(userId, no)
+			old:Destroy()
+		end
 		local at = _RtsZoneLogic:GetCellCenter(zone, col, row)
 		local e = _SpawnService:SpawnByModelId("model://MapObject", self:UnitName(zone, no), Vector3(at.x, at.y - 0.75, 0), mapRoot)
 		if e == nil then return nil end
@@ -259,7 +273,7 @@ script RtsUnitLogic extends Logic
 		if e == nil or not isvalid(e) then return end
 		local u = e.RtsUnitComponent
 		if u == nil then return end
-		local want = (_RtsJobTableLogic:GetStat(u.JobId, u.Level).halfHits or 0) > 0
+		local want = (_RtsJobTableLogic:GetStatFor(u).halfHits or 0) > 0
 		local sh = e:GetChildByName("Shadow")
 		if not want then
 			if sh ~= nil and isvalid(sh) then sh:Destroy() end
@@ -276,6 +290,215 @@ script RtsUnitLogic extends Logic
 		end
 		sh.TransformComponent.Scale = Vector3(1, 1, 1)
 		sh.TransformComponent.Position = Vector3(0.22, 0, 0)
+	end
+
+	-- 대상 지정 스킬(홀리 유니티 — 프리즘)의 획득 레벨. 프리즘이 스킬 표에 얹은 target 항목까지 본다
+	method number TargetSkillLevelFor(any u)
+		local list = _RtsJobTableLogic:GetSkillsFor(u)
+		for i = 1, #list do
+			if list[i].target then return list[i].lv end
+		end
+		return 0
+	end
+
+	-- ===== 프리즘 증강 적용(서버, 2026-09-22) =====
+	--   Prisms에 id 추가 → 그 프리즘의 영구 잠금(3) → 그림자·공격 루프 재설정(주기가 바뀔 수 있음) → 알림. 같은 id 두 번은 무시, 직업이 다르면 무시
+	@ExecSpace("ServerOnly")
+	method void ApplyPrism(string userId, number no, string id)
+		local e = self:GetUnit(userId, no)
+		if e == nil then return end
+		local u = e.RtsUnitComponent
+		local T = _RtsJobTableLogic
+		if T:HasPrism(u, id) then return end
+		local p = T:GetPrism(id)
+		if p == nil or p.job ~= u.JobId then return end
+		if u.Prisms == "" then u.Prisms = id else u.Prisms = u.Prisms .. "," .. id end
+		if p.locks ~= nil then
+			local skills = T:GetSkillsFor(u)
+			for i = 1, #p.locks do
+				local idx = T:FindSkill(skills, p.locks[i])
+				if idx > 0 then u.SkillLocks = T:SetLock(u.SkillLocks, idx, 3) end
+			end
+		end
+		self:EnsureShadow(e)
+		_RtsCombatLogic:StartLoop(userId, no)
+		self:OnChanged(no, self:GetMeso(userId), userId)
+		log("RtsUnit: prism " .. id .. " -> unit " .. string.format("%d", no) .. " (" .. u.JobId .. ")")
+	end
+
+	-- ===== 영입(개발모드 선행, 2026-09-22 사용자 "유닛 영입도 내가 자유롭게") =====
+	--   영입 팝업의 직업 카드 → 빈 번호(1~MaxUnits)에 그 직업 유닛을 보스 곁 가장 가까운 빈 발판에 세운다. 개발모드: 무료·Lv50·동일 직업 중복 허용.
+	--   본편(Phase 5): 영입가 차감·동일 직업 불가·Lv1·발판 선택 — 그때 이 메서드에 규칙을 얹는다. 지금은 TestBench가 아니면 무시
+	@ExecSpace("Server")
+	method void RequestRecruit(string jobId)
+		local userId = senderUserId
+		if not _RtsCombatLogic.TestBench then return end
+		if not _RtsJobTableLogic:HasJob(jobId) then return end
+		local zone = _RtsZoneLogic:GetZoneOfUser(userId)
+		if zone < 1 then return end
+		if self.UnitsByUser[userId] == nil then self.UnitsByUser[userId] = {} end
+		local list = self.UnitsByUser[userId]
+		-- 동일 직업 중복 영입 불가(character.md 헤더 규칙; 2026-09-22 사용자 "듀얼블레이더로 전직했어도 섀도어 영입 추가 안 되어야 하는 건 당연" — 프리즘으로 이름이 바뀌어도 JobId는 그대로라 막힌다). 개발모드도 같음
+		if self:HasJobUnit(userId, jobId) then
+			log("RtsUnit: recruit " .. jobId .. " refused — already owned")
+			return
+		end
+		local no = 0
+		for i = 1, self.MaxUnits do
+			local e = list[i]
+			if e == nil or not isvalid(e) then
+				no = i
+				break
+			end
+		end
+		if no == 0 then return end
+		local col, row = self:FreePadNear(userId, _RtsCombatLogic.BossCol, _RtsCombatLogic.BossRow)
+		if col == 0 then return end
+		self:SpawnUnit(userId, zone, no, jobId, 50, col, row)
+		self:OnChanged(no, self:GetMeso(userId), userId)
+		log("RtsUnit: recruit " .. jobId .. " -> unit " .. string.format("%d", no) .. " at (" .. string.format("%d,%d", col, row) .. ")")
+	end
+
+	-- 이 유저가 그 직업 유닛을 이미 보유했는가(서버)
+	@ExecSpace("ServerOnly")
+	method boolean HasJobUnit(string userId, string jobId)
+		local list = self.UnitsByUser[userId]
+		if list == nil then return false end
+		for _, e in pairs(list) do
+			if e ~= nil and isvalid(e) and e.RtsUnitComponent ~= nil and e.RtsUnitComponent.JobId == jobId then return true end
+		end
+		return false
+	end
+
+	-- (col,row)에서 체비셰프 거리가 가장 가까운, 내 유닛이 서 있지 않은 발판. 없으면 0,0
+	@ExecSpace("ServerOnly")
+	method any FreePadNear(string userId, number col, number row)
+		local list = self.UnitsByUser[userId] or {}
+		local used = {}
+		for _, e in pairs(list) do
+			if e ~= nil and isvalid(e) and e.RtsUnitComponent ~= nil then
+				used[string.format("%d_%d", e.RtsUnitComponent.Col, e.RtsUnitComponent.Row)] = true
+			end
+		end
+		local best = nil
+		local bc, br = 0, 0
+		for r = 1, _RtsConfigLogic:GetGridRows() do
+			for c = 1, _RtsConfigLogic:GetGridCols() do
+				if _RtsZoneLogic:IsPadCell(c, r) and used[string.format("%d_%d", c, r)] == nil then
+					local d = math.max(math.abs(c - col), math.abs(r - row)) * 10 + math.abs(c - col) + math.abs(r - row)
+					if best == nil or d < best then
+						best = d
+						bc, br = c, r
+					end
+				end
+			end
+		end
+		return bc, br
+	end
+
+	-- 방출 환급률: 그 유닛의 레벨업에 쓴 메소(SpentMeso)의 30%(2026-09-22 사용자 "증강 소멸 / 메소 사용한 것의 30% 회수(레벨업에 사용한)")
+	property number DismissRefundRate = 0.3
+
+	-- 유닛 1기 방출(본편 기능, 2026-09-22): 캐릭터 메뉴 '방출' → 두 번째 클릭으로 확정. 효과 — 그 유닛의 증강(프리즘 포함)은 소멸, 레벨업에 쓴 메소의 30% 환급(영입가는 환급 없음),
+	--   이 유닛을 대상으로 지정한 홀리 유니티는 미지정으로, 번호는 비워 두어 다음 영입이 채운다. 증강 시스템(Phase 4 나머지)이 생기면 RtsAugmentLogic에 '유닛 방출' 훅으로 지정 증강을 지운다
+	@ExecSpace("Server")
+	method void RequestDismiss(number no)
+		local userId = senderUserId
+		local list = self.UnitsByUser[userId]
+		if list == nil then return end
+		local e = list[no]
+		if e == nil or not isvalid(e) then return end
+		local u = e.RtsUnitComponent
+		local refund = math.floor((u.SpentMeso or 0) * self.DismissRefundRate + 0.0001)
+		_RtsCombatLogic:StopLoop(userId, no)
+		for otherNo, oe in pairs(list) do
+			if oe ~= nil and isvalid(oe) and oe.RtsUnitComponent ~= nil and oe.RtsUnitComponent.BondNo == no then oe.RtsUnitComponent.BondNo = 0 end
+		end
+		list[no] = nil
+		e:Destroy()
+		self.MesoByUser[userId] = self:GetMeso(userId) + refund
+		self:OnChanged(0, self:GetMeso(userId), userId)
+		log("RtsUnit: dismiss unit " .. string.format("%d", no) .. " refund " .. string.format("%d", refund))
+	end
+
+	-- 방출 시 환급액(클라 확인 문구용)
+	method number DismissRefund(any u)
+		if u == nil then return 0 end
+		return math.floor((u.SpentMeso or 0) * self.DismissRefundRate + 0.0001)
+	end
+
+	-- 개발모드: 내 유닛 전부 삭제(테스트 프리즘 팝업의 '유닛 전부 삭제')
+	@ExecSpace("Server")
+	method void RequestDevClear()
+		local userId = senderUserId
+		if not _RtsCombatLogic.TestBench then return end
+		self:ClearUnits(userId)
+		self:OnChanged(0, self:GetMeso(userId), userId)
+		log("RtsUnit: dev clear")
+	end
+
+	-- 프리즘 id를 그 직업인 내 유닛에 적용(팬텀 영입 프리즘은 직업 목록에서 팬텀을 고르면 되니 여기선 무시)
+	@ExecSpace("Server")
+	method void RequestDevPrism(string id)
+		local userId = senderUserId
+		if not _RtsCombatLogic.TestBench then return end
+		local p = _RtsJobTableLogic:GetPrism(id)
+		if p == nil or p.job == "" then return end
+		local list = self.UnitsByUser[userId]
+		if list == nil then return end
+		for no, e in pairs(list) do
+			if e ~= nil and isvalid(e) and e.RtsUnitComponent ~= nil and e.RtsUnitComponent.JobId == p.job then
+				if _RtsJobTableLogic:HasPrism(e.RtsUnitComponent, id) then
+					self:RemovePrism(userId, no, id)
+				else
+					self:ApplyPrism(userId, no, id)
+				end
+			end
+		end
+	end
+
+	-- 프리즘 해제(개발모드 토글용): Prisms에서 id 제거 → 그 프리즘이 잠근 스킬을 기본 잠금값으로 되돌림 → 그림자·루프·알림
+	@ExecSpace("ServerOnly")
+	method void RemovePrism(string userId, number no, string id)
+		local e = self:GetUnit(userId, no)
+		if e == nil then return end
+		local u = e.RtsUnitComponent
+		local T = _RtsJobTableLogic
+		if not T:HasPrism(u, id) then return end
+		local p = T:GetPrism(id)
+		-- 잠금 복구는 제거 전 표(프리즘이 얹은 항목 순서)로 인덱스를 찾는다
+		if p ~= nil and p.locks ~= nil then
+			local skills = T:GetSkillsFor(u)
+			for i = 1, #p.locks do
+				local idx = T:FindSkill(skills, p.locks[i])
+				if idx > 0 then
+					local def = 0
+					if skills[idx].lock ~= nil then def = skills[idx].lock end
+					u.SkillLocks = T:SetLock(u.SkillLocks, idx, def)
+				end
+			end
+		end
+		local keep = {}
+		for q in string.gmatch(u.Prisms, "[^,]+") do
+			if q ~= id then keep[#keep + 1] = q end
+		end
+		u.Prisms = table.concat(keep, ",")
+		self:EnsureShadow(e)
+		_RtsCombatLogic:StartLoop(userId, no)
+		self:OnChanged(no, self:GetMeso(userId), userId)
+		log("RtsUnit: prism " .. id .. " removed from unit " .. string.format("%d", no))
+	end
+
+	-- 내 유닛 전부 제거(루프 정지·엔티티 삭제) — 개발모드 직업 교체용. 메소·아바타 패스는 유지
+	@ExecSpace("ServerOnly")
+	method void ClearUnits(string userId)
+		local list = self.UnitsByUser[userId]
+		if list == nil then return end
+		for no, e in pairs(list) do
+			_RtsCombatLogic:StopLoop(userId, no)
+			if e ~= nil and isvalid(e) then e:Destroy() end
+		end
+		self.UnitsByUser[userId] = {}
 	end
 
 	@ExecSpace("ServerOnly")
@@ -360,6 +583,7 @@ script RtsUnitLogic extends Logic
 		if meso < cost then return end
 		self.MesoByUser[userId] = meso - cost
 		u.Level = u.Level + 1
+		u.SpentMeso = u.SpentMeso + cost
 		self:EnsureShadow(e)
 		-- 레벨로 공격 주기가 바뀔 수 있어(공격속도 강화·period) 루프를 새 주기로 다시 건다
 		_RtsCombatLogic:StartLoop(userId, no)
@@ -373,7 +597,7 @@ script RtsUnitLogic extends Logic
 		local e = self:GetUnit(userId, no)
 		if e == nil then return end
 		local u = e.RtsUnitComponent
-		local need = _RtsJobTableLogic:GetTargetSkillLevel(u.JobId)
+		local need = self:TargetSkillLevelFor(u)
 		if need <= 0 or u.Level < need then return end
 		if targetNo == no then return end
 		if targetNo ~= 0 and self:GetUnit(userId, targetNo) == nil then return end
@@ -392,7 +616,7 @@ script RtsUnitLogic extends Logic
 		if e == nil then return end
 		if mode ~= 0 and mode ~= 1 and mode ~= 2 then return end
 		local u = e.RtsUnitComponent
-		local skills = _RtsJobTableLogic:GetSkills(u.JobId)
+		local skills = _RtsJobTableLogic:GetSkillsFor(u)
 		local k = skills[idx]
 		if k == nil or k.kind ~= "액티브" or u.Level < k.lv then return end
 		local cur = _RtsJobTableLogic:GetLock(u.SkillLocks, idx)
@@ -408,7 +632,7 @@ script RtsUnitLogic extends Logic
 		local e = self:GetUnit(userId, no)
 		if e == nil then return end
 		local u = e.RtsUnitComponent
-		local skills = _RtsJobTableLogic:GetSkills(u.JobId)
+		local skills = _RtsJobTableLogic:GetSkillsFor(u)
 		local k = skills[idx]
 		if k == nil or k.kind ~= "액티브" then return end
 		if _RtsJobTableLogic:GetLock(u.SkillLocks, idx) == 3 then return end
@@ -442,17 +666,20 @@ script RtsUnitLogic extends Logic
 		if not _RtsZoneLogic:IsPadCell(col, row) then return end
 		if u.Col == col and u.Row == row then return end
 		local now = _UtilLogic.ServerElapsedSeconds
+		-- 개발모드(2026-09-22)에선 이동 쿨타임 없음 — 자산 확인하며 자유롭게 옮긴다
+		local cool = self.CooldownSec
+		if _RtsCombatLogic.TestBench then cool = 0 end
 		local list = self.UnitsByUser[userId]
 		for otherNo, oe in pairs(list) do
 			local o = oe.RtsUnitComponent
 			if otherNo ~= no and o.Col == col and o.Row == row then
 				if o:MoveCoolLeft() > 0 then return end
 				o:PlaceAt(u.Col, u.Row)
-				o.MoveReadyAt = now + self.CooldownSec
+				o.MoveReadyAt = now + cool
 			end
 		end
 		u:PlaceAt(col, row)
-		u.MoveReadyAt = now + self.CooldownSec
+		u.MoveReadyAt = now + cool
 		log("RtsUnit: move " .. string.format("%d", no) .. " -> (" .. string.format("%d,%d", col, row) .. ")")
 		self:OnChanged(no, self:GetMeso(userId), userId)
 	end

@@ -46,6 +46,9 @@ script RtsMonsterComponent extends Component
 
 	property number BarY = 1.15
 
+	-- 보스 체력바 높이(세계) — 주니어 발록(스케일 2 → 3.1유닛) 머리 위. 2026-09-22 개발모드 보스
+	property number BossBarY = 3.4
+
 	-- 보스면 긴 체력바(몬스터 표(#10)에서 넣는다)
 	@Sync
 	property boolean IsBoss = false
@@ -84,7 +87,7 @@ script RtsMonsterComponent extends Component
 
 	method void OnSyncProperty(string name, any value)
 		if not self:IsClient() then return end
-		if name == "Hp" or name == "MaxHp" then self:RefreshHpBar() end
+		if name == "Hp" or name == "MaxHp" or name == "IsBoss" then self:RefreshHpBar() end
 	end
 
 	-- 체력바 만들기(한 번). 배경 = 어두운 회색(테두리 느낌으로 살짝 크게), 채움 = 빨강(HP 비율만큼 왼쪽 정렬). 몬스터 스프라이트와 같은 SortingLayer, 순서 +5/+6.
@@ -122,6 +125,12 @@ script RtsMonsterComponent extends Component
 		return self.BarW
 	end
 
+	@ExecSpace("ClientOnly")
+	method number BarTop()
+		if self.IsBoss then return self.BossBarY end
+		return self.BarY
+	end
+
 	-- 배경은 전체 폭(+테두리 0.04), 채움은 비율만큼 폭을 줄이고 왼쪽 끝을 배경 왼쪽에 맞춘다(스프라이트 중심 기준)
 	@ExecSpace("ClientOnly")
 	method void RefreshHpBar()
@@ -140,9 +149,10 @@ script RtsMonsterComponent extends Component
 		if r < 0 then r = 0 elseif r > 1 then r = 1 end
 		local w = W * r
 		local unit = self.WhiteUnit
-		self.HpBack.TransformComponent.Position = Vector3(0, self.BarY / ps, 0)
+		local by = self:BarTop()
+		self.HpBack.TransformComponent.Position = Vector3(0, by / ps, 0)
 		self.HpBack.TransformComponent.Scale = Vector3((W + 0.04) / unit / ps, (H + 0.04) / unit / ps, 1)
-		self.HpFill.TransformComponent.Position = Vector3(-(W - w) / 2 / ps, self.BarY / ps, 0)
+		self.HpFill.TransformComponent.Position = Vector3(-(W - w) / 2 / ps, by / ps, 0)
 		self.HpFill.TransformComponent.Scale = Vector3(math.max(w, 0.001) / unit / ps, H / unit / ps, 1)
 		local sr = self.HpFill.SpriteRendererComponent
 		if sr ~= nil then sr.Enable = r > 0 end
@@ -167,7 +177,7 @@ script RtsMonsterComponent extends Component
 		-- 정중앙(피격 박스 x), 체력바(세계 BarY ± BarH/2) 바로 위에 결정체 중심 — 로컬 값 = 세계 ÷ 부모 스케일
 		local x = 0
 		if e.HitComponent ~= nil then x = e.HitComponent.ColliderOffset.x end
-		local y = (self.BarY + self.BarH / 2 + 0.05 + self.FrozenWorld / 2) / ps
+		local y = (self:BarTop() + self.BarH / 2 + 0.05 + self.FrozenWorld / 2) / ps
 		local layer = "MapLayer0"
 		local order = 200
 		if e.SpriteRendererComponent ~= nil then
@@ -266,6 +276,12 @@ script RtsMonsterComponent extends Component
 	--   fx = RtsJobTableLogic 스킬 fx(hitClip / hitScale / hitSound / hitDy)
 	@ExecSpace("ClientOnly")
 	method void PlayHitFx(table fx, boolean crit)
+		self:PlayHitFxAt(fx, crit, 1)
+	end
+
+	-- hitNo = 이 시전 안의 타격 번호(1부터) — hitSoundEvery·hitPhases에 쓴다. (PlayHitFx에 인자를 추가하면 Maker 빌드 분석기가 옛 서명을 캐시해 오류를 내서 이름을 따로 둠, 2026-09-22)
+	@ExecSpace("ClientOnly")
+	method void PlayHitFxAt(table fx, boolean crit, number hitNo)
 		local e = self.Entity
 		if e == nil or not isvalid(e) then return end
 		local sr = e.SpriteRendererComponent
@@ -278,15 +294,44 @@ script RtsMonsterComponent extends Component
 			end, 0.12)
 		end
 		if fx == nil then return end
-		if fx.hitSound ~= nil and fx.hitSound ~= "" then _SoundService:PlaySound(fx.hitSound, 1) end
+		local hn = math.floor(hitNo + 0.5)
+		if hn < 1 then hn = 1 end
 		-- hitClips = {…}: 타격마다 무작위 1개(조커 — 원작 hit/0·1·2 세 색). 없으면 hitClip
 		local clip = fx.hitClip
 		if fx.hitClips ~= nil and #fx.hitClips > 0 then clip = fx.hitClips[math.random(1, #fx.hitClips)] end
+		local s = fx.hitScale or 2
+		local snd = fx.hitSound
+		local sndVol = fx.hitSoundVol or 1
+		-- hitPhases = { { upto = n, clips = {…}, scale = …, sound = …, vol = … } … }: 몇 번째 타격인지(hitNo)로 구간을 골라 그 구간의 클립·타격음(블레이드 토네이도 1~72 → 카르마 퓨리 73~117, 2026-09-22 사용자 — 타격음은 토네이도 구간만)
+		if fx.hitPhases ~= nil then
+			local ph = nil
+			-- hitKinds = { 타격마다 phase 번호 }(블레이드 토네이도·카르마 퓨리를 섞어 동시에 — 2026-09-22 사용자 "당연히 동시지"). 없으면 upto 구간
+			if fx.hitKinds ~= nil and fx.hitKinds[hn] ~= nil then
+				ph = fx.hitPhases[fx.hitKinds[hn]]
+			else
+				for i = 1, #fx.hitPhases do
+					if hn <= (fx.hitPhases[i].upto or 999) then
+						ph = fx.hitPhases[i]
+						break
+					end
+				end
+			end
+			if ph ~= nil then
+				if ph.clips ~= nil and #ph.clips > 0 then clip = ph.clips[math.random(1, #ph.clips)] end
+				if ph.scale ~= nil then s = ph.scale end
+				if ph.sound ~= nil then snd = ph.sound end
+				if ph.vol ~= nil then sndVol = ph.vol end
+			end
+		end
+		-- hitSoundPitch = 타격음 재생 속도(애로우 레인 1.5 — RtsSkillFxLogic.PlaySfx). hitSoundEvery = n타마다 1번만
+		if snd ~= nil and snd ~= "" then
+			local every = fx.hitSoundEvery or 1
+			if every <= 1 or ((hn - 1) % every) == 0 then _RtsSkillFxLogic:PlaySfx(snd, sndVol, fx.hitSoundPitch) end
+		end
 		if clip == nil or clip == "" then return end
 		local mapRoot = _EntityService:GetEntityByPath("/maps/RtsMap")
 		if mapRoot == nil then return end
 		local p = e.TransformComponent.WorldPosition
-		local s = fx.hitScale or 2
 		local at = Vector3(p.x, p.y + (fx.hitDy or 0.6), 0)
 		local h = _SpawnService:SpawnByModelId("model://MapObject", "RtsHitFx_" .. e.Name .. "_" .. tostring(math.floor(DateTime.UtcNow.Elapsed)), at, mapRoot)
 		if h == nil then return end

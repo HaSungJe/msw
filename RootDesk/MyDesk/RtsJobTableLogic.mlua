@@ -248,7 +248,7 @@ script RtsJobTableLogic extends Logic
 	-- 스킬 목록(획득 레벨 순). kind = 액티브/패시브, target = 대상 지정 스킬
 	--   fx(있으면) = 연출 정의: motion 아바타 액션 / frames 플립북 스프라이트 RUID(frameSec 간격, SpriteRUID 교체 재생) / scale 월드 스케일
 	--   / feetDx·feetDy 캔버스 중심→발 오프셋(×scale, 유닛 발에 맞춤) / sound 시전음 / hitSound 타격음. 전투(Phase 3)가 이걸 읽어 재생한다
-	--   motion 하나 또는 motions = {…} + motionGap(초)로 아바타 액션을 이어 재생, motionRate = 액션 재생 속도(1 원속, 0.56 = 0.44초 swing이 0.78초), motionLoop = 공격하는 동안 그 액션을 루프로 유지(폭풍의 시; motionFrame·motionFrameEnd = 그 프레임 구간만), motionCycle = motions를 motionGap 간격으로 공격이 이어지는 동안 차례로 반복(조커) / loopClip·loopScale·loopDx·loopDy·loopAlpha·loopOrder = 공격 중 유닛 위에 계속 도는 클립(시전이 0.6초 끊기면 정리, 유지 자세도 함께; loopOrder 190 = 아바타 뒤 — 조커) / 요소별 방향: clipFacesLeft·framesFacesLeft·bodyFacesLeft·loopFacesLeft·projFacesLeft가 있으면 assetFacesLeft보다 우선 / proj·projSec·projDy·projScale = 유닛에서 대상까지 날아가는 투사체 클립(비행 방향으로 회전, projNoRotate로 끔; projs = {…}면 발마다 차례로(라운드 로빈) 1개 — 조커 카드 4종) / markClip·markLife·markLoop = 시전 순간 대상 위 표식 클립(스나이핑 조준; 위치 = 피격 박스 중앙, 크기 = markFit × 박스 긴 쪽 — 없으면 markScale·markDy; markClips = {…} 무작위 1개, markAt = "feet"면 발 위치 + markDx·markDy, markDelay 초 뒤, markScaleX = 가로만 추가 배율) / beam·beamDelay·beamScale·beamSeg·beamDx·beamDy·beamLife = 유닛 손→대상까지 클립 조각을 이어 붙인 빔(체인 라이트닝) / projCount·projStagger·projFrom("around")·projSpread(안쪽 고리 반지름)·projGap(구체 간격 = 고리 간격)·projLife = 구체 여러 개(도트 퍼니셔, 동심원 고리 채우기 OrbSpawnOffset), projHover = 생성 뒤 떠 있는 초, projSpeed = 유닛/초(있으면 비행 시간 = 거리÷속도, 판정도 그 시각), projFlySprites·projHitSprites·projFrameSec = 비행 중 돌릴 프레임 sprite 목록 / 닿은 뒤 한 번 돌릴 폭발 프레임 목록(클립 프레임 범위 지정은 안 먹음), projSpin = 자전 도/초, projArc = 포물선 높이(유닛; 비행 방향에 수직·항상 위로 4t(1−t) 튀어오름, 발마다 50~100% — projArcRandom=true면 위/아래 무작위; projArcByDist = { 1칸, 2칸, 3칸, 4칸+ } 있으면 대상까지 칸 거리로 고른 값 그대로) / zoneClips·zoneScale·zoneAlpha·zoneLife·zoneOrder = 구역 트랙 모든 칸 위 지대 클립(포이즌 리전) / backClip·backScale·backDx·backDy·backLife·backAlpha = 캐릭터 뒤(190) 클립(블리자드 기둥) / 스킬 항목의 after = 후딜 초(다음 공격까지 쉼), dot = { pct, period, dur } 서버 지속 피해, freeze = 빙결 초, range = 사거리 칸(기본 공격은 st.range가 우선, 없으면 2), targets = 타겟 수(없으면 st.targets), aoe = 메인 대상(사거리 안 가장 가까운 적) 곁 몇 칸까지 나머지 대상을 잡는지(범위 공격 기본 1, 체인 라이트닝만 3 — 2026-09-19 사용자), area = 전체 광역기(제네시스·생츄어리·블리자드·드래곤 로어: 메인 대상 없이 사거리 안 적을 랜덤으로 n마리), 지대 dot·구체 spread(도트 퍼니셔)는 사거리 제한 없이 구역 전체가 후보 — RtsCombatLogic.PickTargets, spread = 타격을 대상들에 돌아가며 1회씩(도트 퍼니셔), projEach = 대상마다 투사체 1발(RtsCombatLogic) / clip(있으면) = 플립북 대신 애니메이션 클립 RUID 1회 재생(clipDelay 초 뒤), clips = { ruid 또는 {ruid, dx, dy, scale, delay, life} … } 같은 원점에 함께 띄우는 추가 클립들(스피어 버스터; life = 제거 시각 — 마지막 프레임이 긴 클립은 EndFrame 정리에 잘리므로 클립 총길이를 준다), clipHold = clip도 EndFrame 정리 대신 clipLife까지, motionDelay = 첫 모션 지연 초 / hideWeapon·hideWeaponSec = 스킬 동안 캐릭터 무기·무기 잔상 숨김(이펙트에 검이 들어 있는 레이징 블로우) / bodyClip·bodyScale·bodyDy·bodyLife = 아바타 위 몸 덧그림(원작 effect0, RtsSkillFxLogic.PlayBody) / assetFacesLeft = 원작(왼쪽 보기) 자산 — 유닛이 보는 방향(RtsUnitComponent.FaceDir)에 맞춰 반전, noFlip = 대칭 오라(반전 안 함) / sound·soundDelay = 시전음(soundDelay 초 뒤 재생) / hitDelay 시전→첫 판정 초 / hitGap 타격 간격(타격마다 따로 판정·크리) / hitClip·hitScale·hitDy 몬스터 위 타격 클립(hitClips = {…}면 타격마다 무작위 1개 — 조커 3색) / hitSound 타격음 (RtsCombatLogic·RtsMonsterComponent)
+	--   motion 하나 또는 motions = {…} + motionGap(초)로 아바타 액션을 이어 재생, motionRate = 액션 재생 속도(1 원속, 0.56 = 0.44초 swing이 0.78초), motionLoop = 공격하는 동안 그 액션을 루프로 유지(폭풍의 시; motionFrame·motionFrameEnd = 그 프레임 구간만), motionCycle = motions를 motionGap 간격으로 공격이 이어지는 동안 차례로 반복(조커) / loopClip·loopScale·loopDx·loopDy·loopAlpha·loopOrder = 공격 중 유닛 위에 계속 도는 클립(시전이 0.6초 끊기면 정리, 유지 자세도 함께; loopOrder 190 = 아바타 뒤 — 조커) / loopIntro·loopIntroScale·loopIntroDy·loopIntroLife·loopIntroSound = 루프가 처음 생길 때 같은 자리에 1회 클립·소리(그동안 루프는 투명 — 애로우 레인 활 소환) / loopSound·loopSoundVol = 루프 동안 반복 소리(끝나면 StopSound), loopEnd·loopEndLife·loopEndSound = 루프가 끊길 때 같은 자리 1회 클립·소리(디바인 퍼니시먼트), loopAt "target" = 루프(인트로·엔드 포함)를 유닛이 아니라 메인 대상 몬스터의 자식으로(피격 박스 중앙 + loopDy, loopAtTop이면 박스 윗변 기준, 대상 바뀌면 재생성) / 요소별 방향: clipFacesLeft·framesFacesLeft·bodyFacesLeft·loopFacesLeft·projFacesLeft가 있으면 assetFacesLeft보다 우선 / proj·projSec·projDy·projScale = 유닛에서 대상까지 날아가는 투사체 클립(비행 방향으로 회전, projNoRotate로 끔; projs = {…}면 발마다 차례로(라운드 로빈) 1개 — 조커 카드 4종) / markClip·markLife·markLoop = 시전 순간 대상 위 표식 클립(스나이핑 조준; 위치 = 피격 박스 중앙, 크기 = markFit × 박스 긴 쪽 — 없으면 markScale·markDy; markClips = {…} 무작위 1개, markAt = "feet"면 발 위치 + markDx·markDy, markDelay 초 뒤 + 대상마다 markStagger 초씩 늦게(서버 hitStagger와 짝), markPattern "alternate" = 같은 대상 반복 표식을 좌·우 번갈아 markAltDists 거리로(블리자드 템페스트), markScaleX = 가로만 추가 배율; marks = { {clip, clips, delay, life, scale, at, dx, dy, fit, pivotDy, loop, stagger, pattern, scaleX} … } = 표식 여러 벌(블레이드 토네이도 → 카르마 퓨리)) / sound2·sound2Delay·sound2Vol·sound2Pitch = 두 번째 시전음 / beam·beamDelay·beamScale·beamSeg·beamDx·beamDy·beamLife = 유닛 손→대상까지 클립 조각을 이어 붙인 빔(체인 라이트닝) / projCount·projStagger·projFrom("around" 유닛 주변 / "sky" 대상 머리 위 projSkyHeight에서 ±projSkySpread 흩어져 수직 낙하 — 애로우 레인)·projSpread(안쪽 고리 반지름)·projGap(구체 간격 = 고리 간격)·projLife = 구체 여러 개(도트 퍼니셔, 동심원 고리 채우기 OrbSpawnOffset), projHover = 생성 뒤 떠 있는 초, projSpeed = 유닛/초(있으면 비행 시간 = 거리÷속도, 판정도 그 시각), projFlySprites·projHitSprites·projFrameSec = 비행 중 돌릴 프레임 sprite 목록 / 닿은 뒤 한 번 돌릴 폭발 프레임 목록(클립 프레임 범위 지정은 안 먹음), projSpin = 자전 도/초, projArc = 포물선 높이(유닛; 비행 방향에 수직·항상 위로 4t(1−t) 튀어오름, 발마다 50~100% — projArcRandom=true면 위/아래 무작위; projArcByDist = { 1칸, 2칸, 3칸, 4칸+ } 있으면 대상까지 칸 거리로 고른 값 그대로) / zoneClips·zoneScale·zoneAlpha·zoneLife·zoneOrder = 구역 트랙 모든 칸 위 지대 클립(포이즌 리전) / backClip·backScale·backDx·backDy·backLife·backAlpha·backDelay = 캐릭터 뒤(190) 클립(블리자드 기둥; backDelay 초 뒤 — 카르마 퓨리) / 스킬 항목의 after = 후딜 초(다음 공격까지 쉼), dot = { pct, period, dur } 서버 지속 피해, freeze = 빙결 초, range = 사거리 칸(기본 공격은 st.range가 우선, 없으면 2), targets = 타겟 수(없으면 st.targets), aoe = 메인 대상(사거리 안 가장 가까운 적) 곁 몇 칸까지 나머지 대상을 잡는지(범위 공격 기본 1, 체인 라이트닝만 3 — 2026-09-19 사용자), area = 전체 광역기(제네시스·생츄어리·블리자드·드래곤 로어: 메인 대상 없이 사거리 안 적을 랜덤으로 n마리), 지대 dot·구체 spread(도트 퍼니셔)는 사거리 제한 없이 구역 전체가 후보 — RtsCombatLogic.PickTargets, spread = 타격을 대상들에 돌아가며 1회씩(도트 퍼니셔), projEach = 대상마다 투사체 1발(RtsCombatLogic) / clip(있으면) = 플립북 대신 애니메이션 클립 RUID 1회 재생(clipDelay 초 뒤), clips = { ruid 또는 {ruid, dx, dy, scale, delay, life} … } 같은 원점에 함께 띄우는 추가 클립들(스피어 버스터; life = 제거 시각 — 마지막 프레임이 긴 클립은 EndFrame 정리에 잘리므로 클립 총길이를 준다), clipHold = clip도 EndFrame 정리 대신 clipLife까지, clipOrder = 시전 클립 레이어(기본 300 앞, −10 = 아바타 뒤), motionDelay = 첫 모션 지연 초 / hideWeapon·hideWeaponSec = 스킬 동안 캐릭터 무기·무기 잔상 숨김(이펙트에 검이 들어 있는 레이징 블로우) / bodyClip·bodyScale·bodyDy·bodyLife = 아바타 위 몸 덧그림(원작 effect0, RtsSkillFxLogic.PlayBody) / assetFacesLeft = 원작(왼쪽 보기) 자산 — 유닛이 보는 방향(RtsUnitComponent.FaceDir)에 맞춰 반전, noFlip = 대칭 오라(반전 안 함) / sound·soundDelay·soundPitch = 시전음(soundDelay 초 뒤 재생, soundPitch = 재생 속도) / hitDelay 시전→첫 판정 초 / hitGap 타격 간격(타격마다 따로 판정·크리) / hitStagger 같은 타격 안에서 대상마다 늦추는 초(블리자드 템페스트 15개 낙하) / hitClip·hitScale·hitDy 몬스터 위 타격 클립(hitClips = {…}면 타격마다 무작위 1개 — 조커 3색) / hitSound·hitSoundPitch·hitSoundVol·hitSoundEvery 타격음(피치 = 재생 속도, RtsSkillFxLogic.PlaySfx; hitSoundEvery = n타마다 1번), hitPhases = { {upto, clips, scale, sound, vol} … } 타격 번호 구간별 타격 클립·타격음(sound "" = 무음; hitKinds = { 타격마다 phase 번호 } 가 있으면 구간 대신 그 번호) (RtsCombatLogic·RtsMonsterComponent)
 	--   lock(액티브만, 없으면 0) = 잠금 설정 기본값: 0 사용 / 1 보스전 잠금 / 2 잠금 (드래곤 로어는 기본 보스전 잠금) / cd(초) = 쿨타임 — 있으면 준비됐을 때 기본 공격 대신 우선 사용(RtsCombatLogic)
 	-- 연출 미리보기용 덮어쓰기(클라 스크립트에서 FxOverrides["hero:1"] = {...}로 넣으면 GetSkills가 그 스킬의 fx를 바꿔 준다. 확정되면 표에 옮기고 비운다)
 	property table FxOverrides = {}
@@ -290,32 +290,32 @@ script RtsJobTableLogic extends Logic
 				--   클립 14프레임 0.78초(0.06초/프레임): 0.06~0.24 캐릭터 뒤쪽 잔상(원점 왼쪽 30px, 오른쪽으로 뻗음 = 왼쪽 보기 자산의 등 뒤) → 0.24~0.54 큰 초승달 참격(230×247px, 원점이 오른쪽 끝 → 앞으로) → 0.54~0.78 수평 마무리 참격(340×60~120px).
 				--   확정(2026-09-19 사용자 "지금 딱 좋아"): hideWeapon으로 캐릭터 검·무기 잔상을 숨기고(이펙트의 금색 대검이 검 역할) 몸 동작은 swingO3(뒤→앞 가로 휘두르기; T3 올려베기·T1·T2 내려베기는 "안 어울림"/"칼이 위에서 시작") 하나를 0.58배속으로 늘려(motionRate — 0.45초 → 0.78초 = 클립 길이) 클립과 동시에 시작(2026-09-19 사용자 "첫 모션만 늘려서 싱크" → "초승달(swingT3 올려베기)은 안 어울림" — 클립 궤적이 위→앞 아래 내려베기라 T1): 휘두름 정점 ≈0.39초가 초승달(0.24~0.54)과, 후속 동작이 수평 참격(0.54~0.78)과 겹침. 판정 0.4초·0.65초(hitGap 0.25) = 2회 타격. 사운드는 초승달 시작(soundDelay 0.24)에 한 번 — 원작 hit음이라 타격마다 또 울리지 않게 hitSound 없음.
 				--   몬스터 위 타격 클립 7d4fd3b7…(1121008/hit/0). 원작 effect0류 몸 덧그림(bodyClip)은 맨몸 실루엣이 아바타와 겹쳐 보여 쓰지 않는다. 비교 후 안 쓴 후보: 1101011/effect 8b26a0cd…, 11101008/effect/1 5c2c13c4…, 1121008/effect dee33ecf…·use d3df4514….
-				{ lv = 1, kind = "액티브", name = "레이징 블로우", desc = "사거리 1. 140%의 데미지로 3마리를 2회 타격", target = false, range = 1,
+				{ lv = 1, kind = "액티브", name = "레이징 블로우", desc = "사거리 1 안의 적을 최대 3마리까지 140%의 데미지로 2회 공격한다.", target = false, range = 1,
 					fx = { motion = "swingO3", motionRate = 0.58, hideWeapon = true, hideWeaponSec = 0.85, clip = "fa2bfe8ff4f543fb815dd7ee5e02eac9", clipDelay = 0, scale = 2.0, feetDx = 0, feetDy = 0, assetFacesLeft = true, sound = "d621d7a5bffb427cac3f1e00db9d451b", soundDelay = 0.24,
 						hitDelay = 0.4, hitGap = 0.25, hitClip = "7d4fd3b71abd42d6b37f49652d13a8d7", hitScale = 2.0, hitDy = 0.6 } },
-				{ lv = 10, kind = "패시브", name = "콤보 어택", desc = "몬스터 방어율 5% 무시", target = false },
-				{ lv = 20, kind = "패시브", name = "어드벤스드 콤보 어택", desc = "몬스터 방어율 10% 무시", target = false },
-				{ lv = 40, kind = "패시브", name = "어드벤스드 콤보 어택 강화", desc = "공격력 +100%", target = false },
-				{ lv = 40, kind = "패시브", name = "레이징 블로우 강화", desc = "레이징 블로우의 데미지 +150%, 사거리 2, 6마리를 2회 타격", target = false },
-				{ lv = 50, kind = "패시브", name = "발할라", desc = "몬스터 방어율 100% 무시, 공격력 +30%, 보스 공격시 데미지 +15%", target = false },
+				{ lv = 10, kind = "패시브", name = "콤보 어택", desc = "몬스터의 방어율을 5% 무시한다.", target = false },
+				{ lv = 20, kind = "패시브", name = "어드벤스드 콤보 어택", desc = "몬스터의 방어율을 추가로 10% 무시한다.", target = false },
+				{ lv = 40, kind = "패시브", name = "어드벤스드 콤보 어택 강화", desc = "공격력이 100% 증가한다.", target = false },
+				{ lv = 40, kind = "패시브", name = "레이징 블로우 강화", desc = "레이징 블로우의 데미지가 150% 증가하고, 사거리가 2로, 공격 대상이 최대 6마리로 늘어난다.", target = false },
+				{ lv = 50, kind = "패시브", name = "발할라", desc = "몬스터의 방어율을 100% 무시한다. 공격력이 30%, 보스 공격 시 데미지가 15% 증가한다.", target = false },
 			}
 		end
 		if jobId == "paladin" then
 			return {
 				-- 디바인 차지 연출(2026-09-18 사용자 "지금 것 그대로, 원작 재탐색 ㄴㄴ" = character.md 값): swingTF + 시전 클립 1221004/effect/1(cb9cff6c…, 0.65초) + 시전음 1221004/use(e2989dca…)
 				--   타격 0.3초 뒤 1회(200%). 타격 클립·타격음 미지정 → 몬스터 번쩍임만. 클립은 왼쪽 보기 자산(무기 빛 → 앞쪽에 문양 폭발)이라 assetFacesLeft, 스케일 1.4(2.0은 문양이 두 칸 크기)
-				{ lv = 1, kind = "액티브", name = "디바인 차지", desc = "사거리 1, 120%의 데미지로 4마리를 1회 타격", target = false, range = 1,
+				{ lv = 1, kind = "액티브", name = "디바인 차지", desc = "사거리 1 안의 적을 최대 4마리까지 120%의 데미지로 공격한다.", target = false, range = 1,
 					fx = { motion = "swingTF", clip = "cb9cff6c57fd4cb18a05db3d47277031", scale = 1.4, feetDx = 0, feetDy = 0, assetFacesLeft = true, sound = "e2989dcac9054d689e379b9feff55f54",
 						hitDelay = 0.3 } },
-				{ lv = 10, kind = "패시브", name = "매직 크러쉬", desc = "사거리 4 이내의 적 방어율 10% 감소", target = false },
+				{ lv = 10, kind = "패시브", name = "가드 크러쉬", desc = "사거리 4 안에 있는 적의 방어율을 10% 감소시킨다.", target = false },
 				-- 생츄어리 연출(character.md 값): swingT1 + 시전 클립 1221011/effect(d577178a…, 0.9초, 첫 재생 로딩 → Preload) + 시전음 1221011/use / 타격 0.5초 뒤 1회, 맞는 몬스터 위 1221011/hit/0 + 타격음 1221011/hit. cd = 쿨타임 초(전투 루프가 준비되면 기본 공격 대신 쓴다)
-				{ lv = 20, kind = "액티브", name = "생츄어리", desc = "사거리 4, 200%의 데미지로 15마리를 1회 타격. 쿨타임 15초", target = false, area = true, cd = 15, ratio = 200, hits = 1, targets = 15, range = 4, after = 1.5,
+				{ lv = 20, kind = "액티브", name = "생츄어리", desc = "사거리 4 안의 적을 최대 15마리까지 200%의 데미지로 공격한다. 재사용 대기시간 15초", target = false, area = true, cd = 15, ratio = 200, hits = 1, targets = 15, range = 4, after = 1.5,
 					fx = { motion = "swingT1", clip = "d577178a8212489e8319a4c5b16e897b", scale = 1.2, feetDx = 0, feetDy = 0, assetFacesLeft = true, sound = "aa96c1117c634a23b56440be8de39037",
 						hitDelay = 0.5, hitClip = "5df303c326dd488cbeb17028892b5238", hitScale = 1.6, hitDy = 0.6, hitSound = "2cc05078af454fa3a7856b9fb65ed61f" } },
-				{ lv = 30, kind = "패시브", name = "디바인 블레싱", desc = "최종 데미지 +50%", target = false },
-				{ lv = 40, kind = "패시브", name = "매직 크러쉬 강화", desc = "매직 크러쉬의 방어율 감소를 20%로 변경", target = false },
+				{ lv = 30, kind = "패시브", name = "디바인 블레싱", desc = "최종 데미지가 50% 증가한다.", target = false },
+				{ lv = 40, kind = "패시브", name = "가드 크러쉬 강화", desc = "가드 크러쉬의 방어율 감소가 20%로 증가한다.", target = false },
 				-- 홀리 유니티(40 패시브 +20%)는 2026-09-20 삭제 → 프리즘 스킬 "홀리 유니티"(지정 유닛 최종 +40% — 2026-09-22, 처음 +100%)로 이동. 프리즘 스킬 표는 증강 시스템(Phase 6)에서 얹는다(target = true 항목이 그때 생김)
-				{ lv = 50, kind = "패시브", name = "디바인 차지 강화", desc = "디바인 차지의 데미지 +70%, 사거리 2, 6마리를 2회 타격, 보스 공격시 데미지 +40%", target = false },
+				{ lv = 50, kind = "패시브", name = "디바인 차지 강화", desc = "디바인 차지의 데미지가 70% 증가하고, 사거리가 2로, 공격 대상이 최대 6마리, 공격 횟수가 2회로 늘어난다. 보스 공격 시 데미지가 40% 증가한다.", target = false },
 			}
 		end
 		if jobId == "dk" then
@@ -325,16 +325,16 @@ script RtsJobTableLogic extends Logic
 				--   모션 stabT1은 0.5초 뒤(motionDelay — 찌르기 3개 0.6~0.95초를 덮음). 판정 0.65·0.8·0.95초(hitDelay 0.65 + hitGap 0.15 = 찌르기 시차와 같음). 몬스터 위 hit/0 84c06a06…(푸른 폭발 4fr 0.4초). 세트에 사운드가 없어 옛 스피어 크러셔 시전음 fcac442d…·타격음 6313ad64… 유지.
 				--   **확정 2026-09-19 사용자 "다크나이트 스피어 버스터는 이거로 완전 종결"** — 이 상태 그대로 둔다(클립들은 EndFrame 정리라 용머리·찌르기 마지막 프레임이 0.03초만 보이는데, 사용자가 이 모습을 보고 확정. 더 길게 보이게 하려면 clips 항목에 life = 0.7/0.75/0.9/1.05, clipHold 옵션이 있음).
 				--   이전: 영상 추출 11프레임 플립북(assets/textures/crusher, frames = b309f1e7… 외 10, frameSec 0.09, scale 1.7, feetDx -0.11, feetDy 0.83) — 파일은 남겨 둠
-				{ lv = 1, kind = "액티브", name = "스피어 버스터", desc = "사거리 1, 120% 데미지로 3마리를 3회 타격", target = false, range = 1,
+				{ lv = 1, kind = "액티브", name = "스피어 버스터", desc = "사거리 1 안의 적을 최대 3마리까지 120%의 데미지로 3회 공격한다.", target = false, range = 1,
 					fx = { motion = "stabT1", motionDelay = 0.5, clip = "c7051cc242c54208a7c22df2b4bcc28e", clipLife = 1.2,
 						clips = { "176da561b7f946bcbb45bbfbabbaf605", "852883a5b27442e88ac5a23f5a218a58", "3c2ee6e636924e179cca843f819f9b30", "521bf9f60cb94a7fb9890ba2e0ede109" },
 						scale = 2.0, feetDx = 0, feetDy = 0, assetFacesLeft = true, sound = "fcac442d953049d980da4b8d7bd766d8",
 						hitDelay = 0.65, hitGap = 0.15, hitClip = "84c06a061ae74a10a96fd55947769868", hitScale = 1.8, hitDy = 0.6, hitSound = "6313ad64a5854e20ab6e0e369e1c2c56" } },
-				{ lv = 10, kind = "패시브", name = "비홀더", desc = "공격력 +100", target = false },
-				{ lv = 20, kind = "패시브", name = "버서크", desc = "공격력 +100%", target = false },
-				{ lv = 40, kind = "패시브", name = "스피어 버스터 강화", desc = "스피어 버스터의 데미지 +50%, 보스 공격시 데미지 +25%", target = false },
+				{ lv = 10, kind = "패시브", name = "비홀더", desc = "공격력이 100 증가한다.", target = false },
+				{ lv = 20, kind = "패시브", name = "버서크", desc = "공격력이 100% 증가한다.", target = false },
+				{ lv = 40, kind = "패시브", name = "스피어 버스터 강화", desc = "스피어 버스터의 데미지가 50% 증가하고, 보스 공격 시 데미지가 25% 증가한다.", target = false },
 				-- 드래곤 로어 연출(character.md 값): swingT3 + 시전 클립 9001006/effect(5468cadd…, 18프레임 1.2초, 등장 시 Preload) + 시전음 eec2f5d3… / 타격 0.6초 뒤 1회(300%), 맞는 몬스터 위 9001006/hit/0. 쿨 10초, 기본 보스전 잠금
-				{ lv = 50, kind = "액티브", name = "드래곤 로어", desc = "사거리 5, 300%의 데미지로 15마리를 1회 타격. 쿨타임 15초", target = false, lock = 1, area = true, cd = 15, ratio = 300, hits = 1, targets = 15, range = 5, after = 1.5,
+				{ lv = 50, kind = "액티브", name = "드래곤 로어", desc = "사거리 5 안의 적을 최대 15마리까지 300%의 데미지로 공격한다. 재사용 대기시간 15초", target = false, lock = 1, area = true, cd = 15, ratio = 300, hits = 1, targets = 15, range = 5, after = 1.5,
 					fx = { motion = "swingT3", clip = "5468cadd2f60428e925bc368968e1a1e", scale = 1.5, feetDx = 0, feetDy = 0, assetFacesLeft = true, sound = "eec2f5d35c6f4f6ebe8f19bb52dbf1d1", clipLife = 1.4,
 						hitDelay = 0.6, hitClip = "01c803531e2c4e5aa3c3ef66f14711b8", hitScale = 1.6, hitDy = 0.6 } },
 			}
@@ -343,149 +343,149 @@ script RtsJobTableLogic extends Logic
 			return {
 				-- 폭풍의 시 연출(2026-09-18): 원작 폭풍의 시(3121020 계열) — 공격 중 캐릭터 위에 keydown 이펙트 루프(loopClip, 공격이 끊기면 자동 정리) + 화살 투사체 ball + 타격 hit/0, 시전음·타격음은 3121004 use/hit. 0.2초마다 1발 — shoot1 모션을 루프로 유지(motionLoop), 화살은 유닛 손(+0.9)에서 대상까지 0.15초 비행(proj)
 				--   keydown 클립(keydown/0~2 원본 PNG 실측 2026-09-20)은 마법진이 왼쪽(앞), 날개가 오른쪽(뒤)으로 뻗은 왼쪽 보기 → loopFacesLeft = true. 09-18에 false로 둔 건 루프를 첫 시전 때 한 번만 반전하던 시절 FaceDir 동기화가 늦어 반대로 보인 걸 잘못 고친 것(사용자 2026-09-20 "바라보는 방향 안 따라간다")
-				{ lv = 1, kind = "액티브", name = "폭풍의 시", desc = "사거리 3, 70% 데미지로 1마리를 1회 타격. 이 스킬은 공격속도의 영향을 받지 않고, 0.2초당 1회 공격", target = false, range = 3,
+				{ lv = 1, kind = "액티브", name = "폭풍의 시", desc = "사거리 3 안의 적 1마리를 70%의 데미지로 공격한다. 공격속도와 관계없이 0.2초마다 화살을 발사한다.", target = false, range = 3,
 					fx = { motion = "shoot1", motionLoop = true, sound = "3782f12e174947db8517c13e48217f15",
 						loopClip = "5b382e3dd14b430480b729cc3cb56c82", loopScale = 1.2, loopDx = 0, loopDy = 0, loopAlpha = 0.75, loopFacesLeft = true,
 						proj = "a342d48c6f03440abdfe46fc5a39fa8a", projSec = 0.15, projDy = 0.9, projScale = 1.6, assetFacesLeft = true,
 						hitDelay = 0.15, hitClip = "0361094bf35f40aa844685a50f1a1d7e", hitScale = 1.6, hitDy = 0.6, hitSound = "0d2f3305bff945e88a7c7dae9e366348" } },
-				{ lv = 10, kind = "패시브", name = "크리티컬 마스터리", desc = "크리티컬 확률 30% 증가", target = false },
-				{ lv = 20, kind = "패시브", name = "보우 마스터리", desc = "공격력 +25%", target = false },
-				{ lv = 30, kind = "패시브", name = "보우 액스퍼트", desc = "공격력 +25%", target = false },
-				{ lv = 40, kind = "패시브", name = "샤프아이즈", desc = "모든 유닛의 크리티컬 확률을 20% 증가시키고, 크리티컬 데미지를 20% 증가시킨다.", target = false },
-				{ lv = 50, kind = "패시브", name = "폭풍의 시 강화", desc = "폭풍의 시 데미지 +23%, 보스 공격시 데미지 +30%", target = false },
+				{ lv = 10, kind = "패시브", name = "크리티컬 마스터리", desc = "크리티컬 확률이 30% 증가한다.", target = false },
+				{ lv = 20, kind = "패시브", name = "보우 마스터리", desc = "공격력이 25% 증가한다.", target = false },
+				{ lv = 30, kind = "패시브", name = "보우 액스퍼트", desc = "공격력이 25% 증가한다.", target = false },
+				{ lv = 40, kind = "패시브", name = "샤프아이즈", desc = "모든 아군 유닛의 크리티컬 확률과 크리티컬 데미지가 20% 증가한다.", target = false },
+				{ lv = 50, kind = "패시브", name = "폭풍의 시 강화", desc = "폭풍의 시의 데미지가 23% 증가하고, 보스 공격 시 데미지가 30% 증가한다.", target = false },
 			}
 		end
 		if jobId == "marks" then
 			return {
 				-- 피어싱 연출(2026-09-18): 원작 피어싱(3221017) 시전 이펙트(화살촉 모양 폭발 — 촉이 앞, 날개가 등 뒤로 트레일: 프레임 썸네일로 왼쪽 보기 확인) + 화살 투사체 ball + 타격 hit/3, 사운드는 3221001 use/hit. shoot2(석궁) 모션, 타격 3회 0.12초 간격. 시전 이펙트는 캐릭터와 겹치지 않게 앞으로 0.6×스케일(feetDx −0.6 = 자산 기준 앞쪽, 방향에 따라 반전) — 사용자 2026-09-18 "너무 겹친다"
-				{ lv = 1, kind = "액티브", name = "피어싱", desc = "사거리 3, 110%의 데미지로 6마리를 2회 타격", target = false, range = 3,
+				{ lv = 1, kind = "액티브", name = "피어싱", desc = "사거리 3 안의 적을 최대 6마리까지 110%의 데미지로 2회 공격한다.", target = false, range = 3,
 					fx = { motion = "shoot2", projEach = true, clip = "abe88a701a094181b44c8aa9746a1cd7", scale = 1.2, feetDx = -0.6, feetDy = 0, assetFacesLeft = true, sound = "f06e9bb7399640e088a081032036cebf",
 						proj = "1923e5406af44149a7575b25593e9336", projSec = 0.2, projDy = 0.9, projScale = 1.6,
 						hitDelay = 0.35, hitGap = 0.12, hitClip = "4a8db8d2f9614af3a3c902e4ef56d06b", hitScale = 1.6, hitDy = 0.6, hitSound = "1888d984619e45598028a2f830e78bdb" } },
-				{ lv = 10, kind = "패시브", name = "크리티컬 마스터리", desc = "크리티컬 확률 30% 증가", target = false },
-				{ lv = 20, kind = "패시브", name = "샤프아이즈", desc = "모든 유닛의 크리티컬 확률을 20% 증가시키고, 크리티컬 데미지를 20% 증가시킨다.", target = false },
+				{ lv = 10, kind = "패시브", name = "크리티컬 마스터리", desc = "크리티컬 확률이 30% 증가한다.", target = false },
+				{ lv = 20, kind = "패시브", name = "샤프아이즈", desc = "모든 아군 유닛의 크리티컬 확률과 크리티컬 데미지가 20% 증가한다.", target = false },
 				-- 스나이핑 연출(사용자 2026-09-18 "화살이 아니라 대상에게 표식이 뜨면서 데미지"): 시전 순간 대상 위에 조준 표식 3221007/mob(markClip) + 시전음, 화살 투사체 없음.
 				--   0.4초 뒤 50%×10회(0.08초 간격) 타격 hit/0 + 타격음. 시전 이펙트(석궁 폭발)는 유지. 1마리, 쿨 10초
-				{ lv = 30, kind = "액티브", name = "스나이핑", desc = "사거리 6. 몬스터 1마리를 130%의 데미지로 10회 공격한다. 쿨타임 10초", target = false, cd = 10, ratio = 130, hits = 10, targets = 1, range = 6,
+				{ lv = 30, kind = "액티브", name = "스나이핑", desc = "사거리 6 안의 적 1마리를 130%의 데미지로 10회 공격한다. 재사용 대기시간 10초", target = false, cd = 10, ratio = 130, hits = 10, targets = 1, range = 6,
 					fx = { motion = "shoot2", clip = "6c7b4f7910af41dfbe1348eaf2f8c9e6", scale = 1.2, feetDx = -0.6, feetDy = 0, assetFacesLeft = true, sound = "384e71cfc38a4ab1b8a10963cae6365f",
 						markClip = "0c76a3bdd54548988c48bdbdbbd2a5ca", markFit = 1.5, markPivotDy = 0.36, markLife = 1.4,
 						hitDelay = 0.4, hitGap = 0.08, hitClip = "72fa136a368d4f7eba60ce0d16606be5", hitScale = 1.6, hitDy = 0.6, hitSound = "81a8c21eaf31429aa21ccaa63afc1b35" } },
-				{ lv = 40, kind = "패시브", name = "크로스보우 액스퍼트", desc = "공격력 +70%", target = false },
-				{ lv = 50, kind = "패시브", name = "피어싱 강화", desc = "피어싱의 데미지 +155%, 보스 공격시 데미지 +30%", target = false },
+				{ lv = 40, kind = "패시브", name = "크로스보우 액스퍼트", desc = "공격력이 70% 증가한다.", target = false },
+				{ lv = 50, kind = "패시브", name = "피어싱 강화", desc = "피어싱의 데미지가 155% 증가하고, 보스 공격 시 데미지가 30% 증가한다.", target = false },
 			}
 		end
 		if jobId == "il" then
 			return {
 				-- 체인 라이트닝 연출(2026-09-18): 원작 2221006 — 시전 클립 effect(하늘에서 스태프로 내려오는 번개 + 구슬, 0.78초, 구슬 완성 ≈0.45초) + 0.45초에 유닛 손→대상→대상… 번개 조각 ball/0(beam 체인) + 타격 = 썬더볼트(2201005) hit/0(하늘에서 몬스터로 내리치는 번개 138×247px, 원점 = 타격점; 사용자 "썬콜은 영…" → 2221006 hit/0 전기 구슬에서 교체), 사운드 2221006 use/hit. 한손 스태프 swingO1
-				{ lv = 1, kind = "액티브", name = "체인 라이트닝", desc = "사거리 2. 몬스터 10마리를 130%의 데미지로 1회 공격한다.", target = false, range = 2, aoe = 3,
+				{ lv = 1, kind = "액티브", name = "체인 라이트닝", desc = "사거리 2 안의 적을 최대 10마리까지 130%의 데미지로 공격한다. 번개는 인접한 적에게 연쇄된다.", target = false, range = 2, aoe = 3,
 					fx = { motion = "swingO1", clip = "fa693d02e71841b2bf541bcdbdd84242", scale = 1.4, feetDx = 0.35, feetDy = 0, assetFacesLeft = true, sound = "3c837a89f39e4e038b0a3a378de9a377",
 						beam = "fde245aeb0eb49baa3b0bd64fbc05f7a", beamDelay = 0.4, beamScale = 1.6, beamSeg = 0.5, beamDx = 0.3, beamDy = 0.9, beamLife = 0.5,
 						hitDelay = 0.5, hitGap = 0.15, hitClip = "33fc60d9910448a2b36035277b28c354", hitScale = 1.1, hitDy = 0.35, hitSound = "36187759ab2f4bc293aeb035e4ea8d73" } },
-				{ lv = 10, kind = "패시브", name = "메디테이션", desc = "공격력 +150", target = false },
-				{ lv = 20, kind = "패시브", name = "체인 라이트닝 강화", desc = "체인 라이트닝의 사거리를 3으로, 데미지를 170%로 변경", target = false },
+				{ lv = 10, kind = "패시브", name = "메디테이션", desc = "공격력이 150 증가한다.", target = false },
+				{ lv = 20, kind = "패시브", name = "체인 라이트닝 강화", desc = "체인 라이트닝의 사거리가 3으로 늘어나고, 데미지가 170%로 증가한다.", target = false },
 				-- 블리자드 연출(2026-09-18 사용자 지정: "skill/80003323 세트로" — 캐릭터 등 뒤 effect + 타격 hit/0, 빙결 표시 21628ca1…): 시전 클립 없음(2221012 얼음 결정 감싸기는 뺌 — 원하면 clip 223e1ac7… scale 0.85 feetDx 0.9 feetDy 0.4 assetFacesLeft로 복원)
 				--   등 뒤(backClip, 아바타 order 0보다 아래 −10) = 80003323/effect 96b26165…(땅에서 솟는 큰 얼음 결정 군집 + 파란 고리, 86~298px 원점 바닥 중앙, 3.0초, 'model' 형식 → Preload 필수)
 				--   + 0.5초에 대상마다 80003323/hit/0 735ad75a…(하늘 고리 → 얼음 대각 낙하 → 발 위치 산산조각, 2.52초, 착지 = 14프레임 1.68초 → 2.18초; 원점 = 착지점, 고리는 원점 2.7유닛 위·1.2 오른쪽; 산산조각 281×317px, 0.7·0.95·1.5배는 작아 2.0배(5.6×6.3유닛) — 사용자 "타격 이펙트 더 키우자 → 1.5 → 2로") → 타격 판정 2.2초, 조각 잔해 3.0초, 등 뒤 군집 3.0초에 끝 — 사용자 "캐릭터 이펙트 종료 직전 → 타격 → 타격 이펙트 끝 → 캐릭터 이펙트 종료". 타격 클립 = 2221007/hit/0 99a29e16…(파란 얼음 폭발 100×128px 6프레임, 1.6배 — 2026-09-20 사용자 "타격 순간 몬스터 위 이펙트": 낙하 얼음(마크)은 시전 0.5초 시점 자리에 고정이라 순회 중인 몬스터는 빈자리에서 깨지고 몬스터 쪽엔 번쩍임뿐이었다; 광역 4종 전부 몬스터 위 타격 클립을 갖게 됨 — 생츄어리 1221011/hit/0·제네시스 2321008/hit/0·드래곤 로어 9001006/hit/0은 이미 있음). 사운드는 세트에 없어 2221007 use/hit 유지(사용자 요청 확인: sound/skill/80003323 없음). 빙결 1초(freeze → 파란 틴트 + 우측 위 눈꽃 21628ca1… 루프). 후딜 3.0초(after — 연출 3초를 덮어야 다음 공격이 끼어들지 않음; 다른 3스킬은 1.5)
 				--   버린 것: 2221007 effect0 발밑 결정 / 2221007 effect 눈빛 기둥 / 2221007 tile/4 낙하 얼음(같은 그림의 옛 판) / 2221012 결정 감싸기 / 아이스 스트라이크 기둥·hit / 옛 2221003은 라이브러리에 사운드만(use 08fb1290…/hit 64159fd3…). 세트 tile/0~8(d9d44fb0·0806f2b0·50249344·43e522b8·25791d83·1889792f·12299cff·53e7e897·b52555b4)은 hit/0과 같은 낙하 얼음의 높이·시각 변형 — 착지 시각이 1.6~2.0초로 달라 판정 맞추기 어려워 hit/0 하나만 씀
-				{ lv = 30, kind = "액티브", name = "블리자드", desc = "사거리 6. 몬스터 15마리를 965%의 데미지로 1회 공격하고 5초 지속되는 빙결상태를 부여한다. (빙결: 이동속도 감소 50%). 쿨타임 15초", target = false, area = true, cd = 15, ratio = 965, hits = 1, targets = 15, range = 6, freeze = 5, after = 3.0,
+				{ lv = 30, kind = "액티브", name = "블리자드", desc = "사거리 6 안의 적을 최대 15마리까지 965%의 데미지로 공격하고 5초 동안 빙결시킨다. 빙결된 적은 이동속도가 50% 감소한다. 재사용 대기시간 15초", target = false, area = true, cd = 15, ratio = 965, hits = 1, targets = 15, range = 6, freeze = 5, after = 3.0,
 					fx = { motion = "swingO3", noFlip = true, sound = "267aa4a9324f460b80bc04600aa4d0e0",
 						backClip = "96b261657b0c4aa792bd6f3e7d6c6681", backScale = 1.2, backDx = 0, backDy = 0, backLife = 3.1,
 						markClips = { "735ad75ae1f64d88a9444cf9832f4abc" }, markAt = "feet", markDy = 0.3, markScale = 2.0, markDelay = 0.5, markLife = 2.6,
 						hitDelay = 2.2, hitClip = "99a29e161ca74bb887eb5ee019a5115e", hitScale = 1.6, hitDy = 0.6, hitSound = "6fd7c69b3a494a62afd14019a0d34d4c" } },
-				{ lv = 40, kind = "패시브", name = "아케인 에임", desc = "공격력 +50%", target = false },
-				{ lv = 50, kind = "패시브", name = "인피니티", desc = "공격력 +50%, 보스 공격시 데미지 +40%", target = false },
+				{ lv = 40, kind = "패시브", name = "아케인 에임", desc = "공격력이 50% 증가한다.", target = false },
+				{ lv = 50, kind = "패시브", name = "인피니티", desc = "공격력이 50%, 보스 공격 시 데미지가 40% 증가한다.", target = false },
 			}
 		end
 		if jobId == "fp" then
 			return {
 				-- 포이즌 리전 연출(2026-09-18): 원작 포이즌 리전(2121055) 클립은 라이브러리에 사운드만 있어 3차 포이즌 미스트(2111003)로 — 시전 클립 effect(독 폭발, 1.62초, 대칭) + 트랙 모든 칸에 독안개 tile/0~8(zoneClips, 10초 루프, 반투명) + 틱마다 몬스터 위 mob(초록 고리), 사운드 use/hit.
 				--   피해 = dot(2초마다 공격력 10% × 10초 = 5틱, 직접 타격 없음 hits 0). 강화(L20) 15%·방무 100%는 GetStatRaw dotPct·dotIgn
-				{ lv = 1, kind = "액티브", name = "포이즌 리전", desc = "모든 타일에 10초간 지속되는 포이즌 리전 맹독지대 설치. 맹독지대 위의 몬스터를 포이즌 리전 디버프가 적용. 포이즌 리전 디버프에 적용시 2초당 15%의 데미지를 받는다(방어율 무시 100%). 타일이 중첩되도 디버프형식이기에 중복으로 데미지를 받지 않는다. 쿨타임 15초", target = false, cd = 15, ratio = 0, hits = 0, dot = { pct = 15, period = 2, dur = 10 },
+				{ lv = 1, kind = "액티브", name = "포이즌 리전", desc = "모든 타일에 10초 동안 맹독지대를 설치한다. 맹독지대 위의 적은 2초마다 15%의 데미지를 입으며 방어율을 무시한다. 중첩되지 않는다. 재사용 대기시간 15초", target = false, cd = 15, ratio = 0, hits = 0, dot = { pct = 15, period = 2, dur = 10 },
 					fx = { motion = "swingO2", clip = "b0d47a8948314a5ea04a00690d921fc3", scale = 1.2, feetDx = 0, feetDy = 0.6, noFlip = true, clipLife = 1.7, sound = "eb7f504670a14802a48cc94f4eb66848",
 						zoneClips = { "eaed7d6a19f0483aa51dc5ff151f7acf", "7f743e56d7cd43c7a3baf9f7061abd3d", "302b1c7f241b400b8544f3b7378eacce", "550d34dd449242c9b3df7daebac8f259", "8bfddf0644494979ba02ef5a59b5a336", "53f3500a48814dd0b97b2825d781583c", "ce9db043ed324af5865e8fa21ce41dc1", "92f82ee141f24246b462856f3ecd1493", "3a6509634ee24b789f5446afb10fe357" },
 						zoneScale = 1.6, zoneAlpha = 0.7, zoneLife = 10,
 						hitClip = "e42be518ee2f4b838e52deba8bf1316b", hitScale = 1.4, hitDy = 0.6, hitSound = "fbc82c9f2524497c81aea0a647043ab9" } },
-				{ lv = 10, kind = "패시브", name = "메디테이션", desc = "공격력 +100", target = false },
-				{ lv = 20, kind = "패시브", name = "포이즌 리전 강화", desc = "포이즌 리전의 데미지 +15%", target = false },
+				{ lv = 10, kind = "패시브", name = "메디테이션", desc = "공격력이 100 증가한다.", target = false },
+				{ lv = 20, kind = "패시브", name = "포이즌 리전 강화", desc = "포이즌 리전의 데미지가 15% 증가한다.", target = false },
 				-- 도트 퍼니셔 연출(사용자 2026-09-18 순서: "사운드 시작 → 불구슬이 캐릭터 주위에 넓게 생성 / 사운드 끝 → 주변 적을 탐색해 느리게 추적, 부딪히며 판정"): 시전 클립 2121052 effect(유닛 위 푸른 불꽃 해골, 0.99초, 왼쪽 보기 그림) + 시전음 400021001/use(1.18초).
-				--   구체 30개(사용자 2026-09-18 "30개로" — hits 30 = 구체마다 100% 1회, 표 설명은 10개 그대로라 desc·character.md 수치 조정은 보류) = **RtsDotOrb01~03**(사용자 2026-09-18 지정: 도트 퍼니셔 400021001 스킬 아이콘 d998c591…/iconmouseover 20a64945…를 원형으로 잘라 테두리를 없앤 64px 자체 업로드 sprite, assets/textures/dotorb/) 01→02→03→02 0.12초 맥동 루프, 1.8배 ≈ 1.15유닛 둥근 불구슬, 240°/초 자전(구체마다 방향 엇갈림, projSpin — 사용자 "더 키우고 회전") — 0.03초 간격으로 손 높이 주위 동심원 고리(반지름 2.0부터 1.2 간격, 고리마다 둘레÷1.2개 = 10·16·4개)에 생성돼(캐릭터·서로 간 최소 구체 크기 간격) 떠 있다가(projHover 1.2 = 사운드 길이) 각자 생성 지점에서 가장 가까운 적(보스가 사거리 안이면 보스만)의 피격 박스 중앙으로 4.4유닛/초로 날아가(projSpeed — 2.2에서 2배, 사용자 2026-09-18) 박치기하는 순간 사라짐 + 판정 + 400021001/use2 + 폭발 12121055 hit/0(9b8b4484…, 230×270px → 0.7배, 0.9초 — 사용자 "달라붙으면 폭발 이펙트"). 이전: 플레임 위자드 12121055/effect 프레임(0~4 불접시 / 5~11 불구슬)은 사용자 "불접시" → 아이콘 구슬로 교체
+				--   구체 30개(사용자 2026-09-18 "30개로" — hits 30 = 구체마다 100% 1회, 표 설명은 10개 그대로라 desc·character.md 수치 조정은 보류) = **RtsDotOrb01~03**(사용자 2026-09-18 지정: 도트 퍼니셔 400021001 스킬 아이콘 d998c591…/iconmouseover 20a64945…를 원형으로 잘라 테두리를 없앤 64px 자체 업로드 sprite, assets/textures/dotorb/) 01→02→03→02 0.12초 맥동 루프, 1.8배 ≈ 1.15유닛 둥근 불구슬, 240°/초 자전(구체마다 방향 엇갈림, projSpin — 사용자 "더 키우고 회전") — 30개가 한 번에(projStagger 0 — 2026-09-22 사용자 "구체가 한번에 모두 생성되어야 함", 전엔 0.03초 간격) 손 높이 주위 동심원 고리(반지름 2.0부터 1.2 간격, 고리마다 둘레÷1.2개 = 10·16·4개)에 생성돼(캐릭터·서로 간 최소 구체 크기 간격) 떠 있다가(projHover 1.2 = 사운드 길이) 각자 생성 지점에서 가장 가까운 적(보스가 사거리 안이면 보스만)의 피격 박스 중앙으로 4.4유닛/초로 날아가(projSpeed — 2.2에서 2배, 사용자 2026-09-18) 박치기하는 순간 사라짐 + 판정 + 400021001/use2 + 폭발 12121055 hit/0(9b8b4484…, 230×270px → 0.7배, 0.9초 — 사용자 "달라붙으면 폭발 이펙트"). 이전: 플레임 위자드 12121055/effect 프레임(0~4 불접시 / 5~11 불구슬)은 사용자 "불접시" → 아이콘 구슬로 교체
 				--   서버(RtsCombatLogic.DoAttack)가 같은 식(OrbSpawnOffset)으로 생성 지점·대상·도착 시각(stagger + hover + 거리÷속도)을 계산해 판정을 예약하고 대상 목록을 클라에 넘긴다. 400021001엔 사운드·아이콘만 있고 클립은 라이브러리에 없음
-				{ lv = 30, kind = "액티브", name = "도트 퍼니셔", desc = "사거리 6. 도트 퍼니셔 화염 구체를 10개 소환. 각 구체는 맵에 랜덤하게 생성되고, 가장 가까운 적에게 달라붙어 폭발한다. 965%의 데미지로 1회 타격. 쿨타임 15초", target = false, cd = 15, ratio = 965, hits = 30, targets = 10, range = 6, spread = true,
+				{ lv = 30, kind = "액티브", name = "도트 퍼니셔", desc = "화염 구체 10개를 소환한다. 각 구체는 가장 가까운 적에게 달라붙어 폭발하며 965%의 데미지를 준다. 재사용 대기시간 15초", target = false, cd = 15, ratio = 965, hits = 30, targets = 10, range = 6, spread = true,
 					fx = { motion = "swingO2", clip = "fce52ddb8a274e529790dc6264283f0a", scale = 1.2, feetDx = 0, feetDy = 0.8, assetFacesLeft = true, sound = "da2791e77cec477eb31dceb7b3c1961e",
-						proj = "50781432c95d45b8876842c475c675f5", projCount = 30, projStagger = 0.03, projFrom = "around", projSpread = 2.0, projGap = 1.2, projHover = 1.2, projSpeed = 4.4, projScale = 1.8, projNoRotate = true, projSpin = 240, projFrameSec = 0.12,
+						proj = "50781432c95d45b8876842c475c675f5", projCount = 30, projStagger = 0, projFrom = "around", projSpread = 2.0, projGap = 1.2, projHover = 1.2, projSpeed = 4.4, projScale = 1.8, projNoRotate = true, projSpin = 240, projFrameSec = 0.12,
 						projFlySprites = { "3769c672d4f94a2e9f37b2477ab66d5b", "b0b300d3c83749198c5c146ab1ac5e84", "da5ad791c75e4ef4941d722d39e1f334", "b0b300d3c83749198c5c146ab1ac5e84" },
 						hitClip = "9b8b44848e93472390cbd2799aa52bb0", hitScale = 0.7, hitDy = 0.6, hitSound = "4045608d11f4435385a2f3101852892e" } },
-				{ lv = 40, kind = "패시브", name = "아케인 에임", desc = "공격력 +50%", target = false },
-				{ lv = 50, kind = "패시브", name = "인피니티", desc = "최종 데미지 +30%, 보스 공격시 데미지 +10%", target = false },
+				{ lv = 40, kind = "패시브", name = "아케인 에임", desc = "공격력이 50% 증가한다.", target = false },
+				{ lv = 50, kind = "패시브", name = "인피니티", desc = "최종 데미지가 30%, 보스 공격 시 데미지가 10% 증가한다.", target = false },
 			}
 		end
 		if jobId == "bishop" then
 			return {
 				-- 엔젤레이 연출(2026-09-18): 원작 2321007 — 시전 클립 effect(금빛 날개, 0.9초, 왼쪽 보기 그림) + 빛살 투사체 ball(281px, 왼쪽 촉) 0.2초 + 타격 hit/0, 타격음 hit(use 사운드는 라이브러리에 없음). 한손 완드 swingO1
-				{ lv = 1, kind = "액티브", name = "엔젤레이", desc = "사거리 3. 몬스터 1마리를 38%의 데미지로 3회 공격", target = false, range = 3,
+				{ lv = 1, kind = "액티브", name = "엔젤레이", desc = "사거리 3 안의 적 1마리를 38%의 데미지로 3회 공격한다.", target = false, range = 3,
 					fx = { motion = "swingO1", clip = "e86eef7f960146fea646300653347c2e", scale = 1.2, feetDx = 0.2, feetDy = 0.9, assetFacesLeft = true,
 						proj = "77bc39d2bd9e455b8b2ce07555a90455", projSec = 0.2, projDy = 0.9, projScale = 0.8,
 						hitDelay = 0.3, hitClip = "341a2fd02d0343cfa64da45970aa7cf2", hitScale = 1.4, hitDy = 0.6, hitSound = "c2ca06323f67485e9355ff4d097ae77b" } },
-				{ lv = 10, kind = "패시브", name = "메디테이션", desc = "공격력 +100", target = false },
+				{ lv = 10, kind = "패시브", name = "메디테이션", desc = "공격력이 100 증가한다.", target = false },
 				-- 제네시스 연출: 원작 2321008 — 시전 클립 effect0(천사가 솟는 빛, 1.8초 — 그림이 원점 왼쪽에 치우쳐 있어 assetFacesLeft = false로 두면 항상 캐릭터 등 뒤(몬스터 반대쪽)에 뜬다) + 대상 발 위에 빛기둥 tile/0~5 중 하나(markClips, 기둥 낙하 ≈1.1초) + 타격 hit/0, 사운드 use/hit
-				{ lv = 20, kind = "액티브", name = "제네시스", desc = "사거리 6. 몬스터 15마리를 300%의 데미지로 1회 공격. 쿨타임 15초", target = false, area = true, cd = 15, ratio = 300, hits = 1, targets = 15, range = 6, after = 1.5,
+				{ lv = 20, kind = "액티브", name = "제네시스", desc = "사거리 6 안의 적을 최대 15마리까지 300%의 데미지로 공격한다. 재사용 대기시간 15초", target = false, area = true, cd = 15, ratio = 300, hits = 1, targets = 15, range = 6, after = 1.5,
 					fx = { motion = "swingO3", clip = "1c434f7cecf94e1cb16b68ee0079b01d", scale = 2.1, feetDx = 0, feetDy = 0, assetFacesLeft = false, clipLife = 2.0, sound = "d07011d88da0400e8018379396e564b9",
 						markClips = { "befa4d153d36410ba30ba5ec09c88611", "236a5855f26a4cbeb405a2e6446bef4e", "9bceda8956f74866b6fd65655c85f8d0", "623d68d21e784ac9949fd7941ab53f67", "3b377b037832404e9f2246b7f4bfa283", "ef28fe5cc5de4cc7b79c6e358cef614c" },
 						markAt = "feet", markDy = 0, markScale = 1.6, markScaleX = 2, markLife = 2.2,
 						hitDelay = 1.1, hitClip = "74f5001587c040248e09707c62f92625", hitScale = 1.8, hitDy = 0.6, hitSound = "039d09d0013640b182a7588ac2d34553" } },
-				{ lv = 30, kind = "패시브", name = "프레이", desc = "모든 유닛에게 최종 데미지 +10% 적용", target = false },
-				{ lv = 40, kind = "패시브", name = "아케인 에임", desc = "공격력 +50%", target = false },
-				{ lv = 50, kind = "패시브", name = "인피니티", desc = "최종 데미지 +20%, 보스 공격시 데미지 +40%", target = false },
+				{ lv = 30, kind = "패시브", name = "프레이", desc = "모든 아군 유닛의 최종 데미지가 10% 증가한다. 자신에게는 적용되지 않는다.", target = false },
+				{ lv = 40, kind = "패시브", name = "아케인 에임", desc = "공격력이 50% 증가한다.", target = false },
+				{ lv = 50, kind = "패시브", name = "인피니티", desc = "최종 데미지가 20%, 보스 공격 시 데미지가 40% 증가한다.", target = false },
 			}
 		end
 		if jobId == "nl" then
 			return {
 				-- 쿼드러플 스로우 연출(2026-09-20): 원작 4121013 — 시전 클립 effect(던지는 손 궤적 흰·붉은 호, 9프레임, 왼쪽 보기 그림) + 표창 투사체(뇌전수리검 02070011 bullet — 주황 별 + 번개, 사용자 지정) 4발 0.1초 간격. 사거리 2(사용자 2026-09-20, 3에서)
-				--   + 타격 hit/0(흰 빛 터짐 + 파편) ×4(0.1초 간격), 시전음 use, 타격음 hit. 쉐도우 파트너(30)는 등 뒤(projShadowDx)에서 같은 표창 4발을 0.15초 늦게 어둡게 던지고 타격 4회 ½(st.halfHits)
+				--   + 타격 hit/0(흰 빛 터짐 + 파편) ×4(0.1초 간격), 시전음 use, 타격음 hit. 쉐도우 파트너(30)는 등 뒤(projShadowDx)에서 같은 표창 4발을 0.5초 늦게(본체 4발이 다 나간 뒤 이어서 — 2026-09-22 사용자, 그림자 동작도 0.5초 늦게 RtsSkillFxLogic.ShadowActionDelay) 어둡게 던지고 타격 4회 ½(st.halfHits)
 				--   모션 = swingO1 + 무기 가림(2026-09-20 사용자 확정 — shootF는 활 쏘는 자세라 표창과 안 맞음. 표창 던지기 전용 액션은 없음). 표창 출발 = 배 앞(projDx 0.35·projDy 0.55 — "머리 뒤에서 나온다")
 				--   쉐도우 파트너 그림자 = 유닛 자식 "Shadow" 스프라이트(원작 4111002/special 검은 실루엣, RtsUnitLogic.EnsureShadow, 30레벨~) — 등 뒤 0.44, 본체 액션과 같은 이름의 클립을 따라 재생
-				{ lv = 1, kind = "액티브", name = "쿼드러플 스로우", desc = "사거리 2. 몬스터 1마리를 110%의 데미지로 4회 공격한다.", target = false, range = 2,
+				{ lv = 1, kind = "액티브", name = "쿼드러플 스로우", desc = "사거리 2 안의 적 1마리를 110%의 데미지로 4회 공격한다.", target = false, range = 2,
 					fx = { motion = "swingO1", hideWeapon = true, hideWeaponSec = 0.6, clip = "ff9ced53e871474c9a2ae167e0c75ef1", scale = 1.4, feetDx = 0, feetDy = 0, assetFacesLeft = true, sound = "747c5e5435b942a494f94032dabbffb2",
 						proj = "99a112c1dcbb4cf69fccfca53fbb6620", projCount = 4, projStagger = 0.1, projSec = 0.2, projDx = 0.35, projDy = 0.55, projScale = 1.2,
-						projShadowLv = 30, projShadowDx = 0.5, projShadowDelay = 0.15,
+						projShadowLv = 30, projShadowDx = 0.5, projShadowDelay = 0.5,
 						hitDelay = 0.3, hitGap = 0.1, hitClip = "6d26a151289342db913d50bf9f84a96b", hitScale = 1.4, hitDy = 0.6, hitSound = "4709f06b2fb543f7a980fdbbb23441b1" } },
-				{ lv = 10, kind = "패시브", name = "자벨린 마스터리", desc = "최종 데미지 +10%", target = false },
-				{ lv = 20, kind = "패시브", name = "크리티컬 마스터리", desc = "크리티컬 확률 30% 증가, 크리티컬 데미지 25% 증가", target = false },
-				{ lv = 30, kind = "패시브", name = "쉐도우 파트너", desc = "쉐도우 파트너를 소환한다. 쿼드러플 스로우를 따라 표창 4개를 추가 발사한다(총 8개). 쉐도우 파트너의 표창은 데미지 1/2", target = false },
-				{ lv = 40, kind = "패시브", name = "자벨린 마스터리", desc = "최종 데미지 +10%, 공격력 +100", target = false },
-				{ lv = 50, kind = "패시브", name = "레디 투 다이", desc = "최종 데미지 +20%", target = false },
+				{ lv = 10, kind = "패시브", name = "자벨린 마스터리", desc = "최종 데미지가 10% 증가한다.", target = false },
+				{ lv = 20, kind = "패시브", name = "크리티컬 마스터리", desc = "크리티컬 확률이 30%, 크리티컬 데미지가 25% 증가한다.", target = false },
+				{ lv = 30, kind = "패시브", name = "쉐도우 파트너", desc = "그림자 분신을 소환한다. 분신은 쿼드러플 스로우를 따라 표창 4개를 추가로 던지며, 분신의 표창은 절반의 데미지를 준다.", target = false },
+				{ lv = 40, kind = "패시브", name = "자벨린 마스터리", desc = "최종 데미지가 10%, 공격력이 100 증가한다.", target = false },
+				{ lv = 50, kind = "패시브", name = "레디 투 다이", desc = "최종 데미지가 20% 증가한다.", target = false },
 			}
 		end
 		if jobId == "shad" then
 			return {
 				-- 새비지 블로우 연출(2026-09-20): 시전 클립 = 신형 4201012/effect(사용자 지정 — 붉은 참격 선, 4201005 폴더엔 타격음뿐) + 빠른 한손 베기 모션(swingO2) + 타격마다 4221007(부메랑 스텝)/hit/0 분홍 참격 폭발 ×8(0.05초 간격) + 타격마다 새비지 타격음(사용자 2026-09-20 "8번 파파박")
-				{ lv = 1, kind = "액티브", name = "새비지 블로우", desc = "사거리 1. 몬스터 1마리를 17.5%의 데미지로 8번 공격한다.", target = false, range = 1,
+				{ lv = 1, kind = "액티브", name = "새비지 블로우", desc = "사거리 1 안의 적 1마리를 17.5%의 데미지로 8회 공격한다.", target = false, range = 1,
 					fx = { motion = "swingO2", clip = "895ac1e384ea42ca8dd084f54ff3346b", scale = 1.6, feetDx = 0, feetDy = 0, assetFacesLeft = true,
 						hitDelay = 0.1, hitGap = 0.05, hitClip = "6614245a414645089d41ec1f60df1fab", hitScale = 1.3, hitDy = 0.6, hitSound = "23250468023a4767b32611f2fd8ec49b" } },
-				{ lv = 10, kind = "패시브", name = "대거 마스터리", desc = "공격력 +30%", target = false },
-				{ lv = 20, kind = "패시브", name = "크리티컬 마스터리", desc = "크리티컬 확률 30% 증가, 크리티컬 데미지 20% 증가", target = false },
+				{ lv = 10, kind = "패시브", name = "대거 마스터리", desc = "공격력이 30% 증가한다.", target = false },
+				{ lv = 20, kind = "패시브", name = "크리티컬 마스터리", desc = "크리티컬 확률이 30%, 크리티컬 데미지가 20% 증가한다.", target = false },
 				-- 메소 익스플로전 연출 1차: 원작 4211006 — 시전 클립 effect(발 아래 보라 소용돌이) + 타격 hit/0(흰 폭발 + 연두 불꽃) + 타격음 hit. 사거리 1·10마리(메인 대상 곁 1칸 규칙)
-				{ lv = 30, kind = "액티브", name = "메소 익스플로전", desc = "사거리 1. 몬스터 10마리를 50%의 데미지로 1회 공격한다. 쿨타임 8초", target = false, cd = 8, ratio = 50, hits = 1, targets = 10, range = 1,
+				{ lv = 30, kind = "액티브", name = "메소 익스플로전", desc = "사거리 1 안의 적을 최대 10마리까지 50%의 데미지로 공격한다. 재사용 대기시간 8초", target = false, cd = 8, ratio = 50, hits = 1, targets = 10, range = 1,
 					fx = { motion = "swingO1", clip = "61840689ea7b44f09f91960734232e34", scale = 1.6, feetDx = 0, feetDy = 0, assetFacesLeft = true, sound = "acb0f70275b7422dbcc8a395cbbd9d28",
 						hitDelay = 0.3, hitClip = "644458b8c91949b4b4b84ff949eba8ca", hitScale = 1.4, hitDy = 0.6 } },
-				{ lv = 40, kind = "패시브", name = "대거 익스퍼트", desc = "공격력 +20%, 최종 데미지 +5%", target = false },
-				{ lv = 50, kind = "패시브", name = "레디 투 다이", desc = "최종 데미지 +20%, 보스 공격시 데미지 +30%", target = false },
+				{ lv = 40, kind = "패시브", name = "대거 익스퍼트", desc = "공격력이 20%, 최종 데미지가 5% 증가한다.", target = false },
+				{ lv = 50, kind = "패시브", name = "레디 투 다이", desc = "최종 데미지가 20%, 보스 공격 시 데미지가 30% 증가한다.", target = false },
 			}
 		end
 		if jobId == "phantom" then
 			return {
 				-- 조커 연출 3차(2026-09-20, 사용자 영상 + "스킬명 400041009, 캐릭터 애니메이션은 keydown 01eff730…"): 원작 조커 = 400041009(prepare·keydown·keydownend·screen + pre/loop/end 사운드) + 400041010(타격 3색·타격음).
 				--   캐릭터: alert 자세 유지 + keydown 클립(붉은·금빛 리본이 몸을 감싸며 도는 지팡이 회전 잔상)을 loopClip으로 공격 중 계속. 카드: 사용자 지정 5종(2026-09-20 "빨강·초록·파랑·검정·노랑 5개") = 400041011/screen/6 빨강 십자(e57428fc…) · 400041012/screen/5 초록 나무(3642df1a…) · 400041014/screen/4 파랑 검(4e7909ae…) · 400041015/screen/4 검정·금 달별(6856aa12…) · 400041013/screen/5 노랑 모래시계(68eead1e…), 발마다 차례로(라운드 로빈). 포물선 높이는 대상까지 칸 거리로 1칸 1.0 / 2칸 1.1 / 3칸 1.2 / 4칸 이상 1.3(projArcByDist, 무작위 없음 — 2026-09-20 사용자; 그 전엔 1.0 → 1.4 고정). 비행 시간은 0.65·0.55초를 거쳐 다시 0.4초(사용자 "원래대로, 너무 답답하네"), 판정 0.35초 뒤. 원본이 180~204×300~328px지만 보이는 카드는 그 절반(나머지는 투명한 잔상 테두리)이라 0.55배가 이전 덱(104×176, 0.52배)과 같은 화면 크기(0.3배는 너무 작았음). 회전 없이 그대로(projSpin 제거·projNoRotate), 공격마다 2장(0.05초 간격 — 0.1초 공격이라 초당 20장), **머리 위(+1.35)에서 적에게 항상 위로 볼록한 포물선**(projArc 1.0, 높이 0.5~1.0) 0.4초 비행. 타격은 400041010 hit/0·1·2 무작위 + 타격음
-				{ lv = 1, kind = "액티브", name = "조커", desc = "사거리 5. 몬스터 1마리를 192.5%의 데미지로 1회 공격한다. 이 공격은 공격속도의 영향을 받지 않고 0.1초당 1회 공격한다.", target = false, range = 5,
+				{ lv = 1, kind = "액티브", name = "조커", desc = "사거리 5 안의 적 1마리를 192.5%의 데미지로 공격한다. 공격속도와 관계없이 0.1초마다 카드를 던진다.", target = false, range = 5,
 					fx = { motions = { "swingOF", "swingO1", "swingO1", "stabO1" }, motionCycle = true, motionGap = 0.45,
 						loopClip = "01eff730ea0a4c3aa797fdb50a1e4492", loopScale = 0.9, loopDx = 0, loopDy = 0.55, loopAlpha = 0.9, loopOrder = 190, loopFacesLeft = true,
 						projs = { "e57428fc63e34e239b0ed3c5befdaae3", "3642df1a01b043e282621a3d97ee0beb", "4e7909aecedf4dde84d841bf7a0f7fb4", "6856aa123ca94eb3ad9315fc7e3bf027", "68eead1e49fa4e21b7ab064d47833a2b" }, projCount = 2, projStagger = 0.05, projSec = 0.4, projDx = 0, projDy = 1.35, projScale = 0.55, projNoRotate = true, projArc = 1.0, projArcByDist = { 1.0, 1.1, 1.2, 1.3 }, assetFacesLeft = true,
 						hitDelay = 0.35, hitClips = { "6c691c6d80724c7f966326006e210fcc", "f0f23e845b144475b9b8a7059e4821cc", "8b23673c5c2d4443b384b080eaa1dac2" }, hitScale = 1.4, hitDy = 0.6, hitSound = "e37b311a831546b99b6e512f7ba6983c" } },
-				{ lv = 10, kind = "패시브", name = "조커: 날카로운 검", desc = "모든 유닛의 최종 데미지 +3%", target = false },
-				{ lv = 20, kind = "패시브", name = "문라이트", desc = "공격력 +150, 공격력 +10%", target = false },
-				{ lv = 30, kind = "패시브", name = "프레이 오브 아리아", desc = "공격력 +150, 공격력 +10%", target = false },
-				{ lv = 40, kind = "패시브", name = "케인 엑스퍼트", desc = "최종 데미지 +10%", target = false },
-				{ lv = 50, kind = "패시브", name = "블스아이", desc = "크리티컬 확률 +50%, 크리티컬 데미지 +30%, 몬스터 방어율 무시 +100%, 보스 공격시 데미지 +60%, 최종 데미지 +20%", target = false },
+				{ lv = 10, kind = "패시브", name = "조커: 날카로운 검", desc = "모든 아군 유닛의 최종 데미지가 3% 증가한다.", target = false },
+				{ lv = 20, kind = "패시브", name = "문라이트", desc = "공격력이 150, 공격력이 10% 증가한다.", target = false },
+				{ lv = 30, kind = "패시브", name = "프레이 오브 아리아", desc = "공격력이 150, 공격력이 10% 증가한다.", target = false },
+				{ lv = 40, kind = "패시브", name = "케인 엑스퍼트", desc = "최종 데미지가 10% 증가한다.", target = false },
+				{ lv = 50, kind = "패시브", name = "블스아이", desc = "크리티컬 확률이 50%, 크리티컬 데미지가 30% 증가하고 몬스터의 방어율을 100% 무시한다. 보스 공격 시 데미지가 60%, 최종 데미지가 20% 증가한다.", target = false },
 			}
 		end
 		return { { lv = 1, kind = "액티브", name = "(미정)", desc = "스킬 정의는 character.md — 코드 등록 전", target = false } }
@@ -760,6 +760,358 @@ script RtsJobTableLogic extends Logic
 		local boss = one * hitsEff * bossMul * (st.finBoss / 100) * critMul / period
 		local mob = one * hitsEff * st.targets * (st.fin / 100) * critMul / period
 		return { st = st, base = base, per = per, atk = atk, one = one, period = period, critMul = critMul, boss = boss, mob = mob }
+	end
+
+	-- ===== 프리즘 증강(2026-09-22 개발모드 선행 — 정의·수치는 .info/character.md '종류: 프리즘', 규칙은 .beaver/memory/balance.md) =====
+	--   유닛의 RtsUnitComponent.Prisms(쉼표 목록 "elixir,tempest")에 든 id를 직업 표 위에 얹는다. GetSkillsFor/GetStatFor = GetSkills/GetStat의 유닛판 —
+	--   전투(RtsCombatLogic)·팝업(RtsUnitPopupLogic)·연출(CastFx/HitFx)·잠금(RtsUnitLogic)은 전부 이걸 쓴다. locks = 획득 시 영구 잠금(3)할 스킬 이름(RtsUnitLogic.ApplyPrism).
+	--   연출 자산이 아직 없는 프리즘은 기존 스킬 연출을 그대로 쓴다(사용자가 자산을 하나씩 고르면 교체) — 인레이지만 확보(2026-09-20)
+	method table GetPrisms()
+		return {
+			{ id = "enrage", job = "hero", name = "인레이지", desc = "[프리즘] 레이징 블로우가 인레이지로 강화된다. 사거리 3 안의 적을 최대 6마리까지 3회 공격하며, 보스 공격 시 데미지가 200% 증가한다." },
+			{ id = "holyunity", job = "paladin", name = "홀리 유니티", desc = "[프리즘] 아군 유닛 1명을 지정해 그 유닛의 최종 데미지를 40% 증가시킨다. 자신에게는 사용할 수 없다." },
+			{ id = "giant", job = "dk", name = "거대화", desc = "[프리즘] 스피어 버스터가 거대해진다. 사거리가 6으로 늘어나고, 데미지가 29%, 보스 공격 시 데미지가 185% 증가한다." },
+			{ id = "arrowrain", job = "bow", name = "애로우 레인", desc = "[프리즘] 폭풍의 시 대신 애로우 레인을 사용한다. 하늘에서 화살비를 내려 사거리 6 안의 적 1마리를 54%의 데미지로 2회 공격하며, 공격속도와 관계없이 0.2초마다 발사한다. 보스 공격 시 데미지가 220% 증가한다.", locks = { "폭풍의 시" } },
+			{ id = "truesnipe", job = "marks", name = "트루 스나이핑", desc = "[프리즘] 피어싱과 스나이핑 대신 트루 스나이핑을 사용한다. 사거리 6 안의 적 1마리를 130%의 데미지로 10회 공격하며, 반드시 크리티컬로 적중한다. 재사용 대기시간 2초. 보스 공격 시 데미지가 135% 증가한다.", locks = { "피어싱", "스나이핑" } },
+			{ id = "elixir", job = "il", name = "엘릭서", desc = "[프리즘] 블리자드의 재사용 대기시간이 2초로 줄어든다." },
+			{ id = "tempest", job = "il", name = "블리자드 템페스트", desc = "[프리즘] 보스전에서 블리자드의 15회 타격이 모두 보스 1마리에게 집중된다. 대신 보스에게 주는 최종 데미지가 10% 감소한다." },
+			{ id = "transcend", job = "fp", name = "초월", desc = "[프리즘] 도트 퍼니셔가 초월한다. 구체와 폭발이 2배로 커지고, 재사용 대기시간이 3초로 줄어든다. 구체의 데미지는 281%가 되고, 보스 공격 시 데미지가 250% 증가한다." },
+			{ id = "divinepunish", job = "bishop", name = "디바인 퍼니시먼트", desc = "[프리즘] 엔젤레이 대신 디바인 퍼니시먼트를 사용한다. 빛의 검을 내려 사거리 3 안의 적을 최대 6마리까지 27%의 데미지로 공격하며, 공격속도와 관계없이 0.2초마다 발동한다. 보스 공격 시 데미지가 1,350% 증가한다.", locks = { "엔젤레이" } },
+			{ id = "fuma", job = "nl", name = "풍마수리검", desc = "[프리즘] 쿼드러플 스로우 대신 거대한 풍마수리검을 던진다. 사거리 3 안의 적 1마리를 130%의 데미지로 4회 공격하며, 쉐도우 파트너도 함께 던진다. 보스 공격 시 데미지가 360% 증가한다.", locks = { "쿼드러플 스로우" } },
+			{ id = "dualblade", job = "shad", name = "자유전직 - 듀얼블레이더", desc = "[프리즘] 듀얼블레이더로 전직한다. 새비지 블로우와 메소 익스플로전 대신 블레이드 토네이도와 카르마 퓨리를 함께 사용한다. 두 스킬의 보스 공격 시 데미지가 각각 575% 증가한다.", locks = { "새비지 블로우", "메소 익스플로전" } },
+			{ id = "phantom", job = "", name = "영웅 팬텀", desc = "팬텀 영입 해금" },
+		}
+	end
+
+	method any GetPrism(string id)
+		local list = self:GetPrisms()
+		for i = 1, #list do
+			if list[i].id == id then return list[i] end
+		end
+		return nil
+	end
+
+	-- 유닛이 프리즘 id를 가졌는가
+	method boolean HasPrism(any u, string id)
+		if u == nil or u.Prisms == nil or u.Prisms == "" then return false end
+		for q in string.gmatch(u.Prisms, "[^,]+") do
+			if q == id then return true end
+		end
+		return false
+	end
+
+	method table PrismIds(any u)
+		local out = {}
+		if u == nil or u.Prisms == nil then return out end
+		for q in string.gmatch(u.Prisms, "[^,]+") do out[#out + 1] = q end
+		return out
+	end
+
+	method number FindSkill(table list, string name)
+		for i = 1, #list do
+			if list[i].name == name then return i end
+		end
+		return 0
+	end
+
+	method table CopyTable(table t)
+		local c = {}
+		for k, v in pairs(t) do c[k] = v end
+		return c
+	end
+
+	-- 직업 표 + 이 유닛의 프리즘(전투·팝업·연출·잠금이 쓰는 표)
+	method table GetSkillsFor(any u)
+		local list = self:GetSkills(u.JobId)
+		local ids = self:PrismIds(u)
+		for i = 1, #ids do self:ApplyPrismSkills(ids[i], list, u.JobId) end
+		return list
+	end
+
+	-- 클라: 이 직업의 스킬 연출을 프리즘 변형까지 전부 미리 올린다(유닛이 생길 때). 프리즘을 켠 뒤 첫 시전이 자산 다운로드 중이라 표식·클립이 빈 채로 나오던 문제
+	--   (2026-09-22 사용자 "엘릭서+템페스트 동시에 켰는데 계속 적용 안 되다가 껐다 켜니 정상" — 서버 표는 맞았고 tile 9종×21프레임이 아직 안 내려온 것)
+	@ExecSpace("ClientOnly")
+	method void PreloadJobFx(string jobId)
+		local base = self:GetSkills(jobId)
+		for i = 1, #base do
+			if base[i].fx ~= nil then _RtsSkillFxLogic:Preload(base[i].fx) end
+		end
+		local prisms = self:GetPrisms()
+		for j = 1, #prisms do
+			if prisms[j].job == jobId then
+				local list = self:GetSkills(jobId)
+				self:ApplyPrismSkills(prisms[j].id, list, jobId)
+				for i = 1, #list do
+					if list[i].fx ~= nil then _RtsSkillFxLogic:Preload(list[i].fx) end
+				end
+			end
+		end
+	end
+
+	method table GetStatFor(any u)
+		local st = self:GetStat(u.JobId, u.Level)
+		local ids = self:PrismIds(u)
+		for i = 1, #ids do self:ApplyPrismStat(ids[i], st, u.JobId) end
+		return st
+	end
+
+	-- 프리즘으로 직업 이름이 바뀌는 경우(자유전직 → 듀얼블레이더, 2026-09-22 사용자 "듀얼블레이드 → 듀얼블레이더")
+	method string GetJobNameFor(any u)
+		if self:HasPrism(u, "dualblade") then return "듀얼블레이더" end
+		return self:GetJobName(u.JobId)
+	end
+
+	method void ApplyPrismSkills(string id, table list, string jobId)
+		if id == "enrage" then
+			local i = self:FindSkill(list, "레이징 블로우")
+			if i > 0 then
+				local k = self:CopyTable(list[i])
+				k.desc = "사거리 3. 290%의 데미지로 6마리를 3회 타격 (인레이지)"
+				k.range = 3
+				-- 인레이지판 연출(character.md 히어로 인레이지): 1120017/effect/2 + 추출 사운드 + hit/0. 모션·무기 숨김은 레이징 블로우와 같음
+				k.fx = { motion = "swingO3", motionRate = 0.58, hideWeapon = true, hideWeaponSec = 0.85, clip = "71d8513c51fc48c49609837f3d15160b", clipDelay = 0, scale = 2.0, feetDx = 0, feetDy = 0, assetFacesLeft = true, sound = "e794c1382f484195bae36f1b93c9f060",
+					hitDelay = 0.3, hitGap = 0.2, hitClip = "b79cbdf6d06b487382f03d625a1fc464", hitScale = 2.0, hitDy = 0.6 }
+				list[i] = k
+			end
+		elseif id == "holyunity" then
+			list[#list + 1] = { lv = 50, kind = "패시브", name = "홀리 유니티", desc = "프리즘. 유닛 1개 지정 — 그 유닛의 최종 데미지 +40%", target = true }
+		elseif id == "giant" then
+			local i = self:FindSkill(list, "스피어 버스터")
+			if i > 0 then
+				local k = self:CopyTable(list[i])
+				k.range = 6
+				k.desc = "사거리 6 (거대화). 199%의 데미지로 3마리를 3회 타격"
+				-- 거대화 = 창이 3배(사용자 2026-09-22): 시전 클립·추가 클립 스케일 ×3(타격 클립은 그대로). 원점이 발이라 발판 위치는 같다
+				local fx = self:CopyTable(k.fx)
+				fx.scale = (fx.scale or 1) * 3
+				if fx.clips ~= nil then
+					local cl = {}
+					for c = 1, #fx.clips do
+						local it = fx.clips[c]
+						if type(it) == "table" then
+							local t = self:CopyTable(it)
+							t.scale = (t.scale or fx.scale / 3) * 3
+							cl[c] = t
+						else
+							cl[c] = it
+						end
+					end
+					fx.clips = cl
+				end
+				k.fx = fx
+				list[i] = k
+			end
+		elseif id == "arrowrain" then
+			-- 애로우 레인 연출(2026-09-22 사용자 "사운드는 폭풍의 시 그대로, 발사 애니메이션 등은 교체"): 원작 400031002 —
+			--   공격 시작에 effect(황금 날개 활 소환 → 발사, 15프레임 0.84초, 좌우 대칭) 1회(loopIntro 0.85초 — .win.mod 프레임 시간 합) → 공격 중 repeat(활에서 화살 계속 쏘는 8프레임) 루프.
+			--   화살은 손에서 쏘지 않고 대상 머리 위 4칸에서 수직 낙하(projFrom "sky", ±0.5 흩어짐, 0.2초 비행 = hitDelay). 타격 클립은 폭풍의 시 것(400031002에는 hit 클립이 없음).
+			--   소리(2026-09-22 사용자 "좀 더 임팩트 있게"): 활 소환 순간 원작 400031002/use(1.9초) 1회(loopIntroSound), 발마다 시전음은 폭풍의 시 것, 타격음은 400030002/loop 46a9fd9a…를 피치 1.5로 빨리 감기(hitSoundPitch — 사용자 선택)
+			local i = self:FindSkill(list, "폭풍의 시")
+			local fx = nil
+			if i > 0 and list[i].fx ~= nil then
+				fx = self:CopyTable(list[i].fx)
+				fx.loopClip = "f7b71339a5064fdfa03d0b25fa8a041b"
+				fx.loopScale = 1.2
+				fx.loopDx = 0
+				fx.loopDy = 1.1
+				fx.loopAlpha = 1
+				fx.loopFacesLeft = nil
+				fx.loopIntro = "586154fb11a4489a88e78f3d2a028884"
+				fx.loopIntroScale = 1.1
+				fx.loopIntroDy = 0
+				fx.loopIntroLife = 0.85
+				fx.loopIntroSound = "6b7b47d8bf6441918bc73fdb02a2d542"
+				-- 타격음(2026-09-22 사용자 "46a9fd9a… 이 소리로. 좀 더 빨리 감으면 될 듯"): 400030002/loop 0.97초를 피치 1.5(≈0.65초)로
+				fx.hitSound = "46a9fd9aeb454108857aa9642fc7b91f"
+				fx.hitSoundPitch = 1.5
+				fx.projFrom = "sky"
+				fx.projSkyHeight = 4
+				fx.projSkySpread = 0.5
+				fx.projSec = 0.2
+				fx.hitDelay = 0.2
+			end
+			list[#list + 1] = { lv = 50, kind = "액티브", prism = true, name = "애로우 레인", desc = "폭풍의 시 대신 애로우 레인을 사용한다. 하늘에서 화살비를 내려 사거리 6 안의 적 1마리를 54%의 데미지로 2회 공격하며, 공격속도와 관계없이 0.2초마다 발사한다. 보스 공격 시 데미지가 220% 증가한다.", target = false, range = 6, fx = fx }
+		elseif id == "truesnipe" then
+			-- 트루 스나이핑 연출(2026-09-22 사용자 skillname#400031006): 원작 400031006에는 special(조준 십자선 7프레임 0.84초 — 잠금 3 → 발사 섬광 → 원 확산)과 use 소리만 있다.
+			--   스나이핑 fx를 복사해 표식만 십자선(markClip, 박스 긴 쪽 × 0.45, 0.85초)으로, 시전음은 400031006/use(1.44초), 타격은 섬광 프레임(0.36초)에 맞춰 0.05초 간격 10회·타격 클립 스케일 2.0. 모션·시전 이펙트·타격 클립·타격음은 스나이핑 것
+			local i = self:FindSkill(list, "스나이핑")
+			local fx = nil
+			if i > 0 and list[i].fx ~= nil then
+				fx = self:CopyTable(list[i].fx)
+				fx.markClip = "64224b19c0aa4359963ab551d5862cfd"
+				fx.markFit = 0.45
+				fx.markPivotDy = 0
+				fx.markLife = 0.85
+				fx.sound = "1fa8bbf7adfd40c4a4709c110b9033be"
+				fx.hitDelay = 0.36
+				fx.hitGap = 0.05
+				fx.hitScale = 2.0
+			end
+			list[#list + 1] = { lv = 50, kind = "액티브", prism = true, name = "트루 스나이핑", desc = "피어싱과 스나이핑 대신 트루 스나이핑을 사용한다. 사거리 6 안의 적 1마리를 130%의 데미지로 10회 공격하며, 반드시 크리티컬로 적중한다. 재사용 대기시간 2초. 보스 공격 시 데미지가 135% 증가한다.", target = false, cd = 2, ratio = 130, hits = 10, targets = 1, range = 6, forceCrit = true, fx = fx }
+		elseif id == "elixir" then
+			local i = self:FindSkill(list, "블리자드")
+			if i > 0 then
+				local k = self:CopyTable(list[i])
+				k.cd = 2
+				list[i] = k
+			end
+		elseif id == "tempest" then
+			-- 블리자드 템페스트 연출(2026-09-22 사용자 "skill/2221007 이거임"): 원작 4차 블리자드 2221007 세트 — 캐릭터 등 뒤 effect(눈빛 기둥 8프레임 1.14초) + 발밑 effect0(얼음 결정 21프레임 1.26초),
+			--   대상 위 tile/0~8(포탈 고리 → 얼음 대각 낙하 → 착지 눈보라 1.35~1.44초, 착지 0.66~0.9초) 무작위 1개씩을 0.07초 간격으로 차례로(markStagger) — 보스전엔 보스 발밑 좌·우로 번갈아(markPattern "alternate", 거리 0.5~1.3 순환, 오른쪽은 반전) 15개가 파바박(사용자).
+			--   판정도 0.07초 간격(hitStagger), 첫 판정 = markDelay 0.4 + 착지 평균 0.78 ≈ 1.2초. 발밑 결정(clip)은 아바타 뒤(clipOrder −10, 사용자 "캐릭터 뒤에"). 타격 클립 hit/0·시전음 use·타격음 hit은 기본 블리자드와 같은 2221007 것. 후딜 3.0초 안에 끝남(0.4 + 1.05 + 0.9)
+			local i = self:FindSkill(list, "블리자드")
+			if i > 0 then
+				local k = self:CopyTable(list[i])
+				k.bossHits = 15
+				k.bossFinal = 0.9
+				if k.fx ~= nil then
+					local fx = self:CopyTable(k.fx)
+					fx.backClip = "81280c08ee32472fb989a891f94baa9d"
+					fx.backScale = 1.5
+					fx.backDx = 0
+					fx.backDy = 0
+					fx.backLife = 1.2
+					fx.clip = "f0f59236ecf34183928eeec76e3dfade"
+					fx.scale = 1.4
+					fx.feetDx = 0
+					fx.feetDy = 0
+					fx.clipLife = 1.3
+					fx.clipOrder = -10
+					fx.markClips = { "f898452ab5cb428ba3e339e6c8dc9f1c", "3340ee4327604d5c9fd42bf1e777074d", "cc66344ea8594293832e630f7df4c50a", "547fa7b229054db49ed9af9f2940a794", "772691a0d307413abfce46dbd02c333c", "d89bb70e3ce8408b888f5e8610577eeb", "9bb1c04e7d0f4ebba584c833df73a428", "c71778ae15c94eabbe854f6ef61752c3", "5e66a885aa8f498e96548b81347209be" }
+					fx.markAt = "feet"
+					fx.markDy = 0.2
+					fx.markScale = 1.6
+					fx.markDelay = 0.4
+					fx.markStagger = 0.07
+					fx.markPattern = "alternate"
+					fx.markLife = 1.5
+					fx.hitDelay = 1.2
+					fx.hitStagger = 0.07
+					k.fx = fx
+				end
+				list[i] = k
+			end
+		elseif id == "transcend" then
+			-- 초월 연출(2026-09-22 사용자 "도트 퍼니셔의 크기 2배" → "커진만큼 간격도 늘어나야 함. 속도도 2배"): 구체 1.8 → 3.6, 폭발 0.7 → 1.4, 생성 고리 반지름·간격 2.0/1.2 → 4.0/2.4(고리별 개수 10·16·4 그대로 = 같은 배치를 2배로), 비행 속도 4.4 → 8.8유닛/초(서버 판정 시각도 같은 식). 시전 클립·소리는 그대로
+			--   밸런스(2026-09-22 사용자 "쿨타임 3초, 데미지는 지금보다 1/5" → "보스 증가 빼고 그만큼 감소폭 줄여" → "보스 250% 넣고 그만큼 스킬 데미지 빼자"): cd 15 → 3, 보스 +250%,
+			--   구체 비율 = (965 + 169) ÷ 5 × (110 + 335) ÷ (110 + 250) = 280.4 → 281%(불독 킷 보스 티어 10%: 보스 배율 3.6 × 281 ≈ 1,012 = +335% 시절 4.45 × 227과 같음 → 보스 DPS 동일, 사냥은 15초 시절의 ×0.25). 시전당 281 × 30구체 × 3초마다
+			local i = self:FindSkill(list, "도트 퍼니셔")
+			if i > 0 then
+				local k = self:CopyTable(list[i])
+				k.cd = 3
+				k.ratio = 281
+				if k.fx ~= nil then
+					local fx = self:CopyTable(k.fx)
+					fx.projScale = (fx.projScale or 1.8) * 2
+					fx.hitScale = (fx.hitScale or 0.7) * 2
+					fx.projSpread = (fx.projSpread or 2.0) * 2
+					fx.projGap = (fx.projGap or 1.2) * 2
+					fx.projSpeed = (fx.projSpeed or 4.4) * 2
+					k.fx = fx
+				end
+				list[i] = k
+			end
+		elseif id == "divinepunish" then
+			-- 디바인 퍼니시먼트 연출(2026-09-22 사용자 "skillname#400021086, 애니메이션은 keydown 85964d2e…"): 원작 keydown 스킬 세트 —
+			--   공격 시작에 prepare(빛기둥 → 날개 6프레임 0.36초) 1회 + pre 소리(1.36초) → 공격 중 keydown(황금 날개 + 빛의 검 낙하 17프레임 1.02초, 692×596px라 0.6배) 루프 + loop 소리(0.73초 반복)
+			--   → 공격이 끊기면 keydownend(12프레임 0.72초) + end 소리(1.78초). 발마다 대상 위 hit/0(108px 6프레임) + hit 소리(0.5초). 투사체·시전 클립 없음(검 낙하는 keydown 안에 있음). 모션은 swingO1 2프레임에 멈춘 자세 유지
+			--   keydown·prepare·keydownend는 캐릭터가 아니라 **대상 몬스터 위**(loopAt "target" — 2026-09-22 사용자 "이 애니메이션은 몬스터 위에 나와야 해": 몬스터 자식으로 붙어 따라다니고, 대상이 바뀌면 다시 만든다)
+			--   원점(sprite 피벗 실측): keydown·keydownend (0.88, 0.08) = 오른쪽 아래 — 그림이 원점 왼쪽(원작 캐릭터 앞)으로 뻗는다 → 몬스터 중앙에 맞추려면 오른쪽으로 0.38×692px = 2.63(×0.6 = 1.58유닛). prepare는 피벗 (1.36, 0.13)이라 같은 이동으로 함께 중앙에 온다.
+			--   세로: 피격 박스 윗변(loopAtTop)에서 −0.3 → 검 끝이 머리에 닿는다(사용자 2026-09-22 "몬스터 중앙 기준, 머리 위에 떨어지는 것처럼. 지금 너무 왼쪽")
+			--   모션: swingO1 전체를 루프(사용자 "캐릭터 모션 복구" — 2프레임 고정은 서 있는 것처럼 보였다)
+			local fx = { motion = "swingO1", motionLoop = true, noFlip = true,
+				loopIntro = "1aa895b11b1b4e708e5f549a7ab0dc56", loopIntroScale = 0.6, loopIntroDy = 0, loopIntroLife = 0.36, loopIntroSound = "be4fe11567174e039905d2756dce54cc",
+				loopAt = "target", loopAtTop = true, loopClip = "85964d2eaeae4e22b5490563bf4b247b", loopScale = 0.6, loopDx = 2.63, loopDy = -0.3, loopAlpha = 1,
+				loopSound = "ac773384396f4be284fd079db65e2e3d", loopSoundVol = 0.8,
+				loopEnd = "b4134c0268974cbcbc780d46541ecbde", loopEndLife = 0.75, loopEndSound = "8ee2522b12cd45469a92d38da6872834",
+				hitDelay = 0.1, hitClip = "2655e0dcb9c14bb8a1f37c7fbaa117c0", hitScale = 1.6, hitDy = 0.6, hitSound = "7d2e6a9885554615bb61e1bdfd12e411", hitSoundVol = 0.7 }
+			list[#list + 1] = { lv = 50, kind = "액티브", prism = true, name = "디바인 퍼니시먼트", desc = "엔젤레이 대신 디바인 퍼니시먼트를 사용한다. 빛의 검을 내려 사거리 3 안의 적을 최대 6마리까지 27%의 데미지로 공격하며, 공격속도와 관계없이 0.2초마다 발동한다. 보스 공격 시 데미지가 1,350% 증가한다.", target = false, range = 3, targets = 6, fx = fx }
+		elseif id == "fuma" then
+			-- 풍마수리검 연출(2026-09-22 사용자 "skillname#400041020 — 투사체·피격 이펙트·사운드 교체. 투사체는 shootobj/layerlist/c1 6214486b…, 사운드 special bdb2a84f…, 피격 f05a290c…"):
+			--   쿼드러플 스로우 fx 복사 후 표창 → 회전하는 큰 풍마수리검(456px 6프레임 0.24초 루프, 1.6배 ≈ 7.3유닛 — 사용자 "졸라 커" → "2배 더", 대칭이라 회전 안 함), 타격 클립 → 400041020/hit/0(보라 별 파열 248px, 0.8배), 시전음 special(1.75초), 타격음 hit(0.55초 ×4, 0.6). 시전 클립·모션·쉐도우 파트너는 그대로
+			--   스킬 형태(2026-09-22 사용자 "데미지 증가가 아닌, 쿼드러플 스로우 잠금하고 대신 쓰는 스킬로"): 쿼드러플 스로우 영구 잠금(3) + 표 끝에 '풍마수리검' 액티브. cd·hits 없이 st(ratio 130 = 110 + 20, hits 4, halfHits — 쉐도우 파트너)를 그대로 써서 기본 공격 자리를 대신한다
+			local i = self:FindSkill(list, "쿼드러플 스로우")
+			if i > 0 and list[i].fx ~= nil then
+				local fx = self:CopyTable(list[i].fx)
+				fx.proj = "6214486bfe8b48de84cdeee3ec6b2a98"
+				fx.projScale = 1.6 -- 2026-09-22 사용자 "졸라 커" 0.3 → 0.8 → "2배 더" 1.6 ≈ 7.3유닛(4칸 폭)
+				fx.projNoRotate = true
+				fx.sound = "bdb2a84f86444d41850b9bc314fd9bfa"
+				fx.hitClip = "cd78f86bb3cb40ebb40ecfcfa8a0240f"
+				fx.hitScale = 0.8
+				fx.hitSound = "f05a290c7e95432484ea29323329f1c7"
+				fx.hitSoundVol = 0.6
+				list[#list + 1] = { lv = 50, kind = "액티브", prism = true, name = "풍마수리검", desc = "쿼드러플 스로우 대신 거대한 풍마수리검을 던진다. 사거리 3 안의 적 1마리를 130%의 데미지로 4회 공격하며, 쉐도우 파트너도 함께 던진다. 보스 공격 시 데미지가 360% 증가한다.", target = false, range = 3, fx = fx }
+			end
+		elseif id == "dualblade" then
+			-- 블레이드 토네이도 + 카르마 퓨리 연출(2026-09-22 사용자 skillname#400041043 / #400041021 → 2차 지시):
+			--   토네이도 = 투사체(400041043 shootobj/layerlist/b1 380×488px 12프레임 0.72초 루프, 피벗 중앙, 2.0배): 캐릭터 위치(손 높이 1.0)에서 생성 → 0.3초 머문 뒤(projHover) 25유닛/초로 대상 박스 중앙에 돌진(사거리 3이면 ≤0.3초) → 도착 뒤 판정. 1.9초까지 대상 위에 남는다(projLife)
+			--   판정 0.6초(토네이도 도착)부터 0.0215초 간격 117타 = 3.1초까지(토네이도 72·카르마 45를 섞어서 동시에, hitKinds) — 토네이도가 보스 위에 머무는 2.5초 내내 타격·타격음(사용자). 카르마 퓨리 = 캐릭터 등 뒤 클립(400041021 effect 殺 참격 + 폭발 + 연기 996×568px 25프레임 1.59초, 피벗 바닥 중앙, 1.5배 = 0.5의 3배 — 사용자 "3배·캐릭터 뒤로") 0.3초에(backDelay — 토네이도와 동시)
+			--   소리: 토네이도 loop 950234be…(5.78초, 시전음 1회) + 카르마 use b634a62d…(3.32초, 0.3초 뒤 sound2). 타격음 = 둔탁한 피격음 1개를 두 스킬 공통(사용자) — 토네이도 타 400041042/hit 341c155e…(사용자 지정), 카르마 타 스피어 버스터 타격음 23250468…, 섞여서 3타마다(hitSoundEvery — 0.065초 간격 39번, 소리 1.3초라 ~20개 겹침) SoundService로 겹쳐 재생. 풀(SoundComponent 재시작)은 소리가 하나씩 끊기며 이어져 "같이 안 들린다"(사용자), 타격마다 SoundService는 동시 재생 제한에 걸려 뒤가 잘렸다 → 그 사이값, 대안 레이징 블로우 6313ad64…·카르마 hit fc142213…·토네이도 hit c1f44f0c…
+			--   타격 클립(사용자 지정): 토네이도 타 = hit/1 f5a6d5aa…, 카르마 타 = hit/1 6eab154e…·hit/0 089ce476… 무작위(hitPhases[hitKinds[h]], 0.8배). 모션 swingD1 → 0.3초 뒤 swingD2
+			--   동시 발동(2026-09-22 사용자 "블레이드 토네이도/카르마 퓨리 동시에 사용되어야 함"): 카르마 퓨리 등 뒤 클립·소리·2번째 모션을 토네이도가 출발하는 0.3초에 함께(전엔 1.8초 뒤 순차)
+			local fx = { motions = { "swingD1", "swingD2" }, motionGap = 0.3, noFlip = true,
+				sound = "950234be7d9f44bd9091ab6000832f89", sound2 = "b634a62d21c04da18adc0c036e987dc5", sound2Delay = 0.3,
+				proj = "d91e675288f9450b888c3daed98fb63e", projScale = 2.0, projNoRotate = true, projDx = 0, projDy = 1.0, projHover = 0.3, projSpeed = 25, projLife = 2.9,
+				backClip = "643c9e8d1b7043a29045e3fed2f1021c", backScale = 1.5, backDx = 0, backDy = 0, backDelay = 0.3, backLife = 2.9,
+				hitDelay = 0.6, hitGap = 0.0215, hitScale = 0.8, hitDy = 0.6,
+				hitPhases = { { clips = { "f5a6d5aada3b4e64897a15e99431a741" }, sound = "341c155ebff04edf9b4c9fd29b015a6b" }, { clips = { "6eab154e488045ff9d52991b0023804e", "089ce47604654722adca0f08c2b8e121" }, sound = "23250468023a4767b32611f2fd8ec49b" } },
+				hitSound = "23250468023a4767b32611f2fd8ec49b", hitSoundVol = 1, hitSoundEvery = 3 }
+			-- 타수 3배 분할(2026-09-22 사용자 "타수를 분할해서 3배로 — 타격감"): 39%×24 + 51%×15 = 39타 → 13%×72 + 17%×45 = 117타(총량 동일), 0.6~3.1초. 토네이도(0.3 + 2.9)·카르마 등 뒤 클립(0.3 + 2.9) 둘 다 3.2초까지 — 타격이 끝나는 3.1초 뒤에 사라진다(사용자 "시전 후 2.5초 정도 유지되면서 타격을 계속")
+			--   두 스킬 타격을 앞뒤로 나누지 않고 **섞어서 동시에**(사용자 "당연히 동시지"): 117타 중 토네이도 72·카르마 45를 균등 분산(오차 누적) → hitRatios·hitKinds(클립·타격음이 타격마다 토네이도/카르마로 번갈아)
+			local hr = {}
+			local kinds = {}
+			local acc = 0
+			for h = 1, 117 do
+				acc = acc + 45 / 117
+				if acc >= 1 then
+					acc = acc - 1
+					hr[h] = 17
+					kinds[h] = 2
+				else
+					hr[h] = 13
+					kinds[h] = 1
+				end
+			end
+			fx.hitKinds = kinds
+			list[#list + 1] = { lv = 50, kind = "액티브", prism = true, name = "블레이드 토네이도 + 카르마 퓨리", desc = "검의 폭풍과 카르마 퓨리를 동시에 날려 사거리 3 안의 적 1마리를 13%의 데미지로 72회, 17%의 데미지로 45회 공격한다. 재사용 대기시간 5초 (코드는 두 스킬을 한 행 '블레이드 토네이도 + 카르마 퓨리'로 표시 — RtsJobTableLogic ApplyPrismSkills dualblade)", target = false, cd = 5, ratio = 13, hits = 117, hitRatios = hr, targets = 1, range = 3, fx = fx }
+		end
+	end
+
+	-- 능력치 쪽 변화(기본 공격 비율·타격·주기·사거리, 보스 공격시 데미지 합연산 풀)
+	method void ApplyPrismStat(string id, table st, string jobId)
+		if id == "enrage" then
+			st.hits = 3
+			st.range = 3
+			st.bossAdd = (st.bossAdd or 0) + 200
+		elseif id == "giant" then
+			st.ratio = st.ratio + 29
+			st.range = 6
+			st.bossAdd = (st.bossAdd or 0) + 185
+		elseif id == "arrowrain" then
+			st.ratio = 54
+			st.hits = 2
+			st.period = 0.2
+			st.range = 6
+			st.bossAdd = (st.bossAdd or 0) + 220
+		elseif id == "truesnipe" then
+			st.bossAdd = (st.bossAdd or 0) + 135
+		elseif id == "transcend" then
+			st.bossAdd = (st.bossAdd or 0) + 250 -- 2026-09-22 사용자 "보스 데미지 증가 250% 넣고 그만큼 스킬 데미지 빼자"(구체 비율 918 → 281, ApplyPrismSkills)
+		elseif id == "divinepunish" then
+			st.ratio = 27
+			st.hits = 1
+			st.period = 0.2
+			st.range = 3
+			st.targets = 6 -- 2026-09-22 사용자 "몬스터 타겟 수 6으로"
+			st.bossAdd = (st.bossAdd or 0) + 1350
+		elseif id == "fuma" then
+			st.ratio = st.ratio + 20
+			st.range = 3 -- 2026-09-22 사용자 "사거리 1 추가"(쿼드러플 스로우 2 → 3). 쿨 없는 스킬은 st.range가 우선이라 여기서
+			st.bossAdd = (st.bossAdd or 0) + 360
+		elseif id == "dualblade" then
+			st.bossAdd = (st.bossAdd or 0) + 1150
+		end
 	end
 
 end

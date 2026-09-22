@@ -114,12 +114,12 @@ script RtsUnitPopupLogic extends Logic
 		H:Tint(content, 0, 0, 0, 0)
 		self.Content = content
 
-		local jobName = T:GetJobName(u.JobId)
-		-- 버프 없는 원값(s0)과 버프 반영값(s) — 달라진 행은 ▲
+		local jobName = T:GetJobNameFor(u)
+		-- 버프 없는 원값(s0)과 버프 반영값(s) — 달라진 행은 ▲. 프리즘은 둘 다에 반영(GetStatFor)
 		local B = _RtsUnitBuffLogic
-		local s0 = T:GetStat(u.JobId, u.Level)
+		local s0 = T:GetStatFor(u)
 		local buffs = B:GetBuffsFor(u.Zone, u.No)
-		local s = T:GetStat(u.JobId, u.Level)
+		local s = T:GetStatFor(u)
 		B:ApplyToStat(s, buffs)
 		local c = T:CalcStat(u.JobId, u.Level, s)
 
@@ -134,6 +134,8 @@ script RtsUnitPopupLogic extends Logic
 			"외형", H:ColMuted(), 13, TextAlignmentType.MiddleLeft, false)
 		self:SpawnPreview(look, u)
 		local skins = T:GetSkinNames(u.JobId)
+		-- 프리즘으로 직업명이 바뀌면(자유전직 → 듀얼블레이더) 외형 이름도 그 이름으로(2026-09-22 사용자 "상세정보에도 모험가 - 섀도어라고 나오고. 듀얼블레이더라고 나와야지")
+		if u.JobId ~= "phantom" then skins[1] = "모험가 " .. T:GetJobNameFor(u) end
 		local unlocked = _RtsUnitLogic:IsAvatarUnlocked(u.Owner)
 		local daysLeft = _RtsUnitLogic:AvatarDaysLeft(u.Owner)
 		for i = 1, 2 do
@@ -309,6 +311,22 @@ script RtsUnitPopupLogic extends Logic
 
 	-- 홀리 유니티 행의 대상 지정: "대상:" + 셀렉트 박스 + 쿨타임
 	@ExecSpace("ClientOnly")
+	-- 설명 글이 폭 w(px)에서 몇 줄인지(14px 글꼴: 한글 ≈ 13px, 그 외 ≈ 8px로 어림). 1~3줄
+	method number DescLines(string text, number w)
+		if text == nil or text == "" then return 1 end
+		-- UTF-8 이어붙임 바이트(0x80~0xBF) 수로 한글(3바이트 = 이어붙임 2개) 글자 수를 어림한다
+		local bytes = #text
+		local _, cont = string.gsub(text, "[\128-\191]", "")
+		local wide = math.floor(cont / 2)
+		local narrow = bytes - cont - wide
+		if narrow < 0 then narrow = 0 end
+		local px = wide * 13 + narrow * 8
+		local lines = math.ceil(px / math.max(60, w))
+		if lines < 1 then lines = 1 end
+		if lines > 3 then lines = 3 end
+		return lines
+	end
+
 	method void BuildTargetRow(Entity row, any u, number rx, number sy)
 		local H = _RtsHudLogic
 		local P = _RtsPopupLogic
@@ -341,22 +359,41 @@ script RtsUnitPopupLogic extends Logic
 		end
 	end
 
-	-- 스킬 탭: 획득 레벨 순으로 쌓는다(7행까지라 스크롤 없음 — 홀리 유니티 드롭다운이 행 위치로 자리를 잡기 때문)
+	-- 스킬 탭: 획득 레벨 순으로 쌓는다. 스크롤 목록(8행 이상이면 스크롤), 설명 줄 수만큼 행이 커진다(2026-09-22)
 	@ExecSpace("ClientOnly")
-	method void BuildSkillTab(Entity content, any u, number rx, number rw, number top)
+	method void BuildSkillTab(Entity body, any u, number rx0, number rw0, number top0)
 		local H = _RtsHudLogic
 		local P = _RtsPopupLogic
-		local skills = _RtsJobTableLogic:GetSkills(u.JobId)
-		local sy = top
+		local skills = _RtsJobTableLogic:GetSkillsFor(u)
+		local ids = _RtsJobTableLogic:PrismIds(u)
 		self.BondCoolText = nil
 		self.BondBtn = nil
 		self.BondLocked = false
+		-- 스크롤 목록(2026-09-22 사용자 "공간 좁아서 계속 글 깨지잖아, 스크롤이라도 주던가"): 행 높이는 줄이지 않고 64 고정, 설명이 한 줄(폭 ÷ 13px)을 넘으면 줄 수만큼 20px씩 키운다. 8행 넘으면 스크롤
+		local rowCount = #skills
+		for i = 1, #ids do
+			local pz = _RtsJobTableLogic:GetPrism(ids[i])
+			if pz ~= nil and _RtsJobTableLogic:FindSkill(skills, pz.name) == 0 then rowCount = rowCount + 1 end
+		end
+		local list = self:SpawnScrollList(body, "RtsUnitSkillList", rx0, rw0, top0, rowCount)
+		if list == nil then return end
+		-- 홀리 유니티 드롭다운은 body 좌표로 자리를 잡으므로 원래 열 위치(rx0·top0)로 계산한다(스크롤된 상태에선 어긋날 수 있음). 행은 목록 안에 x 0, 폭은 스크롤바만큼 뺀다
+		local content = list
+		local rx = 0
+		local rw = rw0 - 12
+		local sy = 0
+		local rh0 = 64
 		for i = 1, #skills do
 			local k = skills[i]
 			local got = u.Level >= k.lv
 			local isTarget = k.target and got
-			local rh = 64
-			if isTarget then rh = 100 end
+			local lockMode0 = _RtsJobTableLogic:GetLock(u.SkillLocks, i)
+			local lockable0 = k.kind == "액티브" and (got or lockMode0 == 3)
+			local descW = rw - 90
+			if lockable0 then descW = descW - 236 end
+			local lines = self:DescLines(k.desc, descW)
+			local rh = rh0 + (lines - 1) * 20
+			if isTarget then rh = rh + 36 end
 			local bg = P:Mix(Color.white, 0.04)
 			local border = P:Mix(Color.white, 0.1)
 			if not got then
@@ -380,7 +417,10 @@ script RtsUnitPopupLogic extends Logic
 			local lvLbl = H:SpawnLabel("RtsUnitSkillLv", row, Vector2(0, 0.5), Vector2(0, 0.5), Vector2(12, 0), Vector2(50, 40),
 				"Lv\n<b><size=17>" .. H:Int(k.lv) .. "</size></b>", mutedC, 12, TextAlignmentType.MiddleCenter, false)
 			lvLbl.TextComponent.IsRichText = true
-			local nameText = k.name .. "  <size=11><color=#d9cba6>" .. k.kind .. "</color></size>"
+			-- 프리즘이 얹은 액티브(k.prism)는 태그를 '액티브 · 프리즘'으로(2026-09-22 사용자 "왜 풍마수리검이 2칸이지" — 같은 이름의 프리즘 행은 아래에서 생략)
+			local kindText = k.kind
+			if k.prism then kindText = k.kind .. " · <color=#c48cf0>프리즘</color>" end
+			local nameText = k.name .. "  <size=11><color=#d9cba6>" .. kindText .. "</color></size>"
 			if not got then nameText = nameText .. "  <size=12><color=#8a8072>미획득</color></size>" end
 			-- 획득한 액티브는 우측에 잠금 설정 토글(사용 / 보스전 잠금 / 잠금)이 붙어 글자 폭을 그만큼 줄인다. 영구 잠금(3)은 미획득이어도 표시
 			local lockMode = _RtsJobTableLogic:GetLock(u.SkillLocks, i)
@@ -390,15 +430,38 @@ script RtsUnitPopupLogic extends Logic
 			local nameLbl = H:SpawnLabel("RtsUnitSkillName", row, Vector2(0, 1), Vector2(0, 1), Vector2(70, -8), Vector2(textW, 24),
 				nameText, ink, 17, TextAlignmentType.MiddleLeft, true)
 			nameLbl.TextComponent.IsRichText = true
-			H:SpawnLabel("RtsUnitSkillDesc", row, Vector2(0, 1), Vector2(0, 1), Vector2(70, -34), Vector2(textW, 22),
-				k.desc, desc, 14, TextAlignmentType.MiddleLeft, false)
+			H:SpawnLabel("RtsUnitSkillDesc", row, Vector2(0, 1), Vector2(0, 1), Vector2(70, -34), Vector2(textW, 2 + lines * 20),
+				k.desc, desc, 14, TextAlignmentType.UpperLeft, false)
 			if isLockable then
 				self:BuildLockToggle(row, u, i, rh)
 			end
 			if isTarget then
-				self:BuildTargetRow(row, u, rx, sy)
+				self:BuildTargetRow(row, u, rx0, top0 + sy)
 			end
 			sy = sy - rh - 6
+		end
+		-- 적용된 프리즘 증강(2026-09-22 사용자 "프리즘 스킬들은 모두 상세정보 → 스킬에서 확인"): 스킬 표 뒤에 프리즘색 행으로. 기존 스킬을 바꾸는 프리즘(템페스트·엘릭서·인레이지·거대화·초월·풍마수리검)은 표에 새 항목이 없어 여기서만 보인다
+		for i = 1, #ids do
+			local pz = _RtsJobTableLogic:GetPrism(ids[i])
+			-- 같은 이름의 스킬 행이 이미 있으면(풍마수리검·애로우 레인·트루 스나이핑·디바인 퍼니시먼트) 프리즘 행은 생략
+			if pz ~= nil and _RtsJobTableLogic:FindSkill(skills, pz.name) > 0 then pz = nil end
+			if pz ~= nil then
+				local pc = P:GradeColor("prism")
+				local plines = self:DescLines(pz.desc, rw - 90)
+				local rh = rh0 + (plines - 1) * 20
+				local row = H:SpawnPanel("RtsUnitPrism" .. tostring(i), content, Vector2(0, 1), Vector2(0, 1), Vector2(rx, sy), Vector2(rw, rh), P:Mix(pc, 0.08), P:Mix(pc, 0.45), 1.5)
+				local bar = H:SpawnStretch("model://uisprite", "RtsUnitPrismBar", row, Vector2(0, 0), Vector2(0, 1), Vector2(0, 0), Vector2(4, 0))
+				bar.SpriteGUIRendererComponent.Color = pc
+				local lvLbl = H:SpawnLabel("RtsUnitPrismLv", row, Vector2(0, 0.5), Vector2(0, 0.5), Vector2(12, 0), Vector2(50, 40),
+					"Lv\n<b><size=17>50</size></b>", H:ColMuted(), 12, TextAlignmentType.MiddleCenter, false)
+				lvLbl.TextComponent.IsRichText = true
+				local nameLbl = H:SpawnLabel("RtsUnitPrismName", row, Vector2(0, 1), Vector2(0, 1), Vector2(70, -8), Vector2(rw - 90, 24),
+					pz.name .. "  <size=11><color=#c48cf0>프리즘</color></size>", H:ColInk(), 17, TextAlignmentType.MiddleLeft, true)
+				nameLbl.TextComponent.IsRichText = true
+				H:SpawnLabel("RtsUnitPrismDesc", row, Vector2(0, 1), Vector2(0, 1), Vector2(70, -34), Vector2(rw - 90, 2 + plines * 20),
+					pz.desc, Color(0.902, 0.863, 0.769, 1), 14, TextAlignmentType.UpperLeft, false)
+				sy = sy - rh - 6
+			end
 		end
 	end
 
@@ -456,6 +519,7 @@ script RtsUnitPopupLogic extends Logic
 		if list == nil then return nil end
 		H:Tint(list, 1, 1, 1, 0)
 		local viewH = (self.PanelH - 70) - 66 + top
+		-- rows = 행 수(70px 기준). 스킬 탭처럼 행 높이가 다르면 넉넉히 스크롤을 켠다(행이 7개 이상이면)
 		local fits = rows * 70 - 6 <= viewH
 		local sg = list:AddComponent("ScrollLayoutGroupComponent")
 		if sg ~= nil then
@@ -540,7 +604,7 @@ script RtsUnitPopupLogic extends Logic
 		if no <= 0 then return "미지정" end
 		local o = _RtsUnitLogic:GetMyUnit(no)
 		if o == nil then return "미지정" end
-		return _RtsHudLogic:Int(o.No) .. ". " .. _RtsJobTableLogic:GetJobName(o.JobId) .. " Lv" .. _RtsHudLogic:Int(o.Level)
+		return _RtsHudLogic:Int(o.No) .. ". " .. _RtsJobTableLogic:GetJobNameFor(o) .. " Lv" .. _RtsHudLogic:Int(o.Level)
 	end
 
 	@ExecSpace("ClientOnly")
@@ -621,7 +685,7 @@ script RtsUnitPopupLogic extends Logic
 		local e = _SpawnService:SpawnByModelId("model://uiempty", "RtsUnitPreview", Vector3.zero, parent)
 		if e == nil then
 			H:SpawnLabel("RtsUnitPreviewText", parent, Vector2(0, 1), Vector2(0, 1), Vector2(14, -34), Vector2(120, 190),
-				_RtsJobTableLogic:GetJobName(u.JobId), H:ColMuted(), 14, TextAlignmentType.MiddleCenter, false)
+				_RtsJobTableLogic:GetJobNameFor(u), H:ColMuted(), 14, TextAlignmentType.MiddleCenter, false)
 			return
 		end
 		local t = e.UITransformComponent

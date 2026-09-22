@@ -51,6 +51,19 @@ script RtsSkillFxLogic extends Logic
 	-- 유닛 번호별 모션 순환 타이머(motionCycle — 여러 액션을 공격이 이어지는 동안 차례로 반복, 조커)
 	property table CycleTimer = {}
 
+	-- 루프 클립이 붙은 부모(기본 유닛, loopAt "target"이면 대상 몬스터) — 대상이 바뀌면 루프를 새로 만든다
+	property table LoopAnchor = {}
+
+	-- 쉐도우 파트너 그림자의 동작 지연(초) — 본체 동작을 이만큼 늦게 따라 한다(표창 볼리 projShadowDelay와 맞춤)
+	property number ShadowActionDelay = 0.5
+
+	-- 피치(재생 속도) 있는 효과음용 SoundComponent 엔티티 풀(PlaySfx — SoundService.PlaySound에는 피치가 없다). 라운드 로빈
+	property table SfxPool = {}
+
+	property number SfxIdx = 0
+
+	property number SfxPoolSize = 12
+
 	-- 루프·모션 상태 표(LoopLast·LoopUnit·ActiveLoop·CycleTimer·LoopMotion·Active…)의 키. 시전 연출은 전 클라에 오므로 유닛 번호만으로는 다른 구역의 같은 번호와 겹친다 → 구역×100+번호 (2026-09-20)
 	method number LoopKey(number zone, number no)
 		return math.floor(zone + 0.5) * 100 + math.floor(no + 0.5)
@@ -75,15 +88,31 @@ script RtsSkillFxLogic extends Logic
 		if fx.bodyClip ~= nil and fx.bodyClip ~= "" then list[#list + 1] = fx.bodyClip end
 		if fx.hitClip ~= nil and fx.hitClip ~= "" then list[#list + 1] = fx.hitClip end
 		if fx.hitClips ~= nil then for i = 1, #fx.hitClips do list[#list + 1] = fx.hitClips[i] end end
+		if fx.hitPhases ~= nil then
+			for i = 1, #fx.hitPhases do
+				local ph = fx.hitPhases[i]
+				if ph.clips ~= nil then for j = 1, #ph.clips do list[#list + 1] = ph.clips[j] end end
+			end
+		end
 		if fx.proj ~= nil and fx.proj ~= "" then list[#list + 1] = fx.proj end
 		if fx.projs ~= nil then for i = 1, #fx.projs do list[#list + 1] = fx.projs[i] end end
 		if fx.projFlySprites ~= nil then for i = 1, #fx.projFlySprites do list[#list + 1] = fx.projFlySprites[i] end end
 		if fx.projHitSprites ~= nil then for i = 1, #fx.projHitSprites do list[#list + 1] = fx.projHitSprites[i] end end
 		if fx.loopClip ~= nil and fx.loopClip ~= "" then list[#list + 1] = fx.loopClip end
+		if fx.loopIntro ~= nil and fx.loopIntro ~= "" then list[#list + 1] = fx.loopIntro end
+		if fx.loopEnd ~= nil and fx.loopEnd ~= "" then list[#list + 1] = fx.loopEnd end
+		if fx.hitSoundPitch ~= nil then self:WarmSfx(fx.hitSound) end
+		if fx.soundPitch ~= nil then self:WarmSfx(fx.sound) end
 		if fx.markClip ~= nil and fx.markClip ~= "" then list[#list + 1] = fx.markClip end
 		if fx.beam ~= nil and fx.beam ~= "" then list[#list + 1] = fx.beam end
 		if fx.backClip ~= nil and fx.backClip ~= "" then list[#list + 1] = fx.backClip end
 		if fx.markClips ~= nil then for i = 1, #fx.markClips do list[#list + 1] = fx.markClips[i] end end
+		if fx.marks ~= nil then
+			for i = 1, #fx.marks do
+				if fx.marks[i].clip ~= nil then list[#list + 1] = fx.marks[i].clip end
+				if fx.marks[i].clips ~= nil then for j = 1, #fx.marks[i].clips do list[#list + 1] = fx.marks[i].clips[j] end end
+			end
+		end
 		if fx.zoneClips ~= nil then for i = 1, #fx.zoneClips do list[#list + 1] = fx.zoneClips[i] end end
 		for i = 1, #list do
 			local ruid = list[i]
@@ -92,6 +121,54 @@ script RtsSkillFxLogic extends Logic
 				local p = _SpawnService:SpawnByModelId("model://MapObject", "RtsFxPre_" .. ruid, Vector3(-100, -100, 0), mapRoot)
 				if p ~= nil and p.SpriteRendererComponent ~= nil then p.SpriteRendererComponent.SpriteRUID = ruid end
 			end
+		end
+	end
+
+	-- 효과음 1회. pitch(0~3, 1 = 원속)가 있으면 SoundComponent 풀로 재생(피치 = 음높이 + 재생 속도 — 애로우 레인 타격음 400030002/loop 0.97초를 빨리 감기, 2026-09-22 사용자), 없으면 SoundService
+	@ExecSpace("ClientOnly")
+	--   pitch가 nil이면 SoundService(동시 재생 수 제한이 있어 0.02초 간격 117타에선 앞 몇십 개만 나고 뒤가 잘린다 — 2026-09-22 실측 "타격음이 1초도 안 이어짐"), 1이라도 값이 있으면 풀(SfxPoolSize개를 돌려 쓰며 restart → 끊기지 않고 파바박)
+	method void PlaySfx(string ruid, number volume, any pitch)
+		if ruid == nil or ruid == "" then return end
+		if pitch == nil then
+			_SoundService:PlaySound(ruid, volume or 1)
+			return
+		end
+		local mapRoot = _EntityService:GetEntityByPath("/maps/RtsMap")
+		if mapRoot == nil then return end
+		self.SfxIdx = (self.SfxIdx % self.SfxPoolSize) + 1
+		local e = self.SfxPool[self.SfxIdx]
+		if e == nil or not isvalid(e) then
+			e = _SpawnService:SpawnByModelId("model://MapObject", "RtsSfx" .. _RtsHudLogic:Int(self.SfxIdx), Vector3.zero, mapRoot)
+			if e == nil then return end
+			self.SfxPool[self.SfxIdx] = e
+		end
+		local sc = e.SoundComponent
+		if sc == nil then sc = e:AddComponent("SoundComponent") end
+		if sc == nil then return end
+		if sc.AudioClipRUID ~= ruid then sc.AudioClipRUID = ruid end
+		sc.Loop = false
+		sc.SetCameraAsListener = false
+		sc.Pitch = pitch
+		sc.Volume = volume or 1
+		sc:Play()
+	end
+
+	-- 피치 재생용 풀을 미리 만들어 클립을 올려 둔다(SoundComponent는 AudioClipRUID를 넣어야 로드되므로 첫 타격이 무음이 되지 않게) — 프리로드 때
+	@ExecSpace("ClientOnly")
+	method void WarmSfx(string ruid)
+		if ruid == nil or ruid == "" then return end
+		local mapRoot = _EntityService:GetEntityByPath("/maps/RtsMap")
+		if mapRoot == nil then return end
+		for i = 1, self.SfxPoolSize do
+			local e = self.SfxPool[i]
+			if e == nil or not isvalid(e) then
+				e = _SpawnService:SpawnByModelId("model://MapObject", "RtsSfx" .. _RtsHudLogic:Int(i), Vector3.zero, mapRoot)
+				if e == nil then return end
+				self.SfxPool[i] = e
+			end
+			local sc = e.SoundComponent
+			if sc == nil then sc = e:AddComponent("SoundComponent") end
+			if sc ~= nil and (sc.AudioClipRUID == nil or sc.AudioClipRUID == "") then sc.AudioClipRUID = ruid end
 		end
 	end
 
@@ -176,31 +253,75 @@ script RtsSkillFxLogic extends Logic
 			end
 		end
 		if fx.sound ~= nil and fx.sound ~= "" then
-			-- soundDelay = 시전음을 그 초 뒤에(레이징 블로우: 초승달 참격 시작 0.24초에 맞춤)
+			-- soundDelay = 시전음을 그 초 뒤에(레이징 블로우: 초승달 참격 시작 0.24초에 맞춤). soundPitch = 재생 속도(PlaySfx)
 			if fx.soundDelay ~= nil and fx.soundDelay > 0 then
 				local snd = fx.sound
-				_TimerService:SetTimerOnce(function() _SoundService:PlaySound(snd, 1) end, fx.soundDelay)
+				local sp = fx.soundPitch
+				_TimerService:SetTimerOnce(function() self:PlaySfx(snd, 1, sp) end, fx.soundDelay)
 			else
-				_SoundService:PlaySound(fx.sound, 1)
+				self:PlaySfx(fx.sound, 1, fx.soundPitch)
 			end
 		end
-		if fx.backClip ~= nil and fx.backClip ~= "" then self:PlayBack(unitEntity, no, fx) end
+		-- sound2·sound2Delay·sound2Vol·sound2Pitch: 두 번째 시전음(카르마 퓨리 — 토네이도 뒤 1.5초에)
+		if fx.sound2 ~= nil and fx.sound2 ~= "" then
+			local snd2 = fx.sound2
+			local v2 = fx.sound2Vol or 1
+			local p2 = fx.sound2Pitch
+			_TimerService:SetTimerOnce(function() self:PlaySfx(snd2, v2, p2) end, fx.sound2Delay or 0)
+		end
+		-- backDelay(초): 등 뒤 클립을 늦게(카르마 퓨리 — 토네이도 판정이 끝나는 1.8초에)
+		if fx.backClip ~= nil and fx.backClip ~= "" then
+			if fx.backDelay ~= nil and fx.backDelay > 0 then
+				_TimerService:SetTimerOnce(function() if isvalid(unitEntity) then self:PlayBack(unitEntity, no, fx) end end, fx.backDelay)
+			else
+				self:PlayBack(unitEntity, no, fx)
+			end
+		end
 		if fx.bodyClip ~= nil and fx.bodyClip ~= "" then self:PlayBody(unitEntity, no, fx) end
-		if fx.loopClip ~= nil and fx.loopClip ~= "" then self:EnsureLoopFx(unitEntity, no, fx) end
+		if fx.loopClip ~= nil and fx.loopClip ~= "" then self:EnsureLoopFx(unitEntity, no, fx, target) end
 		if ((fx.proj ~= nil and fx.proj ~= "") or (fx.projs ~= nil and #fx.projs > 0)) and target ~= nil and isvalid(target) then self:PlayProjectile(unitEntity, fx, target, targets) end
-		if (fx.markClip ~= nil and fx.markClip ~= "") or fx.markClips ~= nil then
+		-- 대상 위 표식: fx의 markClip/markClips 1벌 + marks = { {clip, clips, delay, life, scale, at, dx, dy, fit, pivotDy, loop, stagger, pattern} … } 추가 벌(블레이드 토네이도 → 카르마 퓨리처럼 시각이 다른 표식 여러 개)
+		local function playMarks(mfx)
+			-- 같은 대상이 여러 번 들어오면(보스 집중 15타) 표식을 가로로 조금씩 흩뿌린다(PlayMark dup)
+			local seen = {}
 			for j = 1, #targets do
 				local t = targets[j]
 				if isvalid(t) then
-					local md = fx.markDelay or 0
+					seen[t.Name] = (seen[t.Name] or 0) + 1
+					local dup = seen[t.Name]
+					-- markStagger(초): 대상 j마다 (j−1)×markStagger 늦게(블리자드 템페스트 얼음 15개가 차례로 — 서버 hitStagger와 같은 값)
+					local md = (mfx.markDelay or 0) + (mfx.markStagger or 0) * (j - 1)
 					if md > 0 then
 						_TimerService:SetTimerOnce(function()
-							if isvalid(t) then self:PlayMark(fx, t) end
+							if isvalid(t) then self:PlayMark(mfx, t, dup) end
 						end, md)
 					else
-						self:PlayMark(fx, t)
+						self:PlayMark(mfx, t, dup)
 					end
 				end
+			end
+		end
+		if (fx.markClip ~= nil and fx.markClip ~= "") or fx.markClips ~= nil then playMarks(fx) end
+		if fx.marks ~= nil then
+			for mi = 1, #fx.marks do
+				local ov = fx.marks[mi]
+				local mfx = {}
+				for kk, vv in pairs(fx) do mfx[kk] = vv end
+				mfx.markClip = ov.clip
+				mfx.markClips = ov.clips
+				mfx.markDelay = ov.delay
+				mfx.markLife = ov.life
+				mfx.markScale = ov.scale
+				mfx.markAt = ov.at
+				mfx.markDx = ov.dx
+				mfx.markDy = ov.dy
+				mfx.markFit = ov.fit
+				mfx.markPivotDy = ov.pivotDy
+				mfx.markLoop = ov.loop
+				mfx.markStagger = ov.stagger
+				mfx.markPattern = ov.pattern
+				mfx.markScaleX = ov.scaleX
+				playMarks(mfx)
 			end
 		end
 		if fx.beam ~= nil and fx.beam ~= "" and #targets > 0 then
@@ -265,7 +386,7 @@ script RtsSkillFxLogic extends Logic
 
 	-- 공격 중 계속 도는 이펙트(원작 keydown 클립): 없으면 유닛 위에 루프로 띄우고, 시전마다 시각만 갱신. 감시 타이머가 LoopTimeout초 동안 시전이 없으면 이펙트를 지우고 유지 자세(motionLoop)도 stand2로 되돌린다
 	@ExecSpace("ClientOnly")
-	method void EnsureLoopFx(Entity unitEntity, number no, table fx)
+	method void EnsureLoopFx(Entity unitEntity, number no, table fx, any target)
 		self.LoopLast[no] = DateTime.UtcNow.Elapsed
 		self.LoopUnit[no] = unitEntity
 		if self.LoopWatch == nil then
@@ -278,13 +399,34 @@ script RtsSkillFxLogic extends Logic
 		local dir = 1
 		if flip then dir = -1 end
 		-- 유닛 엔티티의 자식으로 붙인다(2026-09-20 사용자 "조커 애니메이션이 캐릭터 위치 이동해도 안 따라간다") — 부모 스케일 2라 로컬 값은 절반. 보는 방향이 바뀌면 반전만 갱신(RefreshLoopFacing — FaceDir 동기화 때도 불린다)
+		--   loopAt "target"(디바인 퍼니시먼트 keydown — 2026-09-22 사용자 "몬스터 위에 나와야"): 대상 몬스터의 자식으로. 부모 스케일은 몬스터 것(보스 2·일반 1)으로 나누고, 위치 = 피격 박스 중앙 + loopDy. 대상이 바뀌면 루프를 새로 만든다
 		self.LoopFx[no] = fx
+		local anchor = unitEntity
+		local pscale = 2
+		local baseY = 0
+		if fx.loopAt == "target" then
+			if target == nil or not isvalid(target) then return end
+			anchor = target
+			local sc = target.TransformComponent.Scale
+			pscale = math.abs(sc.x)
+			if pscale < 0.01 then pscale = 1 end
+			if target.HitComponent ~= nil then
+				baseY = target.HitComponent.ColliderOffset.y
+				-- loopAtTop: 피격 박스 윗변(머리 위)을 원점으로(디바인 퍼니시먼트 — 빛의 검이 머리 위로 떨어지는 그림, 클립 원점이 아래쪽)
+				if fx.loopAtTop then baseY = baseY + target.HitComponent.BoxSize.y * 0.5 end
+			end
+		end
 		local old = self.ActiveLoop[no]
 		if old ~= nil and isvalid(old) then
-			self:RefreshLoopFacing(no)
-			return
+			if self.LoopAnchor[no] == anchor then
+				self:RefreshLoopFacing(no)
+				return
+			end
+			old:Destroy()
+			self.ActiveLoop[no] = nil
 		end
-		local e = _SpawnService:SpawnByModelId("model://MapObject", "RtsLoopFx" .. _RtsHudLogic:Int(no), Vector3.zero, unitEntity)
+		self.LoopAnchor[no] = anchor
+		local e = _SpawnService:SpawnByModelId("model://MapObject", "RtsLoopFx" .. _RtsHudLogic:Int(no), Vector3.zero, anchor)
 		if e == nil then return end
 		local sr = e.SpriteRendererComponent
 		if sr == nil then sr = e:AddComponent("SpriteRendererComponent") end
@@ -294,9 +436,34 @@ script RtsSkillFxLogic extends Logic
 		sr.FlipX = flip
 		sr.SpriteRUID = fx.loopClip
 		if fx.loopAlpha ~= nil then sr.Color = Color(1, 1, 1, fx.loopAlpha) end
-		e.TransformComponent.Position = Vector3((fx.loopDx or 0) * s * dir / 2, (fx.loopDy or 0) / 2, 0)
-		e.TransformComponent.Scale = Vector3(s / 2, s / 2, 1)
+		e.TransformComponent.Position = Vector3((fx.loopDx or 0) * s * dir / pscale, (baseY + (fx.loopDy or 0)) / pscale, 0)
+		e.TransformComponent.Scale = Vector3(s / pscale, s / pscale, 1)
 		self.ActiveLoop[no] = e
+		-- loopIntroSound: 루프가 처음 생길 때 1회 재생하는 소리(애로우 레인 활 소환 400031002/use 1.9초 — 발마다 나는 sound와 별개)
+		if fx.loopIntroSound ~= nil and fx.loopIntroSound ~= "" then _SoundService:PlaySound(fx.loopIntroSound, 1) end
+		-- loopSound: 루프가 도는 동안 반복 재생(디바인 퍼니시먼트 400021086/loop 0.73초). CheckLoops가 루프를 지울 때 StopSound
+		if fx.loopSound ~= nil and fx.loopSound ~= "" then _SoundService:PlayLoopSound(fx.loopSound, fx.loopSoundVol or 1) end
+		-- loopIntro: 루프가 처음 생길 때 같은 자리에 1회 클립(애로우 레인 활 소환 effect — 2026-09-22). loopIntroLife초 동안 루프 그림은 투명, 끝나면 인트로 제거 + 루프 표시.
+		--   루프 엔티티의 자식이라 루프가 정리되면 함께 사라진다. loopIntroScale(없으면 loopScale)·loopIntroDy(유닛 단위, 루프 기준 상대)
+		if fx.loopIntro ~= nil and fx.loopIntro ~= "" then
+			local si = fx.loopIntroScale or s
+			local intro = _SpawnService:SpawnByModelId("model://MapObject", "RtsLoopIntro" .. _RtsHudLogic:Int(no), Vector3.zero, e)
+			if intro ~= nil then
+				local ir = intro.SpriteRendererComponent
+				if ir == nil then ir = intro:AddComponent("SpriteRendererComponent") end
+				ir.SortingLayer = "Default"
+				ir.OrderInLayer = (fx.loopOrder or 300) + 1
+				ir.FlipX = flip
+				ir.SpriteRUID = fx.loopIntro
+				intro.TransformComponent.Position = Vector3(0, (fx.loopIntroDy or 0) / s, 0)
+				intro.TransformComponent.Scale = Vector3(si / s, si / s, 1)
+				sr.Color = Color(1, 1, 1, 0)
+				_TimerService:SetTimerOnce(function()
+					if isvalid(intro) then intro:Destroy() end
+					if isvalid(e) and e.SpriteRendererComponent ~= nil then e.SpriteRendererComponent.Color = Color(1, 1, 1, fx.loopAlpha or 1) end
+				end, fx.loopIntroLife or 1.5)
+			end
+		end
 	end
 
 	-- 루프 클립의 반전·위치를 유닛이 지금 보는 방향에 맞춘다. 시전마다(EnsureLoopFx)와 FaceDir이 동기화되는 순간(RtsUnitComponent.ApplyFace) 둘 다 —
@@ -312,6 +479,7 @@ script RtsSkillFxLogic extends Logic
 		local flip = self:FlipFor(fx, self:FacingRight(u), "loop")
 		if sr.FlipX == flip then return end
 		sr.FlipX = flip
+		if fx.loopAt == "target" then return end
 		local s = fx.loopScale or 1.5
 		local dir = 1
 		if flip then dir = -1 end
@@ -342,9 +510,33 @@ script RtsSkillFxLogic extends Logic
 		for no, e in pairs(self.ActiveLoop) do
 			local last = self.LoopLast[no] or 0
 			if now - last > self.LoopTimeout * 1000 then
+				local fx = self.LoopFx[no]
+				local u = self.LoopUnit[no]
+				if fx ~= nil then
+					if fx.loopSound ~= nil and fx.loopSound ~= "" then _SoundService:StopSound(fx.loopSound) end
+					if fx.loopEndSound ~= nil and fx.loopEndSound ~= "" then _SoundService:PlaySound(fx.loopEndSound, 1) end
+					-- loopEnd: 루프가 끝나는 자리에 1회 클립(디바인 퍼니시먼트 keydownend 0.72초) — 루프와 같은 위치·크기·반전, loopEndLife 뒤 제거
+					local anchor = self.LoopAnchor[no]
+					if anchor == nil or not isvalid(anchor) then anchor = u end
+					if fx.loopEnd ~= nil and fx.loopEnd ~= "" and e ~= nil and isvalid(e) and anchor ~= nil and isvalid(anchor) then
+						local ee = _SpawnService:SpawnByModelId("model://MapObject", "RtsLoopEnd" .. _RtsHudLogic:Int(no), Vector3.zero, anchor)
+						if ee ~= nil then
+							local er = ee.SpriteRendererComponent
+							if er == nil then er = ee:AddComponent("SpriteRendererComponent") end
+							er.SortingLayer = "Default"
+							er.OrderInLayer = fx.loopOrder or 300
+							if e.SpriteRendererComponent ~= nil then er.FlipX = e.SpriteRendererComponent.FlipX end
+							er.SpriteRUID = fx.loopEnd
+							ee.TransformComponent.Position = e.TransformComponent.Position
+							ee.TransformComponent.Scale = e.TransformComponent.Scale
+							_TimerService:SetTimerOnce(function() if isvalid(ee) then ee:Destroy() end end, fx.loopEndLife or 0.75)
+						end
+					end
+				end
 				if e ~= nil and isvalid(e) then e:Destroy() end
 				self.ActiveLoop[no] = nil
 				self.LoopFx[no] = nil
+				self.LoopAnchor[no] = nil
 				-- 유지 자세도 내려놓는다
 				local u = self.LoopUnit[no]
 				if self.LoopMotion[no] ~= nil and u ~= nil and isvalid(u) and u.AvatarRendererComponent ~= nil then
@@ -398,6 +590,10 @@ script RtsSkillFxLogic extends Logic
 					if fx.projFrom == "around" then
 						local o = _RtsJobTableLogic:OrbSpawnOffset(i, count, fx)
 						from = Vector3(up.x + o.x, up.y + (fx.projDy or 0.9) + o.y, 0)
+					elseif fx.projFrom == "sky" then
+						-- 하늘에서 낙하(애로우 레인 2026-09-22): 대상 머리 위 projSkyHeight(기본 4)에서 가로 ±projSkySpread(기본 0.5) 흩어져 수직으로 떨어진다. 회전은 비행 방향(아래)으로 자동
+						local sp = fx.projSkySpread or 0.5
+						from = Vector3(to.x + (math.random(-100, 100) / 100) * sp, to.y + (fx.projSkyHeight or 4), 0)
 					end
 					local d = (fx.projStagger or 0) * (i - 1)
 					if d > 0 then
@@ -407,7 +603,7 @@ script RtsSkillFxLogic extends Logic
 					else
 						self:SpawnProjectile(fx, from, to, mapRoot, false, cells)
 					end
-					-- 그림자 투사체(쉐도우 파트너): 유닛 레벨이 projShadowLv 이상이면 등 뒤 projShadowDx에서 같은 투사체를 projShadowDelay 늦게 어둡게 한 발 더
+					-- 그림자 투사체(쉐도우 파트너): 유닛 레벨이 projShadowLv 이상이면 등 뒤 projShadowDx에서 같은 투사체를 projShadowDelay 늦게 어둡게 한 발 더(0.5 = 본체 4발(0.3초)이 다 나간 뒤 이어서 4발 — 서버 halfHits 판정 0.7~1.0초와 도착 시각이 맞는다)
 					if fx.projShadowLv ~= nil and unitEntity.RtsUnitComponent ~= nil and unitEntity.RtsUnitComponent.Level >= fx.projShadowLv then
 						local back = (fx.projShadowDx or 0.5)
 						if to.x >= from.x then back = -back end
@@ -700,7 +896,7 @@ script RtsSkillFxLogic extends Logic
 	--   위치 = 몬스터 피격 박스(HitComponent ColliderOffset×스케일)의 정중앙, 크기 = 박스의 긴 쪽 × markFit(몬스터가 커져도 전부 감싼다 — 사용자 "정중앙, 몬스터 크기 커져도 다 감싸게"). HitComponent가 없으면 markDy·markScale
 	@ExecSpace("ClientOnly")
 	--   markClips = {…}면 무작위 1개(블리자드 얼음 tile 9종). markAt = "feet"면 피격 박스 대신 몬스터 발 위치(+markDx·markDy)에 markScale로 — 원점이 땅인 낙하 클립(블리자드 얼음·제네시스 빛기둥)
-	method void PlayMark(table fx, Entity target)
+	method void PlayMark(table fx, Entity target, any dup)
 		local mapRoot = _EntityService:GetEntityByPath("/maps/RtsMap")
 		if mapRoot == nil then return end
 		local clip = fx.markClip
@@ -723,12 +919,29 @@ script RtsSkillFxLogic extends Logic
 		end
 		-- 클립 원점이 아래쪽이면 그림 중심이 위로 뜬다 → markPivotDy(스케일 1당 유닛) 만큼 내려 정중앙에 맞춘다
 		cy = cy - (fx.markPivotDy or 0) * s
-		local e = _SpawnService:SpawnByModelId("model://MapObject", "RtsMark_" .. target.Name .. "_" .. tostring(math.floor(DateTime.UtcNow.Elapsed)), Vector3(cx, cy, 0), mapRoot)
+		-- 같은 대상 반복 타격(보스 집중 15타): 2번째부터 가로 ±1.2유닛·세로 ±0.3유닛 무작위로 흩뿌려 얼음 15개가 한 점에 겹치지 않게
+		--   markPattern "alternate"(블리자드 템페스트, 2026-09-22 사용자 "좌우 각각 7~8개씩 번갈아 파바박"): 홀수 번째 왼쪽·짝수 번째 오른쪽, 거리는 markAltDists 순환(기본 0.5·1.0·0.75·1.25·0.6·1.1·0.9·1.3),
+		--   세로는 ±0.15 번갈아. 원작 tile 얼음은 오른쪽 위 고리에서 왼쪽 아래로 떨어지므로 오른쪽 자리는 반전해 고리가 보스 위로 모이게
+		local flipMark = false
+		if fx.markPattern == "alternate" and dup ~= nil then
+			local side = 1
+			if dup % 2 == 1 then side = -1 end
+			local dists = fx.markAltDists or { 0.5, 1.0, 0.75, 1.25, 0.6, 1.1, 0.9, 1.3 }
+			local k = math.ceil(dup / 2)
+			cx = cx + side * dists[((k - 1) % #dists) + 1]
+			if k % 2 == 0 then cy = cy + 0.15 else cy = cy - 0.15 end
+			flipMark = side > 0
+		elseif dup ~= nil and dup > 1 then
+			cx = cx + (math.random() * 2.4 - 1.2)
+			cy = cy + (math.random() * 0.6 - 0.3)
+		end
+		local e = _SpawnService:SpawnByModelId("model://MapObject", "RtsMark_" .. target.Name .. "_" .. tostring(math.floor(DateTime.UtcNow.Elapsed)) .. "_" .. tostring(dup or 1), Vector3(cx, cy, 0), mapRoot)
 		if e == nil then return end
 		local sr = e.SpriteRendererComponent
 		if sr == nil then sr = e:AddComponent("SpriteRendererComponent") end
 		sr.SortingLayer = "Default"
 		sr.OrderInLayer = 330
+		sr.FlipX = flipMark
 		sr.SpriteRUID = clip
 		-- markScaleX = 가로만 따로 배율(제네시스 빛기둥 넓이 2배 — 사용자 2026-09-19)
 		e.TransformComponent.Scale = Vector3(s * (fx.markScaleX or 1), s, 1)
@@ -809,9 +1022,14 @@ script RtsSkillFxLogic extends Logic
 		end
 		local sr = self:ShadowSpriteOf(body)
 		if sr ~= nil then
+			-- 그림자는 본체보다 ShadowActionDelay 늦게 같은 동작(2026-09-22 사용자 "본체 표창이 날아가고 그 뒤에 이어서 — 본체보다 공격이 살짝 느리게"): 표창 4발 뒤에 그림자 4발이 이어지는 projShadowDelay 0.5와 같은 값
 			local clip = self:ShadowClip(name)
-			if sr.SpriteRUID ~= clip then sr.SpriteRUID = clip end
-			sr.PlayRate = rate or 1
+			local r = rate or 1
+			_TimerService:SetTimerOnce(function()
+				if not isvalid(sr) then return end
+				if sr.SpriteRUID ~= clip then sr.SpriteRUID = clip end
+				sr.PlayRate = r
+			end, self.ShadowActionDelay)
 		end
 	end
 
@@ -1026,7 +1244,8 @@ script RtsSkillFxLogic extends Logic
 		local sr = e.SpriteRendererComponent
 		if sr == nil then sr = e:AddComponent("SpriteRendererComponent") end
 		sr.SortingLayer = "Default"
-		sr.OrderInLayer = 300
+		-- clipOrder: 시전 클립을 아바타(0) 뒤에 두려면 −10(블리자드 템페스트 발밑 결정 — 2026-09-22 사용자 "캐릭터 뒤에 오도록"). 기본 300 = 앞
+		sr.OrderInLayer = fx.clipOrder or 300
 		sr.FlipX = flip
 		sr.SpriteRUID = fx.clip
 		e.TransformComponent.Scale = Vector3(s, s, 1)
@@ -1084,7 +1303,7 @@ script RtsSkillFxLogic extends Logic
 	method void PlayBasic(number no)
 		local u = _RtsUnitLogic:GetMyUnit(no)
 		if u == nil then return end
-		local skills = _RtsJobTableLogic:GetSkills(u.JobId)
+		local skills = _RtsJobTableLogic:GetSkillsFor(u)
 		local fx = nil
 		for i = 1, #skills do
 			if skills[i].fx ~= nil then
@@ -1108,7 +1327,7 @@ script RtsSkillFxLogic extends Logic
 		if not on then return end
 		local u = _RtsUnitLogic:GetMyUnit(no)
 		if u == nil then return end
-		local st = _RtsJobTableLogic:GetStat(u.JobId, u.Level)
+		local st = _RtsJobTableLogic:GetStatFor(u)
 		local period = _RtsJobTableLogic:GetPeriod(st)
 		self.DemoTimers[no] = _TimerService:SetTimerRepeat(function()
 			self:PlayBasic(no)

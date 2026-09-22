@@ -188,3 +188,28 @@ MSW(Maker 26.7) 실측으로 확인한 엔진 동작. 다시 실측하면 30분�
 - Scope: project
 - Rationale: 2026-09-20 사용자 "유닛이 한 마리만 공격하는데 정상임? 모든 유닛이 개별적으로·자율적으로", "메인 대상은 죽거나 거리 밖으로 나가기 전까지 쭉".
 - Priority: takes precedence over defaults
+
+
+## 개발모드(RtsCombatLogic.TestBench) = 주니어 발록 보스 1기 + 유닛 없이 시작·영입 팝업 자유 영입(Lv50) + 우측 하단 '테스트 프리즘'(토글) + 보스 라운드 취급
+- Rule: 2026-09-22 사용자 "개발모드부터 만들자. 백만 메소, 프리즘 선택 획득, 몬스터는 주니어 발록 1마리(보스·무적), 한 직업씩 테스트". 입장 시 `SetupTestBench`가 mob/8130100 stand 클립(4b3ad414…) 보스를 (9,7)에(스케일 2, 피격 박스 1.3×1.5, IsBoss → 체력바 BossBarY 3.4), 유닛은 없음(메소 시범값 — 사용자 "100만 빼자"). 영입 팝업 카드 → `RequestRecruit(jobId)`(개발: 무료·Lv50·중복 허용, `FreePadNear`로 보스 곁 빈 발판, 팬텀은 '영웅(개발)' 탭), 이동 쿨 0. 우측 하단 '테스트 프리즘' → `BuildDevPrism`(12종 직업별, `RequestDevPrism` = 있으면 `RemovePrism`(잠금 기본값 복구) 없으면 `ApplyPrism`), '내 유닛 전부 삭제' = `RequestDevClear`. `IsBossRound(zone)` = TestBench면 true → `SkillUsable`이 보스전 잠금(1) 스킬을 거른다(사용자 "드래곤 로어가 발록한테 나감"). 거대화 = 스피어 버스터 fx scale ×3. **프리즘 = `RtsUnitComponent.Prisms`(@Sync 쉼표 목록) + `RtsJobTableLogic.GetPrisms/GetSkillsFor/GetStatFor/GetJobNameFor`**(직업 표 복사본 위에 오버레이: 스킬 항목 교체/추가, st.ratio/hits/period/range/bossAdd, locks → SetLock 3) — GetSkills(jobId)/GetStat(jobId,L)를 직접 부르던 자리(전투·CastFx/HitFx·팝업·HUD 슬롯·잠금·그림자·프리로드)는 전부 For 판으로 바꿨다(HitFx는 zone·no를 받음). 보스 배율은 `DoAttack`에서 대상 IsBoss일 때만 `bossMul = (1+bossAdd/100)·finBoss/fin·bossFinal`. 스킬 항목 키: `bossHits`(보스 1마리에게 n회 반복 — 템페스트 15), `bossFinal`(0.9), `hitRatios`(타격별 비율 — 블토 24×39 + 카르마 15×51), `forceCrit`(트루 스나이핑). 표식 중복 대상은 PlayMark dup로 ±1.2유닛 흩뿌림. 실측: 엘릭서+템페스트 썬콜 Lv50 → 보스에 3초마다 15타 7.7~9.3k(=9,376×0.9×무기 0.9~1.1) ✓, 11직업 프리즘 전부 적용 시 런타임 에러 0.
+- Scope: project
+- Rationale: 프리즘 자산 선별을 직접 눈으로 하려면 프리즘이 실제로 발동하는 개발 환경이 먼저 필요했음. 웨이브·보스 페이즈가 생기면 삭제.
+- Priority: takes precedence over defaults
+
+## 효과음 재생 속도(피치)는 SoundComponent.Pitch로만 — SoundService.PlaySound에는 없다 (2026-09-22)
+- Rule: 소리를 빨리/느리게 감으려면 `SoundComponent`(AudioClipRUID·Pitch 0~3·Volume·Loop=false·SetCameraAsListener=false) 엔티티를 두고 `Play()`. 0.2초 간격처럼 겹쳐 나야 하는 소리는 컴포넌트 1개면 Play마다 앞 소리가 끊기므로 풀(RtsSkillFxLogic.SfxPool 6개, 라운드 로빈)로. AudioClipRUID를 넣어야 로드되므로 프리로드 때 풀에 미리 올린다(WarmSfx) — 확인: IsAudioClipLoaded true·Pitch 1.5·IsPlaying true.
+- Scope: project
+- Rationale: 애로우 레인 타격음 400030002/loop(0.97초)을 사용자 요청으로 1.5배 빨리 감기.
+- Priority: takes precedence over defaults
+
+## 프리즘/스킬 연출 자산은 첫 시전 전에 프리로드 — 안 하면 "적용 안 됨"처럼 보인다 (2026-09-22)
+- Rule: 클립 자산은 SpriteRUID를 넣는 순간부터 내려받기 시작해 큰 세트(tile 9종 × 21프레임)는 몇 초 걸린다. 그동안 시전하면 서버 판정은 맞는데 표식·클립이 빈 채로 그려져 사용자는 "프리즘이 적용 안 된다 → 껐다 켜니 됨"으로 본다. 유닛이 생길 때 그 직업의 프리즘 변형까지 `PreloadJobFx`로 올려 둔다. 원인 찾을 땐 먼저 서버 표(GetSkillsFor)를 execute_script로 찍어 서버/클라 어느 쪽인지 가른다.
+- Scope: project
+- Rationale: 엘릭서+템페스트 동시 적용 버그 조사 — 서버 표는 정상(bossHits 15, cd 2), 클라 자산 지연이 원인.
+- Priority: takes precedence over defaults
+
+## Maker 빌드 분석기는 메서드 서명을 캐시한다 — 기존 메서드에 인자를 늘리면 옛 서명으로 오류, 새 이름으로 추가 (2026-09-22)
+- Rule: 다른 스크립트가 부르는 메서드(예: RtsMonsterComponent.PlayHitFx)의 인자를 늘리면 빌드 콘솔이 옛 서명 `void PlayHitFx(table, boolean)`로 인자 수 오류를 내고(런타임은 정상), refresh·save·재시작으로도 안 지워진다. 인자가 다른 새 메서드(PlayHitFxAt)를 만들고 옛 것은 위임하게 두면 해결. 또 mlua는 메서드 파라미터 재대입(`content = list`)·`any` 값 산술을 거부할 수 있어 새 local로 받는다. 문법 오류는 `maker_clear_logs` → `maker_refresh_workspace` 직후 `maker_logs(normal)`에 `[LEA-3016] InvalidFormat … RtsX.mlua:줄` 로 찍힌다(빌드 콘솔엔 안 나옴).
+- Scope: project
+- Rationale: 2026-09-22 PlayHitFx 3인자화·BuildSkillTab 파라미터 재대입·DescLines 꼬리 잔여로 두 스크립트가 nil이 됐던 일.
+- Priority: takes precedence over defaults

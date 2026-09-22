@@ -31,6 +31,9 @@ script RtsPopupLogic extends Logic
 	-- 증강 탭 상태
 	property table AugTabs = {}
 
+	-- 방출 확인 팝업이 가리키는 내 유닛 번호 (OpenDismiss)
+	property number DismissNo = 0
+
 	-- ===== 셸 =====
 
 	@ExecSpace("ClientOnly")
@@ -81,7 +84,7 @@ script RtsPopupLogic extends Logic
 	method void Open(string kind)
 		if not self.Built then return end
 		if self.Kind ~= "" then self:Close() end
-		if kind ~= "recruit" and kind ~= "augment" and kind ~= "pick" and kind ~= "unit" then
+		if kind ~= "recruit" and kind ~= "augment" and kind ~= "pick" and kind ~= "unit" and kind ~= "devprism" and kind ~= "dismiss" then
 			log("RtsPopup: unknown kind " .. kind)
 			return
 		end
@@ -96,10 +99,17 @@ script RtsPopupLogic extends Logic
 		elseif kind == "augment" then
 			height = 960
 			title = "증강"
+		elseif kind == "devprism" then
+			height = 760
+			title = "테스트 프리즘 증강 (개발용)"
 		elseif kind == "unit" then
 			width = _RtsUnitPopupLogic.PanelW
 			height = _RtsUnitPopupLogic.PanelH
 			title = "유닛"
+		elseif kind == "dismiss" then
+			width = 640
+			height = 290
+			title = "방출"
 		else
 			height = 520
 			title = "보스 처치 — 증강 선택"
@@ -118,12 +128,24 @@ script RtsPopupLogic extends Logic
 			self:BuildRecruit(body)
 		elseif kind == "augment" then
 			self:BuildAugment(body)
+		elseif kind == "devprism" then
+			self:BuildDevPrism(body)
 		elseif kind == "unit" then
 			_RtsUnitPopupLogic:BuildBody(body)
+		elseif kind == "dismiss" then
+			self:BuildDismiss(body)
 		else
 			self:BuildPick(body)
 		end
 		self.Group:SetEnable(true)
+	end
+
+	-- 유닛 메뉴 '방출' → 이 팝업. 확인해야만 RtsUnitLogic.RequestDismiss (2026-09-22 사용자: 메뉴는 닫히고 새 팝업에서 묻는다)
+	@ExecSpace("ClientOnly")
+	method void OpenDismiss(number no)
+		if _RtsUnitLogic:GetMyUnit(no) == nil then return end
+		self.DismissNo = no
+		self:Open("dismiss")
 	end
 
 	@ExecSpace("ClientOnly")
@@ -133,6 +155,7 @@ script RtsPopupLogic extends Logic
 		self.Kind = ""
 		self.Pick = {}
 		self.AugTabs = {}
+		self.DismissNo = 0
 		if self.Body ~= nil then
 			self.Body:Destroy()
 			self.Body = nil
@@ -224,15 +247,18 @@ script RtsPopupLogic extends Logic
 		ph.SpriteGUIRendererComponent.Color = self:Mix(Color.white, 0.02)
 		ph.Parent.SpriteGUIRendererComponent.Color = self:Mix(H:ColGold(), 0.2)
 
+		-- 직업 id 기준(2026-09-22): 카드 클릭 → 서버 RequestRecruit(개발모드: 무료·Lv50·중복 허용. 본편 규칙은 Phase 5). 팬텀은 개발모드에서만 카드로 노출(본편은 프리즘 해금)
 		local groups = {
-			{ "전사", { "히어로", "팔라딘", "다크나이트" } },
-			{ "궁수", { "보우마스터", "신궁" } },
-			{ "마법사", { "아크메이지(썬·콜)", "아크메이지(불·독)", "비숍" } },
-			{ "도적", { "나이트로드", "섀도어" } },
+			{ "전사", { "hero", "paladin", "dk" } },
+			{ "궁수", { "bow", "marks" } },
+			{ "마법사", { "il", "fp", "bishop" } },
+			{ "도적", { "nl", "shad" } },
 		}
-		local colW = 250
-		local gap = 19
+		if _RtsCombatLogic.TestBench then groups[#groups + 1] = { "영웅(개발)", { "phantom" } } end
+		local colW = 200
+		local gap = 14
 		local top = -66
+		local nos = _RtsUnitLogic:ListZoneUnits(_RtsUnitLogic:MyZone())
 		for gi = 1, #groups do
 			local gx = 27 + (gi - 1) * (colW + gap)
 			local g = groups[gi]
@@ -245,20 +271,149 @@ script RtsPopupLogic extends Logic
 				local jy = top - 42 - (ji - 1) * 48
 				local card = H:SpawnPanel("RtsRcJob" .. tostring(gi) .. "_" .. tostring(ji), body, Vector2(0, 1), Vector2(0, 1), Vector2(gx, jy), Vector2(colW, 40),
 					self:Mix(Color.white, 0.04), self:Mix(Color.white, 0.08), 1.5)
-				H:SpawnLabel("RtsRcJobName", card, Vector2(0, 0.5), Vector2(0, 0.5), Vector2(13, 0), Vector2(170, 30),
-					jobs[ji], H:ColInk(), 19, TextAlignmentType.MiddleLeft, false)
-				-- 다음 영입가: 1기 무료 → 500 → 2,000 → 5,000 → 10,000 → 30,000 (Phase 2 테이블로 교체 예정)
+				local jid = jobs[ji]
+				-- 이미 보유한 직업은 흐리게 + '보유 중', 클릭 없음(동일 직업 중복 영입 불가 — 프리즘으로 이름이 바뀐 듀얼블레이더도 섀도어로 센다)
+				local ownedJob = false
+				for oi = 1, #nos do
+					local ou = _RtsUnitLogic:GetMyUnit(nos[oi])
+					if ou ~= nil and ou.JobId == jid then ownedJob = true end
+				end
+				local ink = H:ColInk()
+				if ownedJob then
+					ink = Color(0.55, 0.51, 0.45, 1)
+					card.SpriteGUIRendererComponent.Color = self:Mix(Color.white, 0.02)
+				end
+				H:SpawnLabel("RtsRcJobName", card, Vector2(0, 0.5), Vector2(0, 0.5), Vector2(13, 0), Vector2(150, 30),
+					_RtsJobTableLogic:GetJobName(jid), ink, 17, TextAlignmentType.MiddleLeft, false)
+				-- 영입가: 개발모드 무료(Lv50). 본편 영입가 표는 Phase 5
+				local priceText = "무료"
+				if ownedJob then priceText = "보유 중" end
 				H:SpawnLabel("RtsRcJobPrice", card, Vector2(1, 0.5), Vector2(1, 0.5), Vector2(-13, 0), Vector2(70, 30),
-					"무료", H:ColMuted(), 15, TextAlignmentType.MiddleRight, false)
-				local jobName = jobs[ji]
-				local click = H:SpawnClick("RtsRcJobClick", card)
-				click:ConnectEvent(ButtonClickEvent, function(event)
-					log("RtsPopup: recruit " .. jobName .. " (영입 로직은 Phase 5)")
-				end)
+					priceText, H:ColMuted(), 14, TextAlignmentType.MiddleRight, false)
+				if not ownedJob then
+					local click = H:SpawnClick("RtsRcJobClick", card)
+					click:ConnectEvent(ButtonClickEvent, function(event)
+						_RtsUnitLogic:RequestRecruit(jid)
+						self:Close()
+					end)
+				end
 			end
 		end
-		H:SpawnLabel("RtsRcFoot", body, Vector2(1, 0), Vector2(1, 0), Vector2(-27, 22), Vector2(300, 26),
-			"보유 0 / 6", Color(0.851, 0.796, 0.651, 1), 16, TextAlignmentType.MiddleRight, false)
+		local owned = #_RtsUnitLogic:ListZoneUnits(_RtsUnitLogic:MyZone())
+		H:SpawnLabel("RtsRcFoot", body, Vector2(1, 0), Vector2(1, 0), Vector2(-27, 22), Vector2(400, 26),
+			"보유 " .. H:Int(owned) .. " / " .. H:Int(_RtsUnitLogic:GetMaxUnits()) .. " · 개발모드: 무료·Lv50, 보스 곁 빈 발판에", Color(0.851, 0.796, 0.651, 1), 15, TextAlignmentType.MiddleRight, false)
+	end
+
+	-- ===== 테스트 프리즘(개발모드, 2026-09-22 사용자 "우측 하단에 테스트 프리즘 증강 버튼 … 거기서 선택"): 프리즘 12종을 직업별로 나열, 누르면 그 직업인 내 유닛에 적용 =====
+
+	@ExecSpace("ClientOnly")
+	method void BuildDevPrism(Entity body)
+		local H = _RtsHudLogic
+		local T = _RtsJobTableLogic
+		-- 내 유닛을 직업별로 모아 둔다(프리즘 적용 여부 표시·유닛 없음 표시)
+		local mine = {}
+		local nos = _RtsUnitLogic:ListZoneUnits(_RtsUnitLogic:MyZone())
+		for i = 1, #nos do
+			local u = _RtsUnitLogic:GetMyUnit(nos[i])
+			if u ~= nil then
+				if mine[u.JobId] == nil then mine[u.JobId] = {} end
+				mine[u.JobId][#mine[u.JobId] + 1] = u
+			end
+		end
+		H:SpawnLabel("RtsDpSub", body, Vector2(0, 1), Vector2(0, 1), Vector2(27, -4), Vector2(1050, 24),
+			"누르면 그 직업인 내 유닛 전부에 적용(영구 잠금 포함), 적용된 걸 다시 누르면 해제. 연출 자산이 아직 없는 프리즘은 기존 스킬 연출을 그대로 쓴다", H:ColMuted(), 14, TextAlignmentType.MiddleLeft, false)
+		local prisms = T:GetPrisms()
+		local colW = 520
+		local n = 0
+		for i = 1, #prisms do
+			local pz = prisms[i]
+			if pz.job ~= "" then
+				n = n + 1
+				local col = (n - 1) % 2
+				local row = math.floor((n - 1) / 2)
+				local x = 27 + col * (colW + 20)
+				local y = -40 - row * 104
+				local units = mine[pz.job]
+				local has = false
+				local hasUnit = units ~= nil and #units > 0
+				if hasUnit then
+					has = true
+					for k = 1, #units do
+						if not T:HasPrism(units[k], pz.id) then has = false end
+					end
+				end
+				local txt = "[" .. T:GetJobName(pz.job) .. "] " .. pz.name
+				if has then txt = txt .. "   ✓ 적용됨 (누르면 해제)" elseif not hasUnit then txt = txt .. "   (유닛 없음 — 영입에서)" end
+				local tab = self:SpawnTab("RtsDp" .. pz.id, body, Vector2(x, y), Vector2(colW, 40), txt, has, 15)
+				if not hasUnit then tab.SpriteGUIRendererComponent.Color = self:Mix(Color.white, 0.02) end
+				H:SpawnLabel("RtsDpD" .. pz.id, body, Vector2(0, 1), Vector2(0, 1), Vector2(x + 4, y - 44), Vector2(colW - 8, 52),
+					pz.desc, Color(0.902, 0.863, 0.769, 1), 12, TextAlignmentType.UpperLeft, false)
+				if hasUnit then
+					local pid = pz.id
+					local click = H:SpawnClick("RtsDpClick", tab)
+					click:ConnectEvent(ButtonClickEvent, function(event)
+						_RtsUnitLogic:RequestDevPrism(pid)
+						self:Close()
+					end)
+				end
+			end
+		end
+		-- 하단: 유닛 전부 삭제(직업 바꿔 다시 영입하려고)
+		local clr = self:SpawnTab("RtsDpClear", body, Vector2(27, -40 - math.ceil(n / 2) * 104), Vector2(220, 38), "내 유닛 전부 삭제", false, 15)
+		clr.Parent.SpriteGUIRendererComponent.Color = Color(0.8, 0.35, 0.3, 1)
+		local cclick = H:SpawnClick("RtsDpClearClick", clr)
+		cclick:ConnectEvent(ButtonClickEvent, function(event)
+			_RtsUnitLogic:RequestDevClear()
+			self:Close()
+		end)
+		H:SpawnLabel("RtsDpFoot", body, Vector2(1, 0), Vector2(1, 0), Vector2(-27, 4), Vector2(700, 22),
+			"개발용 — 영웅 팬텀은 영입 팝업 '영웅(개발)'에서 바로 영입. RtsCombatLogic.TestBench가 꺼지면 이 버튼은 사라진다", Color(0.851, 0.796, 0.651, 1), 13, TextAlignmentType.MiddleRight, false)
+	end
+
+	-- ===== 방출 확인: 대상 한 줄 + 안내 문구(사용자 지정 텍스트) + [방출][취소] =====
+
+	@ExecSpace("ClientOnly")
+	method void BuildDismiss(Entity body)
+		local H = _RtsHudLogic
+		local T = _RtsJobTableLogic
+		local no = self.DismissNo
+		local u = _RtsUnitLogic:GetMyUnit(no)
+		if u == nil then
+			self:Close()
+			return
+		end
+		local refund = _RtsUnitLogic:DismissRefund(u)
+		local pct = math.floor(_RtsUnitLogic.DismissRefundRate * 100 + 0.5)
+		-- 대상: "Lv.50 나이트로드 · 환급 3,000 메소"
+		H:SpawnLabel("RtsDmWho", body, Vector2(0, 1), Vector2(0, 1), Vector2(27, -6), Vector2(586, 26),
+			"Lv." .. string.format("%d", u.Level) .. " " .. T:GetJobNameFor(u) .. "   ·   환급 " .. H:FormatNumber(refund) .. " 메소", H:ColMuted(), 15, TextAlignmentType.MiddleLeft, false)
+		-- 안내 문구 (사용자 지정, 2026-09-22)
+		H:SpawnLabel("RtsDmMsg", body, Vector2(0, 1), Vector2(0, 1), Vector2(27, -44), Vector2(586, 90),
+			"적용된 증강은 모두 소멸하며, 사용된 메소의 " .. pct .. "%만 돌려받습니다." .. "\n" .. "정말 방출하시겠습니까?", H:ColInk(), 19, TextAlignmentType.MiddleCenter, true)
+		-- 버튼: 방출(붉은 테두리) / 취소
+		local bw = 180
+		local bh = 44
+		local by = -150
+		local yes = H:SpawnPanel("RtsDmYes", body, Vector2(0.5, 1), Vector2(1, 1), Vector2(-10, by), Vector2(bw, bh),
+			self:Mix(Color(0.8, 0.35, 0.3, 1), 0.25), Color(0.8, 0.35, 0.3, 1), 1.5)
+		H:SpawnLabel("RtsDmYesText", yes, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2(0, 0), Vector2(bw - 8, bh - 6),
+			"방출", Color(0.98, 0.72, 0.66, 1), 17, TextAlignmentType.MiddleCenter, true)
+		local yc = H:SpawnClick("RtsDmYesClick", yes)
+		yc:ConnectEvent(ButtonClickEvent, function(event)
+			local target = self.DismissNo
+			self:Close()
+			if target > 0 then _RtsUnitLogic:RequestDismiss(target) end
+		end)
+		local cancel = self:SpawnTab("RtsDmNo", body, Vector2(0, 0), Vector2(bw, bh), "취소", false, 17)
+		local nt = cancel.Parent.UITransformComponent
+		nt.AnchorsMin = Vector2(0.5, 1)
+		nt.AnchorsMax = Vector2(0.5, 1)
+		nt.Pivot = Vector2(0, 1)
+		nt.anchoredPosition = Vector2(10, by)
+		local nc = H:SpawnClick("RtsDmNoClick", cancel)
+		nc:ConnectEvent(ButtonClickEvent, function(event)
+			self:Close()
+		end)
 	end
 
 	-- ===== 증강: 등급 탭 5 + 목록(비어 있음) + 상세 =====

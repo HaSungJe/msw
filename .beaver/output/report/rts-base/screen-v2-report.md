@@ -460,3 +460,55 @@ Play Test(2026-09-14, 콜드 스타트 3회) — `maker_logs(build)` 0건, 런�
 - **변경(코드)**: `RtsMonsterComponent` 눈꽃 `SetFreezeIcon`/FreezeIcon/FreezeIconRUID(21628ca1…) 삭제, `ShowFreeze`는 틴트 + `SetFrozenFx`(결정체)만. 결정체는 x = 피격 박스 중심, y = 체력바 위(BarY + BarH/2 + 0.05 + FrozenWorld/2, 로컬 = ÷부모 스케일), 순서 +8, `FrozenWorld` 1.7 → 0.7. `FreezeSlow`·워커 감속, 블리자드 `hitClip`(2221007/hit/0) 유지.
 - **근거**: 사용자 "빙결 결정체가 2종류잖아" → "새로 추가된 아이콘을 기존 것의 대체제로 쓰자, 저게 더 낫다" → "정중앙 머리 위에 나와야 하고 지금보다 작아야 함" → "ㅇㅋ".
 - **검증**: 재시작 후 강제 빙결 — 눈꽃 엔티티 0, 결정체 15/15, 스크린샷에서 체력바 위 정중앙에 작은 파란 결정체. 빌드 Error 0. 미커밋.
+
+## Change - 260922-1 · 개발모드(주니어 발록 보스·유닛 1기·메소 100만·직업/프리즘 팝업) + 프리즘 12종 효과 선행 구현
+- **변경(코드)**: `RtsCombatLogic.SetupTestBench` → 주니어 발록 보스 1기(mob/8130100 stand, 스케일 2, IsBoss·무적, (9,7)), 순회 100기·시험대 유닛 이동 삭제; `DoAttack` 보스 배율(`bossMul`, IsBoss 대상만)·`bossHits`(보스 1마리 반복 타격)·`bossFinal`·`hitRatios`·`forceCrit`; `CastFx/HitFx`가 유닛의 프리즘 표 사용(HitFx 인자 zone·no). `RtsUnitLogic`: `DevMeso` 100만, 개발모드 `EnsureDemoUnits` = 유닛 1기(DevJob Lv50, (8,7)), `ApplyPrism`(Prisms 추가·영구 잠금·루프 재시작), `RequestDevJob`/`RequestDevPrism`/`ClearUnits`, `TargetSkillLevelFor`. `RtsJobTableLogic`: `GetPrisms`(12종)·`GetPrism`·`HasPrism`·`GetSkillsFor`·`GetStatFor`·`GetJobNameFor`·`ApplyPrismSkills`/`ApplyPrismStat`(인레이지 3타·사거리 3·인레이지 연출 / 홀리 유니티 target 항목 / 거대화 / 애로우 레인 / 트루 스나이핑 / 엘릭서 / 템페스트 / 초월 / 디바인 퍼니시먼트 / 풍마수리검 / 자유전직 = 듀얼블레이드·블토+카르마 39타). `RtsUnitComponent.Prisms`(@Sync) + 동기화 시 프리로드·팝업·아이콘 갱신. `RtsUnitBuffLogic` bond = prism 조건. `RtsPopupLogic.BuildDev`(직업 11 + 프리즘 버튼), HUD 버튼 "개발", 메소 칩 221px(7자리). `RtsMonsterComponent.BossBarY` 3.4. `RtsSkillFxLogic.PlayMark(dup)` 중복 대상 흩뿌림. GetSkills/GetStat 직접 호출부 전부 For 판으로.
+- **검증**: 개발 팝업 표시 확인, 11직업 순차 교체 + 각 프리즘 적용 런타임 에러 0(DEVSEQ 로그: 능력치·잠금 문자열·직업명 듀얼블레이드 기대대로), 썬콜 엘릭서+템페스트 → 보스 HitEvent 3초마다 15회·7,723~9,273(= 9,376×0.9×스태프 난수) ✓. 빌드 Error 0.
+- **근거**: 사용자 2026-09-22 "개발모드부터 만들자 — 백만 메소, 프리즘 선택 획득", "몬스터는 테스트용 주니어 발록 1마리(보스·체력 무한)", "한 직업씩 테스트". 연출 자산은 사용자가 선별하는 대로 `ApplyPrismSkills`의 fx 자리에 교체. 미커밋.
+
+## Change - 260922-2 · 개발모드 2차 — 자유 영입·테스트 프리즘 버튼(토글)·보스 라운드 잠금·거대화 3배
+- **변경(코드)**: `RtsUnitLogic.RequestRecruit`(개발: 무료·Lv50·중복 허용, `FreePadNear` 보스 곁 빈 발판), `RequestDevClear`, `RemovePrism`(토글 해제·잠금 기본값 복구), `RequestDevPrism` 토글, 개발모드 이동 쿨 0, 유닛 없이 시작·`DevMeso` 삭제(사용자 "100만 빼자"). `RtsPopupLogic.BuildRecruit` 카드 클릭 → 영입(직업 id·팬텀 탭·보유 n/6), `BuildDevPrism`(우측 하단 '테스트 프리즘' 버튼, 12종 직업별, ✓ 적용됨(누르면 해제), 내 유닛 전부 삭제), `BuildDev`(직업 교체) 삭제, 좌하단 '증강' 복귀. `RtsCombatLogic.IsBossRound`(TestBench = 보스 라운드) + `SkillUsable`(보스전 잠금 1 제외 — 사용자 "드래곤 로어가 발록한테 나감"). 거대화: 스피어 버스터 시전·추가 클립 ×3(사용자 "크기 3배 적용 안 됨").
+- **검증**: 영입(히어로·다크나이트) → 보스 곁 (8,7)·(10,7) 배치, 거대화 적용 → 팝업에서 다시 눌러 해제(로그 removed), 테스트 프리즘 팝업 표시. 빌드 Error 0. 미커밋.
+
+## Change - 260922-3 · 유닛 방출(본편 기능) — 증강 소멸 + 레벨업 메소 30% 환급
+- **변경(코드)**: `RtsUnitComponent.SpentMeso`(@Sync, 레벨업 비용 누적 — `RequestLevelUp`), `RtsUnitLogic.RequestDismiss`(소유 검증 → 루프 정지 → 홀리 유니티 대상 해제 → 엔티티 삭제 → 환급 `DismissRefundRate` 0.3 → 알림)·`DismissRefund`, 캐릭터 메뉴 3번째 줄 '방출'(`RtsUnitSelectLogic.OpenMenu`) → 메뉴 닫고 확인 팝업 `RtsPopupLogic` kind `dismiss`(`OpenDismiss(no)`/`BuildDismiss` — 640×290, 대상 한 줄 "Lv.n 직업 · 환급 n 메소" + 사용자 지정 문구 "적용된 증강은 모두 소멸하며, 사용된 메소의 30%만 돌려받습니다. / 정말 방출하시겠습니까?" + [방출][취소]; 방출이 `RequestDismiss`). 메뉴 안 2단 클릭 확인은 팝업으로 대체(2026-09-22 사용자). 증강 소멸은 유닛 삭제로 자연히(프리즘 포함); 능력치 증강 시스템이 생기면 훅으로 지정 증강 제거.
+- **검증**: 메뉴 방출 동작(사용자 클릭 로그 "dismiss unit 2"), SpentMeso 10,000 유닛 방출 → 메소 12,400 → 15,400(+3,000). 확인 팝업 렌더 확인(스크린샷: Lv.50 보우마스터 · 환급 3,000 메소 + 문구 + 두 버튼). 패치 중 문자열 개행 리터럴·잔여 블록으로 RtsPopupLogic/RtsUnitSelectLogic 컴파일 실패(Logic nil) → 수정. 미커밋.
+- **근거**: 사용자 "테스트모드에서 영입한 유닛 방출" → "아니다 방출 기능을 아예 새로 추가하자. 증강 소멸 / 메소 사용한 것의 30% 회수(레벨업에 사용한)".
+
+## Change - 260922-4 · 애로우 레인 프리즘 전용 연출(활 소환 → 루프 → 하늘에서 화살 낙하) + 소환음
+- **변경(코드)**: `RtsSkillFxLogic` — `EnsureLoopFx`에 loopIntro(루프 첫 생성 시 같은 자리 1회 클립, 루프 엔티티 자식, loopIntroLife 동안 루프 투명)·loopIntroSound, `PlayProjectile`에 `projFrom = "sky"`(대상 머리 위 projSkyHeight에서 ±projSkySpread 흩어져 수직 낙하), 프리로드에 loopIntro. `RtsJobTableLogic.ApplyPrismSkills` arrowrain — 폭풍의 시 fx 복사 후 loopClip=400031002/repeat, loopIntro=400031002/effect(1.1, 1.5초), loopIntroSound=400031002/use, projFrom sky(4칸, ±0.5, 0.2초), hitDelay 0.2. fx 키 설명 주석 갱신.
+- **검증(Play)**: 보우마스터 + arrowrain 프리즘, 주니어 발록 보스 — 활 소환 이펙트 1회 → 머리 위 활 루프(화살 위로), 보스 머리 위에서 화살 낙하, 타격 1,129~2,555. 런타임 에러: 확인한 범위에선 없음. 미커밋.
+- **추가(타격음)**: `RtsSkillFxLogic.PlaySfx(ruid, vol, pitch)`/`WarmSfx` — SoundComponent 풀 6개로 피치 재생(SoundService.PlaySound엔 피치 없음); `RtsMonsterComponent` 타격음이 `hitSoundPitch`/`hitSoundVol`을 쓰고, 시전음도 `soundPitch`. 애로우 레인 hitSound = 46a9fd9a…(400030002/loop 0.97초) 피치 1.5. Play 확인: 풀 6·클립 로드 true·pitch 1.5·재생 중.
+- **근거**: 사용자 2026-09-22 "애로우 레인은 skillname#400031002. 사운드는 폭풍의 시 그대로, 발사 애니메이션 등은 교체" → "ㅇㅇ 일단 해보자" → "사운드도 바꿔보자. 좀 더 임팩트 있게" → "46a9fd9a… 이 소리로. 타격음은 이게 좋겠네. 좀 더 빨리 감으면 될 듯".
+
+## Change - 260922-5 · 트루 스나이핑 프리즘 연출(십자선 표식 + 원작 시전음) + 애로우 레인 소환 클립 길이 수정
+- **변경(코드)**: `RtsJobTableLogic.ApplyPrismSkills` truesnipe — 스나이핑 fx 복사 후 markClip 400031006/special(markFit 0.45, 0.85초), sound 400031006/use, hitDelay 0.36(섬광 프레임)·hitGap 0.05·hitScale 2.0. arrowrain loopIntroLife 1.5 → 0.85(effect 클립 실제 길이 0.84초 — .win.mod 프레임 시간 합).
+- **검증(Play)**: 신궁 + truesnipe, 주니어 발록 — 십자선 표식이 보스 몸통 중앙에, 타격 2,911~5,940 ×10. 사용자 "ㅇㅋ 트루스나이핑 확인". 미커밋.
+- **근거**: 사용자 2026-09-22 "트루스나이핑 skillname#400031006 이거임".
+
+## Change - 260922-6 · 블리자드 템페스트 전용 연출(2221007 세트, 좌우 번갈아 15개 낙하) + 프리즘 fx 선로드 + 슬롯 중복 스폰 방지
+- **변경(코드)**: `RtsJobTableLogic.ApplyPrismSkills` tempest — 블리자드 fx 복사 후 backClip 2221007/effect(1.5, 1.2초)·clip 2221007/effect0(1.4, clipOrder −10 = 아바타 뒤)·markClips tile/0~8(markAt feet, 1.6, markDelay 0.4, markStagger 0.07, markPattern "alternate", markLife 1.5)·hitDelay 1.2·hitStagger 0.07. `RtsSkillFxLogic` — PlayCast 표식에 markStagger, PlayMark에 markPattern "alternate"(홀수 왼쪽/짝수 오른쪽, markAltDists 거리 순환, 오른쪽 반전), PlayClip에 clipOrder. `RtsCombatLogic.DoAttack` — 타격 본문을 strike()로 빼고 hitStagger(대상 j마다 지연). `RtsJobTableLogic.PreloadJobFx(jobId)` + `RtsUnitComponent.SetupClient` — 유닛이 생길 때 그 직업의 프리즘 변형 fx까지 전부 프리로드. `RtsUnitLogic.SpawnUnit` — 같은 슬롯에 유닛이 있으면 루프 정지 후 삭제.
+- **버그 원인(사용자 "엘릭서+템페스트 동시에 켰는데 계속 적용 안 되다가 껐다 켜니 정상")**: 서버 표는 켠 순간부터 맞았음(로그 BTCHK3: prisms='elixir,tempest' bossHits=15 cd=2). 클라가 tile 9종 × 21프레임 자산을 시전 직전에야 내려받기 시작해 첫 몇 번 시전은 표식이 빈 채로 그려진 것 — 껐다 켜는 사이 다운로드가 끝나 "정상"으로 보임. 유닛 생성 시 프리즘 변형 fx 선로드로 해결.
+- **버그 원인(사용자 "방출했더니 버그")**: 내 테스트 스크립트가 사용자의 영입과 같은 순간 슬롯 1에 또 스폰 → 엔티티 둘 → 방출은 하나만 삭제, 유령이 남아 공격. 유령 제거 + SpawnUnit 슬롯 가드. 이후 테스트 유닛은 영입 팝업으로만.
+- **검증(Play)**: 썬콜 + 엘릭서 + 템페스트, 주니어 발록 — 캐릭터 뒤 결정·기둥, 보스 위 고리 여러 개 → 좌우 낙하 → 눈보라 착지, 8,653/타. 런타임 에러: 확인한 범위에선 없음. 사용자 "블리자드 템페스트 통과". 미커밋.
+- **근거**: 사용자 2026-09-22 "썬콜의 블리자드 템페스트는 skill/2221007", "좌우 각각 7~8개씩 번갈아서 파바박", "캐릭터 애니메이션이 캐릭터 뒤에 오도록".
+
+## Change - 260922-7 · 초월(불독 프리즘) 연출 2배 + 도트 퍼니셔 구체 동시 생성
+- **변경(코드)**: `RtsJobTableLogic.ApplyPrismSkills` transcend — cd 3, ratio 281 + 보스 +250%(1/5 → 보스 제거 918 → 보스 250 순으로 조정, 보스 DPS 동일), fx 복사: projScale 3.6·hitScale 1.4·projSpread 4.0·projGap 2.4·projSpeed 8.8. 기본 도트 퍼니셔 fx projStagger 0.03 → 0(공통). 프리즘 desc 갱신.
+- **검증(Play)**: 불독 + 초월 — 30개 큰 불구슬이 한 번에 3겹 고리로 생성(스크린샷), 이후 보스로 비행·폭발. 런타임 에러: 확인한 범위에선 없음. 미커밋.
+- **근거**: 사용자 2026-09-22 "초월은 도트 퍼니셔의 크기 2배", "구체가 한번에 모두 생성되어야 함", "커진만큼 간격도 늘어나야 함. 속도도 2배. 초월 전용", "동시 생성은 일반도 포함. 공통".
+
+## Change - 260922-8 · 디바인 퍼니시먼트 프리즘 연출(400021086 keydown 세트, 대상 머리 위 루프) + 쿨 스킬 우선 선택 + 타겟 6
+- **변경(코드)**: `RtsSkillFxLogic` — EnsureLoopFx에 target 인자·loopAt "target"(대상 몬스터 자식, LoopAnchor, 대상 바뀌면 재생성)·loopAtTop(박스 윗변)·loopSound(PlayLoopSound/StopSound)·loopEnd/loopEndSound(CheckLoops 정리 때 1회), 프리로드에 loopEnd. `RtsJobTableLogic.ApplyPrismSkills` divinepunish — 엔젤레이 fx 대신 새 fx(위 자산, loopDx 2.63·loopDy −0.3·스케일 0.6, 모션 swingO1 루프), targets 6(`ApplyPrismStat` st.targets 6, desc). `RtsCombatLogic.DoAttack` — 스킬 선택을 2패스(준비된 쿨 스킬 → 쿨 없는 공격)로: 표 끝의 프리즘 액티브가 제네시스 등 쿨 스킬을 영영 가리던 버그.
+- **검증(Play)**: 비숍 + 디바인 퍼니시먼트 — 사용자 확인 후 위치(왼쪽 치우침)·모션 지적 → 피벗 실측으로 중앙·머리 위 보정, swingO1 루프 → "통과". 미커밋.
+- **근거**: 사용자 2026-09-22 "skillname#400021086 … 애니메이션은 85964d2e…", "몬스터 위에 나와야 해", "제네시스가 잠금이 아닌데 안 쓰고 있음. 타겟 수 6", "모션 복구, 몬스터 중앙 기준 머리 위, 너무 왼쪽", "통과".
+
+## Change - 260922-9 · 풍마수리검 프리즘(대체 스킬 + 400041020 자산) + 쉐도우 파트너 이어 던지기
+- **변경(코드)**: `RtsJobTableLogic` — 프리즘 fuma: locks 쿼드러플 스로우, ApplyPrismSkills가 표 끝에 '풍마수리검' 액티브(range 3, fx = 쿼드러플 스로우 fx 복사 + c1 수리검 1.6배·hit/0 0.8·special/hit 소리), ApplyPrismStat range 3. 쿼드러플 스로우 projShadowDelay 0.15 → 0.5. `RtsSkillFxLogic.SendAction` — 그림자 동작 ShadowActionDelay(0.5) 지연.
+- **검증(Play)**: 사용자 나로 + 풍마수리검 확인 → 크기 두 번 상향(0.3 → 0.8 → 1.6), 사거리 3 → "통과". 미커밋.
+- **근거**: 사용자 2026-09-22 메시지 6건(자산 지정 → 쉐도우 파트너 → 대체 스킬 → 크기 → 사거리 → 통과).
+
+## Change - 260922-10 · 자유전직 - 듀얼블레이더 프리즘 연출(토네이도 돌진 + 카르마 등 뒤, 117타 동시) + 팝업 스크롤·영입 중복 금지 — 프리즘 자산 선별 완료
+- **변경(코드)**: `RtsJobTableLogic` — 프리즘 dualblade fx(400041043 b1 투사체 2.0배 캐릭터→대상 돌진·400041021 effect 등 뒤 1.5배 동시·타격 클립/타격음 hitPhases·hitKinds로 72/45 섞음·117타 0.0215초·hitSoundEvery 3), 이름 듀얼블레이더, 프리즘 액티브 5개 `prism = true`·설명 단축. `RtsSkillFxLogic` — marks(표식 여러 벌)·sound2·backDelay·PlaySfx(pitch nil = SoundService, 값 있으면 풀 12). `RtsMonsterComponent.PlayHitFxAt(fx, crit, hitNo)` + hitPhases/hitKinds/hitSoundEvery. `RtsCombatLogic` — strike(t, hitBase, h)·HitFx에 타격 번호. `RtsUnitPopupLogic` — 스킬 탭을 스크롤 목록으로(설명 줄 수만큼 행 높이, DescLines), 프리즘 행 중복 제거(`액티브 · 프리즘` 태그), 외형 이름 GetJobNameFor. `RtsUnitLogic.HasJobUnit` + `RequestRecruit` 동일 직업 거부, `RtsPopupLogic.BuildRecruit` 보유 카드 비활성('보유 중').
+- **검증(Play)**: 서버 타이머 117타 0.61~3.25초 균등(TIMERCHK), 클라 도착 1·30·60·90·117타 = 59.17·59.82·60.45·61.11·61.70초. 사용자 "됐어 이대로 하자. 팬텀은 굳이 바꿀 거 없어". 컴파일 실패 2건(파라미터 재대입·DescLines 잔여 `end`)·빌드 분석기 서명 캐시(PlayHitFx → PlayHitFxAt) 해결. 미커밋.
+- **근거**: 사용자 2026-09-22 메시지(자산 지정 → 카르마 3배·뒤·토네이도 2배·돌진 → 동시 → 타수 3배 → 2.5초 유지·균등 분배 → 타격음 → "당연히 동시지" → 통과).

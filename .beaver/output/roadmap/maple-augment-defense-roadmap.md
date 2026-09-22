@@ -39,7 +39,7 @@ flowchart LR
 - Phase 1 — 무대 기반 · 유닛 4개 · 의존: — · 푼다: Phase 2 · 파일 집합: RtsMap, RtsConfigLogic, RtsHudLogic, RtsCameraAnchorComponent, RtsZoneLogic, RtsThemeLogic · **done**
 - Phase 2 — 직업·스킬 표 + 연출 · 유닛 4개 · 의존: Phase 1 · 푼다: Phase 3 · 파일 집합: RtsJobTableLogic, RtsSkillFxLogic, RtsUnitBuffLogic, `.info/character·balance-detail·damage·weapon.md` · **done**(프리즘 스킬 정의만 사용자가 09-21 마무리 → Phase 4에서 구현)
 - Phase 3 — 유닛 전투 코어 · 유닛 5개 · 의존: Phase 2 · 푼다: Phase 4 · 파일 집합: RtsUnitLogic, RtsUnitComponent, RtsUnitSelectLogic, RtsUnitPopupLogic, RtsUnitAttackComponent, RtsCombatLogic, RtsMonsterComponent, RtsTrackWalkerComponent · **done**(시험대 위에서 검증 — 실제 웨이브는 Phase 6)
-- Phase 4 — 증강·프리즘 · 유닛 5개 · 의존: Phase 3 · 푼다: Phase 5 · 파일 집합: RtsAugmentTableLogic(신규), RtsAugmentLogic(신규), RtsAugmentPopupLogic(신규), RtsUnitBuffLogic(효과·증강 탭), RtsJobTableLogic(프리즘 증강 11종 → 스킬 12종), RtsSkillFxLogic(프리즘 연출), RtsHudLogic(증강 버튼) · **in-progress**(2026-09-22 direct 착수 — spec/plan `.beaver/output/{spec,plan}/rts-base/augment-prism-*.md`)
+- Phase 4 — 증강·프리즘 · 유닛 5개 · 의존: Phase 3 · 푼다: Phase 5 · 파일 집합: RtsAugmentTableLogic(신규), RtsAugmentLogic(신규), RtsAugmentPopupLogic(신규), RtsUnitBuffLogic(효과·증강 탭), RtsJobTableLogic(프리즘 증강 11종 → 스킬 12종), RtsSkillFxLogic(프리즘 연출), RtsHudLogic(증강 버튼) · in-progress(#16 프리즘 효과만 개발모드로 선행 구현 2026-09-22; 나머지는 자산 선별 뒤 `/beaver:direct`부터 — 규칙은 `.beaver/memory/balance.md` '증강 3택1·대상 지정 규칙')
 - Phase 5 — 유닛 관리(영입·레벨) · 유닛 3개 · 의존: Phase 4 · 푼다: Phase 6 · 파일 집합: RtsRecruitLogic(신규)·영입 팝업, RtsUnitLogic(메소·영입·레벨업가), RtsUnitPopupLogic(레벨업 가격), RtsHudLogic(영입 패널·슬롯), RtsJobTableLogic(영입가) · todo
 - Phase 6 — 스테이지·몬스터 웨이브 · 유닛 5개 · 의존: Phase 5 · 푼다: Phase 7, Phase 10 · 파일 집합: RtsStageTableLogic(신규 — 몬스터 RUID 매칭 포함), RtsStageLogic(신규), RtsWaveLogic(신규), RtsMonsterComponent, RtsTrackWalkerComponent, RtsAugmentLogic(라운드 트리거 연결), RtsCombatLogic(시험대 제거), RtsDemoLogic(제거), RtsHudLogic(시간 칩) · todo
 - Phase 7 — 보스·클리어·결과 · 유닛 4개 · 의존: Phase 6 · 푼다: Phase 8, Phase 10 · 파일 집합: RtsBossComponent(신규), RtsBossLogic(신규), RtsRunResultLogic(신규), RtsStageLogic(보스 스테이지) · todo
@@ -49,7 +49,7 @@ flowchart LR
 
 동시 가능: 없음 (Phase 4·5는 RtsUnitPopupLogic·RtsHudLogic을 같이 건드려 순서대로)
 
-지금: **Phase 4 증강·프리즘**(2026-09-22 direct 기획 중) · Next up: Phase 5 유닛 관리(Phase 4 ship 뒤)
+지금: **개발모드로 프리즘 자산 선별 중**(Phase 4 #16 효과는 구현됨 — 직업·프리즘을 개발 팝업에서 골라 보스 상대 확인, 사용자가 스킨·애니메이션을 하나씩 정하면 `GetSkillsFor` 오버레이의 fx만 교체. **통과(2026-09-22): 전사 3(인레이지·홀리 유니티·거대화)·보우마스터(애로우 레인)·신궁(트루 스나이핑)·썬콜(엘릭서+블리자드 템페스트)** / 남음: 엘릭서+템페스트·불독 초월·비숍 디바인 퍼니시먼트·나로 풍마수리검·섀도어 듀얼블레이더·팬텀) · Next up: **Phase 4 나머지(#14·#15·#17·#18)** — 자산이 모이면 `/beaver:direct 증강·프리즘`
 
 ## Scope & Actors
 - **플레이어(1~8)** — 자기 구역에서 유닛 영입·배치·레벨업, 증강 선택(전부 팝업). F1~F8로 다른 유저 구역 관전. **탈락 후에는 관전을 계속하거나 방을 나가 새 판을 시작할 수 있다.** **관전(타 유저 구역 보기)은 읽기 전용(2026-09-19)**: 우측 영입 패널이 그 유저 유닛의 직업·레벨 목록으로 바뀌고, 유닛 클릭 → 상세정보 팝업(증강·버프 보기 포함)만 가능. 증강·영입·위치 이동·스킬 잠금·레벨업 등 조작은 전부 비활성(서버도 소유자 검증).
@@ -61,7 +61,7 @@ flowchart LR
 - 자유 카메라(엣지/방향키 스크롤, 마우스 가두기) **금지** — F1~F8 시점 전환 + 플레이어 목록 클릭 스냅만.
 - 길찾기 없음 — 몹은 트랙 경로 파라미터 `t`를 따라 등속 순환(S→E 후 S로 순간이동).
 - **PvP·승패 없음** — 유저 간 경쟁 요소 없음. 같은 방은 서로 구경하는 관계일 뿐, 결과는 각자 클리어/탈락.
-- **직업 = 모험가 10(4차) + 영웅 팬텀(프리즘 해금)** — 해적 제외. 듀얼블레이드는 별도 직업이 아니라 섀도어 프리즘 '자유전직 - 듀얼블레이드'(직업명 변경 + 스킬 교체)로만. 전직 없음. 직업군(시그너스·레지스탕스 등)은 나중에 붙일 수 있도록 영입 팝업에 탭 자리를 둔다.
+- **직업 = 모험가 10(4차) + 영웅 팬텀(프리즘 해금)** — 해적 제외. 듀얼블레이더는 별도 직업이 아니라 섀도어 프리즘 '자유전직 - 듀얼블레이더'(직업명 변경 + 스킬 교체)로만. 전직 없음. 직업군(시그너스·레지스탕스 등)은 나중에 붙일 수 있도록 영입 팝업에 탭 자리를 둔다.
 - **유닛 랜덤 뽑기 없음** — 유닛은 전부 결정적 영입. 랜덤은 증강에만.
 - **상성 체계 없음** — 속성도, 물리/마법 내성·약점도 두지 않는다(2026-09-14).
 - 전장의 안개 없음. 모바일 최적화 1차 제외(PC 중심).
@@ -97,20 +97,20 @@ flowchart LR
 | 10 (옛 15) | 자동 공격·타겟팅 | 유닛마다 자기 공격 루프(주기 = 공격속도 또는 스킬 period), 사거리 = 체비셰프 칸, **메인 대상 = 가장 가까운 1마리, 죽거나 사거리 밖까지 고정**, 다수 타격 = 메인 곁 `aoe`칸, 전체 광역 랜덤, 지대·구체 예외, 쿨타임 스킬 우선, 후딜, 스킬 잠금 반영. 규칙 원문 = attack.md | — | 9 | done(260917-6, 260918-11, 260919-2·5, 260920-13) |
 | 11 (옛 16) | 데미지 계산·표시 | 엔진 Attack/Hit 위에 `RtsUnitAttackComponent`(타격마다 크리·무기 난수 따로), damage.md 8단계, 메이플 기본 데미지 스킨(2.0), 피격 번쩍임·스킬 타격 클립·타격음 | — | 10 | done(260917-6, 260918-2, 260919-7) |
 | 12 (옛 17·20) | 유닛 클릭 메뉴·상세 팝업 | 캐릭터 클릭 → 우측 작은 메뉴(위치 이동/상세정보), 우측 슬롯 클릭 → 상세정보. 팝업 = 능력치 총합·스킬 탭(획득/미획득·툴팁·**액티브 잠금 [사용/보스전 잠금/잠금]**)·증강 탭(스텁)·버프 탭·하단 레벨업 버튼(`RequestLevelUp`, `GetLevelCost` 차감). 관전 시 읽기 전용 | 레벨업 단위 = 1씩 | 9 | done(260915-1, 260916-4·5, 260919-1) |
-| 13 (신규) | 몬스터 개체 + 시험대 | `RtsMonsterComponent`(HP·피격 박스·체력바 1.4/보스 2.6·빙결 FrozenUntil·죽은 몬스터 제외) + 트랙 순환 `RtsTrackWalkerComponent`(속도 100 = 3.5u/s, 빙결 ×0.5). **시험대**(`RtsCombatLogic.TestBench`: 무적 순회 몬스터 100기 + 시연 유닛 8기·시연 메소 12,400)는 개발용 — Phase 4·5 검증에도 그대로 쓰고, Phase 6 웨이브가 대체하면 코드째 삭제 | — | 10 | done(260918-11, 260920-15·17) |
+| 13 (신규) | 몬스터 개체 + 시험대 | `RtsMonsterComponent`(HP·피격 박스·체력바 1.4/보스 2.6·빙결 FrozenUntil·죽은 몬스터 제외) + 트랙 순환 `RtsTrackWalkerComponent`(속도 100 = 3.5u/s, 빙결 ×0.5). **개발모드**(`RtsCombatLogic.TestBench`, 2026-09-22 사용자 "한 직업씩 테스트": 주니어 발록 보스 1기(무적·IsBoss) + 유닛 1기 Lv50 + 메소 100만 + 개발 팝업(직업 교체·프리즘 적용))는 개발용 — Phase 6 웨이브·Phase 7 보스가 대체하면 코드째 삭제. 이전: 무적 순회 100기 + 시연 유닛 8기 | — | 10 | done(260918-11, 260920-15·17) |
 
 **Scenes/systems**: `RtsUnitLogic`(`SpawnUnit`·`RequestMove`·`RequestLevelUp`·`ListZoneUnits`) / `RtsUnitComponent`(FaceDir·SkillLocks·BondNo) / `RtsUnitSelectLogic` / `RtsUnitPopupLogic` / `RtsCombatLogic`(`StartLoop`·`DoAttack`·`PickTargets`·`CastFx`·`HitFx`) / `RtsUnitAttackComponent` / `RtsMonsterComponent` / `RtsTrackWalkerComponent`
 
 ### Phase 4 — 증강·프리즘 (판을 가르는 랜덤 축 — 사용자 지시로 최우선) · depends: Phase 3
-> 정의는 `.info/augmentation.md`(2026-09-20 사용자 확정, 09-22 개수 확대): 한 판 **32개** = 브론즈 10 / 실버 10 / 골드 7 / 프리즘 5. 브론즈~골드 = **능력치만**(약점 찾기 = 크확, 급소 찌르기 = 크뎀, 무기 연마 = 공격력 +n, 전투 감각 = 공격력 %, 실버·골드는 보스 사냥꾼/거인 학살자) — 등급마다 I/II/III 3단계, 항목별 확률 [n/100] 기입 완료, **전부 합연산·중복 허용**. 프리즘 = 자쿰·핑크빈·시그너스·루시드·진 힐라 라운드, 후보 = 영웅 팬텀 영입 + 직업 전용 프리즘 증강 11종(썬콜 2개: 엘릭서·블리자드 템페스트 / 섀도어 '자유전직 - 듀얼블레이드' 1개가 블레이드 토네이도·카르마 퓨리 2스킬 + 직업명 변경·새비지·메익 영구 잠금), **한 번 고른 프리즘은 다시 안 나옴**. 프리즘 스킬 정의·수치·자산은 character.md '종류: 프리즘'(**사용자 09-21 마무리 — 이 페이즈 착수 조건**). 스테이지가 아직 없으므로 지급 트리거는 **개발용(증강 버튼에서 라운드 강제 지급)**으로 두고 Phase 6에서 스테이지 전환 이벤트에 연결한다.
+> 정의는 `.info/augmentation.md`(2026-09-20 사용자 확정, 09-22 개수 확대): 한 판 **32개** = 브론즈 10 / 실버 10 / 골드 7 / 프리즘 5. 브론즈~골드 = **능력치만**(약점 찾기 = 크확, 급소 찌르기 = 크뎀, 무기 연마 = 공격력 +n, 전투 감각 = 공격력 %, 실버·골드는 보스 사냥꾼/거인 학살자) — 등급마다 I/II/III 3단계, 항목별 확률 [n/100] 기입 완료, **전부 합연산·중복 허용**. 프리즘 = 자쿰·핑크빈·시그너스·루시드·진 힐라 라운드, 후보 = 영웅 팬텀 영입 + 직업 전용 프리즘 증강 11종(썬콜 2개: 엘릭서·블리자드 템페스트 / 섀도어 '자유전직 - 듀얼블레이더' 1개가 블레이드 토네이도·카르마 퓨리 2스킬 + 직업명 변경·새비지·메익 영구 잠금), **한 번 고른 프리즘은 다시 안 나옴**. 프리즘 스킬 정의·수치·자산은 character.md '종류: 프리즘'(**사용자 09-21 마무리 — 이 페이즈 착수 조건**). 스테이지가 아직 없으므로 지급 트리거는 **개발용(증강 버튼에서 라운드 강제 지급)**으로 두고 Phase 6에서 스테이지 전환 이벤트에 연결한다.
 
 | # | Unit | Goal | Key decision | Depends | Status |
 |---|------|------|--------------|---------|--------|
-| 14 (신규) | 증강 테이블 | augmentation.md → `RtsAugmentTableLogic`(등급·이름·효과·확률·프리즘 전용 직업·지급 라운드표 32개) | 라운드표(등간격·브실골 혼합) — 확정 | — | in-progress |
-| 15 (옛 21·22) | 지급·결정(서버) | 라운드 등급 지급 → 서버가 확률대로 **후보 3개**(프리즘은 이미 고른 것 제외) → 선택 1개를 유저 보유에 추가. 지금은 개발용 트리거(시험대), Phase 6에서 스테이지 이벤트로 교체. 보스 라운드는 못 잡으면 탈락이라 분기 없음 | 후보 3개 안 중복 허용 여부 · 미보유 직업 전용 프리즘 노출 여부 | 14 | in-progress |
-| 16 (옛 24 + 프리즘) | 효과 적용 + 프리즘 증강 11종(스킬 12종) | 능력치 4계열·보스% → `ApplyToStat` 합연산(스킬 공격력%·보스%와 합), 팬텀 영입 해금 플래그, 프리즘 스킬(인레이지·홀리 유니티 ×1.4·거대화·엘릭서·블리자드 템페스트(보스전 15타 집중·×0.9)·초월·디바인 퍼니시먼트·애로우 레인·트루 스나이핑·풍마수리검·자유전직-듀얼블레이드(블레이드 토네이도 + 카르마 퓨리, 직업명 변경, 새비지·메익 영구 잠금)) = 스킬 표 항목(영구 잠금 3) + 연출(Phase 2 장치 재사용, 자산은 사용자가 하나씩 지정) | 프리즘 스킬별 자산·연출 확정 루프 | 7, 8, 15 | in-progress |
-| 17 (옛 23) | 증강 팝업 | (a) 3택1 팝업(닫기 없음, 카드마다 대상 유닛 칩 또는 대상 없이 수령) (b) 좌하단 버튼 → 보유 목록(등급 탭·상세·미지정 ! → 1회 지정·🔒). 유닛 팝업 증강 탭 채움. 관전 시 읽기 전용 | 대상 없는 증강의 적용 시점 | 15 | in-progress |
-| 18 (신규) | 증강 밸런스 재계산 | I/II/III 값·**개수 10/10/7/5**·프리즘 5(썬콜 2개 = 나로 ×1.31 허용) 반영해 balance-detail '증강 반영' 절·augcalc 재생성, 최고점 순위 재확인 | — | 14 | in-progress |
+| 14 (신규) | 증강 테이블 | augmentation.md → `RtsAugmentTableLogic`(등급·이름·효과·확률·프리즘 전용 직업·지급 라운드표 32개) | 라운드표(등간격·브실골 혼합) — 확정 | — | todo |
+| 15 (옛 21·22) | 지급·결정(서버) | 라운드 등급 지급 → 서버가 확률대로 **후보 3개**(프리즘은 이미 고른 것 제외) → 선택 1개를 유저 보유에 추가. 지금은 개발용 트리거(시험대), Phase 6에서 스테이지 이벤트로 교체. 보스 라운드는 못 잡으면 탈락이라 분기 없음 | 후보 3개 안 중복 허용 여부 · 미보유 직업 전용 프리즘 노출 여부 | 14 | todo |
+| 16 (옛 24 + 프리즘) | 효과 적용 + 프리즘 증강 11종(스킬 12종) | 능력치 4계열·보스% → `ApplyToStat` 합연산(스킬 공격력%·보스%와 합), 팬텀 영입 해금 플래그, 프리즘 스킬(인레이지·홀리 유니티 ×1.4·거대화·엘릭서·블리자드 템페스트(보스전 15타 집중·×0.9)·초월·디바인 퍼니시먼트·애로우 레인·트루 스나이핑·풍마수리검·자유전직-듀얼블레이더(블레이드 토네이도 + 카르마 퓨리, 직업명 변경, 새비지·메익 영구 잠금)) = 스킬 표 항목(영구 잠금 3) + 연출(Phase 2 장치 재사용, 자산은 사용자가 하나씩 지정) | 프리즘 스킬별 자산·연출 확정 루프 | 7, 8, 15 | **in-progress**(2026-09-22 개발모드 선행: 프리즘 12종 효과·영구 잠금·보스 15타·보스 배율 = `GetSkillsFor/GetStatFor`·`ApplyPrism` 구현, 연출 자산은 사용자 선별 대기 — 증강 능력치 합산은 미착수) |
+| 17 (옛 23) | 증강 팝업 | (a) 3택1 팝업(닫기 없음, 카드마다 대상 유닛 칩 또는 대상 없이 수령) (b) 좌하단 버튼 → 보유 목록(등급 탭·상세·미지정 ! → 1회 지정·🔒). 유닛 팝업 증강 탭 채움. 관전 시 읽기 전용 | 대상 없는 증강의 적용 시점 | 15 | todo |
+| 18 (신규) | 증강 밸런스 재계산 | I/II/III 값·**개수 10/10/7/5**·프리즘 5(썬콜 2개 = 나로 ×1.31 허용) 반영해 balance-detail '증강 반영' 절·augcalc 재생성, 최고점 순위 재확인 | — | 14 | todo |
 
 **Expected scenes/systems**: `RtsAugmentTableLogic`(`GetGrade(round)`·`GetPool(grade)`·`Roll`) / `RtsAugmentLogic:Grant/Choose/GetModifiers` / `RtsAugmentPopupLogic` / `RtsUnitBuffLogic.GetAugmentsFor`(스텁 → 실제) / `RtsJobTableLogic`(프리즘 스킬 항목·`HasPrism`)
 
