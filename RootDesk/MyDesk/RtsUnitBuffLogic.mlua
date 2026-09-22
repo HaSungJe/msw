@@ -28,8 +28,8 @@ script RtsUnitBuffLogic extends Logic
 	--   fin 최종 데미지 +% / crit 크리 확률 +% / critDmg 크리 데미지 +%. 아이콘은 메이플 원작 스킬 아이콘 RUID
 	method table GetDefs()
 		return {
-			-- 홀리 유니티 = 프리즘 스킬(2026-09-20: 40레벨 패시브 +20% 삭제, 지정 유닛 최종 +100%). lv 99 = 프리즘 획득 전엔 비활성 — 증강 시스템(Phase 6)이 획득 시 lv를 낮추거나 별도 플래그로 켠다
-			{ id = "bond", name = "홀리 유니티", job = "paladin", lv = 99, scope = "target", icon = "53a38855164a4b64accf68785761c283", fin = 100 },
+			-- 홀리 유니티 = 프리즘 스킬(2026-09-20: 40레벨 패시브 +20% 삭제, 지정 유닛 최종 +100% → 2026-09-22 +40%). lv 99 = 프리즘 획득 전엔 비활성 — 증강 시스템(Phase 6)이 획득 시 lv를 낮추거나 별도 플래그로 켠다
+			{ id = "bond", name = "홀리 유니티", job = "paladin", lv = 99, scope = "target", icon = "53a38855164a4b64accf68785761c283", fin = 40 },
 			{ id = "sharpeyes", name = "샤프아이즈", job = "bow", lv = 40, scope = "all", icon = "4cd1961bc55b47cb80e1a7f8843e225e", crit = 20, critDmg = 20 },
 			{ id = "sharpeyes", name = "샤프아이즈", job = "marks", lv = 20, scope = "all", icon = "4cd1961bc55b47cb80e1a7f8843e225e", crit = 20, critDmg = 20 },
 			{ id = "pray", name = "프레이", job = "bishop", lv = 30, scope = "all", icon = "39b3159efcc74334b875c94c64a74243", fin = 10 }, -- 2026-09-19: 주변 1타일·자신 미적용 → 구역 전체(자신 포함)·+10%

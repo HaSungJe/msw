@@ -314,7 +314,7 @@ script RtsJobTableLogic extends Logic
 						hitDelay = 0.5, hitClip = "5df303c326dd488cbeb17028892b5238", hitScale = 1.6, hitDy = 0.6, hitSound = "2cc05078af454fa3a7856b9fb65ed61f" } },
 				{ lv = 30, kind = "패시브", name = "디바인 블레싱", desc = "최종 데미지 +50%", target = false },
 				{ lv = 40, kind = "패시브", name = "매직 크러쉬 강화", desc = "매직 크러쉬의 방어율 감소를 20%로 변경", target = false },
-				-- 홀리 유니티(40 패시브 +20%)는 2026-09-20 삭제 → 프리즘 스킬 "홀리 유니티"(지정 유닛 최종 +100%)로 이동. 프리즘 스킬 표는 증강 시스템(Phase 6)에서 얹는다(target = true 항목이 그때 생김)
+				-- 홀리 유니티(40 패시브 +20%)는 2026-09-20 삭제 → 프리즘 스킬 "홀리 유니티"(지정 유닛 최종 +40% — 2026-09-22, 처음 +100%)로 이동. 프리즘 스킬 표는 증강 시스템(Phase 6)에서 얹는다(target = true 항목이 그때 생김)
 				{ lv = 50, kind = "패시브", name = "디바인 차지 강화", desc = "디바인 차지의 데미지 +70%, 사거리 2, 6마리를 2회 타격, 보스 공격시 데미지 +40%", target = false },
 			}
 		end
