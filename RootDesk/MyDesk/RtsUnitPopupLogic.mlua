@@ -678,7 +678,7 @@ script RtsUnitPopupLogic extends Logic
 			text, H:ColMuted(), 15, TextAlignmentType.MiddleCenter, false)
 	end
 
-	-- 증강 탭(2026-09-24): 맨 위에 증강 합계(공격력·공격력%·보스·크리 확률·크리 데미지·최종) + 티어(1티어면 방어구 부수기), 그 아래 지정된 증강 목록
+	-- 증강 탭(2026-09-24): 맨 위에 증강 합계(공격력·공격력%·보스·크리 확률·크리 데미지·최종) + 방어구 부수기(켜졌을 때만), 그 아래 지정된 증강 목록
 	@ExecSpace("ClientOnly")
 	method void BuildAugTabFor(Entity content, any u, number rx, number rw, number top, table augs)
 		local H = _RtsHudLogic
@@ -697,23 +697,24 @@ script RtsUnitPopupLogic extends Logic
 		local line1 = "증강 " .. H:Int(t.n) .. "개 합계"
 		local line2 = "아직 없어요"
 		if #parts > 0 then line2 = table.concat(parts, "  ·  ") end
-		-- 셋째 줄 = 티어(2026-09-24 증강 효율 삭제 → 1티어면 방어구 부수기 수치)
+		-- 셋째 줄 = 방어구 부수기가 켜졌을 때만 그 수치(자기 직업 프리즘이 있는 1티어 — RtsJobTableLogic.ArmorBreakFor).
+		--   티어·서포터 같은 분류는 화면에 쓰지 않는다(2026-09-24 사용자 "1티어/2티어는 개발 관점에서 나눈 거지 유저는 몰라야 해") — 셋째 줄이 없으면 상자를 줄인다
 		local JT = _RtsJobTableLogic
-		local tier = JT:TierOf(u.JobId)
-		local line3 = "서포터"
-		-- (증강 효과 배율 설명은 프리즘 증강 설명에 — 2026-09-24 사용자 "2티어 약점 증강 효과 이런 거 빼, 프리즘 쪽에 붙어 있어야지")
-		if tier == 2 then line3 = "2티어" end
-		if tier == 1 then line3 = "1티어" end
-		-- 1티어 효과(증강 배율·방어구 부수기)는 자기 직업 프리즘이 있을 때만 — 없으면 '1티어'만(2026-09-24 사용자)
-		if tier == 1 and JT:HasOwnPrism(u) then
+		local line3 = ""
+		if JT:ArmorBreakFor(u) > 0 then
 			local n = JT:AugCountOf(u)
 			if n > JT.ArmorBreakCap then n = JT.ArmorBreakCap end
-			line3 = "1티어 · 증강 " .. H:Int(n) .. "/" .. H:Int(JT.ArmorBreakCap) .. "개 · 방어구 부수기: 보스 방어율 −" .. H:Int(JT:ArmorBreakFor(u)) .. "%p"
+			line3 = "방어구 부수기: 보스 방어율 −" .. H:Int(JT:ArmorBreakFor(u)) .. "%p (증강 " .. H:Int(n) .. "/" .. H:Int(JT.ArmorBreakCap) .. "개)"
 		end
+		local boxH = 88
+		if line3 == "" then boxH = 62 end
+		box.Parent.UITransformComponent.RectSize = Vector2(rw - 12, boxH)
 		H:SpawnLabel("RtsUnitAugSumT", box, Vector2(0, 1), Vector2(0, 1), Vector2(14, -6), Vector2(rw - 40, 22), line1, H:ColGold(), 14, TextAlignmentType.MiddleLeft, true)
 		H:SpawnLabel("RtsUnitAugSumV", box, Vector2(0, 1), Vector2(0, 1), Vector2(14, -30), Vector2(rw - 40, 24), line2, H:ColInk(), 15, TextAlignmentType.MiddleLeft, true)
-		H:SpawnLabel("RtsUnitAugSumE", box, Vector2(0, 1), Vector2(0, 1), Vector2(14, -58), Vector2(rw - 40, 22), line3, H:ColMuted(), 13, TextAlignmentType.MiddleLeft, false)
-		self:BuildAugTab(content, rx, rw, top - 96, augs)
+		if line3 ~= "" then
+			H:SpawnLabel("RtsUnitAugSumE", box, Vector2(0, 1), Vector2(0, 1), Vector2(14, -58), Vector2(rw - 40, 22), line3, H:ColMuted(), 13, TextAlignmentType.MiddleLeft, false)
+		end
+		self:BuildAugTab(content, rx, rw, top - boxH - 8, augs)
 	end
 
 	-- 증강 탭 목록: 이 유닛에 지정된 증강(등급 배지 · 이름 · 효과)

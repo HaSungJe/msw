@@ -236,7 +236,8 @@ script RtsMonsterInfoLogic extends Logic
 			-- 방어구 부수기(2026-09-24 사용자 — 1티어 증강 개수만큼 보스 약화, 아이콘 1f4eea78…)
 			local a = self:ArmorBreakOf(m.Zone)
 			if a > 0 then
-				out[#out + 1] = { id = "armorbreak", name = "방어구 부수기", desc = "1티어 유닛의 증강 1개마다 보스 방어율이 1%p 감소한다(최대 " .. H:Int(_RtsJobTableLogic.ArmorBreakCap) .. "%p). 지금 " .. H:Int(a) .. "%p 감소.", short = "방어 −" .. H:Int(a) .. "%p", left = -1, ruid = "1f4eea783bbe4785b3ba82334f211aaa", color = Color(1, 1, 1, 1) }
+				-- 설명엔 '1티어' 대신 효과를 주는 유닛의 직업 이름(2026-09-24 사용자 "1티어/2티어는 개발 관점 — 유저는 몰라야 해")
+				out[#out + 1] = { id = "armorbreak", name = "방어구 부수기", desc = self:ArmorBreakJobOf(m.Zone) .. "의 증강 1개마다 보스 방어율이 1%p 감소한다(최대 " .. H:Int(_RtsJobTableLogic.ArmorBreakCap) .. "%p). 지금 " .. H:Int(a) .. "%p 감소.", short = "방어 −" .. H:Int(a) .. "%p", left = -1, ruid = "1f4eea783bbe4785b3ba82334f211aaa", color = Color(1, 1, 1, 1) }
 			end
 		end
 		return out
@@ -253,6 +254,24 @@ script RtsMonsterInfoLogic extends Logic
 			if a > v then v = a end
 		end
 		return v
+	end
+
+	-- 구역 zone에서 방어구 부수기를 주는 유닛(ArmorBreakOf와 같은 기준 — 가장 큰 값)의 직업 이름
+	@ExecSpace("ClientOnly")
+	method string ArmorBreakJobOf(number zone)
+		local z = math.floor(zone + 0.5)
+		local nos = _RtsUnitLogic:ListZoneUnits(z)
+		local v = 0
+		local name = ""
+		for i = 1, #nos do
+			local u = _RtsUnitLogic:GetZoneUnit(z, nos[i])
+			local a = _RtsJobTableLogic:ArmorBreakFor(u)
+			if a > v then
+				v = a
+				name = _RtsJobTableLogic:GetJobNameFor(u)
+			end
+		end
+		return name
 	end
 
 	-- 구역 zone의 가드 크러쉬 %p(클라 — 서버 RtsCombatLogic.GuardCrush와 같은 규칙: 팔라딘 40레벨 20, 10레벨 10)

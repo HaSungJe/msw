@@ -106,3 +106,10 @@
 - Why: 2026-09-24 두 번 깨짐(맵 이름 글자 크기 줄, 프리즘 Lv 줄).
 - CLAUDE.md application: not needed(작업 도구 요령)
 - Priority: takes precedence over defaults
+
+## 화면 문구에 개발용 분류(티어·서포터)를 쓰지 않는다 (2026-09-24)
+- Rule: '1티어/2티어'·'서포터' 같은 직업 분류는 개발 관점 용어라 이용자에게 보이는 모든 문구(팝업·툴팁·디버프 설명·증강 설명)에 쓰지 않는다. 효과가 특정 직업에 걸리면 직업 이름을 직접 쓰고(예: 방어구 부수기 설명 = 효과를 주는 유닛의 직업 이름), 분류 표기만 하던 줄은 통째로 없앤다. 코드·주석·.info·docs의 분류는 그대로 둔다.
+- Why: 사용자 "제발 여기에 1티어 이딴 것 좀 없애면 안 돼? 1티어/2티어는 내가 개발 관점에서 나눈 거지 유저는 그런 거 몰라야 해"(캐릭터 상세 증강 합계 칸의 '1티어' 줄).
+- How to apply: 새 문구를 넣을 때 `grep -n '"[^"]*티어' RootDesk/MyDesk/*.mlua`로 문자열 안의 티어 표기가 0인지 확인.
+- CLAUDE.md application: not needed(화면 문구 방침)
+- Priority: takes precedence over defaults
