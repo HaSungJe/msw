@@ -29,6 +29,10 @@ script RtsCombatLogic extends Logic
 	--   (2026-09-23 사용자 "위쪽 타일에 오면 안 때리고 아래쪽에 와야 때린다" — 전엔 발 기준이라 위 칸은 1.3칸, 아래 칸은 0.7칸으로 쟀다)
 	property number UnitFootDy = 0.75
 
+	-- 사거리 여유(칸): 칸 가운데 기준 range칸 + 이만큼. 0.5 = 그 칸의 경계까지(2026-09-24 사용자 "우측 상단 대각선 공격 잘 못함" —
+	--   전 0.25라 눈으로는 대각선 칸 안인데 칸 바깥쪽 절반에 있는 몹은 사거리 밖이었다. 멀어지는 몹은 그 구간을 금방 지나가 거의 안 맞았다)
+	property number RangeSlack = 0.5
+
 	-- 쿨타임 스킬 준비 시각: key = userId .. "_" .. no .. "_" .. idx → ServerElapsedSeconds
 	property table ReadyAt = {}
 
@@ -127,7 +131,7 @@ script RtsCombatLogic extends Logic
 			local p = self:RangePoint(m)
 			local dc = math.abs(p.x - ux) / cell
 			local dr = math.abs(p.y - uy) / cell
-			if math.max(dc, dr) <= range + 0.25 then
+			if math.max(dc, dr) <= range + self.RangeSlack then
 				local d = (p.x - ox) * (p.x - ox) + (p.y - oy) * (p.y - oy)
 				if avoid ~= nil and avoid[m.Name] then
 					if d < altD then
@@ -296,7 +300,7 @@ script RtsCombatLogic extends Logic
 			local p = self:RangePoint(m)
 			local dc = math.abs(p.x - up.x) / cell
 			local dr = math.abs(p.y - up.y) / cell
-			if math.max(dc, dr) <= range + 0.25 then cands[#cands + 1] = { e = m, d = dc * dc + dr * dr } end
+			if math.max(dc, dr) <= range + self.RangeSlack then cands[#cands + 1] = { e = m, d = dc * dc + dr * dr } end
 		end
 		table.sort(cands, function(a, b) return a.d < b.d end)
 		-- 고정 대상이 후보 안에 있으면 맨 앞으로(메인 대상 유지)

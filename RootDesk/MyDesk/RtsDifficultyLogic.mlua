@@ -184,11 +184,11 @@ script RtsDifficultyLogic extends Logic
 		end)
 		self.StartBtn = sb
 		self.Bar = bar
-		-- 맵 이름 줄 오른쪽(정보 카드 = 맵 이름 라벨의 부모)
+		-- 정보 카드 셋째 줄(맵 이름 아래 — 2026-09-24 사용자 "글자가 크면 높이를 늘려": 맵 이름 오른쪽 120px에선 '난이도 매우어려움'이 두 줄로 꺾여 겹쳤다)
 		local card = nil
 		if H.StageSubText ~= nil then card = H.StageSubText.Parent end
 		if card ~= nil then
-			self.RunText = H:SpawnLabel("RtsDiffCardText", card, Vector2(1, 1), Vector2(1, 1), Vector2(-14, -38), Vector2(120, 28), "난이도 보통", H:ColGold(), 17, TextAlignmentType.MiddleRight, true)
+			self.RunText = H:SpawnLabel("RtsDiffCardText", card, Vector2(0, 1), Vector2(0, 1), Vector2(14, -64), Vector2(412, 24), "난이도 보통", H:ColGold(), 15, TextAlignmentType.MiddleLeft, true)
 		end
 		self.Shown = ""
 	end

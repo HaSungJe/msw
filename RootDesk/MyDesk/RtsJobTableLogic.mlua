@@ -975,7 +975,7 @@ script RtsJobTableLogic extends Logic
 	end
 
 	-- 프리즘 id의 대체 스킬(prism = true)을 쓸 수 있는 레벨 — 그 레벨 전엔 프리즘의 영구 잠금(locks)을 걸지 않는다(RtsUnitLogic.SyncPrismLocks). 대체 스킬이 없으면 1
-	--   2026-09-23 사용자 "모든 프리즘에 레벨 제한 50 제거 — 트루 스나이핑 50이라 못 쓰는 게 너무 패널티": 대체 스킬·홀리 유니티 lv 50 → 1(받는 즉시). 블리자드·도트 퍼니셔를 바꾸는 엘릭서·템페스트·초월은 그 스킬(30레벨)을 따른다
+	--   2026-09-23 사용자 "모든 프리즘에 레벨 제한 50 제거 — 트루 스나이핑 50이라 못 쓰는 게 너무 패널티": 대체 스킬·홀리 유니티 lv 50 → 1(받는 즉시). 블리자드·도트 퍼니셔를 바꾸는 템페스트·초월은 그 스킬(30레벨)을 따르다가 2026-09-24 사용자 "프리즘 레벨 제한 다 없애야" → 이것도 1
 	method number PrismLockLevel(string id, string jobId)
 		local list = self:GetSkills(jobId)
 		self:ApplyPrismSkills(id, list, jobId)
@@ -1144,6 +1144,9 @@ script RtsJobTableLogic extends Logic
 			local i = self:FindSkill(list, "블리자드")
 			if i > 0 then
 				local k = self:CopyTable(list[i])
+				-- 프리즘 레벨 제한 없음(2026-09-24 사용자 "캐릭터들 프리즘 레벨 제한 다 없애야") — 블리자드 원래 30레벨 → 받는 즉시(1)
+				k.lv = 1
+				k.prism = true
 				k.cd = 2 -- 구 엘릭서(2026-09-23 템페스트에 통합)
 				k.ratio = 1001 -- 965 + 36(⑤ 모든 대상 — 2026-09-24 사용자 "프리즘 증강의 보스 +n%를 빼고 스킬 데미지로 통합 — 일반 라운드도 밀게"(보스 딜 같음)) / 보스 공격 시 +36%(⑤) — 2026-09-24 사용자 "1티어 30장 · 2티어 8장이 권장 — 편차 줄이기": 그 장수에서 1티어 50만 · 2티어 8만(팬텀 8.8만)
 				k.bossHits = 9 -- (2026-09-24 티어 재설계 — .info/tier.md, 값 = tools/balance-calc.py TUNE) — 1티어 2.5만(전 15 × 보스 최종 −47%)
@@ -1186,6 +1189,9 @@ script RtsJobTableLogic extends Logic
 			local i = self:FindSkill(list, "도트 퍼니셔")
 			if i > 0 then
 				local k = self:CopyTable(list[i])
+				-- 프리즘 레벨 제한 없음(2026-09-24 사용자) — 도트 퍼니셔 원래 30레벨 → 받는 즉시(1)
+				k.lv = 1
+				k.prism = true
 				k.cd = 3
 				k.ratio = 314 -- 2026-09-24 사용자 "1티어 30장 · 2티어 8장이 권장 — 편차 줄이기": 그 장수에서 1티어 50만 · 2티어 8만(팬텀 8.8만) / (2026-09-24 티어 재설계 — .info/tier.md, 값 = tools/balance-calc.py TUNE) — 2티어 4만(보스 최종 +15% 삭제 — 2티어 프리즘은 보스 가산 대신 구체 비율로)
 				k.hits = 60

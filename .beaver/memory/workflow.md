@@ -100,3 +100,9 @@
 - How to apply: 커밋할 때 `git log --since=<오늘 0시> --format=%s`로 오늘 버전 붙은 커밋 수를 세서 +1. 출시 노트·패치 노트에 같은 버전을 쓴다.
 - CLAUDE.md application: CLAUDE.md Commit 절 첫 줄 규칙에 반영(2026-09-24)
 - Priority: takes precedence over defaults
+
+## 백슬래시가 들어간 패치는 Bash heredoc으로 넘기지 않는다 (2026-09-24)
+- Rule: Bash 도구의 heredoc(`python - <<'EOF'`)으로 파이썬 패치를 돌리면 `\128`·`\n` 같은 백슬래시가 한 단계 풀려 `.mlua`에 8진수 문자·실제 줄바꿈이 들어간다(RtsHudLogic `string.gsub(sub, "[\128-\191]")` 줄이 깨졌던 일). 백슬래시가 있는 치환은 Write 도구로 스크래치에 .py를 만들어 실행하거나 Edit 도구로 고친다. 패치 뒤 `grep -c $'\x01'`로 깨진 바이트가 없는지 확인. `python3`은 이 PC에서 스토어 스텁이라 `python`을 쓴다.
+- Why: 2026-09-24 두 번 깨짐(맵 이름 글자 크기 줄, 프리즘 Lv 줄).
+- CLAUDE.md application: not needed(작업 도구 요령)
+- Priority: takes precedence over defaults

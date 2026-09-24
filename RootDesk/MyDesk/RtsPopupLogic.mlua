@@ -138,7 +138,7 @@ script RtsPopupLogic extends Logic
 		if not wasOpen and kind ~= "pick" then _RtsHudLogic:PlayUi(_RtsHudLogic.OpenSound) end
 		-- 팝업이 열리면 영입 배치 모드는 취소(= 영입 취소)
 		_RtsUnitSelectLogic:EndPlace()
-		if kind ~= "recruit" and kind ~= "augment" and kind ~= "pick" and kind ~= "unit" and kind ~= "devprism" and kind ~= "dismiss" and kind ~= "result" and kind ~= "codex" and kind ~= "rank" then
+		if kind ~= "recruit" and kind ~= "augment" and kind ~= "pick" and kind ~= "unit" and kind ~= "devprism" and kind ~= "dismiss" and kind ~= "result" and kind ~= "codex" and kind ~= "rank" and kind ~= "restart" then
 			_RtsConfigLogic:Log("RtsPopup: unknown kind " .. kind)
 			return
 		end
@@ -172,6 +172,10 @@ script RtsPopupLogic extends Logic
 			width = 720
 			height = 820
 			title = "순위"
+		elseif kind == "restart" then
+			width = 640
+			height = 280
+			title = "다시하기"
 		elseif kind == "result" then
 			width = 640
 			height = 360
@@ -208,6 +212,8 @@ script RtsPopupLogic extends Logic
 			self:BuildCodex(body, width)
 		elseif kind == "rank" then
 			self:BuildRank(body, width)
+		elseif kind == "restart" then
+			self:BuildRestart(body)
 		else
 			self:BuildPick(body)
 		end
@@ -467,7 +473,7 @@ script RtsPopupLogic extends Logic
 			head, headColor, 28, TextAlignmentType.MiddleLeft, true)
 		local reached = _RtsStageTableLogic:GetStage(r.stageNo)
 		local reachedName = ""
-		if reached ~= nil then reachedName = " · " .. reached.name end
+		if reached ~= nil then reachedName = " · " .. _RtsStageTableLogic:FullName(reached) end
 		H:SpawnLabel("RtsRsReach", body, Vector2(0, 1), Vector2(0, 1), Vector2(27, -54), Vector2(586, 28),
 			"도달: " .. H:Int(r.stageNo) .. " / " .. H:Int(total) .. reachedName, H:ColInk(), 19, TextAlignmentType.MiddleLeft, false)
 		local line3 = "처치 " .. H:FormatNumber(r.kills) .. "마리"
@@ -480,7 +486,7 @@ script RtsPopupLogic extends Logic
 		else
 			local bs = _RtsStageTableLogic:GetStage(r.bestNo)
 			best = best .. H:Int(r.bestNo) .. " / " .. H:Int(total)
-			if bs ~= nil then best = best .. " · " .. bs.name end
+			if bs ~= nil then best = best .. " · " .. _RtsStageTableLogic:FullName(bs) end
 		end
 		H:SpawnLabel("RtsRsBest", body, Vector2(0, 1), Vector2(0, 1), Vector2(27, -122), Vector2(586, 28),
 			best, H:ColMuted(), 17, TextAlignmentType.MiddleLeft, false)
@@ -534,7 +540,7 @@ script RtsPopupLogic extends Logic
 		if solo then
 			exitCol = H:ColGold()
 			exitInk = Color(1, 0.95, 0.8, 1)
-			exitText = "다시 하기"
+			exitText = "다시하기"
 		end
 		local exit = H:SpawnPanel("RtsRsExit", body, Vector2(0.5, 1), Vector2(0, 1), Vector2(10, by), Vector2(bw, bh),
 			self:Mix(exitCol, 0.25), exitCol, 1.5)
@@ -542,12 +548,60 @@ script RtsPopupLogic extends Logic
 			exitText, exitInk, 17, TextAlignmentType.MiddleCenter, true)
 		local ec = H:SpawnClick("RtsRsExitClick", exit)
 		ec:ConnectEvent(ButtonClickEvent, function(event)
-			self:Close()
 			if solo then
-				_RtsStageLogic:RequestRestartVote()
+				self:OpenRestartConfirm()
 			else
+				self:Close()
 				_RtsRunResultLogic:RequestExit()
 			end
+		end)
+	end
+
+	-- ===== 다시하기 확인(2026-09-24 사용자 "다시하기 버튼 누르면 예/아니오 확인 팝업. 진짜 다시 할 거냐 묻고") =====
+	--   오른쪽 아래 다시하기 · 결과 창 다시하기 · 판이 끝난 뒤 오른쪽 버튼이 모두 여기를 거친다. 예 = RtsStageLogic.RequestRestartVote(혼자면 바로 새 판, 여럿이면 찬성)
+	@ExecSpace("ClientOnly")
+	method void OpenRestartConfirm()
+		local st = _RtsStageLogic.RunState
+		if st ~= "running" and st ~= "ended" then return end
+		self:Open("restart")
+	end
+
+	@ExecSpace("ClientOnly")
+	method void BuildRestart(Entity body)
+		local H = _RtsHudLogic
+		local solo = _RtsStageLogic:IsSolo()
+		local msg = "처음부터 다시 시작합니다.\n지금 판의 유닛 · 메소 · 증강은 모두 사라집니다.\n정말 다시 할까요?"
+		local yesText = "다시하기"
+		if not solo then
+			msg = "다시하기에 찬성합니다.\n방 인원 과반이 찬성하면 처음부터 다시 시작해요.\n찬성할까요?"
+			yesText = "찬성"
+		end
+		if _RtsStageLogic.RunState == "running" and solo then
+			msg = "진행 중인 판을 그만두고 처음부터 다시 시작합니다.\n지금 판의 유닛 · 메소 · 증강은 모두 사라집니다.\n정말 다시 할까요?"
+		end
+		H:SpawnLabel("RtsRsConfirmMsg", body, Vector2(0, 1), Vector2(0, 1), Vector2(27, -10), Vector2(586, 110),
+			msg, H:ColInk(), 18, TextAlignmentType.MiddleCenter, false)
+		local bw = 180
+		local bh = 44
+		local by = -140
+		local yes = H:SpawnPanel("RtsRsConfirmYes", body, Vector2(0.5, 1), Vector2(1, 1), Vector2(-10, by), Vector2(bw, bh),
+			self:Mix(H:ColGold(), 0.25), H:ColGold(), 1.5)
+		H:SpawnLabel("RtsRsConfirmYesText", yes, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2(0, 0), Vector2(bw - 8, bh - 6),
+			"예 · " .. yesText, Color(1, 0.95, 0.8, 1), 17, TextAlignmentType.MiddleCenter, true)
+		local yc = H:SpawnClick("RtsRsConfirmYesClick", yes)
+		yc:ConnectEvent(ButtonClickEvent, function(event)
+			self:Close()
+			_RtsStageLogic:RequestRestartVote()
+		end)
+		local no = self:SpawnTab("RtsRsConfirmNo", body, Vector2(0, 0), Vector2(bw, bh), "아니오", false, 17)
+		local nt = no.Parent.UITransformComponent
+		nt.AnchorsMin = Vector2(0.5, 1)
+		nt.AnchorsMax = Vector2(0.5, 1)
+		nt.Pivot = Vector2(0, 1)
+		nt.anchoredPosition = Vector2(10, by)
+		local nc = H:SpawnClick("RtsRsConfirmNoClick", no)
+		nc:ConnectEvent(ButtonClickEvent, function(event)
+			self:Close()
 		end)
 	end
 

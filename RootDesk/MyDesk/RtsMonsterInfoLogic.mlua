@@ -198,7 +198,7 @@ script RtsMonsterInfoLogic extends Logic
 		if m.StageNo > 0 then s = _RtsStageTableLogic:GetStage(m.StageNo) end
 		if s ~= nil then
 			if info ~= "" then info = info .. "   ·   " end
-			info = info .. H:Int(m.StageNo) .. "라운드 · " .. s.name
+			info = info .. H:Int(m.StageNo) .. "라운드 · " .. _RtsStageTableLogic:FullName(s)
 		end
 		if self.InfoText.TextComponent.Text ~= info then self.InfoText.TextComponent.Text = info end
 		self:RefreshDebuffs(m)

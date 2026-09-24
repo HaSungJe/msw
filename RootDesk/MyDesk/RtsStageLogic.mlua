@@ -426,14 +426,14 @@ script RtsStageLogic extends Logic
 		if self.BossPrep then
 			local nx = _RtsStageTableLogic:GetStage(self.StageNo + 1)
 			local nm = ""
-			if nx ~= nil then nm = nx.name end
+			if nx ~= nil then nm = _RtsStageTableLogic:FullName(nx) end
 			return { title = "보스 준비", sub = nm, clock = string.format("%d", sec) }
 		end
 		local s = self:CurrentStage()
 		if s == nil then return { title = "", sub = "", clock = "" } end
-		if s.kind == "boss" then return { title = "보스", sub = s.name, clock = clock } end
+		if s.kind == "boss" then return { title = "보스", sub = _RtsStageTableLogic:FullName(s), clock = clock } end
 		if s.kind == "rest" then return { title = "쉬는 시간", sub = "", clock = clock } end
-		return { title = string.format("%d라운드", self.StageNo), sub = s.name, clock = clock }
+		return { title = string.format("%d라운드", self.StageNo), sub = _RtsStageTableLogic:FullName(s), clock = clock }
 	end
 
 	@ExecSpace("ClientOnly")
@@ -476,9 +476,9 @@ script RtsStageLogic extends Logic
 		-- 판이 막 끝났으면 다시 하기 투표 안내(한 번)
 		if self.RunState == "ended" and self.PrevRunState ~= "ended" and self.PrevRunState ~= "" then
 			if self:IsSolo() then
-				_RtsHudLogic:ShowHintFor("게임 종료 — '다시 하기'를 누르면 처음부터 다시 시작해요", 6)
+				_RtsHudLogic:ShowHintFor("게임 종료 — '다시하기'를 누르면 처음부터 다시 시작해요", 6)
 			else
-				_RtsHudLogic:ShowHintFor("게임 종료 — 오른쪽 아래 '다시 하기'를 과반이 누르면 처음부터 다시 시작해요", 6)
+				_RtsHudLogic:ShowHintFor("게임 종료 — 오른쪽 아래 '다시하기'를 과반이 누르면 처음부터 다시 시작해요", 6)
 			end
 		end
 		self.PrevRunState = self.RunState

@@ -585,7 +585,7 @@ script RtsUnitPopupLogic extends Logic
 				local bar = H:SpawnStretch("model://uisprite", "RtsUnitPrismBar", row, Vector2(0, 0), Vector2(0, 1), Vector2(0, 0), Vector2(4, 0))
 				bar.SpriteGUIRendererComponent.Color = pc
 				local lvLbl = H:SpawnLabel("RtsUnitPrismLv", row, Vector2(0, 0.5), Vector2(0, 0.5), Vector2(12, 0), Vector2(50, 40),
-					"Lv\n<b><size=17>50</size></b>", H:ColMuted(), 12, TextAlignmentType.MiddleCenter, false)
+					"Lv\n<b><size=17>1</size></b>", H:ColMuted(), 12, TextAlignmentType.MiddleCenter, false) -- 프리즘은 레벨 제한 없음(2026-09-24 사용자 — 전엔 50으로 적혀 있었다)
 				lvLbl.TextComponent.IsRichText = true
 				local nameLbl = H:SpawnLabel("RtsUnitPrismName", row, Vector2(0, 1), Vector2(0, 1), Vector2(70, -8), Vector2(rw - 90, 24),
 					pz.name .. "  <size=11><color=#c48cf0>프리즘</color></size>", H:ColInk(), 17, TextAlignmentType.MiddleLeft, true)

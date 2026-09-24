@@ -219,8 +219,26 @@ script RtsHudLogic extends Logic
 			tc.FontSize = fontSize
 			tc.Alignment = align
 			tc.Bold = bold
+			-- 글이 칸보다 크면 칸에 맞춰 글자를 줄인다(BestFit: MaxSize = 원래 크기, MinSize = 60% — 2026-09-24 사용자 "자꾸 텍스트 영역 찐빠").
+			--   칸마다 글자 수를 어림해 맞추던 방식은 어림이 빗나가면 넘치거나 두 줄로 꺾여 겹쳤다 → 모든 라벨을 여기서 한 번에 막는다.
+			--   나중에 글자 크기를 바꿀 땐 FontSize가 아니라 MaxSize를 바꾼다(SetLabelSize)
+			local fs = math.floor(fontSize + 0.5)
+			tc.BestFit = true
+			tc.MaxSize = fs
+			tc.MinSize = math.max(9, math.floor(fs * 0.6))
 		end
 		return e
+	end
+
+	-- 라벨 글자 크기 바꾸기(BestFit 라벨은 MaxSize가 실제 최대 크기)
+	@ExecSpace("ClientOnly")
+	method void SetLabelSize(Entity e, number size)
+		if e == nil or e.TextComponent == nil then return end
+		local fs = math.floor(size + 0.5)
+		local tc = e.TextComponent
+		tc.FontSize = fs
+		tc.MaxSize = fs
+		tc.MinSize = math.max(9, math.floor(fs * 0.6))
 	end
 
 	-- 테두리 있는 패널: 바깥(테두리색) + 안쪽(배경색, thick만큼 안으로). 자식은 안쪽에 붙인다
@@ -323,8 +341,9 @@ script RtsHudLogic extends Logic
 		self.HudGroup = grp
 
 		-- 좌상단 정보 카드 한 장(2026-09-23 사용자 "글이 길어지면 깨진다 — 메소·필드·맵 정보 하나로 깔끔하게"):
-		--   윗줄 = "109라운드  스페셜"(굵게) + 오른쪽 남은 시간 / 가운데 = 맵 이름(흐리게, 길면 자름 — 줄바꿈 없음) / 구분선 / 아랫줄 = 메소(동전) + 오른쪽 필드 n / 110
-		local card = self:SpawnPanel("RtsInfoCard", grp, Vector2(0, 1), Vector2(0, 1), Vector2(16, -16), Vector2(440, 112),
+		--   윗줄 = "109라운드  스페셜"(굵게) + 오른쪽 남은 시간 / 둘째 줄 = "지역 - 맵"(카드 폭 전체) / 셋째 줄 = 난이도(금색, RtsDifficultyLogic) / 구분선 / 아랫줄 = 메소(동전) + 오른쪽 필드 n / 110
+		--   2026-09-24 사용자 "글자가 크면 높이를 늘려" — 난이도가 맵 이름 오른쪽 120px에 들어가지 않아 두 줄로 꺾여 겹쳤다 → 자기 줄로, 카드 112 → 138
+		local card = self:SpawnPanel("RtsInfoCard", grp, Vector2(0, 1), Vector2(0, 1), Vector2(16, -16), Vector2(440, 138),
 			self:ColPanel(), self:ColBorder(), 1.5)
 		self.StageTitleText = self:SpawnLabel("RtsStageTitle", card, Vector2(0, 1), Vector2(0, 1), Vector2(14, -8), Vector2(320, 32),
 			"대기 중", self:ColInk(), 22, TextAlignmentType.MiddleLeft, true)
@@ -332,12 +351,12 @@ script RtsHudLogic extends Logic
 		self.StageTitleText.TextComponent.Overflow = OverflowType.Truncate
 		self.StageClockText = self:SpawnLabel("RtsStageClock", card, Vector2(1, 1), Vector2(1, 1), Vector2(-14, -8), Vector2(90, 32),
 			"", self:ColInk(), 22, TextAlignmentType.MiddleRight, true)
-		-- 맵 이름(2026-09-24 사용자 "맵 명이 너무 작게 표시됨" — 15 → 18, 줄 높이 22 → 26). 오른쪽 끝 120px은 난이도(RtsDifficultyLogic — "난이도 표시는 맵 오른쪽에")
-		self.StageSubText = self:SpawnLabel("RtsStageSub", card, Vector2(0, 1), Vector2(0, 1), Vector2(14, -38), Vector2(290, 28),
+		-- 맵 이름(2026-09-24 사용자 "맵 명이 너무 작게 표시됨" — 15 → 18). 카드 폭 전체(412) — 난이도는 아랫줄(RtsDifficultyLogic)
+		self.StageSubText = self:SpawnLabel("RtsStageSub", card, Vector2(0, 1), Vector2(0, 1), Vector2(14, -38), Vector2(412, 28),
 			"", self:ColMuted(), 18, TextAlignmentType.MiddleLeft, false)
 		self.StageSubText.TextComponent.Overflow = OverflowType.Truncate
 		self.StageSubText.TextComponent.UseNBSP = true
-		local line = self:SpawnUI("model://uisprite", "RtsInfoLine", card, Vector2(0, 1), Vector2(0, 1), Vector2(12, -70), Vector2(416, 1.5))
+		local line = self:SpawnUI("model://uisprite", "RtsInfoLine", card, Vector2(0, 1), Vector2(0, 1), Vector2(12, -94), Vector2(416, 1.5))
 		line.SpriteGUIRendererComponent.ImageRUID = DataRef(self.WhiteRUID)
 		line.SpriteGUIRendererComponent.Color = self:ColBorderSoft()
 		local coin = self:SpawnUI("model://uisprite", "RtsMesoCoin", card, Vector2(0, 0), Vector2(0, 0.5), Vector2(14, 22), Vector2(24, 24))
@@ -351,8 +370,8 @@ script RtsHudLogic extends Logic
 		self.FieldText = self:SpawnLabel("RtsFieldText", card, Vector2(1, 0), Vector2(1, 0.5), Vector2(-14, 22), Vector2(104, 32),
 			"0 / 110", self:ColInk(), 20, TextAlignmentType.MiddleRight, true)
 
-		-- 좌측 플레이어 목록 (행은 RefreshPlayerList가 채움) — 정보 카드(높이 112) 바로 아래
-		local box = self:SpawnUI("model://uisprite", "RtsPlayers", grp, Vector2(0, 1), Vector2(0, 1), Vector2(16, -140), Vector2(221, 400))
+		-- 좌측 플레이어 목록 (행은 RefreshPlayerList가 채움) — 정보 카드(높이 138) 바로 아래
+		local box = self:SpawnUI("model://uisprite", "RtsPlayers", grp, Vector2(0, 1), Vector2(0, 1), Vector2(16, -166), Vector2(221, 400))
 		self:Tint(box, 0, 0, 0, 0)
 		self.PlayersBox = box
 		self.PlayerHead = self:SpawnLabel("RtsPlayerHead", box, Vector2(0, 1), Vector2(0, 1), Vector2(6, 0), Vector2(200, 20),
@@ -373,7 +392,7 @@ script RtsHudLogic extends Logic
 		local restart = self:SpawnPanel("RtsRestartBtn", grp, Vector2(1, 0), Vector2(1, 0), Vector2(-16, 16), Vector2(200, 64),
 			self:ColPanel(), self:ColBorder(), 2)
 		self.RestartText = self:SpawnLabel("RtsRestartLabel", restart, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2(0, 0), Vector2(192, 56),
-			"다시 하기", self:ColInk(), 19, TextAlignmentType.MiddleCenter, true)
+			"다시하기", self:ColInk(), 19, TextAlignmentType.MiddleCenter, true)
 		local restartClick = self:SpawnClick("RtsRestartClick", restart)
 		restartClick:ConnectEvent(ButtonClickEvent, function(event)
 			self:OnRestartButton()
@@ -542,6 +561,7 @@ script RtsHudLogic extends Logic
 		self.StageShown = key
 		self.StageTitleText.TextComponent.Text = t
 		self.StageSubText.TextComponent.Text = sub
+		-- 긴 "지역 - 맵"은 라벨 BestFit이 칸(412px)에 맞춰 줄인다
 		self.StageClockText.TextComponent.Text = clock
 	end
 
@@ -627,21 +647,15 @@ script RtsHudLogic extends Logic
 	method void OnRestartButton()
 		local st = _RtsStageLogic.RunState
 		if st ~= "running" and st ~= "ended" then return end
-		-- 방에 나 혼자(솔로 포함)면 확인 없이 바로 새 판(2026-09-24 사용자 "방에 나만 있거나 솔로 모드일 때 다시 하기는 즉시 다시 시작")
-		if _RtsStageLogic:IsMyVote() or st == "ended" or _RtsStageLogic:IsSolo() then
+		-- 이미 찬성했으면 다시 누르기 = 찬성 취소(확인 없이 바로)
+		if _RtsStageLogic:IsMyVote() then
 			self.RestartConfirmUntil = 0
 			_RtsStageLogic:RequestRestartVote()
 			return
 		end
-		local now = _UtilLogic.ElapsedSeconds
-		if now < self.RestartConfirmUntil then
-			self.RestartConfirmUntil = 0
-			_RtsStageLogic:RequestRestartVote()
-			return
-		end
-		self.RestartConfirmUntil = now + 3
-		self:ShowHintFor("다시 하기 — 3초 안에 한 번 더 누르면 찬성해요(방 인원 과반이 찬성하면 처음부터)", 3)
-		self:RefreshRestartButton()
+		-- 예/아니오 확인 팝업(2026-09-24 사용자 "다시하기 누르면 예/아니오 확인 팝업 — 진짜 다시 할 거냐 묻고" — 전엔 3초 안에 두 번 누르기).
+		--   혼자면 '예' = 바로 새 판, 여럿이면 '예' = 찬성(과반이면 새 판)
+		_RtsPopupLogic:OpenRestartConfirm()
 	end
 
 	-- '다시 하기' 버튼 문구·색(RtsStageLogic.RefreshHud가 0.25초마다): 표 없음 "다시 하기" / 누가 찬성 "다시 하기 1/2"(금색 테두리) /
@@ -655,18 +669,18 @@ script RtsHudLogic extends Logic
 		local count = self:Int(S.VoteCount) .. "/" .. self:Int(S.VoteNeed)
 		-- 솔로(방 인원 1)는 표 수를 안 보인다(혼자 누르면 바로 새 판 — 2026-09-24 솔로 출시)
 		if S:IsSolo() then count = "" end
-		local text = "다시 하기"
+		local text = "다시하기"
 		local mode = "off"
 		if st ~= "running" and st ~= "ended" then
 			mode = "idle"
 		elseif mine then
-			text = "다시 하기 ✓ " .. count
+			text = "다시하기 ✓ " .. count
 			mode = "mine"
 		elseif _UtilLogic.ElapsedSeconds < self.RestartConfirmUntil then
 			text = "한 번 더 누르면 찬성"
 			mode = "confirm"
 		elseif S.VoteCount > 0 or st == "ended" then
-			text = "다시 하기 " .. count
+			text = "다시하기 " .. count
 			mode = "on"
 		end
 		self:RefreshVotePanel()
@@ -710,7 +724,7 @@ script RtsHudLogic extends Logic
 			left = math.ceil(S.VoteStartedAt + S.VoteTimeout - _UtilLogic.ServerElapsedSeconds)
 			if left < 0 then left = 0 end
 		end
-		local text = "다시 하기 투표  <color=#8fd18a>찬성 " .. self:Int(S.VoteCount) .. "</color> · <color=#e88a7a>반대 " .. self:Int(S.VoteNoCount) .. "</color>  / 과반 " .. self:Int(S.VoteNeed) .. " · " .. self:Int(left) .. "초"
+		local text = "다시하기 투표  <color=#8fd18a>찬성 " .. self:Int(S.VoteCount) .. "</color> · <color=#e88a7a>반대 " .. self:Int(S.VoteNoCount) .. "</color>  / 과반 " .. self:Int(S.VoteNeed) .. " · " .. self:Int(left) .. "초"
 		local key = tostring(active) .. "|" .. self:Int(mine) .. "|" .. text
 		if key == self.VoteShown then return end
 		self.VoteShown = key
@@ -739,7 +753,7 @@ script RtsHudLogic extends Logic
 			_RtsPopupLogic:Close()
 			-- 솔로(방 인원 1)면 '다시 하기' — 혼자 찬성 = 바로 새 판(2026-09-24 솔로 출시), 여럿이면 '나가기'
 			if _RtsStageLogic:IsSolo() then
-				_RtsStageLogic:RequestRestartVote()
+				_RtsPopupLogic:OpenRestartConfirm()
 			else
 				_RtsRunResultLogic:RequestExit()
 			end
@@ -752,6 +766,7 @@ script RtsHudLogic extends Logic
 	@ExecSpace("ClientOnly")
 	method void RefreshRecruitButton()
 		if self.RecruitBtn == nil or self.RecruitText == nil then return end
+		self:RefreshEmptySlots()
 		local stageNo = _RtsStageLogic.StageNo
 		local state = _RtsStageLogic.RunState
 		local owned = #_RtsUnitLogic:ListZoneUnits(_RtsUnitLogic:MyZone())
@@ -774,7 +789,7 @@ script RtsHudLogic extends Logic
 			if key == self.RecruitShown then return end
 			self.RecruitShown = key
 			if solo then
-				self.RecruitText.TextComponent.Text = "다시 하기"
+				self.RecruitText.TextComponent.Text = "다시하기"
 				self.RecruitBtn.SpriteGUIRendererComponent.Color = Color(0.3, 0.24, 0.12, 0.96)
 				self.RecruitBtn.Parent.SpriteGUIRendererComponent.Color = self:ColGold()
 				self.RecruitText.TextComponent.FontColor = Color(1, 0.95, 0.8, 1)
@@ -1027,10 +1042,36 @@ script RtsHudLogic extends Logic
 		s.name.TextComponent.Text = self:Int(no) .. ". " .. jobName
 		s.name.TextComponent.Alignment = TextAlignmentType.MiddleLeft
 		s.name.UITransformComponent.RectSize = Vector2(80, 30)
-		s.name.TextComponent.FontSize = 13
+		self:SetLabelSize(s.name, 13)
 		s.lv.TextComponent.Text = "Lv " .. self:Int(level)
 		s.bar.SpriteGUIRendererComponent.Color = self:SeriesColor(series)
 		self:ApplySlotLook(i)
+	end
+
+	-- 빈 슬롯 문구(2026-09-24 사용자 "우측 유닛 목록의 빈자리 텍스트를 어느 라운드에 해금 이런 거"): i번째 칸이 열리는 순번 = RtsStageTableLogic.RecruitAt[i].
+	--   진행 중이고 이미 열린 칸이면 '빈 자리', 아니면 'n라운드 해금'(n = 정보 카드의 라운드 번호와 같은 순번)
+	@ExecSpace("ClientOnly")
+	method string EmptySlotText(number i)
+		local T = _RtsStageTableLogic
+		T:Ensure()
+		local at = T.RecruitAt[i]
+		if at == nil then return "빈 자리" end
+		local S = _RtsStageLogic
+		if S.RunState == "running" and S.StageNo >= at then return "빈 자리" end
+		return self:Int(at) .. "라운드 해금"
+	end
+
+	-- 빈 슬롯 문구 갱신(라운드가 바뀌면 '해금' → '빈 자리') — RefreshRecruitButton이 주기적으로 부른다
+	@ExecSpace("ClientOnly")
+	method void RefreshEmptySlots()
+		if self.UnitSlots == nil then return end
+		for i = 1, 6 do
+			local s = self.UnitSlots[i]
+			if s ~= nil and not s.filled and s.name ~= nil and isvalid(s.name) then
+				local t = self:EmptySlotText(i)
+				if s.name.TextComponent.Text ~= t then s.name.TextComponent.Text = t end
+			end
+		end
 	end
 
 	@ExecSpace("ClientOnly")
@@ -1038,10 +1079,10 @@ script RtsHudLogic extends Logic
 		local s = self.UnitSlots[i]
 		if s == nil then return end
 		s.filled = false
-		s.name.TextComponent.Text = "빈 자리"
+		s.name.TextComponent.Text = self:EmptySlotText(i)
 		s.name.TextComponent.Alignment = TextAlignmentType.MiddleCenter
-		s.name.UITransformComponent.RectSize = Vector2(110, 30)
-		s.name.TextComponent.FontSize = 14
+		s.name.UITransformComponent.RectSize = Vector2(114, 30)
+		self:SetLabelSize(s.name, 13)
 		s.lv.TextComponent.Text = ""
 		s.bar.SpriteGUIRendererComponent.Color = self:SeriesColor("")
 		if self.SelectedSlot == i then self.SelectedSlot = 0 end

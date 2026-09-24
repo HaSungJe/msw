@@ -69,6 +69,15 @@ script RtsStageTableLogic extends Logic
 		return 0
 	end
 
+	-- 화면용 맵 이름 "지역 - 맵"(2026-09-24 사용자 "맵 이름에 어느 대륙 — 엘나스 - 빙판조심, 레헬른 - 닭이 뛰노는 곳"). 지역 = 표의 theme.
+	--   맵 이름이 이미 지역 이름으로 시작하면(고통의 미궁 중심부(1)) 반복하지 않고 맵 이름만
+	method string FullName(any s)
+		if s == nil then return "" end
+		local t = s.theme or ""
+		if t == "" or string.sub(s.name, 1, string.len(t)) == t then return s.name end
+		return t .. " - " .. s.name
+	end
+
 	-- BEGIN GENERATED
 	-- tools/gen-stage-table.py가 생성 — 손으로 고치지 않는다
 	method void LoadGenerated()
