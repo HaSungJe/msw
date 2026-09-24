@@ -179,8 +179,6 @@ script RtsPopupLogic extends Logic
 		elseif kind == "result" then
 			width = 640
 			height = 360
-			-- 클리어면 순위 두 줄만큼 높게
-			if self.Result ~= nil and self.Result.cleared then height = 430 end
 			title = "결과"
 		else
 			height = 580
@@ -251,7 +249,7 @@ script RtsPopupLogic extends Logic
 		local d = math.floor(diff + 0.5)
 		self.ClearRank = { diff = d, count = count, rank = rank, more = more, at = _UtilLogic.ElapsedSeconds }
 		self.RankCache[d] = nil
-		if self.Kind == "result" then self:Open("result") end
+		-- (결과 창에 순위 줄을 그리지 않으니 다시 그리지 않는다 — 2026-09-25 사용자 "인게임 순위표 제거". 값은 대기방 순위표 때 다시 쓴다)
 	end
 
 	-- 순위 목록 도착(RtsRunResultLogic.ShowRanking): 순위 창이 그 탭이면 다시 그린다
@@ -491,33 +489,7 @@ script RtsPopupLogic extends Logic
 		H:SpawnLabel("RtsRsBest", body, Vector2(0, 1), Vector2(0, 1), Vector2(27, -122), Vector2(586, 28),
 			best, H:ColMuted(), 17, TextAlignmentType.MiddleLeft, false)
 		local by = -186
-		-- 클리어: 그 난이도 검은 마법사 4페이즈 클리어 횟수·순위(2026-09-24 사용자 — 난이도별 따로). 보통 이하·테스트 모드는 기록 안 함 안내
-		if r.cleared then
-			local cr = self.ClearRank
-			local l1 = "순위 기록 중…"
-			local l2 = ""
-			if cr ~= nil then
-				local dn = _RtsDifficultyLogic:GetNames()[cr.diff] or ""
-				if cr.count > 0 then
-					l1 = dn .. " 검은 마법사 클리어 " .. H:Int(cr.count) .. "회째"
-					local rk = H:Int(cr.rank) .. "위"
-					if cr.more then rk = H:Int(cr.rank - 1) .. "위 밖" end
-					l2 = dn .. " 순위 " .. rk .. "   ·   전체 순위는 왼쪽 아래 '순위'"
-				elseif _RtsUnitLogic.DevTools then
-					l1 = "테스트 모드 — 순위에 기록하지 않아요"
-				elseif cr.diff < _RtsRunResultLogic.RankMinDiff then
-					l1 = "순위는 어려움 · 매우어려움 · 극악 클리어만 기록해요"
-					l2 = "난이도마다 따로, 검은 마법사 4페이즈 클리어 횟수 순"
-				else
-					l1 = "순위 기록에 실패했어요"
-				end
-			end
-			H:SpawnLabel("RtsRsFinal", body, Vector2(0, 1), Vector2(0, 1), Vector2(27, -160), Vector2(586, 30),
-				l1, H:ColGold(), 20, TextAlignmentType.MiddleLeft, true)
-			H:SpawnLabel("RtsRsRank", body, Vector2(0, 1), Vector2(0, 1), Vector2(27, -194), Vector2(586, 28),
-				l2, H:ColInk(), 18, TextAlignmentType.MiddleLeft, false)
-			by = -250
-		end
+		-- (클리어 순위 두 줄은 뺐다 — 2026-09-25 사용자 "인게임 순위표 제거, 지금 저기서 보일 게 아니야". 클리어 기록 저장은 그대로, 순위는 대기방(Phase 13)에서)
 		-- 버튼: 여럿 = 관전하기 / 나가기(대기방 — 멀티 업데이트), 솔로(방 인원 1) = 닫기 / 다시 하기(바로 새 판, 2026-09-24 솔로 출시)
 		local solo = _RtsStageLogic:IsSolo()
 		local bw = 180

@@ -463,15 +463,8 @@ script RtsHudLogic extends Logic
 		codexClick:ConnectEvent(ButtonClickEvent, function(event)
 			_RtsPopupLogic:Open("codex")
 		end)
-		-- 증강 도감 위: 순위(2026-09-24 솔로 출시 — 난이도별 검은 마법사 4페이즈 클리어 횟수, RtsPopupLogic.BuildRank)
-		local rankBtn = self:SpawnPanel("RtsRankBtn", grp, Vector2(0, 0), Vector2(0, 0), Vector2(16, 16 + 50 + 44 + 40), Vector2(130, 40),
-			self:ColPanel(), self:ColBorder(), 1.5)
-		self:SpawnLabel("RtsRankLabel", rankBtn, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2(0, 0), Vector2(126, 34),
-			"순위", self:ColInk(), 17, TextAlignmentType.MiddleCenter, true)
-		local rankClick = self:SpawnClick("RtsRankClick", rankBtn)
-		rankClick:ConnectEvent(ButtonClickEvent, function(event)
-			_RtsPopupLogic:Open("rank")
-		end)
+		-- (게임 안 '순위' 버튼은 뺐다 — 2026-09-25 사용자 "인게임 순위표 제거, 지금 저기서 보일 게 아니야". 순위표는 대기방(로드맵 Phase 13)에서.
+		--  클리어 기록 저장(RtsRunResultLogic.SaveClear)은 그대로 — 순위 창 코드(RtsPopupLogic.BuildRank)는 대기방 순위표에서 다시 쓴다)
 		local ex = self:SpawnPanel("RtsExpandBtn", grp, Vector2(0, 0), Vector2(0, 0), Vector2(16 + 130, 16), Vector2(150, 50),
 			Color(0.3, 0.24, 0.12, 0.96), self:ColGold(), 2)
 		self.ExpandBtn = ex
