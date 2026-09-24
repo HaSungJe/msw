@@ -643,6 +643,24 @@ script RtsSkillFxLogic extends Logic
 		end
 	end
 
+	-- 도트 퍼니셔 구체 재조준(2026-09-24): 대상이 죽은 자리 from에서 새 대상 target으로 이어 날아가는 구체 — 떠 있기(projHover) 없이 바로, 대상을 따라간다.
+	--   서버 판정 시각 = 도착 시각(OrbTravelSec). 원래 구체는 대상이 죽어 있으면 폭발 없이 사라진다(SpawnProjectileEx) — 그 자리에서 이 구체가 이어받는다
+	@ExecSpace("ClientOnly")
+	method void PlayOrbRedirect(table fx, Vector2 from, Entity target)
+		local mapRoot = _EntityService:GetEntityByPath("/maps/RtsMap")
+		if mapRoot == nil or target == nil or not isvalid(target) then return end
+		local f2 = {}
+		for key, v in pairs(fx) do f2[key] = v end
+		f2.projHover = 0
+		local tp = target.TransformComponent.WorldPosition
+		local to = Vector2(tp.x, tp.y + (fx.hitDy or 0.6))
+		if target.HitComponent ~= nil then
+			local sc = target.TransformComponent.Scale
+			to = Vector2(tp.x + target.HitComponent.ColliderOffset.x * math.abs(sc.x), tp.y + target.HitComponent.ColliderOffset.y * sc.y)
+		end
+		self:SpawnProjectileEx(f2, Vector3(from.x, from.y, 0), to, mapRoot, false, 1, target)
+	end
+
 	--   projHover가 있으면 그 시간 동안 생성 자리에 떠 있다가(비행 프레임 projFlySprites 루프) 날아간다. projSpeed(유닛/초)가 있으면 비행 시간 = 거리÷속도(서버 판정 시각과 같은 식). 닿으면 projHitSprites(폭발 프레임)를 한 번 돌리고 제거
 	@ExecSpace("ClientOnly")
 	method void SpawnProjectile(table fx, Vector3 from, Vector2 to, Entity mapRoot, boolean shadow, number cells)
@@ -812,6 +830,11 @@ script RtsSkillFxLogic extends Logic
 					arcTimer = nil
 				end
 				if not isvalid(e) then return end
+				-- 따라가던 대상이 이미 죽었으면(또는 사라졌으면) 폭발 없이 사라진다 — 서버가 그 자리에서 다음 적으로 이어지는 구체를 보낸다(RtsCombatLogic.RedirectOrbFx)
+				if homing ~= nil and (not isvalid(homing) or (homing.RtsMonsterComponent ~= nil and homing.RtsMonsterComponent.Dead)) then
+					e:Destroy()
+					return
+				end
 				if fx.projHitSprites ~= nil and #fx.projHitSprites > 0 then
 					-- 닿음: 폭발 프레임들을 한 번 돌리고 제거(회전은 그대로)
 					local step = fx.projFrameSec or 0.09

@@ -78,7 +78,7 @@ script RtsCombatLogic extends Logic
 		return Vector2(p.x + hit.ColliderOffset.x * math.abs(sc.x), p.y + hit.ColliderOffset.y * sc.y)
 	end
 
-	-- (x, y)에서 반지름 r 안의 가장 가까운(피격 박스 가운데 기준) 공격 가능한 몬스터, 없으면 nil — 도트 퍼니셔 구체가 도착했을 때 대상이 이미 죽었으면 폭발 지점 곁 적에게
+	-- (x, y)에서 반지름 r 안의 가장 가까운(피격 박스 가운데 기준) 공격 가능한 몬스터, 없으면 nil — 도트 퍼니셔 구체가 도착했을 때 대상이 이미 죽었으면 그 자리에서 다음 적으로(재조준)
 	@ExecSpace("ServerOnly")
 	method any NearestTargetableAt(number zone, number x, number y, number r)
 		local list = self:GetZoneMonsters(zone)
@@ -623,16 +623,45 @@ script RtsCombatLogic extends Logic
 					_TimerService:SetTimerOnce(function() strike(t, hitBase, hh) end, when + (j - 1) * stagger)
 				end
 			else
-				-- 구체: 도착했는데 대상이 이미 죽었으면(다른 구체·유닛이 먼저 잡음) 폭발 지점에서 반지름 projSpread(2, 초월 4) 안 가장 가까운 다른 적이 맞는다
+				-- 구체 재조준(2026-09-24 사용자 "도트 퍼니셔 구체가 날아가는 도중 적이 죽으면 그냥 불발"): 도착했는데 대상이 이미 죽었으면(다른 구체·유닛이 먼저 잡음)
+				--   그 자리(죽은 대상의 지금 겨냥점 — 사망 클립 동안 남아 있음, 없으면 시전 때 폭발 지점)에서 구역의 가장 가까운 적으로 이어 날아간다(구체는 사거리 제한 없음).
+				--   전 클라에 이어지는 구체(RedirectOrbFx — 떠 있기 없이 바로 비행)를 그리고, 비행 시간(OrbTravelSec, 클라와 같은 식) 뒤 판정. 이어 간 대상도 먼저 죽으면 2번까지 다시.
+				--   전엔 폭발 지점 반지름 projSpread 안의 적만 바로 맞았다 — 몹이 그새 지나가 버리면 헛방
 				local op = nil
 				if orbPoint ~= nil then op = orbPoint[h] end
 				local zone = u.Zone
+				local function redirect(t0, px, py, left)
+					if not isvalid(e) then return end
+					local sx = px
+					local sy = py
+					if t0 ~= nil and isvalid(t0) then
+						local a0 = self:AimPoint(t0)
+						sx = a0.x
+						sy = a0.y
+					end
+					local t2 = self:NearestTargetableAt(zone, sx, sy, 10000)
+					if t2 == nil then return end
+					local a2 = self:AimPoint(t2)
+					local dist = math.sqrt((a2.x - sx) * (a2.x - sx) + (a2.y - sy) * (a2.y - sy))
+					self:RedirectOrbFx(zone, no, idx, sx, sy, t2.Name)
+					_TimerService:SetTimerOnce(function()
+						if not isvalid(e) then return end
+						if self:IsTargetable(t2) then
+							strike(t2, hitBase, hh)
+						elseif left > 0 then
+							redirect(t2, a2.x, a2.y, left - 1)
+						end
+					end, _RtsJobTableLogic:OrbTravelSec(fx, dist))
+				end
 				_TimerService:SetTimerOnce(function()
 					if not isvalid(e) then return end
 					for j = 1, #tlist do
 						local t = tlist[j]
-						if op ~= nil and not self:IsTargetable(t) then t = self:NearestTargetableAt(zone, op.x, op.y, fx.projSpread or 2.0) end
-						if t ~= nil then strike(t, hitBase, hh) end
+						if op ~= nil and not self:IsTargetable(t) then
+							redirect(t, op.x, op.y, 2)
+						elseif t ~= nil then
+							strike(t, hitBase, hh)
+						end
 					end
 				end, when)
 			end
@@ -743,6 +772,19 @@ script RtsCombatLogic extends Logic
 		local fx = nil
 		if k ~= nil then fx = k.fx end
 		t.RtsMonsterComponent:PlayHitFxAt(fx, crit, h)
+	end
+
+	-- 전 클라: 도트 퍼니셔 구체 재조준 — (x, y)(대상이 죽은 자리)에서 새 대상 targetName으로 이어 날아가는 구체(서버 구체 재조준 redirect와 짝)
+	@ExecSpace("Client")
+	method void RedirectOrbFx(number zone, number no, number idx, number x, number y, string targetName)
+		local t = _EntityService:GetEntityByPath("/maps/RtsMap/" .. targetName)
+		if t == nil or not isvalid(t) then return end
+		local u = _RtsUnitLogic:GetZoneUnit(zone, no)
+		if u == nil then return end
+		local skills = _RtsJobTableLogic:GetSkillsFor(u)
+		local k = skills[math.floor(idx)]
+		if k == nil or k.fx == nil then return end
+		_RtsSkillFxLogic:PlayOrbRedirect(k.fx, Vector2(x, y), t)
 	end
 
 end
