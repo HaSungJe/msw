@@ -52,10 +52,17 @@ script RtsUnitComponent extends Component
 	@Sync
 	property string Prisms = ""
 
+	-- 이 유닛에 지정된 브론즈~골드·특수 코어 증강 id(쉼표 목록 — RtsAugmentTableLogic). 서버 RtsAugmentLogic.RequestAssign이 채우고, GetStatFor가 프리즘 다음에 능력치로 얹는다(2026-09-23)
+	@Sync
+	property string Augs = ""
+
 	-- 보는 방향: -1 왼쪽(메이플 아바타 기본 = 스케일 양수), +1 오른쪽. 서버 FaceTo가 정하고 클라가 아바타 루트 스케일 x 부호로 그린다(유닛 엔티티 스케일은 안 건드려 자식 아이콘이 뒤집히지 않음).
 	--   마지막 공격 방향을 유지한다(공격 끝나도 되돌리지 않음 — 사용자 2026-09-18)
 	@Sync
 	property number FaceDir = -1
+
+	-- 클라: 시전 RPC가 알려 준 방향(0 = 없음). FaceDir 동기화가 늦게 와도 시전 순간 아바타·이펙트를 이 방향으로(RtsCombatLogic.CastFxFace). 동기화가 오면 0으로
+	property number LocalFace = 0
 
 	-- 클라: 그림자 분신 스타일 재시도 횟수(엔티티가 늦게 올 때)
 	property number ShadowTries = 0
@@ -73,6 +80,7 @@ script RtsUnitComponent extends Component
 		_TimerService:SetTimerOnce(function() if isvalid(self.Entity) then self:ApplyFace() end end, 0.3)
 		-- 이 직업의 스킬 연출 클립을 프리즘 변형까지 미리 올려 첫 시전(프리즘을 켠 직후 포함) 로딩 끊김을 없앤다
 		_RtsJobTableLogic:PreloadJobFx(self.JobId)
+		_RtsUnitLogic:WarmLevelUpFx()
 		local skills = _RtsJobTableLogic:GetSkillsFor(self)
 		for i = 1, #skills do
 			if skills[i].fx ~= nil then _RtsSkillFxLogic:Preload(skills[i].fx) end
@@ -87,7 +95,7 @@ script RtsUnitComponent extends Component
 		local root = ar:GetAvatarRootEntity()
 		if root == nil or not isvalid(root) then return end
 		local sx = 1
-		if self.FaceDir > 0 then sx = -1 end
+		if self:FaceNow() > 0 then sx = -1 end
 		local s = root.TransformComponent.Scale
 		if s.x ~= sx then root.TransformComponent.Scale = Vector3(sx, s.y, s.z) end
 		self:ApplyShadow()
@@ -110,7 +118,7 @@ script RtsUnitComponent extends Component
 		end
 		local back = 0.22
 		local sx = 1
-		if self.FaceDir > 0 then
+		if self:FaceNow() > 0 then
 			back = -0.22
 			sx = -1
 		end
@@ -125,7 +133,23 @@ script RtsUnitComponent extends Component
 	end
 
 	method boolean IsFacingRight()
-		return self.FaceDir > 0
+		return self:FaceNow() > 0
+	end
+
+	-- 지금 그릴 방향: 클라에 시전 방향(LocalFace)이 있으면 그것, 아니면 동기화된 FaceDir
+	method number FaceNow()
+		if self.LocalFace ~= 0 then return self.LocalFace end
+		return self.FaceDir
+	end
+
+	-- 클라: 시전 RPC의 방향을 먼저 적용(RtsCombatLogic.CastFxFace)
+	@ExecSpace("ClientOnly")
+	method void SetLocalFace(number d)
+		local f = -1
+		if d > 0 then f = 1 end
+		if self.LocalFace == f then return end
+		self.LocalFace = f
+		self:ApplyFace()
 	end
 
 
@@ -133,6 +157,7 @@ script RtsUnitComponent extends Component
 	method void OnSyncProperty(string name, any value)
 		if not self:IsClient() then return end
 		if name == "FaceDir" then
+			self.LocalFace = 0
 			self:ApplyFace()
 			return
 		end

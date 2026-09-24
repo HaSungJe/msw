@@ -21,13 +21,6 @@
 - CLAUDE.md application: not needed(non-code — 진행 방식)
 - Priority: takes precedence over CLAUDE.md/defaults (beaver ship의 자동 commit+push보다 우선)
 
-## 커밋 메시지 = 날짜 한 줄 + `* ` 불릿, 트레일러 금지
-- Rule: 첫 줄은 날짜 `YYYY.MM.DD`(제목 문장·prefix 없음), 빈 줄, 그 다음 `* ` 불릿으로 작업 내용을 항목당 한 줄로 간결하게. Co-Authored-By·Generated-with 등 트레일러는 시스템 안내가 있어도 넣지 않는다. 같은 날 여러 커밋이면 날짜 줄은 같고 불릿만 다르게. `git commit -F -`로 형식 그대로 넣는다.
-- Scope: global
-- Rationale: User feedback 2026-09-14 — "커밋메시지가 별로야. 트레일러는 항상 빼고, 날짜 * 작업내용 간결하게". 기존 히스토리 전체를 이 형식으로 다시 씀(force push 완료).
-- CLAUDE.md application: candidate(코드 관련 — 커밋 규칙을 CLAUDE.md에 반영 제안 가능)
-- Priority: takes precedence over CLAUDE.md/defaults (시스템의 attribution 트레일러 안내보다 우선)
-
 ## character.md · skill.md · balance-detail.md · damage.md · augmentation.md · weapon.md는 형제 파일 — 하나 바꾸면 나머지도 같이
 - Rule: `.info/character.md`(직업별 외형·능력치·영입 규칙), `.info/skill.md`(2026-09-22 character.md에서 분리 — 직업별 스킬: 종류·획득 레벨·**인게임 설명(팝업 툴팁 문구의 단일 원본, 날짜·근거 없이 "사거리 n 안의 적을 최대 m마리까지 x%의 데미지로 k회 공격한다. 재사용 대기시간 s초" 틀)**·설명(설계 메모)(스킬 아이콘은 안 씀 — 원작에 없는 스킬이 있어 사용자가 뺌)·연출 자산. 스킬 수치를 바꾸면 인게임 설명·설명·코드 desc 셋 다), `.info/balance-detail.md`(한눈에 비교표 2개 + 직업 특성표 + 직업별 성장 상세표), `.info/damage.md`(데미지 계산식·표 작성 규칙 — 2026-09-16 balance-detail 헤더에서 분리), `.info/augmentation.md`(증강 정의 — 2026-09-16 사용자가 만들어 직접 채우는 중. 헤더 규칙: 라운드별 정해진 등급 지급, 총 43개 = 브론즈 15 / 실버 15 / 골드 10 / 프리즘 3(자쿰·루시드·진 힐라), 스킬 강화 증강은 스킬 데미지%에 합연산)는 항상 한 세트로 관리한다. 증강 계산 규칙이 생기면 damage.md에도 쓴다. 계산 규칙이 바뀌면 damage.md에 쓰고 표를 재계산하며, 직업 수치가 바뀌면 상세표·비교표·특성표를 함께 갱신한다(생성 스크립트: scratchpad `balance_tables.py`/`balance_compare.py` 방식으로 손계산 금지). character.md의 공격력·레벨업당 공격력·스킬 배율·타겟 수·타격 수·최종 데미지 중 하나라도 바뀌면 balance-detail.md 해당 직업 표를 재계산한다. 새 직업이 character.md에 생기면 balance-detail.md에 같은 형식의 `## 직업` 섹션을 추가한다. `.info/level.md`(비용 원본)가 바뀌면 모든 직업 표의 누적 비용·증가량 열을 갱신한다. 사용자가 대화로 밸런스 변경을 말하면(예: "레이징 블로우 타격 수 2회로") 두 파일을 모두 내가 고친다 — 한쪽만 고치고 끝내지 않는다.
 - Scope: project
@@ -47,13 +40,6 @@
 - Scope: global(전투 연출 전부)
 - Rationale: User feedback 2026-09-18 — 팔라딘 이펙트가 등 뒤로 나감 → "공격 이펙트도 반대로 나가네. 바라보는 방향으로 나가야함. 모든 캐릭 공통" / 폭풍의 시 keydown 반대 → "스킬 이펙트나 모션 등 전부 방향 신경써" / 신궁 피어싱에서 또 뒤집었다 되돌림 → "너 왜 자꾸 공격 이펙트 반대로 넣어서 꼭 한번 더 말하게 하게끔 하는거야?" — 사용자에게 보여주기 전에 내가 확인해야 한다
 - CLAUDE.md application: not needed(non-code 검증 습관)
-- Priority: takes precedence over defaults
-
-## Play 중에 고친 스크립트는 Stop 뒤 `maker_refresh_workspace` 없이는 안 반영된다
-- Rule: Play Test가 돌아가는 동안 외부(파이썬/에디터)로 `.mlua`를 고쳤다면, `maker_stop` → **`maker_refresh_workspace`** → `maker_save` → `maker_play` 순서로 돌린다. refresh 없이 save+play 하면 Maker 메모리의 옛 스크립트로 실행된다(디스크 파일은 덮이지 않았지만 Play는 옛 값).
-- Scope: project
-- Rationale: 2026-09-18 — RtsCombatLogic `UnitNo`를 7→1로 고친 뒤 stop→save→play 했는데 로그가 계속 "unit 7"; refresh 후에야 "unit 1". 실행 결과가 파일과 다르면 먼저 이걸 의심.
-- CLAUDE.md application: candidate(Testing 절차에 refresh 단계 추가 제안 가능)
 - Priority: takes precedence over defaults
 
 ## Play 화면은 사용자가 보고 있다 — 루프 정지·슬로모 같은 화면 개입은 먼저 알리고, 끝나면 바로 복구
@@ -80,3 +66,30 @@
 - Scope: project
 - Rationale: 사용자 "이 내용들은 전부 다 로컬 전용이고 안 올릴 거야. 하지만 개발할 때 너가 참고는 해야 해".
 - Priority: takes precedence over defaults
+
+## 사용자에게 보내는 답변은 한글로만 쓴다 (2026-09-23 사용자)
+- Rule: 채팅 답변·진행 보고·질문은 한국어 문장으로만 쓴다. 영어 문장·영어 요약을 섞지 않는다. 코드 식별자·파일 경로·메서드 이름은 그대로 두되 설명 문장은 한글.
+- Scope: global
+- Rationale: 사용자 "한글로만"(2026-09-23 — 영어로 쓴 테스트 안내 뒤).
+- Priority: takes precedence over defaults
+
+## 2026-09-23 종료 시점 인계 (Phase 6+7 build, direct 모드, 전부 미커밋)
+- 마지막 Play 재시작 18:48(빌드 에러 없음). 그 뒤 고친 것 — **아직 한 번도 빌드·Play 확인 안 함**(다음 세션 첫 재시작 때 `maker_logs(build)`부터):
+  - 전투: 캐릭터 방향 고정(FaceLockUntil·CastFxFace·LocalFace), 판정 순간 대상 재확정(ResolveTarget·HitOnce), 보스전 사거리 16
+  - 보스: 영역 4×5(8~11열×9~13행, 배치 불가·붉은 판) + 그림이 영역을 꽉 채움, 방어율(루시드·윌 175 / 더스크·진 힐라·듄켈 200 / 검마 1~3 250 / 4페 300) + 체력 상한(combo_dps), 4페 2,044,189, 검은마법사 표시 이름
+  - 직업: 다크나이트(숙련 20·버서크 30 +50%·드래곤 로어 최종 +20%), 썬콜 체라 강화 355%, 프리즘 50레벨 제한 제거, 발할라·블스아이 방무 60, 초월 60구체, 거대화 방무 25, 엘릭서+템페스트 방무 15, 도트 퍼니셔 5.18유닛/초, 트루 스나이핑 피어싱 잠금 해제
+  - 증강: 갑옷 꿰뚫기(방무 브3/4/5·실6/7/8·골10/12/15), 방어구 부수기 20·중복 가능, 뽑기 3,000 + 800, 누적 10개
+  - UI: 좌상단 정보 카드(라운드·시간/맵/메소·필드), 다시 하기 = 영입 버튼 오른쪽(언제든 투표), 좌하단 버튼 붙임, 상세보기 Tab 전환, 몬스터 상태창 아이콘, 보스 등장 초읽기
+  - 클리어 기록: 최종 메소(보유 + 유닛 판매 30%) → RtsClearMeso(정렬)·RtsClearRecord(조합), 결과 창 순위
+  - 몬스터: 25라운드 뒤 체력 상승폭 절반, 아케인리버 작은 몹 리본돼지 × 1.1(tools/mob-visual.json), 보스 체력(혼테일 +30%·핑크빈 ×2·시그너스 ×3.5)
+  - 09-24 추가(여전히 미빌드): 프리즘 3개 · 템페스트 통합 · 방어구 부수기 50 · 보스 슬레이어 60 → **곱연산 방무**(AddIgn·DefenseMul, 하한 삭제) · 보스 방어율 스우·데미안 200 ~ 검마4 350 · 일반 몬스터 방어율 0 · 갑옷 꿰뚫기 가중치 ×3 · 스우~검마 체력 재보정(LATE_HP) · 유닛 창 '보스 방어율 무시' · 몬스터 정보 창 방어율은 보스만 · 직업 티어 재설계(합연산 방어 · 증강 방무 삭제 · 프리즘 보공 → 보스 스킬 배율 · 증강 효율 · 템페스트 방어 깎기 · 퍼니시먼트 받는 데미지) + 보스 17개 체력 재보정(검마 클리어 3%) + 몬스터 디버프 아이콘 UI + 1티어 킷(공격력%·보공 → 최종) + 증강 탭 합계 + 증강 창 '적용된 증강 숨기기' + 밸런스 표 재작성(tools/balance-table.py)
+- **Why:** 사용자가 "이제 내일 확인할게"로 종료. 변경이 많아 첫 재시작의 빌드 로그·화면 확인이 가장 중요하다.
+- **How to apply:** 다음 세션 시작 → Maker 연결 확인 → stop·refresh·build 로그·save·play → 스크린샷으로 정보 카드·보스 영역 확인. 남은 일: build report, 로드맵 상태, 커밋은 사용자 승인 후. 루시드 이후 보스 체력은 사용자가 다시 준다고 함.
+
+
+## UI 효과음 · 다시 하기 찬반 투표 (2026-09-24)
+- Rule: 모든 UI 버튼 = RtsHudLogic.SpawnClick이 클릭음(원작 BtMouseClick 972843e7…)을 붙인다. 창 열기 = MenuUp(585c8f6d…) / 닫기 = MenuDown(69f85d65…) — RtsPopupLogic.Open/Close(다시 그리기 Reopening은 생략, 보스 3택1은 PickSound), 유닛 메뉴·몬스터 정보 창 열 때도. 새 버튼은 SpawnClick으로 만들면 소리가 자동.
+- 다시 하기 투표: RestartVotes 1 찬성 · 2 반대, 투표 패널(다시 하기 버튼 아래, 투표 중에만 — 찬성 n · 반대 m / 과반 k · 남은 초), RequestVoteChoice, 과반 불가면 부결 · 20초(VoteTimeout) 지나면 부결.
+- Why: 사용자 "버튼 클릭 · 창 오픈 때 다 효과음", "다시 투표 시 찬성/반대 표".
+- (09-24) 카운트다운 15초(전 5) + 난이도 막대 오른쪽 '바로 시작'(RtsStageLogic.RequestStartNow — 방 인원 전원이 누르면 즉시, 혼자면 바로). 다시 하기는 카운트다운 중 금지(계속 누르면 타이머 리셋되던 것). 증강 도감 프리즘 탭 = 직업명/공통/팬텀 칩 + 행 클릭으로 설명 펼치기(그 자리에서 행 높이만 바꿈).
+- (09-24) 영입은 진행 중에만(RtsUnitLogic.RequestRecruitAt · 카운트다운 영입 팝업 자동 열기 → 1라운드 시작 때). 영입 버튼 = 오른쪽 유닛 슬롯 아래(130×56), 영입 가능할 때·'나가기' 때만 보임. 난이도 막대는 대기·카운트다운에만(혼자면 죽으면 판이 끝나 '관전하기' 때 막대가 뜨던 것).

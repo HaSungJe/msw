@@ -1,14 +1,17 @@
--- Phase 4 #14·#17 (부분, 2026-09-15): 트랙 위 캐릭터 선택 — 마우스 오버 손 커서 / 클릭 → 캐릭터 우측 작은 메뉴(위치 이동·상세정보·방출) / 위치 이동 모드 / 영입 배치 모드
+-- Phase 4 #14·#17 (부분, 2026-09-15): 트랙 위 캐릭터 선택 — 메이플 커서(평소 장갑, 누르는 동안 장갑 + 마우스 — 2026-09-23) / 클릭 → 캐릭터 우측 작은 메뉴(위치 이동·상세정보·방출) / 위치 이동 모드 / 영입 배치 모드
 --   클릭 판정은 전부 InputService의 ScreenTouchEvent + 자체 상자(UnitAtScreen·CellAtScreen). 유닛 엔티티의 TouchReceive는 쓰지 않는다(2026-09-22 TouchEvent 미발화로 교체)
 --   위치 이동 모드: 발판마다 틀 스프라이트(테두리+연한 채움)로 칸을 강조(빈 칸 금색, 내 유닛 자리 파랑 = 맞교환). 클릭한 발판으로 이동(서버 검증, 유닛마다 3분 쿨). ESC 취소.
 --   상세정보 = RtsUnitPopupLogic(유닛 정보 팝업). 전부 클라 전용. 좌표는 1920×1080 기준.
 @Logic
 script RtsUnitSelectLogic extends Logic
 
-	-- 메이플스토리 기본 손 커서(ui/basic/cursor/0). 캐릭터·발판 위에서만 보인다
-	property string HandCursorRUID = "3930c5d2e85b4bff8467aada64fda7f5"
+	-- 마우스 커서 = 메이플스토리 커서(2026-09-23 사용자 "메이플 마우스 커서로" → "캐릭터 위에 올릴 때 뜨던 커서가 기본, 클릭할 때는 마우스 표시가 붙은 것"):
+	--   평소(캐릭터 위 포함) = 원작 기본 장갑 ui/basic/cursor/0, 왼쪽 버튼을 누르고 있는 동안 = 장갑 + 마우스 ui/basic/cursor/13. 0.03초마다 버튼 상태를 본다
+	property string DefaultCursorRUID = "3930c5d2e85b4bff8467aada64fda7f5"
 
-	property boolean HandShown = false
+	property string PressCursorRUID = "5df970b476ee4013a9194c321c0df12f"
+
+	property boolean CursorPressed = false
 
 	-- 컨텍스트 메뉴(캐릭터 우측): 열려 있는 유닛 번호(0 = 닫힘)
 	property number MenuNo = 0
@@ -17,6 +20,14 @@ script RtsUnitSelectLogic extends Logic
 
 	-- 열린 메뉴의 UI 좌표 사각형 {x0,y0,x1,y1} (중앙 원점) — 유닛 TouchEvent가 메뉴 위에서 났는지 판정용
 	property table MenuRect = nil
+
+	-- 메뉴의 레벨업 줄(안쪽 패널·글자) — 제자리 갱신용
+	property Entity MenuLvBtn = nil
+
+	property table MenuLvRow = nil
+
+	-- 메뉴 머리줄(레벨 + 직업)
+	property Entity MenuHead = nil
 
 	-- 위치 이동 모드: 이동 중인 유닛 번호(0 = 아님) + 발판 표시 엔티티들
 	property number MoveNo = 0
@@ -45,19 +56,33 @@ script RtsUnitSelectLogic extends Logic
 
 	@ExecSpace("ClientOnly")
 	method number UnitAtScreen(Vector2 screen)
+		return self:UnitAtScreenPad(screen, 0, 0)
+	end
+
+	-- 여유(padX 가로 양쪽, padY 위아래)를 둔 유닛 판정. 여럿이면 발이 클릭점에 가장 가까운 유닛
+	--   몬스터 정보 패널보다 캐릭터가 먼저 잡히게(2026-09-23 사용자) — 월드 클릭은 정확한 상자 → 넓힌 상자 → 몬스터 순
+	@ExecSpace("ClientOnly")
+	method number UnitAtScreenPad(Vector2 screen, number padX, number padY)
 		local w = _UILogic:ScreenToWorldPosition(screen)
 		local nos = _RtsUnitLogic:ListZoneUnits(_RtsUnitLogic:MyZone())
+		local best = 0
+		local bestD = 1e18
 		for i0 = 1, #nos do
 			local no = nos[i0]
 			local u = _RtsUnitLogic:GetMyUnit(no)
 			if u ~= nil then
 				local p = u.Entity.TransformComponent.WorldPosition
-				if w.x >= p.x - self.HitHalfW and w.x <= p.x + self.HitHalfW and w.y >= p.y and w.y <= p.y + self.HitH then
-					return no
+				if w.x >= p.x - self.HitHalfW - padX and w.x <= p.x + self.HitHalfW + padX and w.y >= p.y - padY and w.y <= p.y + self.HitH + padY then
+					local cy = p.y + self.HitH / 2
+					local d = (w.x - p.x) * (w.x - p.x) + (w.y - cy) * (w.y - cy)
+					if d < bestD then
+						bestD = d
+						best = no
+					end
 				end
 			end
 		end
-		return 0
+		return best
 	end
 
 	-- 화면 좌표 → 그리드 칸 (내 구역 기준). x=col, y=row
@@ -71,36 +96,20 @@ script RtsUnitSelectLogic extends Logic
 		return Vector2(col, row)
 	end
 
-	@ExecSpace("ClientOnly")
-	method void SetHand(boolean on)
-		if on == self.HandShown then return end
-		self.HandShown = on
-		if on then
-			_InputService:SetCursor(self.HandCursorRUID, Vector2(0, 0))
-		else
-			_InputService:ResetCursor()
-		end
-	end
-
-	@ExecSpace("ClientOnly")
-	@EventSender("Service", "InputService")
-	handler HandleMouseMoveEvent(MouseMoveEvent event)
-		if _RtsPopupLogic:IsOpen() or _InputService:IsPointerOverUI() then
-			self:SetHand(false)
-			return
-		end
-		local screen = _InputService:GetCursorPosition()
-		if self.PlaceJob ~= "" then
-			local pc = self:CellAtScreen(screen)
-			self:SetHand(_RtsZoneLogic:IsPadCell(pc.x, pc.y) and _RtsUnitLogic:MyUnitAt(pc.x, pc.y) == 0)
-			return
-		end
-		if self.MoveNo > 0 then
-			local cell = self:CellAtScreen(screen)
-			self:SetHand(_RtsZoneLogic:IsPadCell(cell.x, cell.y))
-			return
-		end
-		self:SetHand(self:UnitAtScreen(screen) > 0)
+	-- 클라 시작: 기본 커서를 메이플 장갑으로, 왼쪽 버튼을 누르는 동안은 장갑 + 마우스
+	method void OnBeginPlay()
+		if not self:IsClient() then return end
+		_InputService:SetCursor(self.DefaultCursorRUID, Vector2(0, 0))
+		_TimerService:SetTimerRepeat(function()
+			local down = _InputService:IsKeyPressed(KeyboardKey.Mouse0)
+			if down == self.CursorPressed then return end
+			self.CursorPressed = down
+			if down then
+				_InputService:SetCursor(self.PressCursorRUID, Vector2(0, 0))
+			else
+				_InputService:SetCursor(self.DefaultCursorRUID, Vector2(0, 0))
+			end
+		end, 0.03)
 	end
 
 	-- ===== 클릭 → 컨텍스트 메뉴 =====
@@ -125,20 +134,44 @@ script RtsUnitSelectLogic extends Logic
 		local H = _RtsHudLogic
 		local P = _RtsPopupLogic
 		if H.HudGroup == nil then return end
+		H:PlayUi(H.OpenSound) -- 창 여는 소리(2026-09-24 사용자)
 		-- 캐릭터 오른쪽 어깨 옆. 월드 → 화면 → UI(중앙 원점)
 		local p = u.Entity.TransformComponent.WorldPosition
 		local screen = _UILogic:WorldToScreenPosition(Vector2(p.x + 0.9, p.y + 1.2))
 		local ui = _UILogic:ScreenToUIPosition(screen)
-		local W = 170
+		local W = 300
 		local rowH = 40
-		-- 3번째 줄 '방출'(2026-09-22 사용자): 증강 소멸 + 레벨업 메소 30% 환급. 누르면 메뉴를 닫고 확인 팝업(RtsPopupLogic 'dismiss')을 연다
-		local rows = 3
+		-- 맨 위 = 머리줄 "LV.10 아크메이지(썬·콜)"(2026-09-23 사용자 — 발아래 이름표 대신), 그 아래 위치 이동 · 상세정보 · 레벨업 · 방출
+		-- '레벨업'(2026-09-23 사용자 "상세보기/방출 선택지에서도 레벨업, 스페이스로") — 메뉴가 열려 있으면 스페이스 = 레벨업(HandleKeyDownEvent)
+		-- '방출'(2026-09-22 사용자): 증강 소멸 + 레벨업 메소 30% 환급. 누르면 메뉴를 닫고 확인 팝업(RtsPopupLogic 'dismiss')을 연다
+		local rows = 5
 		local menuH = rowH * rows + 14
+		-- 화면 밖으로 잘리지 않게(2026-09-23 사용자 — 맨 아래·위 칸 캐릭터의 메뉴가 화면 밖으로 나갔다): 화면 네 모서리를 UI 좌표로 바꿔 메뉴를 안쪽으로 밀어 넣는다
+		local edge0 = _UILogic:ScreenToUIPosition(Vector2(0, 0))
+		local edge1 = _UILogic:ScreenToUIPosition(Vector2(_UILogic.ScreenWidth, _UILogic.ScreenHeight))
+		local margin = 8
+		local minX = math.min(edge0.x, edge1.x) + margin
+		local maxX = math.max(edge0.x, edge1.x) - margin
+		local minY = math.min(edge0.y, edge1.y) + margin
+		local maxY = math.max(edge0.y, edge1.y) - margin
+		local mx = ui.x
+		local my = ui.y
+		if mx + W > maxX then mx = maxX - W end
+		if mx < minX then mx = minX end
+		if my + menuH / 2 > maxY then my = maxY - menuH / 2 end
+		if my - menuH / 2 < minY then my = minY + menuH / 2 end
+		ui = Vector2(mx, my)
 		local menu = H:SpawnPanel("RtsUnitMenu", H.HudGroup, Vector2(0.5, 0.5), Vector2(0, 0.5), Vector2(ui.x, ui.y), Vector2(W, menuH),
 			Color(0.11, 0.094, 0.075, 0.97), H:ColGold(), 1.5)
 		self.Menu = menu.Parent
 		self.MenuNo = no
 		self.MenuRect = { x0 = ui.x - 6, y0 = ui.y - menuH / 2 - 6, x1 = ui.x + W + 6, y1 = ui.y + menuH / 2 + 6 }
+
+		-- 0) 머리줄: 레벨 + 직업(프리즘 전직 반영). 레벨업하면 RefreshMenuLevel이 글자를 바꾼다
+		self.MenuHead = H:SpawnLabel("RtsUnitMenuHead", menu, Vector2(0, 1), Vector2(0, 1), Vector2(12, -6), Vector2(W - 24, rowH - 4),
+			"", H:ColGold(), 17, TextAlignmentType.MiddleLeft, true)
+		local line = H:SpawnUI("model://uisprite", "RtsUnitMenuHeadLine", menu, Vector2(0, 1), Vector2(0, 1), Vector2(8, -6 - rowH + 3), Vector2(W - 16, 1.5))
+		line.SpriteGUIRendererComponent.Color = H:ColBorderSoft()
 
 		-- 1) 위치 이동 (쿨타임 중이면 남은 시간, 비활성)
 		local left = u:MoveCoolLeft()
@@ -148,33 +181,43 @@ script RtsUnitSelectLogic extends Logic
 			text = "이동 대기 " .. _RtsUnitPopupLogic:FmtSec(left)
 			ink = Color(0.6, 0.56, 0.5, 1)
 		end
-		local b1 = H:SpawnPanel("RtsUnitMenuMove", menu, Vector2(0, 1), Vector2(0, 1), Vector2(6, -6), Vector2(W - 12, rowH - 4),
+		local b1 = H:SpawnPanel("RtsUnitMenuMove", menu, Vector2(0, 1), Vector2(0, 1), Vector2(6, -6 - rowH), Vector2(W - 12, rowH - 4),
 			P:Mix(Color.white, 0.05), P:Mix(H:ColGold(), 0.35), 1.5)
 		H:SpawnLabel("RtsUnitMenuMoveText", b1, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2(0, 0), Vector2(W - 20, 30),
 			text, ink, 16, TextAlignmentType.MiddleCenter, true)
+		self:SpawnKeyCap(b1, "L")
 		if left <= 0 then
 			local c1 = H:SpawnClick("RtsUnitMenuMoveClick", b1)
 			c1:ConnectEvent(ButtonClickEvent, function(event)
-				local target = self.MenuNo
-				self:CloseMenu()
-				self:BeginMove(target)
+				self:MenuMove()
 			end)
 		end
 
 		-- 2) 상세정보
-		local b2 = H:SpawnPanel("RtsUnitMenuInfo", menu, Vector2(0, 1), Vector2(0, 1), Vector2(6, -6 - rowH), Vector2(W - 12, rowH - 4),
+		local b2 = H:SpawnPanel("RtsUnitMenuInfo", menu, Vector2(0, 1), Vector2(0, 1), Vector2(6, -6 - rowH * 2), Vector2(W - 12, rowH - 4),
 			P:Mix(Color.white, 0.05), P:Mix(H:ColGold(), 0.35), 1.5)
 		H:SpawnLabel("RtsUnitMenuInfoText", b2, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2(0, 0), Vector2(W - 20, 30),
 			"상세정보", H:ColInk(), 16, TextAlignmentType.MiddleCenter, true)
+		self:SpawnKeyCap(b2, "S")
 		local c2 = H:SpawnClick("RtsUnitMenuInfoClick", b2)
 		c2:ConnectEvent(ButtonClickEvent, function(event)
-			local target = self.MenuNo
-			self:CloseMenu()
-			_RtsUnitPopupLogic:OpenUnit(target)
+			self:MenuInfo()
 		end)
 
-		-- 3) 방출 — 붉은 테두리. 누르면 메뉴 닫고 확인 팝업(정말 방출하시겠습니까?) → 팝업의 '방출'이 RtsUnitLogic.RequestDismiss
-		local b3 = H:SpawnPanel("RtsUnitMenuDismiss", menu, Vector2(0, 1), Vector2(0, 1), Vector2(6, -6 - rowH * 2), Vector2(W - 12, rowH - 4),
+		-- 3) LV.UP (비용 [메소]) + [Space] 키캡. 누르면 메뉴는 그대로 두고 레벨업(연달아 누를 수 있게), 글자·색은 RefreshMenuLevel이 제자리 갱신
+		local b4 = H:SpawnPanel("RtsUnitMenuLv", menu, Vector2(0, 1), Vector2(0, 1), Vector2(6, -6 - rowH * 3), Vector2(W - 12, rowH - 4),
+			P:Mix(H:ColGold(), 0.9), H:ColGold(), 1.5)
+		self.MenuLvBtn = b4
+		self.MenuLvRow = self:SpawnLvRow(b4, 68, 15)
+		self:SpawnKeyCap(b4, "Space")
+		local c4 = H:SpawnClick("RtsUnitMenuLvClick", b4)
+		c4:ConnectEvent(ButtonClickEvent, function(event)
+			self:LevelUpShortcut()
+		end)
+		self:RefreshMenuLevel()
+
+		-- 4) 방출 — 붉은 테두리. 누르면 메뉴 닫고 확인 팝업(정말 방출하시겠습니까?) → 팝업의 '방출'이 RtsUnitLogic.RequestDismiss
+		local b3 = H:SpawnPanel("RtsUnitMenuDismiss", menu, Vector2(0, 1), Vector2(0, 1), Vector2(6, -6 - rowH * 4), Vector2(W - 12, rowH - 4),
 			P:Mix(Color.white, 0.05), Color(0.8, 0.35, 0.3, 1), 1.5)
 		H:SpawnLabel("RtsUnitMenuDismissText", b3, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2(0, 0), Vector2(W - 20, 30),
 			"방출", Color(0.95, 0.6, 0.55, 1), 16, TextAlignmentType.MiddleCenter, true)
@@ -195,10 +238,116 @@ script RtsUnitSelectLogic extends Logic
 		return p.x >= r.x0 and p.x <= r.x1 and p.y >= r.y0 and p.y <= r.y1
 	end
 
+	-- 레벨업 줄 조각(메뉴·유닛 팝업 공용, 2026-09-23 사용자 "LV.UP (350 메소아이콘) 스페이스" — 간격 없이, 'n→n+1' 표시는 삭제):
+	--   글자 폭을 잴 수 없어 오른쪽에서부터 붙인다 — [ "LV.UP (350" (오른쪽 맞춤) ][메소 아이콘][ ")" ] … rightPad(메뉴 = Space 키캡 폭)
+	@ExecSpace("ClientOnly")
+	method table SpawnLvRow(Entity parent, number rightPad, number fontSize)
+		local H = _RtsHudLogic
+		local r = {}
+		r.close = H:SpawnLabel("RtsLvClose", parent, Vector2(1, 0.5), Vector2(1, 0.5), Vector2(0 - rightPad, 0), Vector2(10, 30),
+			")", H:ColInk(), fontSize, TextAlignmentType.MiddleLeft, true)
+		r.coin = H:SpawnUI("model://uisprite", "RtsLvCoin", parent, Vector2(1, 0.5), Vector2(1, 0.5), Vector2(0 - rightPad - 11, 0), Vector2(18, 18))
+		if r.coin ~= nil and r.coin.SpriteGUIRendererComponent ~= nil then
+			r.coin.SpriteGUIRendererComponent.ImageRUID = DataRef(H.CoinRUID)
+			r.coin.SpriteGUIRendererComponent.Color = Color(1, 1, 1, 1)
+		end
+		r.text = H:SpawnLabel("RtsLvText", parent, Vector2(1, 0.5), Vector2(1, 0.5), Vector2(0 - rightPad - 11 - 18 - 3, 0), Vector2(230, 30),
+			"", H:ColInk(), fontSize, TextAlignmentType.MiddleRight, true)
+		return r
+	end
+
+	-- 레벨업 줄 글자·색: 최대 레벨이면 "LV.MAX"만(아이콘·괄호 숨김)
+	@ExecSpace("ClientOnly")
+	method void ApplyLvRow(table r, any u, Color ink)
+		if r == nil or r.text == nil or not isvalid(r.text) or u == nil then return end
+		local H = _RtsHudLogic
+		local T = _RtsJobTableLogic
+		local maxed = u.Level >= T:GetMaxLevel()
+		local text = "LV.MAX"
+		if not maxed then text = "LV.UP (" .. H:FormatNumber(T:GetLevelCost(u.Level + 1)) end
+		if r.text.TextComponent.Text ~= text then r.text.TextComponent.Text = text end
+		r.text.TextComponent.FontColor = ink
+		r.close.TextComponent.FontColor = ink
+		if r.close.Enable == maxed then r.close:SetEnable(not maxed) end
+		if r.coin ~= nil and r.coin.Enable == maxed then r.coin:SetEnable(not maxed) end
+	end
+
+	-- 메뉴 '위치 이동'(클릭·L 키): 쿨타임 중이면 무시
+	@ExecSpace("ClientOnly")
+	method void MenuMove()
+		local target = self.MenuNo
+		if target == 0 then return end
+		local u = _RtsUnitLogic:GetMyUnit(target)
+		if u == nil or u:MoveCoolLeft() > 0 then return end
+		self:CloseMenu()
+		self:BeginMove(target)
+	end
+
+	-- 메뉴 '상세정보'(클릭·S 키)
+	@ExecSpace("ClientOnly")
+	method void MenuInfo()
+		local target = self.MenuNo
+		if target == 0 then return end
+		self:CloseMenu()
+		_RtsUnitPopupLogic:OpenUnit(target)
+	end
+
+	-- 오른쪽 끝 작은 키캡("Space"·"L"·"S") — 단축키 표시(메뉴·유닛 팝업 공용)
+	@ExecSpace("ClientOnly")
+	method void SpawnKeyCap(Entity parent, string key)
+		local H = _RtsHudLogic
+		local cap = H:SpawnPanel("RtsKeyCap", parent, Vector2(1, 0.5), Vector2(1, 0.5), Vector2(-6, 0), Vector2(58, 24),
+			Color(0.12, 0.1, 0.08, 0.9), Color(0.95, 0.9, 0.75, 0.9), 1.2)
+		H:SpawnLabel("RtsKeyCapText", cap, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2(0, 0), Vector2(56, 22),
+			key, Color(0.95, 0.9, 0.75, 1), 12, TextAlignmentType.MiddleCenter, true)
+	end
+
+	-- 메뉴의 레벨업 줄: "레벨업 → Lv 6 · 70" / 최대 레벨 / 메소 부족이면 흐리게
+	@ExecSpace("ClientOnly")
+	method void RefreshMenuLevel()
+		if self.MenuNo == 0 or self.MenuLvBtn == nil or not isvalid(self.MenuLvBtn) then return end
+		local u = _RtsUnitLogic:GetMyUnit(self.MenuNo)
+		if u == nil then return end
+		local H = _RtsHudLogic
+		local P = _RtsPopupLogic
+		local T = _RtsJobTableLogic
+		if self.MenuHead ~= nil and isvalid(self.MenuHead) then
+			local head = "LV." .. H:Int(u.Level) .. "  " .. T:GetJobNameFor(u)
+			if self.MenuHead.TextComponent.Text ~= head then self.MenuHead.TextComponent.Text = head end
+		end
+		local can = _RtsUnitPopupLogic:CanLevelUp(u)
+		if can then
+			self.MenuLvBtn.SpriteGUIRendererComponent.Color = P:Mix(H:ColGold(), 0.9)
+			self.MenuLvBtn.Parent.SpriteGUIRendererComponent.Color = H:ColGold()
+			self:ApplyLvRow(self.MenuLvRow, u, Color(0.133, 0.114, 0.09, 1))
+		else
+			self.MenuLvBtn.SpriteGUIRendererComponent.Color = P:Mix(H:ColGold(), 0.25)
+			self.MenuLvBtn.Parent.SpriteGUIRendererComponent.Color = P:Mix(H:ColGold(), 0.4)
+			self:ApplyLvRow(self.MenuLvRow, u, Color(0.6, 0.55, 0.45, 1))
+		end
+	end
+
+	-- 레벨업 단축(스페이스·메뉴 버튼): 캐릭터 메뉴가 열려 있으면 그 유닛, 아니면 유닛 상세 팝업의 유닛. 메소 부족·최대 레벨은 무시(서버도 검사)
+	@ExecSpace("ClientOnly")
+	method void LevelUpShortcut()
+		local no = 0
+		if self.MenuNo > 0 then
+			no = self.MenuNo
+		elseif _RtsPopupLogic.Kind == "unit" and _RtsUnitPopupLogic.CurNo > 0 then
+			no = _RtsUnitPopupLogic.CurNo
+		end
+		if no == 0 then return end
+		if not _RtsUnitPopupLogic:CanLevelUp(_RtsUnitLogic:GetMyUnit(no)) then return end
+		_RtsUnitLogic:LevelUpNow(no)
+	end
+
 	@ExecSpace("ClientOnly")
 	method void CloseMenu()
 		self.MenuNo = 0
 		self.MenuRect = nil
+		self.MenuLvBtn = nil
+		self.MenuLvRow = nil
+		self.MenuHead = nil
 		if self.Menu ~= nil then
 			self.Menu:Destroy()
 			self.Menu = nil
@@ -262,7 +411,6 @@ script RtsUnitSelectLogic extends Logic
 	method void EndMove()
 		self.MoveNo = 0
 		self:ClearMarkers()
-		self:SetHand(false)
 		_RtsHudLogic:HideHint()
 	end
 
@@ -303,7 +451,6 @@ script RtsUnitSelectLogic extends Logic
 		if self.PlaceJob == "" then return end
 		self.PlaceJob = ""
 		self:ClearMarkers()
-		self:SetHand(false)
 		_RtsHudLogic:HideHint()
 	end
 
@@ -326,10 +473,20 @@ script RtsUnitSelectLogic extends Logic
 		if self.MoveNo == 0 then
 			if _RtsPopupLogic:IsOpen() then return end
 			local hitNo = self:UnitAtScreen(event.TouchPoint)
+			-- 몬스터보다 캐릭터 우선: 정확한 상자에 없으면 넓힌 상자(가로 ±0.35, 위아래 ±0.3)에서 한 번 더
+			if hitNo == 0 then hitNo = self:UnitAtScreenPad(event.TouchPoint, 0.35, 0.3) end
 			if hitNo > 0 then
 				if not self:IsOverMenu(event.TouchPoint) then self:OnUnitClicked(hitNo) end
-			elseif self.MenuNo > 0 then
-				self:CloseMenu()
+				return
+			end
+			if self.MenuNo > 0 and self:IsOverMenu(event.TouchPoint) then return end
+			if self.MenuNo > 0 then self:CloseMenu() end
+			-- 유닛이 아니면 몬스터(보스 포함) 정보 패널(2026-09-23 사용자), 빈 곳이면 닫기
+			local mob = _RtsMonsterInfoLogic:MonsterAtScreen(event.TouchPoint)
+			if mob ~= nil then
+				_RtsMonsterInfoLogic:Open(mob)
+			else
+				_RtsMonsterInfoLogic:Close()
 			end
 			return
 		end
@@ -344,7 +501,34 @@ script RtsUnitSelectLogic extends Logic
 	@ExecSpace("ClientOnly")
 	@EventSender("Service", "InputService")
 	handler HandleKeyDownEvent(KeyDownEvent event)
+		-- Tab = 유닛 상세 팝업의 우측 탭 순환(스킬 → 증강 → 적용 중인 버프, 2026-09-23 사용자)
+		if event.key == KeyboardKey.Tab then
+			if _RtsUnitPopupLogic:IsOpen() then _RtsUnitPopupLogic:CycleTab() end
+			return
+		end
+		-- 스페이스 = 레벨업(캐릭터 메뉴 또는 유닛 상세 팝업이 열려 있을 때 — 2026-09-23 사용자)
+		if event.key == KeyboardKey.Space then
+			-- 증강 창에서 유닛을 골라 둔 상태면 스페이스 = 그 유닛에 지정(2026-09-23 사용자)
+			if _RtsPopupLogic.Kind == "augment" then
+				_RtsPopupLogic:AssignPicked()
+				return
+			end
+			self:LevelUpShortcut()
+			return
+		end
+		-- 캐릭터 메뉴가 열려 있을 때: L = 위치 이동, S = 상세정보(2026-09-23 사용자)
+		if self.MenuNo > 0 then
+			if event.key == KeyboardKey.L then
+				self:MenuMove()
+				return
+			end
+			if event.key == KeyboardKey.S then
+				self:MenuInfo()
+				return
+			end
+		end
 		if event.key ~= KeyboardKey.Escape then return end
+		if _RtsMonsterInfoLogic:IsOpen() then _RtsMonsterInfoLogic:Close() end
 		if self.PlaceJob ~= "" then
 			self:EndPlace()
 		elseif self.MoveNo > 0 then

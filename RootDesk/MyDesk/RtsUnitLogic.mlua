@@ -1,15 +1,17 @@
--- Phase 4 #14 / Phase 5 #19 (부분, 2026-09-15): 유닛 보유·조작의 서버 권위.
---   유저별 유닛 6기(번호 1~6 = HUD 슬롯), 메소, 레벨업·대상 지정·스킨·위치 이동 요청 처리.
---   위치 이동과 대상 변경은 유닛마다 3분 쿨타임(고정). 영입 로직(Phase 5 #18)이 생기기 전까지는 입장 시 시범 편성 3기를 지급한다.
+-- Phase 4 #14 / Phase 5 #19 (2026-09-15) → Phase 6 (2026-09-23): 유닛 보유·조작의 서버 권위.
+--   유저별 유닛 6기(번호 1~6 = HUD 슬롯), 메소, 영입·레벨업·대상 지정·스킨·위치 이동·방출 요청 처리.
+--   판 시작 = 유닛 없음·메소 0(InitUser). 영입은 Lv1·무료, 보유 수 < 영입 한도(1·5·자쿰·혼테일·핑크빈·시그너스에서 1칸씩, RtsStageTableLogic.RecruitLimit)일 때만. 메소는 몹 처치 드랍(AddMeso).
+--   위치 이동과 대상 변경은 유닛마다 3분 쿨타임(고정). 탈락하면 유닛 전멸(WipeUnits), 새 판이면 초기화(ResetUser).
 --   유닛 엔티티 이름 = "Unit<구역>_<번호>" (/maps/RtsMap 아래) — 클라는 이 이름으로 내 유닛을 찾는다.
 @Logic
 script RtsUnitLogic extends Logic
 
-	-- 유저별 보유 메소 (경제 테이블 전까지 시범값)
+	-- 유저별 보유 메소(판 시작 0, 몹 처치 드랍으로 쌓임)
 	@Sync
 	property SyncTable<string, number> MesoByUser
 
-	property number DemoMeso = 12400
+	-- 개발 도구(테스트 프리즘 버튼·프리즘 켜고 끄기 요청). 2026-09-23 사용자 "테스트 프리즘 버튼 숨기고 시작" → false(다시 쓸 땐 true)
+	property boolean DevTools = false
 
 	-- 위치 이동·대상 변경 쿨타임(초) — 유닛마다 3분 고정
 	property number CooldownSec = 180
@@ -185,34 +187,52 @@ script RtsUnitLogic extends Logic
 		return v
 	end
 
-	-- 시범 편성(아티팩트 v27과 동일): 1. 히어로 Lv12 / 2. 팔라딘 Lv40 / 3. 시험대 유닛. 영입(Phase 5 #18)이 생기면 제거
+	-- 입장(RtsStageLogic.OnUserEnter): 유닛 없음·메소 0으로 시작(이미 있으면 그대로 — 판 초기화는 ResetUser)
 	@ExecSpace("ServerOnly")
-	method void EnsureDemoUnits(string userId, number zone)
-		if self.UnitsByUser[userId] ~= nil then return end
-		self.UnitsByUser[userId] = {}
-		self.MesoByUser[userId] = self.DemoMeso
-		self:LoadAvatarPass(userId)
-		if _RtsCombatLogic.TestBench then
-			-- 개발모드(2026-09-22 사용자 "유닛 영입도 자유롭게", "100만 메소 빼자"): 시범 메소 그대로, 유닛 없이 시작 — 우측 영입 팝업에서 직업을 누르고 발판을 골라 Lv50 1기를 세우고(RequestRecruitAt),
-			--   우측 하단 '테스트 프리즘' 팝업에서 프리즘을 고른다(RequestDevPrism — 다시 누르면 해제). 이동 쿨타임은 0(RequestMove)
-			self:OnChanged(0, self.DemoMeso, userId)
-			log("RtsUnit: dev mode — no units (recruit from popup)")
-			return
+	method void InitUser(string userId)
+		if self.UnitsByUser[userId] == nil then self.UnitsByUser[userId] = {} end
+		if self.MesoByUser[userId] == nil then
+			self.MesoByUser[userId] = 0
+			self:LoadAvatarPass(userId)
 		end
-		self:SpawnUnit(userId, zone, 1, "hero", 12, 13, 7)
-		self:SpawnUnit(userId, zone, 2, "paladin", 40, 6, 3)
-		-- 2026-09-20 시험대: 3번 = 팬텀 Lv30(조커). 이전: 섀도어 Lv30·나이트로드 Lv30(확인 끝), 다크나이트 Lv20 — 되돌리려면 "shad", 30 / "nl", 30 / "dk", 20
-		self:SpawnUnit(userId, zone, 3, "phantom", 30, 5, 9)
-		-- 2026-09-18 시험대용 4번 = 보우마스터(폭풍의 시), 5번 = 신궁(피어싱·스나이핑)
-		self:SpawnUnit(userId, zone, 4, "bow", 30, 4, 6)
-		self:SpawnUnit(userId, zone, 5, "marks", 30, 5, 6)
-		-- 6번 = 썬콜(체인 라이트닝·블리자드), 7번 = 불독(포이즌 리전·도트 퍼니셔), 8번 = 비숍(엔젤레이·제네시스) — 모두 Lv30(두 번째 액티브까지)
-		self:SpawnUnit(userId, zone, 6, "il", 30, 9, 5)
-		self:SpawnUnit(userId, zone, 7, "fp", 30, 10, 5)
-		self:SpawnUnit(userId, zone, 8, "bishop", 30, 10, 9)
-		-- 시범 팔라딘의 홀리 유니티 대상(1번)은 2026-09-20 삭제 — 홀리 유니티가 프리즘 스킬이 되어 기본 킷엔 대상 지정 스킬이 없음
-		self:OnChanged(0, self.DemoMeso, userId)
-		log("RtsUnit: demo units x8 for zone " .. tostring(zone))
+		self:OnChanged(0, self:GetMeso(userId), userId)
+	end
+
+	-- 몹 처치 드랍(RtsRunResultLogic.OnMobKilled — 구역 주인). 처치마다 RPC를 보내지 않는다 — MesoByUser 동기화(OnSyncProperty)가 HUD 메소·레벨업 버튼을 갱신
+	@ExecSpace("ServerOnly")
+	method void AddMeso(string userId, number n)
+		if n <= 0 or self.UnitsByUser[userId] == nil then return end
+		self.MesoByUser[userId] = self:GetMeso(userId) + n
+	end
+
+	-- 탈락: 유닛 전멸(공격 루프 정지·엔티티 제거). 메소는 남겨 둔다(결과 표시용 아님 — 새 판에서 ResetUser)
+	@ExecSpace("ServerOnly")
+	method void WipeUnits(string userId)
+		self:ClearUnits(userId)
+		self:OnChanged(0, self:GetMeso(userId), userId)
+	end
+
+	-- 새 판(RtsStageLogic.ResetRun): 유닛 제거 + 메소 0
+	@ExecSpace("ServerOnly")
+	method void ResetUser(string userId)
+		self:ClearUnits(userId)
+		self.MesoByUser[userId] = 0
+		self:OnChanged(0, 0, userId)
+	end
+
+	-- 이 유저가 지금 더 영입할 수 있는 수(한도 − 보유, 0 미만 0)
+	@ExecSpace("ServerOnly")
+	method number RecruitRoom(string userId)
+		local owned = 0
+		local list = self.UnitsByUser[userId]
+		if list ~= nil then
+			for no, e in pairs(list) do
+				if e ~= nil and isvalid(e) then owned = owned + 1 end
+			end
+		end
+		local room = _RtsStageTableLogic:RecruitLimit(_RtsStageLogic.StageNo) - owned
+		if room < 0 then room = 0 end
+		return room
 	end
 
 	-- 유닛 엔티티 = MapObject + AvatarRenderer + CostumeManager(직업 세트) + RtsUnitComponent. 스케일 2 = 칸 80px. 클릭 판정은 RtsUnitSelectLogic(화면 터치 상자) — TouchReceive 없음
@@ -311,27 +331,50 @@ script RtsUnitLogic extends Logic
 		local p = T:GetPrism(id)
 		if p == nil or p.job ~= u.JobId then return end
 		if u.Prisms == "" then u.Prisms = id else u.Prisms = u.Prisms .. "," .. id end
-		if p.locks ~= nil then
-			local skills = T:GetSkillsFor(u)
-			for i = 1, #p.locks do
-				local idx = T:FindSkill(skills, p.locks[i])
-				if idx > 0 then u.SkillLocks = T:SetLock(u.SkillLocks, idx, 3) end
-			end
-		end
+		self:SyncPrismLocks(e)
 		self:EnsureShadow(e)
 		_RtsCombatLogic:StartLoop(userId, no)
 		self:OnChanged(no, self:GetMeso(userId), userId)
 		log("RtsUnit: prism " .. id .. " -> unit " .. string.format("%d", no) .. " (" .. u.JobId .. ")")
 	end
 
-	-- ===== 영입(개발모드 선행, 2026-09-22 사용자 "유닛 영입도 내가 자유롭게") =====
+	-- 프리즘 영구 잠금(3)은 그 프리즘 스킬을 쓸 수 있는 레벨(대개 50)이 된 뒤에만 건다 — 2026-09-23 사용자 "레벨 제한을 못 채우면 다른 스킬은 잠기지 않게,
+	--   트루 스나이핑(50)을 받았더니 스킬이 다 잠겼다". 프리즘 지정·레벨업 때 부른다(이미 3이면 그대로)
+	@ExecSpace("ServerOnly")
+	method void SyncPrismLocks(Entity e)
+		if e == nil or not isvalid(e) then return end
+		local u = e.RtsUnitComponent
+		if u == nil or u.Prisms == nil or u.Prisms == "" then return end
+		local T = _RtsJobTableLogic
+		for id in string.gmatch(u.Prisms, "[^,]+") do
+			local p = T:GetPrism(id)
+			if p ~= nil and p.locks ~= nil and u.Level >= T:PrismLockLevel(id, u.JobId) then
+				local skills = T:GetSkillsFor(u)
+				for i = 1, #p.locks do
+					local idx = T:FindSkill(skills, p.locks[i])
+					if idx > 0 and T:GetLock(u.SkillLocks, idx) ~= 3 then u.SkillLocks = T:SetLock(u.SkillLocks, idx, 3) end
+				end
+			end
+		end
+	end
+
+	-- ===== 영입 =====
 	--   영입 팝업의 직업 카드 → 클라 배치 모드(RtsUnitSelectLogic.BeginPlace)에서 고른 빈 발판 (col,row)에 빈 번호(1~MaxUnits)로 세운다(2026-09-22 사용자 "중앙에 생성하지 말고 위치 선택, 취소하면 영입도 취소").
-	--   발판이 아니거나 내 유닛이 서 있으면 거부. 개발모드: 무료·Lv50. 본편(Phase 5): 영입가 차감·Lv1 — 그때 이 메서드에 규칙을 얹는다. 지금은 TestBench가 아니면 무시
+	--   본편(2026-09-23 사용자 "항상 Lv1 + 메소 레벨업", "5라운드당 1명"): 무료·Lv1, 보유 수 < 영입 한도일 때만(방출로 빈 칸은 다시 영입 가능).
+	--   거부: 판 진행 중(카운트다운·진행)이 아님 / 탈락·클리어한 유저 / 한도 초과 / 발판 아님 / 내 유닛이 서 있음 / 같은 직업 보유
 	@ExecSpace("Server")
 	method void RequestRecruitAt(string jobId, number col, number row)
 		local userId = senderUserId
-		if not _RtsCombatLogic.TestBench then return end
 		if not _RtsJobTableLogic:HasJob(jobId) then return end
+		local state = _RtsStageLogic.RunState
+		-- 영입은 진행 중에만(2026-09-24 사용자 "시작도 안 했는데 영입 가능" — 전엔 카운트다운도)
+		if state ~= "running" then return end
+		if not _RtsRunResultLogic:IsAlive(userId) then return end
+		if not self:IsJobUnlocked(userId, jobId) then return end
+		if self:RecruitRoom(userId) <= 0 then
+			log("RtsUnit: recruit " .. jobId .. " refused — limit")
+			return
+		end
 		local zone = _RtsZoneLogic:GetZoneOfUser(userId)
 		if zone < 1 then return end
 		if not _RtsZoneLogic:IsPadCell(col, row) then return end
@@ -357,9 +400,17 @@ script RtsUnitLogic extends Logic
 				return
 			end
 		end
-		self:SpawnUnit(userId, zone, no, jobId, 50, col, row)
+		self:SpawnUnit(userId, zone, no, jobId, 1, col, row)
 		self:OnChanged(no, self:GetMeso(userId), userId)
 		log("RtsUnit: recruit " .. jobId .. " -> unit " .. string.format("%d", no) .. " at (" .. string.format("%d,%d", col, row) .. ")")
+	end
+
+	-- 영입할 수 있게 열린 직업인가(서버·클라 공용). 모험가 10직업은 항상, 영웅 팬텀은 프리즘 '팬텀 잠금 해제'(augmentation.md)를 받은 유저만.
+	--   2026-09-23 사용자 "팬텀 프리즘 없는데도 팬텀 영입 가능 — 선택조차 못 하게": 전엔 개발 도구(DevTools)가 켜져 있으면 열려 있었다(증강 시스템 전 임시) → 제거.
+	--   클라 영입 카드(RtsPopupLogic 영입 창 — '잠김', 클릭 없음)와 서버 RequestRecruitAt가 같이 쓴다
+	method boolean IsJobUnlocked(string userId, string jobId)
+		if jobId ~= "phantom" then return true end
+		return _RtsAugmentLogic:HasUnlock(userId, "phantom")
 	end
 
 	-- 이 유저가 그 직업 유닛을 이미 보유했는가(서버)
@@ -386,29 +437,31 @@ script RtsUnitLogic extends Logic
 		local e = list[no]
 		if e == nil or not isvalid(e) then return end
 		local u = e.RtsUnitComponent
-		local refund = math.floor((u.SpentMeso or 0) * self.DismissRefundRate + 0.0001)
+		local refund = self:DismissRefund(u)
 		_RtsCombatLogic:StopLoop(userId, no)
 		for otherNo, oe in pairs(list) do
 			if oe ~= nil and isvalid(oe) and oe.RtsUnitComponent ~= nil and oe.RtsUnitComponent.BondNo == no then oe.RtsUnitComponent.BondNo = 0 end
 		end
 		list[no] = nil
 		e:Destroy()
+		-- 그 유닛에 지정된 증강 소멸(2026-09-22 규칙)
+		_RtsAugmentLogic:OnUnitDismissed(userId, no)
 		self.MesoByUser[userId] = self:GetMeso(userId) + refund
 		self:OnChanged(0, self:GetMeso(userId), userId)
 		log("RtsUnit: dismiss unit " .. string.format("%d", no) .. " refund " .. string.format("%d", refund))
 	end
 
-	-- 방출 시 환급액(클라 확인 문구용)
+	-- 방출 시 환급액(서버 지급·클라 확인 문구 공용) — 10메소 단위로 내림
 	method number DismissRefund(any u)
 		if u == nil then return 0 end
-		return math.floor((u.SpentMeso or 0) * self.DismissRefundRate + 0.0001)
+		return math.floor((u.SpentMeso or 0) * self.DismissRefundRate / 10 + 0.0001) * 10
 	end
 
-	-- 개발모드: 내 유닛 전부 삭제(테스트 프리즘 팝업의 '유닛 전부 삭제')
+	-- 개발 도구: 내 유닛 전부 삭제(테스트 프리즘 팝업의 '유닛 전부 삭제')
 	@ExecSpace("Server")
 	method void RequestDevClear()
 		local userId = senderUserId
-		if not _RtsCombatLogic.TestBench then return end
+		if not self.DevTools then return end
 		self:ClearUnits(userId)
 		self:OnChanged(0, self:GetMeso(userId), userId)
 		log("RtsUnit: dev clear")
@@ -418,7 +471,7 @@ script RtsUnitLogic extends Logic
 	@ExecSpace("Server")
 	method void RequestDevPrism(string id)
 		local userId = senderUserId
-		if not _RtsCombatLogic.TestBench then return end
+		if not self.DevTools then return end
 		local p = _RtsJobTableLogic:GetPrism(id)
 		if p == nil or p.job == "" then return end
 		local list = self.UnitsByUser[userId]
@@ -478,12 +531,14 @@ script RtsUnitLogic extends Logic
 		self.UnitsByUser[userId] = {}
 	end
 
+	-- 퇴장: 유닛(루프 정지 포함)·메소·아바타 패스 상태를 지운다
 	@ExecSpace("ServerOnly")
 	method void RemoveUnits(string userId)
 		local list = self.UnitsByUser[userId]
 		if list == nil then return end
 		for no, e in pairs(list) do
-			if e ~= nil then e:Destroy() end
+			_RtsCombatLogic:StopLoop(userId, no)
+			if e ~= nil and isvalid(e) then e:Destroy() end
 		end
 		self.UnitsByUser[userId] = nil
 		self.MesoByUser[userId] = nil
@@ -561,10 +616,54 @@ script RtsUnitLogic extends Logic
 		self.MesoByUser[userId] = meso - cost
 		u.Level = u.Level + 1
 		u.SpentMeso = u.SpentMeso + cost
+		self:SyncPrismLocks(e)
 		self:EnsureShadow(e)
 		-- 레벨로 공격 주기가 바뀔 수 있어(공격속도 강화·period) 루프를 새 주기로 다시 건다
 		_RtsCombatLogic:StartLoop(userId, no)
 		self:OnChanged(no, meso - cost, userId)
+		-- 소리·이펙트는 누른 사람 클라가 누르는 순간 바로 낸다(LevelUpNow) — 여기선 그 구역을 보는 다른 사람용 이펙트만
+		self:ShowLevelUpEffect(u.Zone, no)
+	end
+
+	-- 클라: 레벨업 버튼·스페이스·메뉴 — 누르는 순간 소리 + 이펙트를 바로 내고(서버 왕복을 기다리면 늦다 — 2026-09-23 사용자 "레벨업 이펙트가 너무 느려,
+	--   누르는 순간 이펙트랑 소리가 같이"), 서버에 레벨업 요청. 메소·최대 레벨은 부르는 쪽(CanLevelUp)이 먼저 거른다
+	@ExecSpace("ClientOnly")
+	method void LevelUpNow(number no)
+		local u = self:GetMyUnit(no)
+		if u == nil then return end
+		_SoundService:PlaySound(self.LevelUpSound, 1)
+		_RtsSkillFxLogic:PlaySfx(self.LevelUpSound, 1 / _RtsSkillFxLogic.SfxMaster, 1)
+		self:PlayLevelUpClip(u)
+		self:RequestLevelUp(no)
+	end
+
+	-- 클라: 레벨업 이펙트 클립·소리를 미리 올려 둔다(첫 레벨업 때 로딩으로 늦게 뜨지 않게) — 유닛이 생길 때(RtsUnitComponent.SetupClient)
+	@ExecSpace("ClientOnly")
+	method void WarmLevelUpFx()
+		_RtsSkillFxLogic:Preload({ clip = self.LevelUpClip })
+		_SoundService:LoadSound(self.LevelUpSound)
+	end
+
+	-- 레벨업 효과음(원작 sound/game/levelup — 2026-09-23 사용자 "레벨업 사운드도") — 누른 사람에게만(LevelUpNow).
+	--   "레벨업 소리 좀 커야" — 볼륨 상한이 1.0이라 효과음 배율(SfxMaster) 없이 최대로, 같은 소리를 두 겹(SoundService + 효과음 풀) 동시에 틀어 더 크게
+	property string LevelUpSound = "c198d87b06b24707864b1ac73345cca8"
+
+	-- 레벨업 이펙트(원작 effect/basiceff/levelup_fast — 2026-09-23 사용자 "레벨업하는 캐릭터 주위에 레벨업 이펙트") — 유닛 발밑에 붙여 한 번(유닛 스케일을 그대로 받음),
+	--   그 구역을 보고 있는 클라만
+	property string LevelUpClip = "d92f2ec742d94285af771d33086773d3"
+
+	@ExecSpace("Client")
+	method void ShowLevelUpEffect(number zone, number no)
+		if math.floor(zone + 0.5) ~= math.floor(_RtsHudLogic.WatchedZone + 0.5) then return end
+		-- 내 구역(= 내가 누른 레벨업)은 LevelUpNow가 이미 냈다
+		if math.floor(zone + 0.5) == math.floor(self:MyZone() + 0.5) then return end
+		self:PlayLevelUpClip(self:GetZoneUnit(zone, no))
+	end
+
+	@ExecSpace("ClientOnly")
+	method void PlayLevelUpClip(any u)
+		if u == nil or u.Entity == nil or not isvalid(u.Entity) then return end
+		_EffectService:PlayEffectAttached(self.LevelUpClip, u.Entity, Vector3(0, 0, 0), 0, Vector3(1, 1, 1), false, { SortingLayer = "Default", OrderInLayer = 305 })
 	end
 
 	-- 대상 지정(홀리 유니티): 대상 지정 스킬을 가진 직업·레벨이어야 하고, 대상은 내 다른 유닛 또는 0(미지정). 바꾸면 3분 쿨
@@ -643,9 +742,7 @@ script RtsUnitLogic extends Logic
 		if not _RtsZoneLogic:IsPadCell(col, row) then return end
 		if u.Col == col and u.Row == row then return end
 		local now = _UtilLogic.ServerElapsedSeconds
-		-- 개발모드(2026-09-22)에선 이동 쿨타임 없음 — 자산 확인하며 자유롭게 옮긴다
 		local cool = self.CooldownSec
-		if _RtsCombatLogic.TestBench then cool = 0 end
 		local list = self.UnitsByUser[userId]
 		for otherNo, oe in pairs(list) do
 			local o = oe.RtsUnitComponent

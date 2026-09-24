@@ -10,14 +10,15 @@
 4. `maker_logs(kind:"normal")` — 런타임(클라이언트/서버) 로그·에러 확인
 5. `maker_screenshot` — 화면 상태 확인, `maker_keyboard_input`/`maker_mouse_input`으로 조작 재현
 6. `maker_stop` — 편집 모드 복귀
+- Play 중에 외부(파이썬/에디터)로 `.mlua`를 고쳤다면: `maker_stop` → **`maker_refresh_workspace`** → `maker_save` → `maker_play`. refresh 없이 save+play하면 Maker 메모리의 옛 스크립트로 실행된다(디스크 파일은 그대로지만 Play는 옛 값). 실측 2026-09-18 — `UnitNo`를 7→1로 고친 뒤 stop→save→play 했는데 로그가 계속 "unit 7", refresh 후에야 "unit 1". 실행 결과가 파일과 다르면 먼저 이것을 의심한다.
 
 ## 케이스 규칙 (standard)
 - 기능당 최소: 정상 동작 1건 + 실패/경계 1건(잘못된 입력, 권한 없는 클라이언트 호출 등)을 Play Test 시나리오로 기술하고 로그로 확인한다.
 - 서버 검증 로직은 클라이언트에서 우회 호출이 막히는지 확인한다 (WorldConfig의 AuthorityCheck 활성 상태, 근거: Global/WorldConfig.config:17-18).
 
 ## 데이터 검증 (Data-Access Smoke)
-- 현재 데이터 저장 계층(DataStorage) 사용 없음 — 도입 시 이 절을 갱신한다.
-- 도입 후: Play Test 전 `maker_reset_data_storage`로 로컬 저장소를 초기화해 시나리오를 재현 가능하게 만들고, 저장→재접속(재플레이)→로드 왕복을 1회 확인한다.
+- 사용처(2026-09-24): `RtsRunResultLogic.SaveClear` — 클리어 기록을 난이도별 저장소에 쓴다(`SortableDataStorage` `RtsClearMeso_D<n>` = 순위, `GlobalDataStorage` `RtsClearRecord_D<n>` = 조합, n = 난이도 1~6). 테스트 모드(`RtsUnitLogic.DevTools`)면 저장하지 않는다.
+- Play Test 전 `maker_reset_data_storage`로 로컬 저장소를 초기화해 시나리오를 재현 가능하게 만들고, 저장→재접속(재플레이)→로드 왕복을 1회 확인한다.
 
 ## 회귀 실패 처리
 - 빌드 콘솔 오류(문법)는 즉시 수정 후 재확인. 런타임 오류는 로그의 스택/메시지를 근거로 원인 스크립트를 수정하고 동일 시나리오를 재실행한다.

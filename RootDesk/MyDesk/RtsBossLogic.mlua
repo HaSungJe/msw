@@ -1,0 +1,232 @@
+-- Phase 7 (2026-09-23): 보스 스테이지. 살아 있는 구역마다 스테이지 보스(어둠의 신전은 아이온·얄다바오트 2체 — 둘째는 1초 뒤)를 구역 보스 영역(RtsZoneLogic 2×2 칸)에 세운다.
+--   트랙 이동 없음(2026-09-23 사용자 "보스의 트랙 이동을 빼고 화면 중앙 트랙에 고정" → 같은 날 "이쪽 4칸에 보스 영역 — 보스는 저기로": 화면 중앙 → 9~10열 × 12~13행).
+--   보스 그림(스프라이트 테두리 = 피격 박스 ÷ 0.7·0.8)이 보스 영역(4×5칸, 2체면 가로로 반씩)을 꽉 채우게 키우거나 줄인다(SizeMul — 표 스케일 × 배율, 체력바 높이·폭도 따라감).
+--   스테이지 시간(60초)이 끝났는데 살아 있으면 그 구역 주인 탈락(보스 HP 깎은 비율 기록).
+--   구역 보스를 다 잡으면 그 구역은 통과, 살아 있는 구역이 모두 통과하면 3초 뒤 다음 스테이지(RtsStageLogic.ScheduleEarlyEnd).
+--   마지막 스테이지(검은 마법사 4페이즈)를 잡으면 클리어. 보스 방어율은 표(RtsStageTableLogic def — 주니어 발록~시그너스 50, 스우·데미안 100 · 루시드·윌 120 · 더스크·진 힐라·듄켈 130 · 검은 마법사 140/140/145/150 — 2026-09-24 합연산, 체력은 tools/difficulty-sim.py 티어 모드 보정)를 RtsMonsterComponent.Defense로.
+@Logic
+script RtsBossLogic extends Logic
+
+	-- 서버: 구역 → { 보스 엔티티 … } (이번 보스 스테이지)
+	property table ByZone = {}
+
+	-- 서버: 구역 → 보스 최대 HP 합(깎은 비율 계산)
+	property table MaxHpByZone = {}
+
+	-- 서버: 구역 → 보스를 다 잡았는가
+	property table Down = {}
+
+	-- 보스 크기: 그림(스프라이트 테두리)이 보스 영역 슬롯(영역 ÷ 보스 수 가로, 영역 세로)에 꽉 차는 배율(2026-09-23 사용자 "가로 4칸 세로 5줄에 보스가 다 채워지도록" —
+	--   전엔 2×2 영역 × 1.5 + 1칸 위). 피격 박스 = 그림 × (0.7, 0.8)이라 그림 크기 = 박스 ÷ 그 비율
+	property number BoxToSpriteW = 0.7
+
+	property number BoxToSpriteH = 0.8
+
+	-- 두 번째 보스 출발 간격(초)
+	property number SecondDelay = 1
+
+	property number Serial = 0
+
+	@ExecSpace("ServerOnly")
+	method void SpawnBosses(number n)
+		self:ClearAll()
+		local s = _RtsStageTableLogic:GetStage(n)
+		if s == nil or s.kind ~= "boss" then return end
+		local zones = _RtsRunResultLogic:AliveZones()
+		for zi = 1, #zones do
+			local zone = zones[zi]
+			self.ByZone[zone] = {}
+			-- 난이도 체력 배율(2026-09-24 — RtsDifficultyLogic: 그 구역 주인의 난이도 × 극악 곡선)
+			local hp = math.max(1, math.floor(s.hp * _RtsDifficultyLogic:HpMul(zone, n) + 0.5))
+			self.MaxHpByZone[zone] = hp * #s.mobs
+			self.Down[zone] = false
+			for k = 1, #s.mobs do
+				local mobId = s.mobs[k]
+				if k == 1 then
+					self:SpawnBoss(zone, mobId, hp, s.def, n)
+				else
+					_TimerService:SetTimerOnce(function()
+						if _RtsStageLogic.StageNo == n and _RtsRunResultLogic:IsZoneAlive(zone) and self.ByZone[zone] ~= nil then
+							self:SpawnBoss(zone, mobId, hp, s.def, n)
+						end
+					end, self.SecondDelay * (k - 1))
+				end
+			end
+		end
+	end
+
+	@ExecSpace("ServerOnly")
+	method void SpawnBoss(number zone, string mobId, number hp, number def, number stageNo)
+		self.Serial = self.Serial + 1
+		local name = "Boss" .. string.format("%d", math.floor(zone + 0.5)) .. "_" .. string.format("%d", self.Serial)
+		local e = _RtsWaveLogic:SpawnMonsterEntity(name, zone, mobId, hp, true)
+		if e == nil then return end
+		if e.RtsMonsterComponent ~= nil then
+			e.RtsMonsterComponent.Defense = def
+			e.RtsMonsterComponent.StageNo = stageNo
+		end
+		local list = self.ByZone[zone]
+		if list == nil then
+			list = {}
+			self.ByZone[zone] = list
+		end
+		-- 제자리 고정: 트랙 걷기 멈춤(Paused) + 보스 영역. 영역을 보스 수만큼 가로로 나눈 슬롯에 피격 박스가 들어가게 줄이고, 몸 가운데(피격 박스 중심)를 슬롯 가운데에
+		local w = e.RtsTrackWalkerComponent
+		if w ~= nil then
+			w.BossMode = true
+			w.Loop = false
+			w.Paused = true
+		end
+		local count = 1
+		local st = _RtsStageTableLogic:GetStage(stageNo)
+		if st ~= nil and st.mobs ~= nil then count = #st.mobs end
+		local idx = #list + 1
+		local cell = _RtsConfigLogic:GetGridCell()
+		local areaW = cell * _RtsZoneLogic.BossAreaCols
+		local areaH = cell * _RtsZoneLogic.BossAreaRows
+		local slotW = areaW / count
+		local c = _RtsZoneLogic:GetBossAreaCenter(zone)
+		local cx = c.x + (idx - (count + 1) / 2) * slotW
+		local cy = c.y
+		local mul = 1
+		local bx = 0
+		local by = 0
+		local mon = _RtsStageTableLogic:GetMonster(mobId)
+		if mon ~= nil then
+			local s = mon.scale or 1
+			local bw = (mon.boxW or 1) * s
+			local bh = (mon.boxH or 1) * s
+			-- 그림 크기(박스 ÷ 0.7·0.8)로 슬롯에 꽉 차게 — 키우는 쪽도 허용
+			if bw > 0 and bh > 0 then mul = math.min(slotW / (bw / self.BoxToSpriteW), areaH / (bh / self.BoxToSpriteH)) end
+			bx = (mon.boxX or 0) * s * mul
+			by = (mon.boxY or 0) * s * mul
+			e.TransformComponent.Scale = Vector3(s * mul, s * mul, 1)
+			-- 데미지 숫자 시작 높이(세계) = 줄어든 체력바 위
+			if e.DamageSkinSpawnerComponent ~= nil then e.DamageSkinSpawnerComponent.DamageSkinOffset = Vector2(0, (mon.barY or 3.4) * mul + 0.2) end
+		end
+		local m = e.RtsMonsterComponent
+		if m ~= nil then
+			m.SizeMul = mul
+			-- 체력바 폭 = 슬롯 폭(2체면 서로 겹치지 않게)
+			m.BossBarFit = slotW - 0.12
+		end
+		if w ~= nil then w.YOffset = 0 - by end
+		e.TransformComponent.WorldPosition = Vector3(cx - bx, cy - by, 0)
+		list[#list + 1] = e
+	end
+
+	-- 이 구역에 남은(살아 있는) 보스 수 — 아직 안 나온 둘째 보스는 MaxHp 합과 실제 수로 가린다
+	@ExecSpace("ServerOnly")
+	method number AliveBossCount(number zone)
+		local list = self.ByZone[zone]
+		if list == nil then return 0 end
+		local n = 0
+		for i = 1, #list do
+			local e = list[i]
+			if e ~= nil and isvalid(e) and e.RtsMonsterComponent ~= nil and not e.RtsMonsterComponent.Dead then n = n + 1 end
+		end
+		return n
+	end
+
+	-- 보스 처치(RtsMonsterComponent.Die). 그 구역 보스가 다 나왔고 다 죽었으면 통과 — 마지막 스테이지면 클리어, 살아 있는 구역 모두 통과면 조기 종료
+	@ExecSpace("ServerOnly")
+	method void OnBossKilled(number zone)
+		local z = math.floor(zone + 0.5)
+		local list = self.ByZone[z]
+		if list == nil or self.Down[z] then return end
+		local s = _RtsStageLogic:CurrentStage()
+		if s == nil then return end
+		if #list < #s.mobs or self:AliveBossCount(z) > 0 then return end
+		self.Down[z] = true
+		log("RtsBoss: zone " .. string.format("%d", z) .. " down " .. s.name)
+		-- 프리즘 라운드(자쿰·시그너스·루시드 — 2026-09-23 3개로) 보스를 잡으면 그 구역 주인에게 프리즘 3택1
+		_RtsAugmentLogic:OnBossDown(_RtsRunResultLogic:OwnerOfZone(z), _RtsStageLogic.StageNo)
+		if _RtsStageLogic.StageNo >= _RtsStageTableLogic:GetStageCount() then
+			_RtsRunResultLogic:Clear(_RtsRunResultLogic:OwnerOfZone(z))
+		end
+		self:CheckAllDown()
+	end
+
+	@ExecSpace("ServerOnly")
+	method void CheckAllDown()
+		local zones = _RtsRunResultLogic:AliveZones()
+		for i = 1, #zones do
+			local z = zones[i]
+			-- 이번 보스전 도중 들어온 구역(보스 없음)은 기다리지 않는다
+			if self.ByZone[z] ~= nil and not self.Down[z] then return end
+		end
+		_RtsStageLogic:ScheduleEarlyEnd()
+	end
+
+	-- 보스가 E에 닿음(RtsTrackWalkerComponent) → 그 구역 탈락. 2026-09-23부터 보스는 제자리 고정(Paused)이라 안 불린다 — 걷는 보스를 되살릴 때 쓰려고 남김
+	@ExecSpace("ServerOnly")
+	method void OnBossReachedEnd(number zone)
+		local z = math.floor(zone + 0.5)
+		if self.Down[z] then return end
+		local owner = _RtsRunResultLogic:OwnerOfZone(z)
+		if owner == "" or not _RtsRunResultLogic:IsAlive(owner) then return end
+		_RtsRunResultLogic:Eliminate(owner, "boss", self:DamagePct(z))
+		self:CheckAllDown()
+	end
+
+	-- 스테이지 시간이 끝났을 때 보스가 남은 구역 → 탈락
+	@ExecSpace("ServerOnly")
+	method void OnStageTimeUp()
+		for z, list in pairs(self.ByZone) do
+			if not self.Down[z] then
+				local owner = _RtsRunResultLogic:OwnerOfZone(z)
+				if owner ~= "" and _RtsRunResultLogic:IsAlive(owner) then
+					_RtsRunResultLogic:Eliminate(owner, "boss", self:DamagePct(z))
+				end
+			end
+		end
+		self:ClearAll()
+	end
+
+	-- 보스 HP 깎은 비율(0~1) = 1 − 남은 HP 합 ÷ 최대 HP 합(아직 안 나온 보스는 안 깎인 것으로)
+	@ExecSpace("ServerOnly")
+	method number DamagePct(number zone)
+		local maxHp = self.MaxHpByZone[zone] or 0
+		if maxHp <= 0 then return 0 end
+		local list = self.ByZone[zone] or {}
+		local s = _RtsStageLogic:CurrentStage()
+		local remain = 0
+		for i = 1, #list do
+			local e = list[i]
+			if e ~= nil and isvalid(e) and e.RtsMonsterComponent ~= nil and not e.RtsMonsterComponent.Dead then remain = remain + e.RtsMonsterComponent.Hp end
+		end
+		if s ~= nil and #list < #s.mobs then remain = remain + math.floor(s.hp * _RtsDifficultyLogic:HpMul(zone, _RtsStageLogic.StageNo) + 0.5) * (#s.mobs - #list) end
+		local pct = 1 - remain / maxHp
+		if pct < 0 then pct = 0 elseif pct > 1 then pct = 1 end
+		return pct
+	end
+
+	@ExecSpace("ServerOnly")
+	method void ClearZone(number zone)
+		local z = math.floor(zone + 0.5)
+		local list = self.ByZone[z]
+		if list ~= nil then
+			for i = 1, #list do
+				local e = list[i]
+				if e ~= nil and isvalid(e) then e:Destroy() end
+			end
+		end
+		self.ByZone[z] = nil
+		self.MaxHpByZone[z] = nil
+		self.Down[z] = nil
+	end
+
+	@ExecSpace("ServerOnly")
+	method void ClearAll()
+		for z, list in pairs(self.ByZone) do
+			for i = 1, #list do
+				local e = list[i]
+				if e ~= nil and isvalid(e) then e:Destroy() end
+			end
+		end
+		self.ByZone = {}
+		self.MaxHpByZone = {}
+		self.Down = {}
+	end
+
+end

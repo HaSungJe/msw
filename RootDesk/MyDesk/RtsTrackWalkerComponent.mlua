@@ -1,6 +1,7 @@
--- rts-base: 트랙 위를 등속으로 도는 이동체 (2026-09-14 프로토타입 — 초록달팽이 시연)
---   t(0=S, 1=E)를 속도/트랙 길이만큼 올리며 RtsZoneLogic.GetTrackPoint로 위치를 잡는다. E에 닿으면 S로 순간이동(Loop).
---   Phase 3 #10(몹 스폰·순환)의 이동 부분이 이걸 그대로 쓴다. 서버가 움직이고 위치는 동기화.
+-- rts-base: 트랙 위를 등속으로 도는 이동체 (2026-09-14 프로토타입 → Phase 6·7 웨이브·보스)
+--   t(0=S, 1=E)를 속도/트랙 길이만큼 올리며 RtsZoneLogic.GetTrackPoint로 위치를 잡는다. 일반 몹은 E에 닿으면 S로 순간이동(Loop).
+--   서버가 움직이고 위치는 동기화. 보관(보스 스테이지) 중엔 Paused로 멈춘다.
+--   보스(BossMode): 트랙 길이 ÷ 60초 속도(UnitsPerSec)로 한 바퀴만, 빙결 감속 무시, E(t=1)에 닿으면 RtsBossLogic.OnBossReachedEnd 한 번.
 @Component
 script RtsTrackWalkerComponent extends Component
 
@@ -8,23 +9,41 @@ script RtsTrackWalkerComponent extends Component
 
 	property number T = 0
 
-	-- 속도 수치(100 = 기준 속도, RtsConfigLogic.SpeedUnitPerSec). 몹 속도는 전부 동일(로드맵) — 값은 Phase 2 테이블로 옮긴다
+	-- 속도 수치(100 = 기준 속도, RtsConfigLogic.SpeedUnitPerSec). 몹 속도는 전부 동일(로드맵)
 	property number Speed = 100
+
+	-- 0보다 크면 속도 수치 대신 이 값(유닛/초)으로 — 보스(트랙 길이 ÷ 60초)
+	property number UnitsPerSec = 0
 
 	property boolean Loop = true
 
 	property number Facing = -1
 
+	property boolean Paused = false
+
+	property boolean BossMode = false
+
+	property boolean Reached = false
+
+	-- 트랙 점에서 세로로 내리는 양(유닛). 보스는 몸 가운데가 트랙 위에 오도록 −(피격 박스 중심 높이) — 3배 크기라 발 기준이면 윗줄에서 화면 밖으로 잘림(2026-09-23)
+	property number YOffset = 0
+
 	@ExecSpace("ServerOnly")
 	method void OnUpdate(number delta)
+		if self.Paused or self.Reached then return end
+		local m = self.Entity.RtsMonsterComponent
+		if m ~= nil and m.Dead then return end
 		local len = _RtsZoneLogic:GetTrackLength()
 		if len <= 0 then return end
 		local before = _RtsZoneLogic:GetTrackPoint(self.Zone, self.T)
-		local spd = self.Speed
-		-- 빙결(블리자드) 중이면 이동속도 × RtsMonsterComponent.FreezeSlow(0.5) — 2026-09-20 사용자 "이동속도 감속도 구현"
-		local m = self.Entity.RtsMonsterComponent
-		if m ~= nil and m:IsFrozenNow() then spd = spd * m.FreezeSlow end
-		self.T = self.T + _RtsConfigLogic:SpeedToUnitsPerSec(spd) * delta / len
+		local ups = self.UnitsPerSec
+		if ups <= 0 then
+			local spd = self.Speed
+			-- 빙결(블리자드) 중이면 이동속도 × RtsMonsterComponent.FreezeSlow(0.5) — 보스는 무시
+			if not self.BossMode and m ~= nil and m:IsFrozenNow() then spd = spd * m.FreezeSlow end
+			ups = _RtsConfigLogic:SpeedToUnitsPerSec(spd)
+		end
+		self.T = self.T + ups * delta / len
 		if self.T >= 1 then
 			if self.Loop then
 				self.T = self.T - 1
@@ -34,13 +53,17 @@ script RtsTrackWalkerComponent extends Component
 			end
 		end
 		local p = _RtsZoneLogic:GetTrackPoint(self.Zone, self.T)
-		self.Entity.TransformComponent.WorldPosition = Vector3(p.x, p.y, 0)
+		self.Entity.TransformComponent.WorldPosition = Vector3(p.x, p.y + self.YOffset, 0)
 		-- 몬스터 스프라이트는 기본이 왼쪽 보기 → 오른쪽으로 갈 때 뒤집는다
 		local dx = p.x - before.x
 		if dx > 0.0005 then
 			self:SetFacing(1)
 		elseif dx < -0.0005 then
 			self:SetFacing(-1)
+		end
+		if self.BossMode and self.T >= 1 then
+			self.Reached = true
+			_RtsBossLogic:OnBossReachedEnd(self.Zone)
 		end
 	end
 

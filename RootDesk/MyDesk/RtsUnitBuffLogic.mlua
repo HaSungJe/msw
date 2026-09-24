@@ -29,11 +29,11 @@ script RtsUnitBuffLogic extends Logic
 	method table GetDefs()
 		return {
 			-- 홀리 유니티 = 프리즘 스킬(2026-09-20: 40레벨 패시브 +20% 삭제, 지정 유닛 최종 +100% → 2026-09-22 +40%). prism = 이 프리즘을 가진 유닛만 출처(RtsUnitComponent.Prisms)
-			{ id = "bond", name = "홀리 유니티", job = "paladin", lv = 50, prism = "holyunity", scope = "target", icon = "53a38855164a4b64accf68785761c283", fin = 40 },
+			{ id = "bond", name = "홀리 유니티", job = "paladin", lv = 1, prism = "holyunity", scope = "target", icon = "53a38855164a4b64accf68785761c283", fin = 40 },
 			{ id = "sharpeyes", name = "샤프아이즈", job = "bow", lv = 40, scope = "all", icon = "4cd1961bc55b47cb80e1a7f8843e225e", crit = 20, critDmg = 20 },
 			{ id = "sharpeyes", name = "샤프아이즈", job = "marks", lv = 20, scope = "all", icon = "4cd1961bc55b47cb80e1a7f8843e225e", crit = 20, critDmg = 20 },
 			{ id = "pray", name = "프레이", job = "bishop", lv = 30, scope = "all", icon = "39b3159efcc74334b875c94c64a74243", fin = 10 }, -- 2026-09-19: 주변 1타일·자신 미적용 → 구역 전체(자신 포함)·+10%
-			{ id = "joker", name = "조커: 날카로운 검", job = "phantom", lv = 10, scope = "all", icon = "f1575f7842c740a49f9e19c2514de64e", fin = 3 }, -- 2026-09-19 3차: 5 → 3
+			{ id = "joker", name = "조커: 날카로운 검", job = "phantom", lv = 10, scope = "all", icon = "f1575f7842c740a49f9e19c2514de64e", fin = 5 }, -- 2026-09-24 사용자 "조커 최종 5% — 커트라인 낮추게"(2026-09-19 3차 5 → 3에서 되돌림)
 		}
 	end
 
@@ -90,6 +90,14 @@ script RtsUnitBuffLogic extends Logic
 		return out
 	end
 
+	-- 팝업 갱신 서명용: 버프 id와 수치
+	method string BuffSig(number zone, number no)
+		local buffs = self:GetBuffsFor(zone, no)
+		local parts = {}
+		for i = 1, #buffs do parts[#parts + 1] = buffs[i].def.id .. ":" .. tostring(buffs[i].def.fin or 0) end
+		return table.concat(parts, ",")
+	end
+
 	method boolean InScope(table def, any src, any me)
 		if def.scope == "target" then return src.BondNo == me.No end
 		if def.scope == "near" then
@@ -113,10 +121,12 @@ script RtsUnitBuffLogic extends Logic
 		if st.crit > 100 then st.crit = 100 end
 	end
 
-	-- 이 유닛에 지정된 증강 목록 { g 등급(bronze/silver/gold/prism), t 이름, d 효과 }. Phase 6 증강 시스템(RtsAugmentLogic)이 생기면 거기서 채운다 — 지금은 빈 목록
+	-- 이 유닛에 지정된 증강 목록 { g 등급(bronze/silver/gold/prism), t 이름, d 효과 } — RtsAugmentLogic 보유 목록 중 이 유닛에 지정된 것(2026-09-23)
 	@ExecSpace("ClientOnly")
 	method table GetAugmentsFor(number zone, number no)
-		return {}
+		local u = self:UnitAt(zone, no)
+		if u == nil then return {} end
+		return _RtsAugmentLogic:ListForUnit(u.Owner, no)
 	end
 
 	-- ===== 캐릭터 밑 아이콘 =====
@@ -162,7 +172,12 @@ script RtsUnitBuffLogic extends Logic
 			local k = kids[i]
 			if k ~= nil and string.sub(k.Name, 1, 11) == "RtsBuffIcon" then k:Destroy() end
 		end
-		local buffs = self:GetBuffsFor(u.Zone, u.No)
+		-- 아이콘 없는 버프는 발밑 줄에서 뺀다
+		local all = self:GetBuffsFor(u.Zone, u.No)
+		local buffs = {}
+		for i = 1, #all do
+			if all[i].def.icon ~= nil and all[i].def.icon ~= "" then buffs[#buffs + 1] = all[i] end
+		end
 		if #buffs == 0 then return end
 		local gen = (self.IconGen[key] or 0) + 1
 		self.IconGen[key] = gen

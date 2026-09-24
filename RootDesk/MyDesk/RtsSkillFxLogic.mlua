@@ -64,6 +64,12 @@ script RtsSkillFxLogic extends Logic
 
 	property number SfxPoolSize = 12
 
+	-- PlaySfxGap: 효과음 RUID → 마지막으로 튼 시각(ElapsedSeconds)
+	property table SfxLastAt = {}
+
+	-- 스킬 효과음 전체 배율(2026-09-23 사용자 "BGM이 스킬에 씹힌다, 두 배는 키워야" — BGM은 최대 1.0이라 효과음을 0.8로 낮춰 상대 약 2배)
+	property number SfxMaster = 0.8
+
 	-- 루프·모션 상태 표(LoopLast·LoopUnit·ActiveLoop·CycleTimer·LoopMotion·Active…)의 키. 시전 연출은 전 클라에 오므로 유닛 번호만으로는 다른 구역의 같은 번호와 겹친다 → 구역×100+번호 (2026-09-20)
 	method number LoopKey(number zone, number no)
 		return math.floor(zone + 0.5) * 100 + math.floor(no + 0.5)
@@ -127,10 +133,22 @@ script RtsSkillFxLogic extends Logic
 	-- 효과음 1회. pitch(0~3, 1 = 원속)가 있으면 SoundComponent 풀로 재생(피치 = 음높이 + 재생 속도 — 애로우 레인 타격음 400030002/loop 0.97초를 빨리 감기, 2026-09-22 사용자), 없으면 SoundService
 	@ExecSpace("ClientOnly")
 	--   pitch가 nil이면 SoundService(동시 재생 수 제한이 있어 0.02초 간격 117타에선 앞 몇십 개만 나고 뒤가 잘린다 — 2026-09-22 실측 "타격음이 1초도 안 이어짐"), 1이라도 값이 있으면 풀(SfxPoolSize개를 돌려 쓰며 restart → 끊기지 않고 파바박)
+	-- 같은 효과음을 gap초 안에 또 부르면 건너뛴다(한꺼번에 여러 몹이 맞는 틱 피해 — 포이즌 리전)
+	@ExecSpace("ClientOnly")
+	method void PlaySfxGap(string ruid, number volume, number gap)
+		if ruid == nil or ruid == "" then return end
+		local now = _UtilLogic.ElapsedSeconds
+		local last = self.SfxLastAt[ruid]
+		if last ~= nil and now - last < gap then return end
+		self.SfxLastAt[ruid] = now
+		self:PlaySfx(ruid, volume, nil)
+	end
+
 	method void PlaySfx(string ruid, number volume, any pitch)
 		if ruid == nil or ruid == "" then return end
+		local vol = (volume or 1) * self.SfxMaster
 		if pitch == nil then
-			_SoundService:PlaySound(ruid, volume or 1)
+			_SoundService:PlaySound(ruid, vol)
 			return
 		end
 		local mapRoot = _EntityService:GetEntityByPath("/maps/RtsMap")
@@ -149,7 +167,7 @@ script RtsSkillFxLogic extends Logic
 		sc.Loop = false
 		sc.SetCameraAsListener = false
 		sc.Pitch = pitch
-		sc.Volume = volume or 1
+		sc.Volume = vol
 		sc:Play()
 	end
 
@@ -559,7 +577,7 @@ script RtsSkillFxLogic extends Logic
 
 	-- 투사체: 유닛 손 높이(projDy)에서 대상(+hitDy)까지 projSec 동안 직선 비행 후 제거. 원작 ball 클립은 왼쪽으로 나는 그림(assetFacesLeft)이라 오른쪽으로 날 때 반전.
 	--   대각선 대상이면 비행 방향으로 회전(ZRotation) — 오른쪽으로 갈 땐 반전 뒤 각도 그대로, 왼쪽으로 갈 땐 반전 없이 각도−180 (위아래가 뒤집히지 않게). 사용자 2026-09-18 "투사체가 가로/세로만? 너무 일직선"
-	--   projCount개를 projStagger초 간격으로(도트 퍼니셔 구체 10개). projFrom = "around"면 유닛 손이 아니라 대상 주변 projSpread 반지름 안 무작위 지점에서 출발("구체가 맵에 랜덤 생성돼 가장 가까운 적에게").
+	--   projCount개를 projStagger초 간격으로(도트 퍼니셔 구체 30개). projFrom = "around"면 유닛 손이 아니라 대상 주변 projSpread 반지름 안 무작위 지점에서 출발("구체가 맵에 랜덤 생성돼 가장 가까운 적에게").
 	--   projLife가 있으면 도착 뒤에도 그때까지 남긴다(클립 뒷부분이 폭발인 구체)
 	--   targets가 여럿이면 projEach = 대상마다 1발, projFrom "around"(구체)는 유닛 손 높이 주위 반지름 projSpread에 각도 2π(i-1)/n + π/n로 골고루 생성돼 targets[i](서버가 구체마다 정한 대상 — 가까운 적, 보스 우선)로 달려든다, 그 외는 메인 대상 1발
 	@ExecSpace("ClientOnly")
@@ -601,12 +619,15 @@ script RtsSkillFxLogic extends Logic
 						from = Vector3(to.x + (math.random(-100, 100) / 100) * sp, to.y + (fx.projSkyHeight or 4), 0)
 					end
 					local d = (fx.projStagger or 0) * (i - 1)
+					-- 구체(around)는 대상을 따라간다(SpawnProjectileEx homing) — 나머지 투사체는 짧게 날아 처음 자리로
+					local homing = nil
+					if fx.projFrom == "around" then homing = t end
 					if d > 0 then
 						_TimerService:SetTimerOnce(function()
-							if isvalid(t) then self:SpawnProjectile(fx, from, to, mapRoot, false, cells) end
+							if isvalid(t) then self:SpawnProjectileEx(fx, from, to, mapRoot, false, cells, homing) end
 						end, d)
 					else
-						self:SpawnProjectile(fx, from, to, mapRoot, false, cells)
+						self:SpawnProjectileEx(fx, from, to, mapRoot, false, cells, homing)
 					end
 					-- 그림자 투사체(쉐도우 파트너): 유닛 레벨이 projShadowLv 이상이면 등 뒤 projShadowDx에서 같은 투사체를 projShadowDelay 늦게 어둡게 한 발 더(0.5 = 본체 4발(0.3초)이 다 나간 뒤 이어서 4발 — 서버 halfHits 판정 0.7~1.0초와 도착 시각이 맞는다)
 					if fx.projShadowLv ~= nil and unitEntity.RtsUnitComponent ~= nil and unitEntity.RtsUnitComponent.Level >= fx.projShadowLv then
@@ -625,6 +646,13 @@ script RtsSkillFxLogic extends Logic
 	--   projHover가 있으면 그 시간 동안 생성 자리에 떠 있다가(비행 프레임 projFlySprites 루프) 날아간다. projSpeed(유닛/초)가 있으면 비행 시간 = 거리÷속도(서버 판정 시각과 같은 식). 닿으면 projHitSprites(폭발 프레임)를 한 번 돌리고 제거
 	@ExecSpace("ClientOnly")
 	method void SpawnProjectile(table fx, Vector3 from, Vector2 to, Entity mapRoot, boolean shadow, number cells)
+		self:SpawnProjectileEx(fx, from, to, mapRoot, shadow, cells, nil)
+	end
+
+	-- SpawnProjectile + homing(대상 엔티티): 있으면 날아가는 동안 그 대상의 지금 피격 박스 가운데를 따라간다(비행 시간 sec는 처음 거리로 정한 그대로 — 서버 판정 시각과 맞춤).
+	--   대상이 사라지면 마지막으로 본 자리로. 도트 퍼니셔 구체(2026-09-23 사용자 "이동 중인 대상의 지금 위치를 따라가야")
+	@ExecSpace("ClientOnly")
+	method void SpawnProjectileEx(table fx, Vector3 from, Vector2 to, Entity mapRoot, boolean shadow, number cells, any homing)
 		local goingRight = to.x >= from.x
 		local flip = self:FlipFor(fx, goingRight, "proj")
 		local dx = to.x - from.x
@@ -696,7 +724,10 @@ script RtsSkillFxLogic extends Logic
 		if shadow then sr.Color = Color(0.25, 0.2, 0.35, 0.85) end
 		local dist = math.sqrt(dx * dx + dy * dy)
 		local sec = fx.projSec or 0.15
-		if fx.projSpeed ~= nil and fx.projSpeed > 0 then sec = dist / fx.projSpeed end
+		if fx.projSpeed ~= nil and fx.projSpeed > 0 then
+			-- projNear(칸)가 있으면 1타일 밖은 천천히, 안쪽은 돌진(RtsJobTableLogic.OrbTravelSec — 서버 판정 시각과 같은 식)
+			if fx.projNear ~= nil then sec = _RtsJobTableLogic:OrbTravelSec(fx, dist) else sec = dist / fx.projSpeed end
+		end
 		local hover = fx.projHover or 0
 		local arcTimer = nil
 		local function fly()
@@ -736,6 +767,37 @@ script RtsSkillFxLogic extends Logic
 					local bump = h * 4 * t * (1 - t)
 					e.TransformComponent.WorldPosition = Vector3(sx + dx * t + nx * bump, sy + dy * t + ny * bump, 0)
 					if t >= 1 and arcTimer ~= nil then
+						_TimerService:ClearTimer(arcTimer)
+						arcTimer = nil
+					end
+				end, 0.03)
+			elseif homing ~= nil then
+				local sx, sy = from.x, from.y
+				local lastX, lastY = to.x, to.y
+				local t0 = DateTime.UtcNow.Elapsed
+				arcTimer = _TimerService:SetTimerRepeat(function()
+					if not isvalid(e) then
+						if arcTimer ~= nil then _TimerService:ClearTimer(arcTimer) end
+						arcTimer = nil
+						return
+					end
+					if isvalid(homing) and homing.TransformComponent ~= nil then
+						local hp = homing.TransformComponent.WorldPosition
+						lastX = hp.x
+						lastY = hp.y + (fx.hitDy or 0.6)
+						if homing.HitComponent ~= nil then
+							local hsc = homing.TransformComponent.Scale
+							lastX = hp.x + homing.HitComponent.ColliderOffset.x * math.abs(hsc.x)
+							lastY = hp.y + homing.HitComponent.ColliderOffset.y * hsc.y
+						end
+					end
+					local k = (DateTime.UtcNow.Elapsed - t0) / (sec * 1000)
+					if k > 1 then k = 1 end
+					-- 진행률: projNear가 있으면 1타일 밖은 일정한 느린 속도, 마지막 1타일은 돌진(RtsJobTableLogic.OrbProgress — 2026-09-23 사용자 "몬스터와 1타일 안일 때 빨라지게")
+					local kp = k
+					if fx.projNear ~= nil then kp = _RtsJobTableLogic:OrbProgress(fx, dist, k * sec) end
+					e.TransformComponent.WorldPosition = Vector3(sx + (lastX - sx) * kp, sy + (lastY - sy) * kp, 0)
+					if k >= 1 and arcTimer ~= nil then
 						_TimerService:ClearTimer(arcTimer)
 						arcTimer = nil
 					end
@@ -977,7 +1039,7 @@ script RtsSkillFxLogic extends Logic
 	@ExecSpace("ClientOnly")
 	method boolean FacingRight(Entity unitEntity)
 		local u = unitEntity.RtsUnitComponent
-		return u ~= nil and u.FaceDir > 0
+		return u ~= nil and u:FaceNow() > 0
 	end
 
 	-- 이펙트를 좌우 반전할지: 원작 스킬 클립(assetFacesLeft)은 왼쪽 보기로 그려져 있어 오른쪽을 볼 때 반전, 오른쪽 보기 자산은 왼쪽을 볼 때 반전.

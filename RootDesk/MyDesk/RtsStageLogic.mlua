@@ -1,0 +1,516 @@
+-- Phase 6·7 (2026-09-23): 방 전역 한 판 진행 — 132 스테이지를 모든 유저가 같은 시계로 넘긴다.
+--   idle ─(첫 입장)→ countdown 5초 ─→ running: BeginStage(n) … EndStage → BeginStage(n+1) … ─(모두 탈락·클리어)→ ended ─(새 유저 입장)→ 초기화 후 countdown
+--   몬스터 스테이지 20초(0.5초마다 1마리 × 40) · 보스 60초(구역 몹은 보관, 보스 처치 시 3초 뒤 조기 종료) · 쉬는 30초.
+--   서버가 0.25초마다 StageEndsAt을 확인하고, 클라는 동기화된 StageEndsAt으로 남은 시간을 직접 계산해 HUD 시간 칩·필드 칩·영입 버튼을 0.25초마다 갱신한다.
+@Logic
+script RtsStageLogic extends Logic
+
+	-- "idle" / "countdown" / "running" / "ended"
+	@Sync
+	property string RunState = "idle"
+
+	-- 지금 스테이지 순번(카운트다운 중 0)
+	@Sync
+	property number StageNo = 0
+
+	-- 이번 스테이지(카운트다운이면 시작) 끝 시각 — ServerElapsedSeconds 기준(서버·클라 공용 시계)
+	@Sync
+	property number StageEndsAt = 0
+
+	-- 2026-09-24: 5 → 15초(난이도를 고를 시간 — '바로 시작'으로 앞당김, RequestStartNow)
+	property number CountdownSec = 15
+
+	-- 카운트다운 중 '바로 시작'을 누른 유저(방 인원 전원이면 즉시 시작 — 혼자면 바로)
+	@Sync
+	property SyncTable<string, number> ReadyByUser
+
+	@Sync
+	property number ReadyCount = 0
+
+	@Sync
+	property number RoomCount = 0
+
+	-- 보스 조기 종료: 살아 있는 유저 전원이 보스를 잡으면 이 초 뒤 다음 스테이지
+	property number EarlyEndDelay = 3
+
+	property number EarlyEndAt = 0
+
+	-- 보스 스테이지 직전 쉬는 시간(2026-09-23 사용자 "각 보스 시작 전에 쉬는 시간 5초"): 앞 스테이지가 끝나면 BossPrepSec초 동안 BossPrep = true(스테이지 번호는 앞 스테이지 그대로),
+	--   끝나면 보스 스테이지 시작. 일반 몹 스폰은 멈춘 채, 필드의 몹은 계속 걷는다
+	@Sync
+	property boolean BossPrep = false
+
+	property number BossPrepSec = 5
+
+	property number TickSec = 0.25
+
+	property number TickId = 0
+
+	-- '다시 하기' 투표(2026-09-23 사용자): userId → 1. 방 인원 과반이 찬성하면 처음부터 다시(혼자면 1표).
+	--   카운트다운·진행·종료 언제든(같은 날 "죽었을 때 말고 도중에 언제든 투표로") — 버튼은 HUD 영입 버튼 오른쪽(RtsHudLogic.RefreshRestartButton)
+	@Sync
+	property SyncTable<string, number> RestartVotes
+
+	@Sync
+	property number VoteCount = 0
+
+	@Sync
+	property number VoteNeed = 1
+
+	-- 반대 표(2026-09-24 사용자 "찬성/반대 표 나오게"): RestartVotes 값 1 = 찬성, 2 = 반대. 반대가 많아 과반 찬성이 불가능하거나 VoteTimeout초가 지나면 부결(투표 닫힘)
+	@Sync
+	property number VoteNoCount = 0
+
+	@Sync
+	property number VoteStartedAt = 0
+
+	property number VoteTimeout = 20
+
+	-- 클라: 판 종료 안내를 한 번만
+	property string PrevRunState = ""
+
+	-- 클라: 지금 틀고 있는 배경음 RUID(스테이지 표 bgm — monster-wave.md 라운드별 배경음). 같은 곡이면 이어서 틀고, 다른 곡일 때만 바꾼다(끊김 방지)
+	property string BgmNow = ""
+
+	-- 2026-09-23 사용자 "BGM이 스킬에 씹힌다" → 0.6에서 최대 1.0(효과음은 RtsSkillFxLogic.SfxMaster 0.8)
+	property number BgmVolume = 1.0
+
+	-- 클라: 카운트다운 때 영입 팝업을 한 번만 자동으로 연다
+	property boolean AutoRecruitShown = false
+
+	-- 클라: 보스 준비 초읽기 안내에 마지막으로 띄운 초(0 = 없음)
+	property number PrepShown = 0
+
+	property number HudTickId = 0
+
+	method void OnBeginPlay()
+		if self:IsServer() then
+			self.TickId = _TimerService:SetTimerRepeat(function() self:Tick() end, self.TickSec, self.TickSec)
+		else
+			self.HudTickId = _TimerService:SetTimerRepeat(function() self:RefreshHud() end, self.TickSec, 0.5)
+		end
+	end
+
+	-- ===== 공용 조회 =====
+
+	method table CurrentStage()
+		if self.StageNo < 1 then return nil end
+		return _RtsStageTableLogic:GetStage(self.StageNo)
+	end
+
+	-- 지금 보스 스테이지인가(전투 사거리·보스전 잠금 스킬 판단)
+	method boolean IsBossStageNow()
+		return self.RunState == "running" and _RtsStageTableLogic:IsBossStage(self.StageNo)
+	end
+
+	method number TimeLeft()
+		local left = self.StageEndsAt - _UtilLogic.ServerElapsedSeconds
+		if left < 0 then return 0 end
+		return left
+	end
+
+	-- ===== 서버: 입장·퇴장 =====
+
+	-- 구역 배정 직후(RtsBootstrapLogic). 판이 끝난 방이면 맵을 초기화하고 새 판, 대기 중이면 카운트다운 시작.
+	--   진행 중 입장은 결과 상태만 만들고, 몹은 다음 BeginStage부터 그 구역에도 나온다
+	@ExecSpace("ServerOnly")
+	method void OnUserEnter(string userId)
+		if self.RunState == "ended" then self:ResetRun() end
+		_RtsUnitLogic:InitUser(userId)
+		_RtsRunResultLogic:InitUser(userId)
+		if self.RunState == "idle" then self:BeginCountdown() end
+		-- 방 인원이 늘었으니 과반 기준 갱신
+		self:TallyVotes()
+		self:TallyReady()
+	end
+
+	-- 퇴장(구역 반납 뒤): 그 구역 몹·보스 정리. 아무도 없으면 대기로, 남은 생존자가 없으면 판 종료
+	@ExecSpace("ServerOnly")
+	method void OnUserLeave(string userId, number zone)
+		_RtsWaveLogic:ClearZone(zone)
+		_RtsBossLogic:ClearZone(zone)
+		_RtsRunResultLogic:OnLeave(userId)
+		_RtsAugmentLogic:ResetUser(userId)
+		self.RestartVotes[userId] = nil
+		self.ReadyByUser[userId] = nil
+		local anyone = false
+		for uid, z in pairs(_RtsZoneLogic.ZoneByUser) do anyone = true end
+		if not anyone then
+			self:ResetRun()
+			return
+		end
+		if (self.RunState == "running" or self.RunState == "countdown") and _RtsRunResultLogic:AliveCount() == 0 then self:EndRun() end
+		-- 방 인원이 줄었으니 과반 기준 갱신(남은 사람들의 찬성이 과반이면 바로 다시 하기)
+		self:TallyVotes()
+		self:TallyReady()
+	end
+
+	-- ===== 서버: 다시 하기 투표 (카운트다운·진행·종료 언제든) =====
+
+	-- 카운트다운 '바로 시작'(2026-09-24 사용자): 누른 사람 표시, 방 인원 전원이 누르면 카운트다운을 끝낸다(Tick이 1라운드 시작)
+	@ExecSpace("Server")
+	method void RequestStartNow()
+		local userId = senderUserId
+		if userId == nil or userId == "" then return end
+		if self.RunState ~= "countdown" then return end
+		if _RtsZoneLogic:GetZoneOfUser(userId) < 1 then return end
+		self.ReadyByUser[userId] = 1
+		self:TallyReady()
+	end
+
+	@ExecSpace("ServerOnly")
+	method void TallyReady()
+		local total = 0
+		local ready = 0
+		for userId, zone in pairs(_RtsZoneLogic.ZoneByUser) do
+			total = total + 1
+			if self.ReadyByUser[userId] ~= nil then ready = ready + 1 end
+		end
+		self.ReadyCount = ready
+		self.RoomCount = total
+		if self.RunState == "countdown" and total > 0 and ready >= total then
+			log("RtsStage: start now " .. string.format("%d/%d", ready, total))
+			self.StageEndsAt = _UtilLogic.ServerElapsedSeconds
+		end
+	end
+
+	@ExecSpace("ServerOnly")
+	method void ClearReady()
+		local keys = {}
+		for userId, v in pairs(self.ReadyByUser) do keys[#keys + 1] = userId end
+		for i = 1, #keys do self.ReadyByUser[keys[i]] = nil end
+		self.ReadyCount = 0
+		local total = 0
+		for userId, zone in pairs(_RtsZoneLogic.ZoneByUser) do total = total + 1 end
+		self.RoomCount = total
+	end
+
+	-- 클라: 내가 '바로 시작'을 눌렀는가
+	@ExecSpace("ClientOnly")
+	method boolean IsMyReady()
+		return self.ReadyByUser[_RtsUnitLogic:MyUserId()] ~= nil
+	end
+
+	-- 누르면 찬성, 다시 누르면 취소. 카운트다운 중엔 못 한다(2026-09-24 사용자 "계속 누르면 타이머가 계속 리셋됨")
+	@ExecSpace("Server")
+	method void RequestRestartVote()
+		local userId = senderUserId
+		if userId == nil or userId == "" then return end
+		local st = self.RunState
+		if st ~= "running" and st ~= "ended" then return end
+		if _RtsZoneLogic:GetZoneOfUser(userId) < 1 then return end
+		if (self.VoteCount + self.VoteNoCount) == 0 then self.VoteStartedAt = _UtilLogic.ServerElapsedSeconds end
+		if self.RestartVotes[userId] == 1 then
+			self.RestartVotes[userId] = nil
+		else
+			self.RestartVotes[userId] = 1
+		end
+		self:TallyVotes()
+	end
+
+	-- 투표 패널의 찬성(1)·반대(2) — 투표가 열려 있을 때만
+	@ExecSpace("Server")
+	method void RequestVoteChoice(number choice)
+		local userId = senderUserId
+		if userId == nil or userId == "" then return end
+		if (self.VoteCount + self.VoteNoCount) == 0 then return end
+		if _RtsZoneLogic:GetZoneOfUser(userId) < 1 then return end
+		local c = math.floor(choice + 0.5)
+		if c ~= 1 and c ~= 2 then return end
+		self.RestartVotes[userId] = c
+		self:TallyVotes()
+	end
+
+	-- 찬성 수·필요 수(방 인원 과반) 갱신, 과반이면 처음부터 다시
+	@ExecSpace("ServerOnly")
+	method void TallyVotes()
+		local total = 0
+		local yes = 0
+		local no = 0
+		for userId, zone in pairs(_RtsZoneLogic.ZoneByUser) do
+			total = total + 1
+			local v = self.RestartVotes[userId]
+			if v == 1 then yes = yes + 1 elseif v == 2 then no = no + 1 end
+		end
+		self.VoteCount = yes
+		self.VoteNoCount = no
+		self.VoteNeed = math.floor(total / 2) + 1
+		if total > 0 and yes >= self.VoteNeed then
+			self:RestartRun()
+		elseif total > 0 and (yes + no) > 0 and (total - no) < self.VoteNeed then
+			-- 반대가 많아 과반 찬성이 불가능 → 부결
+			log("RtsStage: restart vote rejected " .. string.format("%d:%d", yes, no))
+			self:ClearVotes()
+		end
+	end
+
+	@ExecSpace("ServerOnly")
+	method void ClearVotes()
+		local keys = {}
+		for userId, v in pairs(self.RestartVotes) do keys[#keys + 1] = userId end
+		for i = 1, #keys do self.RestartVotes[keys[i]] = nil end
+		self.VoteCount = 0
+		self.VoteNoCount = 0
+		self.VoteStartedAt = 0
+	end
+
+	-- 처음부터 다시: 맵 초기화(몹·보스·비석·유닛·메소·결과) 후 방에 있는 전원 진행 중으로 → 카운트다운
+	@ExecSpace("ServerOnly")
+	method void RestartRun()
+		log("RtsStage: restart by vote " .. string.format("%d/%d", self.VoteCount, self.VoteNeed))
+		self:ResetRun()
+		for userId, zone in pairs(_RtsZoneLogic.ZoneByUser) do
+			_RtsUnitLogic:InitUser(userId)
+		end
+		self:BeginCountdown()
+	end
+
+	-- ===== 서버: 진행 =====
+
+	@ExecSpace("ServerOnly")
+	method void BeginCountdown()
+		self.RunState = "countdown"
+		self.StageNo = 0
+		self.EarlyEndAt = 0
+		self.StageEndsAt = _UtilLogic.ServerElapsedSeconds + self.CountdownSec
+		self:ClearReady()
+		log("RtsStage: countdown " .. string.format("%d", self.CountdownSec) .. "s")
+	end
+
+	@ExecSpace("ServerOnly")
+	method void Tick()
+		local now = _UtilLogic.ServerElapsedSeconds
+		-- 다시 하기 투표 시간 제한 → 부결
+		if (self.VoteCount + self.VoteNoCount) > 0 and now > self.VoteStartedAt + self.VoteTimeout then
+			log("RtsStage: restart vote timeout")
+			self:ClearVotes()
+		end
+		if self.RunState == "countdown" then
+			if now >= self.StageEndsAt then self:BeginStage(1) end
+		elseif self.RunState == "running" then
+			if self.BossPrep then
+				if now >= self.StageEndsAt then
+					self.BossPrep = false
+					self:BeginStage(self.StageNo + 1)
+				end
+				return
+			end
+			if self.EarlyEndAt > 0 and now >= self.EarlyEndAt then
+				self:EndStage()
+			elseif now >= self.StageEndsAt then
+				self:EndStage()
+			end
+		end
+	end
+
+	@ExecSpace("ServerOnly")
+	method void BeginStage(number n)
+		local s = _RtsStageTableLogic:GetStage(n)
+		if s == nil then
+			self:EndRun()
+			return
+		end
+		self.RunState = "running"
+		self.StageNo = n
+		self.EarlyEndAt = 0
+		self.BossPrep = false
+		self.StageEndsAt = _UtilLogic.ServerElapsedSeconds + s.sec
+		if s.kind == "mob" then
+			_RtsWaveLogic:StartSpawn(n)
+		elseif s.kind == "boss" then
+			_RtsWaveLogic:StashAll()
+			_RtsBossLogic:SpawnBosses(n)
+		end
+		self:OnStageStarted(n)
+	end
+
+	-- 훅: 스테이지 시작 — 브론즈~골드 증강 지급 라운드면 3택1(RtsAugmentLogic). 배경음은 클라 RefreshBgm
+	@ExecSpace("ServerOnly")
+	method void OnStageStarted(number n)
+		local s = _RtsStageTableLogic:GetStage(n)
+		log("RtsStage: start " .. string.format("%d", n) .. " " .. s.kind .. " " .. s.name)
+		_RtsAugmentLogic:OnStageStarted(n)
+	end
+
+	@ExecSpace("ServerOnly")
+	method void EndStage()
+		local n = self.StageNo
+		local s = _RtsStageTableLogic:GetStage(n)
+		if s == nil then return end
+		self.EarlyEndAt = 0
+		if s.kind == "mob" then
+			_RtsWaveLogic:StopSpawn()
+		elseif s.kind == "boss" then
+			-- 시간이 끝났는데 보스가 살아 있는 구역 = 탈락(보스 HP 깎은 비율 기록). 보관했던 일반 몹은 같은 자리에서 다시 돈다
+			_RtsBossLogic:OnStageTimeUp()
+			_RtsWaveLogic:UnstashAll()
+		end
+		if self.RunState ~= "running" then return end
+		_RtsRunResultLogic:OnStageSurvived(n)
+		if _RtsRunResultLogic:AliveCount() == 0 or n >= _RtsStageTableLogic:GetStageCount() then
+			self:EndRun()
+			return
+		end
+		-- 다음이 보스면 BossPrepSec초 쉬었다가(Tick이 BeginStage)
+		local nx = _RtsStageTableLogic:GetStage(n + 1)
+		if nx ~= nil and nx.kind == "boss" and self.BossPrepSec > 0 then
+			self.BossPrep = true
+			self.StageEndsAt = _UtilLogic.ServerElapsedSeconds + self.BossPrepSec
+			return
+		end
+		self:BeginStage(n + 1)
+	end
+
+	-- 보스 조기 종료 예약(RtsBossLogic — 살아 있는 구역의 보스가 모두 죽었을 때). 시간 칩도 남은 3초로 보이게 끝 시각을 당긴다
+	@ExecSpace("ServerOnly")
+	method void ScheduleEarlyEnd()
+		if self.RunState ~= "running" or self.EarlyEndAt > 0 then return end
+		self.EarlyEndAt = _UtilLogic.ServerElapsedSeconds + self.EarlyEndDelay
+		if self.EarlyEndAt < self.StageEndsAt then self.StageEndsAt = self.EarlyEndAt end
+	end
+
+	-- 판 종료: 스폰·보스 정지. 필드·비석은 그대로 두고(관전), 새 유저가 들어오면 ResetRun
+	@ExecSpace("ServerOnly")
+	method void EndRun()
+		if self.RunState == "ended" then return end
+		self.RunState = "ended"
+		self.EarlyEndAt = 0
+		self.BossPrep = false
+		self.StageEndsAt = _UtilLogic.ServerElapsedSeconds
+		_RtsWaveLogic:StopSpawn()
+		_RtsBossLogic:ClearAll()
+		-- 진행 중에 던진 찬성표는 그대로 이어 간다(투표가 판 종료 전용이던 때는 여기서 비웠다)
+		self:TallyVotes()
+		log("RtsStage: run ended at stage " .. string.format("%d", self.StageNo))
+	end
+
+	-- 맵 초기화: 몹·보스·비석 제거, 유닛·메소 초기화, 결과 상태 진행 중으로
+	@ExecSpace("ServerOnly")
+	method void ResetRun()
+		_RtsWaveLogic:StopSpawn()
+		_RtsWaveLogic:ClearAll()
+		_RtsBossLogic:ClearAll()
+		for userId, zone in pairs(_RtsZoneLogic.ZoneByUser) do
+			_RtsUnitLogic:ResetUser(userId)
+			_RtsAugmentLogic:ResetUser(userId)
+		end
+		_RtsRunResultLogic:ResetAll()
+		self:ClearVotes()
+		self.RunState = "idle"
+		self.BossPrep = false
+		self.StageNo = 0
+		self.EarlyEndAt = 0
+		self.StageEndsAt = 0
+		_RtsBootstrapLogic:BroadcastPlayerList()
+		log("RtsStage: reset")
+	end
+
+	-- ===== 클라: HUD =====
+
+	-- 정보 카드 문구(2026-09-23 사용자 "메소·필드·맵 정보 하나로" — RtsHudLogic.SetStageCard): { title = 윗줄(굵게), sub = 맵 이름, clock = 오른쪽 남은 시간 }
+	--   카운트다운 "시작까지"·5 / 몬스터 "12라운드"·"골드비치 해변"·0:17 / 보스 "보스"·"자쿰의 제단"·0:43 / 보스 준비 "보스 준비"·다음 보스 맵·5 / 쉬는 "쉬는 시간" / 종료 "게임 종료"
+	--   현재 라운드만(2026-09-23 사용자 "4/132 이런 식으로 나오지 말고")
+	@ExecSpace("ClientOnly")
+	method table StageParts()
+		local sec = math.max(0, math.ceil(self:TimeLeft()))
+		local clock = string.format("%d:%02d", math.floor(sec / 60), sec % 60)
+		if self.RunState == "countdown" then return { title = "시작까지", sub = "", clock = string.format("%d", sec) } end
+		if self.RunState == "ended" then return { title = "게임 종료", sub = "", clock = "" } end
+		if self.RunState ~= "running" then return { title = "대기 중", sub = "", clock = "" } end
+		if self.BossPrep then
+			local nx = _RtsStageTableLogic:GetStage(self.StageNo + 1)
+			local nm = ""
+			if nx ~= nil then nm = nx.name end
+			return { title = "보스 준비", sub = nm, clock = string.format("%d", sec) }
+		end
+		local s = self:CurrentStage()
+		if s == nil then return { title = "", sub = "", clock = "" } end
+		if s.kind == "boss" then return { title = "보스", sub = s.name, clock = clock } end
+		if s.kind == "rest" then return { title = "쉬는 시간", sub = "", clock = clock } end
+		return { title = string.format("%d라운드", self.StageNo), sub = s.name, clock = clock }
+	end
+
+	@ExecSpace("ClientOnly")
+	method void RefreshHud()
+		if not _RtsHudLogic.Built then return end
+		local s = self:CurrentStage()
+		local special = self.RunState == "running" and s ~= nil and s.special == true
+		local parts = self:StageParts()
+		_RtsHudLogic:SetStageCard(parts.title, parts.sub, parts.clock, special)
+		_RtsHudLogic:SetField(_RtsWaveLogic:GetField(_RtsUnitLogic:MyZone()), _RtsWaveLogic.FieldLimit)
+		_RtsHudLogic:RefreshRecruitButton()
+		_RtsHudLogic:RefreshRestartButton()
+		-- 판이 시작되면(1라운드) 영입 팝업을 한 번 자동으로(이후 칸이 열리면 영입 버튼만 강조). 영입은 진행 중에만(2026-09-24 사용자 — 전엔 카운트다운 때)
+		if self.RunState == "running" then
+			if not self.AutoRecruitShown and _RtsPopupLogic.Built and not _RtsPopupLogic:IsOpen() and _RtsRunResultLogic:IsMeAlive() then
+				self.AutoRecruitShown = true
+				_RtsPopupLogic:Open("recruit")
+			end
+		else
+			self.AutoRecruitShown = false
+		end
+		self:RefreshBgm(s)
+		-- 보스 준비(BossPrepSec초) 동안 화면 가운데 초읽기 "자쿰 등장까지 5초"(2026-09-23 사용자 "보스 젠 전 쉬는 시간이 없다 — 자쿰 바로 시작" →
+		--   실제론 5초 있었지만(로그 25라운드 끝 18:40:30 → 자쿰 18:40:35) 필드 몹이 계속 걷고 좌상단 칩 글자만 바뀌어 티가 안 났다)
+		if self.RunState == "running" and self.BossPrep then
+			local n = math.max(1, math.ceil(self:TimeLeft()))
+			if n ~= self.PrepShown then
+				self.PrepShown = n
+				local nm = "보스"
+				local nx = _RtsStageTableLogic:GetStage(self.StageNo + 1)
+				if nx ~= nil and nx.mobs ~= nil and #nx.mobs > 0 then
+					local mon = _RtsStageTableLogic:GetMonster(nx.mobs[1])
+					if mon ~= nil and mon.name ~= nil then nm = mon.name end
+				end
+				_RtsHudLogic:ShowHintFor(nm .. " 등장까지 " .. string.format("%d", n) .. "초", 1.2)
+			end
+		else
+			self.PrepShown = 0
+		end
+		-- 판이 막 끝났으면 다시 하기 투표 안내(한 번)
+		if self.RunState == "ended" and self.PrevRunState ~= "ended" and self.PrevRunState ~= "" then
+			_RtsHudLogic:ShowHintFor("게임 종료 — 영입 버튼 옆 '다시 하기'를 과반이 누르면 처음부터 다시 시작합니다", 6)
+		end
+		self.PrevRunState = self.RunState
+	end
+
+	-- 배경음: 진행 중 = 그 스테이지 곡, 대기·카운트다운 = 1스테이지 곡, 판 종료 = 마지막 곡 유지(탈락한 사람은 끔 — 살아 있는 구역 관전 중이면 그 곡)
+	@ExecSpace("ClientOnly")
+	method void RefreshBgm(any s)
+		local want = ""
+		if self.RunState == "running" and s ~= nil then
+			want = s.bgm or ""
+		elseif self.RunState == "countdown" or self.RunState == "idle" then
+			local s1 = _RtsStageTableLogic:GetStage(1)
+			if s1 ~= nil then want = s1.bgm or "" end
+		end
+		-- 탈락(사망) 뒤엔 배경음 끔 — 단 살아 있는 다른 유저 구역을 관전 중이면 그 구역 곡(= 지금 스테이지 곡) (2026-09-23 사용자)
+		if _RtsRunResultLogic:GetState(_RtsUnitLogic:MyUserId()) == 1 then
+			if self.RunState ~= "running" or not _RtsHudLogic:IsZoneAliveClient(_RtsHudLogic.WatchedZone) then
+				if self.BgmNow ~= "" then
+					self.BgmNow = ""
+					_SoundService:StopBGM(false)
+				end
+				return
+			end
+		end
+		if want == "" or want == self.BgmNow then return end
+		self.BgmNow = want
+		_SoundService:PlayBGM(want, self.BgmVolume)
+	end
+
+	-- 클라: 내가 다시 하기에 찬성했는가
+	@ExecSpace("ClientOnly")
+	method boolean IsMyVote()
+		return self.RestartVotes[_RtsUnitLogic:MyUserId()] == 1
+	end
+
+	-- 클라: 내 투표 0 없음 · 1 찬성 · 2 반대
+	@ExecSpace("ClientOnly")
+	method number MyVote()
+		local v = self.RestartVotes[_RtsUnitLogic:MyUserId()]
+		if v == nil then return 0 end
+		return v
+	end
+
+end

@@ -1,7 +1,7 @@
--- rts-base #2: HUD v2 (화면 v2 — 아티팩트 v16)
+-- rts-base #2: HUD v2 (화면 v2 — 아티팩트 v16) + Phase 6 (2026-09-23)
 --   하단 바(미니맵·초상화·정보·스킬칸·부대지정) 전부 제거.
---   좌상단 시간·메소 칩 / 좌측 플레이어 목록(n/8, 생존·탈락, 나, 클릭→그 구역) /
---   우측 영입 버튼 + 유닛 슬롯 6 / 좌하단 증강 버튼. 팝업은 RtsPopupLogic.
+--   좌상단 정보 카드 한 장(라운드·스페셜·남은 시간 / 맵 이름 / 메소·필드 n / 110) / 좌측 플레이어 목록(n/8, 생존·탈락, 나, 클릭→그 구역) /
+--   상단 가운데 큰 영입 버튼(한도 표시) + 오른쪽 '다시 하기' 투표(언제든) / 우측 유닛 슬롯 6 / 좌하단 증강 버튼. 팝업은 RtsPopupLogic. 스테이지·필드·영입 버튼은 RtsStageLogic.RefreshHud가 0.25초마다.
 --   UI 좌표는 1920×1080 기준(목업 1cqw = 19.2px).
 @Logic
 script RtsHudLogic extends Logic
@@ -18,9 +18,38 @@ script RtsHudLogic extends Logic
 
 	property Entity AnchorEntity = nil
 
-	property Entity TimeText = nil
+	-- 좌상단 정보 카드(2026-09-23 사용자 "메소·필드·맵 정보 하나로"): 윗줄 라운드(+스페셜)·시간, 가운데 맵 이름, 아랫줄 메소·필드
+	property Entity StageTitleText = nil
+
+	property Entity StageSubText = nil
+
+	property Entity StageClockText = nil
 
 	property Entity MesoText = nil
+
+	property Entity FieldText = nil
+
+	-- 상단 가운데 영입 버튼(바깥 테두리·안쪽·글자)과 표시 상태
+	property Entity RecruitBtn = nil
+
+	property Entity RecruitText = nil
+
+	property string RecruitShown = ""
+
+	property number RecruitRoomPrev = 0
+
+	-- 영입 칸이 새로 열릴 때(판 시작·5·자쿰·혼테일·핑크빈·시그너스) 알림음 = 원작 sound/ui/dlgnotice(2026-09-23 사용자 "영입 가능 표시 뜰 때 사운드")
+	--   RecruitLimitPrev = 직전 영입 한도(진행 중이 아니면 0으로 되돌려 새 판 시작에도 울린다). 방출로 빈 칸이 생긴 건 울리지 않음
+	property number RecruitLimitPrev = 0
+
+	property string RecruitSound = "5db4f31bbcc243ec8f08713ad78dbe79"
+
+	-- 영입 칸이 새로 열렸을 때 반짝임 끝 시각(ElapsedSeconds)·토글
+	property number RecruitFlashUntil = 0
+
+	property boolean RecruitFlashOn = false
+
+	property string StageShown = ""
 
 	property Entity PlayersBox = nil
 
@@ -50,6 +79,65 @@ script RtsHudLogic extends Logic
 	property Entity Hint = nil
 
 	property Entity HintText = nil
+
+	property number HintGen = 0
+
+	-- 좌하단 증강 버튼(안쪽·글자)과 표시 중인 미지정 수
+	property Entity AugBtn = nil
+
+	-- 증강 버튼 오른쪽 '펼치기 (n)' — 접어 둔(고르지 않은) 증강 선택지가 있을 때만(2026-09-23 사용자)
+	property Entity ExpandBtn = nil
+
+	property Entity ExpandLabel = nil
+
+	property string ExpandShown = ""
+
+	-- 증강 버튼 위 '증강 뽑기 n' 버튼(2026-09-23 사용자 — 메소로 증강 뽑기, 로드맵 #43). 뽑을 수 있으면 금색, 아니면 흐리게
+	property Entity BuyBtn = nil
+
+	property Entity BuyLabel = nil
+
+	property string BuyShown = ""
+
+	-- 뽑기 버튼의 '프리즘 남은/최대'(2026-09-24 사용자 "추가 획득 가능한 프리즘 개수 2/2") — RtsAugmentLogic.ClientTick이 SetBuyPrism으로
+	property number BuyPrismLeft = 2
+
+	property number BuyPrismMax = 2
+
+	-- 다음 뽑기의 프리즘 확률 %(천장 포함 — RtsAugmentLogic.BuyPrismRate)
+	property number BuyPrismRatePct = 5
+
+	property Entity AugLabel = nil
+
+	property number AugShown = -1
+
+	-- 스테이지 칩 오른쪽 '다시 하기' 투표 버튼(2026-09-23 사용자 "죽었을 때 말고 라운드 오른쪽에 기본으로 — 언제든 도중에 투표로 다시 하기")
+	property Entity RestartBtn = nil
+
+	property Entity RestartText = nil
+
+	property string RestartShown = ""
+
+	-- 진행 중 실수 방지: 첫 클릭 뒤 이 시각(ElapsedSeconds)까지 한 번 더 누르면 찬성
+	property number RestartConfirmUntil = 0
+
+	-- UI 효과음(2026-09-24 사용자 "버튼 클릭 · 창 오픈 때 다 효과음"): 원작 sound/ui — BtMouseClick · MenuUp · MenuDown
+	property string ClickSound = "972843e759204d3e9ad84e7d3fa94f83"
+
+	property string OpenSound = "585c8f6d8891403f8717c378ab2f7c78"
+
+	property string CloseSound = "69f85d65004541db82615459032e1d4a"
+
+	-- 다시 하기 투표 패널(2026-09-24 사용자 "다시 투표 시 찬성/반대 표 나오게"): '다시 하기' 버튼 아래 — 찬성·반대 수 + 두 버튼(투표가 열려 있을 때만)
+	property Entity VotePanel = nil
+
+	property Entity VoteText = nil
+
+	property Entity VoteYesBtn = nil
+
+	property Entity VoteNoBtn = nil
+
+	property string VoteShown = ""
 
 	-- ===== UI 헬퍼 (RtsPopupLogic도 사용) =====
 
@@ -136,8 +224,21 @@ script RtsHudLogic extends Logic
 	@ExecSpace("ClientOnly")
 	method Entity SpawnClick(string name, Entity parent)
 		local b = self:SpawnStretch("model://uibutton", name, parent, Vector2(0, 0), Vector2(1, 1), Vector2(0, 0), Vector2(0, 0))
-		if b ~= nil then self:Tint(b, 1, 1, 1, 0.01) end
+		if b ~= nil then
+			self:Tint(b, 1, 1, 1, 0.01)
+			-- 모든 UI 버튼 클릭음(2026-09-24 사용자)
+			b:ConnectEvent(ButtonClickEvent, function(event)
+				self:PlayUi(self.ClickSound)
+			end)
+		end
 		return b
+	end
+
+	-- UI 효과음 한 번(클라)
+	@ExecSpace("ClientOnly")
+	method void PlayUi(string ruid)
+		if ruid == nil or ruid == "" then return end
+		_SoundService:PlaySound(ruid, 1)
 	end
 
 	-- 팔레트
@@ -197,42 +298,89 @@ script RtsHudLogic extends Logic
 		grp:SetEnable(true)
 		self.HudGroup = grp
 
-		-- 좌상단: 시간 칩 → 메소 칩
-		local timeChip = self:SpawnPanel("RtsTimeChip", grp, Vector2(0, 1), Vector2(0, 1), Vector2(16, -16), Vector2(170, 44),
+		-- 좌상단 정보 카드 한 장(2026-09-23 사용자 "글이 길어지면 깨진다 — 메소·필드·맵 정보 하나로 깔끔하게"):
+		--   윗줄 = "109라운드  스페셜"(굵게) + 오른쪽 남은 시간 / 가운데 = 맵 이름(흐리게, 길면 자름 — 줄바꿈 없음) / 구분선 / 아랫줄 = 메소(동전) + 오른쪽 필드 n / 110
+		local card = self:SpawnPanel("RtsInfoCard", grp, Vector2(0, 1), Vector2(0, 1), Vector2(16, -16), Vector2(440, 112),
 			self:ColPanel(), self:ColBorder(), 1.5)
-		self:SpawnLabel("RtsTimeKey", timeChip, Vector2(0, 0.5), Vector2(0, 0.5), Vector2(12, 0), Vector2(40, 30),
-			"시간", self:ColMuted(), 15, TextAlignmentType.MiddleLeft, false)
-		self.TimeText = self:SpawnLabel("RtsTimeText", timeChip, Vector2(0, 0.5), Vector2(0, 0.5), Vector2(58, 0), Vector2(100, 34),
-			"--:--", self:ColInk(), 28, TextAlignmentType.MiddleLeft, true)
-
-		-- 메소 칩은 7자리(1,000,000 — 개발모드 100만·후반 누적)까지 한 줄에 들어가게 시간 칩보다 넓게(2026-09-22: 170 → 221 = 플레이어 목록 폭)
-		local mesoChip = self:SpawnPanel("RtsMesoChip", grp, Vector2(0, 1), Vector2(0, 1), Vector2(16, -68), Vector2(221, 44),
-			self:ColPanel(), self:ColBorder(), 1.5)
-		local coin = self:SpawnUI("model://uisprite", "RtsMesoCoin", mesoChip, Vector2(0, 0.5), Vector2(0, 0.5), Vector2(12, 0), Vector2(26, 26))
+		self.StageTitleText = self:SpawnLabel("RtsStageTitle", card, Vector2(0, 1), Vector2(0, 1), Vector2(14, -8), Vector2(320, 32),
+			"대기 중", self:ColInk(), 22, TextAlignmentType.MiddleLeft, true)
+		self.StageTitleText.TextComponent.IsRichText = true
+		self.StageTitleText.TextComponent.Overflow = OverflowType.Truncate
+		self.StageClockText = self:SpawnLabel("RtsStageClock", card, Vector2(1, 1), Vector2(1, 1), Vector2(-14, -8), Vector2(90, 32),
+			"", self:ColInk(), 22, TextAlignmentType.MiddleRight, true)
+		-- 맵 이름(2026-09-24 사용자 "맵 명이 너무 작게 표시됨" — 15 → 18, 줄 높이 22 → 26). 오른쪽 끝 120px은 난이도(RtsDifficultyLogic — "난이도 표시는 맵 오른쪽에")
+		self.StageSubText = self:SpawnLabel("RtsStageSub", card, Vector2(0, 1), Vector2(0, 1), Vector2(14, -38), Vector2(290, 28),
+			"", self:ColMuted(), 18, TextAlignmentType.MiddleLeft, false)
+		self.StageSubText.TextComponent.Overflow = OverflowType.Truncate
+		self.StageSubText.TextComponent.UseNBSP = true
+		local line = self:SpawnUI("model://uisprite", "RtsInfoLine", card, Vector2(0, 1), Vector2(0, 1), Vector2(12, -70), Vector2(416, 1.5))
+		line.SpriteGUIRendererComponent.ImageRUID = DataRef(self.WhiteRUID)
+		line.SpriteGUIRendererComponent.Color = self:ColBorderSoft()
+		local coin = self:SpawnUI("model://uisprite", "RtsMesoCoin", card, Vector2(0, 0), Vector2(0, 0.5), Vector2(14, 22), Vector2(24, 24))
 		coin.SpriteGUIRendererComponent.ImageRUID = DataRef(self.CoinRUID)
 		coin.SpriteGUIRendererComponent.Color = Color(1, 1, 1, 1)
-		self.MesoText = self:SpawnLabel("RtsMesoText", mesoChip, Vector2(0, 0.5), Vector2(0, 0.5), Vector2(48, 0), Vector2(165, 34),
-			"0", self:ColInk(), 26, TextAlignmentType.MiddleLeft, true)
+		self.MesoText = self:SpawnLabel("RtsMesoText", card, Vector2(0, 0), Vector2(0, 0.5), Vector2(46, 22), Vector2(200, 32),
+			"0", self:ColInk(), 22, TextAlignmentType.MiddleLeft, true)
+		-- 필드: 내 구역에 살아 있는 몹 수 / 110(탈락선). 90 이상 붉게
+		self:SpawnLabel("RtsFieldKey", card, Vector2(1, 0), Vector2(1, 0.5), Vector2(-122, 22), Vector2(44, 28),
+			"필드", self:ColMuted(), 15, TextAlignmentType.MiddleRight, false)
+		self.FieldText = self:SpawnLabel("RtsFieldText", card, Vector2(1, 0), Vector2(1, 0.5), Vector2(-14, 22), Vector2(104, 32),
+			"0 / 110", self:ColInk(), 20, TextAlignmentType.MiddleRight, true)
 
-		-- 좌측 플레이어 목록 (행은 RefreshPlayerList가 채움)
-		local box = self:SpawnUI("model://uisprite", "RtsPlayers", grp, Vector2(0, 1), Vector2(0, 1), Vector2(16, -123), Vector2(221, 400))
+		-- 좌측 플레이어 목록 (행은 RefreshPlayerList가 채움) — 정보 카드(높이 112) 바로 아래
+		local box = self:SpawnUI("model://uisprite", "RtsPlayers", grp, Vector2(0, 1), Vector2(0, 1), Vector2(16, -140), Vector2(221, 400))
 		self:Tint(box, 0, 0, 0, 0)
 		self.PlayersBox = box
 		self.PlayerHead = self:SpawnLabel("RtsPlayerHead", box, Vector2(0, 1), Vector2(0, 1), Vector2(6, 0), Vector2(200, 20),
 			"0 / 8", Color(0.49, 0.525, 0.584, 1), 13, TextAlignmentType.MiddleLeft, false)
 
-		-- 우측: 영입 버튼 + 유닛 슬롯 6
-		local recruit = self:SpawnPanel("RtsRecruitBtn", grp, Vector2(1, 1), Vector2(1, 1), Vector2(-16, -104), Vector2(130, 50),
-			self:ColPanel(), self:ColBorder(), 1.5)
-		self:SpawnLabel("RtsRecruitLabel", recruit, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2(0, 0), Vector2(120, 40),
+		-- 영입 버튼: 오른쪽 유닛 슬롯(6칸, y −104부터 50 간격) 바로 아래(2026-09-24 사용자 "화면 중앙에서 우측으로" — 전 상단 가운데 340×64).
+		--   영입이 가능할 때(진행 중 + 빈 칸)와 '나가기'(판 끝·탈락·클리어)일 때만 보인다 — RefreshRecruitButton
+		local recruit = self:SpawnPanel("RtsRecruitBtn", grp, Vector2(1, 1), Vector2(1, 1), Vector2(-16, -104 - 6 * 50), Vector2(130, 56),
+			self:ColPanel(), self:ColBorder(), 2)
+		self.RecruitText = self:SpawnLabel("RtsRecruitLabel", recruit, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2(0, 0), Vector2(126, 48),
 			"영입", self:ColInk(), 20, TextAlignmentType.MiddleCenter, true)
 		local recruitClick = self:SpawnClick("RtsRecruitClick", recruit)
 		recruitClick:ConnectEvent(ButtonClickEvent, function(event)
-			_RtsPopupLogic:Open("recruit")
+			self:OnTopButton()
 		end)
+		self.RecruitBtn = recruit
+		-- 영입 버튼 오른쪽: '다시 하기' 투표 — 카운트다운·진행·종료 언제든(2026-09-23 사용자 — 처음엔 스테이지 칩 옆, 같은 날 "영입 버튼 우측으로"). 방 인원 과반 찬성이면 처음부터. 문구·색은 RefreshRestartButton
+		local restart = self:SpawnPanel("RtsRestartBtn", grp, Vector2(0.5, 1), Vector2(0, 1), Vector2(170 + 8, -16), Vector2(200, 64),
+			self:ColPanel(), self:ColBorder(), 2)
+		self.RestartText = self:SpawnLabel("RtsRestartLabel", restart, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2(0, 0), Vector2(192, 56),
+			"다시 하기", self:ColInk(), 19, TextAlignmentType.MiddleCenter, true)
+		local restartClick = self:SpawnClick("RtsRestartClick", restart)
+		restartClick:ConnectEvent(ButtonClickEvent, function(event)
+			self:OnRestartButton()
+		end)
+		self.RestartBtn = restart
+		-- 다시 하기 투표 패널: 버튼 바로 아래(투표 중에만)
+		local vp = self:SpawnPanel("RtsVotePanel", grp, Vector2(0.5, 1), Vector2(0, 1), Vector2(170 + 8, -86), Vector2(260, 76),
+			self:ColPanel(), self:ColGold(), 1.5)
+		self.VotePanel = vp
+		self.VoteText = self:SpawnLabel("RtsVoteText", vp, Vector2(0, 1), Vector2(0, 1), Vector2(10, -4), Vector2(240, 26),
+			"", self:ColInk(), 14, TextAlignmentType.MiddleLeft, true)
+		self.VoteText.TextComponent.IsRichText = true
+		local yes = self:SpawnPanel("RtsVoteYes", vp, Vector2(0, 0), Vector2(0, 0), Vector2(10, 8), Vector2(115, 34), self:ColPanel(), self:ColBorder(), 1.5)
+		self:SpawnLabel("RtsVoteYesText", yes, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2(0, 0), Vector2(110, 30), "찬성", self:ColInk(), 16, TextAlignmentType.MiddleCenter, true)
+		local yc = self:SpawnClick("RtsVoteYesClick", yes)
+		yc:ConnectEvent(ButtonClickEvent, function(event)
+			_RtsStageLogic:RequestVoteChoice(1)
+		end)
+		self.VoteYesBtn = yes
+		local no = self:SpawnPanel("RtsVoteNo", vp, Vector2(0, 0), Vector2(0, 0), Vector2(135, 8), Vector2(115, 34), self:ColPanel(), self:ColBorder(), 1.5)
+		self:SpawnLabel("RtsVoteNoText", no, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2(0, 0), Vector2(110, 30), "반대", self:ColInk(), 16, TextAlignmentType.MiddleCenter, true)
+		local nc = self:SpawnClick("RtsVoteNoClick", no)
+		nc:ConnectEvent(ButtonClickEvent, function(event)
+			_RtsStageLogic:RequestVoteChoice(2)
+		end)
+		self.VoteNoBtn = no
+		vp.Parent:SetEnable(false)
 
+		-- 우측: 유닛 슬롯 6(맨 위는 엔진 시스템 버튼 자리라 비운다 — 예전 영입 버튼 높이부터)
 		for i = 1, 6 do
-			local y = -168 - (i - 1) * 50
+			local y = -104 - (i - 1) * 50
 			local slot = self:SpawnPanel("RtsUnitSlot" .. tostring(i), grp, Vector2(1, 1), Vector2(1, 1), Vector2(-16, y), Vector2(130, 44),
 				self:ColPanel(), self:ColBorderSoft(), 1.5)
 			local bar = self:SpawnStretch("model://uisprite", "RtsUnitSlotBar" .. tostring(i), slot,
@@ -253,18 +401,47 @@ script RtsHudLogic extends Logic
 			self:ApplySlotLook(i)
 		end
 
-		-- 좌하단: 증강 버튼
-		local aug = self:SpawnPanel("RtsAugBtn", grp, Vector2(0, 0), Vector2(0, 0), Vector2(16, 16), Vector2(100, 50),
+		-- 좌하단: 증강 버튼 · 오른쪽에 펼치기 · 위에 증강 뽑기 — 서로 붙여서(2026-09-23 사용자 "버튼 패딩 없이 붙여줘")
+		local aug = self:SpawnPanel("RtsAugBtn", grp, Vector2(0, 0), Vector2(0, 0), Vector2(16, 16), Vector2(130, 50),
 			self:ColPanel(), self:ColBorder(), 1.5)
-		self:SpawnLabel("RtsAugLabel", aug, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2(0, 0), Vector2(96, 40),
+		self.AugBtn = aug
+		self.AugLabel = self:SpawnLabel("RtsAugLabel", aug, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2(0, 0), Vector2(126, 40),
 			"증강", self:ColInk(), 20, TextAlignmentType.MiddleCenter, true)
 		local augClick = self:SpawnClick("RtsAugClick", aug)
 		augClick:ConnectEvent(ButtonClickEvent, function(event)
 			_RtsPopupLogic:Open("augment")
 		end)
+		-- 증강 뽑기 버튼(높이 44) 위: 증강 도감(2026-09-24 사용자 "좌측 아래에 증강 도감 — 등급별 증강 목록")
+		local codex = self:SpawnPanel("RtsCodexBtn", grp, Vector2(0, 0), Vector2(0, 0), Vector2(16, 16 + 50 + 44), Vector2(130, 40),
+			self:ColPanel(), self:ColBorder(), 1.5)
+		self:SpawnLabel("RtsCodexLabel", codex, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2(0, 0), Vector2(126, 34),
+			"증강 도감", self:ColInk(), 17, TextAlignmentType.MiddleCenter, true)
+		local codexClick = self:SpawnClick("RtsCodexClick", codex)
+		codexClick:ConnectEvent(ButtonClickEvent, function(event)
+			_RtsPopupLogic:Open("codex")
+		end)
+		local ex = self:SpawnPanel("RtsExpandBtn", grp, Vector2(0, 0), Vector2(0, 0), Vector2(16 + 130, 16), Vector2(150, 50),
+			Color(0.3, 0.24, 0.12, 0.96), self:ColGold(), 2)
+		self.ExpandBtn = ex
+		self.ExpandLabel = self:SpawnLabel("RtsExpandLabel", ex, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2(0, 0), Vector2(146, 40),
+			"펼치기", Color(1, 0.95, 0.8, 1), 19, TextAlignmentType.MiddleCenter, true)
+		local exClick = self:SpawnClick("RtsExpandClick", ex)
+		exClick:ConnectEvent(ButtonClickEvent, function(event)
+			_RtsAugmentLogic:ExpandPick()
+		end)
+		ex.Parent:SetEnable(false)
+		local buy = self:SpawnPanel("RtsBuyBtn", grp, Vector2(0, 0), Vector2(0, 0), Vector2(16, 16 + 50), Vector2(280, 44),
+			self:ColPanel(), self:ColBorder(), 1.5)
+		self.BuyBtn = buy
+		self.BuyLabel = self:SpawnLabel("RtsBuyLabel", buy, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2(0, 0), Vector2(270, 38),
+			"증강 뽑기", self:ColInk(), 16, TextAlignmentType.MiddleCenter, true)
+		local buyClick = self:SpawnClick("RtsBuyClick", buy)
+		buyClick:ConnectEvent(ButtonClickEvent, function(event)
+			_RtsAugmentLogic:BuyFromHud()
+		end)
 
-		-- 우측 하단: 테스트 프리즘 버튼(개발모드 전용, 2026-09-22 사용자 "우측 하단에 테스트 프리즘 증강 버튼") → 프리즘 선택 팝업
-		if _RtsCombatLogic.TestBench then
+		-- 우측 하단: 테스트 프리즘 버튼(개발 도구, 2026-09-22 사용자 "우측 하단에 테스트 프리즘 증강 버튼") → 프리즘 선택 팝업
+		if _RtsUnitLogic.DevTools then
 			local dev = self:SpawnPanel("RtsDevBtn", grp, Vector2(1, 0), Vector2(1, 0), Vector2(-16, 16), Vector2(160, 50),
 				self:ColPanel(), Color(0.55, 0.75, 1, 1), 1.5)
 			self:SpawnLabel("RtsDevLabel", dev, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2(0, 0), Vector2(156, 40),
@@ -275,8 +452,8 @@ script RtsHudLogic extends Logic
 			end)
 		end
 
-		-- 상단 중앙 안내(기본 숨김)
-		local hint = self:SpawnPanel("RtsHint", grp, Vector2(0.5, 1), Vector2(0.5, 1), Vector2(0, -16), Vector2(720, 44),
+		-- 상단 중앙 안내(기본 숨김) — 영입 버튼 아래
+		local hint = self:SpawnPanel("RtsHint", grp, Vector2(0.5, 1), Vector2(0.5, 1), Vector2(0, -92), Vector2(720, 44),
 			Color(0.22, 0.185, 0.118, 0.94), self:ColGold(), 1.5)
 		self.HintText = self:SpawnLabel("RtsHintText", hint, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2(0, 0), Vector2(700, 36),
 			"", self:ColInk(), 17, TextAlignmentType.MiddleCenter, true)
@@ -309,12 +486,301 @@ script RtsHudLogic extends Logic
 		self.Hint:SetEnable(false)
 	end
 
-	-- ===== 시간·메소 =====
+	-- sec초 동안만 안내(같은 안내가 다시 오면 시간 연장)
+	@ExecSpace("ClientOnly")
+	method void ShowHintFor(string text, number sec)
+		self:ShowHint(text)
+		self.HintGen = self.HintGen + 1
+		local gen = self.HintGen
+		_TimerService:SetTimerOnce(function()
+			if self.HintGen == gen then self:HideHint() end
+		end, sec)
+	end
+
+	-- ===== 스테이지·메소·필드·영입 버튼 (RtsStageLogic.RefreshHud가 0.25초마다) =====
 
 	@ExecSpace("ClientOnly")
-	method void SetTime(string text)
-		if self.TimeText == nil or self.TimeText.TextComponent == nil then return end
-		self.TimeText.TextComponent.Text = text
+	method void SetStageCard(string title, string sub, string clock, boolean special)
+		if self.StageTitleText == nil or self.StageSubText == nil or self.StageClockText == nil then return end
+		local t = title
+		if special then t = title .. "  <color=#e0b95a>스페셜</color>" end
+		local key = t .. "|" .. sub .. "|" .. clock
+		if key == self.StageShown then return end
+		self.StageShown = key
+		self.StageTitleText.TextComponent.Text = t
+		self.StageSubText.TextComponent.Text = sub
+		self.StageClockText.TextComponent.Text = clock
+	end
+
+	@ExecSpace("ClientOnly")
+	method void SetField(number n, number limit)
+		if self.FieldText == nil or self.FieldText.TextComponent == nil then return end
+		self.FieldText.TextComponent.Text = self:Int(n) .. " / " .. self:Int(limit)
+		if n >= limit - 20 then
+			self.FieldText.TextComponent.FontColor = Color(0.92, 0.32, 0.28, 1)
+		else
+			self.FieldText.TextComponent.FontColor = self:ColInk()
+		end
+	end
+
+	-- 좌하단 증강 버튼: 미지정이 있으면 '증강 (n)' + 붉은 테두리(2026-09-23 Phase 4 합류 — RtsAugmentLogic.ClientTick이 0.3초마다)
+	@ExecSpace("ClientOnly")
+	method void SetAugmentCount(number n)
+		if self.AugLabel == nil or self.AugBtn == nil then return end
+		if n == self.AugShown then return end
+		self.AugShown = n
+		if n > 0 then
+			self.AugLabel.TextComponent.Text = "증강 (" .. self:Int(n) .. ")"
+			self.AugBtn.Parent.SpriteGUIRendererComponent.Color = Color(0.95, 0.45, 0.4, 1)
+		else
+			self.AugLabel.TextComponent.Text = "증강"
+			self.AugBtn.Parent.SpriteGUIRendererComponent.Color = self:ColBorder()
+		end
+	end
+
+	-- '증강 뽑기 3,000' 버튼: 가격과 뽑을 수 있는지(메소·선택지 MaxPending(10)개 미만·진행 중)에 따라 금색/흐림
+	@ExecSpace("ClientOnly")
+	method void SetBuyPrism(number left, number max)
+		self.BuyPrismLeft = left
+		self.BuyPrismMax = max
+	end
+
+	-- 뽑기 버튼의 프리즘 확률 글자(" · 7%") — 더 못 얻으면 빈칸
+	method string BuyPrismRateText()
+		if self.BuyPrismLeft <= 0 or self.BuyPrismRatePct <= 0 then return "" end
+		return " · " .. self:Int(self.BuyPrismRatePct) .. "%"
+	end
+
+	@ExecSpace("ClientOnly")
+	method void SetBuyPrismRate(number pct)
+		self.BuyPrismRatePct = pct
+	end
+
+	@ExecSpace("ClientOnly")
+	method void SetBuyButton(number price, boolean can)
+		if self.BuyBtn == nil or self.BuyLabel == nil then return end
+		local key = self:Int(price) .. "|" .. tostring(can) .. "|" .. self:Int(self.BuyPrismLeft) .. "/" .. self:Int(self.BuyPrismMax) .. "|" .. self:Int(self.BuyPrismRatePct)
+		if key == self.BuyShown then return end
+		self.BuyShown = key
+		-- 가격 옆에 뽑기로 더 얻을 수 있는 프리즘 수(남은/최대 — 0이면 흐리게)
+		local pc = "#d7b4ff"
+		if self.BuyPrismLeft <= 0 then pc = "#8a8378" end
+		self.BuyLabel.TextComponent.IsRichText = true
+		self.BuyLabel.TextComponent.Text = "증강 뽑기  " .. self:FormatNumber(price) .. "   <size=13><color=" .. pc .. ">프리즘 " .. self:Int(self.BuyPrismLeft) .. "/" .. self:Int(self.BuyPrismMax) .. self:BuyPrismRateText() .. "</color></size>"
+		if can then
+			self.BuyBtn.SpriteGUIRendererComponent.Color = Color(0.3, 0.24, 0.12, 0.96)
+			self.BuyBtn.Parent.SpriteGUIRendererComponent.Color = self:ColGold()
+			self.BuyLabel.TextComponent.FontColor = Color(1, 0.95, 0.8, 1)
+		else
+			self.BuyBtn.SpriteGUIRendererComponent.Color = self:ColPanel()
+			self.BuyBtn.Parent.SpriteGUIRendererComponent.Color = self:ColBorderSoft()
+			self.BuyLabel.TextComponent.FontColor = self:ColMuted()
+		end
+	end
+
+	-- '펼치기 (n)' 버튼: 고르지 않은 증강 선택지 수 n, 3택1 창이 닫혀 있을 때만 보인다(RtsAugmentLogic.ClientTick이 0.3초마다)
+	@ExecSpace("ClientOnly")
+	method void SetPendingOffers(number n, boolean visible)
+		if self.ExpandBtn == nil or self.ExpandLabel == nil then return end
+		local key = tostring(visible) .. "|" .. self:Int(n)
+		if key == self.ExpandShown then return end
+		self.ExpandShown = key
+		self.ExpandBtn.Parent:SetEnable(visible)
+		if n > 1 then self.ExpandLabel.TextComponent.Text = "펼치기 (" .. self:Int(n) .. ")" else self.ExpandLabel.TextComponent.Text = "펼치기" end
+	end
+
+	-- '다시 하기' 클릭: 찬성했으면 취소, 판이 끝났으면 바로 찬성, 진행 중이면 3초 안에 한 번 더 눌러야 찬성(실수로 판을 날리지 않게)
+	@ExecSpace("ClientOnly")
+	method void OnRestartButton()
+		local st = _RtsStageLogic.RunState
+		if st ~= "running" and st ~= "ended" then return end
+		if _RtsStageLogic:IsMyVote() or st == "ended" then
+			self.RestartConfirmUntil = 0
+			_RtsStageLogic:RequestRestartVote()
+			return
+		end
+		local now = _UtilLogic.ElapsedSeconds
+		if now < self.RestartConfirmUntil then
+			self.RestartConfirmUntil = 0
+			_RtsStageLogic:RequestRestartVote()
+			return
+		end
+		self.RestartConfirmUntil = now + 3
+		self:ShowHintFor("다시 하기 — 3초 안에 한 번 더 누르면 찬성해요(방 인원 과반이 찬성하면 처음부터)", 3)
+		self:RefreshRestartButton()
+	end
+
+	-- '다시 하기' 버튼 문구·색(RtsStageLogic.RefreshHud가 0.25초마다): 표 없음 "다시 하기" / 누가 찬성 "다시 하기 1/2"(금색 테두리) /
+	--   내가 찬성 "다시 하기 ✓ 1/2"(밝은 금색) / 확인 대기 "한 번 더 누르면 찬성"(붉은 테두리) / 판 시작 전 흐리게
+	@ExecSpace("ClientOnly")
+	method void RefreshRestartButton()
+		if self.RestartBtn == nil or self.RestartText == nil then return end
+		local S = _RtsStageLogic
+		local st = S.RunState
+		local mine = S:IsMyVote()
+		local count = self:Int(S.VoteCount) .. "/" .. self:Int(S.VoteNeed)
+		local text = "다시 하기"
+		local mode = "off"
+		if st ~= "running" and st ~= "ended" then
+			mode = "idle"
+		elseif mine then
+			text = "다시 하기 ✓ " .. count
+			mode = "mine"
+		elseif _UtilLogic.ElapsedSeconds < self.RestartConfirmUntil then
+			text = "한 번 더 누르면 찬성"
+			mode = "confirm"
+		elseif S.VoteCount > 0 or st == "ended" then
+			text = "다시 하기 " .. count
+			mode = "on"
+		end
+		self:RefreshVotePanel()
+		local key = mode .. "|" .. text
+		if key == self.RestartShown then return end
+		self.RestartShown = key
+		self.RestartText.TextComponent.Text = text
+		local outer = self.RestartBtn.Parent
+		if mode == "mine" then
+			self.RestartBtn.SpriteGUIRendererComponent.Color = Color(0.45, 0.37, 0.18, 0.96)
+			outer.SpriteGUIRendererComponent.Color = Color(1, 0.9, 0.55, 1)
+			self.RestartText.TextComponent.FontColor = Color(1, 0.97, 0.85, 1)
+		elseif mode == "confirm" then
+			self.RestartBtn.SpriteGUIRendererComponent.Color = Color(0.3, 0.13, 0.11, 0.94)
+			outer.SpriteGUIRendererComponent.Color = Color(0.8, 0.35, 0.3, 1)
+			self.RestartText.TextComponent.FontColor = Color(0.98, 0.72, 0.66, 1)
+		elseif mode == "on" then
+			self.RestartBtn.SpriteGUIRendererComponent.Color = Color(0.22, 0.185, 0.118, 0.94)
+			outer.SpriteGUIRendererComponent.Color = self:ColGold()
+			self.RestartText.TextComponent.FontColor = Color(0.973, 0.925, 0.784, 1)
+		elseif mode == "off" then
+			self.RestartBtn.SpriteGUIRendererComponent.Color = self:ColPanel()
+			outer.SpriteGUIRendererComponent.Color = self:ColBorder()
+			self.RestartText.TextComponent.FontColor = self:ColInk()
+		else
+			self.RestartBtn.SpriteGUIRendererComponent.Color = self:ColPanel()
+			outer.SpriteGUIRendererComponent.Color = self:ColBorderSoft()
+			self.RestartText.TextComponent.FontColor = self:ColMuted()
+		end
+	end
+
+	-- 투표 패널: 누가 찬성·반대를 누르면(투표 중) 보이고, 찬성 n · 반대 m / 과반 k · 남은 초 + 내 선택 강조
+	@ExecSpace("ClientOnly")
+	method void RefreshVotePanel()
+		if self.VotePanel == nil or self.VoteText == nil then return end
+		local S = _RtsStageLogic
+		local active = (S.VoteCount + S.VoteNoCount) > 0
+		local mine = S:MyVote()
+		local left = 0
+		if active then
+			left = math.ceil(S.VoteStartedAt + S.VoteTimeout - _UtilLogic.ServerElapsedSeconds)
+			if left < 0 then left = 0 end
+		end
+		local text = "다시 하기 투표  <color=#8fd18a>찬성 " .. self:Int(S.VoteCount) .. "</color> · <color=#e88a7a>반대 " .. self:Int(S.VoteNoCount) .. "</color>  / 과반 " .. self:Int(S.VoteNeed) .. " · " .. self:Int(left) .. "초"
+		local key = tostring(active) .. "|" .. self:Int(mine) .. "|" .. text
+		if key == self.VoteShown then return end
+		self.VoteShown = key
+		self.VotePanel.Parent:SetEnable(active)
+		if not active then return end
+		self.VoteText.TextComponent.Text = text
+		local btns = { self.VoteYesBtn, self.VoteNoBtn }
+		for i = 1, 2 do
+			local b = btns[i]
+			if b ~= nil then
+				if mine == i then
+					b.SpriteGUIRendererComponent.Color = Color(0.45, 0.37, 0.18, 0.96)
+					b.Parent.SpriteGUIRendererComponent.Color = Color(1, 0.9, 0.55, 1)
+				else
+					b.SpriteGUIRendererComponent.Color = self:ColPanel()
+					b.Parent.SpriteGUIRendererComponent.Color = self:ColBorder()
+				end
+			end
+		end
+	end
+
+	-- 상단 가운데 버튼 클릭: 판이 끝났거나 탈락·클리어한 뒤(관전 중)면 나가기, 아니면 영입 팝업. 다시 하기 투표는 스테이지 칩 옆 버튼(OnRestartButton)
+	@ExecSpace("ClientOnly")
+	method void OnTopButton()
+		if _RtsStageLogic.RunState == "ended" or not _RtsRunResultLogic:IsMeAlive() then
+			_RtsPopupLogic:Close()
+			_RtsRunResultLogic:RequestExit()
+			return
+		end
+		_RtsPopupLogic:Open("recruit")
+	end
+
+	-- 상단 가운데 버튼: '영입 가능 n'(금색) / '다음 영입 · n라운드'(흐리게) / '영입 완료' / '영입 불가'(판 시작 전·끝) / 탈락·클리어 뒤 '나가기'(붉은 테두리, 2026-09-23 사용자). 칸이 새로 열리면 1.5초 반짝
+	@ExecSpace("ClientOnly")
+	method void RefreshRecruitButton()
+		if self.RecruitBtn == nil or self.RecruitText == nil then return end
+		local stageNo = _RtsStageLogic.StageNo
+		local state = _RtsStageLogic.RunState
+		local owned = #_RtsUnitLogic:ListZoneUnits(_RtsUnitLogic:MyZone())
+		local room = _RtsStageTableLogic:RecruitLimit(stageNo) - owned
+		if room < 0 then room = 0 end
+		local text = ""
+		local on = false
+		-- 보이기(2026-09-24 사용자 "영입 가능 버튼은 영입이 가능할 때만"): '나가기'(판 끝·탈락·클리어) 또는 진행 중 + 빈 칸이 있을 때만
+		local exitMode = state == "ended" or not _RtsRunResultLogic:IsMeAlive()
+		local canRecruit = state == "running" and room > 0 and owned < _RtsUnitLogic:GetMaxUnits()
+		self.RecruitBtn.Parent:SetEnable(exitMode or canRecruit)
+		-- 판이 끝났거나 탈락·클리어했으면 '나가기'(다시 하기는 스테이지 칩 옆 버튼)
+		if exitMode then
+			self.RecruitRoomPrev = 0
+			self.RecruitLimitPrev = 0
+			local key = "exit"
+			if key == self.RecruitShown then return end
+			self.RecruitShown = key
+			self.RecruitText.TextComponent.Text = "나가기"
+			self.RecruitBtn.SpriteGUIRendererComponent.Color = Color(0.3, 0.13, 0.11, 0.94)
+			self.RecruitBtn.Parent.SpriteGUIRendererComponent.Color = Color(0.8, 0.35, 0.3, 1)
+			self.RecruitText.TextComponent.FontColor = Color(0.98, 0.72, 0.66, 1)
+			return
+		end
+		if state ~= "running" then
+			text = "영입 불가"
+			room = 0
+			self.RecruitLimitPrev = 0
+		elseif owned >= _RtsUnitLogic:GetMaxUnits() then
+			text = "영입 완료"
+		elseif room > 0 then
+			text = "영입 가능 " .. self:Int(room)
+			on = true
+		else
+			local nextNo = _RtsStageTableLogic:NextRecruitStage(stageNo)
+			if nextNo > 0 then text = "다음 영입 · " .. self:Int(nextNo) .. "라운드" else text = "영입 완료" end
+		end
+		local now = _UtilLogic.ElapsedSeconds
+		if room > self.RecruitRoomPrev then self.RecruitFlashUntil = now + 1.5 end
+		if state == "running" then
+			local limit = _RtsStageTableLogic:RecruitLimit(stageNo)
+			if room > 0 and limit > self.RecruitLimitPrev then _SoundService:PlaySound(self.RecruitSound, 1) end
+			self.RecruitLimitPrev = limit
+		end
+		-- 영입 팝업이 열려 있으면 칸 수가 바뀔 때 내용(카드 활성·하단 문구)을 다시 그린다
+		if room ~= self.RecruitRoomPrev and _RtsPopupLogic.Kind == "recruit" then _RtsPopupLogic:Open("recruit") end
+		self.RecruitRoomPrev = room
+		local flash = false
+		if now < self.RecruitFlashUntil then
+			self.RecruitFlashOn = not self.RecruitFlashOn
+			flash = self.RecruitFlashOn
+		end
+		local key = text .. tostring(on) .. tostring(flash)
+		if key == self.RecruitShown then return end
+		self.RecruitShown = key
+		self.RecruitText.TextComponent.Text = text
+		local outer = self.RecruitBtn.Parent
+		if flash then
+			self.RecruitBtn.SpriteGUIRendererComponent.Color = Color(0.45, 0.37, 0.18, 0.96)
+			outer.SpriteGUIRendererComponent.Color = Color(1, 0.9, 0.55, 1)
+			self.RecruitText.TextComponent.FontColor = Color(1, 0.97, 0.85, 1)
+		elseif on then
+			self.RecruitBtn.SpriteGUIRendererComponent.Color = Color(0.22, 0.185, 0.118, 0.94)
+			outer.SpriteGUIRendererComponent.Color = self:ColGold()
+			self.RecruitText.TextComponent.FontColor = Color(0.973, 0.925, 0.784, 1)
+		else
+			self.RecruitBtn.SpriteGUIRendererComponent.Color = Color(0.094, 0.082, 0.071, 0.6)
+			outer.SpriteGUIRendererComponent.Color = self:ColBorderSoft()
+			self.RecruitText.TextComponent.FontColor = self:ColMuted()
+		end
 	end
 
 	-- 프로퍼티·동기화 값은 실수(1.0)로 오므로 표시용 정수 문자열은 이걸로
@@ -373,6 +839,17 @@ script RtsHudLogic extends Logic
 			self.PlayerHead.TextComponent.Text = string.format("%d / %d", count, _RtsZoneLogic:GetZoneCount())
 		end
 		self:ApplyWatchLook()
+	end
+
+	-- 플레이어 목록 기준: 구역 zone의 주인이 살아 있는가(목록에 없으면 false) — 탈락 뒤 관전 배경음(RtsStageLogic.RefreshBgm)
+	@ExecSpace("ClientOnly")
+	method boolean IsZoneAliveClient(number zone)
+		local z = math.floor(zone + 0.5)
+		for i = 1, #self.PlayerOrder do
+			local p = self.Players[self.PlayerOrder[i]]
+			if p ~= nil and math.floor(p.zone + 0.5) == z then return p.alive == true end
+		end
+		return false
 	end
 
 	@ExecSpace("ClientOnly")

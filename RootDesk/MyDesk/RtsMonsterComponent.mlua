@@ -1,9 +1,11 @@
--- Phase 3 (2026-09-17, 시험대): 트랙 위 몬스터 1기의 상태. 같은 엔티티에 SpriteRenderer(이동 클립) + HitComponent(피격 판정 박스)
---   + DamageSkinSpawnerComponent(데미지 숫자)가 붙는다. HP는 서버가 깎고 동기화. 피격 연출(번쩍임·타격 이펙트·타격음)은 클라 PlayHitFx.
---   지금은 체력 무제한 허수아비(Invincible)로 유닛 공격을 시험한다 — 몬스터 스폰·순환(#10)·사망(#13)은 나중.
+-- Phase 3 (2026-09-17) → Phase 6·7 (2026-09-23): 트랙 위 몬스터·보스 1기의 상태. 같은 엔티티에 SpriteRenderer(이동 클립) + HitComponent(피격 판정 박스)
+--   + DamageSkinSpawnerComponent(데미지 숫자) + RtsTrackWalkerComponent가 붙는다(생성 = RtsWaveLogic.SpawnMonsterEntity). HP는 서버가 깎고 동기화.
+--   피격 연출(번쩍임·타격 이펙트·타격음)은 클라 PlayHitFx. HP 0 → Die(): 드랍 메소(구역 주인)·처치 수·필드 −1(일반) / 보스 처치 알림(보스),
+--   클라는 Dead 동기화로 사망 클립 + 사망음(보고 있는 구역만), 서버가 사망 클립 길이 뒤 제거.
 @Component
 script RtsMonsterComponent extends Component
 
+	-- RtsStageTableLogic 몬스터 id(M001~M229, B01~B18) — 클라가 사망 클립·사망음·체력바 높이를 표에서 찾는다
 	@Sync
 	property string MonsterId = "M001"
 
@@ -13,9 +15,26 @@ script RtsMonsterComponent extends Component
 	@Sync
 	property number Hp = 100
 
-	-- 시험용 허수아비: 데미지를 받아도 HP가 줄지 않는다
+	-- 죽음(대상 제외·걷기 정지). 클라는 이 값이 켜지면 사망 연출
 	@Sync
-	property boolean Invincible = false
+	property boolean Dead = false
+
+	-- 서버: 보관 중(보스 스테이지 — 대상 제외, RtsWaveLogic.SetStashed)
+	property boolean Stashed = false
+
+	-- 서버: 처치 시 구역 주인에게 주는 메소(일반 몹만)
+	property number Meso = 0
+
+	-- 방어율 %(보스 50, 검은 마법사 4페이즈 100, 일반 0) — RtsCombatLogic 방어 단계. 클라 몬스터 정보 패널도 읽어서 동기화
+	@Sync
+	property number Defense = 0
+
+	-- 이 몬스터가 나온 라운드(스테이지 순번) — 몬스터 정보 패널(RtsMonsterInfoLogic) 표시용
+	@Sync
+	property number StageNo = 0
+
+	-- 사망 연출이 끝난 뒤 서버가 지우기까지 여유(초)
+	property number DieGrace = 0.25
 
 	-- 이 몬스터가 걷는 구역(포이즌 리전 같은 구역 전체 지속 피해가 이 값으로 고른다)
 	@Sync
@@ -40,9 +59,12 @@ script RtsMonsterComponent extends Component
 
 	property number BarW = 1.4
 
-	property number BossBarW = 2.6
+	-- 보스 체력바(2026-09-23 보스 크기 3배에 맞춰 폭 2.6 → 7.8, 두께 0.12 → 0.24)
+	property number BossBarW = 7.8
 
 	property number BarH = 0.12
+
+	property number BossBarH = 0.24
 
 	property number BarY = 1.15
 
@@ -52,6 +74,14 @@ script RtsMonsterComponent extends Component
 	-- 보스면 긴 체력바(몬스터 표(#10)에서 넣는다)
 	@Sync
 	property boolean IsBoss = false
+
+	-- 크기 배율(보스 영역에 맞춰 줄인 보스 — RtsBossLogic.SpawnBoss, 엔티티 스케일 = 표 scale × SizeMul). 표 barY(세계, 원래 크기 기준)에 곱한다
+	@Sync
+	property number SizeMul = 1
+
+	-- 보스 체력바 폭(세계) — 0이면 BossBarW. 보스 영역 슬롯 폭(RtsBossLogic.SpawnBoss)
+	@Sync
+	property number BossBarFit = 0
 
 	-- 빙결 표시(클라, 몬스터 자식) = 얼음 결정체 아이콘: 원작 2221012/effect 223e1ac7…(얼음 결정이 뭉쳐 결정체가 되는 18프레임 — 0~12 형성, 13~17 부서짐).
 	--   켤 때 0→12를 한 번 돌려 12번(완성된 결정체)에 멈춰 두고, 풀릴 때 13→17(부서짐)을 돌린 뒤 제거. 위치 = 몬스터 정중앙, 체력바 바로 위(머리 위 — 2026-09-20 사용자 "정중앙 머리 위, 지금보다 작게"),
@@ -67,11 +97,33 @@ script RtsMonsterComponent extends Component
 	-- 결정체 세계 크기(가로 ≈ FrozenWorld 유닛; 원본 결정체 ≈ 250px = 2.5유닛 → 0.7유닛이면 0.28배, 부모 스케일로 나눠 로컬 값). 처음 1.7(몸을 덮는 오버레이)은 사용자 "작게" → 0.7
 	property number FrozenWorld = 0.7
 
+	-- 부위(클라, 몬스터 자식): 여러 부위 보스(혼테일 — 몬스터 표 parts)의 나머지 부위 엔티티들. 같은 기준점(로컬 0,0)에 겹쳐 그리면 원작처럼 맞물린다
+	property table PartFx = {}
+
 	-- 빙결 갱신 세대(겹쳐 맞으면 마지막 것만 해제)
 	property number FreezeGen = 0
 
 	-- 빙결 중 이동속도 배율(스킬 설명 "이동속도 감소 50%") — RtsTrackWalkerComponent가 FrozenUntil 동안 곱한다(2026-09-20)
 	property number FreezeSlow = 0.5
+
+	-- 방어율 감소(썬콜 블리자드 템페스트 — 2026-09-24 사용자 "적중한 적의 방어율을 까는 식"): 끝나는 서버 시각 · 감소율 %(방어율에 곱한다 — 350 × (1 − 30%) = 245).
+	--   RtsCombatLogic.DefenseMul이 가드 크러쉬보다 먼저 적용. 몬스터 정보 창 디버프 아이콘(RtsMonsterInfoLogic)도 읽는다
+	@Sync
+	property number ShredUntil = 0
+
+	@Sync
+	property number ShredPct = 0
+
+	-- 받는 데미지 증가(비숍 디바인 퍼니시먼트 — 2026-09-24 사용자 "받는 데미지 증가 효과"): 끝나는 서버 시각 · 증가 %(모든 유닛의 데미지에 곱)
+	@Sync
+	property number VulnUntil = 0
+
+	@Sync
+	property number VulnPct = 0
+
+	-- 중독(불독 포이즌 리전) 표시용: 지대가 끝나는 서버 시각(틱마다 서버가 맞춘다) — 데미지 계산엔 안 쓴다
+	@Sync
+	property number PoisonUntil = 0
 
 	method void OnBeginPlay()
 		if self:IsServer() then
@@ -80,14 +132,98 @@ script RtsMonsterComponent extends Component
 			end)
 		else
 			-- 스프라이트·스케일이 잡힌 뒤 체력바(0.2초 뒤 한 번 더 — 동기화 지연 대비)
-			_TimerService:SetTimerOnce(function() self:EnsureHpBar() end, 0.1)
+			_TimerService:SetTimerOnce(function()
+				self:EnsureParts()
+				self:EnsureHpBar()
+			end, 0.1)
 			_TimerService:SetTimerOnce(function() self:RefreshHpBar() end, 0.5)
 		end
 	end
 
 	method void OnSyncProperty(string name, any value)
 		if not self:IsClient() then return end
-		if name == "Hp" or name == "MaxHp" or name == "IsBoss" then self:RefreshHpBar() end
+		if name == "Dead" then
+			if self.Dead then self:PlayDie() end
+			return
+		end
+		if name == "Hp" or name == "MaxHp" or name == "IsBoss" or name == "MonsterId" or name == "SizeMul" or name == "BossBarFit" then self:RefreshHpBar() end
+	end
+
+	-- 클라 사망 연출: 체력바·빙결 표시 제거 → 사망 클립(마지막 프레임에서 숨김) + 사망음(지금 보고 있는 구역만, 겹침 간격 제한)
+	@ExecSpace("ClientOnly")
+	method void PlayDie()
+		local e = self.Entity
+		if e == nil or not isvalid(e) then return end
+		if self.HpBack ~= nil and isvalid(self.HpBack) then self.HpBack:SetEnable(false) end
+		if self.HpFill ~= nil and isvalid(self.HpFill) then self.HpFill:SetEnable(false) end
+		local fz = self.FrozenFx
+		self.FrozenFx = nil
+		if fz ~= nil and isvalid(fz) then fz:Destroy() end
+		self.Frozen = false
+		local mon = _RtsStageTableLogic:GetMonster(self.MonsterId)
+		-- 부위도 각자 사망 클립(마지막 프레임에서 숨김)
+		if mon ~= nil and mon.parts ~= nil then
+			for i = 1, #self.PartFx do
+				local pe = self.PartFx[i]
+				local pd = mon.parts[i]
+				if pe ~= nil and isvalid(pe) and pe.SpriteRendererComponent ~= nil and pd ~= nil then
+					if pd.die ~= nil and pd.die ~= "" then
+						pe.SpriteRendererComponent.SpriteRUID = pd.die
+						pe:ConnectEvent(SpriteAnimPlayerEndFrameEvent, function(ev)
+							if isvalid(pe) and pe.SpriteRendererComponent ~= nil then pe.SpriteRendererComponent.Enable = false end
+						end)
+					else
+						pe.SpriteRendererComponent.Enable = false
+					end
+				end
+			end
+		end
+		local sr = e.SpriteRendererComponent
+		if sr ~= nil then
+			if mon ~= nil and mon.die ~= nil and mon.die ~= "" then
+				sr.Color = Color.white
+				sr.SpriteRUID = mon.die
+				e:ConnectEvent(SpriteAnimPlayerEndFrameEvent, function(ev)
+					if isvalid(e) and e.SpriteRendererComponent ~= nil then e.SpriteRendererComponent.Enable = false end
+				end)
+			else
+				sr.Enable = false
+			end
+		end
+		if mon ~= nil and mon.dieSound ~= nil and mon.dieSound ~= "" and math.floor(self.Zone + 0.5) == math.floor(_RtsHudLogic.WatchedZone + 0.5) then
+			_RtsWaveLogic:PlayDieSound(mon.dieSound)
+		end
+	end
+
+	-- 여러 부위 보스(몬스터 표 parts)면 나머지 부위를 자식으로(한 번): 로컬 (0,0)·스케일 1(부모 스케일을 그대로 받음), 그리기 순서 = 몸통 순서 + part.order(음수 = 몸통 뒤)
+	@ExecSpace("ClientOnly")
+	method void EnsureParts()
+		local e = self.Entity
+		if e == nil or not isvalid(e) or #self.PartFx > 0 then return end
+		local mon = _RtsStageTableLogic:GetMonster(self.MonsterId)
+		if mon == nil or mon.parts == nil then return end
+		local layer = "MapLayer0"
+		local order = 200
+		local flip = false
+		if e.SpriteRendererComponent ~= nil then
+			layer = e.SpriteRendererComponent.SortingLayer
+			order = e.SpriteRendererComponent.OrderInLayer
+			flip = e.SpriteRendererComponent.FlipX
+		end
+		for i = 1, #mon.parts do
+			local p = mon.parts[i]
+			local pe = _SpawnService:SpawnByModelId("model://MapObject", "RtsPart" .. string.format("%d", i), Vector3.zero, e)
+			if pe ~= nil then
+				pe.TransformComponent.Position = Vector3(0, 0, 0)
+				local sr = pe.SpriteRendererComponent
+				if sr == nil then sr = pe:AddComponent("SpriteRendererComponent") end
+				sr.SpriteRUID = p.walk
+				sr.SortingLayer = layer
+				sr.OrderInLayer = order + (p.order or -1)
+				sr.FlipX = flip
+			end
+			self.PartFx[i] = pe
+		end
 	end
 
 	-- 체력바 만들기(한 번). 배경 = 어두운 회색(테두리 느낌으로 살짝 크게), 채움 = 빨강(HP 비율만큼 왼쪽 정렬). 몬스터 스프라이트와 같은 SortingLayer, 순서 +5/+6.
@@ -121,12 +257,24 @@ script RtsMonsterComponent extends Component
 
 	@ExecSpace("ClientOnly")
 	method number BarWidth()
-		if self.IsBoss then return self.BossBarW end
+		if self.IsBoss then
+			if self.BossBarFit > 0 then return self.BossBarFit end
+			return self.BossBarW
+		end
 		return self.BarW
 	end
 
 	@ExecSpace("ClientOnly")
+	method number BarHeight()
+		if self.IsBoss then return self.BossBarH end
+		return self.BarH
+	end
+
+	-- 체력바 높이(세계): 몬스터 표 barY(스프라이트 위 끝), 없으면 기본값
+	@ExecSpace("ClientOnly")
 	method number BarTop()
+		local mon = _RtsStageTableLogic:GetMonster(self.MonsterId)
+		if mon ~= nil and mon.barY ~= nil then return mon.barY * self.SizeMul end
 		if self.IsBoss then return self.BossBarY end
 		return self.BarY
 	end
@@ -143,7 +291,7 @@ script RtsMonsterComponent extends Component
 		if e ~= nil and isvalid(e) then ps = math.abs(e.TransformComponent.Scale.x) end
 		if ps < 0.01 then ps = 1 end
 		local W = self:BarWidth()
-		local H = self.BarH
+		local H = self:BarHeight()
 		local r = 1
 		if self.MaxHp > 0 then r = self.Hp / self.MaxHp end
 		if r < 0 then r = 0 elseif r > 1 then r = 1 end
@@ -231,14 +379,38 @@ script RtsMonsterComponent extends Component
 
 	@ExecSpace("ServerOnly")
 	method void OnHitServer(number total)
-		if self.Invincible then return end
+		if self.Dead or self.Stashed then return end
 		self.Hp = self.Hp - total
-		if self.Hp < 0 then self.Hp = 0 end
+		if self.Hp <= 0 then
+			self.Hp = 0
+			self:Die()
+		end
 	end
 
-	-- 빙결 sec초(블리자드 5초 — character.md "이동속도 감소 50%"). 서버는 끝 시각만 기록(걷기 감속은 FrozenUntil로), 전 클라에 틴트·결정체
+	-- 처치: 일반 몹 = 필드 −1 · 처치 수 +1 · 메소(구역 주인) / 보스 = RtsBossLogic 처치 알림. 사망 클립 길이(표 dieSec) 뒤 제거
+	@ExecSpace("ServerOnly")
+	method void Die()
+		if self.Dead then return end
+		self.Dead = true
+		local e = self.Entity
+		if self.IsBoss then
+			_RtsBossLogic:OnBossKilled(self.Zone)
+		else
+			_RtsWaveLogic:OnMobGone(self.Zone, e.Name)
+			_RtsRunResultLogic:OnMobKilled(self.Zone, self.Meso)
+		end
+		local sec = 0.6
+		local mon = _RtsStageTableLogic:GetMonster(self.MonsterId)
+		if mon ~= nil and mon.dieSec ~= nil and mon.dieSec > 0 then sec = mon.dieSec end
+		_TimerService:SetTimerOnce(function()
+			if isvalid(e) then e:Destroy() end
+		end, sec + self.DieGrace)
+	end
+
+	-- 빙결 sec초(블리자드 5초 — character.md "이동속도 감소 50%"). 서버는 끝 시각만 기록(걷기 감속은 FrozenUntil로), 전 클라에 틴트·결정체. 보스는 빙결 없음
 	@ExecSpace("ServerOnly")
 	method void Freeze(number sec)
+		if self.IsBoss or self.Dead then return end
 		self.FrozenUntil = _UtilLogic.ServerElapsedSeconds + sec
 		self:ShowFreeze(sec)
 	end
@@ -263,6 +435,35 @@ script RtsMonsterComponent extends Component
 	-- 빙결 중인가(서버·클라 공용 — 걷기 감속은 서버가 FrozenUntil로 본다)
 	method boolean IsFrozenNow()
 		return self.FrozenUntil > _UtilLogic.ServerElapsedSeconds
+	end
+
+	-- 방어율 감소 pct%를 sec초(이미 걸려 있으면 큰 % · 늦은 끝 시각)
+	@ExecSpace("ServerOnly")
+	method void ApplyShred(number pct, number sec)
+		if self.Dead then return end
+		local now = _UtilLogic.ServerElapsedSeconds
+		if now >= self.ShredUntil or pct > self.ShredPct then self.ShredPct = pct end
+		if now + sec > self.ShredUntil then self.ShredUntil = now + sec end
+	end
+
+	-- 받는 데미지 증가 pct%를 sec초(이미 걸려 있으면 큰 % · 늦은 끝 시각)
+	@ExecSpace("ServerOnly")
+	method void ApplyVuln(number pct, number sec)
+		if self.Dead then return end
+		local now = _UtilLogic.ServerElapsedSeconds
+		if now >= self.VulnUntil or pct > self.VulnPct then self.VulnPct = pct end
+		if now + sec > self.VulnUntil then self.VulnUntil = now + sec end
+	end
+
+	-- 지금 걸린 방어율 감소 % / 받는 데미지 증가 %(없으면 0) — 서버·클라 공용
+	method number ShredNow()
+		if self.ShredUntil > _UtilLogic.ServerElapsedSeconds then return self.ShredPct end
+		return 0
+	end
+
+	method number VulnNow()
+		if self.VulnUntil > _UtilLogic.ServerElapsedSeconds then return self.VulnPct end
+		return 0
 	end
 
 	-- 번쩍임이 끝났을 때 돌아갈 색(빙결 중이면 옅은 파랑)
@@ -326,13 +527,25 @@ script RtsMonsterComponent extends Component
 		-- hitSoundPitch = 타격음 재생 속도(애로우 레인 1.5 — RtsSkillFxLogic.PlaySfx). hitSoundEvery = n타마다 1번만
 		if snd ~= nil and snd ~= "" then
 			local every = fx.hitSoundEvery or 1
-			if every <= 1 or ((hn - 1) % every) == 0 then _RtsSkillFxLogic:PlaySfx(snd, sndVol, fx.hitSoundPitch) end
+			-- hitSoundGap(초) = 같은 타격음은 그 간격 안에 한 번만(포이즌 리전 틱이 몹 수만큼 겹쳐 찢어지던 것 — 2026-09-23)
+			if every <= 1 or ((hn - 1) % every) == 0 then
+				if fx.hitSoundGap ~= nil then
+					_RtsSkillFxLogic:PlaySfxGap(snd, sndVol, fx.hitSoundGap)
+				else
+					_RtsSkillFxLogic:PlaySfx(snd, sndVol, fx.hitSoundPitch)
+				end
+			end
 		end
 		if clip == nil or clip == "" then return end
 		local mapRoot = _EntityService:GetEntityByPath("/maps/RtsMap")
 		if mapRoot == nil then return end
 		local p = e.TransformComponent.WorldPosition
 		local at = Vector3(p.x, p.y + (fx.hitDy or 0.6), 0)
+		-- 보스(3배 크기)는 발밑이 아니라 몸 가운데(피격 박스 중심)에
+		if self.IsBoss and e.HitComponent ~= nil then
+			local sc = e.TransformComponent.Scale
+			at = Vector3(p.x + e.HitComponent.ColliderOffset.x * math.abs(sc.x), p.y + e.HitComponent.ColliderOffset.y * sc.y, 0)
+		end
 		local h = _SpawnService:SpawnByModelId("model://MapObject", "RtsHitFx_" .. e.Name .. "_" .. tostring(math.floor(DateTime.UtcNow.Elapsed)), at, mapRoot)
 		if h == nil then return end
 		local hs = h.SpriteRendererComponent

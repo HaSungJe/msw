@@ -1,0 +1,196 @@
+-- 난이도(2026-09-24 사용자 — .info/tier.md 10절): 매우쉬움 · 쉬움 · 보통 · 어려움 · 매우어려움 · 극악.
+--   몬스터 체력(보스·일반 모두 — 사용자 "보스와 몬스터 모두", "보스와 같은 곡선") = 표 체력(RtsStageTableLogic) × 난이도 배율 × 극악 곡선.
+--   극악 곡선 = 보스 라운드마다 '표 체력 대비' 배율(tools/clear-sim.py 2000판 — 최적 조합을 아는 사람 기준 시그너스까지 보스별 통과 99·95·88%,
+--     스우부터 누적 생존 60 → … → 검마 4페 3.5%). 일반 몬스터 라운드는 앞뒤 보스 배율을 라운드로 로그 보간.
+--   난이도 배율 = 곡선에 곱하는 값(사용자 "한 곡선 × 배율" → 값 지정): 매우쉬움 0.2 · 쉬움 0.4 · 보통 0.6 · 어려움 0.7 · 매우어려움 0.8 · 극악 1.0 → 같은 시뮬 클리어 70.0 / 48.7 / 41.9 / 30.3 / 18.4 / 3.5%(프리즘 조건 · 천장 반영).
+--   플레이어마다 자기 구역 난이도를 판 시작 전(대기·카운트다운·끝남)에 고르고(기본 보통), 진행 중엔 고정. 클리어 기록은 난이도별 저장소(RtsRunResultLogic.SaveClear).
+@Logic
+script RtsDifficultyLogic extends Logic
+
+	-- 유저 → 난이도 번호(1 매우쉬움 … 3 보통 … 6 극악). 없으면 보통
+	@Sync
+	property SyncTable<string, number> DiffByUser
+
+	-- 클라: 상단 가운데(영입 버튼 아래) 난이도 막대(판 시작 전) · 좌상단 정보 카드의 맵 이름 오른쪽 난이도 글자(항상 — 2026-09-24 사용자 "난이도 표시는 맵 오른쪽에")
+	property Entity Bar = nil
+
+	property table Btns = {}
+
+	property Entity RunText = nil
+
+	-- 막대 아랫줄 안내(2026-09-24 사용자 "난이도 안 골랐는데 보통으로 시작 — n초 후 자동 시작된다고 떠야"): 카운트다운 남은 초 · 지금 선택
+	property Entity MsgText = nil
+
+	-- '바로 시작' 버튼(카운트다운 중에만 — RtsStageLogic.RequestStartNow)
+	property Entity StartBtn = nil
+
+	property Entity StartText = nil
+
+	property string Shown = ""
+
+	method void OnBeginPlay()
+		if self:IsClient() then
+			_TimerService:SetTimerRepeat(function() self:ClientTick() end, 0.3, 1)
+		end
+	end
+
+	-- ===== 표 =====
+
+	method table GetNames()
+		return { "매우쉬움", "쉬움", "보통", "어려움", "매우어려움", "극악" }
+	end
+
+	method table GetFactors()
+		return { 0.2, 0.4, 0.6, 0.7, 0.8, 1.0 } -- 2026-09-24 사용자 지정(전 0.297/0.451/0.597/0.783/0.903 — 클리어 85/65/40/20/10% 역산값)
+	end
+
+	-- 극악 곡선: { 보스 라운드, 표 체력 대비 배율 } — tools/clear-sim.py(2026-09-24 티어 재설계 반영). 표 체력이 바뀌면 다시 돌려 갱신
+	method table GetCurve()
+		-- 2026-09-24 재보정: 1티어 증강 배율은 자기 프리즘이 있을 때만 + 뽑기 프리즘 천장(안 나오면 +2%p) 반영
+		return {
+			{ 10, 1.28 }, { 26, 1.27 }, { 29, 1.68 }, { 43, 1.43 }, { 47, 1.53 }, { 56, 0.60 }, { 60, 0.56 }, { 64, 0.72 }, { 89, 3.46 }, { 110, 7.63 }, { 114, 8.95 }, { 121, 15.54 }, { 127, 23.54 }, { 129, 26.99 }, { 130, 29.69 }, { 131, 29.84 }, { 132, 31.78 },
+		}
+	end
+
+	method number Of(string userId)
+		if userId == nil or userId == "" then return 3 end
+		local d = self.DiffByUser[userId]
+		if d == nil or d < 1 or d > 6 then return 3 end
+		return math.floor(d + 0.5)
+	end
+
+	method string NameOf(string userId)
+		return self:GetNames()[self:Of(userId)]
+	end
+
+	-- 라운드 no의 극악 곡선 값(보스 라운드는 그 값, 사이는 앞뒤 보스 값을 로그 보간, 첫 보스 전은 첫 보스 값)
+	method number CurveAt(number no)
+		local c = self:GetCurve()
+		if no <= c[1][1] then return c[1][2] end
+		for i = 2, #c do
+			local b = c[i]
+			if no <= b[1] then
+				local a = c[i - 1]
+				if no == b[1] then return b[2] end
+				local t = (no - a[1]) / (b[1] - a[1])
+				return math.exp(math.log(a[2]) + (math.log(b[2]) - math.log(a[2])) * t)
+			end
+		end
+		return c[#c][2]
+	end
+
+	-- 구역 zone(그 구역 주인의 난이도)에서 라운드 no 몬스터 체력 배율 — RtsWaveLogic.SpawnMob · RtsBossLogic.SpawnBosses(서버 — OwnerOfZone이 서버 전용)
+	@ExecSpace("ServerOnly")
+	method number HpMul(number zone, number no)
+		local owner = _RtsRunResultLogic:OwnerOfZone(math.floor(zone + 0.5))
+		return self:GetFactors()[self:Of(owner)] * self:CurveAt(no)
+	end
+
+	-- ===== 서버: 고르기 =====
+
+	-- 판 진행 중엔 못 바꾼다(대기·카운트다운·끝남에서만 — 막대는 대기·카운트다운에만 보임)
+	@ExecSpace("Server")
+	method void RequestSet(number idx)
+		local userId = senderUserId
+		if userId == nil or userId == "" then return end
+		if _RtsStageLogic.RunState == "running" then return end
+		local i = math.floor(idx + 0.5)
+		if i < 1 or i > 6 then return end
+		self.DiffByUser[userId] = i
+		log("RtsDifficulty: " .. userId .. " -> " .. self:GetNames()[i])
+	end
+
+	-- ===== 클라: 막대 =====
+
+	@ExecSpace("ClientOnly")
+	method void ClientTick()
+		local H = _RtsHudLogic
+		if H.HudGroup == nil then return end
+		if self.Bar == nil then self:Build() end
+		if self.Bar == nil then return end
+		local my = self:Of(_RtsUnitLogic:MyUserId())
+		local state = _RtsStageLogic.RunState
+		local running = state == "running"
+		local name = self:GetNames()[my]
+		local msg = "판 시작 전 · 지금 선택: " .. name
+		local startText = "바로 시작"
+		if state == "countdown" then
+			local left = math.ceil(_RtsStageLogic.StageEndsAt - _UtilLogic.ServerElapsedSeconds)
+			if left < 0 then left = 0 end
+			msg = H:Int(left) .. "초 후 자동으로 시작합니다 · 난이도를 고르고 '바로 시작'(지금: " .. name .. ")"
+			local S = _RtsStageLogic
+			if S.RoomCount > 1 then startText = "바로 시작 " .. H:Int(S.ReadyCount) .. "/" .. H:Int(S.RoomCount) end
+			if S:IsMyReady() and S.RoomCount > 1 then startText = "대기 " .. H:Int(S.ReadyCount) .. "/" .. H:Int(S.RoomCount) end
+		elseif state == "ended" then
+			msg = "판이 끝났어요 · 다음 판 난이도: " .. name
+		end
+		local sig = tostring(running) .. "|" .. H:Int(my) .. "|" .. msg .. "|" .. startText
+		if sig == self.Shown then return end
+		self.Shown = sig
+		if self.MsgText ~= nil then self.MsgText.TextComponent.Text = msg end
+		if self.StartBtn ~= nil then
+			self.StartBtn.Parent:SetEnable(state == "countdown")
+			self.StartText.TextComponent.Text = startText
+		end
+		-- 판 시작 전(대기·카운트다운)에만 — 판이 끝난 뒤(혼자면 죽으면 곧 끝남)·관전 중엔 안 띄운다(2026-09-24 사용자 "죽어서 관전하기 눌렀는데 난이도 선택창이 나온다"). 다음 판은 다시 하기 → 카운트다운에서 고른다
+		self.Bar.Parent:SetEnable(state == "idle" or state == "countdown")
+		if self.RunText ~= nil then self.RunText.TextComponent.Text = "난이도 " .. name end
+		for i = 1, #self.Btns do
+			local b = self.Btns[i]
+			if i == my then
+				b.SpriteGUIRendererComponent.Color = Color(0.3, 0.24, 0.12, 0.96)
+				b.Parent.SpriteGUIRendererComponent.Color = H:ColGold()
+			else
+				b.SpriteGUIRendererComponent.Color = H:ColPanel()
+				b.Parent.SpriteGUIRendererComponent.Color = H:ColBorder()
+			end
+		end
+	end
+
+	-- 영입 버튼(상단 가운데, 높이 64) 아래: "난이도" + 6칸 + 안내 줄(판 시작 전에만). 정보 카드 맵 이름 오른쪽에 '난이도 보통'(항상)
+	@ExecSpace("ClientOnly")
+	method void Build()
+		local H = _RtsHudLogic
+		local names = self:GetNames()
+		local w = 88
+		local gap = 6
+		local total = 86 + #names * w + (#names - 1) * gap + 12 + 124
+		-- 윗줄 = "난이도" + 6칸, 아랫줄 = 안내(남은 초 · 지금 선택)
+		local bar = H:SpawnPanel("RtsDiffBar", H.HudGroup, Vector2(0.5, 1), Vector2(0.5, 1), Vector2(0, -88), Vector2(total, 80),
+			H:ColPanel(), H:ColBorder(), 1.5)
+		if bar == nil then return end
+		H:SpawnLabel("RtsDiffTitle", bar, Vector2(0, 1), Vector2(0, 1), Vector2(12, -6), Vector2(70, 36), "난이도", H:ColMuted(), 16, TextAlignmentType.MiddleLeft, true)
+		self.MsgText = H:SpawnLabel("RtsDiffMsg", bar, Vector2(0, 0), Vector2(0, 0), Vector2(12, 6), Vector2(total - 24, 26), "", Color(1, 0.86, 0.55, 1), 14, TextAlignmentType.MiddleLeft, false)
+		self.Btns = {}
+		for i = 1, #names do
+			local x = 86 + (i - 1) * (w + gap)
+			local b = H:SpawnPanel("RtsDiffBtn" .. tostring(i), bar, Vector2(0, 1), Vector2(0, 1), Vector2(x, -6), Vector2(w, 36),
+				H:ColPanel(), H:ColBorder(), 1.5)
+			H:SpawnLabel("RtsDiffBtnText" .. tostring(i), b, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2(0, 0), Vector2(w - 4, 32), names[i], H:ColInk(), 15, TextAlignmentType.MiddleCenter, true)
+			local click = H:SpawnClick("RtsDiffClick" .. tostring(i), b)
+			local idx = i
+			click:ConnectEvent(ButtonClickEvent, function(event)
+				self:RequestSet(idx)
+			end)
+			self.Btns[#self.Btns + 1] = b
+		end
+		-- 오른쪽 끝: 바로 시작(카운트다운 중에만)
+		local sb = H:SpawnPanel("RtsDiffStart", bar, Vector2(1, 1), Vector2(1, 1), Vector2(-12, -6), Vector2(112, 36),
+			Color(0.3, 0.24, 0.12, 0.96), H:ColGold(), 2)
+		self.StartText = H:SpawnLabel("RtsDiffStartText", sb, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2(0, 0), Vector2(108, 32), "바로 시작", Color(1, 0.95, 0.8, 1), 15, TextAlignmentType.MiddleCenter, true)
+		local sc = H:SpawnClick("RtsDiffStartClick", sb)
+		sc:ConnectEvent(ButtonClickEvent, function(event)
+			_RtsStageLogic:RequestStartNow()
+		end)
+		self.StartBtn = sb
+		self.Bar = bar
+		-- 맵 이름 줄 오른쪽(정보 카드 = 맵 이름 라벨의 부모)
+		local card = nil
+		if H.StageSubText ~= nil then card = H.StageSubText.Parent end
+		if card ~= nil then
+			self.RunText = H:SpawnLabel("RtsDiffCardText", card, Vector2(1, 1), Vector2(1, 1), Vector2(-14, -38), Vector2(120, 28), "난이도 보통", H:ColGold(), 17, TextAlignmentType.MiddleRight, true)
+		end
+		self.Shown = ""
+	end
+
+end

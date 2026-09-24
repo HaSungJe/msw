@@ -1,7 +1,7 @@
 -- Phase 5 #19·#20 + Phase 4 #14 (부분, 2026-09-15): 유닛 정보 팝업 (아티팩트 v27 #unitModal 그대로)
 --   열기: 우측 유닛 슬롯 클릭 / 캐릭터 클릭 메뉴의 상세정보. 셸(딤·패널·제목·X·ESC)은 RtsPopupLogic("unit").
 --   좌: 외형(스킨 2 — 기본 세트 / 월드 아바타 = 월드코인 1,600으로 30일 해금, 잠기면 클릭 → 구매창) + 능력치(RtsJobTableLogic.Calc, 파티 버프 반영 행은 ▲).
---   우: 탭 3개 — 스킬(미획득 흐림, 액티브/패시브) / 증강 n(이 유닛에 지정된 증강, Phase 6 전엔 빈 목록) / 적용 중인 버프 n(RtsUnitBuffLogic). 증강·버프는 ScrollLayoutGroup 스크롤 목록.
+--   우: 탭 3개 — 스킬(미획득 흐림, 액티브/패시브) / 증강 n(이 유닛에 지정된 증강, Phase 6 전엔 빈 목록) / 적용 중인 버프 n(RtsUnitBuffLogic). 증강·버프는 ScrollLayoutGroup 스크롤 목록. Tab 키로 순환(CycleTab).
 --   대상 지정 스킬(홀리 유니티) 행에는 셀렉트 박스(미지정 / 내 다른 유닛). 하단: [레벨업] 버튼만(2026-09-16 — 누적 투자·다음 벽·보유 메소·'(벽)' 문구는 유저에게 필요 없는 내부 정보라 삭제. 메소는 HUD 좌상단).
 --   위치 이동은 여기 없음 — 캐릭터 클릭 메뉴(RtsUnitSelectLogic)에서. 대상 변경·위치 이동은 유닛마다 3분 쿨.
 --   좌표는 1920×1080 기준(목업 1cqw = 19.2px). 값은 서버가 바꾸고(RtsUnitLogic) 동기화가 오면 다시 그린다.
@@ -31,6 +31,21 @@ script RtsUnitPopupLogic extends Logic
 	property number TickId = 0
 
 	property boolean BondLocked = false
+
+	-- 제자리 갱신용 참조(2026-09-23 사용자 "레벨업 누를 때 창이 깜빡거림"): 능력치 값 라벨 8개 · 레벨업 버튼(안쪽·글자·비용)
+	--   Render는 엔티티 100여 개를 지우고 다시 만들어(스폰이 여러 프레임에 나뉨) 깜빡이므로, 구조가 같으면 글자·색만 바꾼다
+	property table StatVals = {}
+
+	property Entity LvBtn = nil
+
+	-- 레벨업 버튼 글자 조각(RtsUnitSelectLogic.SpawnLvRow — "LV.UP (15→16 · 350 [메소])")
+	property table LvRow = nil
+
+	-- 마지막으로 통째로 그린 구조 서명(직업·프리즘·잠금·스킨·대상·탭·획득 스킬 수·버프·증강 수·해금·대상 쿨) — 달라질 때만 Render
+	property string Sig = ""
+
+	-- 동기화가 한꺼번에 여러 번 와도(레벨·사용 메소·메소·알림) 한 번만 갱신
+	property boolean UpdatePending = false
 
 	-- ===== 열기·닫기 =====
 
@@ -71,17 +86,111 @@ script RtsUnitPopupLogic extends Logic
 		self.Dropdown = nil
 		self.BondCoolText = nil
 		self.BondBtn = nil
+		self.StatVals = {}
+		self.LvBtn = nil
+		self.LvRow = nil
+		self.Sig = ""
 		if self.TickId ~= 0 then
 			_TimerService:ClearTimer(self.TickId)
 			self.TickId = 0
 		end
 	end
 
-	-- 서버 값이 바뀌어 도착했을 때 (RtsUnitComponent.OnSyncProperty / RtsUnitLogic.OnChanged)
+	-- 서버 값이 바뀌어 도착했을 때 (RtsUnitComponent.OnSyncProperty / RtsUnitLogic.OnChanged·메소 동기화). 0.05초 안에 온 것은 한 번으로 묶는다
 	@ExecSpace("ClientOnly")
 	method void OnUnitSynced(number no)
+		-- 캐릭터 클릭 메뉴의 레벨업 줄(레벨·비용·메소 부족 표시)도 같이
+		_RtsUnitSelectLogic:RefreshMenuLevel()
 		if self.CurNo == 0 or self.Body == nil then return end
-		self:Render()
+		if self.UpdatePending then return end
+		self.UpdatePending = true
+		_TimerService:SetTimerOnce(function()
+			self.UpdatePending = false
+			self:UpdateInPlace()
+		end, 0.05)
+	end
+
+	-- 구조가 그대로면 제목·능력치·레벨업 버튼만 제자리에서 바꾸고, 달라졌으면 통째로 다시 그린다
+	@ExecSpace("ClientOnly")
+	method void UpdateInPlace()
+		if self.CurNo == 0 or self.Body == nil then return end
+		local u = _RtsUnitLogic:GetMyUnit(self.CurNo)
+		if u == nil then
+			_RtsPopupLogic:Close()
+			return
+		end
+		if self:Signature(u) ~= self.Sig or #self.StatVals == 0 or self.LvBtn == nil then
+			self:Render()
+			return
+		end
+		self:ApplyTitle(u)
+		local rows = self:StatRowTexts(u)
+		for i = 1, #rows do
+			local v = self.StatVals[i]
+			if v ~= nil and isvalid(v) and v.TextComponent.Text ~= rows[i][2] then v.TextComponent.Text = rows[i][2] end
+		end
+		self:ApplyLevelButton(u)
+	end
+
+	-- 통째로 다시 그려야 하는 구조의 서명
+	@ExecSpace("ClientOnly")
+	method string Signature(any u)
+		local skills = _RtsJobTableLogic:GetSkillsFor(u)
+		local got = 0
+		for i = 1, #skills do
+			if u.Level >= skills[i].lv then got = got + 1 end
+		end
+		local B = _RtsUnitBuffLogic
+		local unlocked = "0"
+		if _RtsUnitLogic:IsAvatarUnlocked(u.Owner) then unlocked = "1" end
+		local bondLock = "0"
+		if u:BondCoolLeft() > 0 then bondLock = "1" end
+		return u.JobId .. "|" .. u.Prisms .. "|" .. u.SkillLocks .. "|" .. _RtsHudLogic:Int(u.Skin) .. "|" .. _RtsHudLogic:Int(u.BondNo) .. "|" .. self.Tab
+			.. "|" .. _RtsHudLogic:Int(got) .. "|" .. B:BuffSig(u.Zone, u.No) .. "|" .. _RtsHudLogic:Int(#B:GetAugmentsFor(u.Zone, u.No))
+			.. "|" .. unlocked .. "|" .. bondLock
+	end
+
+	-- 제목: "2. 팔라딘  Lv 40 · 모험가 · 전사"
+	@ExecSpace("ClientOnly")
+	method void ApplyTitle(any u)
+		local H = _RtsHudLogic
+		local T = _RtsJobTableLogic
+		local P = _RtsPopupLogic
+		local text = H:Int(u.No) .. ". " .. T:GetJobNameFor(u) .. "  <size=18><color=#c9b58a>Lv " .. H:Int(u.Level) .. " · " .. T:GetJobGroup(u.JobId) .. "</color></size>"
+		P.Title.TextComponent.IsRichText = true
+		if P.Title.TextComponent.Text ~= text then P.Title.TextComponent.Text = text end
+	end
+
+	-- 레벨업 가능 여부(최대 레벨 아님 + 메소 충분) — 버튼 모양과 클릭 판단 공용(서버도 다시 검사)
+	@ExecSpace("ClientOnly")
+	method boolean CanLevelUp(any u)
+		if u == nil then return false end
+		local T = _RtsJobTableLogic
+		if u.Level >= T:GetMaxLevel() then return false end
+		return _RtsUnitLogic:GetMyMeso() >= T:GetLevelCost(u.Level + 1)
+	end
+
+	-- 레벨업 버튼: "레벨업 → Lv n" + 비용, 메소 부족·최대 레벨이면 흐리게
+	@ExecSpace("ClientOnly")
+	method void ApplyLevelButton(any u)
+		if self.LvBtn == nil or not isvalid(self.LvBtn) then return end
+		local H = _RtsHudLogic
+		local P = _RtsPopupLogic
+		local T = _RtsJobTableLogic
+		local nextLv = u.Level + 1
+		local maxed = u.Level >= T:GetMaxLevel()
+		local can = self:CanLevelUp(u)
+		local lbg = P:Mix(H:ColGold(), 0.92)
+		local lborder = H:ColGold()
+		local lInk = Color(0.133, 0.114, 0.09, 1)
+		if not can then
+			lbg = P:Mix(lbg, 0.4)
+			lborder = P:Mix(lborder, 0.4)
+			lInk = Color(0.45, 0.4, 0.33, 1)
+		end
+		self.LvBtn.SpriteGUIRendererComponent.Color = lbg
+		self.LvBtn.Parent.SpriteGUIRendererComponent.Color = lborder
+		_RtsUnitSelectLogic:ApplyLvRow(self.LvRow, u, lInk)
 	end
 
 	-- ===== 그리기 =====
@@ -115,18 +224,9 @@ script RtsUnitPopupLogic extends Logic
 		H:Tint(content, 0, 0, 0, 0)
 		self.Content = content
 
-		local jobName = T:GetJobNameFor(u)
-		-- 버프 없는 원값(s0)과 버프 반영값(s) — 달라진 행은 ▲. 프리즘은 둘 다에 반영(GetStatFor)
 		local B = _RtsUnitBuffLogic
-		local s0 = T:GetStatFor(u)
 		local buffs = B:GetBuffsFor(u.Zone, u.No)
-		local s = T:GetStatFor(u)
-		B:ApplyToStat(s, buffs)
-		local c = T:CalcStat(u.JobId, u.Level, s)
-
-		-- 제목: "2. 팔라딘  Lv 40 · 모험가 · 전사"
-		P.Title.TextComponent.IsRichText = true
-		P.Title.TextComponent.Text = H:Int(u.No) .. ". " .. jobName .. "  <size=18><color=#c9b58a>Lv " .. H:Int(u.Level) .. " · " .. T:GetJobGroup(u.JobId) .. "</color></size>"
+		self:ApplyTitle(u)
 
 		-- ----- 좌: 외형 + 스킨 -----
 		local look = H:SpawnPanel("RtsUnitLook", content, Vector2(0, 1), Vector2(0, 1), Vector2(27, -10), Vector2(365, 236),
@@ -190,53 +290,17 @@ script RtsUnitPopupLogic extends Logic
 			P:Mix(Color.white, 0.03), P:Mix(H:ColGold(), 0.25), 1.5)
 		H:SpawnLabel("RtsUnitStatsK", stats, Vector2(0, 1), Vector2(0, 1), Vector2(14, -10), Vector2(200, 18),
 			"능력치", H:ColMuted(), 13, TextAlignmentType.MiddleLeft, false)
-		local muted = "<color=#a3957a>"
-		local ignText = H:Int(s.ign) .. "%"
-		if s.ignBoss >= 0 then ignText = ignText .. " " .. muted .. "· 보스 " .. H:Int(s.ignBoss) .. "%</color>" end
-		local up = " <color=#9fd39a>▲</color>"
-		-- 최종 데미지는 배율(120%)이 아니라 추가분만(+20%; 기본 0%) — 2026-09-18 사용자 "이거는 +만 표시"
-		local function plusPct(v)
-			local d = v - 100
-			if d > 0 then return "+" .. H:Int(d) .. "%" end
-			return H:Int(d) .. "%"
-		end
-		local finText = plusPct(s.fin)
-		if s.finBoss ~= s.fin then finText = finText .. " " .. muted .. "· 보스 " .. plusPct(s.finBoss) .. "</color>" end
-		if s.fin ~= s0.fin or s.finBoss ~= s0.finBoss then finText = finText .. up end
-		-- 보스 공격시 데미지 증가(킷 티어 + 증강 + 프리즘, 합연산) — 기본 0%라 +n%만
-		local bossText = "+" .. H:Int(s.bossAdd or 0) .. "%"
-		if (s.bossAdd or 0) ~= (s0.bossAdd or 0) then bossText = bossText .. up end
-		-- 크리티컬은 확률/데미지 두 줄, 적용 중인 총합만(버프 포함 값 하나)
-		local critText = H:Int(s.crit) .. "%"
-		if s.crit ~= s0.crit then critText = critText .. up end
-		local critDmgText = H:Int(s.critDmg) .. "%"
-		if s.critDmg ~= s0.critDmg then critDmgText = critDmgText .. up end
-		-- 기본 공격 구성·보스 DPS·몬스터 DPS 줄은 2026-09-18 사용자 요청으로 제거(설계 수치 — 유저에게 불필요)
-		-- 공격속도는 등급만(보통·빠름…; n초당 1회 없음), 공격력은 총합만(구성식 없음), 공격력 %는 추가되는 %의 합(+n%) — 2026-09-18 사용자
-		local rows = {
-			{ "공격속도", s.speed },
-			{ "공격력", "<b>" .. self:Fmt(c.atk) .. "</b>" },
-			{ "공격력 %", plusPct(s.pct) },
-			{ "방어율 무시", ignText },
-			{ "최종 데미지", finText },
-			{ "보스 데미지", bossText },
-			{ "크리티컬 확률", critText },
-			{ "크리티컬 데미지", critDmgText },
-		}
+		local rows = self:StatRowTexts(u)
+		self.StatVals = {}
 		local y = -34
 		for i = 1, #rows do
-			if rows[i][1] == "sep" then
-				local line = H:SpawnUI("model://uisprite", "RtsUnitStatSep", stats, Vector2(0, 1), Vector2(0, 1), Vector2(14, y - 4), Vector2(337, 1.5))
-				line.SpriteGUIRendererComponent.Color = H:ColBorderSoft()
-				y = y - 14
-			else
-				H:SpawnLabel("RtsUnitStatK", stats, Vector2(0, 1), Vector2(0, 1), Vector2(14, y), Vector2(120, 26),
-					rows[i][1], H:ColMuted(), 14, TextAlignmentType.MiddleLeft, false)
-				local v = H:SpawnLabel("RtsUnitStatV", stats, Vector2(1, 1), Vector2(1, 1), Vector2(-14, y), Vector2(230, 26),
-					rows[i][2], H:ColInk(), 15, TextAlignmentType.MiddleRight, false)
-				v.TextComponent.IsRichText = true
-				y = y - 30
-			end
+			H:SpawnLabel("RtsUnitStatK", stats, Vector2(0, 1), Vector2(0, 1), Vector2(14, y), Vector2(120, 26),
+				rows[i][1], H:ColMuted(), 14, TextAlignmentType.MiddleLeft, false)
+			local v = H:SpawnLabel("RtsUnitStatV", stats, Vector2(1, 1), Vector2(1, 1), Vector2(-14, y), Vector2(230, 26),
+				rows[i][2], H:ColInk(), 15, TextAlignmentType.MiddleRight, false)
+			v.TextComponent.IsRichText = true
+			self.StatVals[i] = v
+			y = y - 30
 		end
 
 		-- ----- 우: 탭(스킬 / 증강 n / 적용 중인 버프 n) + 목록 -----
@@ -263,9 +327,14 @@ script RtsUnitPopupLogic extends Logic
 			end
 			tx = tx + tb.w + 8
 		end
+		-- 단축키 표시: 탭 오른쪽 [Tab] — Tab 키로 스킬 → 증강 → 적용 중인 버프 순환(2026-09-23 사용자, RtsUnitSelectLogic.HandleKeyDownEvent → CycleTab)
+		local tkey = H:SpawnPanel("RtsUnitTabKey", content, Vector2(0, 1), Vector2(0, 1), Vector2(tx + 4, -14), Vector2(56, 26),
+			Color(0.12, 0.1, 0.08, 0.9), Color(0.95, 0.9, 0.75, 0.9), 1.2)
+		H:SpawnLabel("RtsUnitTabKeyText", tkey, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2(0, 0), Vector2(54, 24),
+			"Tab", Color(0.95, 0.9, 0.75, 1), 13, TextAlignmentType.MiddleCenter, true)
 		local top = -54
 		if self.Tab == "aug" then
-			self:BuildAugTab(content, rx, rw, top, augs)
+			self:BuildAugTabFor(content, u, rx, rw, top, augs)
 		elseif self.Tab == "buff" then
 			self:BuildBuffTab(content, rx, rw, top, buffs)
 		else
@@ -275,39 +344,68 @@ script RtsUnitPopupLogic extends Logic
 		-- ----- 하단: 레벨업 버튼만 -----
 		--   누적 투자·다음 벽까지 비용·보유 메소는 안 보인다(2026-09-16 사용자: 유저에게 필요 없는 내부 정보. 메소는 HUD 좌상단에 있음).
 		--   벽 레벨(10·20·…)도 유저에겐 그냥 다음 레벨 — 비용만 보여 주고 '(벽)' 문구·붉은색 없음
-		local T2 = _RtsJobTableLogic
-		local meso = _RtsUnitLogic:GetMyMeso()
+		-- 레벨업 → Lv n (메소 부족·최대 레벨은 흐리게). 모양·글자는 ApplyLevelButton이 제자리에서 바꾸고, 클릭은 누를 때 가능 여부를 본다
+		local lbtn = H:SpawnPanel("RtsUnitLvUp", content, Vector2(1, 0), Vector2(1, 0), Vector2(-27, 10), Vector2(280, 44), H:ColGold(), H:ColGold(), 1.5)
+		self.LvBtn = lbtn
+		self.LvRow = _RtsUnitSelectLogic:SpawnLvRow(lbtn, 14, 16)
+		self:ApplyLevelButton(u)
+		local lclick = H:SpawnClick("RtsUnitLvUpClick", lbtn)
+		lclick:ConnectEvent(ButtonClickEvent, function(event)
+			if self:CanLevelUp(_RtsUnitLogic:GetMyUnit(self.CurNo)) then _RtsUnitLogic:LevelUpNow(self.CurNo) end
+		end)
+		-- 단축키 표시: 레벨업 버튼 왼쪽 [Space] (2026-09-23 사용자 — 스페이스 = 레벨업, RtsUnitSelectLogic.HandleKeyDownEvent)
+		local key = H:SpawnPanel("RtsUnitLvKey", content, Vector2(1, 0), Vector2(1, 0), Vector2(-27 - 280 - 10, 20), Vector2(70, 26),
+			Color(0.12, 0.1, 0.08, 0.9), Color(0.95, 0.9, 0.75, 0.9), 1.2)
+		H:SpawnLabel("RtsUnitLvKeyText", key, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2(0, 0), Vector2(68, 24),
+			"Space", Color(0.95, 0.9, 0.75, 1), 13, TextAlignmentType.MiddleCenter, true)
+		self.Sig = self:Signature(u)
+	end
 
-		-- 레벨업 → Lv n (메소 부족·최대 레벨은 비활성)
-		local nextLv = u.Level + 1
-		local maxed = u.Level >= T2:GetMaxLevel()
-		local cost = T2:GetLevelCost(nextLv)
-		local can = (not maxed) and meso >= cost
-		local lbg = P:Mix(H:ColGold(), 0.92)
-		local lborder = H:ColGold()
-		local lInk = Color(0.133, 0.114, 0.09, 1)
-		if not can then
-			lbg = P:Mix(lbg, 0.4)
-			lborder = P:Mix(lborder, 0.4)
-			lInk = Color(0.45, 0.4, 0.33, 1)
+	-- 능력치 8줄 { 이름, 값(리치 텍스트) } — 버프 없는 원값(s0)과 버프 반영값(s)이 다른 행은 ▲. 프리즘은 둘 다에 반영(GetStatFor)
+	--   기본 공격 구성·보스 DPS·몬스터 DPS 줄은 2026-09-18 사용자 요청으로 제거(설계 수치 — 유저에게 불필요)
+	--   공격속도는 등급만(보통·빠름…; n초당 1회 없음), 공격력은 총합만(구성식 없음), 공격력 %는 추가되는 %의 합(+n%) — 2026-09-18 사용자
+	@ExecSpace("ClientOnly")
+	method table StatRowTexts(any u)
+		local H = _RtsHudLogic
+		local T = _RtsJobTableLogic
+		local B = _RtsUnitBuffLogic
+		local s0 = T:GetStatFor(u)
+		local s = T:GetStatFor(u)
+		B:ApplyToStat(s, B:GetBuffsFor(u.Zone, u.No))
+		local c = T:CalcStat(u.JobId, u.Level, s)
+		local muted = "<color=#a3957a>"
+		-- 방무는 보스 옵션(2026-09-24 사용자 "일반 몬스터 방어율 0 — 방무는 보스 옵션"): 보스 상대 총 방무(발할라 ignBoss까지 합연산) 하나만
+		local ignBossTotal = s.ign
+		if s.ignBoss > 0 then ignBossTotal = s.ign + s.ignBoss end
+		local ignText = H:Int(ignBossTotal) .. "%"
+		local up = " <color=#9fd39a>▲</color>"
+		-- 최종 데미지는 배율(120%)이 아니라 추가분만(+20%; 기본 0%) — 2026-09-18 사용자 "이거는 +만 표시"
+		local function plusPct(v)
+			local d = v - 100
+			if d > 0 then return "+" .. H:Int(d) .. "%" end
+			return H:Int(d) .. "%"
 		end
-		local lbtn = H:SpawnPanel("RtsUnitLvUp", content, Vector2(1, 0), Vector2(1, 0), Vector2(-27, 10), Vector2(260, 44), lbg, lborder, 1.5)
-		local mainText = "레벨업 → Lv " .. H:Int(nextLv)
-		local costText = self:Fmt(cost) .. " 메소"
-		if maxed then
-			mainText = "레벨업"
-			costText = "최대 레벨"
-		end
-		H:SpawnLabel("RtsUnitLvUpText", lbtn, Vector2(0, 0.5), Vector2(0, 0.5), Vector2(14, 0), Vector2(150, 40),
-			mainText, lInk, 16, TextAlignmentType.MiddleLeft, true)
-		H:SpawnLabel("RtsUnitLvUpCost", lbtn, Vector2(1, 0.5), Vector2(1, 0.5), Vector2(-12, 0), Vector2(100, 40),
-			costText, lInk, 13, TextAlignmentType.MiddleRight, false)
-		if can then
-			local lclick = H:SpawnClick("RtsUnitLvUpClick", lbtn)
-			lclick:ConnectEvent(ButtonClickEvent, function(event)
-				_RtsUnitLogic:RequestLevelUp(self.CurNo)
-			end)
-		end
+		local finText = plusPct(s.fin)
+		if s.finBoss ~= s.fin then finText = finText .. " " .. muted .. "· 보스 " .. plusPct(s.finBoss) .. "</color>" end
+		if s.fin ~= s0.fin or s.finBoss ~= s0.finBoss then finText = finText .. up end
+		-- 보스 공격시 데미지 증가(킷 티어 + 증강 + 프리즘, 합연산) — 기본 0%라 +n%만
+		local bossText = "+" .. H:Int(s.bossAdd or 0) .. "%"
+		if (s.bossAdd or 0) ~= (s0.bossAdd or 0) then bossText = bossText .. up end
+		-- 크리티컬은 확률/데미지 두 줄, 적용 중인 총합만(버프 포함 값 하나)
+		local critText = H:Int(s.crit) .. "%"
+		if s.crit ~= s0.crit then critText = critText .. up end
+		local critDmgText = H:Int(s.critDmg) .. "%"
+		if s.critDmg ~= s0.critDmg then critDmgText = critDmgText .. up end
+		return {
+			{ "공격속도", s.speed },
+			{ "공격력", "<b>" .. self:Fmt(c.atk) .. "</b>" },
+			{ "공격력 %", plusPct(s.pct) },
+			{ "보스 방어율 무시", ignText },
+			{ "최종 데미지", finText },
+			{ "보스 데미지", bossText },
+			{ "크리티컬 확률", critText },
+			{ "크리티컬 데미지", critDmgText },
+		}
 	end
 
 	-- 홀리 유니티 행의 대상 지정: "대상:" + 셀렉트 박스 + 쿨타임
@@ -547,7 +645,43 @@ script RtsUnitPopupLogic extends Logic
 			text, H:ColMuted(), 15, TextAlignmentType.MiddleCenter, false)
 	end
 
-	-- 증강 탭: 이 유닛에 지정된 증강(등급 배지 · 이름 · 효과). Phase 6 전엔 빈 목록
+	-- 증강 탭(2026-09-24): 맨 위에 증강 합계(공격력·공격력%·보스·크리 확률·크리 데미지·최종) + 티어(1티어면 방어구 부수기), 그 아래 지정된 증강 목록
+	@ExecSpace("ClientOnly")
+	method void BuildAugTabFor(Entity content, any u, number rx, number rw, number top, table augs)
+		local H = _RtsHudLogic
+		local P = _RtsPopupLogic
+		-- 증강 효과 배율까지 곱한 합계(1티어 ×3 · 2티어 약점 ×2 — RtsJobTableLogic.AugMulFor, 2026-09-24)
+		local t = _RtsAugmentTableLogic:TotalsMul(u.Augs, _RtsJobTableLogic:AugMulFor(u))
+		local box = H:SpawnPanel("RtsUnitAugSum", content, Vector2(0, 1), Vector2(0, 1), Vector2(rx, top), Vector2(rw - 12, 88),
+			P:Mix(H:ColGold(), 0.08), P:Mix(H:ColGold(), 0.4), 1.5)
+		local parts = {}
+		if t.atk > 0 then parts[#parts + 1] = "공격력 +" .. H:Int(t.atk) end
+		if t.pct > 0 then parts[#parts + 1] = "공격력 +" .. H:Int(t.pct) .. "%" end
+		if t.boss > 0 then parts[#parts + 1] = "보스 공격 시 데미지 +" .. H:Int(t.boss) .. "%" end
+		if t.crit > 0 then parts[#parts + 1] = "크리티컬 확률 +" .. H:Int(t.crit) .. "%" end
+		if t.critDmg > 0 then parts[#parts + 1] = "크리티컬 데미지 +" .. H:Int(t.critDmg) .. "%" end
+		if t.fin > 100.01 then parts[#parts + 1] = "최종 데미지 +" .. H:Int(t.fin - 100) .. "%" end
+		local line1 = "증강 " .. H:Int(t.n) .. "개 합계"
+		local line2 = "아직 없어요"
+		if #parts > 0 then line2 = table.concat(parts, "  ·  ") end
+		-- 셋째 줄 = 티어(2026-09-24 증강 효율 삭제 → 1티어면 방어구 부수기 수치)
+		local JT = _RtsJobTableLogic
+		local tier = JT:TierOf(u.JobId)
+		local line3 = "서포터"
+		-- (증강 효과 배율 설명은 프리즘 증강 설명에 — 2026-09-24 사용자 "2티어 약점 증강 효과 이런 거 빼, 프리즘 쪽에 붙어 있어야지")
+		if tier == 2 then line3 = "2티어" end
+		if tier == 1 then
+			local n = JT:AugCountOf(u)
+			if n > JT.ArmorBreakCap then n = JT.ArmorBreakCap end
+			line3 = "1티어 · 증강 " .. H:Int(n) .. "/" .. H:Int(JT.ArmorBreakCap) .. "개 · 방어구 부수기: 보스 방어율 −" .. H:Int(JT:ArmorBreakFor(u)) .. "%p"
+		end
+		H:SpawnLabel("RtsUnitAugSumT", box, Vector2(0, 1), Vector2(0, 1), Vector2(14, -6), Vector2(rw - 40, 22), line1, H:ColGold(), 14, TextAlignmentType.MiddleLeft, true)
+		H:SpawnLabel("RtsUnitAugSumV", box, Vector2(0, 1), Vector2(0, 1), Vector2(14, -30), Vector2(rw - 40, 24), line2, H:ColInk(), 15, TextAlignmentType.MiddleLeft, true)
+		H:SpawnLabel("RtsUnitAugSumE", box, Vector2(0, 1), Vector2(0, 1), Vector2(14, -58), Vector2(rw - 40, 22), line3, H:ColMuted(), 13, TextAlignmentType.MiddleLeft, false)
+		self:BuildAugTab(content, rx, rw, top - 96, augs)
+	end
+
+	-- 증강 탭 목록: 이 유닛에 지정된 증강(등급 배지 · 이름 · 효과)
 	@ExecSpace("ClientOnly")
 	method void BuildAugTab(Entity content, number rx, number rw, number top, table augs)
 		local H = _RtsHudLogic
@@ -588,7 +722,10 @@ script RtsUnitPopupLogic extends Logic
 			local b = buffs[i]
 			local row = H:SpawnPanel("RtsUnitBuff" .. tostring(i), list, Vector2(0, 1), Vector2(0, 1), Vector2(0, 0), Vector2(rw - 12, 64),
 				P:Mix(Color.white, 0.04), P:Mix(Color.white, 0.1), 1.5)
-			local ic = H:SpawnUI("model://uisprite", "RtsUnitBuffIcon", row, Vector2(0, 0.5), Vector2(0, 0.5), Vector2(14, 0), Vector2(40, 40))
+			local ic = nil
+			if b.def.icon ~= nil and b.def.icon ~= "" then
+				ic = H:SpawnUI("model://uisprite", "RtsUnitBuffIcon", row, Vector2(0, 0.5), Vector2(0, 0.5), Vector2(14, 0), Vector2(40, 40))
+			end
 			if ic ~= nil and ic.SpriteGUIRendererComponent ~= nil then
 				ic.SpriteGUIRendererComponent.ImageRUID = DataRef(b.def.icon)
 				ic.SpriteGUIRendererComponent.Color = Color.white
@@ -664,6 +801,20 @@ script RtsUnitPopupLogic extends Logic
 			self.BondCoolText.TextComponent.Text = "변경 가능 · 쿨타임 3분"
 			self.BondCoolText.TextComponent.FontColor = Color(0.624, 0.827, 0.604, 1)
 		end
+	end
+
+	-- Tab 키 = 우측 탭 순환: 스킬 → 증강 → 적용 중인 버프 → 스킬(2026-09-23 사용자). RtsUnitSelectLogic.HandleKeyDownEvent가 부른다
+	@ExecSpace("ClientOnly")
+	method void CycleTab()
+		if self.CurNo == 0 or self.Body == nil then return end
+		if self.Tab == "skill" then
+			self.Tab = "aug"
+		elseif self.Tab == "aug" then
+			self.Tab = "buff"
+		else
+			self.Tab = "skill"
+		end
+		self:Render()
 	end
 
 	-- 1초마다: 쿨타임 글자 갱신, 쿨이 끝나는 순간 전체 다시 그림(버튼 활성)

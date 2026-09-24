@@ -13,16 +13,12 @@ script RtsBootstrapLogic extends Logic
 		end
 		self:EnsureGroundTiles()
 		_RtsZoneLogic:EnsureZoneVisuals()
-		_RtsDemoLogic:EnsureWalkers()
 
-		-- 구역 배정 후 해당 클라에만 통지, 플레이어 목록은 전 클라에 통지
+		-- 구역 배정 후 해당 클라에만 통지 → 한 판 진행에 합류(Phase 6: 입장 5초 뒤 시작, 판이 끝난 방이면 초기화 후 새 판). 플레이어 목록은 전 클라에 통지
 		local zone = _RtsZoneLogic:AssignZone(userId)
 		if zone > 0 then
 			userEntity.RtsCameraAnchorComponent:ApplyAssignedZone(zone, userId)
-			-- 영입(Phase 5 #18) 전까지 시범 편성 3기 + 시범 메소
-			_RtsUnitLogic:EnsureDemoUnits(userId, zone)
-			-- Phase 3 시험대(2026-09-17): 순회 정지 + 허수아비 + 유닛 1 자동 공격 (RtsCombatLogic.TestBench)
-			_RtsCombatLogic:SetupTestBench(userId, zone)
+			_RtsStageLogic:OnUserEnter(userId)
 		end
 		self:BroadcastPlayerList()
 	end
@@ -30,13 +26,15 @@ script RtsBootstrapLogic extends Logic
 	@ExecSpace("ServerOnly")
 	@EventSender("Service", "UserService")
 	handler HandleUserLeaveEvent(UserLeaveEvent event)
+		local zone = _RtsZoneLogic:GetZoneOfUser(event.UserId)
 		_RtsUnitLogic:RemoveUnits(event.UserId)
 		_RtsZoneLogic:ReleaseZone(event.UserId)
+		_RtsStageLogic:OnUserLeave(event.UserId, zone)
 		self:BroadcastPlayerList()
 	end
 
 	-- 배정 현황 → "userId(탭)닉네임(탭)구역(탭)생존" 줄바꿈 구분(구역순) → 모든 클라의 HUD 플레이어 목록 갱신
-	--   생존은 탈락 판정(Phase 3 #13)이 생기기 전까지 항상 1
+	--   생존 = RtsRunResultLogic 상태(진행 중·클리어 1 / 탈락 0)
 	@ExecSpace("ServerOnly")
 	method void BroadcastPlayerList()
 		local rows = {}
@@ -46,7 +44,9 @@ script RtsBootstrapLogic extends Logic
 			if e ~= nil and e.PlayerComponent ~= nil and e.PlayerComponent.Nickname ~= "" then
 				nick = e.PlayerComponent.Nickname
 			end
-			rows[#rows + 1] = { zone = zone, line = userId .. "\t" .. nick .. "\t" .. tostring(zone) .. "\t1" }
+			local alive = "1"
+			if _RtsRunResultLogic:GetState(userId) == 1 then alive = "0" end
+			rows[#rows + 1] = { zone = zone, line = userId .. "\t" .. nick .. "\t" .. tostring(zone) .. "\t" .. alive }
 		end
 		table.sort(rows, function(a, b) return a.zone < b.zone end)
 		local packed = ""

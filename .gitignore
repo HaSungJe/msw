@@ -4,3 +4,4 @@
 .claude/settings.json
 .mcp.json
 .info
+__pycache__/

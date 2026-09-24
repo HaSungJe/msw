@@ -1,7 +1,7 @@
 {
   "Id": "",
   "GameId": "",
-  "EntryKey": "codeblock://bbc27b39-bea0-48d7-aed6-659a84aea7e0",
+  "EntryKey": "codeblock://c1208a74-97dc-4017-be93-86cbc1b10dba",
   "ContentType": "x-mod/codeblock",
   "Content": "",
   "Usage": 0,
@@ -22,9 +22,9 @@
         "Minor": 1
       },
       "Description": "",
-      "Id": "bbc27b39-bea0-48d7-aed6-659a84aea7e0",
+      "Id": "c1208a74-97dc-4017-be93-86cbc1b10dba",
       "Language": 1,
-      "Name": "RtsDemoLogic",
+      "Name": "RtsAugmentTableLogic",
       "Type": 5,
       "Source": 0,
       "Target": null
