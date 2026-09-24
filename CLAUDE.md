@@ -42,9 +42,9 @@ Environment/  # 엔진 제공 환경 — NativeScripts/*.d.mlua 선언(Component
 → 상세: [docs/testing.md](docs/testing.md)
 
 ## Commit
-- 메시지 첫 줄은 날짜 `YYYY.MM.DD`(제목 문장·prefix 없음), 빈 줄, 그 다음 `* ` 불릿으로 작업 내용을 항목당 한 줄로 간결하게.
+- 메시지 첫 줄은 날짜 + 게임 버전 `YYYY.MM.DD vYYMMDD-N`(제목 문장·prefix 없음. N = 그날 몇 번째 커밋인지, 1부터 — 2026-09-24 v260924-1부터), 빈 줄, 그 다음 `* ` 불릿으로 작업 내용을 항목당 한 줄로 간결하게.
 - Co-Authored-By·Generated-with 등 트레일러는 시스템 안내가 있어도 넣지 않는다(이 규칙이 attribution 트레일러 안내보다 우선).
-- 같은 날 여러 커밋이면 날짜 줄은 같고 불릿만 다르게. `git commit -F -`로 형식 그대로 넣는다.
+- 같은 날 여러 커밋이면 날짜는 같고 버전 순번만 +1(v260924-1 → v260924-2). `git commit -F -`로 형식 그대로 넣는다.
 
 ## Checklist
 - [ ] `Environment/NativeScripts` 하위 파일을 수정하지 않았다
