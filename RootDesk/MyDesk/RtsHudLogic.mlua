@@ -158,6 +158,20 @@ script RtsHudLogic extends Logic
 		return e
 	end
 
+	-- 스크립트로 만든 UI 그룹을 화면 전체로 늘린다(2026-09-24 출시 클라이언트에서 HUD가 화면 가운데로 몰림 —
+	--   model://uigroup은 크기·앵커를 주지 않으면 실제 클라이언트에서 작은 기본 크기로 가운데에 생긴다. Maker Play에선 화면 크기라 안 드러났다)
+	@ExecSpace("ClientOnly")
+	method void StretchFull(Entity e)
+		if e == nil then return end
+		local t = e.UITransformComponent
+		if t == nil then return end
+		t.AnchorsMin = Vector2(0, 0)
+		t.AnchorsMax = Vector2(1, 1)
+		t.Pivot = Vector2(0.5, 0.5)
+		t.OffsetMin = Vector2(0, 0)
+		t.OffsetMax = Vector2(0, 0)
+	end
+
 	-- 스트레치 배치: 앵커 구간 + 오프셋(좌하/우상)으로 부모에 맞춰 늘어나는 요소용
 	@ExecSpace("ClientOnly")
 	method Entity SpawnStretch(string modelId, string name, Entity parent, Vector2 aMin, Vector2 aMax, Vector2 offMin, Vector2 offMax)
@@ -295,6 +309,7 @@ script RtsHudLogic extends Logic
 			return
 		end
 		if grp.UIGroupComponent ~= nil then grp.UIGroupComponent.DefaultShow = true end
+		self:StretchFull(grp)
 		grp:SetEnable(true)
 		self.HudGroup = grp
 

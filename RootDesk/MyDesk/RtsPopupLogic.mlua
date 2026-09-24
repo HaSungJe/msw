@@ -81,6 +81,8 @@ script RtsPopupLogic extends Logic
 			return
 		end
 		if grp.UIGroupComponent ~= nil then grp.UIGroupComponent.DefaultShow = true end
+		-- 화면 전체로(RtsHudLogic.StretchFull — 안 하면 실제 클라이언트에서 가운데 작은 사각형이 된다)
+		H:StretchFull(grp)
 		self.Group = grp
 
 		local dim = H:SpawnStretch("model://uibutton", "RtsPopupDim", grp, Vector2(0, 0), Vector2(1, 1), Vector2(0, 0), Vector2(0, 0))

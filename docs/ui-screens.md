@@ -13,6 +13,7 @@
 - `.ui` 파일은 없다. UI는 **전부 mlua 스크립트가 런타임에 스폰**한다. 엔진의 `/ui` 엔티티를 찾고(RtsHudLogic:284), 그 아래에 두 그룹을 만든다.
   - `RtsHudGroup`(`_RtsHudLogic.HudGroup`, RtsHudLogic:292): HUD, 캐릭터 클릭 메뉴, 몬스터 정보, 난이도 막대가 여기 붙는다.
   - `RtsPopupGroup`(`_RtsPopupLogic.Group`, RtsPopupLogic:73): 팝업 셸이 붙는다. HUD를 다 만든 뒤 `_RtsPopupLogic:Build(ui)`로 생성된다(RtsHudLogic:466).
+  - **두 그룹 모두 만든 직후 `_RtsHudLogic:StretchFull(grp)`로 화면 전체(anchor 0,0~1,1, 오프셋 0)로 늘린다.** 안 하면 실제 클라이언트에서 그룹이 작은 기본 크기로 화면 가운데에 생겨 모서리 요소가 전부 가운데로 몰린다(2026-09-24 v260924-1 출시 화면에서 발견 — Maker Play에서는 드러나지 않음). 새 UI 그룹을 만들 때도 똑같이 한다.
 - HUD를 만드는 시점: 로컬 플레이어의 카메라 앵커가 클라에서 시작할 때 `RtsCameraAnchorComponent.SetupClient` → `_RtsHudLogic:BuildHud`(RtsCameraAnchorComponent:46)가 한 번 호출된다.
 - 쓰는 모델: `model://uigroup`, `model://uisprite`, `model://uitext`, `model://uibutton`, `model://uiempty`(유닛 외형 미리보기).
 
