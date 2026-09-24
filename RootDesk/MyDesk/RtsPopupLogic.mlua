@@ -47,14 +47,13 @@ script RtsPopupLogic extends Logic
 
 	property table RankCache = {}
 
-	-- 테마·아이콘 창 탭(2026-09-25 사용자 "테마·아이콘도 종류를 탭으로 — 지금은 기본 탭만")과 아이콘 창 쪽(한 쪽 32칸 — 247칸을 한꺼번에 만들면 UI가 1,000개가 넘어 느리다)
+	-- 테마·아이콘 창 탭(2026-09-25 사용자 "테마·아이콘도 종류를 탭으로 — 지금은 기본 탭만")
 	property string ThemeTab = "기본"
 
 	property string IconTab = "기본"
 
-	property number IconPage = 1
-
-	property number IconPerPage = 32
+	-- 아이콘 창 칸을 한 번에 만드는 수(247칸을 한 프레임에 만들면 창이 늦게 뜬다 — 창은 바로 열고 위에서부터 나눠 채운다)
+	property number IconBatch = 40
 
 	-- 영입 팝업 탭: "adv" 모험가 / "hero" 영웅(팬텀)
 	property string RecruitTab = "adv"
@@ -657,6 +656,30 @@ script RtsPopupLogic extends Logic
 		end
 	end
 
+	-- 스크롤 격자(테마·아이콘 창 공용): body 안 (27, bottom) ~ (−27, −top) 영역, 칸 cell × cell 크기·간격 gap·가로 cols칸, 넘치면 세로 스크롤
+	@ExecSpace("ClientOnly")
+	method Entity SpawnScrollGrid(Entity body, string name, number top, number bottom, Vector2 cell, number gap, number cols)
+		local H = _RtsHudLogic
+		local list = H:SpawnStretch("model://uisprite", name, body, Vector2(0, 0), Vector2(1, 1), Vector2(27, bottom), Vector2(-27, 0 - top))
+		list.SpriteGUIRendererComponent.Color = self:Mix(Color.white, 0.02)
+		local sg = list:AddComponent("ScrollLayoutGroupComponent")
+		if sg ~= nil then
+			sg.Type = LayoutGroupType.Grid
+			sg.CellSize = cell
+			sg.GridSpacing = Vector2(gap, gap)
+			sg.Constraint = GridLayoutConstraint.FixedColumnCount
+			sg.ConstraintCount = cols
+			sg.ChildAlignment = ChildAlignmentType.UpperLeft
+			sg.GridChildAlignment = ChildAlignmentType.UpperLeft
+			sg.UseScroll = true
+			sg.ScrollBarVisible = ScrollBarVisibility.AlwaysShow
+			sg.ScrollBarThickness = 8
+			sg.ScrollBarHandleColor = H:ColGold()
+			sg.ScrollBarBackgroundColor = Color(1, 1, 1, 0.06)
+		end
+		return list
+	end
+
 	@ExecSpace("ClientOnly")
 	method void BuildTheme(Entity body, number W)
 		local H = _RtsHudLogic
@@ -674,14 +697,14 @@ script RtsPopupLogic extends Logic
 		end)
 		H:SpawnLabel("RtsThemeInfo", body, Vector2(0, 1), Vector2(0, 1), Vector2(27, -52), Vector2(W - 54, 26),
 			"고르면 내 구역의 바닥 · 트랙이 바뀌어요 — 보이는 것만 달라지고 밸런스는 그대로", H:ColMuted(), 14, TextAlignmentType.MiddleLeft, false)
+		-- 카드 = 스크롤 격자 3열(2026-09-25 사용자 "맵 테마도 스크롤 — 여러 개 생길 수도")
+		local grid = self:SpawnScrollGrid(body, "RtsThemeList", 86, 20, Vector2(270, 220), 12, 3)
 		local list = T:GetPresets()
 		local k = 0
 		for i = 1, #list do
 			local pr = list[i]
 			if (pr.tab or "기본") == self.ThemeTab then
 				k = k + 1
-				local x = 27 + ((k - 1) % 3) * 282
-				local y = -92 - math.floor((k - 1) / 3) * 232
 				local cur = pr.key == P.MyTheme
 				local border = self:Mix(Color.white, 0.12)
 				local thick = 1.5
@@ -689,7 +712,7 @@ script RtsPopupLogic extends Logic
 					border = H:ColGold()
 					thick = 2.5
 				end
-				local card = H:SpawnPanel("RtsThemeCard" .. H:Int(k), body, Vector2(0, 1), Vector2(0, 1), Vector2(x, y), Vector2(270, 220),
+				local card = H:SpawnPanel("RtsThemeCard" .. H:Int(k), grid, Vector2(0, 1), Vector2(0, 1), Vector2(0, 0), Vector2(270, 220),
 					self:Mix(Color.white, 0.04), border, thick)
 				local thumb = H:SpawnUI("model://uisprite", "RtsThemeCardThumb", card, Vector2(0.5, 1), Vector2(0.5, 1), Vector2(0, -8), Vector2(250, 150))
 				H:PaintThumb(thumb, pr)
@@ -724,7 +747,7 @@ script RtsPopupLogic extends Logic
 		end)
 	end
 
-	-- ===== 아이콘(2026-09-25 사용자): 탭 + 한 쪽 32칸(8×4) 격자 + 쪽 넘기기. 보유 = 원색, 미보유 = 실루엣, 사용 중 = 금색 칸 =====
+	-- ===== 아이콘(2026-09-25 사용자): 탭 + 스크롤 격자(8열 — "페이징 말고 스크롤"). 보유 = 원색, 미보유 = 실루엣, 사용 중 = 금색 칸 =====
 	--   칸 → 정보(획득 여부 · 획득처 · 확률 · 획득일) → [이 아이콘 사용] → 예/아니오 → RtsProfileLogic.RequestSetIcon
 	@ExecSpace("ClientOnly")
 	method void BuildIcon(Entity body, number W)
@@ -735,62 +758,43 @@ script RtsPopupLogic extends Logic
 			self:Open("icon")
 		end)
 		local ids = P:IconIds()
-		local per = self.IconPerPage
-		local pages = math.max(1, math.ceil(#ids / per))
-		if self.IconPage < 1 then self.IconPage = 1 end
-		if self.IconPage > pages then self.IconPage = pages end
 		H:SpawnLabel("RtsIconHead", body, Vector2(0, 1), Vector2(0, 1), Vector2(27, -52), Vector2(W - 54, 26),
 			"보유 " .. H:Int(P.MyOwnedCount) .. " / " .. H:Int(#ids) .. "   ·   매우어려움에서 몬스터를 처치하면 1% 확률로 획득", H:ColMuted(), 15, TextAlignmentType.MiddleLeft, false)
-		local first = (self.IconPage - 1) * per + 1
-		local last = math.min(#ids, first + per - 1)
-		for i = first, last do
-			local id = ids[i]
-			local k = i - first
-			local x = 27 + (k % 8) * 102
-			local y = -90 - math.floor(k / 8) * 102
-			local owned = P:IsOwned(id)
-			local cell = H:SpawnUI("model://uibutton", "RtsIconCell" .. H:Int(k + 1), body, Vector2(0, 1), Vector2(0, 1), Vector2(x, y), Vector2(94, 94))
-			local bg = self:Mix(Color.white, 0.03)
-			if owned then bg = self:Mix(Color.white, 0.08) end
-			if id == P.MyIcon then bg = self:Mix(H:ColGold(), 0.35) end
-			cell.SpriteGUIRendererComponent.Color = bg
-			local face = H:SpawnMonsterPortrait(cell, id, 82, false)
-			if face ~= nil and not owned then face.SpriteGUIRendererComponent.Color = Color(0.05, 0.05, 0.06, 0.8) end
-			cell:ConnectEvent(ButtonClickEvent, function(event)
-				H:PlayUi(H.ClickSound)
-				P.PendingIcon = id
-				self:Open("iconinfo")
-			end)
+		local grid = self:SpawnScrollGrid(body, "RtsIconList", 86, 20, Vector2(94, 94), 8, 8)
+		-- 창은 바로 열고 칸은 IconBatch개씩 나눠 만든다(위에서부터). 창이 닫히거나 다시 그려지면 멈춘다
+		local nextIdx = 1
+		local step = nil
+		step = function()
+			if self.Body ~= body or grid == nil or not isvalid(grid) then return end
+			local last = math.min(#ids, nextIdx + self.IconBatch - 1)
+			for i = nextIdx, last do
+				self:SpawnIconCell(grid, ids[i], i)
+			end
+			nextIdx = last + 1
+			if nextIdx <= #ids then _TimerService:SetTimerOnce(step, 0.03) end
 		end
-		-- 쪽 넘기기
-		local prev = self:SpawnTab("RtsIconPrev", body, Vector2(0, 0), Vector2(120, 38), "‹ 이전", false, 16)
-		local pt = prev.Parent.UITransformComponent
-		pt.AnchorsMin = Vector2(0.5, 0)
-		pt.AnchorsMax = Vector2(0.5, 0)
-		pt.Pivot = Vector2(1, 0)
-		pt.anchoredPosition = Vector2(-80, 18)
-		if self.IconPage > 1 then
-			local pc = H:SpawnClick("RtsIconPrevClick", prev)
-			pc:ConnectEvent(ButtonClickEvent, function(event)
-				self.IconPage = self.IconPage - 1
-				self:Open("icon")
-			end)
-		end
-		H:SpawnLabel("RtsIconPageText", body, Vector2(0.5, 0), Vector2(0.5, 0), Vector2(0, 18), Vector2(140, 38),
-			H:Int(self.IconPage) .. " / " .. H:Int(pages), H:ColInk(), 17, TextAlignmentType.MiddleCenter, true)
-		local nxt = self:SpawnTab("RtsIconNext", body, Vector2(0, 0), Vector2(120, 38), "다음 ›", false, 16)
-		local nt = nxt.Parent.UITransformComponent
-		nt.AnchorsMin = Vector2(0.5, 0)
-		nt.AnchorsMax = Vector2(0.5, 0)
-		nt.Pivot = Vector2(0, 0)
-		nt.anchoredPosition = Vector2(80, 18)
-		if self.IconPage < pages then
-			local nc = H:SpawnClick("RtsIconNextClick", nxt)
-			nc:ConnectEvent(ButtonClickEvent, function(event)
-				self.IconPage = self.IconPage + 1
-				self:Open("icon")
-			end)
-		end
+		step()
+	end
+
+	-- 아이콘 칸 하나(uibutton 94×94 + 초상 82): 보유 원색 · 미보유 실루엣 · 사용 중 금색 바탕. 누르면 정보
+	@ExecSpace("ClientOnly")
+	method void SpawnIconCell(Entity grid, string id, number index)
+		local H = _RtsHudLogic
+		local P = _RtsProfileLogic
+		local owned = P:IsOwned(id)
+		local cell = H:SpawnUI("model://uibutton", "RtsIconCell" .. H:Int(index), grid, Vector2(0, 1), Vector2(0, 1), Vector2(0, 0), Vector2(94, 94))
+		if cell == nil then return end
+		local bg = self:Mix(Color.white, 0.03)
+		if owned then bg = self:Mix(Color.white, 0.08) end
+		if id == P.MyIcon then bg = self:Mix(H:ColGold(), 0.35) end
+		cell.SpriteGUIRendererComponent.Color = bg
+		local face = H:SpawnMonsterPortrait(cell, id, 82, false)
+		if face ~= nil and not owned then face.SpriteGUIRendererComponent.Color = Color(0.05, 0.05, 0.06, 0.8) end
+		cell:ConnectEvent(ButtonClickEvent, function(event)
+			H:PlayUi(H.ClickSound)
+			P.PendingIcon = id
+			self:Open("iconinfo")
+		end)
 	end
 
 	-- 아이콘 정보: 큰 초상 · 이름 · 상태(사용 중 / 보유 + 획득일 / 미획득) · 획득처 · 확률 · [이 아이콘 사용](보유·미사용) · [목록으로]

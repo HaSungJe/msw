@@ -39,3 +39,9 @@ Maker(2026-09-25): 빌드 로그 오류 0(경고는 기존 것 + `ParseOwned` �
 - (해결 2026-09-25) 원형 마스크 업로드 `RtsCircleMask` 69e2dced… → `CircleMaskRUID` — 카드 아이콘 원형 확인
 - 헤네시스 외 4종 테마는 임시 모양(기존 타일 + 틴트, 장식·썸네일 없음) — 디자인은 ChatGPT(`docs/theme-presets.md`)
 - Maker 로컬 DataStorage에 시험으로 준 아이콘 14개·테마 perion이 남아 있다(Maker 전용 — 출시 월드와 무관, 필요하면 `maker_reset_data_storage`)
+
+## Change - 250925-1
+- **Change summary**: 아이콘 창 쪽 넘기기 → 스크롤 격자(사용자 "페이징 말고 스크롤"), 맵 테마 창 고정 3열 → 스크롤 격자(사용자 "여러 개 생길 수도")
+- **Changed files**: `RtsPopupLogic.mlua`(`SpawnScrollGrid` 공용 · `SpawnIconCell` · `IconBatch` 나눠 채우기, 삭제: `IconPage`·`IconPerPage`·이전/다음 버튼) · `docs/ui-screens.md`
+- **Verification**: Maker 빌드 로그 오류 0, 아이콘 창 스크롤 막대 + 위에서부터 칸 채움 확인(사용자가 Maker에서 플레이 중이라 추가 확인은 중단)
+- **Remaining issues**: 테마 창 스크롤은 화면 확인 전(테마 5종이라 한 화면에 다 들어감)
