@@ -1,6 +1,6 @@
 -- Phase 5 #19·#20 + Phase 4 #14 (부분, 2026-09-15): 유닛 정보 팝업 (아티팩트 v27 #unitModal 그대로)
 --   열기: 우측 유닛 슬롯 클릭 / 캐릭터 클릭 메뉴의 상세정보. 셸(딤·패널·제목·X·ESC)은 RtsPopupLogic("unit").
---   좌: 외형(스킨 2 — 기본 세트 / 월드 아바타 = 월드코인 1,600으로 30일 해금, 잠기면 클릭 → 구매창) + 능력치(RtsJobTableLogic.Calc, 파티 버프 반영 행은 ▲).
+--   좌: 외형(스킨 2 — 기본 세트 / 월드 아바타 = 월드코인 1,600으로 영구 해금, 잠기면 클릭 → 구매창) + 능력치(RtsJobTableLogic.Calc, 파티 버프 반영 행은 ▲).
 --   우: 탭 3개 — 스킬(미획득 흐림, 액티브/패시브) / 증강 n(이 유닛에 지정된 증강, Phase 6 전엔 빈 목록) / 적용 중인 버프 n(RtsUnitBuffLogic). 증강·버프는 ScrollLayoutGroup 스크롤 목록. Tab 키로 순환(CycleTab).
 --   대상 지정 스킬(홀리 유니티) 행에는 셀렉트 박스(미지정 / 내 다른 유닛). 하단: [레벨업] 버튼만(2026-09-16 — 누적 투자·다음 벽·보유 메소·'(벽)' 문구는 유저에게 필요 없는 내부 정보라 삭제. 메소는 HUD 좌상단).
 --   위치 이동은 여기 없음 — 캐릭터 클릭 메뉴(RtsUnitSelectLogic)에서. 대상 변경·위치 이동은 유닛마다 3분 쿨.
@@ -238,7 +238,6 @@ script RtsUnitPopupLogic extends Logic
 		-- 프리즘으로 직업명이 바뀌면(자유전직 → 듀얼블레이더) 외형 이름도 그 이름으로(2026-09-22 사용자 "상세정보에도 모험가 - 섀도어라고 나오고. 듀얼블레이더라고 나와야지")
 		if u.JobId ~= "phantom" then skins[1] = "모험가 " .. T:GetJobNameFor(u) end
 		local unlocked = _RtsUnitLogic:IsAvatarUnlocked(u.Owner)
-		local daysLeft = _RtsUnitLogic:AvatarDaysLeft(u.Owner)
 		for i = 1, 2 do
 			local on = (u.Skin == i - 1)
 			local locked = (i == 2 and not unlocked)
@@ -259,10 +258,10 @@ script RtsUnitPopupLogic extends Logic
 			local subColor = H:ColMuted()
 			if i == 2 then
 				if locked then
-					subText = "1,600 월드코인 · 30일 해금"
+					subText = "1,600 월드코인 · 영구 해금"
 					subColor = H:ColGold()
 				else
-					subText = "내 메이플월드 코디 · D-" .. H:Int(daysLeft)
+					subText = "내 메이플월드 코디"
 				end
 			end
 			H:SpawnLabel("RtsUnitSkinSub", b, Vector2(0, 1), Vector2(0, 1), Vector2(10, -30), Vector2(190, 18),
@@ -282,7 +281,7 @@ script RtsUnitPopupLogic extends Logic
 			end
 		end
 		H:SpawnLabel("RtsUnitSkinNote", look, Vector2(0, 1), Vector2(0, 1), Vector2(146, -164), Vector2(205, 18),
-			"월드 아바타는 구매할 때마다 30일 연장", H:ColMuted(), 11, TextAlignmentType.MiddleLeft, false)
+			"월드 아바타는 한 번 사면 영구 · 모든 유닛", H:ColMuted(), 11, TextAlignmentType.MiddleLeft, false)
 
 		-- ----- 좌: 능력치 -----
 		local statsH = 34 + 30 * 8 + 16

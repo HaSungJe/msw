@@ -19,7 +19,7 @@ script RtsUnitComponent extends Component
 	@Sync
 	property number Level = 1
 
-	-- 0 기본 세트 / 1 월드 아바타(주인 코디, 월드코인 결제로 30일 해금)
+	-- 0 기본 세트 / 1 월드 아바타(주인 코디, 월드코인 결제로 영구 해금)
 	@Sync
 	property number Skin = 0
 

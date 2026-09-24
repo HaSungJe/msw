@@ -21,12 +21,14 @@ script RtsUnitLogic extends Logic
 	-- 서버: userId → { [no] = entity }
 	property table UnitsByUser = {}
 
-	-- 월드 아바타 이용권: 월드 상점 아이템 "월드 아바타 30일"(1,600 월드코인, 아이템 타입 = 재구매하면 30일 연장). 2026-09-15 비공개 등록, 출시 때 공개
+	-- 월드 아바타 영구 이용권(2026-09-24 사용자 "영구로 바꿔" — 전엔 30일·재구매 연장): 월드 상점 아이템 QK03ZI15E(1,600 월드코인). 한 번 사면 영구 해금.
+	--   2026-09-15 비공개 등록, 출시 때 공개
 	property string AvatarProductId = "QK03ZI15E"
 
-	property number AvatarDays = 30
+	-- 영구 해금 값(해금 만료 자리에 넣는 아주 먼 미래 — DateTime.UtcNow.Elapsed보다 늘 크다, 2^53 아래)
+	property number AvatarForever = 9000000000000000
 
-	-- 유저별 해금 만료(UTC ms, DateTime.UtcNow.Elapsed 기준). 0 = 잠김. 원본은 유저 DataStorage "avatarUntil"
+	-- 유저별 해금 만료(UTC ms, DateTime.UtcNow.Elapsed 기준). 0 = 잠김, AvatarForever = 영구. 원본은 유저 DataStorage "avatarUntil"
 	@Sync
 	property SyncTable<string, number> AvatarUntilByUser
 
@@ -86,13 +88,6 @@ script RtsUnitLogic extends Logic
 
 	method boolean IsAvatarUnlocked(string userId)
 		return self:GetAvatarUntil(userId) > DateTime.UtcNow.Elapsed
-	end
-
-	-- 남은 일수(올림). 잠김이면 0
-	method number AvatarDaysLeft(string userId)
-		local left = self:GetAvatarUntil(userId) - DateTime.UtcNow.Elapsed
-		if left <= 0 then return 0 end
-		return math.ceil(left / 86400000)
 	end
 
 	-- ===== 클라 =====
@@ -556,7 +551,7 @@ script RtsUnitLogic extends Logic
 		self.AvatarUntilByUser[userId] = untilMs
 	end
 
-	-- 월드 상점 지급 콜백: 구매 1건 = 만료(또는 지금)부터 30일 연장. true를 돌려줘야 구매 완료
+	-- 월드 상점 지급 콜백: 구매 = 영구 해금(이미 영구면 그대로 — 값만 다시 쓴다). true를 돌려줘야 구매 완료
 	@ExecSpace("ServerOnly")
 	method boolean ProcessPurchase(any info)
 		if info == nil or info.ProductId ~= self.AvatarProductId then
@@ -564,10 +559,7 @@ script RtsUnitLogic extends Logic
 			return false
 		end
 		local userId = info.UserId
-		local now = DateTime.UtcNow.Elapsed
-		local base = self:GetAvatarUntil(userId)
-		if base < now then base = now end
-		local untilMs = base + self.AvatarDays * 86400000
+		local untilMs = self.AvatarForever
 		local ds = _DataStorageService:GetUserDataStorage(userId)
 		if ds ~= nil then
 			local code = ds:SetAndWait(self.AvatarKey, string.format("%d", untilMs))
@@ -577,12 +569,12 @@ script RtsUnitLogic extends Logic
 			end
 		end
 		self.AvatarUntilByUser[userId] = untilMs
-		log("RtsUnit: avatar pass +" .. tostring(self.AvatarDays) .. "d for " .. userId .. " (order " .. tostring(info.OrderNumber) .. ")")
+		log("RtsUnit: avatar pass permanent for " .. userId .. " (order " .. tostring(info.OrderNumber) .. ")")
 		self:OnChanged(0, self:GetMeso(userId), userId)
 		return true
 	end
 
-	-- 만료된 유저의 월드 아바타 스킨을 기본 세트로
+	-- 해금이 없는 유저의 월드 아바타 스킨을 기본 세트로(영구 이용권 전 30일권이 끝난 경우 등)
 	@ExecSpace("ServerOnly")
 	method void ExpireAvatars()
 		for userId, list in pairs(self.UnitsByUser) do

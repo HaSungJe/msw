@@ -242,7 +242,7 @@ script RtsJobTableLogic extends Logic
 		return nil
 	end
 
-	-- 스킨 2종: 1 기본 세트 / 2 월드 아바타(내 메이플월드 코디 — 월드코인 결제로 30일 해금). 인덱스는 0-기반 값 Skin(0/1)+1
+	-- 스킨 2종: 1 기본 세트 / 2 월드 아바타(내 메이플월드 코디 — 월드코인 결제로 영구 해금). 인덱스는 0-기반 값 Skin(0/1)+1
 	method table GetSkinNames(string jobId)
 		if jobId == "phantom" then return { "영웅 팬텀", "월드 아바타" } end
 		return { "모험가 " .. self:GetJobName(jobId), "월드 아바타" }
