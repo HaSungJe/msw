@@ -465,7 +465,7 @@ script RtsUnitSelectLogic extends Logic
 			if not _RtsZoneLogic:IsPadCell(pc.x, pc.y) then return end
 			if _RtsUnitLogic:MyUnitAt(pc.x, pc.y) > 0 then return end
 			local jobId = self.PlaceJob
-			log("RtsUnitSelect: recruit " .. jobId .. " -> (" .. _RtsHudLogic:Int(pc.x) .. "," .. _RtsHudLogic:Int(pc.y) .. ")")
+			_RtsConfigLogic:Log("RtsUnitSelect: recruit " .. jobId .. " -> (" .. _RtsHudLogic:Int(pc.x) .. "," .. _RtsHudLogic:Int(pc.y) .. ")")
 			self:EndPlace()
 			_RtsUnitLogic:RequestRecruitAt(jobId, pc.x, pc.y)
 			return
@@ -493,7 +493,7 @@ script RtsUnitSelectLogic extends Logic
 		local cell = self:CellAtScreen(event.TouchPoint)
 		if not _RtsZoneLogic:IsPadCell(cell.x, cell.y) then return end
 		local no = self.MoveNo
-		log("RtsUnitSelect: move " .. _RtsHudLogic:Int(no) .. " -> (" .. _RtsHudLogic:Int(cell.x) .. "," .. _RtsHudLogic:Int(cell.y) .. ")")
+		_RtsConfigLogic:Log("RtsUnitSelect: move " .. _RtsHudLogic:Int(no) .. " -> (" .. _RtsHudLogic:Int(cell.x) .. "," .. _RtsHudLogic:Int(cell.y) .. ")")
 		self:EndMove()
 		_RtsUnitLogic:RequestMove(no, cell.x, cell.y)
 	end

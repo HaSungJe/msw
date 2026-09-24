@@ -7,7 +7,7 @@
 1. `maker_save` — 편집 내용 저장 (미저장 상태로 맵 이동/플레이 시 유실 위험)
 2. `maker_logs(kind:"build")` — 스크립트 문법/검증 오류 먼저 확인 (빌드 콘솔)
 3. `maker_play` — Play Test 시작
-4. `maker_logs(kind:"normal")` — 런타임(클라이언트/서버) 로그·에러 확인
+4. `maker_logs(kind:"normal")` — 런타임(클라이언트/서버) 로그·에러 확인. 게임 스크립트 로그는 기본으로 꺼져 있다(`RtsConfigLogic.DebugLog = false`) — 흐름 로그가 필요하면 Play 중 `maker_execute_script`로 `server_main`과 `client` 각각 `_RtsConfigLogic.DebugLog = true`. 엔진 오류(LEA-…)는 스위치와 상관없이 찍힌다
 5. `maker_screenshot` — 화면 상태 확인, `maker_keyboard_input`/`maker_mouse_input`으로 조작 재현
 6. `maker_stop` — 편집 모드 복귀
 - Play 중에 외부(파이썬/에디터)로 `.mlua`를 고쳤다면: `maker_stop` → **`maker_refresh_workspace`** → `maker_save` → `maker_play`. refresh 없이 save+play하면 Maker 메모리의 옛 스크립트로 실행된다(디스크 파일은 그대로지만 Play는 옛 값). 실측 2026-09-18 — `UnitNo`를 7→1로 고친 뒤 stop→save→play 했는데 로그가 계속 "unit 7", refresh 후에야 "unit 1". 실행 결과가 파일과 다르면 먼저 이것을 의심한다.

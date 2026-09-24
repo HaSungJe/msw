@@ -26,6 +26,7 @@ Environment/  # 엔진 제공 환경 — NativeScripts/*.d.mlua 선언(Component
 - mlua API·문법이 불확실하면 추측하지 말고 msw-mcp의 `mlua_api_retriever` / `mlua_document_retriever`로 확인 후 작성.
 - 조작 RPC(영입·레벨업·증강·위치 이동·스킬 잠금 등 클라가 부르는 `@ExecSpace("Server")` 메서드)는 서버에서 `senderUserId`로 소유자를 검증해 남의 구역·유닛 조작을 거부한다(클라에서 버튼을 숨기는 것만으로 막지 않는다).
 - 숫자를 엔티티 이름·테이블 키·화면 표기에 쓸 땐 `tostring` 대신 정수 포맷(`string.format("%d", math.floor(v + 0.5))` 또는 `_RtsHudLogic:Int(v)`) — 프로퍼티·Sync·RPC로 온 number는 `"1.0"`이 된다.
+- 로그는 `log()`를 직접 부르지 않고 `_RtsConfigLogic:Log(msg)`로 남긴다 — `RtsConfigLogic.DebugLog`(기본 false)가 켜졌을 때만 찍혀 출시 월드 콘솔에 로그가 뜨지 않는다(2026-09-24 사용자 "이용자 입장에서 로그가 자꾸 뜬다"). Maker 확인 때만 서버·클라 각각 `_RtsConfigLogic.DebugLog = true`로 켠다.
 - 엔진 동작 실측과 그에 따른 작성 관례(프롭·유닛 아바타 스폰, 애니 끝 이벤트, 줌 잠금, 스프라이트 PPU·텍스트 Truncate, 숫자 포맷, 입력·터치·UI 좌표·RPC) → 상세: [docs/msw-engine.md](docs/msw-engine.md)
 
 ## Shared Logic Separation (standard: MSW 권장)

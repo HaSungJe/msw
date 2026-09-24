@@ -97,7 +97,7 @@ script RtsDifficultyLogic extends Logic
 		local i = math.floor(idx + 0.5)
 		if i < 1 or i > 6 then return end
 		self.DiffByUser[userId] = i
-		log("RtsDifficulty: " .. userId .. " -> " .. self:GetNames()[i])
+		_RtsConfigLogic:Log("RtsDifficulty: " .. userId .. " -> " .. self:GetNames()[i])
 	end
 
 	-- ===== 클라: 막대 =====

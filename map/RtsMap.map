@@ -120,7 +120,14 @@
           "displayOrder": 2,
           "pathConstraints": "///",
           "revision": 1,
-          "modelId": null,
+          "origin": {
+            "type": "Model",
+            "entry_id": "recttilemap",
+            "sub_entity_id": null,
+            "root_entity_id": null,
+            "replaced_model_id": null
+          },
+          "modelId": "recttilemap",
           "@components": [
             {
               "@type": "MOD.Core.TransformComponent",

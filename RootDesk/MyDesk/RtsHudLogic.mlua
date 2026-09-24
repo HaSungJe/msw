@@ -38,11 +38,12 @@ script RtsHudLogic extends Logic
 
 	property number RecruitRoomPrev = 0
 
-	-- 영입 칸이 새로 열릴 때(판 시작·5·자쿰·혼테일·핑크빈·시그너스) 알림음 = 원작 sound/ui/dlgnotice(2026-09-23 사용자 "영입 가능 표시 뜰 때 사운드")
+	-- 영입 칸이 새로 열릴 때(판 시작·5·자쿰·혼테일·핑크빈·시그너스) 알림음 = 증강 3택1이 뜰 때와 같은 원작 업적 달성음 sound/achievementeff/achievmentcomplete
+	--   (2026-09-24 사용자 "영입 가능 표시 뜰 때 증강 나오는 것처럼 사운드" — 전엔 sound/ui/dlgnotice 5db4f31b…, RtsPopupLogic.PickSound와 같은 RUID)
 	--   RecruitLimitPrev = 직전 영입 한도(진행 중이 아니면 0으로 되돌려 새 판 시작에도 울린다). 방출로 빈 칸이 생긴 건 울리지 않음
 	property number RecruitLimitPrev = 0
 
-	property string RecruitSound = "5db4f31bbcc243ec8f08713ad78dbe79"
+	property string RecruitSound = "dbb38b4f04044499906bd7a2ca9c4d7c"
 
 	-- 영입 칸이 새로 열렸을 때 반짝임 끝 시각(ElapsedSeconds)·토글
 	property number RecruitFlashUntil = 0
@@ -248,6 +249,14 @@ script RtsHudLogic extends Logic
 		return b
 	end
 
+	-- 클릭음 없는 버튼(누르면 자기 소리가 따로 나는 곳 — 예: '펼치기'는 3택1 등장음이 난다, 2026-09-24 사용자 "펼칠 때 소리 중복")
+	@ExecSpace("ClientOnly")
+	method Entity SpawnClickQuiet(string name, Entity parent)
+		local b = self:SpawnStretch("model://uibutton", name, parent, Vector2(0, 0), Vector2(1, 1), Vector2(0, 0), Vector2(0, 0))
+		if b ~= nil then self:Tint(b, 1, 1, 1, 0.01) end
+		return b
+	end
+
 	-- UI 효과음 한 번(클라)
 	@ExecSpace("ClientOnly")
 	method void PlayUi(string ruid)
@@ -297,7 +306,7 @@ script RtsHudLogic extends Logic
 		self.AnchorEntity = anchorEntity
 		local ui = _EntityService:GetEntityByPath("/ui")
 		if ui == nil then
-			log("RtsHud: /ui not found")
+			_RtsConfigLogic:Log("RtsHud: /ui not found")
 			return
 		end
 		local lp = _UserService.LocalPlayer
@@ -305,7 +314,7 @@ script RtsHudLogic extends Logic
 
 		local grp = _SpawnService:SpawnByModelId("model://uigroup", "RtsHudGroup", Vector3.zero, ui)
 		if grp == nil then
-			log("RtsHud: group spawn failed")
+			_RtsConfigLogic:Log("RtsHud: group spawn failed")
 			return
 		end
 		if grp.UIGroupComponent ~= nil then grp.UIGroupComponent.DefaultShow = true end
@@ -360,8 +369,8 @@ script RtsHudLogic extends Logic
 			self:OnTopButton()
 		end)
 		self.RecruitBtn = recruit
-		-- 영입 버튼 오른쪽: '다시 하기' 투표 — 카운트다운·진행·종료 언제든(2026-09-23 사용자 — 처음엔 스테이지 칩 옆, 같은 날 "영입 버튼 우측으로"). 방 인원 과반 찬성이면 처음부터. 문구·색은 RefreshRestartButton
-		local restart = self:SpawnPanel("RtsRestartBtn", grp, Vector2(0.5, 1), Vector2(0, 1), Vector2(170 + 8, -16), Vector2(200, 64),
+		-- 오른쪽 아래: '다시 하기'(2026-09-24 사용자 "화면 중앙에 나오지 말고 화면 우측 하단에" — 전엔 위쪽 가운데 오른편). 방 인원 과반 찬성이면 처음부터(혼자면 바로). 문구·색은 RefreshRestartButton
+		local restart = self:SpawnPanel("RtsRestartBtn", grp, Vector2(1, 0), Vector2(1, 0), Vector2(-16, 16), Vector2(200, 64),
 			self:ColPanel(), self:ColBorder(), 2)
 		self.RestartText = self:SpawnLabel("RtsRestartLabel", restart, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2(0, 0), Vector2(192, 56),
 			"다시 하기", self:ColInk(), 19, TextAlignmentType.MiddleCenter, true)
@@ -370,8 +379,8 @@ script RtsHudLogic extends Logic
 			self:OnRestartButton()
 		end)
 		self.RestartBtn = restart
-		-- 다시 하기 투표 패널: 버튼 바로 아래(투표 중에만)
-		local vp = self:SpawnPanel("RtsVotePanel", grp, Vector2(0.5, 1), Vector2(0, 1), Vector2(170 + 8, -86), Vector2(260, 76),
+		-- 다시 하기 투표 패널: 버튼 바로 위(투표 중에만)
+		local vp = self:SpawnPanel("RtsVotePanel", grp, Vector2(1, 0), Vector2(1, 0), Vector2(-16, 16 + 64 + 8), Vector2(260, 76),
 			self:ColPanel(), self:ColGold(), 1.5)
 		self.VotePanel = vp
 		self.VoteText = self:SpawnLabel("RtsVoteText", vp, Vector2(0, 1), Vector2(0, 1), Vector2(10, -4), Vector2(240, 26),
@@ -449,7 +458,7 @@ script RtsHudLogic extends Logic
 		self.ExpandBtn = ex
 		self.ExpandLabel = self:SpawnLabel("RtsExpandLabel", ex, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2(0, 0), Vector2(146, 40),
 			"펼치기", Color(1, 0.95, 0.8, 1), 19, TextAlignmentType.MiddleCenter, true)
-		local exClick = self:SpawnClick("RtsExpandClick", ex)
+		local exClick = self:SpawnClickQuiet("RtsExpandClick", ex)
 		exClick:ConnectEvent(ButtonClickEvent, function(event)
 			_RtsAugmentLogic:ExpandPick()
 		end)
@@ -464,9 +473,9 @@ script RtsHudLogic extends Logic
 			_RtsAugmentLogic:BuyFromHud()
 		end)
 
-		-- 우측 하단: 테스트 프리즘 버튼(개발 도구, 2026-09-22 사용자 "우측 하단에 테스트 프리즘 증강 버튼") → 프리즘 선택 팝업
+		-- 우측 하단(다시 하기 왼쪽): 테스트 프리즘 버튼(개발 도구, 2026-09-22 사용자 "우측 하단에 테스트 프리즘 증강 버튼") → 프리즘 선택 팝업
 		if _RtsUnitLogic.DevTools then
-			local dev = self:SpawnPanel("RtsDevBtn", grp, Vector2(1, 0), Vector2(1, 0), Vector2(-16, 16), Vector2(160, 50),
+			local dev = self:SpawnPanel("RtsDevBtn", grp, Vector2(1, 0), Vector2(1, 0), Vector2(-16 - 200 - 8, 16), Vector2(160, 50),
 				self:ColPanel(), Color(0.55, 0.75, 1, 1), 1.5)
 			self:SpawnLabel("RtsDevLabel", dev, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2(0, 0), Vector2(156, 40),
 				"테스트 프리즘", self:ColInk(), 19, TextAlignmentType.MiddleCenter, true)
@@ -485,7 +494,7 @@ script RtsHudLogic extends Logic
 		self.Hint:SetEnable(false)
 
 		self.Built = true
-		log("RtsHud: built v2")
+		_RtsConfigLogic:Log("RtsHud: built v2")
 
 		_RtsPopupLogic:Build(ui)
 		if self.PendingPlayers ~= "" then
@@ -723,7 +732,7 @@ script RtsHudLogic extends Logic
 		end
 	end
 
-	-- 상단 가운데 버튼 클릭: 판이 끝났거나 탈락·클리어한 뒤(관전 중)면 나가기, 아니면 영입 팝업. 다시 하기 투표는 스테이지 칩 옆 버튼(OnRestartButton)
+	-- 상단 가운데 버튼 클릭: 판이 끝났거나 탈락·클리어한 뒤(관전 중)면 나가기, 아니면 영입 팝업. 다시 하기 투표는 오른쪽 아래 버튼(OnRestartButton)
 	@ExecSpace("ClientOnly")
 	method void OnTopButton()
 		if _RtsStageLogic.RunState == "ended" or not _RtsRunResultLogic:IsMeAlive() then
@@ -754,7 +763,7 @@ script RtsHudLogic extends Logic
 		local exitMode = state == "ended" or not _RtsRunResultLogic:IsMeAlive()
 		local canRecruit = state == "running" and room > 0 and owned < _RtsUnitLogic:GetMaxUnits()
 		self.RecruitBtn.Parent:SetEnable(exitMode or canRecruit)
-		-- 판이 끝났거나 탈락·클리어했으면 '나가기'(다시 하기는 스테이지 칩 옆 버튼)
+		-- 판이 끝났거나 탈락·클리어했으면 '나가기'(다시 하기는 오른쪽 아래 버튼)
 		if exitMode then
 			self.RecruitRoomPrev = 0
 			self.RecruitLimitPrev = 0

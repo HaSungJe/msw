@@ -113,14 +113,14 @@ script RtsThemeLogic extends Logic
 	method boolean ApplyPreset(string key)
 		local preset = self:GetPreset(key)
 		if preset.key ~= key then
-			log("RtsTheme: unknown preset " .. key)
+			_RtsConfigLogic:Log("RtsTheme: unknown preset " .. key)
 			return false
 		end
 		self.ActiveKey = preset.key
 		_RtsBootstrapLogic:FillGroundTiles(preset.floorTile, preset.floorVariants, preset.variantRatio)
 		_RtsZoneLogic:SetGridRUID(preset.gridRUID)
 		_RtsZoneLogic:SetDecor(preset.decor)
-		log("RtsTheme: applied " .. preset.key)
+		_RtsConfigLogic:Log("RtsTheme: applied " .. preset.key)
 		return true
 	end
 

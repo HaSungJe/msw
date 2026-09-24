@@ -218,7 +218,14 @@ script RtsUnitPopupLogic extends Logic
 		local H = _RtsHudLogic
 		local P = _RtsPopupLogic
 		local T = _RtsJobTableLogic
-		if self.Content ~= nil then self.Content:Destroy() end
+		-- 옛 내용은 새 내용이 그려질 때까지 잠깐 남겼다가 지운다(2026-09-24 사용자 "캐릭터 상세보기 탭으로 넘어갈 때 번쩍임" —
+		--   엔진이 UI를 여러 프레임에 나눠 만들어 지우자마자 새로 만들면 잠깐 빈 창이 보였다). 새 내용이 위에 그려진다
+		if self.Content ~= nil then
+			local old = self.Content
+			_TimerService:SetTimerOnce(function()
+				if old ~= nil and isvalid(old) then old:Destroy() end
+			end, 0.12)
+		end
 		self.Dropdown = nil
 		local content = H:SpawnStretch("model://uisprite", "RtsUnitContent", self.Body, Vector2(0, 0), Vector2(1, 1), Vector2(0, 0), Vector2(0, 0))
 		H:Tint(content, 0, 0, 0, 0)
@@ -300,6 +307,33 @@ script RtsUnitPopupLogic extends Logic
 			v.TextComponent.IsRichText = true
 			self.StatVals[i] = v
 			y = y - 30
+		end
+
+		-- ----- 좌 아래: 증강으로 오른 수치(2026-09-24 사용자 "캐릭터 상세정보 아래에 박스 하나 더 — 증강으로 올라간 수치") -----
+		--   증강 탭 합계와 같은 계산(RtsAugmentTableLogic.TotalsMul × 티어 배율 RtsJobTableLogic.AugMulFor), 2열 격자
+		local at = _RtsAugmentTableLogic:TotalsMul(u.Augs, _RtsJobTableLogic:AugMulFor(u))
+		local augBox = H:SpawnPanel("RtsUnitAugGain", content, Vector2(0, 1), Vector2(0, 1), Vector2(27, -256 - statsH - 8), Vector2(365, 88),
+			P:Mix(H:ColGold(), 0.06), P:Mix(H:ColGold(), 0.35), 1.5)
+		H:SpawnLabel("RtsUnitAugGainT", augBox, Vector2(0, 1), Vector2(0, 1), Vector2(14, -6), Vector2(335, 20),
+			"증강으로 오른 수치 (" .. H:Int(at.n) .. "개)", H:ColGold(), 13, TextAlignmentType.MiddleLeft, true)
+		local gains = {}
+		if at.atk > 0 then gains[#gains + 1] = "공격력 +" .. H:Int(at.atk) end
+		if at.pct > 0 then gains[#gains + 1] = "공격력 +" .. H:Int(at.pct) .. "%" end
+		if at.boss > 0 then gains[#gains + 1] = "보스 데미지 +" .. H:Int(at.boss) .. "%" end
+		if at.crit > 0 then gains[#gains + 1] = "크리티컬 확률 +" .. H:Int(at.crit) .. "%" end
+		if at.critDmg > 0 then gains[#gains + 1] = "크리티컬 데미지 +" .. H:Int(at.critDmg) .. "%" end
+		if at.fin > 100.01 then gains[#gains + 1] = "최종 데미지 +" .. H:Int(at.fin - 100) .. "%" end
+		if #gains == 0 then
+			H:SpawnLabel("RtsUnitAugGainNone", augBox, Vector2(0, 1), Vector2(0, 1), Vector2(14, -32), Vector2(335, 22),
+				"적용된 증강이 없어요", H:ColMuted(), 14, TextAlignmentType.MiddleLeft, false)
+		else
+			for gi = 1, #gains do
+				local col = (gi - 1) % 2
+				local line = math.floor((gi - 1) / 2)
+				local gl = H:SpawnLabel("RtsUnitAugGainV", augBox, Vector2(0, 1), Vector2(0, 1), Vector2(14 + col * 172, -28 - line * 20), Vector2(166, 20),
+					gains[gi], H:ColInk(), 13, TextAlignmentType.MiddleLeft, false)
+				gl.TextComponent.Overflow = OverflowType.Truncate
+			end
 		end
 
 		-- ----- 우: 탭(스킬 / 증강 n / 적용 중인 버프 n) + 목록 -----
@@ -685,7 +719,21 @@ script RtsUnitPopupLogic extends Logic
 	method void BuildAugTab(Entity content, number rx, number rw, number top, table augs)
 		local H = _RtsHudLogic
 		local P = _RtsPopupLogic
-		local list = self:SpawnScrollList(content, "RtsUnitAugList", rx, rw, top, #augs)
+		-- 설명 줄 수만큼 행 높이(2026-09-24 사용자 "풍마수리검 효과가 기니까 텍스트 깨짐" — 전엔 64px 고정이라 긴 프리즘 설명이 다음 행으로 넘쳤다).
+		--   머리표("[나이트로드 전용] [프리즘]")는 배지와 겹치니 뗀다. 스크롤 판단도 실제 높이 합으로
+		local descs = {}
+		local heights = {}
+		local total = 0
+		for i = 1, #augs do
+			local d = P:StripTags(augs[i].d or "")
+			local lines = self:DescLines(d, rw - 120)
+			if string.len(d) > 150 then lines = math.max(lines, math.ceil(string.len(d) / 2.6 / 44)) end
+			if lines > 6 then lines = 6 end
+			descs[i] = d
+			heights[i] = 44 + lines * 20
+			total = total + heights[i] + 6
+		end
+		local list = self:SpawnScrollList(content, "RtsUnitAugList", rx, rw, top, math.max(#augs, math.ceil(total / 70)))
 		if list == nil then return end
 		if #augs == 0 then
 			self:SpawnEmptyRow(list, rw, "적용 중인 증강이 없어요.")
@@ -693,15 +741,16 @@ script RtsUnitPopupLogic extends Logic
 		end
 		for i = 1, #augs do
 			local a = augs[i]
-			local row = H:SpawnPanel("RtsUnitAug" .. tostring(i), list, Vector2(0, 1), Vector2(0, 1), Vector2(0, 0), Vector2(rw - 12, 64),
+			local rh = heights[i]
+			local row = H:SpawnPanel("RtsUnitAug" .. tostring(i), list, Vector2(0, 1), Vector2(0, 1), Vector2(0, 0), Vector2(rw - 12, rh),
 				P:Mix(Color.white, 0.04), P:Mix(Color.white, 0.1), 1.5)
 			local band = H:SpawnStretch("model://uisprite", "RtsUnitAugBand", row, Vector2(0, 0), Vector2(0, 1), Vector2(0, 0), Vector2(4, 0))
 			band.SpriteGUIRendererComponent.Color = P:GradeColor(a.g)
 			P:SpawnBadge("RtsUnitAugBadge", row, Vector2(14, -20), a.g)
 			H:SpawnLabel("RtsUnitAugT", row, Vector2(0, 1), Vector2(0, 1), Vector2(92, -8), Vector2(rw - 120, 24),
 				a.t, H:ColInk(), 17, TextAlignmentType.MiddleLeft, true)
-			H:SpawnLabel("RtsUnitAugD", row, Vector2(0, 1), Vector2(0, 1), Vector2(92, -34), Vector2(rw - 120, 22),
-				a.d, Color(0.902, 0.863, 0.769, 1), 14, TextAlignmentType.MiddleLeft, false)
+			H:SpawnLabel("RtsUnitAugD", row, Vector2(0, 1), Vector2(0, 1), Vector2(92, -34), Vector2(rw - 120, rh - 42),
+				descs[i], Color(0.902, 0.863, 0.769, 1), 14, TextAlignmentType.UpperLeft, false)
 		end
 	end
 

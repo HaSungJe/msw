@@ -138,7 +138,7 @@ script RtsBossLogic extends Logic
 		if s == nil then return end
 		if #list < #s.mobs or self:AliveBossCount(z) > 0 then return end
 		self.Down[z] = true
-		log("RtsBoss: zone " .. string.format("%d", z) .. " down " .. s.name)
+		_RtsConfigLogic:Log("RtsBoss: zone " .. string.format("%d", z) .. " down " .. s.name)
 		-- 프리즘 라운드(자쿰·시그너스·루시드 — 2026-09-23 3개로) 보스를 잡으면 그 구역 주인에게 프리즘 3택1
 		_RtsAugmentLogic:OnBossDown(_RtsRunResultLogic:OwnerOfZone(z), _RtsStageLogic.StageNo)
 		if _RtsStageLogic.StageNo >= _RtsStageTableLogic:GetStageCount() then

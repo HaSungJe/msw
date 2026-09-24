@@ -291,7 +291,7 @@ script RtsZoneLogic extends Logic
 		end
 		self:SetDecor(_RtsThemeLogic:GetDecor())
 		self.VisualsBuilt = true
-		log("RtsZone: visuals built (grid track x" .. tostring(self:GetZoneCount()) .. ")")
+		_RtsConfigLogic:Log("RtsZone: visuals built (grid track x" .. tostring(self:GetZoneCount()) .. ")")
 	end
 
 	-- 보스 영역 표시: 영역(4×5) 칸 위 반투명 붉은 판(그리드 100 위, 장식 110·유닛·몹 아래). 칸 경계선이 보이게 가장자리를 살짝 안으로

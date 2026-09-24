@@ -330,7 +330,7 @@ script RtsUnitLogic extends Logic
 		self:EnsureShadow(e)
 		_RtsCombatLogic:StartLoop(userId, no)
 		self:OnChanged(no, self:GetMeso(userId), userId)
-		log("RtsUnit: prism " .. id .. " -> unit " .. string.format("%d", no) .. " (" .. u.JobId .. ")")
+		_RtsConfigLogic:Log("RtsUnit: prism " .. id .. " -> unit " .. string.format("%d", no) .. " (" .. u.JobId .. ")")
 	end
 
 	-- 프리즘 영구 잠금(3)은 그 프리즘 스킬을 쓸 수 있는 레벨(대개 50)이 된 뒤에만 건다 — 2026-09-23 사용자 "레벨 제한을 못 채우면 다른 스킬은 잠기지 않게,
@@ -367,7 +367,7 @@ script RtsUnitLogic extends Logic
 		if not _RtsRunResultLogic:IsAlive(userId) then return end
 		if not self:IsJobUnlocked(userId, jobId) then return end
 		if self:RecruitRoom(userId) <= 0 then
-			log("RtsUnit: recruit " .. jobId .. " refused — limit")
+			_RtsConfigLogic:Log("RtsUnit: recruit " .. jobId .. " refused — limit")
 			return
 		end
 		local zone = _RtsZoneLogic:GetZoneOfUser(userId)
@@ -377,7 +377,7 @@ script RtsUnitLogic extends Logic
 		local list = self.UnitsByUser[userId]
 		-- 동일 직업 중복 영입 불가(character.md 헤더 규칙; 2026-09-22 사용자 "듀얼블레이더로 전직했어도 섀도어 영입 추가 안 되어야 하는 건 당연" — 프리즘으로 이름이 바뀌어도 JobId는 그대로라 막힌다). 개발모드도 같음
 		if self:HasJobUnit(userId, jobId) then
-			log("RtsUnit: recruit " .. jobId .. " refused — already owned")
+			_RtsConfigLogic:Log("RtsUnit: recruit " .. jobId .. " refused — already owned")
 			return
 		end
 		local no = 0
@@ -391,13 +391,13 @@ script RtsUnitLogic extends Logic
 		if no == 0 then return end
 		for _, oe in pairs(list) do
 			if oe ~= nil and isvalid(oe) and oe.RtsUnitComponent ~= nil and oe.RtsUnitComponent.Col == col and oe.RtsUnitComponent.Row == row then
-				log("RtsUnit: recruit " .. jobId .. " refused — pad (" .. string.format("%d,%d", col, row) .. ") occupied")
+				_RtsConfigLogic:Log("RtsUnit: recruit " .. jobId .. " refused — pad (" .. string.format("%d,%d", col, row) .. ") occupied")
 				return
 			end
 		end
 		self:SpawnUnit(userId, zone, no, jobId, 1, col, row)
 		self:OnChanged(no, self:GetMeso(userId), userId)
-		log("RtsUnit: recruit " .. jobId .. " -> unit " .. string.format("%d", no) .. " at (" .. string.format("%d,%d", col, row) .. ")")
+		_RtsConfigLogic:Log("RtsUnit: recruit " .. jobId .. " -> unit " .. string.format("%d", no) .. " at (" .. string.format("%d,%d", col, row) .. ")")
 	end
 
 	-- 영입할 수 있게 열린 직업인가(서버·클라 공용). 모험가 10직업은 항상, 영웅 팬텀은 프리즘 '팬텀 잠금 해제'(augmentation.md)를 받은 유저만.
@@ -443,7 +443,7 @@ script RtsUnitLogic extends Logic
 		_RtsAugmentLogic:OnUnitDismissed(userId, no)
 		self.MesoByUser[userId] = self:GetMeso(userId) + refund
 		self:OnChanged(0, self:GetMeso(userId), userId)
-		log("RtsUnit: dismiss unit " .. string.format("%d", no) .. " refund " .. string.format("%d", refund))
+		_RtsConfigLogic:Log("RtsUnit: dismiss unit " .. string.format("%d", no) .. " refund " .. string.format("%d", refund))
 	end
 
 	-- 방출 시 환급액(서버 지급·클라 확인 문구 공용) — 10메소 단위로 내림
@@ -459,7 +459,7 @@ script RtsUnitLogic extends Logic
 		if not self.DevTools then return end
 		self:ClearUnits(userId)
 		self:OnChanged(0, self:GetMeso(userId), userId)
-		log("RtsUnit: dev clear")
+		_RtsConfigLogic:Log("RtsUnit: dev clear")
 	end
 
 	-- 프리즘 id를 그 직업인 내 유닛에 적용(팬텀 영입 프리즘은 직업 목록에서 팬텀을 고르면 되니 여기선 무시)
@@ -511,7 +511,7 @@ script RtsUnitLogic extends Logic
 		self:EnsureShadow(e)
 		_RtsCombatLogic:StartLoop(userId, no)
 		self:OnChanged(no, self:GetMeso(userId), userId)
-		log("RtsUnit: prism " .. id .. " removed from unit " .. string.format("%d", no))
+		_RtsConfigLogic:Log("RtsUnit: prism " .. id .. " removed from unit " .. string.format("%d", no))
 	end
 
 	-- 내 유닛 전부 제거(루프 정지·엔티티 삭제) — 개발모드 직업 교체용. 메소·아바타 패스는 유지
@@ -555,7 +555,7 @@ script RtsUnitLogic extends Logic
 	@ExecSpace("ServerOnly")
 	method boolean ProcessPurchase(any info)
 		if info == nil or info.ProductId ~= self.AvatarProductId then
-			log("RtsUnit: unknown product " .. tostring(info ~= nil and info.ProductId or "nil"))
+			_RtsConfigLogic:Log("RtsUnit: unknown product " .. tostring(info ~= nil and info.ProductId or "nil"))
 			return false
 		end
 		local userId = info.UserId
@@ -564,12 +564,12 @@ script RtsUnitLogic extends Logic
 		if ds ~= nil then
 			local code = ds:SetAndWait(self.AvatarKey, string.format("%d", untilMs))
 			if code ~= 0 then
-				log("RtsUnit: avatar pass save failed code=" .. tostring(code))
+				_RtsConfigLogic:Log("RtsUnit: avatar pass save failed code=" .. tostring(code))
 				return false
 			end
 		end
 		self.AvatarUntilByUser[userId] = untilMs
-		log("RtsUnit: avatar pass permanent for " .. userId .. " (order " .. tostring(info.OrderNumber) .. ")")
+		_RtsConfigLogic:Log("RtsUnit: avatar pass permanent for " .. userId .. " (order " .. tostring(info.OrderNumber) .. ")")
 		self:OnChanged(0, self:GetMeso(userId), userId)
 		return true
 	end
@@ -746,7 +746,7 @@ script RtsUnitLogic extends Logic
 		end
 		u:PlaceAt(col, row)
 		u.MoveReadyAt = now + cool
-		log("RtsUnit: move " .. string.format("%d", no) .. " -> (" .. string.format("%d,%d", col, row) .. ")")
+		_RtsConfigLogic:Log("RtsUnit: move " .. string.format("%d", no) .. " -> (" .. string.format("%d,%d", col, row) .. ")")
 		self:OnChanged(no, self:GetMeso(userId), userId)
 	end
 

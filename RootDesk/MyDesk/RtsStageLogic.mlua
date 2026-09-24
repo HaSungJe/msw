@@ -169,7 +169,7 @@ script RtsStageLogic extends Logic
 		self.ReadyCount = ready
 		self.RoomCount = total
 		if self.RunState == "countdown" and total > 0 and ready >= total then
-			log("RtsStage: start now " .. string.format("%d/%d", ready, total))
+			_RtsConfigLogic:Log("RtsStage: start now " .. string.format("%d/%d", ready, total))
 			self.StageEndsAt = _UtilLogic.ServerElapsedSeconds
 		end
 	end
@@ -245,7 +245,7 @@ script RtsStageLogic extends Logic
 			self:RestartRun()
 		elseif total > 0 and (yes + no) > 0 and (total - no) < self.VoteNeed then
 			-- 반대가 많아 과반 찬성이 불가능 → 부결
-			log("RtsStage: restart vote rejected " .. string.format("%d:%d", yes, no))
+			_RtsConfigLogic:Log("RtsStage: restart vote rejected " .. string.format("%d:%d", yes, no))
 			self:ClearVotes()
 		end
 	end
@@ -263,7 +263,7 @@ script RtsStageLogic extends Logic
 	-- 처음부터 다시: 맵 초기화(몹·보스·비석·유닛·메소·결과) 후 방에 있는 전원 진행 중으로 → 카운트다운
 	@ExecSpace("ServerOnly")
 	method void RestartRun()
-		log("RtsStage: restart by vote " .. string.format("%d/%d", self.VoteCount, self.VoteNeed))
+		_RtsConfigLogic:Log("RtsStage: restart by vote " .. string.format("%d/%d", self.VoteCount, self.VoteNeed))
 		self:ResetRun()
 		for userId, zone in pairs(_RtsZoneLogic.ZoneByUser) do
 			_RtsUnitLogic:InitUser(userId)
@@ -280,7 +280,7 @@ script RtsStageLogic extends Logic
 		self.EarlyEndAt = 0
 		self.StageEndsAt = _UtilLogic.ServerElapsedSeconds + self.CountdownSec
 		self:ClearReady()
-		log("RtsStage: countdown " .. string.format("%d", self.CountdownSec) .. "s")
+		_RtsConfigLogic:Log("RtsStage: countdown " .. string.format("%d", self.CountdownSec) .. "s")
 	end
 
 	@ExecSpace("ServerOnly")
@@ -288,7 +288,7 @@ script RtsStageLogic extends Logic
 		local now = _UtilLogic.ServerElapsedSeconds
 		-- 다시 하기 투표 시간 제한 → 부결
 		if (self.VoteCount + self.VoteNoCount) > 0 and now > self.VoteStartedAt + self.VoteTimeout then
-			log("RtsStage: restart vote timeout")
+			_RtsConfigLogic:Log("RtsStage: restart vote timeout")
 			self:ClearVotes()
 		end
 		if self.RunState == "countdown" then
@@ -334,7 +334,7 @@ script RtsStageLogic extends Logic
 	@ExecSpace("ServerOnly")
 	method void OnStageStarted(number n)
 		local s = _RtsStageTableLogic:GetStage(n)
-		log("RtsStage: start " .. string.format("%d", n) .. " " .. s.kind .. " " .. s.name)
+		_RtsConfigLogic:Log("RtsStage: start " .. string.format("%d", n) .. " " .. s.kind .. " " .. s.name)
 		_RtsAugmentLogic:OnStageStarted(n)
 	end
 
@@ -387,7 +387,7 @@ script RtsStageLogic extends Logic
 		_RtsBossLogic:ClearAll()
 		-- 진행 중에 던진 찬성표는 그대로 이어 간다(투표가 판 종료 전용이던 때는 여기서 비웠다)
 		self:TallyVotes()
-		log("RtsStage: run ended at stage " .. string.format("%d", self.StageNo))
+		_RtsConfigLogic:Log("RtsStage: run ended at stage " .. string.format("%d", self.StageNo))
 	end
 
 	-- 맵 초기화: 몹·보스·비석 제거, 유닛·메소 초기화, 결과 상태 진행 중으로
@@ -408,7 +408,7 @@ script RtsStageLogic extends Logic
 		self.EarlyEndAt = 0
 		self.StageEndsAt = 0
 		_RtsBootstrapLogic:BroadcastPlayerList()
-		log("RtsStage: reset")
+		_RtsConfigLogic:Log("RtsStage: reset")
 	end
 
 	-- ===== 클라: HUD =====
@@ -478,7 +478,7 @@ script RtsStageLogic extends Logic
 			if self:IsSolo() then
 				_RtsHudLogic:ShowHintFor("게임 종료 — '다시 하기'를 누르면 처음부터 다시 시작해요", 6)
 			else
-				_RtsHudLogic:ShowHintFor("게임 종료 — 위쪽 '다시 하기'를 과반이 누르면 처음부터 다시 시작해요", 6)
+				_RtsHudLogic:ShowHintFor("게임 종료 — 오른쪽 아래 '다시 하기'를 과반이 누르면 처음부터 다시 시작해요", 6)
 			end
 		end
 		self.PrevRunState = self.RunState

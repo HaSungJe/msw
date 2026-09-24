@@ -174,7 +174,7 @@ script RtsAugmentLogic extends Logic
 		if cur then total = total + 1 end
 		while total > self.MaxPending do
 			if cur then
-				log("RtsAugment: drop oldest offer " .. (self.OfferByUser[userId] or "") .. " -> " .. userId)
+				_RtsConfigLogic:Log("RtsAugment: drop oldest offer " .. (self.OfferByUser[userId] or "") .. " -> " .. userId)
 				self.OfferByUser[userId] = ""
 				cur = false
 			else
@@ -220,7 +220,7 @@ script RtsAugmentLogic extends Logic
 			return
 		end
 		self.OfferByUser[userId] = grade .. "|" .. table.concat(ids, ",")
-		log("RtsAugment: offer " .. grade .. " -> " .. userId .. " [" .. table.concat(ids, ",") .. "]")
+		_RtsConfigLogic:Log("RtsAugment: offer " .. grade .. " -> " .. userId .. " [" .. table.concat(ids, ",") .. "]")
 	end
 
 	-- 클라: '받기' 누름 — 지금 보이는 제안을 '방금 고름'으로 적고 서버에 수령 요청
@@ -247,7 +247,7 @@ script RtsAugmentLogic extends Logic
 		if d.unlock ~= nil then no = -1 end
 		list[#list + 1] = { id = id, no = no }
 		self.OwnedByUser[userId] = self:PackOwned(list)
-		log("RtsAugment: " .. userId .. " took " .. id)
+		_RtsConfigLogic:Log("RtsAugment: " .. userId .. " took " .. id)
 		self:PopNext(userId)
 		self:SyncPending(userId)
 	end
@@ -274,7 +274,7 @@ script RtsAugmentLogic extends Logic
 		end
 		item.no = no
 		self.OwnedByUser[userId] = self:PackOwned(list)
-		log("RtsAugment: " .. userId .. " assigned " .. item.id .. " -> unit " .. string.format("%d", math.floor(no + 0.5)))
+		_RtsConfigLogic:Log("RtsAugment: " .. userId .. " assigned " .. item.id .. " -> unit " .. string.format("%d", math.floor(no + 0.5)))
 	end
 
 	-- 유닛 방출(RtsUnitLogic.RequestDismiss): 그 유닛에 지정된 증강 소멸
@@ -363,7 +363,7 @@ script RtsAugmentLogic extends Logic
 		elseif self:BuyPrismLeft(userId) > 0 then
 			self.BuyPrismPity[userId] = (self.BuyPrismPity[userId] or 0) + self.BuyPrismPityStep
 		end
-		log("RtsAugment: " .. userId .. " bought " .. grade .. " for " .. string.format("%d", price))
+		_RtsConfigLogic:Log("RtsAugment: " .. userId .. " bought " .. grade .. " for " .. string.format("%d", price))
 		self:Offer(userId, grade)
 	end
 

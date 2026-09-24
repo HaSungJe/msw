@@ -86,7 +86,7 @@
 | 클릭(원작 BtMouseClick) | `972843e759204d3e9ad84e7d3fa94f83` (`ClickSound`, RtsHudLogic:125) | `SpawnClick`로 만든 모든 버튼(자동). 팝업 딤은 `SpawnStretch`로 만든 버튼이라 클릭음이 없고, 대신 닫기음이 난다 |
 | 창 열기(MenuUp) | `585c8f6d8891403f8717c378ab2f7c78` (`OpenSound`, :127) | 팝업을 처음 열 때(RtsPopupLogic:123 — 다시 그리기와 `pick`은 빠짐), 캐릭터 메뉴(RtsUnitSelectLogic:137), 몬스터 정보(RtsMonsterInfoLogic:97 — 같은 몬스터는 빠짐) |
 | 창 닫기(MenuDown) | `69f85d65004541db82615459032e1d4a` (`CloseSound`, :129) | 팝업 닫기(RtsPopupLogic:223 — 다시 그리기와 `pick`은 빠짐) |
-| 영입 칸 열림(dlgnotice) | `5db4f31bbcc243ec8f08713ad78dbe79` (`RecruitSound`, :45) | 진행 중 영입 한도가 늘어날 때(:755) |
+| 영입 칸 열림(증강 3택1과 같은 업적 달성음, 2026-09-24) | `dbb38b4f04044499906bd7a2ca9c4d7c` (`RecruitSound`, :45) | 진행 중 영입 한도가 늘어날 때(:755) |
 | 3택1 등장(업적 달성음) | `dbb38b4f04044499906bd7a2ca9c4d7c` (`PickSound`, RtsPopupLogic:61) | 3택1 본문을 그릴 때마다(:1090) |
 | 레벨업 | `LevelUpSound` `c198d87b…` + 클립 `d92f2ec7…` (RtsUnitLogic:649/653) | 레벨업 버튼·Space(RtsUnitLogic:631-637) |
 
@@ -149,8 +149,8 @@ y=1080 +------------------------------------------------------------------------
 |---|---|---|---|
 | A | 정보 카드 `RtsInfoCard` | 16~456, 16~128 | RtsHudLogic:303 |
 | B | 플레이어 목록 `RtsPlayers` (행 y 164+37·(i−1), 높이 32) | 16~237, 140~540 | :331, :857 |
-| D | 다시 하기 `RtsRestartBtn` | 1138~1338, 16~80 | :349 |
-| E | 투표 패널 `RtsVotePanel` | 1138~1398, 86~162 | :359 |
+| D | 다시 하기 `RtsRestartBtn` (2026-09-24 오른쪽 아래로) | 1704~1904, 1000~1064 | RtsHudLogic `RtsRestartBtn` |
+| E | 투표 패널 `RtsVotePanel` (다시 하기 바로 위) | 1644~1904, 916~992 | RtsHudLogic `RtsVotePanel` |
 | F | 난이도 막대 `RtsDiffBar` (폭 780 = 86+6·88+5·6+12+124) | 570~1350, 88~168 | RtsDifficultyLogic:157-159 |
 | H | 안내 `RtsHint` | 600~1320, 92~136 | RtsHudLogic:456 |
 | G1~G6 | 유닛 슬롯 `RtsUnitSlot1~6` | 1774~1904, 104+50·(i−1) ~ +44 | :383-384 |
@@ -163,7 +163,7 @@ y=1080 +------------------------------------------------------------------------
 | X | 펼치기 `RtsExpandBtn` | 146~296, 1014~1064 | :423 |
 | M | 몬스터 정보 `RtsMonInfo` | 672~1248, 946~1064 | RtsMonsterInfoLogic:100 |
 | M2 | 디버프 아이콘 줄 `RtsMonInfoDebuffs` (아이콘 수 × 42) | 790~, 904~940 | RtsMonsterInfoLogic:280 |
-| V | 테스트 프리즘 `RtsDevBtn` (`RtsUnitLogic.DevTools`가 켜졌을 때만 — 지금 기본값 false, RtsUnitLogic:14) | 1744~1904, 1014~1064 | RtsHudLogic:444 |
+| V | 테스트 프리즘 `RtsDevBtn` (`RtsUnitLogic.DevTools`가 켜졌을 때만 — 지금 기본값 false, RtsUnitLogic:14) | 1536~1696, 1014~1064 (다시 하기 왼쪽) | RtsHudLogic `RtsDevBtn` |
 | N | 캐릭터 클릭 메뉴 `RtsUnitMenu` | 클릭한 유닛 오른쪽 어깨 옆, 화면 안쪽으로 밀림 | RtsUnitSelectLogic:139-164 |
 | P | 팝업 `RtsPopupPanel` | 화면 정중앙 | RtsPopupLogic:88 |
 
@@ -205,11 +205,11 @@ y=1080 +------------------------------------------------------------------------
 
 행 모양은 `ApplyPlayerLook`(:882-917)이 정한다. 목록 데이터는 서버가 `"userId\t닉\t구역\t생존\n…"` 문자열로 보낸다(`@ExecSpace("Client") RefreshPlayerList(string)`, :812). **이 RPC의 서명은 바꾸지 않는다.**
 
-### 3.3 상단 가운데: 다시 하기·투표·난이도 막대·안내 (D·E·F·H)
+### 3.3 상단 가운데: 난이도 막대·안내 (F·H) + 오른쪽 아래: 다시 하기·투표 (D·E — 2026-09-24 오른쪽 아래로 옮김)
 | 요소 | 엔티티 이름 | 만드는 곳 | anchor·pivot·위치·크기 | 색·글꼴 | 보이는 조건 | 클릭/동작 |
 |---|---|---|---|---|---|---|
-| 다시 하기 | `RtsRestartBtn`/`In` | :349 | a(0.5,1) p(0,1) (178,-16) 200×64, 테두리 2 | 모드별(아래 표). 글자 `RtsRestartLabel` 192×56 19 굵게 | 항상 | `OnRestartButton`(:594). 진행 중에는 3초 안에 한 번 더 눌러야 찬성, 종료 뒤에는 바로 찬성, 이미 찬성했으면 취소 |
-| 투표 패널 | `RtsVotePanel`/`In` | :359 | a(0.5,1) p(0,1) (178,-86) 260×76, 테두리 1.5 | ColPanel / ColGold | 찬성+반대 > 0 (`RefreshVotePanel` :667) | — |
+| 다시 하기 | `RtsRestartBtn`/`In` | :349 | a(1,0) p(1,0) (-16,16) 200×64, 테두리 2 (오른쪽 아래) | 모드별(아래 표). 글자 `RtsRestartLabel` 192×56 19 굵게 | 항상 | `OnRestartButton`(:594). 진행 중에는 3초 안에 한 번 더 눌러야 찬성, 종료 뒤에는 바로 찬성, 이미 찬성했으면 취소 |
+| 투표 패널 | `RtsVotePanel`/`In` | :359 | a(1,0) p(1,0) (-16,88) 260×76, 테두리 1.5 (다시 하기 바로 위) | ColPanel / ColGold | 찬성+반대 > 0 (`RefreshVotePanel` :667) | — |
 | 투표 글 | `RtsVoteText` | :362 | a(0,1) p(0,1) (10,-4) 240×26 | ColInk 14 굵게 리치. `찬성 n`은 #8fd18a, `반대 m`은 #e88a7a, 그 뒤에 과반·남은 초 | 〃 | — |
 | 찬성 / 반대 | `RtsVoteYes`/`RtsVoteNo` (+`Text`, `Click`) | :365 / :372 | a(0,0) p(0,0) (10,8) / (135,8) 115×34 | 보통 ColPanel/ColBorder, 내 선택이면 (0.45,0.37,0.18,0.96)/(1,0.9,0.55). 글자 16 굵게 | 〃 | `_RtsStageLogic:RequestVoteChoice(1 또는 2)` (Server) |
 | 난이도 막대 | `RtsDiffBar`/`In` | RtsDifficultyLogic:159 | a(0.5,1) p(0.5,1) (0,-88) 780×80 | ColPanel / ColBorder | idle·countdown (:136) | — |
@@ -253,6 +253,7 @@ y=1080 +------------------------------------------------------------------------
 네 버튼은 사용자 요청으로 틈 없이 붙어 있다(:404). 증강·뽑기·펼치기 값은 `RtsAugmentLogic.ClientTick`이 0.3초마다 밀어 넣는다(RtsAugmentLogic:66, :433-463).
 
 ### 3.6 하단 가운데 몬스터 정보 (M·M2) — RtsMonsterInfoLogic
+- **2026-09-24 디버프 칸**: 정보 창 오른쪽에 붙은 상자 `RtsMonInfoDebuffs`(a(1,0) p(0,0) (8,0), 폭 `DebuffBoxW` 340, 높이 12 + 줄 수 × `DebuffRowH` 30 — 위로 자람). 한 줄 = 아이콘 26 · 이름(14 굵게) · 효과 요약 `short`(금색, 예: 방어 −30%p) · 남은 시간("12.3초" / "유지"). 줄에 마우스를 올리면 칸 **위쪽**에 긴 설명 `RtsMonInfoTip`(폭 = 칸 폭, 높이 = 설명 길이에 맞춤, `RaycastTarget = false` — 설명 창이 마우스를 가로채 깜빡이던 문제). 아래 표의 옛 '디버프 아이콘 줄' 설명은 이걸로 바뀜.
 | 요소 | 엔티티 이름 | 줄 | anchor·pivot·위치·크기 | 색·글꼴 | 비고 |
 |---|---|---|---|---|---|
 | 패널 | `RtsMonInfo`/`In` | 100 | HudGroup 기준 a(0.5,0) p(0.5,0) (0,16) 576×118 (576 = LeftX 118 + BarW 366 + 4 + PctW 70 + 18) | (0.11,0.094,0.075,0.95) / ColGold 1.5 | 몬스터를 클릭하면 열린다. 0.2초마다 갱신(:142) |
@@ -311,6 +312,7 @@ y=1080 +------------------------------------------------------------------------
 | `devprism` | 테스트 프리즘 증강 (개발용) | 1114×760 | V 버튼(DevTools일 때만) | 프리즘 2열 목록 + 전부 삭제 |
 
 ### 4.3 유닛 정보 팝업 (`unit`, RtsUnitPopupLogic, 1229×720 — :11-13)
+- **2026-09-24**: 능력치 박스 아래 `RtsUnitAugGain`(27, −256−능력치 높이−8) 365×88 — '증강으로 오른 수치 (n개)' + 2열 격자(공격력·공격력%·보스 데미지·크리티컬 확률/데미지·최종 데미지, `TotalsMul` × `AugMulFor`). 증강 탭 행은 설명 줄 수만큼 높아지고(44 + 줄 × 20, 최대 6줄), 설명의 머리표([직업 전용] [프리즘])는 뗀다. 탭 전환·다시 그리기는 옛 `Content`를 0.12초 남겼다가 지운다.
 | 영역 | 엔티티 | 줄 | 위치·크기 (본문 기준) | 비고 |
 |---|---|---|---|---|
 | 외형 패널 | `RtsUnitLook` | 232 | a(0,1) (27,-10) 365×236 | Mix(white,0.03) / Mix(Gold,0.25). "외형" 13 |
@@ -468,6 +470,8 @@ y=1080 +------------------------------------------------------------------------
 - 팝업에 내부 설계 수치(누적 투자, 벽, 예산)를 보이지 않는다(로드맵 규칙).
 
 ### 7.3 작업 요령
+- **다시 그리기는 번쩍이지 않게**(2026-09-24): 같은 팝업을 다시 그릴 때(`RtsPopupLogic.Open`이 같은 kind로 불릴 때) 팝업 그룹은 끄지 않고 옛 body를 0.12초 남겼다가 지운다(`OldBody`/`KeepOldBody`). 유닛 창 `Render`도 옛 `Content`를 0.12초 뒤에 지운다. 엔진이 UI를 여러 프레임에 나눠 만들기 때문에, 지우자마자 새로 만들면 빈 창이 한순간 보인다 — 새 화면 코드도 같은 방식을 쓴다.
+- 자기 효과음이 따로 있는 버튼은 `SpawnClickQuiet`(클릭음 없음)로 만든다(예: HUD '펼치기' — 3택1 등장음과 겹쳤다).
 - UI 코드만 고치는 작업은 `@ExecSpace("ClientOnly")`(또는 `Client`) 메서드 안에서 끝낸다. 대상은 `Build*`, `Apply*`, `Refresh*`, `Set*`, `Spawn*` 계열이다. 새 스크립트가 필요하면 PascalCase에 `Logic`/`Component` 접미사를 붙이고 모든 메서드에 `@ExecSpace`를 적는다(CLAUDE.md).
 - mlua API가 불확실하면 추측하지 말고 msw-mcp `mlua_api_retriever`로 확인한다. 런타임 이름이 선언 파일과 다른 경우가 있다. 예: 스크롤바는 `ScrollBar*`(RtsUnitPopupLogic:629). `AutoHide`/`Hide`는 쓰지 않는다(:613).
 - 엔진 동작 실측(텍스트 Truncate, 업로드 스프라이트 PPU, UI 좌표 변환, 입력)은 `docs/msw-engine.md`에 있다.

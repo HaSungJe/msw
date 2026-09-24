@@ -64,7 +64,7 @@ script RtsCameraAnchorComponent extends Component
 			if camera == nil then return end
 			local target = _RtsConfigLogic:GetCameraZoomPercent()
 			if math.abs(camera.ZoomRatio - target) > 0.5 or _CameraService:GetCurrentCameraComponent() ~= camera then
-				log("RtsCamera: zoom retry " .. tostring(attempt + 1) .. " (ratio=" .. tostring(camera.ZoomRatio) .. ")")
+				_RtsConfigLogic:Log("RtsCamera: zoom retry " .. tostring(attempt + 1) .. " (ratio=" .. tostring(camera.ZoomRatio) .. ")")
 				self:ClaimCamera()
 				self:EnsureZoom(attempt + 1)
 			end
