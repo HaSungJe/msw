@@ -1,8 +1,8 @@
 -- Phase 6·7 (2026-09-23): 유저별 한 판 결과 — 진행 중 / 탈락 / 클리어, 처치 수, 마지막으로 버틴 스테이지, 보스 HP 깎은 비율.
 --   탈락(필드 110 또는 보스 시간 초과) → 그 구역 몹·보스 정리, 유닛 전멸, 구역 가운데 비석, 플레이어 목록 탈락, 개인 최고 기록 저장, 결과 팝업.
---   클리어(검은 마법사 4페이즈 처치) → 결과 팝업. 결과 팝업의 '나가기' = 매칭으로 돌아가기(RequestExit — 인스턴스 방이면 정적 방으로, 지금은 안내).
+--   클리어(검은 마법사 4페이즈 처치) → 결과 팝업. 솔로(방 인원 1)면 '다시 하기', 여럿이면 '나가기' = 대기방으로(RequestExit — 인스턴스 방이면 정적 방으로, 지금은 안내).
 --   점수 = 마지막으로 버틴 스테이지 순번 × 100,000 + 탈락한 보스전의 보스 HP 깎은 비율(0~10,000) — 전광판 등록은 Phase 8 #42.
---   클리어 = 최종 메소(보유 + 유닛 전부 판매 30%)로 순위·조합 저장(SaveClear, 2026-09-23 사용자).
+--   클리어 = 난이도별(어려움·매우어려움·극악) 검은 마법사 4페이즈 클리어 횟수 순위 저장(SaveClear, 2026-09-24 사용자 — 옛 최종 메소 순위 폐기).
 @Logic
 script RtsRunResultLogic extends Logic
 
@@ -29,13 +29,25 @@ script RtsRunResultLogic extends Logic
 
 	property number ScorePerStage = 100000
 
-	-- 클리어 기록(2026-09-23 사용자 "클리어 시 조합 정보와 남은 메소 저장, 등수는 남은 메소 기준 — 남은 유닛을 모두 판매한다고 가정한 금액의 30%를 더해서"):
-	--   최종 메소 = 보유 메소 + 유닛 전부 방출 환급(레벨업에 쓴 메소의 30% — RtsUnitLogic.DismissRefund).
-	--   순위 = SortableDataStorage RankStorage(userId → 최고 최종 메소), 조합 = GlobalDataStorage RecordStorage(userId → "최종|보유|판매|닉네임|UTC ms|유닛;유닛…",
-	--   유닛 = "직업:레벨:프리즘+프리즘:증강+증강"). 최고 기록일 때만 덮어쓴다. 로비 전광판(Phase 8)이 이 두 저장소를 읽는다
-	property string RankStorage = "RtsClearMeso"
+	-- 순위(2026-09-24 사용자 "어려움/매우어려움/극악을 따로따로 분리해서 클리어 횟수 순위로" — 옛 최종 메소 순위 폐기):
+	--   난이도별 SortableDataStorage RankStorage .. "_D" .. 난이도(4 어려움 · 5 매우어려움 · 6 극악), userId → 값.
+	--   값 = 검은 마법사 4페이즈 클리어 횟수 × RankScale + (RankScale − 1 − 2026-01-01부터 흐른 초) → 횟수가 같으면 그 횟수에 먼저 도달한 사람이 위.
+	--   닉네임 = GlobalDataStorage RankNickStorage(userId → 닉네임, 클리어할 때 갱신). 보통 이하·테스트 모드 판은 기록하지 않는다
+	property string RankStorage = "RtsBm4Clear"
 
-	property string RecordStorage = "RtsClearRecord"
+	property string RankNickStorage = "RtsRankNick"
+
+	property number RankMinDiff = 4
+
+	property number RankScale = 10000000000
+
+	property number RankMax = 999999999999999
+
+	-- 순위 창 한 탭에 보이는 인원
+	property number RankShowTop = 50
+
+	-- 서버: 순위 조회 연타 방지(userId .. 난이도 → 마지막 조회 시각)
+	property table RankAskAt = {}
 
 	-- ===== 상태 조회(서버·클라 공용) =====
 
@@ -208,18 +220,6 @@ script RtsRunResultLogic extends Logic
 		end)
 	end
 
-	-- 유닛 전부 방출했을 때의 환급 합(= 판매 금액의 30%)
-	@ExecSpace("ServerOnly")
-	method number UnitSaleTotal(string userId)
-		local total = 0
-		local list = _RtsUnitLogic.UnitsByUser[userId]
-		if list == nil then return 0 end
-		for no, e in pairs(list) do
-			if e ~= nil and isvalid(e) and e.RtsUnitComponent ~= nil then total = total + _RtsUnitLogic:DismissRefund(e.RtsUnitComponent) end
-		end
-		return total
-	end
-
 	-- 조합 문자열: 번호순 "직업:레벨:프리즘+…:증강+…"를 ;로
 	@ExecSpace("ServerOnly")
 	method string ComboText(string userId)
@@ -240,58 +240,138 @@ script RtsRunResultLogic extends Logic
 		return table.concat(parts, ";")
 	end
 
-	-- 클리어 기록 저장 + 이번 기록의 순위(최종 메소보다 높은 다른 유저 수 + 1 — 정렬 조회 첫 페이지까지만 센다) → 결과 팝업에 표시
+	-- 순위 값(RankStorage 주석): 횟수 × RankScale + (RankScale − 1 − 2026-01-01부터 흐른 초)
+	@ExecSpace("ServerOnly")
+	method number RankValue(number count)
+		local sec = math.floor((DateTime.UtcNow.Elapsed - DateTime(2026, 1, 1).Elapsed) / 1000)
+		if sec < 0 then sec = 0 end
+		if sec > self.RankScale - 1 then sec = self.RankScale - 1 end
+		return count * self.RankScale + (self.RankScale - 1 - sec)
+	end
+
+	@ExecSpace("ServerOnly")
+	method string NickOf(string userId)
+		local ue = _UserService:GetUserEntityByUserId(userId)
+		if ue ~= nil and ue.PlayerComponent ~= nil and ue.PlayerComponent.Nickname ~= "" then return ue.PlayerComponent.Nickname end
+		return userId
+	end
+
+	-- 클리어 기록: 그 난이도 클리어 횟수 +1 → 이번 순위(나보다 값이 큰 다른 유저 수 + 1 — 정렬 조회 첫 페이지까지만 센다) → 결과 창(ShowClearRank).
+	--   보통 이하·테스트 모드(DevTools — 타격마다 +DevExtraDamage)는 저장하지 않고 횟수 0으로 알린다
 	@ExecSpace("ServerOnly")
 	method void SaveClear(string userId)
-		local meso = math.floor(_RtsUnitLogic:GetMeso(userId) + 0.5)
-		local sale = math.floor(self:UnitSaleTotal(userId) + 0.5)
-		local final = meso + sale
-		local combo = self:ComboText(userId)
-		local nick = userId
-		local ue = _UserService:GetUserEntityByUserId(userId)
-		if ue ~= nil and ue.PlayerComponent ~= nil and ue.PlayerComponent.Nickname ~= "" then nick = ue.PlayerComponent.Nickname end
-		-- 난이도별 저장소(2026-09-24 — RankStorage/RecordStorage + "_D" + 난이도 번호 1 매우쉬움 … 6 극악)
-		local diff = _RtsDifficultyLogic:Of(userId)
-		local suffix = "_D" .. string.format("%d", diff)
-		log("RtsResult: clear record " .. userId .. " [" .. _RtsDifficultyLogic:NameOf(userId) .. "] final " .. string.format("%d", final) .. " (meso " .. string.format("%d", meso) .. " + sale " .. string.format("%d", sale) .. ") " .. combo)
-		-- 테스트 모드(DevTools — 타격마다 +DevExtraDamage)로 깬 판은 점수만 보여 주고 순위·조합은 저장하지 않는다(2026-09-24 ship 리뷰)
-		local rank = nil
-		if not _RtsUnitLogic.DevTools then rank = _DataStorageService:GetSortableDataStorage(self.RankStorage .. suffix) end
-		if rank == nil then
-			self:ShowClearScore(final, meso, sale, 0, final, false, userId)
+		local diff = math.floor(_RtsDifficultyLogic:Of(userId) + 0.5)
+		log("RtsResult: clear " .. userId .. " [" .. _RtsDifficultyLogic:NameOf(userId) .. "] " .. self:ComboText(userId))
+		if _RtsUnitLogic.DevTools or diff < self.RankMinDiff then
+			self:ShowClearRank(diff, 0, 0, false, userId)
 			return
 		end
+		local rank = _DataStorageService:GetSortableDataStorage(self.RankStorage .. "_D" .. string.format("%d", diff))
+		if rank == nil then
+			self:ShowClearRank(diff, 0, 0, false, userId)
+			return
+		end
+		local names = _DataStorageService:GetGlobalDataStorage(self.RankNickStorage)
+		if names ~= nil then names:SetAsync(userId, self:NickOf(userId), function(c0, k0) end) end
 		rank:GetAsync(userId, function(code, key, value)
-			local best = 0
-			if code == 0 and value ~= nil then best = value end
-			if final > best then
-				best = final
-				rank:SetAsync(userId, final, function(c2, k2) end)
-				local rec = _DataStorageService:GetGlobalDataStorage(self.RecordStorage .. suffix)
-				if rec ~= nil then
-					local line = string.format("%d|%d|%d|", final, meso, sale) .. nick .. "|" .. string.format("%d", math.floor(DateTime.UtcNow.Elapsed)) .. "|" .. combo
-					rec:SetAsync(userId, line, function(c3, k3) end)
-				end
-			end
-			rank:GetSortedAsync(SortDirection.Descending, final + 1, 999999999999, function(c4, pages)
-				local above = 0
-				local more = false
-				if c4 == 0 and pages ~= nil then
-					local datas = pages:GetCurrentPageDatas()
-					for _, it in pairs(datas) do
-						if it.KeyInfo.Key ~= userId then above = above + 1 end
+			local count = 0
+			if code == 0 and value ~= nil then count = math.floor(value / self.RankScale) end
+			count = count + 1
+			local v = self:RankValue(count)
+			rank:SetAsync(userId, v, function(c2, k2)
+				rank:GetSortedAsync(SortDirection.Descending, v + 1, self.RankMax, function(c3, pages)
+					local above = 0
+					local more = false
+					if c3 == 0 and pages ~= nil then
+						local datas = pages:GetCurrentPageDatas()
+						for _, it in pairs(datas) do
+							if it.KeyInfo.Key ~= userId then above = above + 1 end
+						end
+						more = not pages.IsLastPage
 					end
-					more = not pages.IsLastPage
-				end
-				self:ShowClearScore(final, meso, sale, above + 1, best, more, userId)
+					log("RtsResult: rank D" .. string.format("%d", diff) .. " " .. userId .. " clears " .. string.format("%d", count) .. " rank " .. string.format("%d", above + 1))
+					self:ShowClearRank(diff, count, above + 1, more, userId)
+				end)
 			end)
 		end)
 	end
 
-	-- 결과 팝업에 클리어 점수(그 유저에게만 — 마지막 인자 userId): 최종 메소(보유 + 유닛 판매) · 순위(more = 첫 페이지보다 뒤) · 개인 최고
+	-- 결과 창에 클리어 순위(그 유저에게만 — 마지막 인자 userId): 난이도 · 그 난이도 클리어 횟수(0 = 기록 안 함) · 순위(more = 첫 페이지보다 뒤)
 	@ExecSpace("Client")
-	method void ShowClearScore(number final, number meso, number sale, number rank, number best, boolean more, string userId)
-		_RtsPopupLogic:SetClearScore(final, meso, sale, rank, best, more)
+	method void ShowClearRank(number diff, number count, number rank, boolean more, string userId)
+		_RtsPopupLogic:SetClearRank(diff, count, rank, more)
+	end
+
+	-- 순위 창(탭 = 어려움·매우어려움·극악): 그 난이도 상위 RankShowTop명(닉네임·클리어 횟수) + 내 횟수·순위 → 요청한 유저에게만(ShowRanking).
+	--   같은 탭 조회는 3초에 한 번
+	@ExecSpace("Server")
+	method void RequestRanking(number diff)
+		local userId = senderUserId
+		if userId == nil or userId == "" then return end
+		local d = math.floor(diff + 0.5)
+		if d < self.RankMinDiff or d > 6 then return end
+		local askKey = userId .. "_" .. string.format("%d", d)
+		local now = _UtilLogic.ElapsedSeconds
+		if self.RankAskAt[askKey] ~= nil and now - self.RankAskAt[askKey] < 3 then return end
+		self.RankAskAt[askKey] = now
+		local rank = _DataStorageService:GetSortableDataStorage(self.RankStorage .. "_D" .. string.format("%d", d))
+		if rank == nil then return end
+		-- 상위 목록(값 큰 순)
+		local list = {}
+		local code, pages = rank:GetSortedAndWait(SortDirection.Descending, 1, self.RankMax)
+		while code == 0 and pages ~= nil do
+			for _, it in pairs(pages:GetCurrentPageDatas()) do
+				list[#list + 1] = { key = it.KeyInfo.Key, v = it.Value }
+			end
+			if pages.IsLastPage or #list >= self.RankShowTop then break end
+			if pages:LoadNextPageAndWait() ~= 0 then break end
+			pages:MoveToNextPageAndWait()
+		end
+		table.sort(list, function(x, y) return x.v > y.v end)
+		local keys = {}
+		for i = 1, math.min(#list, self.RankShowTop) do keys[#keys + 1] = list[i].key end
+		-- 닉네임
+		local names = {}
+		local ns = _DataStorageService:GetGlobalDataStorage(self.RankNickStorage)
+		if ns ~= nil and #keys > 0 then
+			local c2, items = ns:BatchGetAndWait(keys)
+			while c2 == 0 and items ~= nil do
+				for _, it in pairs(items:GetCurrentPageDatas()) do names[it.KeyInfo.Key] = it.Value end
+				if items.IsLastPage then break end
+				if items:LoadNextPageAndWait() ~= 0 then break end
+				items:MoveToNextPageAndWait()
+			end
+		end
+		-- 내 횟수·순위
+		local myCount = 0
+		local myRank = 0
+		local myMore = false
+		local c3, mine = rank:GetAndWait(userId)
+		if c3 == 0 and mine ~= nil and mine > 0 then
+			myCount = math.floor(mine / self.RankScale)
+			local n = 0
+			local c4, above = rank:GetSortedAndWait(SortDirection.Descending, mine + 1, self.RankMax)
+			if c4 == 0 and above ~= nil then
+				for _, it in pairs(above:GetCurrentPageDatas()) do
+					if it.KeyInfo.Key ~= userId then n = n + 1 end
+				end
+				myMore = not above.IsLastPage
+			end
+			myRank = n + 1
+		end
+		-- 행 = "닉네임(탭)횟수" 줄바꿈 구분
+		local rows = {}
+		for i = 1, #keys do
+			local nick = names[keys[i]] or "?"
+			nick = string.gsub(nick, "[\t\n]", " ")
+			rows[#rows + 1] = nick .. "\t" .. string.format("%d", math.floor(list[i].v / self.RankScale))
+		end
+		self:ShowRanking(d, table.concat(rows, "\n"), myCount, myRank, myMore, userId)
+	end
+
+	@ExecSpace("Client")
+	method void ShowRanking(number diff, string rows, number myCount, number myRank, boolean myMore, string userId)
+		_RtsPopupLogic:SetRanking(diff, rows, myCount, myRank, myMore)
 	end
 
 	-- 구역 가운데 비석
@@ -322,8 +402,9 @@ script RtsRunResultLogic extends Logic
 		_RtsPopupLogic:OpenResult(cleared, reason, stageNo, lastNo, kills, pct, bestNo, bestClear)
 	end
 
-	-- '나가기'(결과 팝업·탈락 뒤 상단 버튼) = 매칭으로 돌아가기(2026-09-23 사용자). 게임이 인스턴스 방에서 돌면 정적 방(매칭 로비)으로 옮기고,
-	--   아직 매칭 로비가 없는 지금(게임이 정적 방 — Phase 8 방·멀티 전)은 안내만. KickUser는 사유와 상관없이 '추방됐습니다' 창이 떠서 쓰지 않는다
+	-- '나가기'(여럿일 때 결과 팝업·탈락 뒤 우측 버튼) = 대기방으로(2026-09-23 사용자). 게임이 인스턴스 방에서 돌면 정적 방(대기방)으로 옮기고,
+	--   대기방이 없는 지금(멀티 업데이트 Phase 8 전)은 안내만. 솔로(방 인원 1)면 버튼이 '다시 하기'라 여기 오지 않는다.
+	--   KickUser는 사유와 상관없이 '추방됐습니다' 창이 떠서 쓰지 않는다
 	@ExecSpace("Server")
 	method void RequestExit()
 		local userId = senderUserId
@@ -337,7 +418,7 @@ script RtsRunResultLogic extends Logic
 
 	@ExecSpace("Client")
 	method void NotifyNoMatching(string userId)
-		_RtsHudLogic:ShowHintFor("매칭 화면은 방·멀티 단계(Phase 8)에서 연결됩니다 — 지금은 관전하거나, 영입 버튼 옆 '다시 하기'로 투표", 4)
+		_RtsHudLogic:ShowHintFor("대기방(매칭 · 방 목록)은 멀티 업데이트 때 열려요 — 지금은 관전하거나 위쪽 '다시 하기'로 투표해요", 4)
 	end
 
 end

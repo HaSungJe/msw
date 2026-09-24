@@ -40,3 +40,7 @@
 {"ts":"2026-09-24T02:41:21.342Z","version":"0.10.1","command":"status","args":["--workspace","C:\\workspace\\msw","--json"],"cwd":"C:\\workspace\\msw","exitCode":0,"durationMs":66}
 {"ts":"2026-09-24T02:41:21.376Z","version":"0.10.1","command":"status","args":["--workspace","C:\\workspace\\msw","--json"],"cwd":"C:\\workspace\\msw","exitCode":0,"durationMs":10}
 {"ts":"2026-09-24T04:53:25.627Z","version":"0.10.1","command":"status","args":["--workspace","C:\\workspace\\msw","--json"],"cwd":"C:\\workspace\\msw","exitCode":0,"durationMs":10}
+{"ts":"2026-09-24T06:33:54.218Z","version":"0.10.1","command":"status","args":["--workspace","C:\\workspace\\msw","--json"],"cwd":"C:\\workspace\\msw","exitCode":0,"durationMs":46}
+{"ts":"2026-09-24T06:34:12.153Z","version":"0.10.1","command":"status","args":["--workspace","C:\\workspace\\msw","--json"],"cwd":"C:\\workspace\\msw","exitCode":0,"durationMs":10}
+{"ts":"2026-09-24T06:34:12.177Z","version":"0.10.1","command":"status","args":["--workspace","C:\\workspace\\msw","--json"],"cwd":"C:\\workspace\\msw","exitCode":0,"durationMs":11}
+{"ts":"2026-09-24T06:34:17.805Z","version":"0.10.1","command":"mcp","args":["--agent","codex","--workspace","C:\\workspace\\msw","--silent","--mcp-var","MSW_MAKER_MCP_PATH=<redacted>","--mcp-var","MSW_MCP_URL=<redacted>","--mcp-var","MSW_MCP_TOKEN=<redacted>"],"cwd":"C:\\workspace\\msw","exitCode":0,"durationMs":13}

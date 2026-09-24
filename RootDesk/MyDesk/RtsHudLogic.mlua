@@ -420,6 +420,15 @@ script RtsHudLogic extends Logic
 		codexClick:ConnectEvent(ButtonClickEvent, function(event)
 			_RtsPopupLogic:Open("codex")
 		end)
+		-- 증강 도감 위: 순위(2026-09-24 솔로 출시 — 난이도별 검은 마법사 4페이즈 클리어 횟수, RtsPopupLogic.BuildRank)
+		local rankBtn = self:SpawnPanel("RtsRankBtn", grp, Vector2(0, 0), Vector2(0, 0), Vector2(16, 16 + 50 + 44 + 40), Vector2(130, 40),
+			self:ColPanel(), self:ColBorder(), 1.5)
+		self:SpawnLabel("RtsRankLabel", rankBtn, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2(0, 0), Vector2(126, 34),
+			"순위", self:ColInk(), 17, TextAlignmentType.MiddleCenter, true)
+		local rankClick = self:SpawnClick("RtsRankClick", rankBtn)
+		rankClick:ConnectEvent(ButtonClickEvent, function(event)
+			_RtsPopupLogic:Open("rank")
+		end)
 		local ex = self:SpawnPanel("RtsExpandBtn", grp, Vector2(0, 0), Vector2(0, 0), Vector2(16 + 130, 16), Vector2(150, 50),
 			Color(0.3, 0.24, 0.12, 0.96), self:ColGold(), 2)
 		self.ExpandBtn = ex
@@ -594,7 +603,8 @@ script RtsHudLogic extends Logic
 	method void OnRestartButton()
 		local st = _RtsStageLogic.RunState
 		if st ~= "running" and st ~= "ended" then return end
-		if _RtsStageLogic:IsMyVote() or st == "ended" then
+		-- 방에 나 혼자(솔로 포함)면 확인 없이 바로 새 판(2026-09-24 사용자 "방에 나만 있거나 솔로 모드일 때 다시 하기는 즉시 다시 시작")
+		if _RtsStageLogic:IsMyVote() or st == "ended" or _RtsStageLogic:IsSolo() then
 			self.RestartConfirmUntil = 0
 			_RtsStageLogic:RequestRestartVote()
 			return
@@ -619,6 +629,8 @@ script RtsHudLogic extends Logic
 		local st = S.RunState
 		local mine = S:IsMyVote()
 		local count = self:Int(S.VoteCount) .. "/" .. self:Int(S.VoteNeed)
+		-- 솔로(방 인원 1)는 표 수를 안 보인다(혼자 누르면 바로 새 판 — 2026-09-24 솔로 출시)
+		if S:IsSolo() then count = "" end
 		local text = "다시 하기"
 		local mode = "off"
 		if st ~= "running" and st ~= "ended" then
@@ -701,7 +713,12 @@ script RtsHudLogic extends Logic
 	method void OnTopButton()
 		if _RtsStageLogic.RunState == "ended" or not _RtsRunResultLogic:IsMeAlive() then
 			_RtsPopupLogic:Close()
-			_RtsRunResultLogic:RequestExit()
+			-- 솔로(방 인원 1)면 '다시 하기' — 혼자 찬성 = 바로 새 판(2026-09-24 솔로 출시), 여럿이면 '나가기'
+			if _RtsStageLogic:IsSolo() then
+				_RtsStageLogic:RequestRestartVote()
+			else
+				_RtsRunResultLogic:RequestExit()
+			end
 			return
 		end
 		_RtsPopupLogic:Open("recruit")
@@ -726,13 +743,23 @@ script RtsHudLogic extends Logic
 		if exitMode then
 			self.RecruitRoomPrev = 0
 			self.RecruitLimitPrev = 0
+			-- 솔로(방 인원 1)면 '다시 하기'(금색), 여럿이면 '나가기'(붉은 테두리)
+			local solo = _RtsStageLogic:IsSolo()
 			local key = "exit"
+			if solo then key = "exit_solo" end
 			if key == self.RecruitShown then return end
 			self.RecruitShown = key
-			self.RecruitText.TextComponent.Text = "나가기"
-			self.RecruitBtn.SpriteGUIRendererComponent.Color = Color(0.3, 0.13, 0.11, 0.94)
-			self.RecruitBtn.Parent.SpriteGUIRendererComponent.Color = Color(0.8, 0.35, 0.3, 1)
-			self.RecruitText.TextComponent.FontColor = Color(0.98, 0.72, 0.66, 1)
+			if solo then
+				self.RecruitText.TextComponent.Text = "다시 하기"
+				self.RecruitBtn.SpriteGUIRendererComponent.Color = Color(0.3, 0.24, 0.12, 0.96)
+				self.RecruitBtn.Parent.SpriteGUIRendererComponent.Color = self:ColGold()
+				self.RecruitText.TextComponent.FontColor = Color(1, 0.95, 0.8, 1)
+			else
+				self.RecruitText.TextComponent.Text = "나가기"
+				self.RecruitBtn.SpriteGUIRendererComponent.Color = Color(0.3, 0.13, 0.11, 0.94)
+				self.RecruitBtn.Parent.SpriteGUIRendererComponent.Color = Color(0.8, 0.35, 0.3, 1)
+				self.RecruitText.TextComponent.FontColor = Color(0.98, 0.72, 0.66, 1)
+			end
 			return
 		end
 		if state ~= "running" then

@@ -27,7 +27,7 @@ flowchart LR
   P7 --> P5["Phase 5 · 유닛 관리 — 영입·레벨 (3)"]:::done
   P5 --> P4["Phase 4 · 증강·프리즘 (6)"]:::done
   P4 --> P9["Phase 9 · 밸런싱·난이도 (2)"]:::done
-  P9 --> P12["Phase 12 · 솔로 출시 (3)"]:::todo
+  P9 --> P12["Phase 12 · 솔로 출시 (3)"]:::inprogress
   P12 --> P8["Phase 8 · 멀티 업데이트 — 매칭·방 (3)"]:::todo
   P12 --> P10["Phase 10 · 아이콘·테마·플레이어 목록 (6)"]:::inprogress
   P8 --> P11["Phase 11 · 디자인 인계 — ChatGPT (2)"]:::inprogress
@@ -45,14 +45,14 @@ flowchart LR
 - Phase 5 — 유닛 관리(영입·레벨) · 유닛 3개(1 dropped) · 의존: Phase 7 · 푼다: Phase 4 · 파일 집합: RtsUnitLogic, RtsPopupLogic(영입), RtsUnitPopupLogic(레벨업) · **done**(2026-09-24)
 - Phase 4 — 증강·프리즘 · 유닛 6개 · 의존: Phase 5 · 푼다: Phase 9 · 파일 집합: RtsAugmentTableLogic, RtsAugmentLogic, RtsJobTableLogic, RtsPopupLogic(3택1·도감), RtsHudLogic(뽑기) · **done**(2026-09-24)
 - Phase 9 — 밸런싱·난이도 · 유닛 2개 · 의존: Phase 4 · 푼다: Phase 12 · 파일 집합: RtsDifficultyLogic, RtsJobTableLogic, RtsCombatLogic, tools/clear-sim.py · **done**(2026-09-24)
-- Phase 12 — 솔로 출시 · 유닛 3개 · 의존: Phase 9 · 푼다: Phase 8, Phase 10 · 파일 집합: RtsRunResultLogic(순위 저장·나가기), RtsPopupLogic(결과 창), RtsHudLogic(우측 버튼·투표 패널), RtsStageLogic(다시 하기) · todo
+- Phase 12 — 솔로 출시 · 유닛 3개 · 의존: Phase 9 · 푼다: Phase 8, Phase 10 · 파일 집합: RtsRunResultLogic(순위 저장·나가기), RtsPopupLogic(결과 창·순위 창), RtsHudLogic(우측 버튼·순위 버튼·다시 하기), RtsStageLogic(다시 하기) · in-progress(#44·#46 구현, #47 출시 점검 남음)
 - Phase 8 — 멀티 업데이트(대기방·매칭·방) · 유닛 3개 · 의존: Phase 12 · 푼다: Phase 11 · 파일 집합: RtsRoomLogic(신규 — 매칭·방), RtsLeaderboardLogic(신규 — 로비 전광판), RtsBootstrapLogic, RtsStageLogic(방 인원) · todo
 - Phase 10 — 아이콘·테마·플레이어 목록 · 유닛 6개 · 의존: Phase 12 · 푼다: Phase 11 · 파일 집합: RtsIconCollectionLogic(신규), RtsThemeLogic, RtsHudLogic(좌측 플레이어 카드), RtsPopupLogic(수정·컬렉션 팝업), RtsCombatLogic·RtsMonsterComponent(처치 드랍 훅), 월드 상품 · in-progress(#35·#37 done)
 - Phase 11 — 디자인 인계(ChatGPT) · 유닛 2개 · 의존: Phase 8, Phase 10(어느 정도 마무리 뒤) · 푼다: — · 파일 집합: `docs/ui-screens.md`, `AGENT.md`, UI 생성 코드(RtsHudLogic·RtsPopupLogic·RtsUnitPopupLogic·RtsDifficultyLogic·RtsMonsterInfoLogic의 Client 메서드) · in-progress(#45 명세 문서)
 
 동시 가능: 없음 (Phase 12·8·10은 RtsPopupLogic·RtsHudLogic을 같이 건드려 순서대로)
 
-지금: Phase 10 · Phase 11 진행 중(완료 유닛 일부) · Next up: **Phase 12 — 솔로 출시**
+지금: **Phase 12 솔로 출시 진행 중**(#44 순위·#46 솔로 정리 구현, #47 출시 점검 남음) · Phase 10 · 11 일부 · Next up: **Phase 12 — 솔로 출시**
 
 ## Scope & Actors
 - **플레이어(1~8)** — 자기 구역에서 영입·배치·레벨업, 증강 선택·뽑기(전부 팝업). F1~F8·플레이어 목록 클릭으로 다른 구역 관전. **관전(타 구역 보기)은 읽기 전용** — 상세보기만, 조작은 전부 비활성(서버도 소유자 검증). 탈락 후엔 관전을 계속하거나 방을 나간다.
@@ -142,8 +142,8 @@ flowchart LR
 
 | # | Unit | Goal | Key decision | Depends | Status |
 |---|------|------|--------------|---------|--------|
-| 44 (신규, 2026-09-24) | 순위 기준 교체 | **어려움·매우어려움·극악을 따로따로 — 난이도별 탭 3개, 각 탭 = 그 난이도에서 검은 마법사 4페이즈를 깬 횟수 순**(2026-09-24 사용자, 옛 최종 메소·최대 라운드 기준 폐기). 클리어할 때마다 서버가 그 난이도 횟수 +1(테스트 모드 제외), 결과 창에 내 순위·횟수, 순위 창(탭 3개)에서 상위 목록 | 동점 2차 기준(그 횟수에 먼저 도달한 사람?) | 30 | todo |
-| 46 (신규, 2026-09-24) | 솔로 전용 정리 | 혼자일 때 멀티 전용 흐름을 걷어 낸다 — 결과 창·우측 버튼의 '나가기'(지금은 "매칭은 Phase 8" 안내만 뜸) → **'다시 하기'**(혼자면 투표 없이 바로), 다시 하기 투표 패널·'바로 시작 n/m'·F1~F8 빈 구역 보기 등은 1명일 때 숨기거나 단순하게. 멀티 업데이트 때 그대로 되살릴 수 있게 '방 인원 1'로 판단 | 숨길 범위(관전·F1~F8·플레이어 목록) | 44 | todo |
+| 44 (신규, 2026-09-24) | 순위 기준 교체 | **어려움·매우어려움·극악을 따로따로 — 난이도별 탭 3개, 각 탭 = 그 난이도에서 검은 마법사 4페이즈를 깬 횟수 순**(2026-09-24 사용자, 옛 최종 메소·최대 라운드 기준 폐기). 클리어할 때마다 서버가 그 난이도 횟수 +1(테스트 모드 제외), 결과 창에 내 순위·횟수, 순위 창(탭 3개)에서 상위 목록 | 동점 2차 기준 → 그 횟수에 먼저 도달한 사람이 위(값에 2026-01-01부터 흐른 초를 거꾸로 넣음) | 30 | in-progress(2026-09-24 구현 — 결과 창 순위·왼쪽 아래 '순위' 창(탭 3개), Play로 저장·조회 확인. 사용자 확인 대기) |
+| 46 (신규, 2026-09-24) | 솔로 전용 정리 | 혼자일 때 멀티 전용 흐름을 걷어 낸다 — 결과 창·우측 버튼의 '나가기'(지금은 "매칭은 Phase 8" 안내만 뜸) → **'다시 하기'**(혼자면 투표 없이 바로), 다시 하기 투표 패널·'바로 시작 n/m'·F1~F8 빈 구역 보기 등은 1명일 때 숨기거나 단순하게. 멀티 업데이트 때 그대로 되살릴 수 있게 '방 인원 1'로 판단 | 숨길 범위(관전·F1~F8·플레이어 목록) | 44 | in-progress(2026-09-24 구현 — 방에 혼자면 결과 창 [닫기][다시 하기]·우측 '다시 하기'·위쪽 다시 하기 확인 없이 즉시·표 수 숨김. 관전·F1~F8·목록은 그대로. 사용자 확인 대기) |
 | 47 (신규, 2026-09-24) | 출시 점검 | Maker 빌드·한 판 처음부터 끝까지 Play(초상 정중앙·효과음·도감·결과 창), 테스트 모드 꺼짐 확인, 썸네일(`assets/thumbnail`), 월드 상품(아바타 `QK03ZI15E`) 판매 상태, 출시 설정 최대 인원 1 — **월드 업로드·공개는 사용자가 Maker에서 직접** | — | 44, 46 | todo |
 
 ### Phase 8 — 멀티 업데이트(매칭·방) (출시 뒤 여럿이 모여 돌린다) · depends: Phase 12

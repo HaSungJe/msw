@@ -185,6 +185,12 @@ script RtsStageLogic extends Logic
 		self.RoomCount = total
 	end
 
+	-- 클라: 혼자 하는 판인가(방 인원 1 — 솔로 출시 2026-09-24: '나가기' 대신 '다시 하기', 관전하기 대신 닫기, 다시 하기 안내 단순화)
+	@ExecSpace("ClientOnly")
+	method boolean IsSolo()
+		return self.RoomCount <= 1
+	end
+
 	-- 클라: 내가 '바로 시작'을 눌렀는가
 	@ExecSpace("ClientOnly")
 	method boolean IsMyReady()
@@ -469,7 +475,11 @@ script RtsStageLogic extends Logic
 		end
 		-- 판이 막 끝났으면 다시 하기 투표 안내(한 번)
 		if self.RunState == "ended" and self.PrevRunState ~= "ended" and self.PrevRunState ~= "" then
-			_RtsHudLogic:ShowHintFor("게임 종료 — 영입 버튼 옆 '다시 하기'를 과반이 누르면 처음부터 다시 시작합니다", 6)
+			if self:IsSolo() then
+				_RtsHudLogic:ShowHintFor("게임 종료 — '다시 하기'를 누르면 처음부터 다시 시작해요", 6)
+			else
+				_RtsHudLogic:ShowHintFor("게임 종료 — 위쪽 '다시 하기'를 과반이 누르면 처음부터 다시 시작해요", 6)
+			end
 		end
 		self.PrevRunState = self.RunState
 	end
