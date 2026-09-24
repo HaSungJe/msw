@@ -35,9 +35,6 @@ script RtsMonsterInfoLogic extends Logic
 	-- 왼쪽 몬스터 아이콘(2026-09-23 사용자 "상태창 좌측에 몬스터 아이콘") — 이동 애니메이션을 칸 정중앙에 맞춰 반복. IconW 칸 + 여백 뒤에 이름·체력바·정보
 	property number IconW = 94
 
-	-- 아이콘 확대 상한(작은 몬스터가 칸에 맞춰 너무 커지지 않게)
-	property number IconMaxFit = 2.5
-
 	property number LeftX = 118
 
 	-- 디버프(2026-09-24 사용자 "이동속도 감소 같은 디버프도 아이콘으로 — 마우스를 올리면 설명과 남은 시간" → 같은 날 "몬스터 우측에 디버프 정보 칸" → 같은 날 "네모 박스 높이를 키워서 아래에 디버프, 마우스 오버하면 박스 우측에"): 정보 창 안 아래 줄(DebuffRow = 그 줄, 칩 = 아이콘(또는 색 띠) + 디버프 이름).
@@ -116,24 +113,8 @@ script RtsMonsterInfoLogic extends Logic
 		slot.SpriteGUIRendererComponent.Color = Color(0.2, 0.17, 0.15, 1)
 		-- 칸 밖으로 삐져나오는 걷기 클립(초록버섯 등 — 프레임이 크거나 기준점이 치우친 것)을 칸 안으로 자른다(2026-09-24 사용자 "칸 밖으로 빠져나옴")
 		if slot.MaskComponent == nil then slot:AddComponent("MaskComponent") end
-		local mon0 = _RtsStageTableLogic:GetMonster(target.RtsMonsterComponent.MonsterId)
-		if mon0 ~= nil and mon0.walk ~= nil and mon0.walk ~= "" then
-			local icon = H:SpawnUI("model://uisprite", "RtsMonInfoIcon", slot, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2(0, 0), Vector2(self.IconW - 8, self.IconW - 8))
-			local ir = icon.SpriteGUIRendererComponent
-			-- 칸 정중앙(2026-09-24 사용자 "사각형 안에 점 찍고 거기에 몬스터 모습이 정중앙에"): 클립은 기준점(발끝)이 칸 가운데에 오게 그려진다 →
-			--   원본 크기(NativeSize)로 두고, 표의 그림 테두리(프레임 = boxW/0.7 · boxH/0.8, 기준점 → 그림 가운데 = boxX · boxY, 단위 100px)로 칸에 맞게 키운 뒤 그 가운데를 칸 가운데로 되돌린다
-			local fw = (mon0.boxW or 0.28) / 0.7 * 100
-			local fh = (mon0.boxH or 0.24) / 0.8 * 100
-			local inner = self.IconW - 8
-			local fit = math.min(inner / fw, inner / fh, self.IconMaxFit)
-			ir.PreserveSprite = PreserveSpriteType.NativeSize
-			ir.AnimClipPlayType = SpriteAnimClipPlayType.Loop
-			ir.Color = Color(1, 1, 1, 1)
-			ir.ImageRUID = DataRef(mon0.walk)
-			-- 크기·위치는 RUID를 넣은 뒤에(시험 초상과 같은 순서 — RUID 대입이 표시 설정을 되돌릴 수 있다)
-			ir.LocalScale = Vector2(fit, fit)
-			ir.LocalPosition = Vector2(-(mon0.boxX or 0) * 100 * fit, -(mon0.boxY or 0) * 100 * fit)
-		end
+		-- 칸 정중앙에 걷기 클립 반복(공용 초상 RtsHudLogic.SpawnMonsterPortrait — 아이콘·유저 카드와 같은 맞춤 식, 2026-09-25 공용화)
+		H:SpawnMonsterPortrait(slot, target.RtsMonsterComponent.MonsterId, self.IconW - 8, true)
 		self.NameText = H:SpawnLabel("RtsMonInfoName", panel, Vector2(0, 1), Vector2(0, 1), Vector2(x0, -8), Vector2(self.BarW + 4 + self.PctW, 28),
 			"", H:ColInk(), 19, TextAlignmentType.MiddleLeft, true)
 		self.NameText.TextComponent.IsRichText = true

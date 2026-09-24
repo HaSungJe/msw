@@ -27,6 +27,7 @@ Environment/  # 엔진 제공 환경 — NativeScripts/*.d.mlua 선언(Component
 - 조작 RPC(영입·레벨업·증강·위치 이동·스킬 잠금 등 클라가 부르는 `@ExecSpace("Server")` 메서드)는 서버에서 `senderUserId`로 소유자를 검증해 남의 구역·유닛 조작을 거부한다(클라에서 버튼을 숨기는 것만으로 막지 않는다).
 - 숫자를 엔티티 이름·테이블 키·화면 표기에 쓸 땐 `tostring` 대신 정수 포맷(`string.format("%d", math.floor(v + 0.5))` 또는 `_RtsHudLogic:Int(v)`) — 프로퍼티·Sync·RPC로 온 number는 `"1.0"`이 된다.
 - 로그는 `log()`를 직접 부르지 않고 `_RtsConfigLogic:Log(msg)`로 남긴다 — `RtsConfigLogic.DebugLog`(기본 false)가 켜졌을 때만 찍혀 출시 월드 콘솔에 로그가 뜨지 않는다(2026-09-24 사용자 "이용자 입장에서 로그가 자꾸 뜬다"). Maker 확인 때만 서버·클라 각각 `_RtsConfigLogic.DebugLog = true`로 켠다.
+- 스테이지·몬스터 표(`RtsStageTableLogic.mlua`의 `-- BEGIN GENERATED ~ -- END GENERATED`)는 `tools/gen-stage-table.py`가 `.info/monster-wave.md`·`.info/monster.md`로 만든다 — **손으로 고치지 않는다**(다음 생성 때 사라진다). 값(크기 배율 `MOB_SIZE`, 표시 테마 `DISPLAY_THEME`, 몬스터 자산 RUID 등)은 생성기 상수나 `.info/monster.md`를 고친 뒤 `python tools/gen-stage-table.py` → 돌리기 전 사본과 `diff`해서 의도한 줄만 바뀌었는지 확인. 표시 이름만 바꿀 땐 `THEMES`(체력 압박이 쓰는 테마 순번 t)에 넣지 말고 `DISPLAY_THEME`으로. 몬스터 크기 점검은 Play에서 구역마다 6×3 격자로 세워(TrackWalker `Paused`·`Enable = false`, 한 번에 50~70마리씩 나눠 스폰) F1~F8로 본다.
 - 엔진 동작 실측과 그에 따른 작성 관례(프롭·유닛 아바타 스폰, 애니 끝 이벤트, 줌 잠금, 스프라이트 PPU·텍스트 Truncate, 숫자 포맷, 입력·터치·UI 좌표·RPC) → 상세: [docs/msw-engine.md](docs/msw-engine.md)
 
 ## Shared Logic Separation (standard: MSW 권장)

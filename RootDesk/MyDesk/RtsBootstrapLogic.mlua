@@ -19,6 +19,8 @@ script RtsBootstrapLogic extends Logic
 		if zone > 0 then
 			userEntity.RtsCameraAnchorComponent:ApplyAssignedZone(zone, userId)
 			_RtsStageLogic:OnUserEnter(userId)
+			-- 계정 꾸미기(테마·아이콘, 2026-09-25): 저장소에서 불러와 내 구역에 테마 적용 + 그 유저에게 전체 전달(목록은 아래 BroadcastPlayerList)
+			_RtsProfileLogic:OnUserEnter(userId, zone)
 		end
 		self:BroadcastPlayerList()
 	end
@@ -30,11 +32,13 @@ script RtsBootstrapLogic extends Logic
 		_RtsUnitLogic:RemoveUnits(event.UserId)
 		_RtsZoneLogic:ReleaseZone(event.UserId)
 		_RtsStageLogic:OnUserLeave(event.UserId, zone)
+		-- 빈 구역은 기본 테마로 되돌리고 프로필 메모리 정리
+		_RtsProfileLogic:OnUserLeave(event.UserId, zone)
 		self:BroadcastPlayerList()
 	end
 
-	-- 배정 현황 → "userId(탭)닉네임(탭)구역(탭)생존" 줄바꿈 구분(구역순) → 모든 클라의 HUD 플레이어 목록 갱신
-	--   생존 = RtsRunResultLogic 상태(진행 중·클리어 1 / 탈락 0)
+	-- 배정 현황 → "userId(탭)닉네임(탭)구역(탭)생존(탭)테마(탭)아이콘" 줄바꿈 구분(구역순) → 모든 클라의 HUD 플레이어 목록(유저 카드) 갱신
+	--   생존 = RtsRunResultLogic 상태(진행 중·클리어 1 / 탈락 0). 테마·아이콘 = RtsProfileLogic(2026-09-25 — 카드 배경 썸네일·동그란 아이콘)
 	@ExecSpace("ServerOnly")
 	method void BroadcastPlayerList()
 		local rows = {}
@@ -46,7 +50,7 @@ script RtsBootstrapLogic extends Logic
 			end
 			local alive = "1"
 			if _RtsRunResultLogic:GetState(userId) == 1 then alive = "0" end
-			rows[#rows + 1] = { zone = zone, line = userId .. "\t" .. nick .. "\t" .. tostring(zone) .. "\t" .. alive }
+			rows[#rows + 1] = { zone = zone, line = userId .. "\t" .. nick .. "\t" .. tostring(zone) .. "\t" .. alive .. "\t" .. _RtsProfileLogic:ThemeOf(userId) .. "\t" .. _RtsProfileLogic:IconOf(userId) }
 		end
 		table.sort(rows, function(a, b) return a.zone < b.zone end)
 		local packed = ""
@@ -71,10 +75,11 @@ script RtsBootstrapLogic extends Logic
 		local pad = 16 / tileUnit
 		local need = (tilesX + pad * 2) * (tilesY + pad * 2)
 		if tilemap.TileCount >= need then return end
-		self:FillGroundTiles(_RtsThemeLogic:GetFloorTileName(), _RtsThemeLogic:GetFloorVariants(), _RtsThemeLogic:GetFloorVariantRatio())
+		local preset = _RtsThemeLogic:GetPreset(_RtsThemeLogic.DefaultKey)
+		self:FillGroundTiles(preset.floorTile, preset.floorVariants, preset.variantRatio)
 	end
 
-	-- 바닥 전체를 주어진 타일(타일셋의 Name)로 다시 채운다 — 테마 전환도 이걸 쓴다
+	-- 바닥 전체를 주어진 타일(타일셋의 Name)로 다시 채운다 — 처음 한 번(기본 테마). 유저 테마는 구역만(FillZoneTiles)
 	--   variants가 있으면 ratio 비율만큼 무작위 칸을 변형 타일(꽃 등)로 바꿔 반복감을 줄인다(결정적 해시 → 매번 같은 자리)
 	@ExecSpace("ServerOnly")
 	method void FillGroundTiles(string tileName, table variants, number ratio)
@@ -89,9 +94,45 @@ script RtsBootstrapLogic extends Logic
 		local pad = 16 / tileUnit
 		tilemap:Clear()
 		tilemap:BoxFill(tileName, Vector2Int(0 - pad, 0 - pad), Vector2Int(tilesX - 1 + pad, tilesY - 1 + pad))
+		self:ScatterVariants(tilemap, variants, ratio, 0 - pad, 0 - pad, tilesX - 1 + pad, tilesY - 1 + pad)
+	end
+
+	-- 구역 하나의 바닥만 다시 칠한다(테마 = 유저별, RtsThemeLogic.ApplyToZone — 2026-09-25).
+	--   맵은 (0,0)부터 구역 2열 × 4행, 구역 한 칸 = 구역 간격(48×32유닛) = 타일 12×8칸(FloorTileUnit 4)이라 경계가 타일에 딱 맞는다.
+	--   맨 바깥 구역은 EnsureGroundTiles의 사방 여유(16유닛)까지 같이 칠한다
+	@ExecSpace("ServerOnly")
+	method void FillZoneTiles(number zone, string tileName, table variants, number ratio)
+		local tm = _EntityService:GetEntityByPath("/maps/RtsMap/RectTileMap")
+		if tm == nil or tm.RectTileMapComponent == nil then return end
+		local tilemap = tm.RectTileMapComponent
+		local C = _RtsConfigLogic
+		local tileUnit = C:GetFloorTileUnit()
+		local cols = C:GetZoneCols()
+		local rows = C:GetZoneRows()
+		local idx = math.floor(zone + 0.5) - 1
+		local col = idx % cols
+		local rowB = rows - 1 - math.floor(idx / cols)
+		local perX = math.floor(C:GetZonePitchX() / tileUnit + 0.5)
+		local perY = math.floor(C:GetZonePitchY() / tileUnit + 0.5)
+		local pad = math.floor(16 / tileUnit + 0.5)
+		local x0 = col * perX
+		local x1 = x0 + perX - 1
+		local y0 = rowB * perY
+		local y1 = y0 + perY - 1
+		if col == 0 then x0 = x0 - pad end
+		if col == cols - 1 then x1 = x1 + pad end
+		if rowB == 0 then y0 = y0 - pad end
+		if rowB == rows - 1 then y1 = y1 + pad end
+		tilemap:BoxFill(tileName, Vector2Int(x0, y0), Vector2Int(x1, y1))
+		self:ScatterVariants(tilemap, variants, ratio, x0, y0, x1, y1)
+	end
+
+	-- 변형 타일(꽃 등)을 ratio 비율로 섞는다 — 칸 좌표 해시라 매번 같은 자리(FillGroundTiles·FillZoneTiles 공용)
+	@ExecSpace("ServerOnly")
+	method void ScatterVariants(any tilemap, table variants, number ratio, number x0, number y0, number x1, number y1)
 		if variants == nil or #variants == 0 or ratio <= 0 then return end
-		for y = 0 - pad, tilesY - 1 + pad do
-			for x = 0 - pad, tilesX - 1 + pad do
+		for y = y0, y1 do
+			for x = x0, x1 do
 				local h = ((x + 97) * 374761393 + (y + 89) * 668265263) % 1000003
 				if (h % 1000) / 1000 < ratio then
 					local v = variants[(h % #variants) + 1]

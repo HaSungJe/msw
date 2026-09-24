@@ -1,11 +1,17 @@
 -- rts-base: 트랙/타일 테마 프리셋 (2026-09-14 사용자 지시 — "트랙/타일은 프리셋 가능하도록")
---   프리셋 = 바닥 타일 이름(+변형 타일·비율) + 그리드 트랙 텍스처 RUID + 배경 사물 목록(공식 스프라이트, 칸 좌표) 묶음. 타일은 CaveFloorTileSet 안의 Name.
---   기본은 헤네시스. 프리셋 선택 UI·과금은 나중(로드맵 Phase 10 이후) — 여기는 단일 소스와 적용 함수만.
---   적용은 서버가 한다(타일·프롭이 서버 소유). 클라는 GetActiveKey/GetPreset로 읽기만.
+--   프리셋 = 바닥 타일 이름(+변형 타일·비율) + 그리드 트랙 텍스처 RUID(+틴트) + 배경 사물 목록(공식 스프라이트, 칸 좌표) + 썸네일 묶음. 타일은 CaveFloorTileSet 안의 Name.
+--   2026-09-25 사용자 "맵 테마 여러 개 — 헤네시스/엘리니아/페리온/커닝시티/리스항구, 기본은 헤네시스, 선택하면 내 맵/트랙이 바뀜(보이는 것만)":
+--   테마는 **유저마다(= 그 유저 구역만)** 적용한다(ApplyToZone). 고르기·저장은 RtsProfileLogic, 창은 RtsPopupLogic('theme').
+--   헤네시스 외 4종은 기능 뼈대용 임시 모양(기존 타일 + 트랙 판 틴트, 장식·썸네일 없음) — 실제 디자인은 ChatGPT가 docs/theme-presets.md를 보고 이 표만 바꾼다.
+--   적용은 서버가 한다(타일·프롭이 서버 소유). 클라는 GetPreset·GetPresets로 읽기만.
 @Logic
 script RtsThemeLogic extends Logic
 
-	property string ActiveKey = "henesys"
+	-- 기본 테마 키(빈 구역·처음 입장·모르는 키)
+	property string DefaultKey = "henesys"
+
+	-- 서버: 구역 → 지금 적용된 테마 키(없으면 DefaultKey — EnsureZoneVisuals·EnsureGroundTiles가 기본으로 세운 상태)
+	property table ZoneTheme = {}
 
 	-- 배경 사물: 공식 MSW 탑뷰 헤네시스 오브젝트(maplestory/map/obj/msw/topview_henesys/*)를 **트랙·발판 영역 바깥**에만
 	--   (2026-09-14 사용자: 안쪽은 유닛 자리라 배경과 겹치면 안 됨). 왼쪽 여백·오른쪽 16~18열·위쪽 띠. 불투명, 그리드 위(OrderInLayer 110).
@@ -53,24 +59,51 @@ script RtsThemeLogic extends Logic
 		return 1
 	end
 
-	-- 프리셋 표. 새 테마 = 여기 한 줄 + 타일셋에 타일 1개 + 그리드 텍스처 1장(assets/textures/README.md 절차) + 장식물 목록
+	-- 프리셋 표(표 순서 = 테마 창 순서). 새 테마 = 여기 한 줄 + 타일셋에 타일 1개 + 그리드 텍스처 1장(assets/textures/README.md 절차) + 장식물 목록 + 썸네일 — docs/theme-presets.md
+	--   key       저장 값(유저 DataStorage "theme")·RPC 인자 — 한 번 정하면 바꾸지 않는다
+	--   tab       테마 창 탭 이름(같은 이름끼리 한 탭). 지금은 '기본'만
+	--   gridTint  트랙 판 색 입히기(임시 모양용). 디자인 텍스처가 오면 흰색으로
+	--   thumb     썸네일 스프라이트 RUID("" = 없음 → color로 칠함) — 테마 창 카드·테마 상자·유저 카드 배경
 	method table GetPresets()
 		return {
-			{ key = "henesys", name = "헤네시스", floorTile = "HenesysGrass1", floorVariants = { "HenesysGrass2", "HenesysGrass3" }, variantRatio = 0.12,
-				gridRUID = "95b3ec9d377e46ecb9d394467d27dada", decor = self:GetHenesysDecor() }, -- 2026-09-20 16×13(ZoneTrackGridHenesys16). 이전 18×12 f8bf4274602c4d22b2e6643e114fbc5f
-			{ key = "elnath", name = "엘나스", floorTile = "ElnathSnowFloor", floorVariants = {}, variantRatio = 0,
-				gridRUID = "651583e1c1ee44cdb6d2a891755ab528", decor = {} }, -- 아직 18×12 텍스처 — 엘나스를 다시 쓰려면 gen-track-grid.js 회청 변형으로 16×13 재생성 필요
+			{ key = "henesys", name = "헤네시스", tab = "기본", floorTile = "HenesysGrass1", floorVariants = { "HenesysGrass2", "HenesysGrass3" }, variantRatio = 0.12,
+				gridRUID = "95b3ec9d377e46ecb9d394467d27dada", gridTint = Color(1, 1, 1, 1), decor = self:GetHenesysDecor(), thumb = "", color = Color(0.42, 0.66, 0.3, 1) }, -- 2026-09-20 16×13(ZoneTrackGridHenesys16)
+			-- ↓ 임시 모양(2026-09-25 뼈대) — 기존 타일 + 트랙 판 틴트. ChatGPT가 floorTile·gridRUID·decor·thumb를 바꾼다
+			{ key = "ellinia", name = "엘리니아", tab = "기본", floorTile = "HenesysGrassFloor", floorVariants = {}, variantRatio = 0,
+				gridRUID = "95b3ec9d377e46ecb9d394467d27dada", gridTint = Color(0.7, 0.95, 0.86, 1), decor = {}, thumb = "", color = Color(0.25, 0.55, 0.47, 1) },
+			{ key = "perion", name = "페리온", tab = "기본", floorTile = "HenesysSoil", floorVariants = {}, variantRatio = 0,
+				gridRUID = "95b3ec9d377e46ecb9d394467d27dada", gridTint = Color(1, 0.82, 0.64, 1), decor = {}, thumb = "", color = Color(0.66, 0.44, 0.26, 1) },
+			{ key = "kerning", name = "커닝시티", tab = "기본", floorTile = "HenesysStone1", floorVariants = {}, variantRatio = 0,
+				gridRUID = "95b3ec9d377e46ecb9d394467d27dada", gridTint = Color(0.8, 0.78, 0.95, 1), decor = {}, thumb = "", color = Color(0.4, 0.4, 0.54, 1) },
+			{ key = "lith", name = "리스항구", tab = "기본", floorTile = "ElnathSnowFloor", floorVariants = {}, variantRatio = 0,
+				gridRUID = "95b3ec9d377e46ecb9d394467d27dada", gridTint = Color(0.72, 0.88, 1, 1), decor = {}, thumb = "", color = Color(0.33, 0.56, 0.8, 1) },
 		}
 	end
 
-	method table GetPresetKeys()
-		local keys = {}
+	-- 탭 이름(표 순서대로, 중복 없이)
+	method table GetTabs()
+		local out = {}
+		local seen = {}
 		local list = self:GetPresets()
-		for i = 1, #list do keys[i] = list[i].key end
-		return keys
+		for i = 1, #list do
+			local t = list[i].tab or "기본"
+			if not seen[t] then
+				seen[t] = true
+				out[#out + 1] = t
+			end
+		end
+		return out
 	end
 
-	-- 없는 키면 첫 번째(기본) 프리셋
+	method boolean HasKey(string key)
+		local list = self:GetPresets()
+		for i = 1, #list do
+			if list[i].key == key then return true end
+		end
+		return false
+	end
+
+	-- 없는 키면 기본(헤네시스)
 	method table GetPreset(string key)
 		local list = self:GetPresets()
 		for i = 1, #list do
@@ -79,48 +112,29 @@ script RtsThemeLogic extends Logic
 		return list[1]
 	end
 
-	method string GetActiveKey()
-		return self.ActiveKey
+	method string GetZoneTheme(number zone)
+		local k = self.ZoneTheme[math.floor(zone + 0.5)]
+		if k == nil or k == "" then return self.DefaultKey end
+		return k
 	end
 
-	method string GetFloorTileName()
-		return self:GetPreset(self.ActiveKey).floorTile
-	end
-
-	-- 바닥 변형 타일(꽃 등)과 비율 — FillGroundTiles가 무작위 칸에 섞는다
-	method table GetFloorVariants()
-		local v = self:GetPreset(self.ActiveKey).floorVariants
-		if v == nil then return {} end
-		return v
-	end
-
-	method number GetFloorVariantRatio()
-		local r = self:GetPreset(self.ActiveKey).variantRatio
-		if r == nil then return 0 end
-		return r
-	end
-
-	method string GetGridRUID()
-		return self:GetPreset(self.ActiveKey).gridRUID
-	end
-
-	method table GetDecor()
-		return self:GetPreset(self.ActiveKey).decor
-	end
-
-	-- 프리셋 전환: 바닥 타일 다시 채우고 8구역 그리드 스프라이트·장식물 교체. 입장 전(시각화 전)에 불러도 안전
+	-- 구역 하나에 테마 적용(서버): 그 구역 사각형 바닥 타일 · 구역 트랙 판(텍스처 + 틴트) · 구역 여백 장식. 같은 테마면 아무것도 안 한다
+	--   2026-09-25 — 전엔 ApplyPreset(key)가 8구역·바닥 전체를 한꺼번에 바꿨다(한 사람이 바꾸면 모두 바뀜)
 	@ExecSpace("ServerOnly")
-	method boolean ApplyPreset(string key)
-		local preset = self:GetPreset(key)
-		if preset.key ~= key then
+	method boolean ApplyToZone(number zone, string key)
+		local z = math.floor(zone + 0.5)
+		if z < 1 or z > _RtsZoneLogic:GetZoneCount() then return false end
+		if not self:HasKey(key) then
 			_RtsConfigLogic:Log("RtsTheme: unknown preset " .. key)
 			return false
 		end
-		self.ActiveKey = preset.key
-		_RtsBootstrapLogic:FillGroundTiles(preset.floorTile, preset.floorVariants, preset.variantRatio)
-		_RtsZoneLogic:SetGridRUID(preset.gridRUID)
-		_RtsZoneLogic:SetDecor(preset.decor)
-		_RtsConfigLogic:Log("RtsTheme: applied " .. preset.key)
+		if self:GetZoneTheme(z) == key then return true end
+		local preset = self:GetPreset(key)
+		_RtsBootstrapLogic:FillZoneTiles(z, preset.floorTile, preset.floorVariants, preset.variantRatio)
+		_RtsZoneLogic:SetZoneGrid(z, preset.gridRUID, preset.gridTint)
+		_RtsZoneLogic:SetZoneDecor(z, preset.decor)
+		self.ZoneTheme[z] = key
+		_RtsConfigLogic:Log("RtsTheme: zone " .. string.format("%d", z) .. " → " .. key)
 		return true
 	end
 

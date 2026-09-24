@@ -47,6 +47,15 @@ script RtsPopupLogic extends Logic
 
 	property table RankCache = {}
 
+	-- 테마·아이콘 창 탭(2026-09-25 사용자 "테마·아이콘도 종류를 탭으로 — 지금은 기본 탭만")과 아이콘 창 쪽(한 쪽 32칸 — 247칸을 한꺼번에 만들면 UI가 1,000개가 넘어 느리다)
+	property string ThemeTab = "기본"
+
+	property string IconTab = "기본"
+
+	property number IconPage = 1
+
+	property number IconPerPage = 32
+
 	-- 영입 팝업 탭: "adv" 모험가 / "hero" 영웅(팬텀)
 	property string RecruitTab = "adv"
 
@@ -138,7 +147,8 @@ script RtsPopupLogic extends Logic
 		if not wasOpen and kind ~= "pick" then _RtsHudLogic:PlayUi(_RtsHudLogic.OpenSound) end
 		-- 팝업이 열리면 영입 배치 모드는 취소(= 영입 취소)
 		_RtsUnitSelectLogic:EndPlace()
-		if kind ~= "recruit" and kind ~= "augment" and kind ~= "pick" and kind ~= "unit" and kind ~= "devprism" and kind ~= "dismiss" and kind ~= "result" and kind ~= "codex" and kind ~= "rank" and kind ~= "restart" then
+		if kind ~= "recruit" and kind ~= "augment" and kind ~= "pick" and kind ~= "unit" and kind ~= "devprism" and kind ~= "dismiss" and kind ~= "result" and kind ~= "codex" and kind ~= "rank" and kind ~= "restart"
+			and kind ~= "theme" and kind ~= "themeconfirm" and kind ~= "icon" and kind ~= "iconinfo" and kind ~= "iconconfirm" and kind ~= "iconget" then
 			_RtsConfigLogic:Log("RtsPopup: unknown kind " .. kind)
 			return
 		end
@@ -176,6 +186,30 @@ script RtsPopupLogic extends Logic
 			width = 640
 			height = 280
 			title = "다시하기"
+		elseif kind == "theme" then
+			width = 900
+			height = 660
+			title = "맵 테마"
+		elseif kind == "themeconfirm" then
+			width = 640
+			height = 300
+			title = "맵 테마"
+		elseif kind == "icon" then
+			width = 900
+			height = 700
+			title = "아이콘"
+		elseif kind == "iconinfo" then
+			width = 640
+			height = 370
+			title = "아이콘"
+		elseif kind == "iconconfirm" then
+			width = 640
+			height = 280
+			title = "아이콘"
+		elseif kind == "iconget" then
+			width = 640
+			height = 430
+			title = "새 아이콘 획득!"
 		elseif kind == "result" then
 			width = 640
 			height = 360
@@ -212,6 +246,18 @@ script RtsPopupLogic extends Logic
 			self:BuildRank(body, width)
 		elseif kind == "restart" then
 			self:BuildRestart(body)
+		elseif kind == "theme" then
+			self:BuildTheme(body, width)
+		elseif kind == "themeconfirm" then
+			self:BuildThemeConfirm(body)
+		elseif kind == "icon" then
+			self:BuildIcon(body, width)
+		elseif kind == "iconinfo" then
+			self:BuildIconInfo(body, width)
+		elseif kind == "iconconfirm" then
+			self:BuildIconConfirm(body)
+		elseif kind == "iconget" then
+			self:BuildIconGot(body, width)
 		else
 			self:BuildPick(body)
 		end
@@ -279,6 +325,10 @@ script RtsPopupLogic extends Logic
 			self.Body = nil
 		end
 		if self.Group ~= nil and not self.Reopening then self.Group:SetEnable(false) end
+		-- 기다리던 아이콘 획득 팝업(보스 3택1 등이 떠 있어 미뤘던 것)을 이어서(RtsProfileLogic.FlushGot)
+		if not self.Reopening then
+			_TimerService:SetTimerOnce(function() _RtsProfileLogic:FlushGot() end, 0.15)
+		end
 	end
 
 	@ExecSpace("ClientOnly")
@@ -551,6 +601,18 @@ script RtsPopupLogic extends Logic
 		if _RtsStageLogic.RunState == "running" and solo then
 			msg = "진행 중인 판을 그만두고 처음부터 다시 시작합니다.\n지금 판의 유닛 · 메소 · 증강은 모두 사라집니다.\n정말 다시 할까요?"
 		end
+		self:BuildConfirm(body, msg, yesText, function()
+			self:Close()
+			_RtsStageLogic:RequestRestartVote()
+		end, function()
+			self:Close()
+		end)
+	end
+
+	-- 예/아니오 공용(다시하기·테마·아이콘 변경 확인): 가운데 글 + 금색 [예] + [아니오]. 누르면 yesFn / noFn
+	@ExecSpace("ClientOnly")
+	method void BuildConfirm(Entity body, string msg, string yesText, any yesFn, any noFn)
+		local H = _RtsHudLogic
 		H:SpawnLabel("RtsRsConfirmMsg", body, Vector2(0, 1), Vector2(0, 1), Vector2(27, -10), Vector2(586, 110),
 			msg, H:ColInk(), 18, TextAlignmentType.MiddleCenter, false)
 		local bw = 180
@@ -562,8 +624,7 @@ script RtsPopupLogic extends Logic
 			yesText, Color(1, 0.95, 0.8, 1), 17, TextAlignmentType.MiddleCenter, true)
 		local yc = H:SpawnClick("RtsRsConfirmYesClick", yes)
 		yc:ConnectEvent(ButtonClickEvent, function(event)
-			self:Close()
-			_RtsStageLogic:RequestRestartVote()
+			yesFn()
 		end)
 		local no = self:SpawnTab("RtsRsConfirmNo", body, Vector2(0, 0), Vector2(bw, bh), "아니오", false, 17)
 		local nt = no.Parent.UITransformComponent
@@ -573,6 +634,271 @@ script RtsPopupLogic extends Logic
 		nt.anchoredPosition = Vector2(10, by)
 		local nc = H:SpawnClick("RtsRsConfirmNoClick", no)
 		nc:ConnectEvent(ButtonClickEvent, function(event)
+			noFn()
+		end)
+	end
+
+	-- ===== 맵 테마(2026-09-25 사용자): 탭(종류) + 테마 카드(썸네일·이름·사용 중). 카드 → 변경 확인 예/아니오 → RtsProfileLogic.RequestSetTheme =====
+	--   썸네일 없는 테마는 테마 색 단색(RtsHudLogic.PaintThumb) — 썸네일·모양은 ChatGPT(docs/theme-presets.md)
+
+	-- 탭 줄(테마·아이콘 창 공용): names 순서대로, cur이 켜진 탭. 누르면 onPick(name)
+	@ExecSpace("ClientOnly")
+	method void BuildTabRow(Entity body, string prefix, table names, string cur, any onPick)
+		local H = _RtsHudLogic
+		for i = 1, #names do
+			local nm = names[i]
+			local tab = self:SpawnTab(prefix .. H:Int(i), body, Vector2(27 + (i - 1) * 138, -10), Vector2(130, 34), nm, nm == cur, 16)
+			if nm ~= cur then
+				local click = H:SpawnClick(prefix .. "Click", tab)
+				click:ConnectEvent(ButtonClickEvent, function(event)
+					onPick(nm)
+				end)
+			end
+		end
+	end
+
+	@ExecSpace("ClientOnly")
+	method void BuildTheme(Entity body, number W)
+		local H = _RtsHudLogic
+		local T = _RtsThemeLogic
+		local P = _RtsProfileLogic
+		local tabs = T:GetTabs()
+		local found = false
+		for i = 1, #tabs do
+			if tabs[i] == self.ThemeTab then found = true end
+		end
+		if not found then self.ThemeTab = tabs[1] or "기본" end
+		self:BuildTabRow(body, "RtsThemeTab", tabs, self.ThemeTab, function(nm)
+			self.ThemeTab = nm
+			self:Open("theme")
+		end)
+		H:SpawnLabel("RtsThemeInfo", body, Vector2(0, 1), Vector2(0, 1), Vector2(27, -52), Vector2(W - 54, 26),
+			"고르면 내 구역의 바닥 · 트랙이 바뀌어요 — 보이는 것만 달라지고 밸런스는 그대로", H:ColMuted(), 14, TextAlignmentType.MiddleLeft, false)
+		local list = T:GetPresets()
+		local k = 0
+		for i = 1, #list do
+			local pr = list[i]
+			if (pr.tab or "기본") == self.ThemeTab then
+				k = k + 1
+				local x = 27 + ((k - 1) % 3) * 282
+				local y = -92 - math.floor((k - 1) / 3) * 232
+				local cur = pr.key == P.MyTheme
+				local border = self:Mix(Color.white, 0.12)
+				local thick = 1.5
+				if cur then
+					border = H:ColGold()
+					thick = 2.5
+				end
+				local card = H:SpawnPanel("RtsThemeCard" .. H:Int(k), body, Vector2(0, 1), Vector2(0, 1), Vector2(x, y), Vector2(270, 220),
+					self:Mix(Color.white, 0.04), border, thick)
+				local thumb = H:SpawnUI("model://uisprite", "RtsThemeCardThumb", card, Vector2(0.5, 1), Vector2(0.5, 1), Vector2(0, -8), Vector2(250, 150))
+				H:PaintThumb(thumb, pr)
+				H:SpawnLabel("RtsThemeCardName", card, Vector2(0, 0), Vector2(0, 0), Vector2(12, 14), Vector2(160, 34),
+					pr.name, H:ColInk(), 19, TextAlignmentType.MiddleLeft, true)
+				if cur then
+					H:SpawnLabel("RtsThemeCardCur", card, Vector2(1, 0), Vector2(1, 0), Vector2(-12, 14), Vector2(90, 34),
+						"사용 중", H:ColGold(), 15, TextAlignmentType.MiddleRight, true)
+				else
+					local key = pr.key
+					local click = H:SpawnClick("RtsThemeCardClick", card)
+					click:ConnectEvent(ButtonClickEvent, function(event)
+						P.PendingTheme = key
+						self:Open("themeconfirm")
+					end)
+				end
+			end
+		end
+	end
+
+	@ExecSpace("ClientOnly")
+	method void BuildThemeConfirm(Entity body)
+		local P = _RtsProfileLogic
+		local pr = _RtsThemeLogic:GetPreset(P.PendingTheme)
+		local msg = "맵 테마를 변경하시겠습니까?\n→ " .. pr.name .. "\n내 구역의 바닥 · 트랙만 바뀌어요 (밸런스 영향 없음)"
+		self:BuildConfirm(body, msg, "예", function()
+			local key = P.PendingTheme
+			self:Close()
+			P:RequestSetTheme(key)
+		end, function()
+			self:Open("theme")
+		end)
+	end
+
+	-- ===== 아이콘(2026-09-25 사용자): 탭 + 한 쪽 32칸(8×4) 격자 + 쪽 넘기기. 보유 = 원색, 미보유 = 실루엣, 사용 중 = 금색 칸 =====
+	--   칸 → 정보(획득 여부 · 획득처 · 확률 · 획득일) → [이 아이콘 사용] → 예/아니오 → RtsProfileLogic.RequestSetIcon
+	@ExecSpace("ClientOnly")
+	method void BuildIcon(Entity body, number W)
+		local H = _RtsHudLogic
+		local P = _RtsProfileLogic
+		self:BuildTabRow(body, "RtsIconTab", { "기본" }, self.IconTab, function(nm)
+			self.IconTab = nm
+			self:Open("icon")
+		end)
+		local ids = P:IconIds()
+		local per = self.IconPerPage
+		local pages = math.max(1, math.ceil(#ids / per))
+		if self.IconPage < 1 then self.IconPage = 1 end
+		if self.IconPage > pages then self.IconPage = pages end
+		H:SpawnLabel("RtsIconHead", body, Vector2(0, 1), Vector2(0, 1), Vector2(27, -52), Vector2(W - 54, 26),
+			"보유 " .. H:Int(P.MyOwnedCount) .. " / " .. H:Int(#ids) .. "   ·   매우어려움에서 몬스터를 처치하면 1% 확률로 획득", H:ColMuted(), 15, TextAlignmentType.MiddleLeft, false)
+		local first = (self.IconPage - 1) * per + 1
+		local last = math.min(#ids, first + per - 1)
+		for i = first, last do
+			local id = ids[i]
+			local k = i - first
+			local x = 27 + (k % 8) * 102
+			local y = -90 - math.floor(k / 8) * 102
+			local owned = P:IsOwned(id)
+			local cell = H:SpawnUI("model://uibutton", "RtsIconCell" .. H:Int(k + 1), body, Vector2(0, 1), Vector2(0, 1), Vector2(x, y), Vector2(94, 94))
+			local bg = self:Mix(Color.white, 0.03)
+			if owned then bg = self:Mix(Color.white, 0.08) end
+			if id == P.MyIcon then bg = self:Mix(H:ColGold(), 0.35) end
+			cell.SpriteGUIRendererComponent.Color = bg
+			local face = H:SpawnMonsterPortrait(cell, id, 82, false)
+			if face ~= nil and not owned then face.SpriteGUIRendererComponent.Color = Color(0.05, 0.05, 0.06, 0.8) end
+			cell:ConnectEvent(ButtonClickEvent, function(event)
+				H:PlayUi(H.ClickSound)
+				P.PendingIcon = id
+				self:Open("iconinfo")
+			end)
+		end
+		-- 쪽 넘기기
+		local prev = self:SpawnTab("RtsIconPrev", body, Vector2(0, 0), Vector2(120, 38), "‹ 이전", false, 16)
+		local pt = prev.Parent.UITransformComponent
+		pt.AnchorsMin = Vector2(0.5, 0)
+		pt.AnchorsMax = Vector2(0.5, 0)
+		pt.Pivot = Vector2(1, 0)
+		pt.anchoredPosition = Vector2(-80, 18)
+		if self.IconPage > 1 then
+			local pc = H:SpawnClick("RtsIconPrevClick", prev)
+			pc:ConnectEvent(ButtonClickEvent, function(event)
+				self.IconPage = self.IconPage - 1
+				self:Open("icon")
+			end)
+		end
+		H:SpawnLabel("RtsIconPageText", body, Vector2(0.5, 0), Vector2(0.5, 0), Vector2(0, 18), Vector2(140, 38),
+			H:Int(self.IconPage) .. " / " .. H:Int(pages), H:ColInk(), 17, TextAlignmentType.MiddleCenter, true)
+		local nxt = self:SpawnTab("RtsIconNext", body, Vector2(0, 0), Vector2(120, 38), "다음 ›", false, 16)
+		local nt = nxt.Parent.UITransformComponent
+		nt.AnchorsMin = Vector2(0.5, 0)
+		nt.AnchorsMax = Vector2(0.5, 0)
+		nt.Pivot = Vector2(0, 0)
+		nt.anchoredPosition = Vector2(80, 18)
+		if self.IconPage < pages then
+			local nc = H:SpawnClick("RtsIconNextClick", nxt)
+			nc:ConnectEvent(ButtonClickEvent, function(event)
+				self.IconPage = self.IconPage + 1
+				self:Open("icon")
+			end)
+		end
+	end
+
+	-- 아이콘 정보: 큰 초상 · 이름 · 상태(사용 중 / 보유 + 획득일 / 미획득) · 획득처 · 확률 · [이 아이콘 사용](보유·미사용) · [목록으로]
+	@ExecSpace("ClientOnly")
+	method void BuildIconInfo(Entity body, number W)
+		local H = _RtsHudLogic
+		local P = _RtsProfileLogic
+		local id = P.PendingIcon
+		local mon = _RtsStageTableLogic:GetMonster(id)
+		if mon == nil then return end
+		local slot = H:SpawnUI("model://uisprite", "RtsIconInfoSlot", body, Vector2(0, 1), Vector2(0, 1), Vector2(27, -10), Vector2(140, 140))
+		slot.SpriteGUIRendererComponent.Color = Color(0.2, 0.17, 0.15, 1)
+		if slot.MaskComponent == nil then slot:AddComponent("MaskComponent") end
+		local owned = P:IsOwned(id)
+		local face = H:SpawnMonsterPortrait(slot, id, 128, owned)
+		if face ~= nil and not owned then face.SpriteGUIRendererComponent.Color = Color(0.05, 0.05, 0.06, 0.8) end
+		local tx = 187
+		local tw = W - tx - 27
+		H:SpawnLabel("RtsIconInfoName", body, Vector2(0, 1), Vector2(0, 1), Vector2(tx, -10), Vector2(tw, 34),
+			mon.name, H:ColInk(), 22, TextAlignmentType.MiddleLeft, true)
+		local state = "미획득"
+		local stateCol = H:ColMuted()
+		if id == P.MyIcon then
+			state = "사용 중"
+			stateCol = H:ColGold()
+		elseif owned then
+			state = "보유"
+			stateCol = Color(0.55, 0.85, 0.55, 1)
+		end
+		local date = P:OwnedDate(id)
+		if owned and date ~= "" then state = state .. "   ·   획득일 " .. date end
+		H:SpawnLabel("RtsIconInfoState", body, Vector2(0, 1), Vector2(0, 1), Vector2(tx, -48), Vector2(tw, 28),
+			state, stateCol, 17, TextAlignmentType.MiddleLeft, true)
+		H:SpawnLabel("RtsIconInfoWhere", body, Vector2(0, 1), Vector2(0, 1), Vector2(tx, -84), Vector2(tw, 26),
+			"획득처: " .. P:WhereText(id), H:ColInk(), 15, TextAlignmentType.MiddleLeft, false)
+		H:SpawnLabel("RtsIconInfoRate", body, Vector2(0, 1), Vector2(0, 1), Vector2(tx, -114), Vector2(tw, 26),
+			"확률: 매우어려움에서 처치 시 1%", H:ColInk(), 15, TextAlignmentType.MiddleLeft, false)
+		local bw = 200
+		local bh = 44
+		if owned and id ~= P.MyIcon then
+			local use = H:SpawnPanel("RtsIconUse", body, Vector2(0.5, 0), Vector2(1, 0), Vector2(-10, 24), Vector2(bw, bh),
+				self:Mix(H:ColGold(), 0.25), H:ColGold(), 1.5)
+			H:SpawnLabel("RtsIconUseText", use, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2(0, 0), Vector2(bw - 8, bh - 6),
+				"이 아이콘 사용", Color(1, 0.95, 0.8, 1), 17, TextAlignmentType.MiddleCenter, true)
+			local uc = H:SpawnClick("RtsIconUseClick", use)
+			uc:ConnectEvent(ButtonClickEvent, function(event)
+				self:Open("iconconfirm")
+			end)
+		end
+		local back = self:SpawnTab("RtsIconBack", body, Vector2(0, 0), Vector2(bw, bh), "목록으로", false, 17)
+		local bt = back.Parent.UITransformComponent
+		bt.AnchorsMin = Vector2(0.5, 0)
+		bt.AnchorsMax = Vector2(0.5, 0)
+		bt.Pivot = Vector2(0, 0)
+		bt.anchoredPosition = Vector2(10, 24)
+		if not (owned and id ~= P.MyIcon) then
+			bt.Pivot = Vector2(0.5, 0)
+			bt.anchoredPosition = Vector2(0, 24)
+		end
+		local bc = H:SpawnClick("RtsIconBackClick", back)
+		bc:ConnectEvent(ButtonClickEvent, function(event)
+			self:Open("icon")
+		end)
+	end
+
+	@ExecSpace("ClientOnly")
+	method void BuildIconConfirm(Entity body)
+		local P = _RtsProfileLogic
+		local mon = _RtsStageTableLogic:GetMonster(P.PendingIcon)
+		local nm = P.PendingIcon
+		if mon ~= nil then nm = mon.name end
+		self:BuildConfirm(body, "아이콘을 변경하시겠습니까?\n→ " .. nm, "예", function()
+			local id = P.PendingIcon
+			self:Close()
+			P:RequestSetIcon(id)
+		end, function()
+			self:Open("iconinfo")
+		end)
+	end
+
+	-- 획득 팝업(RtsProfileLogic.ShowIconGot → FlushGot): 초상 · 이름 · 획득처 · 획득일 · [확인]
+	@ExecSpace("ClientOnly")
+	method void BuildIconGot(Entity body, number W)
+		local H = _RtsHudLogic
+		local P = _RtsProfileLogic
+		local id = P.GotIcon
+		local mon = _RtsStageTableLogic:GetMonster(id)
+		if mon == nil then return end
+		H:PlayUi(self.PickSound)
+		local slot = H:SpawnUI("model://uisprite", "RtsIconGotSlot", body, Vector2(0.5, 1), Vector2(0.5, 1), Vector2(0, -6), Vector2(140, 140))
+		slot.SpriteGUIRendererComponent.Color = self:Mix(H:ColGold(), 0.22)
+		if slot.MaskComponent == nil then slot:AddComponent("MaskComponent") end
+		H:SpawnMonsterPortrait(slot, id, 128, true)
+		H:SpawnLabel("RtsIconGotName", body, Vector2(0.5, 1), Vector2(0.5, 1), Vector2(0, -154), Vector2(W - 54, 34),
+			mon.name .. " 아이콘을 얻었어요!", H:ColGold(), 22, TextAlignmentType.MiddleCenter, true)
+		local line = "획득처: " .. P:WhereText(id)
+		local date = P:OwnedDate(id)
+		if date ~= "" then line = line .. "   ·   획득일 " .. date end
+		H:SpawnLabel("RtsIconGotWhere", body, Vector2(0.5, 1), Vector2(0.5, 1), Vector2(0, -192), Vector2(W - 54, 26),
+			line, H:ColInk(), 15, TextAlignmentType.MiddleCenter, false)
+		local bw = 200
+		local bh = 44
+		local ok = H:SpawnPanel("RtsIconGotOk", body, Vector2(0.5, 0), Vector2(0.5, 0), Vector2(0, 22), Vector2(bw, bh),
+			self:Mix(H:ColGold(), 0.25), H:ColGold(), 1.5)
+		H:SpawnLabel("RtsIconGotOkText", ok, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2(0, 0), Vector2(bw - 8, bh - 6),
+			"확인", Color(1, 0.95, 0.8, 1), 17, TextAlignmentType.MiddleCenter, true)
+		local oc = H:SpawnClick("RtsIconGotOkClick", ok)
+		oc:ConnectEvent(ButtonClickEvent, function(event)
 			self:Close()
 		end)
 	end

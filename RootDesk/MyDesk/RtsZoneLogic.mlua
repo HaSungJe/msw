@@ -20,8 +20,8 @@ script RtsZoneLogic extends Logic
 
 	property table PadList = {}
 
-	-- 구역별 장식물 수(테마 전환 시 제거용)
-	property number DecorCount = 0
+	-- 구역 → 세운 장식물 수(테마 전환 시 제거용 — 구역마다 테마가 달라 개수도 다르다, 2026-09-25)
+	property table DecorCountByZone = {}
 
 	-- 보스 영역(1-기반 왼쪽 위 칸 + 한 변 칸 수). 2026-09-23 사용자 "이쪽 4칸에 보스 영역 — 보스는 저기로"(노란 돌·빨간 꽃 자리)
 	--   → 같은 날 "가로 4칸 세로 5줄에 보스가 다 채워지도록": 8~11열 × 9~13행(가운데 = 원래 2×2 가운데 열, 아래 끝 = 그리드 바닥)
@@ -279,7 +279,9 @@ script RtsZoneLogic extends Logic
 		local offX = _RtsConfigLogic:GetGridLeft() + _RtsConfigLogic:GetGridCols() * cell * 0.5
 		local offY = _RtsConfigLogic:GetGridTop() - _RtsConfigLogic:GetGridRows() * cell * 0.5
 		local scale = _RtsConfigLogic:GetGridTextureScale()
-		local ruid = _RtsThemeLogic:GetGridRUID()
+		-- 처음엔 모든 구역을 기본 테마로(유저가 들어오면 RtsProfileLogic이 그 구역만 자기 테마로 — RtsThemeLogic.ApplyToZone)
+		local preset = _RtsThemeLogic:GetPreset(_RtsThemeLogic.DefaultKey)
+		local ruid = preset.gridRUID
 
 		for n = 1, self:GetZoneCount() do
 			local c = _RtsConfigLogic:GetZoneCenter(n)
@@ -289,7 +291,7 @@ script RtsZoneLogic extends Logic
 			end
 			self:SpawnBossArea(n, mapRoot)
 		end
-		self:SetDecor(_RtsThemeLogic:GetDecor())
+		for n = 1, self:GetZoneCount() do self:SetZoneDecor(n, preset.decor) end
 		self.VisualsBuilt = true
 		_RtsConfigLogic:Log("RtsZone: visuals built (grid track x" .. tostring(self:GetZoneCount()) .. ")")
 	end
@@ -307,45 +309,46 @@ script RtsZoneLogic extends Logic
 		e.SpriteRendererComponent.Color = Color(0.85, 0.16, 0.12, 0.28)
 	end
 
-	-- 배경 사물: 테마 프리셋의 목록을 8구역 모두에 같은 자리로. 기존 것은 지우고 다시 세운다
-	--   자리·층·투명도는 프리셋이 정한다(지금은 트랙 바깥, 그리드 위 110, 불투명). 유닛·몹(200~)은 더 위
+	-- 배경 사물(구역 하나): 그 구역의 옛 장식을 지우고 목록대로 다시 세운다. 자리·층·투명도는 프리셋이 정한다(트랙 바깥 여백, 그리드 위 110, 불투명). 유닛·몹(200~)은 더 위
+	--   2026-09-25 구역마다 테마가 다를 수 있어 구역 단위로(RtsThemeLogic.ApplyToZone). 전엔 8구역 한꺼번에 SetDecor
 	@ExecSpace("ServerOnly")
-	method void SetDecor(table list)
+	method void SetZoneDecor(number zone, table list)
 		local mapRoot = _EntityService:GetEntityByPath("/maps/RtsMap")
 		if mapRoot == nil then return end
-		for n = 1, self:GetZoneCount() do
-			for i = 1, self.DecorCount do
-				local old = _EntityService:GetEntityByPath("/maps/RtsMap/ZoneDecor" .. tostring(n) .. "_" .. tostring(i))
-				if old ~= nil then old:Destroy() end
-			end
+		local n = math.floor(zone + 0.5)
+		-- 옛 장식: 기록한 개수까지 + 그 뒤로도 이름이 이어지는 동안 지운다(개수 기록이 없는 경로에서도 남지 않게)
+		local old = self.DecorCountByZone[n] or 0
+		local i = 1
+		while true do
+			local e = _EntityService:GetEntityByPath("/maps/RtsMap/ZoneDecor" .. string.format("%d_%d", n, i))
+			if e == nil and i > old then break end
+			if e ~= nil then e:Destroy() end
+			i = i + 1
 		end
-		self.DecorCount = #list
+		if list == nil then list = {} end
+		self.DecorCountByZone[n] = #list
 		local order = _RtsThemeLogic:GetDecorOrder()
 		local alpha = _RtsThemeLogic:GetDecorAlpha()
-		for n = 1, self:GetZoneCount() do
-			for i = 1, #list do
-				local d = list[i]
-				local at = self:GetCellCenter(n, d.col, d.row)
-				local e = self:SpawnProp("ZoneDecor" .. tostring(n) .. "_" .. tostring(i), mapRoot, at, d.ruid, order)
-				if e ~= nil then
-					e.SpriteRendererComponent.Color = Color(1, 1, 1, alpha)
-					if d.scale ~= nil and d.scale ~= 1 then
-						e.TransformComponent.Scale = Vector3(d.scale, d.scale, 1)
-					end
+		for i = 1, #list do
+			local d = list[i]
+			local at = self:GetCellCenter(n, d.col, d.row)
+			local e = self:SpawnProp("ZoneDecor" .. string.format("%d_%d", n, i), mapRoot, at, d.ruid, order)
+			if e ~= nil then
+				e.SpriteRendererComponent.Color = Color(1, 1, 1, alpha)
+				if d.scale ~= nil and d.scale ~= 1 then
+					e.TransformComponent.Scale = Vector3(d.scale, d.scale, 1)
 				end
 			end
 		end
 	end
 
-	-- 테마 전환: 이미 세워진 8구역 그리드 스프라이트의 텍스처만 바꾼다 (RtsThemeLogic.ApplyPreset)
+	-- 트랙 판(구역 하나): 이미 세워진 ZoneGrid{n}의 텍스처·색만 바꾼다(RtsThemeLogic.ApplyToZone — 임시 모양은 틴트로 테마 구분)
 	@ExecSpace("ServerOnly")
-	method void SetGridRUID(string ruid)
-		for n = 1, self:GetZoneCount() do
-			local grid = _EntityService:GetEntityByPath("/maps/RtsMap/ZoneGrid" .. tostring(n))
-			if grid ~= nil and grid.SpriteRendererComponent ~= nil then
-				grid.SpriteRendererComponent.SpriteRUID = ruid
-			end
-		end
+	method void SetZoneGrid(number zone, string ruid, Color tint)
+		local grid = _EntityService:GetEntityByPath("/maps/RtsMap/ZoneGrid" .. string.format("%d", math.floor(zone + 0.5)))
+		if grid == nil or grid.SpriteRendererComponent == nil then return end
+		grid.SpriteRendererComponent.SpriteRUID = ruid
+		grid.SpriteRendererComponent.Color = tint
 	end
 
 end

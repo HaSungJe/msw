@@ -57,9 +57,15 @@
 |---|---|---|---|---|
 | `crusher/crusher_01..11.png` | 292×250 알파 PNG 11프레임(≈11fps, 90ms 간격, 1.0초). 옛 용기사 3차 스피어 크러셔(1311001 — 라이브러리엔 소리만 남음) 이펙트를 나무위키 mp4(302×296, 흰 배경 + 용기사 캐릭터)에서 추출. 흰 배경 → 알파(a = 1 − min(RGB)/255), 캐릭터 실루엣(idle + 찌르기 포즈)은 **구멍(알파 0)** — 게임에선 그 자리에 우리 아바타가 선다. 흰 하이라이트는 원리상 복원 불가라 외곽선 속을 연한 시안 반투명으로 메움 → 용머리 발사 구간(8~11)은 원본보다 빈약. `meta.json`: crop·발 위치(157,208)·fps | `crusher/extract_crusher.py`(ffmpeg 프레임 추출 + cv2/numpy) | 업로드 완료(2026-09-16, sprite/skill `RtsCrusherFx01..11`): cfbb29c1bc164b1f9fcd7172a48edd84, 01785f5c43984033a3b01349f2577a5e, 512cf540171a479499f1e29954c26b6e, 85ce003c137347f2b2951a157b6e542c, 364932f1809b4c8298974d0aeaf7b151, 6bb848a925174ef58436b4f474e1ed14, b93ed9948ce4456e87ffb0f1f7809a3f, 5a7d68c91f5e40dfa0e5cd82cefc1cfc, c9cb83a286f241aab46823416c819a9b, 9ebbdf97148d48db9ca76af0dd9b4372, 3718a78d28b341f2822c207baa5c65c9 — 목록은 `crusher/meta.json` `ruids` | **후보 — 게임 데모 확인**. v1(외곽선만)은 사용자 피드백 "너무 비어있고 테두리만" → **v2 속 채움**(`crusher/v2/`, `RtsCrusherFx2_01..11`, 외곽선을 크게 닫은 영역 안 저알파를 흰빛 시안 α0.55로 채움 + 감마 0.7) 재업로드 → **v3 진하게**(`crusher/v3/`, `RtsCrusherFx3_01..11`: 속 흰빛 α0.85 + 선 ×1.8 + 감마 0.6, 용머리 프레임은 median 5 + 닫힘 25로 덩어리화) → v3는 "너무 어색"으로 **v2로 복귀** — 현재 `meta.json` `ruids`가 v2(v3 RUID는 `ruids_v3_dense`에 보관). 데모: stabT1 + 플립북 90ms + 옛 시전음 `fcac442d…`, 스케일 1.7, 발 오프셋 (−0.11, +0.83)×스케일, Default/300. 다크나이트 창은 캐시 무기(afterImage swordTS = 빨간 참격)라 진짜 스피어로 바꿔야 함(`assets.md` 메모) |
 
-## 테마 프리셋 (2026-09-14)
-바닥 타일 + 그리드 트랙 텍스처는 `RootDesk/MyDesk/RtsThemeLogic.mlua`의 프리셋 표로 묶어서 고른다(기본 `henesys`, 보관 `elnath`). `CaveFloorTileSet`에는 두 타일이 모두 들어 있다(HenesysGrassFloor·ElnathSnowFloor).
-**새 테마 추가** = ① 바닥 256px 타일 생성·업로드 → 타일셋 `datas`에 항목 추가 ② `gen-track-grid.js`의 선/발판 색을 그 배경에 맞춰 생성·업로드 ③ `RtsThemeLogic.GetPresets`에 한 줄 + 장식물 목록(`decor`: 공식 스프라이트 RUID + 칸 좌표) ④ 아티팩트 `.stage[data-theme=…]` 변수 한 벌 + `DECOR` 목록. 런타임 전환은 서버에서 `_RtsThemeLogic:ApplyPreset(key)`.
+## 테마 프리셋 (2026-09-14 → 2026-09-25 유저별 5종)
+바닥 타일 + 그리드 트랙 텍스처(+틴트) + 장식 + 썸네일은 `RootDesk/MyDesk/RtsThemeLogic.mlua`의 프리셋 표로 묶는다 — 헤네시스·엘리니아·페리온·커닝시티·리스항구(헤네시스 외 4종은 임시 모양). **유저마다 자기 구역에만** 적용(`_RtsThemeLogic:ApplyToZone(zone, key)`, 서버). 옛 `elnath` 프리셋은 표에서 뺐다(자산은 위 표에 '보관').
+**새 테마 추가·디자인 교체 절차는 `docs/theme-presets.md`** (ChatGPT 인계용).
+
+## 원형 마스크 (2026-09-25 — 유저 카드 동그란 아이콘)
+
+| 파일 | 내용 | 생성 | RUID | 상태 |
+|---|---|---|---|---|
+| `circle-mask.png` | 128px 흰 원(가장자리 안티앨리어싱), 투명 배경. `MaskComponent` 칸의 이미지로 쓰면 자식(몬스터 초상)이 원 모양으로 잘린다 | PIL(4배 크기로 그린 뒤 축소) | `69e2dced65e443d3bb391464fd64b123` (RtsCircleMask, sprite/etc, 2026-09-25) → `RtsHudLogic.CircleMaskRUID` | **적용 중** |
 
 헤네시스 배경 마을(그리드 아래 반투명 58개)은 공식 MSW 탑뷰 오브젝트 `maplestory/map/obj/msw/topview_henesys/{building,tree,acc,flag}/N/0`(msw-mcp `asset_search_resources` 쿼리 `*topview_henesys`). 월드 프롭 엔티티는 네이티브 모델 `model://MapObject`(Transform + SpriteRenderer).
 

@@ -1,0 +1,350 @@
+-- 계정 꾸미기(2026-09-25 사용자 — 로드맵 Phase 10 테마 + Phase 14 아이콘): 유저별 맵 테마 · 선택 아이콘 · 보유 아이콘(획득 일시).
+--   서버가 원본을 쥔다 — 유저 DataStorage "theme"·"icon"·"icons"에 영구 저장하고, 입장·변경·획득 때마다 그 유저에게 전체를 보낸다(SendProfile).
+--   (사용자 "아이콘이나 테마는 서버 쪽에서 항상 유저에게 전달해야 누적 — 영구 획득 정보", "획득일을 저장 — 나중에 집계할 수도")
+--   테마 = 내 구역만 외형 변경(RtsThemeLogic.ApplyToZone, 밸런스 영향 없음). 아이콘 = 몬스터 247종, 기본 초록달팽이(M001)만 보유,
+--   매우어려움(난이도 5)에서만 그 몬스터를 처치할 때 1%(보스 포함, 극악 제외 — 사용자 "무조건 매우어려움에서 1%").
+--   창: RtsPopupLogic 'theme'·'themeconfirm'·'icon'·'iconinfo'·'iconconfirm'·'iconget'. 카드: RtsHudLogic 유저 카드(목록 줄의 테마·아이콘 칸).
+@Logic
+script RtsProfileLogic extends Logic
+
+	-- 유저 DataStorage 키(바꾸지 않는다 — 저장된 값이 사라진 것처럼 보인다)
+	property string ThemeKey = "theme"
+
+	property string IconKey = "icon"
+
+	-- "M005:1790000000000,M131:1790000123456" — 몬스터 id : 획득 시각(UTC ms, DateTime.UtcNow.Elapsed). M001은 적지 않아도 보유
+	property string IconsKey = "icons"
+
+	property string DefaultIcon = "M001"
+
+	-- 획득 확률·난이도(5 = 매우어려움 — RtsDifficultyLogic.GetNames)
+	property number DropRate = 0.01
+
+	property number DropDiff = 5
+
+	-- ===== 서버 상태(유저별) =====
+	property table ThemeByUser = {}
+
+	property table IconByUser = {}
+
+	-- userId → { [몬스터 id] = 획득 시각 ms } (M001 = 0)
+	property table OwnedByUser = {}
+
+	-- 구역 → 주인 userId(입장·퇴장 때 갱신 — 처치마다 동기화 테이블 ZoneByUser를 훑지 않게)
+	property table OwnerByZone = {}
+
+	-- ===== 클라 상태(내 것 — SendProfile로만 바뀐다) =====
+	property string MyTheme = "henesys"
+
+	property string MyIcon = "M001"
+
+	property table MyOwned = {}
+
+	property number MyOwnedCount = 1
+
+	-- 창에서 고른 테마 키 · 아이콘 id(확인 팝업이 쓴다)
+	property string PendingTheme = ""
+
+	property string PendingIcon = ""
+
+	-- 획득 팝업 대기열(보스 3택1 등 다른 창이 먼저 떠 있으면 닫힌 뒤에)
+	property table GotQueue = {}
+
+	property string GotIcon = ""
+
+	-- 아이콘 순서(M001…M229, B01…B18) — 처음 부를 때 만든다
+	property table IconIdCache = {}
+
+	-- ===== 공용 =====
+
+	-- "M005:123,M131:456" → { M001 = 0, M005 = 123, M131 = 456 } (틀린 조각은 버린다)
+	method table ParseOwned(string packed)
+		local out = {}
+		out[self.DefaultIcon] = 0
+		if packed == nil or packed == "" then return out end
+		for piece in string.gmatch(packed, "[^,]+") do
+			local id, at = string.match(piece, "^%s*([MB]%d+)%s*:%s*(%d+)%s*$")
+			if id == nil then id = string.match(piece, "^%s*([MB]%d+)%s*$") end
+			if id ~= nil and _RtsStageTableLogic:GetMonster(id) ~= nil then
+				out[id] = tonumber(at or "0") or 0
+			end
+		end
+		return out
+	end
+
+	-- 보유 표 → 저장 문자열(M001 제외, id 순)
+	method string SerializeOwned(table owned)
+		local ids = {}
+		for id, at in pairs(owned) do
+			if id ~= self.DefaultIcon then ids[#ids + 1] = id end
+		end
+		table.sort(ids)
+		local parts = {}
+		for i = 1, #ids do
+			-- 획득 시각은 정수 ms(≈6.4e16) — 실수로 바꾸면 정밀도가 깨지니 그대로 정수로 쓴다
+			parts[#parts + 1] = ids[i] .. ":" .. string.format("%d", math.floor(owned[ids[i]] or 0))
+		end
+		return table.concat(parts, ",")
+	end
+
+	-- 클라 전달용(M001 포함)
+	method string PackOwned(table owned)
+		local s = self:SerializeOwned(owned)
+		if s == "" then return self.DefaultIcon .. ":0" end
+		return self.DefaultIcon .. ":0," .. s
+	end
+
+	method string ThemeOf(string userId)
+		local k = self.ThemeByUser[userId]
+		if k == nil or k == "" then return _RtsThemeLogic.DefaultKey end
+		return k
+	end
+
+	method string IconOf(string userId)
+		local k = self.IconByUser[userId]
+		if k == nil or k == "" then return self.DefaultIcon end
+		return k
+	end
+
+	-- ===== 서버: 입장·퇴장 =====
+
+	-- 입장(RtsBootstrapLogic.HandleUserEnterEvent): 저장소 3칸 읽기 → 틀린 값은 기본 → 내 구역에 테마 → 그 유저에게 전체 전달
+	@ExecSpace("ServerOnly")
+	method void OnUserEnter(string userId, number zone)
+		self:Load(userId)
+		if zone > 0 then self.OwnerByZone[math.floor(zone + 0.5)] = userId end
+		if zone > 0 then _RtsThemeLogic:ApplyToZone(zone, self:ThemeOf(userId)) end
+		self:SendProfile(self:ThemeOf(userId), self:IconOf(userId), self:PackOwned(self.OwnedByUser[userId]), userId)
+	end
+
+	@ExecSpace("ServerOnly")
+	method void Load(string userId)
+		local theme = _RtsThemeLogic.DefaultKey
+		local icon = self.DefaultIcon
+		local packed = ""
+		local ds = _DataStorageService:GetUserDataStorage(userId)
+		if ds ~= nil then
+			local c1, v1 = ds:GetAndWait(self.ThemeKey)
+			if c1 == 0 and v1 ~= nil and v1 ~= "" then theme = v1 end
+			local c2, v2 = ds:GetAndWait(self.IconKey)
+			if c2 == 0 and v2 ~= nil and v2 ~= "" then icon = v2 end
+			local c3, v3 = ds:GetAndWait(self.IconsKey)
+			if c3 == 0 and v3 ~= nil then packed = v3 end
+		end
+		if not _RtsThemeLogic:HasKey(theme) then theme = _RtsThemeLogic.DefaultKey end
+		local owned = self:ParseOwned(packed)
+		if owned[icon] == nil then icon = self.DefaultIcon end
+		self.ThemeByUser[userId] = theme
+		self.IconByUser[userId] = icon
+		self.OwnedByUser[userId] = owned
+		_RtsConfigLogic:Log("RtsProfile: load " .. userId .. " theme=" .. theme .. " icon=" .. icon .. " owned=" .. string.format("%d", self:CountOwned(owned)))
+	end
+
+	-- 퇴장: 빈 구역은 기본 테마로, 메모리 정리
+	@ExecSpace("ServerOnly")
+	method void OnUserLeave(string userId, number zone)
+		if zone > 0 then
+			_RtsThemeLogic:ApplyToZone(zone, _RtsThemeLogic.DefaultKey)
+			if self.OwnerByZone[math.floor(zone + 0.5)] == userId then self.OwnerByZone[math.floor(zone + 0.5)] = nil end
+		end
+		self.ThemeByUser[userId] = nil
+		self.IconByUser[userId] = nil
+		self.OwnedByUser[userId] = nil
+	end
+
+	method number CountOwned(table owned)
+		local n = 0
+		if owned == nil then return 0 end
+		for _, _v in pairs(owned) do n = n + 1 end
+		return n
+	end
+
+	-- 그 유저에게 전체 + 전 클라 목록(카드 배경·아이콘)
+	@ExecSpace("ServerOnly")
+	method void PushProfile(string userId)
+		local owned = self.OwnedByUser[userId]
+		if owned == nil then owned = self:ParseOwned("") end
+		self:SendProfile(self:ThemeOf(userId), self:IconOf(userId), self:PackOwned(owned), userId)
+		_RtsBootstrapLogic:BroadcastPlayerList()
+	end
+
+	-- ===== 서버: 변경 요청(조작 RPC — senderUserId 본인 것만) =====
+
+	-- 테마 변경: 모르는 키·구역 없음 → 무시. 저장 성공 뒤에 내 구역에 적용
+	@ExecSpace("Server")
+	method void RequestSetTheme(string key)
+		local userId = senderUserId
+		if userId == nil or userId == "" then return end
+		local zone = _RtsZoneLogic:GetZoneOfUser(userId)
+		if zone < 1 then return end
+		if not _RtsThemeLogic:HasKey(key) then
+			_RtsConfigLogic:Log("RtsProfile: unknown theme " .. tostring(key) .. " from " .. userId)
+			return
+		end
+		if self:ThemeOf(userId) == key then
+			self:PushProfile(userId)
+			return
+		end
+		local ds = _DataStorageService:GetUserDataStorage(userId)
+		if ds == nil then return end
+		ds:SetAsync(self.ThemeKey, key, function(code, k)
+			if code ~= 0 then
+				_RtsConfigLogic:Log("RtsProfile: theme save failed code=" .. tostring(code))
+				return
+			end
+			self.ThemeByUser[userId] = key
+			local z = _RtsZoneLogic:GetZoneOfUser(userId)
+			if z > 0 then _RtsThemeLogic:ApplyToZone(z, key) end
+			self:PushProfile(userId)
+		end)
+	end
+
+	-- 아이콘 변경: 보유한 것만
+	@ExecSpace("Server")
+	method void RequestSetIcon(string id)
+		local userId = senderUserId
+		if userId == nil or userId == "" then return end
+		local owned = self.OwnedByUser[userId]
+		if owned == nil or owned[id] == nil then
+			_RtsConfigLogic:Log("RtsProfile: not owned icon " .. tostring(id) .. " from " .. userId)
+			return
+		end
+		if self:IconOf(userId) == id then
+			self:PushProfile(userId)
+			return
+		end
+		local ds = _DataStorageService:GetUserDataStorage(userId)
+		if ds == nil then return end
+		ds:SetAsync(self.IconKey, id, function(code, k)
+			if code ~= 0 then
+				_RtsConfigLogic:Log("RtsProfile: icon save failed code=" .. tostring(code))
+				return
+			end
+			self.IconByUser[userId] = id
+			self:PushProfile(userId)
+		end)
+	end
+
+	-- ===== 서버: 처치 → 아이콘 획득(RtsMonsterComponent.Die) =====
+	--   대상 = 그 구역 주인. 테스트 모드 · 매우어려움이 아님 · 이미 보유 · 난수 ≥ 1% → 아무것도 안 함.
+	--   보유에 먼저 넣고(저장 중 같은 몬스터로 두 번 굴리지 않게) 저장 실패면 되돌린다
+	@ExecSpace("ServerOnly")
+	method void OnMonsterKilled(number zone, string monsterId)
+		if _RtsUnitLogic.DevTools then return end
+		local userId = self.OwnerByZone[math.floor(zone + 0.5)]
+		if userId == nil or userId == "" then return end
+		if _RtsDifficultyLogic:Of(userId) ~= self.DropDiff then return end
+		local owned = self.OwnedByUser[userId]
+		if owned == nil or owned[monsterId] ~= nil then return end
+		if _RtsStageTableLogic:GetMonster(monsterId) == nil then return end
+		if _UtilLogic:RandomDouble() >= self.DropRate then return end
+		self:GrantIcon(userId, monsterId)
+	end
+
+	-- 획득 확정(저장 → 전달 → 획득 팝업). 시험 스크립트도 이걸 부른다
+	@ExecSpace("ServerOnly")
+	method void GrantIcon(string userId, string monsterId)
+		local owned = self.OwnedByUser[userId]
+		if owned == nil or owned[monsterId] ~= nil then return end
+		local ds = _DataStorageService:GetUserDataStorage(userId)
+		if ds == nil then return end
+		owned[monsterId] = DateTime.UtcNow.Elapsed
+		ds:SetAsync(self.IconsKey, self:SerializeOwned(owned), function(code, k)
+			if code ~= 0 then
+				owned[monsterId] = nil
+				_RtsConfigLogic:Log("RtsProfile: icons save failed code=" .. tostring(code))
+				return
+			end
+			_RtsConfigLogic:Log("RtsProfile: icon " .. monsterId .. " → " .. userId)
+			self:PushProfile(userId)
+			self:ShowIconGot(monsterId, userId)
+		end)
+	end
+
+	-- ===== 클라 =====
+
+	-- 서버 → 그 유저(마지막 인자 userId): 내 테마·선택 아이콘·보유 전체. 받은 값 그대로 쓰고 열린 창·테마 상자를 다시 그린다
+	@ExecSpace("Client")
+	method void SendProfile(string theme, string icon, string owned, string userId)
+		self.MyTheme = theme
+		self.MyIcon = icon
+		self.MyOwned = self:ParseOwned(owned)
+		self.MyOwnedCount = self:CountOwned(self.MyOwned)
+		_RtsHudLogic:RefreshThemeBox()
+		local k = _RtsPopupLogic.Kind
+		if k == "theme" or k == "icon" or k == "iconinfo" then _RtsPopupLogic:Open(k) end
+	end
+
+	-- 서버 → 그 유저: 아이콘 획득 팝업(다른 창이 있으면 대기 — FlushGot)
+	@ExecSpace("Client")
+	method void ShowIconGot(string monsterId, string userId)
+		self.GotQueue[#self.GotQueue + 1] = monsterId
+		self:FlushGot()
+	end
+
+	-- 대기 중인 획득 팝업을 연다. 보스 3택1·다른 획득 팝업이 떠 있으면 그 창이 닫힐 때(RtsPopupLogic.Close) 다시 부른다
+	@ExecSpace("ClientOnly")
+	method void FlushGot()
+		if #self.GotQueue == 0 then return end
+		local k = _RtsPopupLogic.Kind
+		if k == "pick" or k == "iconget" then return end
+		self.GotIcon = self.GotQueue[1]
+		table.remove(self.GotQueue, 1)
+		_RtsPopupLogic:Open("iconget")
+	end
+
+	method boolean IsOwned(string id)
+		return self.MyOwned[id] ~= nil
+	end
+
+	-- 획득일 "2026-09-25"(보는 사람 현지 날짜, 없거나 기본 = "") — 저장 값은 UTC ms(DateTime.UtcNow.Elapsed)
+	@ExecSpace("ClientOnly")
+	method string OwnedDate(string id)
+		local at = self.MyOwned[id]
+		if at == nil or at <= 0 then return "" end
+		local ok, text = pcall(function()
+			local d = _UtilLogic:GetLocalTimeFrom(DateTime(math.floor(at)))
+			return string.format("%04d-%02d-%02d", d.Year, d.Month, d.Day)
+		end)
+		if ok and text ~= nil then return text end
+		return ""
+	end
+
+	-- 아이콘 순서: 일반(M) 번호순 → 보스(B) 번호순
+	method table IconIds()
+		if #self.IconIdCache > 0 then return self.IconIdCache end
+		local ms = {}
+		local bs = {}
+		for id, _m in pairs(_RtsStageTableLogic.Monsters) do
+			if string.sub(id, 1, 1) == "B" then bs[#bs + 1] = id else ms[#ms + 1] = id end
+		end
+		table.sort(ms)
+		table.sort(bs)
+		local out = {}
+		for i = 1, #ms do out[#out + 1] = ms[i] end
+		for i = 1, #bs do out[#out + 1] = bs[i] end
+		self.IconIdCache = out
+		return out
+	end
+
+	-- 그 몬스터가 처음 나오는 스테이지(없으면 nil) — 아이콘 정보의 '획득처'
+	method any FirstStageOf(string id)
+		local list = _RtsStageTableLogic.Stages
+		for i = 1, #list do
+			local s = list[i]
+			for j = 1, #s.mobs do
+				if s.mobs[j] == id then return s end
+			end
+		end
+		return nil
+	end
+
+	-- "매우어려움 · 12라운드 · 빅토리아 - 개미굴"
+	method string WhereText(string id)
+		local s = self:FirstStageOf(id)
+		local diff = _RtsDifficultyLogic:GetNames()[self.DropDiff] or "매우어려움"
+		if s == nil then return diff end
+		return diff .. " · " .. _RtsHudLogic:Int(s.no) .. "라운드 · " .. _RtsStageTableLogic:FullName(s)
+	end
+
+end

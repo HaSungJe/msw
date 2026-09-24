@@ -520,9 +520,11 @@ def vis_gm(mid, sc):
 
 def monster_geom(mid, m):
     boss = mid.startswith("B")
+    icon = ""
     try:
         fr = clip_frames(m["walk"])
-        w, h, ox, oy = max((sprite_geom(g) for g, _ in fr[:3]), key=lambda x: x[1])
+        # 아이콘(2026-09-25 — 몬스터 아이콘 수집) = 크기 기준으로 쓴 그 프레임(첫 3프레임 중 가장 높은 것)의 스프라이트 → 표 box로 가운데 맞춤이 그대로 맞는다
+        icon, (w, h, ox, oy) = max(((g, sprite_geom(g)) for g, _ in fr[:3]), key=lambda x: x[1][1])
     except Exception:
         w, h, ox, oy = (300, 300, 150, 0) if boss else (40, 30, 20, 0)
     try:
@@ -545,7 +547,7 @@ def monster_geom(mid, m):
         if mid in ARC_MOBS and REF_GM[0]:
             gm = vis_gm(mid, sc)
             if gm and gm < REF_GM[0]: sc *= REF_GM[0] * MOB_VIS_UP / gm
-    return {"scale": round(sc, 3), "boxW": round(W * 0.7, 3), "boxH": round(H * 0.8, 3), "boxX": round((w / 2 - ox) / 100, 3),
+    return {"icon": icon, "scale": round(sc, 3), "boxW": round(W * 0.7, 3), "boxH": round(H * 0.8, 3), "boxX": round((w / 2 - ox) / 100, 3),
             "boxY": round((h / 2 - oy) / 100, 3), "barY": round((h - oy) / 100 * sc + 0.15, 3), "dieSec": round(min(max(die_sec, 0.3), 3.0), 2)}
 
 # 게임 안 표시 이름(2026-09-23 사용자 "검은마법사 2·3·4페이즈 텍스트 제거, 검은마법사라고만") — monster.md 이름은 그대로(페이즈 구분용)
@@ -656,6 +658,7 @@ for mid, m in MON.items():
     if mid in BOSS_PARTS:
         parts = ", parts = { " + ", ".join("{ walk = %s, die = %s, order = %d }" % (lstr(pw), lstr(pd), po) for pw, pd, po in BOSS_PARTS[mid]) + " }"
     if mid in MOB_SIZE: parts += ", size = " + lnum(MOB_SIZE[mid])
+    if m.get("icon"): parts += ", icon = " + lstr(m["icon"])
     L.append("\t\t\t%s = { name = %s, walk = %s, die = %s, dieSound = %s, dieSec = %s, scale = %s, boxW = %s, boxH = %s, boxX = %s, boxY = %s, barY = %s%s }," % (
         mid, lstr(DISPLAY_NAME.get(mid, m["name"])), lstr(m["walk"]), lstr(m["die"]), lstr(m["dieSound"]), lnum(m["dieSec"]), lnum(m["scale"]),
         lnum(m["boxW"]), lnum(m["boxH"]), lnum(m["boxX"]), lnum(m["boxY"]), lnum(m["barY"]), parts))
