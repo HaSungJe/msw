@@ -587,7 +587,7 @@ script RtsPopupLogic extends Logic
 		local yes = H:SpawnPanel("RtsRsConfirmYes", body, Vector2(0.5, 1), Vector2(1, 1), Vector2(-10, by), Vector2(bw, bh),
 			self:Mix(H:ColGold(), 0.25), H:ColGold(), 1.5)
 		H:SpawnLabel("RtsRsConfirmYesText", yes, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2(0, 0), Vector2(bw - 8, bh - 6),
-			"예 · " .. yesText, Color(1, 0.95, 0.8, 1), 17, TextAlignmentType.MiddleCenter, true)
+			yesText, Color(1, 0.95, 0.8, 1), 17, TextAlignmentType.MiddleCenter, true)
 		local yc = H:SpawnClick("RtsRsConfirmYesClick", yes)
 		yc:ConnectEvent(ButtonClickEvent, function(event)
 			self:Close()

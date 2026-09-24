@@ -120,7 +120,8 @@ def capacity(run, s, G):
     guard = 0
     if pal: guard = 20 if lvs[id(pal)] >= 40 else (10 if lvs[id(pal)] >= 10 else 0)
     t1 = run.units[0]
-    armor = min(len(t1.augs) + (1 if t1.prism else 0), 30)
+    # 방어구 부수기는 1티어가 자기 직업 프리즘을 가졌을 때만(2026-09-24 게임과 같게 — RtsJobTableLogic.ArmorBreakFor)
+    armor = min(len(t1.augs) + 1, 30) if t1.prism else 0
     pray = 1.1 if (bis and lvs[id(bis)] >= 30) else 1.0
     vuln = 1.2 if (bis and bis.prism) else 1.0
     holy = 1.4 if (pal and pal.prism) else 1.0

@@ -6,6 +6,12 @@ script RtsMonsterInfoLogic extends Logic
 
 	property Entity Panel = nil
 
+	-- 정보 창 안쪽(디버프 줄을 여기에 붙인다)
+	property Entity PanelIn = nil
+
+	-- 정보 창 높이(2026-09-24 사용자 "네모 박스 높이를 키워서 아래에 디버프" — 118 → 160, 아래 40px = 디버프 줄)
+	property number PanelH = 160
+
 	property Entity Target = nil
 
 	property Entity NameText = nil
@@ -34,8 +40,8 @@ script RtsMonsterInfoLogic extends Logic
 
 	property number LeftX = 118
 
-	-- 디버프(2026-09-24 사용자 "이동속도 감소 같은 디버프도 아이콘으로 — 마우스를 올리면 설명과 남은 시간" → 같은 날 "몬스터 우측에 디버프 정보 칸"): 정보 창 오른쪽에 붙은 칸(DebuffRow = 그 칸).
-	--   목록 = DebuffList(동기화된 FrozenUntil·ShredUntil/Pct·VulnUntil/Pct·PoisonUntil + 구역 팔라딘 가드 크러쉬). 아이콘 RUID가 없으면 색 배지 + 글자(ruid만 채우면 그림으로)
+	-- 디버프(2026-09-24 사용자 "이동속도 감소 같은 디버프도 아이콘으로 — 마우스를 올리면 설명과 남은 시간" → 같은 날 "몬스터 우측에 디버프 정보 칸" → 같은 날 "네모 박스 높이를 키워서 아래에 디버프, 마우스 오버하면 박스 우측에"): 정보 창 안 아래 줄(DebuffRow = 그 줄, 칩 = 아이콘(또는 색 띠) + 디버프 이름).
+	--   목록 = DebuffList(동기화된 FrozenUntil·ShredUntil/Pct·VulnUntil/Pct·PoisonUntil + 구역 팔라딘 가드 크러쉬·방어구 부수기). 아이콘 RUID가 없으면 색 띠(ruid만 채우면 그림으로)
 	property Entity DebuffRow = nil
 
 	property string DebuffSig = ""
@@ -50,10 +56,8 @@ script RtsMonsterInfoLogic extends Logic
 
 	property number IconSize = 36
 
-	-- 디버프 칸(2026-09-24 사용자 "몬스터 우측에 디버프 정보 칸"): 정보 창 오른쪽에 붙은 상자, 한 줄 = 아이콘 · 이름 · 효과 요약 · 남은 시간
+	-- 디버프 설명 창 폭(칩에 마우스를 올리면 정보 창 바로 오른쪽에 뜬다)
 	property number DebuffBoxW = 340
-
-	property number DebuffRowH = 30
 
 	method boolean IsOpen()
 		return self.Target ~= nil
@@ -102,11 +106,12 @@ script RtsMonsterInfoLogic extends Logic
 		if not same then H:PlayUi(H.OpenSound) end -- 창 여는 소리(2026-09-24 사용자) — 같은 몬스터 다시 그리기는 빼고
 		self.Target = target
 		local x0 = self.LeftX
-		local panel = H:SpawnPanel("RtsMonInfo", H.HudGroup, Vector2(0.5, 0), Vector2(0.5, 0), Vector2(0, 16), Vector2(x0 + self.BarW + 4 + self.PctW + 18, 118),
+		local panel = H:SpawnPanel("RtsMonInfo", H.HudGroup, Vector2(0.5, 0), Vector2(0.5, 0), Vector2(0, 16), Vector2(x0 + self.BarW + 4 + self.PctW + 18, self.PanelH),
 			Color(0.11, 0.094, 0.075, 0.95), H:ColGold(), 1.5)
 		self.Panel = panel.Parent
+		self.PanelIn = panel
 		-- 아이콘: 어두운 칸 + 몬스터 이동 애니메이션(표 walk 클립, 여러 부위 보스는 몸통)
-		local slot = H:SpawnUI("model://uisprite", "RtsMonInfoIconBack", panel, Vector2(0, 0.5), Vector2(0, 0.5), Vector2(12, 0), Vector2(self.IconW, self.IconW))
+		local slot = H:SpawnUI("model://uisprite", "RtsMonInfoIconBack", panel, Vector2(0, 1), Vector2(0, 1), Vector2(12, -10), Vector2(self.IconW, self.IconW))
 		slot.SpriteGUIRendererComponent.ImageRUID = DataRef(H.WhiteRUID)
 		slot.SpriteGUIRendererComponent.Color = Color(0.2, 0.17, 0.15, 1)
 		-- 칸 밖으로 삐져나오는 걷기 클립(초록버섯 등 — 프레임이 크거나 기준점이 치우친 것)을 칸 안으로 자른다(2026-09-24 사용자 "칸 밖으로 빠져나옴")
@@ -162,6 +167,7 @@ script RtsMonsterInfoLogic extends Logic
 		self.HpPctText = nil
 		self.InfoText = nil
 		self.DebuffRow = nil
+		self.PanelIn = nil
 		self.DebuffSig = ""
 		self.DebuffTimes = {}
 		self.Tip = nil
@@ -204,33 +210,33 @@ script RtsMonsterInfoLogic extends Logic
 		self:RefreshDebuffs(m)
 	end
 
-	-- 지금 걸린 디버프: { id, name, desc, left(남은 초, −1 = 조건이 있는 동안), ruid(아이콘 — 없으면 ""), color(배지), glyph(배지 글자) }
+	-- 지금 걸린 디버프: { id, name, desc, left(남은 초, −1 = 조건이 있는 동안), ruid(아이콘 — 없으면 ""), color(칩 왼쪽 색 띠 — 아이콘이 없을 때) }
 	@ExecSpace("ClientOnly")
 	method table DebuffList(any m)
 		local H = _RtsHudLogic
 		local now = _UtilLogic.ServerElapsedSeconds
 		local out = {}
 		if not m.IsBoss and m.FrozenUntil > now then
-			out[#out + 1] = { id = "freeze", name = "빙결", desc = "블리자드에 얼어 이동속도가 50% 감소한다.", short = "이속 −50%", left = m.FrozenUntil - now, ruid = "", color = Color(0.45, 0.78, 1, 1), glyph = "빙" }
+			out[#out + 1] = { id = "freeze", name = "빙결", desc = "블리자드에 얼어 이동속도가 50% 감소한다.", short = "이속 −50%", left = m.FrozenUntil - now, ruid = "", color = Color(0.45, 0.78, 1, 1) }
 		end
 		if m.ShredUntil > now and m.ShredPct > 0 then
-			out[#out + 1] = { id = "shred", name = "방어율 감소", desc = "블리자드 템페스트: 방어율이 " .. H:Int(m.ShredPct) .. "%p 감소한다.", short = "방어 −" .. H:Int(m.ShredPct) .. "%p", left = m.ShredUntil - now, ruid = "", color = Color(0.3, 0.55, 0.95, 1), glyph = "파" }
+			out[#out + 1] = { id = "shred", name = "방어율 감소", desc = "블리자드 템페스트: 방어율이 " .. H:Int(m.ShredPct) .. "%p 감소한다.", short = "방어 −" .. H:Int(m.ShredPct) .. "%p", left = m.ShredUntil - now, ruid = "", color = Color(0.3, 0.55, 0.95, 1) }
 		end
 		if m.VulnUntil > now and m.VulnPct > 0 then
-			out[#out + 1] = { id = "vuln", name = "받는 데미지 증가", desc = "디바인 퍼니시먼트: 받는 데미지가 " .. H:Int(m.VulnPct) .. "% 증가한다.", short = "피해 +" .. H:Int(m.VulnPct) .. "%", left = m.VulnUntil - now, ruid = "", color = Color(0.95, 0.8, 0.35, 1), glyph = "약" }
+			out[#out + 1] = { id = "vuln", name = "받는 데미지 증가", desc = "디바인 퍼니시먼트: 받는 데미지가 " .. H:Int(m.VulnPct) .. "% 증가한다.", short = "피해 +" .. H:Int(m.VulnPct) .. "%", left = m.VulnUntil - now, ruid = "", color = Color(0.95, 0.8, 0.35, 1) }
 		end
 		if m.PoisonUntil > now then
-			out[#out + 1] = { id = "poison", name = "중독", desc = "포이즌 리전: 맹독 지대 안에서 2초마다 지속 피해를 입는다.", short = "지속 피해", left = m.PoisonUntil - now, ruid = "", color = Color(0.45, 0.8, 0.35, 1), glyph = "독" }
+			out[#out + 1] = { id = "poison", name = "중독", desc = "포이즌 리전: 맹독 지대 안에서 2초마다 지속 피해를 입는다.", short = "지속 피해", left = m.PoisonUntil - now, ruid = "", color = Color(0.45, 0.8, 0.35, 1) }
 		end
 		if m.Defense > 0 then
 			local g = self:GuardCrushOf(m.Zone)
 			if g > 0 then
-				out[#out + 1] = { id = "guard", name = "가드 크러쉬", desc = "팔라딘이 구역에 있는 동안 방어율이 " .. H:Int(g) .. "%p 감소한다.", short = "방어 −" .. H:Int(g) .. "%p", left = -1, ruid = "b28058e366624ed0beb099fb67831526", color = Color(1, 1, 1, 1), glyph = "" }
+				out[#out + 1] = { id = "guard", name = "가드 크러쉬", desc = "팔라딘이 구역에 있는 동안 방어율이 " .. H:Int(g) .. "%p 감소한다.", short = "방어 −" .. H:Int(g) .. "%p", left = -1, ruid = "b28058e366624ed0beb099fb67831526", color = Color(1, 1, 1, 1) }
 			end
 			-- 방어구 부수기(2026-09-24 사용자 — 1티어 증강 개수만큼 보스 약화, 아이콘 1f4eea78…)
 			local a = self:ArmorBreakOf(m.Zone)
 			if a > 0 then
-				out[#out + 1] = { id = "armorbreak", name = "방어구 부수기", desc = "1티어 유닛의 증강 1개마다 보스 방어율이 1%p 감소한다(최대 " .. H:Int(_RtsJobTableLogic.ArmorBreakCap) .. "%p). 지금 " .. H:Int(a) .. "%p 감소.", short = "방어 −" .. H:Int(a) .. "%p", left = -1, ruid = "1f4eea783bbe4785b3ba82334f211aaa", color = Color(1, 1, 1, 1), glyph = "" }
+				out[#out + 1] = { id = "armorbreak", name = "방어구 부수기", desc = "1티어 유닛의 증강 1개마다 보스 방어율이 1%p 감소한다(최대 " .. H:Int(_RtsJobTableLogic.ArmorBreakCap) .. "%p). 지금 " .. H:Int(a) .. "%p 감소.", short = "방어 −" .. H:Int(a) .. "%p", left = -1, ruid = "1f4eea783bbe4785b3ba82334f211aaa", color = Color(1, 1, 1, 1) }
 			end
 		end
 		return out
@@ -264,72 +270,88 @@ script RtsMonsterInfoLogic extends Logic
 		return v
 	end
 
-	-- 디버프 칸: 목록(id 순서)이 바뀌면 줄을 다시 만들고, 매 갱신마다 요약·남은 시간·설명 글자만 바꾼다
-	--   칸 = 정보 창 오른쪽 아래에 붙은 상자(줄 수만큼 위로 자람). 줄에 마우스를 올리면 칸 위쪽에 긴 설명(설명 창은 마우스를 받지 않아 깜빡이지 않는다)
+	-- 디버프 줄: 정보 창 안 아래쪽(이름·체력·정보 줄 밑). 디버프마다 칩 = 아이콘 + 효과 요약(방어 −2%p). 목록(id 순서)이 바뀌면 다시 만들고, 매 갱신마다 요약·설명 글자만 바꾼다.
+	--   칩에 마우스를 올리면 정보 창 바로 오른쪽에 이름 · 설명 · 남은 시간(설명 창은 마우스를 받지 않는다 — 깜빡임 방지)
 	@ExecSpace("ClientOnly")
 	method void RefreshDebuffs(any m)
-		if self.Panel == nil or not isvalid(self.Panel) then return end
+		if self.Panel == nil or not isvalid(self.Panel) or self.PanelIn == nil or not isvalid(self.PanelIn) then return end
 		local H = _RtsHudLogic
 		local list = self:DebuffList(m)
 		local sig = ""
 		for i = 1, #list do sig = sig .. list[i].id .. ";" end
-		if sig ~= self.DebuffSig then
+		if sig ~= self.DebuffSig or self.DebuffRow == nil then
 			self.DebuffSig = sig
 			self:HideTip()
 			if self.DebuffRow ~= nil and isvalid(self.DebuffRow) then self.DebuffRow:Destroy() end
-			self.DebuffRow = nil
 			self.DebuffTimes = {}
-			if #list > 0 then
-				local n = #list
-				local W = self.DebuffBoxW
-				local rh = self.DebuffRowH
-				local box = H:SpawnPanel("RtsMonInfoDebuffs", self.Panel, Vector2(1, 0), Vector2(0, 0), Vector2(8, 0), Vector2(W, 12 + n * rh),
-					Color(0.11, 0.094, 0.075, 0.95), H:ColGold(), 1.5)
-				self.DebuffRow = box.Parent
-				for i = 1, n do
-					local d = list[i]
-					local row = H:SpawnUI("model://uisprite", "RtsMonInfoDebuffRow" .. d.id, box, Vector2(0, 1), Vector2(0, 1), Vector2(4, -6 - (i - 1) * rh), Vector2(W - 11, rh))
-					row.SpriteGUIRendererComponent.Color = Color(1, 1, 1, 0)
-					local icon = H:SpawnUI("model://uisprite", "RtsMonInfoDebuffIcon", row, Vector2(0, 0.5), Vector2(0, 0.5), Vector2(4, 0), Vector2(26, 26))
+			-- 줄 = 창 폭 전체(초상 아래까지), 위에 가는 구분선
+			local avail = self.LeftX + self.BarW + 4 + self.PctW + 18 - 24
+			local row = H:SpawnUI("model://uisprite", "RtsMonInfoDebuffs", self.PanelIn, Vector2(0, 0), Vector2(0, 0), Vector2(12, 8), Vector2(avail, 34))
+			row.SpriteGUIRendererComponent.Color = Color(1, 1, 1, 0)
+			row.SpriteGUIRendererComponent.RaycastTarget = false
+			self.DebuffRow = row
+			local line = H:SpawnUI("model://uisprite", "RtsMonInfoDebuffLine", row, Vector2(0, 1), Vector2(0, 0), Vector2(0, 5), Vector2(avail, 1.5))
+			line.SpriteGUIRendererComponent.ImageRUID = DataRef(H.WhiteRUID)
+			line.SpriteGUIRendererComponent.Color = H:ColBorderSoft()
+			line.SpriteGUIRendererComponent.RaycastTarget = false
+			local n = #list
+			if n == 0 then
+				local none = H:SpawnLabel("RtsMonInfoDebuffNone", row, Vector2(0, 0.5), Vector2(0, 0.5), Vector2(4, 0), Vector2(avail - 8, 26), "걸린 디버프 없음", H:ColMuted(), 14, TextAlignmentType.MiddleLeft, false)
+				none.SpriteGUIRendererComponent.RaycastTarget = false
+			end
+			-- 칩 = 디버프 이름 그대로(2026-09-24 사용자 "빙/파/약/독 뭐냐 — 빙결이면 빙결, 중독이면 중독"). 아이콘 그림이 있으면 그림 + 이름, 없으면 왼쪽 색 띠 + 이름.
+			--   효과 수치·남은 시간은 설명 창(마우스 오버). 칩 폭 = 이름 길이(글자 × 15px), 합이 줄보다 길면 같은 비율로 줄인다(라벨 BestFit이 글자를 맞춘다)
+			local ws = {}
+			local sum = 0
+			for i = 1, n do
+				local d = list[i]
+				local _, cont = string.gsub(d.name, "[\128-\191]", "")
+				local chars = string.len(d.name) - cont
+				local lead = 14
+				if d.ruid ~= "" then lead = 34 end
+				ws[i] = lead + chars * 15 + 12
+				sum = sum + ws[i] + 6
+			end
+			local k = 1
+			if sum > avail then k = avail / sum end
+			local x = 0
+			for i = 1, n do
+				local d = list[i]
+				local w = math.floor(ws[i] * k)
+				local lead = 14
+				if d.ruid ~= "" then lead = 34 end
+				local chip = H:SpawnPanel("RtsMonInfoDebuff" .. d.id, row, Vector2(0, 0.5), Vector2(0, 0.5), Vector2(x, 0), Vector2(w, 32),
+					Color(0.16, 0.135, 0.11, 1), H:ColBorderSoft(), 1)
+				x = x + w + math.floor(6 * k)
+				local outer = chip.Parent
+				chip.SpriteGUIRendererComponent.RaycastTarget = false
+				if d.ruid ~= "" then
+					local icon = H:SpawnUI("model://uisprite", "RtsMonInfoDebuffIcon", chip, Vector2(0, 0.5), Vector2(0, 0.5), Vector2(4, 0), Vector2(24, 24))
 					local r = icon.SpriteGUIRendererComponent
 					r.RaycastTarget = false
-					if d.ruid ~= "" then
-						r.ImageRUID = DataRef(d.ruid)
-						r.PreserveSprite = PreserveSpriteType.AspectOnly
-						r.Color = Color(1, 1, 1, 1)
-					else
-						r.Color = d.color
-						local g = H:SpawnLabel("RtsMonInfoDebuffGlyph", icon, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2(0, 2), Vector2(26, 26), d.glyph, Color(0.1, 0.08, 0.06, 1), 14, TextAlignmentType.MiddleCenter, true)
-						g.SpriteGUIRendererComponent.RaycastTarget = false
-					end
-					local nm = H:SpawnLabel("RtsMonInfoDebuffName", row, Vector2(0, 0.5), Vector2(0, 0.5), Vector2(38, 0), Vector2(104, 26), d.name, H:ColInk(), 14, TextAlignmentType.MiddleLeft, true)
-					nm.SpriteGUIRendererComponent.RaycastTarget = false
-					nm.TextComponent.Overflow = OverflowType.Truncate
-					local sh = H:SpawnLabel("RtsMonInfoDebuffShort", row, Vector2(0, 0.5), Vector2(0, 0.5), Vector2(146, 0), Vector2(120, 26), d.short or "", H:ColGold(), 14, TextAlignmentType.MiddleLeft, true)
-					sh.SpriteGUIRendererComponent.RaycastTarget = false
-					sh.TextComponent.Overflow = OverflowType.Truncate
-					local tl = H:SpawnLabel("RtsMonInfoDebuffTime", row, Vector2(1, 0.5), Vector2(1, 0.5), Vector2(-6, 0), Vector2(60, 26), "", H:ColMuted(), 13, TextAlignmentType.MiddleRight, false)
-					tl.SpriteGUIRendererComponent.RaycastTarget = false
-					self.DebuffTimes[d.id] = { time = tl, short = sh }
-					-- 줄 전체가 마우스를 받는다(자식들은 받지 않음 — 들어가고 나갈 때 깜빡이던 원인)
-					local tr = row.UITouchReceiveComponent
-					if tr == nil then tr = row:AddComponent("UITouchReceiveComponent") end
-					local id = d.id
-					row:ConnectEvent(UITouchEnterEvent, function(ev) self:ShowTip(id, 0) end)
-					row:ConnectEvent(UITouchExitEvent, function(ev) if self.TipId == id then self:HideTip() end end)
+					-- 칸 크기에 맞춰 늘려 그린다(AspectOnly는 그림의 기준점을 따라 한쪽으로 치우쳤다)
+					r.PreserveSprite = PreserveSpriteType.None
+					r.ImageRUID = DataRef(d.ruid)
+					r.Color = Color(1, 1, 1, 1)
+				else
+					local bar = H:SpawnUI("model://uisprite", "RtsMonInfoDebuffBar", chip, Vector2(0, 0.5), Vector2(0, 0.5), Vector2(4, 0), Vector2(4, 20))
+					bar.SpriteGUIRendererComponent.ImageRUID = DataRef(H.WhiteRUID)
+					bar.SpriteGUIRendererComponent.Color = d.color
+					bar.SpriteGUIRendererComponent.RaycastTarget = false
 				end
+				local sh = H:SpawnLabel("RtsMonInfoDebuffName", chip, Vector2(0, 0.5), Vector2(0, 0.5), Vector2(math.floor(lead * k), 0), Vector2(math.max(10, w - math.floor(lead * k) - 6), 26), d.name, H:ColInk(), 14, TextAlignmentType.MiddleLeft, true)
+				sh.SpriteGUIRendererComponent.RaycastTarget = false
+				self.DebuffTimes[d.id] = { short = sh }
+				-- 칩 전체(바깥 테두리)가 마우스를 받는다
+				local tr = outer.UITouchReceiveComponent
+				if tr == nil then tr = outer:AddComponent("UITouchReceiveComponent") end
+				local id = d.id
+				outer:ConnectEvent(UITouchEnterEvent, function(ev) self:ShowTip(id, 0) end)
+				outer:ConnectEvent(UITouchExitEvent, function(ev) if self.TipId == id then self:HideTip() end end)
 			end
 		end
 		for i = 1, #list do
 			local d = list[i]
-			local rowUi = self.DebuffTimes[d.id]
-			if rowUi ~= nil then
-				local t = "유지"
-				if d.left >= 0 then t = string.format("%.1f", d.left) .. "초" end
-				if rowUi.time ~= nil and isvalid(rowUi.time) and rowUi.time.TextComponent.Text ~= t then rowUi.time.TextComponent.Text = t end
-				local sh = d.short or ""
-				if rowUi.short ~= nil and isvalid(rowUi.short) and rowUi.short.TextComponent.Text ~= sh then rowUi.short.TextComponent.Text = sh end
-			end
 			if self.TipId == d.id and self.TipText ~= nil and isvalid(self.TipText) then
 				local txt = self:TipBody(d)
 				if self.TipText.TextComponent.Text ~= txt then self.TipText.TextComponent.Text = txt end
@@ -345,11 +367,11 @@ script RtsMonsterInfoLogic extends Logic
 		return "<b>" .. d.name .. "</b>\n" .. d.desc .. "\n<color=#e0b95a>" .. left .. "</color>"
 	end
 
-	-- 긴 설명 창: 디버프 칸 바로 위(칸과 겹치지 않게), 폭 = 칸 폭, 높이 = 설명 길이에 맞춤. 마우스를 받지 않는다
+	-- 긴 설명 창: 정보 창 바로 오른쪽(아래 맞춤, 폭 DebuffBoxW), 높이 = 설명 길이에 맞춤. 마우스를 받지 않는다
 	@ExecSpace("ClientOnly")
 	method void ShowTip(string id, number x)
 		self:HideTip()
-		if self.DebuffRow == nil or not isvalid(self.DebuffRow) or self.Target == nil or not isvalid(self.Target) then return end
+		if self.Panel == nil or not isvalid(self.Panel) or self.Target == nil or not isvalid(self.Target) then return end
 		local list = self:DebuffList(self.Target.RtsMonsterComponent)
 		local d = nil
 		for i = 1, #list do
@@ -358,16 +380,16 @@ script RtsMonsterInfoLogic extends Logic
 		if d == nil then return end
 		local H = _RtsHudLogic
 		local W = self.DebuffBoxW
-		-- 한 줄 약 21자(14pt, 폭 W−24) — 한글 3바이트 기준 어림, 넉넉히
+		-- 한 줄 약 18자(16pt, 폭 W−24) — 한글 3바이트 기준 어림, 넉넉히(글이 넘치면 라벨 BestFit이 줄인다)
 		local chars = math.ceil(string.len(d.desc) / 2.6)
-		local lines = math.max(1, math.ceil(chars / 21))
-		local h = 14 + 22 + lines * 20 + 22
-		local tip = H:SpawnPanel("RtsMonInfoTip", self.DebuffRow, Vector2(0, 1), Vector2(0, 0), Vector2(0, 6), Vector2(W, h), Color(0.11, 0.094, 0.075, 0.97), H:ColGold(), 1.5)
+		local lines = math.max(1, math.ceil(chars / 18))
+		local h = math.max(self.PanelH, 16 + 26 + lines * 23 + 26)
+		local tip = H:SpawnPanel("RtsMonInfoTip", self.Panel, Vector2(1, 0), Vector2(0, 0), Vector2(8, 0), Vector2(W, h), Color(0.11, 0.094, 0.075, 0.97), H:ColGold(), 1.5)
 		self.Tip = tip.Parent
 		self.Tip.SpriteGUIRendererComponent.RaycastTarget = false
 		tip.SpriteGUIRendererComponent.RaycastTarget = false
 		self.TipId = id
-		self.TipText = H:SpawnLabel("RtsMonInfoTipText", tip, Vector2(0, 0), Vector2(0, 0), Vector2(12, 6), Vector2(W - 24, h - 12), self:TipBody(d), H:ColInk(), 14, TextAlignmentType.UpperLeft, false)
+		self.TipText = H:SpawnLabel("RtsMonInfoTipText", tip, Vector2(0, 1), Vector2(0, 1), Vector2(12, -10), Vector2(W - 24, h - 20), self:TipBody(d), H:ColInk(), 16, TextAlignmentType.UpperLeft, false)
 		self.TipText.TextComponent.IsRichText = true
 		self.TipText.SpriteGUIRendererComponent.RaycastTarget = false
 	end
