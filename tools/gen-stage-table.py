@@ -550,6 +550,41 @@ def monster_geom(mid, m):
 
 # 게임 안 표시 이름(2026-09-23 사용자 "검은마법사 2·3·4페이즈 텍스트 제거, 검은마법사라고만") — monster.md 이름은 그대로(페이즈 구분용)
 DISPLAY_NAME = {"B16": "검은마법사", "B17": "검은마법사", "B18": "검은마법사"}
+# 일반 몬스터 크기 배율(엔티티 스케일 = scale × size — RtsWaveLogic.SpawnMonsterEntity가 곱하고, 체력바·데미지 숫자 높이도 × size).
+#   2026-09-25 사용자 "리프레 켄타우로스부터 2배 · 시간의 신전 3배 · 미래의 헤네시스 2배 · 황혼의 페리온 2배"
+#   → 같은 날 크기 점검: "개조당한 안드로이드 수송차 2.5배, 개조당한 레이저 안드로이드·수리로봇·미사일 안드로이드·미사일 안드로이드 블루 1.5배"
+MOB_SIZE = {}
+for _n in range(79, 92): MOB_SIZE["M%03d" % _n] = 2     # 리프레 붉은 켄타우로스 ~ 죽은 용의 둥지
+for _n in range(92, 98): MOB_SIZE["M%03d" % _n] = 3     # 시간의 신전
+for _n in range(98, 109): MOB_SIZE["M%03d" % _n] = 2    # 미래의 헤네시스 · 황혼의 페리온
+MOB_SIZE["M119"] = 2.5                                   # 개조당한 안드로이드 수송차
+for _n in range(120, 124): MOB_SIZE["M%03d" % _n] = 1.5  # 개조당한 레이저 안드로이드 · 수리로봇 · 미사일 안드로이드 · 미사일 안드로이드 블루
+# 같은 날 F3 점검: 타락마족 검병·도끼병 1.2 · 방패병은 검병·도끼병과 같은 크기(실제 배율 2.18·2.11 → 1.345 × 1.6 = 2.15) · 늑대기수 1.5,
+#   분노·슬픔·즐거움·암석·화염·강인한 영혼의 에르다스 2 · 안식의 에르다스 3 · 아르마 2 · 아르마의 부하 1.2 · 파인디어·큰뿔 파인디어·유나나 1.3
+MOB_SIZE.update({"M129": 1.2, "M130": 1.2, "M131": 1.6, "M132": 1.5, "M140": 3, "M141": 2, "M142": 1.2, "M143": 1.3, "M144": 1.3, "M145": 1.3})
+for _n in range(134, 140): MOB_SIZE["M%03d" % _n] = 2    # 분노 · 슬픔 · 즐거움 · 암석 · 화염 · 강인한 영혼의 에르다스
+# F3 다시 보기: 늑대기수 "현재 기준 1.3배"(1.5 × 1.3 = 1.95) · 기쁨의 에르다스 2 · 파인디어·큰뿔 파인디어 한 번 더 1.3배(1.3 × 1.3 = 1.69)
+MOB_SIZE.update({"M132": 1.95, "M133": 2, "M143": 1.69, "M144": 1.69})
+MOB_SIZE["M132"] = 2.24   # 늑대기수 "마지막으로 1.15배"(1.95 × 1.15)
+# F4 점검: 램나나 ~ 종이봉투 뒷골목주민 1.3, 크릴라 · 족장 크릴라 · 버샤크 · 족장 버샤크 2
+for _n in range(146, 164): MOB_SIZE["M%03d" % _n] = 1.3
+MOB_SIZE.update({"M155": 2, "M156": 2, "M157": 2, "M158": 2})
+# F5 점검: 나무판자 뒷골목주민 · 성난·광기의 무도회주민 · 춤추는 빨간구두 1.3, 약화된 클리너 · 클리너 2, 가고일 2종 ~ 비탄의 정령 2
+for _n in range(164, 182): MOB_SIZE["M%03d" % _n] = 2
+MOB_SIZE.update({"M164": 1.3, "M165": 1.3, "M166": 1.3, "M168": 1.3})
+# F6 점검: 절망의 정령 2 · 기억속의 제네로이드 A·B형 ~ 강한 형님 1.3, 푸른 그림자 ~ 의식에 휘말린 망치병 2.3,
+#   의식에 휘말린 마법사·궁병 2.3 · 아투인 · 아투스 · 벨라리온 · 벨라리스 2
+MOB_SIZE.update({"M182": 2, "M183": 1.3, "M184": 1.3, "M185": 1.3, "M186": 1.3, "M187": 1.3})
+for _n in range(188, 196): MOB_SIZE["M%03d" % _n] = 2.3
+for _n in range(196, 200): MOB_SIZE["M%03d" % _n] = 2
+# F7 점검: 아라냐 ~ 절망의 칼날 전부 2
+for _n in range(200, 218): MOB_SIZE["M%03d" % _n] = 2
+# F8 점검: 침묵의 기사 ~ 어센시온 전부 2
+for _n in range(218, 230): MOB_SIZE["M%03d" % _n] = 2
+for _n in range(225, 230): MOB_SIZE["M%03d" % _n] = 2.6  # 안세스티온 · 트랜센디온 · 포어베리온 · 엠브리온 · 어센시온 "여기서 1.3배 추가"(2 × 1.3)
+# 표시 테마(게임 안 "지역 - 맵" · monster.md 라운드 표)만 바꾼다 — 체력 압박·아케인 구분(THEMES 순번 t)은 그대로(2026-09-25 사용자 "황혼의 페리온"):
+#   미래의 헤네시스 뒤쪽 4개 맵(인적이 끊긴 남쪽 길 ~ 원혼의 땅)은 원작 황혼의 페리온 맵
+DISPLAY_THEME = {50: "황혼의 페리온", 51: "황혼의 페리온", 52: "황혼의 페리온", 53: "황혼의 페리온"}
 REF_GM[0] = vis_gm(MOB_VIS_REF, monster_geom(MOB_VIS_REF, dict(MON[MOB_VIS_REF]))["scale"])
 for mid, m in MON.items():
     if not m["walk"]:
@@ -613,13 +648,14 @@ L = ["\t-- BEGIN GENERATED", "\t-- tools/gen-stage-table.py가 생성 — 손으
 for s in ST:
     d = BOSS_DEF_AT.get(s["no"], BOSS_DEF) if s["kind"] == "boss" else (mob_def(s["no"]) if s["kind"] == "mob" else 0)
     L.append("\t\t\t{ no = %d, tag = %s, name = %s, kind = %s, theme = %s, bgm = %s, sec = %d, hp = %d, meso = %d, special = %s, def = %d, mobs = { %s } }," % (
-        s["no"], lstr(s["tag"]), lstr(s["name"]), lstr(s["kind"]), lstr(s["theme"]), lstr(BGM_RUID.get(s["bgm"], "")), s["sec"], s["hp"], s["meso"],
+        s["no"], lstr(s["tag"]), lstr(s["name"]), lstr(s["kind"]), lstr(DISPLAY_THEME.get(s["no"], s["theme"])), lstr(BGM_RUID.get(s["bgm"], "")), s["sec"], s["hp"], s["meso"],
         "true" if s["special"] else "false", d, ", ".join(lstr(x) for x in s["mobs"])))
 L.append("\t\t}"); L.append("\t\tself.Monsters = {")
 for mid, m in MON.items():
     parts = ""
     if mid in BOSS_PARTS:
         parts = ", parts = { " + ", ".join("{ walk = %s, die = %s, order = %d }" % (lstr(pw), lstr(pd), po) for pw, pd, po in BOSS_PARTS[mid]) + " }"
+    if mid in MOB_SIZE: parts += ", size = " + lnum(MOB_SIZE[mid])
     L.append("\t\t\t%s = { name = %s, walk = %s, die = %s, dieSound = %s, dieSec = %s, scale = %s, boxW = %s, boxH = %s, boxX = %s, boxY = %s, barY = %s%s }," % (
         mid, lstr(DISPLAY_NAME.get(mid, m["name"])), lstr(m["walk"]), lstr(m["die"]), lstr(m["dieSound"]), lnum(m["dieSec"]), lnum(m["scale"]),
         lnum(m["boxW"]), lnum(m["boxH"]), lnum(m["boxX"]), lnum(m["boxY"]), lnum(m["barY"]), parts))
@@ -652,7 +688,7 @@ for s in ST:
     kind = "**스페셜**" if s["special"] else KIND[s["kind"]]
     if s["kind"] == "boss" and len(s["mobs"]) > 1: kind = f'보스 ×{len(s["mobs"])}'
     basis = f'한계 {s["hp"] / s["cap"] / mob_hp_mul(s["no"]):.0%} ×{mob_hp_mul(s["no"]):g}' if s["kind"] == "mob" else ((f'몬테카를로 보정(방어 {BOSS_DEF_AT.get(s["no"], BOSS_DEF)})' if s.get("late") else f'고점 {s["peak"]:,.0f}의 {s["ratio"]:.0%}') if s["kind"] == "boss" else "-")
-    T.append(f'| {s["no"]} | {s["tag"]} | {s["name"]} | {s["theme"]} | {kind} | {s["units"]} | {"-" if s["kind"] == "rest" else format(s["hp"], ",")} | {basis} | '
+    T.append(f'| {s["no"]} | {s["tag"]} | {s["name"]} | {DISPLAY_THEME.get(s["no"], s["theme"])} | {kind} | {s["units"]} | {"-" if s["kind"] == "rest" else format(s["hp"], ",")} | {basis} | '
              f'{format(s["meso"] // SPAWN, ",") if s["kind"] == "mob" else "-"} | {s["meso"]:,} | {s["cum"]:,} | {"·".join(str(v) for v in sorted(s["lv"], reverse=True))} |')
 io.open(path, "w", encoding="utf-8", newline="\n").write(head + "\n".join(T) + "\n")
 print("썼음:", os.path.relpath(LUA, ROOT), "· .info/monster.md")
