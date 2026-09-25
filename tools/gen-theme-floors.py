@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-"""테마 바닥 타일 4종(엘리니아·페리온·커닝·리스) — ChatGPT 초안(assets/design/260925-theme-presets/*-floor-256.png)을 반복 가능한 256×256 불투명 타일로 보정한다.
+"""테마 바닥 타일 4종(엘리니아·페리온·커닝·리스) — ChatGPT 초안(assets/design/themes/floors/*-floor-256.png)을 반복 가능한 256×256 불투명 타일로 보정한다.
   1) 알파 255로(초안 가장자리·전체 알파가 254 이하인 것) — 평균색 위에 합성
-  2) 대표색 쪽으로 평균을 옮김(가이드라인 docs/design/260925-theme-presets.md 표의 바닥 대표색, 이동량 SHIFT) · 대비 CONTRAST(엘리니아 큰 잎무늬는 낮춤)
+  2) 대표색 쪽으로 평균을 옮김(가이드라인 docs/design/theme-presets.md 표의 바닥 대표색, 이동량 SHIFT) · 대비 CONTRAST(엘리니아 큰 잎무늬는 낮춤)
   3) 이음새 제거: 가로 → 세로 순서로 '반 칸 돌린 사본'과 섞는다. 가중치 = 가운데 1 · 가장자리 0(sin²) — 가장자리는 돌린 사본(= 원본 가운데라 이어짐), 돌린 사본의 이음새(가운데 줄)는 원본이 덮는다
   4) 3×3 미리보기 + 가장자리 차이(좌우·상하 평균 절대차) 출력
 사용: python tools/gen-theme-floors.py [미리보기 폴더]  → assets/textures/floor-<key>.png
@@ -11,7 +11,7 @@ import numpy as np
 from PIL import Image
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-SRC = os.path.join(ROOT, "assets", "design", "260925-theme-presets")
+SRC = os.path.join(ROOT, "assets", "design", "themes", "floors")
 OUT = os.path.join(ROOT, "assets", "textures")
 PREV = sys.argv[1] if len(sys.argv) > 1 else None
 

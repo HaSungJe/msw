@@ -4,7 +4,7 @@
 > 화면 요소 전체·디자인 규칙은 `docs/ui-screens.md`, 엔진 관례는 `docs/msw-engine.md`.
 
 시각 방향 시안 5종과 원작 마을 랜드마크 근거는 `assets/theme-concepts/README.md`에 있다. `assets/theme-concepts/comparison.html`에서 한눈에 비교할 수 있다. 시안은 실제 트랙 텍스처가 아니므로 RUID로 바로 올리지 않는다.
-사용자가 2026-09-25 기본맵 5종 방향을 승인했다. 처음 만든 트랙형 썸네일은 풍경형으로 교체했다. 현재 배경·썸네일 원본과 RUID는 `assets/design/260925-theme-scenery/`, `assets/textures/README.md`를 따른다.
+사용자가 2026-09-25 기본맵 5종 방향을 승인했다. 처음 만든 트랙형 썸네일은 풍경형으로 교체했다. 현재 배경·썸네일 원본과 RUID는 `assets/design/themes/scenery/`, `assets/textures/README.md`를 따른다.
 
 ## 1. 테마는 무엇인가
 - 유저마다 **자기 구역(16×13 칸 그리드 한 판 + 좌우 여백)**의 겉모습을 고른다. 다른 사람 구역은 그 사람 테마 그대로.
@@ -28,7 +28,7 @@
 | `thumb` | 같은 마을 풍경을 줄인 썸네일 스프라이트 RUID(`""` = 없음) | 됨 — 권장 400×240(5:3). 프로필 창 카드 250×200(정사각 카드 270 안) · 좌상단 상자 배경 400×240(프로필 + 정보 합친 상자) · 유저 카드 배경 250×150(2026-09-25 — 둘 다 5:3)에 같이 쓰임 |
 | `color` | 썸네일이 없을 때 대신 칠하는 색 | 됨 |
 
-## 3. 지금 상태(2026-09-25 기본 마을 5종 디자인 적용 — `docs/design/260925-theme-presets.md`, Maker 검증 완료)
+## 3. 지금 상태(2026-09-25 기본 마을 5종 디자인 적용 — `docs/design/theme-presets.md`, Maker 검증 완료)
 
 | key | 이름 | 바닥 | 트랙 판 | 장식 | 풍경 배경 | 풍경 썸네일 |
 |---|---|---|---|---|---|---|
@@ -73,5 +73,5 @@
 | `w` · `h` | 원본 그림 px — 프로필 창 카드(250×190 안)에 비율 맞춰 넣을 때 | 그림을 바꾸면 같이 |
 | `free` | `true` = 누구나 보유. `false`면 보유 목록(`"tombs"`)에 있어야 고를 수 있다 | 됨 |
 
-지금 1종: `basic` 기본 비석 = 단풍잎 문양의 카툰풍 비석 `31d8e058…`(1199×1312, 투명 PNG). 원본은 `assets/design/260925-cartoon-tomb/basic-cartoon-source.png`. 이전 원작 묘비 `29e864c6…`는 보관한다.
+지금 1종: `basic` 기본 비석 = 단풍잎 문양의 카툰풍 비석 `31d8e058…`(1199×1312, 투명 PNG). 원본은 `assets/design/tombstone/basic-cartoon-source.png`. 이전 원작 묘비 `29e864c6…`는 보관한다.
 새 비석 = 그림 업로드(새 리소스) → `GetPresets`에 한 줄.

@@ -707,7 +707,11 @@ script RtsPopupLogic extends Logic
 		-- 왼쪽 위: 외형(기본 스킨) 150×170 — 2026-09-25 사용자 "외형 높이가 너무 높다". UI 아바타는 칸 아래쪽에 서서 칸을 캐릭터 크기에 맞게 낮춘다
 		local frame = H:SpawnPanel("RtsRiAvatarBox", body, Vector2(0, 1), Vector2(0, 1), Vector2(27, -6), Vector2(150, 170),
 			self:Mix(Color.white, 0.03), self:Mix(Color.white, 0.1), 1.5)
-		_RtsUnitPopupLogic:SpawnPreviewAt(frame, { JobId = jid }, Vector2(80, -84), Vector2(120, 150))
+		if jid == "il" then
+			_RtsUnitPopupLogic:SpawnPreviewAt(frame, { JobId = jid }, Vector2(75, -85), Vector2(140, 140))
+		else
+			_RtsUnitPopupLogic:SpawnPreviewAt(frame, { JobId = jid }, Vector2(80, -84), Vector2(120, 150))
+		end
 		H:SpawnLabel("RtsRiGroup", body, Vector2(0, 1), Vector2(0, 1), Vector2(27, -182), Vector2(150, 24),
 			T:GetJobGroup(jid), H:ColMuted(), 15, TextAlignmentType.MiddleCenter, false)
 		-- 오른쪽 위: 오각형 — 축 = 위부터 시계 방향 공격 속도 · 사거리 · 증강 효율 · 보스 · 사냥

@@ -63,6 +63,15 @@ script RtsUnitComponent extends Component
 	-- 클라: 그림자 분신 스타일 재시도 횟수(엔티티가 늦게 올 때)
 	property number ShadowTries = 0
 
+	-- 썬콜 전용 스프라이트 유닛. 아바타/코스튬 없이 프레임을 직접 재생한다.
+	property Entity MageSkinEntity = nil
+	property table MageSkinSprites = {}
+	property string MageSkinAction = "stand1"
+	property number MageSkinTries = 0
+	property boolean MageSkinLoading = false
+	property number MageActionClock = 0
+	property table MageFrameDurations = {}
+
 	method void OnBeginPlay()
 		if self:IsClient() then self:SetupClient() end
 	end
@@ -73,7 +82,12 @@ script RtsUnitComponent extends Component
 		_RtsUnitBuffLogic:MarkDirty(self.Zone)
 		self:ApplyFace()
 		-- 아바타 루트가 아직 없을 수 있어 잠시 뒤 한 번 더
-		_TimerService:SetTimerOnce(function() if isvalid(self.Entity) then self:ApplyFace() end end, 0.3)
+		_TimerService:SetTimerOnce(function()
+			if isvalid(self.Entity) then
+				self:ApplyFace()
+				self:SetupMageSkin()
+			end
+		end, 0.3)
 		-- 이 직업의 스킬 연출 클립을 프리즘 변형까지 미리 올려 첫 시전(프리즘을 켠 직후 포함) 로딩 끊김을 없앤다
 		_RtsJobTableLogic:PreloadJobFx(self.JobId)
 		_RtsUnitLogic:WarmLevelUpFx()
@@ -81,11 +95,13 @@ script RtsUnitComponent extends Component
 		for i = 1, #skills do
 			if skills[i].fx ~= nil then _RtsSkillFxLogic:Preload(skills[i].fx) end
 		end
+		self:SetupMageSkin()
 	end
 
 	-- 보는 방향을 아바타에 반영(클라). 메이플 아바타는 기본이 왼쪽 보기라 오른쪽을 볼 때 루트 스케일 x = -1
 	@ExecSpace("ClientOnly")
 	method void ApplyFace()
+		self:DrawMageSkin()
 		local ar = self.Entity.AvatarRendererComponent
 		if ar == nil then return end
 		local root = ar:GetAvatarRootEntity()
@@ -97,6 +113,94 @@ script RtsUnitComponent extends Component
 		self:ApplyShadow()
 		-- 공격 중 도는 루프 클립(폭풍의 시 keydown·조커 리본)은 유닛 엔티티의 자식이라 아바타 루트 스케일을 안 타므로 따로 반전 — 2026-09-20 사용자 "모든 캐릭터 애니메이션은 보는 방향 따라가야"
 		_RtsSkillFxLogic:RefreshLoopFacing(_RtsSkillFxLogic:LoopKey(self.Zone, self.No))
+	end
+
+	@ExecSpace("ClientOnly")
+	method void SetupMageSkin()
+		if self.JobId ~= "il" or isvalid(self.MageSkinEntity) or self.MageSkinLoading then return end
+		if self.MageSkinTries >= 10 then return end
+		self.MageSkinTries = self.MageSkinTries + 1
+		local frames = _RtsJobTableLogic:GetMageSkinFrames()
+		self.MageFrameDurations = _RtsJobTableLogic:GetMageSkinFrameDurations()
+		if frames.stand1 == nil or #frames.stand1 == 0 then return end
+		local loaded = {}
+		self.MageSkinLoading = true
+		for action, sequence in pairs(frames) do
+			loaded[action] = {}
+			for i, ruid in ipairs(sequence) do
+				local sprite = _ResourceService:LoadSpriteAndWait(ruid)
+				if sprite == nil or not sprite.IsLoadComplete then
+					self.MageSkinLoading = false
+					_TimerService:SetTimerOnce(function()
+						if isvalid(self.Entity) then self:SetupMageSkin() end
+					end, 1)
+					return
+				end
+				loaded[action][i] = sprite
+			end
+		end
+		self.MageSkinLoading = false
+		if not isvalid(self.Entity) then return end
+		local skin = _SpawnService:SpawnByModelId("model://MapObject", "MageSkin", Vector3.zero, self.Entity)
+		if skin == nil then return end
+		skin.SpriteRendererComponent.OrderInLayer = 0
+		skin.SpriteRendererComponent.SortingLayer = "Default"
+		self.MageSkinSprites = loaded
+		self.MageSkinEntity = skin
+		self:DrawMageSkin()
+	end
+
+	@ExecSpace("ClientOnly")
+	method void OnUpdate(number delta)
+		if self.JobId ~= "il" or not isvalid(self.MageSkinEntity) then return end
+		if self.MageSkinAction == "stand1" then return end
+		self.MageActionClock = self.MageActionClock + delta
+		self:DrawMageSkin()
+	end
+
+	@ExecSpace("ClientOnly")
+	method void PlayMageAction(string name)
+		if name ~= "swingO1" and name ~= "swingO3" then name = "stand1" end
+		self.MageActionClock = 0
+		self.MageSkinAction = name
+		self:DrawMageSkin()
+	end
+
+	@ExecSpace("ClientOnly")
+	method void DrawMageSkin()
+		local skin = self.MageSkinEntity
+		if not isvalid(skin) then return end
+		local sequence = self.MageSkinSprites[self.MageSkinAction]
+		if sequence == nil then return end
+		-- 표시와 대기 복귀가 같은 스킬별 시간표를 사용한다.
+		local frame = 1
+		if self.MageSkinAction ~= "stand1" then
+			local elapsed = self.MageActionClock
+			local durations = self.MageFrameDurations[self.MageSkinAction]
+			if durations == nil then return end
+			for i = 1, #sequence - 1 do
+				if elapsed < durations[i] then break end
+				elapsed = elapsed - durations[i]
+				frame = i + 1
+			end
+		end
+		local sprite = sequence[frame]
+		if sprite == nil then return end
+		local sr = skin.SpriteRendererComponent
+		local flip = self:FaceNow() > 0
+		local pixelScale = 0.002
+		local x = (sprite.PivotPixel.x - sprite.Width / 2) * pixelScale
+		if flip then x = -x end
+		local feetY = sprite.Height - 64
+		-- 대기 1장 고정·스킬별 3장 순서 재생. 회전·호흡 변형 없이 발을 맞춘다.
+		local y = (sprite.PivotPixel.y - (sprite.Height - feetY)) * pixelScale
+		skin.TransformComponent.Position = Vector3(x, y, 0)
+		skin.TransformComponent.ZRotation = 0
+		local scale = sprite.PixelPerUnit * pixelScale
+		skin.TransformComponent.Scale = Vector3(scale, scale, 1)
+		if sr.SpriteRUID ~= sprite.RUID then sr.SpriteRUID = sprite.RUID end
+		sr.FlipX = flip
+		skin.Visible = true
 	end
 
 	-- 쉐도우 파트너 그림자(서버가 30레벨부터 자식 "Shadow" 스프라이트로 세움 — 원작 4111002/special 검은 실루엣): 등 뒤(보는 방향 반대) 0.22(로컬, 부모 스케일 2라 세계 0.44)에 두고
@@ -152,6 +256,7 @@ script RtsUnitComponent extends Component
 	-- 서버가 바꾼 값이 도착하면 열려 있는 팝업·슬롯을 다시 그린다. 버프 아이콘은 남의 유닛도(구역 단위로 모아서)
 	method void OnSyncProperty(string name, any value)
 		if not self:IsClient() then return end
+		if name == "JobId" then self:SetupMageSkin() end
 		if name == "FaceDir" then
 			self.LocalFace = 0
 			self:ApplyFace()

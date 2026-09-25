@@ -8,6 +8,7 @@ Maker 26.7에서 실측으로 확인한 엔진 동작과 그에 따른 작성 �
 - 근거: 실측 2026-09-14 (증강 디펜스 구역 시각화·데코·달팽이 시연)
 
 ## 캐릭터(유닛)는 MSW 아바타 방식 — MapObject에 AvatarRenderer + CostumeManager를 붙인다
+- 썬콜(`il`)은 2026-09-25 사용자 요청으로 예외: 두 아바타 컴포넌트를 생성하지 않고 클라이언트 자식 `MageSkin` 스프라이트로 확정 대기 자세와 체인 라이트닝·블리자드 각 3프레임을 표시한다. RUID와 발 기준점은 `docs/design/ice-lightning-mage-motion.md` 참조.
 - `model://MapObject` 스폰 → `RemoveComponent("SpriteRendererComponent")` → `AddComponent("AvatarRendererComponent")` + `AddComponent("CostumeManagerComponent")`(서버에서), `UseCustomEquipOnly=true`, `Custom{Longcoat,TwoHandedWeapon,Shoes,Hair,...}Equip`에 아바타 아이템 RUID. 스케일 2.0이 셀(80px)에 맞음. AvatarRenderer `OrderInLayer 200`, `ShowDefaultWeaponEffects=true`면 무기 잔상(모험가 히어로 소드는 불꽃 궤적)이 붙는다. 공격 모션은 클라에서 `AvatarRendererComponent:GetBodyEntity():SendEvent(ActionStateChangedEvent(action, action, playRate, SpriteAnimClipPlayType.Onetime))`, 끝나면 `stand2` Loop로 복귀. **같은 액션을 연달아 보내면 재생되지 않으므로** stand를 거쳐서 다음 공격. 두손검 액션: swingT1/T2/T3(3프레임 0.7초), swingTF(4프레임 0.65초), stabT1/T2/TF.
 - 근거: 실측 2026-09-14. 스프라이트를 따로 만들 필요 없이 장비 RUID 세트만으로 직업 외형·모션이 나와 사용자가 확정("내가 원한 게 딱 저 정도").
 

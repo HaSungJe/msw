@@ -2,7 +2,7 @@
 
 ## 기본 비석 (2026-09-25)
 
-`assets/design/260925-cartoon-tomb/basic-cartoon-source.png` — 1199×1312 투명 카툰 비석(단풍잎 문양·이끼·데이지). RUID `31d8e05805664acea73d37b04ca92f68` (`RtsTombCartoonBasic`, sprite/object). `RtsTombLogic.GetPresets().basic`에 월드 스케일 0.6으로 적용. 이전 원작 묘비 RUID `29e864c67e6c451d917b34519a4a9373`은 보관.
+`assets/design/tombstone/basic-cartoon-source.png` — 1199×1312 투명 카툰 비석(단풍잎 문양·이끼·데이지). RUID `31d8e05805664acea73d37b04ca92f68` (`RtsTombCartoonBasic`, sprite/object). `RtsTombLogic.GetPresets().basic`에 월드 스케일 0.6으로 적용. 이전 원작 묘비 RUID `29e864c67e6c451d917b34519a4a9373`은 보관.
 
 ## 바닥 타일 (256px 무이음새)
 
@@ -10,7 +10,7 @@
 
 | 파일 | 톤 | 생성기 | RUID | 상태 |
 |---|---|---|---|---|
-| `floor-ellinia.png` | 엘리니아 이끼(진한 비취 `#168E73`) — 2026-09-25 테마 디자인(`docs/design/260925-theme-presets.md`). 큰 잎무늬는 대비를 낮춰(0.68) 반복이 덜 보이게 | `tools/gen-theme-floors.py` (초안 `assets/design/260925-theme-presets/*-floor-256.png` → 알파를 평균색에 합성 → 대비·목표색 이동 → 가로·세로 반바퀴 굴린 사본과 sin² 가중 합성 = 무이음새, 알파 255) | `e3089b8f17144a4ca0a3b80117627a8e` (ThemeFloorEllinia → ElliniaMoss) | **적용 중**(테마 `ellinia`) |
+| `floor-ellinia.png` | 엘리니아 이끼(진한 비취 `#168E73`) — 2026-09-25 테마 디자인(`docs/design/theme-presets.md`). 큰 잎무늬는 대비를 낮춰(0.68) 반복이 덜 보이게 | `tools/gen-theme-floors.py` (초안 `assets/design/themes/floors/*-floor-256.png` → 알파를 평균색에 합성 → 대비·목표색 이동 → 가로·세로 반바퀴 굴린 사본과 sin² 가중 합성 = 무이음새, 알파 255) | `e3089b8f17144a4ca0a3b80117627a8e` (ThemeFloorEllinia → ElliniaMoss) | **적용 중**(테마 `ellinia`) |
 | `floor-perion.png` | 페리온 적갈색 흙 `#E99245` | 같은 생성기 | `272e8d94a1f8432c876b676c315bfe9d` (ThemeFloorPerion → PerionEarth) | **적용 중**(테마 `perion`) |
 | `floor-kerning.png` | 커닝 회보라 도시 바닥 `#596588` | 같은 생성기 | `8dce7ba39e1447f0bd5e87cdb52bc936` (ThemeFloorKerning → KerningPavement) | **적용 중**(테마 `kerning`) |
 | `floor-lith.png` | 리스 옅은 모래·석회암 `#F1DFB8` | 같은 생성기 | `fa1020b1c467413bac7538a1f040a165` (ThemeFloorLith → LithSand) | **적용 중**(테마 `lith`) |
@@ -24,7 +24,7 @@
 
 ## 구역 그리드 트랙 (화면 v2 — **16×13칸**, 칸 80px, 1280×1040, 투명 배경. 2026-09-20: 18×12에서 우측 2열 삭제·아래 1행 추가 — 좌우 대칭)
 
-현재 적용: `assets/design/260925-theme-tracks/track-v3-*.png` 5종. M2 경로·발판은 공통이며 마을마다 길의 재질과 가장자리 장식이 다르다. 출발·되돌리기는 원형 배지를 제거하고 길 표면에 화살표만 새겼다. 생성기는 `tools/gen-track-grid.js`; 경로 좌표는 이전과 같다. `track-v2-*.png`는 바로 이전 버전으로 보관한다.
+현재 적용: `assets/design/themes/tracks/track-v3-*.png` 5종. M2 경로·발판은 공통이며 마을마다 길의 재질과 가장자리 장식이 다르다. 출발·되돌리기는 원형 배지를 제거하고 길 표면에 화살표만 새겼다. 생성기는 `tools/gen-track-grid.js`; 경로 좌표는 이전과 같다. 구버전 트랙 PNG와 스타디움 생성기는 정리했으며 현재 트랙 5종만 유지한다.
 
 | 테마 | 길 디자인 | RUID |
 |---|---|---|
@@ -34,24 +34,11 @@
 | 커닝시티 | 청회색 벽돌, 노란 공사장 안전 표식 | `e0721799e39d4ecebf723b842c013b74` |
 | 리스항구 | 목재 부두와 항구석, 로프·물결 | `7b1ad42ce59245eea17e52ab201b4dde` |
 
-아래는 이전 트랙 자산으로 보관한다. 이전 66칸 경로는 `track-grid-66.png`, 18×12는 `track-grid-18x12.png`다.
-
-| 파일 | 내용 | 생성기 | RUID | 상태 |
-|---|---|---|---|---|
-| `track-grid.png` | M2 경로(2026-09-25 — 77칸, 교차 4곳, 매듭 3곳, 보스 영역 가운데 2×2는 비움). 트랙 칸 = 헤네시스 포석 + 연석 + 흰 점선 진행선, 발판 = 트랙·보스 영역이 아닌 칸 전부 흰 반투명(게임 `IsPadCell`과 같은 규칙), S = 초록 원 + 진행 방향 화살표, E = 짙은 빨강 원 + 되돌리기 화살(복귀 점선 없음) | `tools/gen-track-grid.js` 이전 출력 | `b1a2d2e1fde64330afe3dcf374b69a51` (ZoneTrackGridM2, sprite/etc) | 보관 |
-| `track-grid-ellinia.png` | 같은 경로 — 따뜻한 회갈색 둥근돌 `#B6A99B` + 가장자리 뿌리 `#6B4A2E`, 연석 `#4F3C2A`, 발판 선 `#225E50` α0.40 | 생성기 이전 출력 | `d7069e5ee7d4427ab5865d18fc6e430d` (ZoneTrackGridEllinia) | 보관 |
-| `track-grid-perion.png` | 밝은 사암 블록 `#F2D090`, 연석 `#9A5F33`, 발판 선 `#935327` α0.40 | 생성기 이전 출력 | `9a318273eb8c4498b980b11d7f06eb33` (ZoneTrackGridPerion) | 보관 |
-| `track-grid-kerning.png` | 밝은 회색 도시 벽돌 `#C9C8D2`, 연석 `#3E4358`, 발판 선 `#35425E` α0.45 | 생성기 이전 출력 | `58875bb327c04dc687d21b6055306b80` (ZoneTrackGridKerning) | 보관 |
-| `track-grid-lith.png` | 경로 순서로 목재 판자 `#BB946B` 3칸 · 백색 항구석 `#E3D3B5` 2칸 교차(모래 바닥에 묻히지 않게 목재 비중↑), 연석 `#6E5035`, 발판 선 `#9D825E` α0.36 | 생성기 이전 출력 | `5ac3d33b7d7d40edad2d5fe8336d1ea7` (ZoneTrackGridLith) | 보관 |
-| `track-grid-66.png` | 이전 66칸 경로(아티팩트 v17, 보스 영역 아래 4×5 시절) — S/E 글자 + E→S 복귀 화살표, 발판은 트랙에 붙은 칸만 | 같은 생성기(옛 SEQ) | `95b3ec9d377e46ecb9d394467d27dada` (ZoneTrackGridHenesys16) | 보관 |
-| `track-grid-18x12.png` | 이전 18×12 판 | 같은 생성기(COLS 18·ROWS 12) | `f8bf4274602c4d22b2e6643e114fbc5f` (ZoneTrackGridHenesys) | 보관 |
-| (눈 배경판) | 같은 경로, 회청 선·회청 발판(엘나스 눈 위 용) — **아직 18×12**, 다시 쓰려면 16×13 재생성 | `tools/gen-track-grid.js` (색만 다름) | `651583e1c1ee44cdb6d2a891755ab528` (ZoneTrackGrid) | 프리셋 `elnath` |
-
 구역마다 스프라이트 1장(PPU 100 → 스케일 2.2222 = 28.44×23.11유닛, RtsConfigLogic.GridTextureScale). 경로를 바꾸면 생성기의 `SEQ`와 `RtsZoneLogic.GetTurnPoints`를 같이 고친다. 칸 수를 바꾸면 생성기 COLS/ROWS + RtsConfigLogic GridCols/GridRows/GridLeft/GridTop + 장식물 자리(RtsThemeLogic)도 같이.
 
 ## 테마 풍경 배경·썸네일 (2026-09-25)
 
-`assets/design/260925-theme-scenery/`의 마을 풍경 원본에서 1920×1080 배경과 400×240 썸네일을 만들었다. 배경은 구역 중심에 PPU 100·스케일 `GridTextureScale`로 배치하며, `MapLayer0` 순서 90·알파 0.78이다. 트랙 판은 순서 100으로 그 위에 놓인다. 두 자산은 같은 그림이므로 테마 선택 카드에서 본 풍경이 실제 전장에도 나온다.
+`assets/design/themes/scenery/`의 마을 풍경 원본에서 1920×1080 배경과 400×240 썸네일을 만들었다. 배경은 구역 중심에 PPU 100·스케일 `GridTextureScale`로 배치하며, `MapLayer0` 순서 90·알파 0.78이다. 트랙 판은 순서 100으로 그 위에 놓인다. 두 자산은 같은 그림이므로 테마 선택 카드에서 본 풍경이 실제 전장에도 나온다.
 
 | 테마 | 배경 파일 · RUID | 썸네일 파일 · RUID |
 |---|---|---|
@@ -61,9 +48,9 @@
 | 커닝시티 | `kerning-background-1920x1080.png` · `e2f7cda163294b3b8d8ab956f2966bda` | `kerning-thumb-400x240.png` · `457ec944d357431ba1642520d7d4eb16` |
 | 리스항구 | `lith-background-1920x1080.png` · `89b81c540feb454796ba78a0025b7223` | `lith-thumb-400x240.png` · `7653fa3a53314b43a2aa4b16ccae3adc` |
 
-## 이전 테마 썸네일·마을 장식 (2026-09-25 — `docs/design/260925-theme-presets.md`, ChatGPT 시안)
+## 이전 테마 썸네일·마을 장식 (2026-09-25 — `docs/design/theme-presets.md`, ChatGPT 시안)
 
-원본은 `assets/design/260925-theme-presets/`. 아래 옛 썸네일 5장은 트랙이 보여 **보관**하며, 프리셋은 위의 새 풍경 썸네일을 사용한다. 장식은 투명 컷아웃을 **반으로 줄여**(최대 변 ≤ 768) 올렸다 → 프리셋 `scale`은 가이드라인 값 × 2. 전부 sprite/etc, PPU 100.
+장식 원본은 `assets/design/themes/decor/`. 아래 옛 썸네일 5장의 디자인 원본은 `.beaver/output/archive/design-cleanup-260925/old-theme-thumbnails/`로 분리했다. 이 표의 `assets/textures/thumb-*.png`와 기존 업로드 RUID는 유지하며, 프리셋은 위의 새 풍경 썸네일을 사용한다. 장식은 투명 컷아웃을 **반으로 줄여**(최대 변 ≤ 768) 올렸다 → 프리셋 `scale`은 가이드라인 값 × 2. 전부 sprite/etc, PPU 100.
 
 | 파일 | 내용 | RUID | 쓰는 곳 |
 |---|---|---|---|
@@ -80,15 +67,6 @@
 ## 몬스터·보스 썸네일 (2026-09-25 — ChatGPT 제작 `assets/design/monster-thumbnails/`)
 
 247종(몬스터 M001~M229 · 보스 B01~B18) 256×256 투명 PNG(그림 최대 216, 가운데)를 **각각 새 스프라이트**(sprite/etc, 이름 `RtsThumb<ID>`)로 올렸다. ID → RUID 표 = `assets/textures/monster-thumbs.tsv`(ID · RUID · 이름) → `python tools/gen-monster-thumbs.py` → `RtsMonsterThumbLogic.mlua` GENERATED 구간. `RtsHudLogic.SpawnMonsterPortrait`가 이 표를 먼저 본다 — 아이콘 탭·프로필 상자·유저 카드·아이콘 정보·획득 팝업·몬스터 정보 창 초상 전부. 그림을 바꾸면 새 리소스로 올려 tsv만 고치고 생성기를 다시 돌린다.
-
-## 구역 트랙 — 스타디움 (폐기, 2026-09-14 화면 v2로 교체)
-
-| 파일 | 재질 | 생성기 | RUID | 상태 |
-|---|---|---|---|---|
-| `track-henesys-stone.png` | 헤네시스 돌길 포석(2줄 엇갈림 + 연석) | `tools/gen-track-stone.js` | `faf04ce588484d07847a8b34f13f4b9e` (ZoneTrackHenesysStone) | 보관 |
-| (초판) | 베이지 흙 노면 | `tools/gen-track-texture.js` | `b4672b0c52eb4bd4b5a0a22c075b2aea` (ZoneTrackStadium) | 보관 |
-
-`gen-track-stone.js`는 중심선 라운드 사각형을 촘촘히 샘플링해 픽셀마다 (호길이 s, 수직거리 d)를 구한 뒤 (s, d) 공간에 포석을 그립니다 → 돌이 트랙 진행 방향을 따라 눕습니다. 둘레는 정수 개의 돌로 나눠 이음매가 맞물립니다.
 
 ## HUD 프레임 (폐기 — 화면 v2에서 미니맵/초상화/정보창 제거)
 `tools/gen-hud-frame.js` — 구 스타식 HUD 프레임. RUID `3c4c2394686a46cf86a34f520d31c3f0`(340) · `3c81e689753f4c0eb2a58418963fdf2f`(240) · `28511390f76c42c08a9105751ced4051`(info). 보관.

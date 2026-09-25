@@ -259,7 +259,11 @@ script RtsUnitPopupLogic extends Logic
 		if H.CircleMaskRUID ~= "" then glow.SpriteGUIRendererComponent.ImageRUID = DataRef(H.CircleMaskRUID) end
 		glow.SpriteGUIRendererComponent.Color = Color(0.79, 0.64, 0.29, 0.13)
 		glow.SpriteGUIRendererComponent.RaycastTarget = false
-		self:SpawnPreviewAt(look, u, Vector2(181, -90), Vector2(112, 140))
+		if u.JobId == "il" then
+			self:SpawnPreviewAt(look, u, Vector2(181, -98), Vector2(176, 176))
+		else
+			self:SpawnPreviewAt(look, u, Vector2(181, -90), Vector2(112, 140))
+		end
 		local skinName = "영웅 팬텀"
 		if u.JobId ~= "phantom" then skinName = "모험가 " .. T:GetJobNameFor(u) end
 		local plate = H:SpawnPanel("RtsUnitLookPlate", look, Vector2(0.5, 0), Vector2(0.5, 0), Vector2(0, 12), Vector2(220, 30),
@@ -945,6 +949,13 @@ script RtsUnitPopupLogic extends Logic
 		t.Pivot = Vector2(0.5, 0.5)
 		t.anchoredPosition = pos
 		t.RectSize = size
+		if u.JobId == "il" then
+			local sprite = e:AddComponent("SpriteGUIRendererComponent")
+			sprite.ImageRUID = _RtsJobTableLogic:GetMagePortraitRUID()
+			sprite.PreserveSprite = PreserveSpriteType.AspectOnly
+			sprite.RaycastTarget = false
+			return
+		end
 		local cm = e:AddComponent("CostumeManagerComponent")
 		local ar = e:AddComponent("AvatarGUIRendererComponent")
 		if cm == nil or ar == nil then return end

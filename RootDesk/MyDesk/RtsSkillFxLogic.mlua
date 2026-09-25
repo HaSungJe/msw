@@ -205,12 +205,24 @@ script RtsSkillFxLogic extends Logic
 		local ar = unitEntity.AvatarRendererComponent
 		local body = nil
 		if ar ~= nil then body = ar:GetBodyEntity() end
+		if unitEntity.RtsUnitComponent ~= nil and unitEntity.RtsUnitComponent.JobId == "il" then body = unitEntity end
 		-- hideWeapon: 스킬 동안 캐릭터의 무기(와 무기 잔상)를 투명하게 — 원작 레이징 블로우 이펙트는 금색 대검을 포함해서 실제 검이 옆에 따로 튀어나오면 어색(사용자 2026-09-19 "기본 칼이 애니메이션에 가려지는 게 맞다"). hideWeaponSec(없으면 clipLife, 없으면 0.9초) 뒤 복구
 		if fx.hideWeapon and ar ~= nil then self:HideWeapon(unitEntity, fx.hideWeaponSec or fx.clipLife or 0.9) end
 		local motions = fx.motions
 		if motions == nil and fx.motion ~= nil then motions = { fx.motion } end
 		local stand = self:StandName(unitEntity)
-		if body ~= nil and fx.motionCycle and motions ~= nil and #motions > 0 then
+		if unitEntity.RtsUnitComponent ~= nil and unitEntity.RtsUnitComponent.JobId == "il" and motions ~= nil and #motions > 0 then
+			-- 표시 프레임과 같은 시간표: 체인 0.8초, 블리자드 시전 전체 3초.
+			local durations = _RtsJobTableLogic:GetMageSkinFrameDurations()[motions[1]]
+			local poseSec = 0
+			for _, duration in ipairs(durations) do poseSec = poseSec + duration end
+			self:SendAction(unitEntity, motions[1], 1, SpriteAnimClipPlayType.Onetime, nil, nil)
+			self.LastMotion[unitEntity.Id] = motions[1]
+			self.MotionUntil[unitEntity.Id] = _UtilLogic.ElapsedSeconds + poseSec
+			_TimerService:SetTimerOnce(function()
+				if isvalid(unitEntity) then self:ReturnStand(unitEntity, "stand1") end
+			end, poseSec)
+		elseif body ~= nil and fx.motionCycle and motions ~= nil and #motions > 0 then
 			-- motionCycle: 공격이 이어지는 동안 motions를 motionGap 간격으로 차례로 반복(조커 — swingOF → swingO1 → swingO1, 2026-09-20 사용자 "3개 섞어봐"). 공격이 0.6초 끊기면 CheckLoops가 정리
 			self.LoopLast[no] = DateTime.UtcNow.Elapsed
 			self.LoopUnit[no] = unitEntity
@@ -1104,6 +1116,10 @@ script RtsSkillFxLogic extends Logic
 	@ExecSpace("ClientOnly")
 	method void SendAction(Entity body, string name, any rate, any playType, any frameA, any frameB)
 		if body == nil or not isvalid(body) then return end
+		if body.RtsUnitComponent ~= nil and body.RtsUnitComponent.JobId == "il" then
+			body.RtsUnitComponent:PlayMageAction(name)
+			return
+		end
 		-- frameA·frameB(있으면) = 재생 프레임 범위. 같은 값이면 그 프레임에 멈춘 자세(조커 — 지팡이를 앞으로 뻗은 stabO1 마지막 프레임 유지)
 		if frameA ~= nil then
 			body:SendEvent(ActionStateChangedEvent(name, name, rate, playType, frameA, frameB or frameA))

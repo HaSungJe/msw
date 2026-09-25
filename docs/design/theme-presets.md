@@ -3,21 +3,21 @@
 - 상태: **구현됨** (2026-09-25 사용자: "기본맵이니 뭐 이정도면 되겠다. 이대로 ㄱㄱ" → 2026-09-25 Claude Code 적용·Maker 검증. RUID·경로는 `assets/textures/README.md`, 현재 표는 `docs/theme-presets.md` 3절. 엘리니아 왼쪽 거목은 HUD에 가려 row 4.0 → 5.6)
 - 대상 화면: `docs/ui-screens.md` 3.0 프로필 상자, 3.2 유저 카드, 4.2 `profile` 테마 카드, 5장 `ZoneGrid`·`ZoneDecor`
 - 한 줄 요약: 확정된 5종 시안의 마을 랜드마크를 바닥·트랙·여백 장식·테마 썸네일로 적용한다.
-- 구현 담당: Claude Code. 이 문서와 PNG는 ChatGPT 디자인 산출물이다. `.mlua` 수정·MSW 리소스 업로드·Maker 조작은 `AGENT.md`·`docs/design-handoff.md`대로 Claude Code가 한다.
+- 구현 담당: Claude Code. 이 문서와 PNG는 ChatGPT 디자인 산출물이다. `.mlua` 수정·MSW 리소스 업로드·Maker 조작은 `AGENTS.md`·`docs/design-handoff.md`대로 Claude Code가 한다.
 
 ## 이미지
 
-기준 폴더: `assets/design/260925-theme-presets/`. 비교 시안은 `assets/theme-concepts/comparison.html`, 시안의 원작 마을 참고 근거는 `assets/theme-concepts/README.md`.
+현재 기준 폴더: `assets/design/themes/`(`floors/`, `decor/`, `scenery/`, `tracks/`). 2026-09-25 정리로 옛 트랙형 썸네일은 작업 폴더에서 제외했다. 아래 표의 카드 썸네일은 `scenery/<key>-thumb-400x240.png`, 바닥은 `floors/`, 장식은 `decor/`에서 찾는다. 비교 시안은 `assets/theme-concepts/comparison.html`, 시안의 원작 마을 참고 근거는 `assets/theme-concepts/README.md`.
 
 | 테마 | 카드 썸네일(400×240, 불투명) | 바닥 질감 원본 / 256px 축소본 | 여백 장식(투명 스프라이트) |
 |---|---|---|---|
-| 헤네시스 | `henesys-thumb.png` | 기존 `HenesysGrass1/2/3` 유지 | 기존 `GetHenesysDecor()` 유지 |
-| 엘리니아 | `ellinia-thumb.png` | `ellinia-floor-source.png` / `ellinia-floor-256.png` | `ellinia-giant-tree.png` (1024×1536) |
-| 페리온 | `perion-thumb.png` | `perion-floor-source.png` / `perion-floor-256.png` | `perion-cliff-village.png` (1137×1383) |
-| 커닝시티 | `kerning-thumb.png` | `kerning-floor-source.png` / `kerning-floor-256.png` | `kerning-construction.png` (1024×1536) |
-| 리스항구 | `lith-thumb.png` | `lith-floor-source.png` / `lith-floor-256.png` | `lith-harbor-ship.png` (1203×1307) |
+| 헤네시스 | `henesys-thumb-400x240.png` | 기존 `HenesysGrass1/2/3` 유지 | 기존 `GetHenesysDecor()` 유지 |
+| 엘리니아 | `ellinia-thumb-400x240.png` | `ellinia-floor-source.png` / `ellinia-floor-256.png` | `ellinia-giant-tree.png` (1024×1536) |
+| 페리온 | `perion-thumb-400x240.png` | `perion-floor-source.png` / `perion-floor-256.png` | `perion-cliff-village.png` (1137×1383) |
+| 커닝시티 | `kerning-thumb-400x240.png` | `kerning-floor-source.png` / `kerning-floor-256.png` | `kerning-construction.png` (1024×1536) |
+| 리스항구 | `lith-thumb-400x240.png` | `lith-floor-source.png` / `lith-floor-256.png` | `lith-harbor-ship.png` (1203×1307) |
 
-투명 장식은 생성 PNG에 알파 채널이 있고, 네 모서리 투명도를 확인했다. 섬네일은 확정 시안을 400×240으로 고품질 축소한 것이다. 바닥 256px 파일은 **제작 초안**이다. 아래 이음새·알파 점검을 끝내기 전 업로드하지 않는다.
+투명 장식은 생성 PNG에 알파 채널이 있고, 네 모서리 투명도를 확인했다. 현재 썸네일은 풍경 원본을 400×240으로 축소한 것이다. 아래 초기 구현 지침보다 `docs/theme-presets.md`와 현재 코드가 우선한다. 바닥 256px 파일은 **제작 초안**이다. 아래 이음새·알파 점검을 끝내기 전 업로드하지 않는다.
 
 ## 테마별 실제 적용 모습
 

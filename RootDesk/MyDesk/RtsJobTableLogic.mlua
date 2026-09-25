@@ -6,6 +6,32 @@ script RtsJobTableLogic extends Logic
 
 	property number MaxLevel = 50
 
+	-- 썬콜 전용 PNG: 고정 전투 대기 + 원본 순서의 체인/블리자드 각 3프레임.
+	@ExecSpace("ClientOnly")
+	method table GetMageSkinFrames()
+		return {
+			stand1 = { "fe0c6be3795d49e29a311b3edb8e89ab" },
+			swingO1 = { "66b1f0af75c745bdaf10c9710486b867", "0c4635067dcc4aae9ed3987fc3820dcd", "307d3b6aa3d7485d932c9fcde44642ed" },
+			swingO3 = { "cfb678afe3fe423ca87a610f41f5c989", "08f5c40cb8fa4af28fab2f6b996fdd41", "3821ebdc6c2346c2b2561fec50b9900c" },
+		}
+	end
+
+	-- 선택창·상세정보 공용 흉상. 전투 프레임과 별도로 관리한다.
+	@ExecSpace("ClientOnly")
+	method string GetMagePortraitRUID()
+		return "f93cfcc7a46d428cb6ed2bb3d71fc986"
+	end
+
+	-- 블리자드는 준비 0.5초 → 시전 유지(타격 2.2초까지) → 마무리(총 3초).
+	@ExecSpace("ClientOnly")
+	method table GetMageSkinFrameDurations()
+		return {
+			stand1 = { 1 },
+			swingO1 = { 0.30, 0.15, 0.35 },
+			swingO3 = { 0.50, 1.70, 0.80 },
+		}
+	end
+
 	-- 크리티컬 기본값: 확률 0%, 크리티컬 데미지 20%(원작 메이플 기본). 스킬·증강의 크리 확률/데미지는 각각 합연산
 	property number BaseCritRate = 0
 

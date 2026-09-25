@@ -206,9 +206,12 @@ script RtsUnitLogic extends Logic
 		local e = _SpawnService:SpawnByModelId("model://MapObject", self:UnitName(zone, no), Vector3(at.x, at.y - 0.75, 0), mapRoot)
 		if e == nil then return nil end
 		e:RemoveComponent("SpriteRendererComponent")
-		local ar = e:AddComponent("AvatarRendererComponent")
-		if ar ~= nil then ar.OrderInLayer = 200 end
-		e:AddComponent("CostumeManagerComponent")
+		-- 썬콜은 PNG 프레임으로 그리는 스프라이트 유닛. 기본 아바타를 만들지 않는다.
+		if jobId ~= "il" then
+			local ar = e:AddComponent("AvatarRendererComponent")
+			if ar ~= nil then ar.OrderInLayer = 200 end
+			e:AddComponent("CostumeManagerComponent")
+		end
 		-- 공격(Phase 3): 확장 AttackComponent + 데미지 스킨 형식(숫자는 몬스터의 DamageSkinSpawner가 그림)
 		e:AddComponent("RtsUnitAttackComponent")
 		local skin = e:AddComponent("DamageSkinSettingComponent")
