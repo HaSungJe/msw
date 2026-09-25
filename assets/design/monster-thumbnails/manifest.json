@@ -1,0 +1,5189 @@
+[
+  {
+    "id": "M001",
+    "name": "초록달팽이",
+    "kind": "monster",
+    "file": "monster/M001.png",
+    "spriteRuid": "cad85efb89644a23a98411016b34df62",
+    "sourcePath": "maplestory/npc/9062134/move/0",
+    "sourceSize": [
+      40,
+      28
+    ],
+    "croppedSize": [
+      37,
+      26
+    ],
+    "artSize": [
+      216,
+      152
+    ],
+    "sha256": "56d911c1380d850fba0f3fe9670b8cdc9816c272d5f5ca16cedb1f8fee088f1f"
+  },
+  {
+    "id": "M002",
+    "name": "파란달팽이",
+    "kind": "monster",
+    "file": "monster/M002.png",
+    "spriteRuid": "16c4dcfabc414cb0a341b9fe8035e705",
+    "sourcePath": "maplestory/mob/0100101/move/0",
+    "sourceSize": [
+      36,
+      36
+    ],
+    "croppedSize": [
+      35,
+      34
+    ],
+    "artSize": [
+      216,
+      210
+    ],
+    "sha256": "ce168fe92e69aba981238fd7394f3a17d56bcadaae935ce7a8c0fa9cc8319a48"
+  },
+  {
+    "id": "M003",
+    "name": "빨간달팽이",
+    "kind": "monster",
+    "file": "monster/M003.png",
+    "spriteRuid": "a11b63bfaa3a482ab07f226860b82eca",
+    "sourcePath": "maplestory/mob/0130101/move/0",
+    "sourceSize": [
+      36,
+      36
+    ],
+    "croppedSize": [
+      35,
+      34
+    ],
+    "artSize": [
+      216,
+      210
+    ],
+    "sha256": "49916be9ef32381446bf9e2dad8528ce5d16ffae451fa68a129ae3591ecf94ba"
+  },
+  {
+    "id": "M004",
+    "name": "스포아",
+    "kind": "monster",
+    "file": "monster/M004.png",
+    "spriteRuid": "9bf39f94876c4c039a1e61da0799043c",
+    "sourcePath": "maplestory/mob/0120100/move/1",
+    "sourceSize": [
+      36,
+      40
+    ],
+    "croppedSize": [
+      35,
+      37
+    ],
+    "artSize": [
+      204,
+      216
+    ],
+    "sha256": "3e0889d40ec75257ef40f7278c262d6dc3e53f6a4c28999756412e30b592a38a"
+  },
+  {
+    "id": "M005",
+    "name": "돼지",
+    "kind": "monster",
+    "file": "monster/M005.png",
+    "spriteRuid": "2bd386b72c3b410e97c7c965f40d7acb",
+    "sourcePath": "maplestory/mob/1210100/move/0",
+    "sourceSize": [
+      68,
+      48
+    ],
+    "croppedSize": [
+      67,
+      46
+    ],
+    "artSize": [
+      216,
+      148
+    ],
+    "sha256": "c6c6f54bcbf7bebc75f662a3981edff0d7a96af86c0bf1ec92dcf70b723bc5c6"
+  },
+  {
+    "id": "M006",
+    "name": "리본돼지",
+    "kind": "monster",
+    "file": "monster/M006.png",
+    "spriteRuid": "77d572c472e946d3abffb8639ec3da5b",
+    "sourcePath": "maplestory/mob/1210101/move/1",
+    "sourceSize": [
+      68,
+      52
+    ],
+    "croppedSize": [
+      67,
+      50
+    ],
+    "artSize": [
+      216,
+      161
+    ],
+    "sha256": "89511399e2b2621b9e2f15302244ed03c44fe588ee7cd70c4cb6b1bd7a7d94e4"
+  },
+  {
+    "id": "M007",
+    "name": "초록버섯",
+    "kind": "monster",
+    "file": "monster/M007.png",
+    "spriteRuid": "2528b911165944eeba540aabceb7a0f3",
+    "sourcePath": "maplestory/mob/1110100/move/0",
+    "sourceSize": [
+      56,
+      52
+    ],
+    "croppedSize": [
+      56,
+      52
+    ],
+    "artSize": [
+      216,
+      201
+    ],
+    "sha256": "1f766ed89435800658a2c539ad048249fef94d081018d669bc355753b34ffb60"
+  },
+  {
+    "id": "M008",
+    "name": "주황버섯",
+    "kind": "monster",
+    "file": "monster/M008.png",
+    "spriteRuid": "49460619e5fc4780abe88e199834a22d",
+    "sourcePath": "maplestory/mob/1210102/move/1",
+    "sourceSize": [
+      64,
+      64
+    ],
+    "croppedSize": [
+      62,
+      64
+    ],
+    "artSize": [
+      209,
+      216
+    ],
+    "sha256": "57d17991943937735580829ee58653a2c1408a1dc5cd45356a664504ed5d238f"
+  },
+  {
+    "id": "M009",
+    "name": "파란버섯",
+    "kind": "monster",
+    "file": "monster/M009.png",
+    "spriteRuid": "ac1086c2b26049579cd1a279276528b9",
+    "sourcePath": "maplestory/mob/2220100/move/1",
+    "sourceSize": [
+      64,
+      64
+    ],
+    "croppedSize": [
+      62,
+      64
+    ],
+    "artSize": [
+      209,
+      216
+    ],
+    "sha256": "6da636e6dbd8ac757e35605889be07f17ca6b6f313ac40123fd8e27fe0cd8f26"
+  },
+  {
+    "id": "M010",
+    "name": "뿔버섯",
+    "kind": "monster",
+    "file": "monster/M010.png",
+    "spriteRuid": "5b9da2dd68884bd3831bb17ab1ecf9c1",
+    "sourcePath": "maplestory/mob/2110200/move/0",
+    "sourceSize": [
+      56,
+      52
+    ],
+    "croppedSize": [
+      56,
+      52
+    ],
+    "artSize": [
+      216,
+      201
+    ],
+    "sha256": "ba82b4dddfbd6d6ab8005d3643aa20b1365d4a3fed1fc344df75459893172730"
+  },
+  {
+    "id": "M011",
+    "name": "좀비버섯",
+    "kind": "monster",
+    "file": "monster/M011.png",
+    "spriteRuid": "f8bc2365fc0d48189bfd088e0f34d3df",
+    "sourcePath": "maplestory/mob/2230101/move/2",
+    "sourceSize": [
+      64,
+      68
+    ],
+    "croppedSize": [
+      63,
+      67
+    ],
+    "artSize": [
+      203,
+      216
+    ],
+    "sha256": "af2d1e593d6d914e2f6dc90c9bfeb89c025a59e949689c6f9edb58a92ed9248c"
+  },
+  {
+    "id": "M012",
+    "name": "이블아이",
+    "kind": "monster",
+    "file": "monster/M012.png",
+    "spriteRuid": "a2a5b05958df4a7dab1be3fc38b2b585",
+    "sourcePath": "maplestory/mob/2230100/move/1",
+    "sourceSize": [
+      84,
+      60
+    ],
+    "croppedSize": [
+      81,
+      57
+    ],
+    "artSize": [
+      216,
+      152
+    ],
+    "sha256": "504c0db3cafc36886d019ccca0c9f8ce42855d3cd59a6b6fa5be053156ec18f1"
+  },
+  {
+    "id": "M013",
+    "name": "콜드아이",
+    "kind": "monster",
+    "file": "monster/M013.png",
+    "spriteRuid": "f38894ca512644d9b2324d05ae02557c",
+    "sourcePath": "maplestory/mob/4230100/move/1",
+    "sourceSize": [
+      88,
+      60
+    ],
+    "croppedSize": [
+      88,
+      57
+    ],
+    "artSize": [
+      216,
+      140
+    ],
+    "sha256": "c4950ba9c8c01c0b01757db3123080fbf2a123382790dd1b21574b015afac149"
+  },
+  {
+    "id": "M014",
+    "name": "카파 드레이크",
+    "kind": "monster",
+    "file": "monster/M014.png",
+    "spriteRuid": "523c68271ebd401cbe96cbc2fd2d98d5",
+    "sourcePath": "maplestory/mob/4130100/move/1",
+    "sourceSize": [
+      128,
+      84
+    ],
+    "croppedSize": [
+      127,
+      82
+    ],
+    "artSize": [
+      216,
+      139
+    ],
+    "sha256": "1aa3d4b1d39b404f96aa57bf8580f5246d11d3f3e088e2a2aef854fcaf4d7d00"
+  },
+  {
+    "id": "M015",
+    "name": "아이스 드레이크",
+    "kind": "monster",
+    "file": "monster/M015.png",
+    "spriteRuid": "08dccd87b9b24f339037fac3f61341ea",
+    "sourcePath": "maplestory/mob/6230600/move/1",
+    "sourceSize": [
+      128,
+      84
+    ],
+    "croppedSize": [
+      127,
+      82
+    ],
+    "artSize": [
+      216,
+      139
+    ],
+    "sha256": "7a557802b116ca223aba84c6517f1e5ed3b9add986ccc0252c26d2e2a7cc701e"
+  },
+  {
+    "id": "M016",
+    "name": "다크 드레이크",
+    "kind": "monster",
+    "file": "monster/M016.png",
+    "spriteRuid": "24a0e5f0dc414414b9d600763b5eef18",
+    "sourcePath": "maplestory/mob/6230601/move/1",
+    "sourceSize": [
+      128,
+      88
+    ],
+    "croppedSize": [
+      127,
+      87
+    ],
+    "artSize": [
+      216,
+      148
+    ],
+    "sha256": "f331702bce9a4447d08d2f8a0231a2a29b47a7ac9e9c68d43bdaef88be16e78d"
+  },
+  {
+    "id": "M017",
+    "name": "와일드 카고",
+    "kind": "monster",
+    "file": "monster/M017.png",
+    "spriteRuid": "b0e46b01c5cc4b32bea1197f944a2770",
+    "sourcePath": "maplestory/mob/6230100/move/2",
+    "sourceSize": [
+      148,
+      100
+    ],
+    "croppedSize": [
+      147,
+      97
+    ],
+    "artSize": [
+      216,
+      143
+    ],
+    "sha256": "9f5611f38d02db0441f242ad83b963e2d763f581110c69b3440c3b70fcd66300"
+  },
+  {
+    "id": "M018",
+    "name": "타우로마시스",
+    "kind": "monster",
+    "file": "monster/M018.png",
+    "spriteRuid": "072496be74904667b2a6675eca994ae3",
+    "sourcePath": "maplestory/mob/7130100/move/0",
+    "sourceSize": [
+      172,
+      116
+    ],
+    "croppedSize": [
+      170,
+      115
+    ],
+    "artSize": [
+      216,
+      146
+    ],
+    "sha256": "3d99b17f2bd571e67dae331042841e68711faa43f3836f8f37a29bc3ce81d745"
+  },
+  {
+    "id": "M019",
+    "name": "타우로스피어",
+    "kind": "monster",
+    "file": "monster/M019.png",
+    "spriteRuid": "6f21202bd8ce4d519d257e03e0e2993c",
+    "sourcePath": "maplestory/mob/7130101/move/0",
+    "sourceSize": [
+      188,
+      124
+    ],
+    "croppedSize": [
+      188,
+      124
+    ],
+    "artSize": [
+      216,
+      142
+    ],
+    "sha256": "b2d72b0235dd04e23ebf7a4654460aa88d7771d07e17651cb3f6cd101f43f3bc"
+  },
+  {
+    "id": "B01",
+    "name": "주니어 발록",
+    "kind": "boss",
+    "file": "boss/B01.png",
+    "spriteRuid": "9e00d0b8c9e94634a1d94f0f1691c0d5",
+    "sourcePath": "maplestory/mob/8130100/stand/0",
+    "sourceSize": [
+      160,
+      156
+    ],
+    "croppedSize": [
+      160,
+      156
+    ],
+    "artSize": [
+      216,
+      211
+    ],
+    "sha256": "0ef648f865fe2d7fee6d1d6bf8df4823f3f4bed5abfceec371fb3464e18502a7"
+  },
+  {
+    "id": "M020",
+    "name": "야자수 슬라임",
+    "kind": "monster",
+    "file": "monster/M020.png",
+    "spriteRuid": "2027bef15f4a4ffc8888b9d79d6d628f",
+    "sourcePath": "maplestory/mob/3401000/move/2",
+    "sourceSize": [
+      68,
+      72
+    ],
+    "croppedSize": [
+      67,
+      71
+    ],
+    "artSize": [
+      204,
+      216
+    ],
+    "sha256": "2f897240478286f1fb183bd2162db5f6fa63733a7e375a46e7989e50e782bf99"
+  },
+  {
+    "id": "M021",
+    "name": "코코넛 슬라임",
+    "kind": "monster",
+    "file": "monster/M021.png",
+    "spriteRuid": "9da938f7cb304ee9b2e99cee357d0b97",
+    "sourcePath": "maplestory/mob/3401001/move/0",
+    "sourceSize": [
+      104,
+      112
+    ],
+    "croppedSize": [
+      102,
+      110
+    ],
+    "artSize": [
+      200,
+      216
+    ],
+    "sha256": "552522ccc54729d84b57fa925429f9699a7c9202fdd24d1eaa74fdd35cc16b07"
+  },
+  {
+    "id": "M022",
+    "name": "초록조개 슬라임",
+    "kind": "monster",
+    "file": "monster/M022.png",
+    "spriteRuid": "1d97e925b4b24bf79d5770bdb9bc628a",
+    "sourcePath": "maplestory/mob/3401002/move/2",
+    "sourceSize": [
+      68,
+      40
+    ],
+    "croppedSize": [
+      67,
+      39
+    ],
+    "artSize": [
+      216,
+      126
+    ],
+    "sha256": "2adcb921dc6e89b163a594881fe39fd51cba8b8024d117c850e4eab7ccbf8dc8"
+  },
+  {
+    "id": "M023",
+    "name": "보라조개 슬라임",
+    "kind": "monster",
+    "file": "monster/M023.png",
+    "spriteRuid": "8d1ee851f530483393fd7c074f12a949",
+    "sourcePath": "maplestory/mob/3401003/move/2",
+    "sourceSize": [
+      68,
+      40
+    ],
+    "croppedSize": [
+      67,
+      39
+    ],
+    "artSize": [
+      216,
+      126
+    ],
+    "sha256": "464a0a54b2b12e2f306cc1aed23b415ab446a4aef953a928fd74a0a95791a28e"
+  },
+  {
+    "id": "M024",
+    "name": "갈매기 슬라임",
+    "kind": "monster",
+    "file": "monster/M024.png",
+    "spriteRuid": "3567d74ff8454d75bf73a0caec915e65",
+    "sourcePath": "maplestory/mob/3401004/move/1",
+    "sourceSize": [
+      72,
+      64
+    ],
+    "croppedSize": [
+      70,
+      61
+    ],
+    "artSize": [
+      216,
+      188
+    ],
+    "sha256": "c096ca4f6cdec03a47e4f765182bf67f1291711594428c5fa201e7cda0371a6e"
+  },
+  {
+    "id": "M025",
+    "name": "빨간 튜브 슬라임",
+    "kind": "monster",
+    "file": "monster/M025.png",
+    "spriteRuid": "5408b1f42df34fa6a1ffabb260541dcf",
+    "sourcePath": "maplestory/mob/3401005/move/1",
+    "sourceSize": [
+      116,
+      76
+    ],
+    "croppedSize": [
+      115,
+      75
+    ],
+    "artSize": [
+      216,
+      141
+    ],
+    "sha256": "a58e7096a5fee4dc67dfdd903a943b460df1e03817092c8895d3f1c5c5ac4faa"
+  },
+  {
+    "id": "M026",
+    "name": "파란 튜브 슬라임",
+    "kind": "monster",
+    "file": "monster/M026.png",
+    "spriteRuid": "2c65bf76f59e4595bd579d416cb1fd47",
+    "sourcePath": "maplestory/mob/3401006/move/1",
+    "sourceSize": [
+      116,
+      76
+    ],
+    "croppedSize": [
+      115,
+      75
+    ],
+    "artSize": [
+      216,
+      141
+    ],
+    "sha256": "cbf1c98cdfaec9b6bc40bc26123fb0cb5af9804e6292c62b6db2167d2473491f"
+  },
+  {
+    "id": "M027",
+    "name": "새우 슬라임",
+    "kind": "monster",
+    "file": "monster/M027.png",
+    "spriteRuid": "006eae999eac4e1a9f602cf5d16e1f1c",
+    "sourcePath": "maplestory/mob/3401007/move/0",
+    "sourceSize": [
+      88,
+      88
+    ],
+    "croppedSize": [
+      88,
+      88
+    ],
+    "artSize": [
+      216,
+      216
+    ],
+    "sha256": "fc539545b33c383199834a4bbfac0351a944fe76443bb19633666bff2a612e84"
+  },
+  {
+    "id": "M028",
+    "name": "날치 슬라임",
+    "kind": "monster",
+    "file": "monster/M028.png",
+    "spriteRuid": "0eddc82eb8e24dd9a8b8e20d6ed87b9d",
+    "sourcePath": "maplestory/mob/3401008/move/1",
+    "sourceSize": [
+      76,
+      80
+    ],
+    "croppedSize": [
+      75,
+      79
+    ],
+    "artSize": [
+      205,
+      216
+    ],
+    "sha256": "d45b1c26bd0a3366f92fd3a0ce365c0ebd07e1fc7841270c1337014718fb0d0f"
+  },
+  {
+    "id": "M029",
+    "name": "불사가리 슬라임",
+    "kind": "monster",
+    "file": "monster/M029.png",
+    "spriteRuid": "37a0ce86c02b4e45881c57897dfca210",
+    "sourcePath": "maplestory/mob/3401009/move/2",
+    "sourceSize": [
+      84,
+      92
+    ],
+    "croppedSize": [
+      81,
+      89
+    ],
+    "artSize": [
+      197,
+      216
+    ],
+    "sha256": "e18fabc69542400824f07df08335998d99ba6e53a9d9c4279af8adcfa9d56606"
+  },
+  {
+    "id": "M030",
+    "name": "주니어 그류핀",
+    "kind": "monster",
+    "file": "monster/M030.png",
+    "spriteRuid": "09fe58cba6084125b590f61f7a79f5a6",
+    "sourcePath": "maplestory/mob/3210202/move/0",
+    "sourceSize": [
+      36,
+      44
+    ],
+    "croppedSize": [
+      36,
+      43
+    ],
+    "artSize": [
+      181,
+      216
+    ],
+    "sha256": "744b2beb6b1f8af52d408294fdd25a5c6e6ef0f39b7588bfe76a70aeb9a5a9af"
+  },
+  {
+    "id": "M031",
+    "name": "주니어 라이오너",
+    "kind": "monster",
+    "file": "monster/M031.png",
+    "spriteRuid": "bef01f26ad3440299f8f256e6fa23a2e",
+    "sourcePath": "maplestory/mob/3210201/move/0",
+    "sourceSize": [
+      36,
+      44
+    ],
+    "croppedSize": [
+      36,
+      43
+    ],
+    "artSize": [
+      181,
+      216
+    ],
+    "sha256": "4ea0b642a8d92808e5fc15666414043ac6a7ad5f246b3fc78709525405dcf66e"
+  },
+  {
+    "id": "M032",
+    "name": "주니어 샐리온",
+    "kind": "monster",
+    "file": "monster/M032.png",
+    "spriteRuid": "41b1f3bcebc444f5a5cc78dd6f0909c8",
+    "sourcePath": "maplestory/mob/3210200/move/0",
+    "sourceSize": [
+      36,
+      44
+    ],
+    "croppedSize": [
+      36,
+      43
+    ],
+    "artSize": [
+      181,
+      216
+    ],
+    "sha256": "78b390c02f0418df8f1b525d69d07293b3d07ffc9fae31a5af0ba92d3c173f77"
+  },
+  {
+    "id": "M033",
+    "name": "그류핀",
+    "kind": "monster",
+    "file": "monster/M033.png",
+    "spriteRuid": "6c8c629808af48a3a949584f7e7a7c36",
+    "sourcePath": "maplestory/mob/5120003/move/0",
+    "sourceSize": [
+      60,
+      60
+    ],
+    "croppedSize": [
+      60,
+      57
+    ],
+    "artSize": [
+      216,
+      205
+    ],
+    "sha256": "4efe685b7c3f83d5669fe9af3372ae52378d31033cccf8a3191413ed03b3ee52"
+  },
+  {
+    "id": "M034",
+    "name": "라이오너",
+    "kind": "monster",
+    "file": "monster/M034.png",
+    "spriteRuid": "7b518c33828447638ac9568fdd8fe462",
+    "sourcePath": "maplestory/mob/5120002/move/0",
+    "sourceSize": [
+      60,
+      60
+    ],
+    "croppedSize": [
+      60,
+      57
+    ],
+    "artSize": [
+      216,
+      205
+    ],
+    "sha256": "b451aa6f61eb190ae39ac07289bf4047be4d11c3be3a8e0c55fc41dbd073429d"
+  },
+  {
+    "id": "M035",
+    "name": "샐리온",
+    "kind": "monster",
+    "file": "monster/M035.png",
+    "spriteRuid": "813e9bc0061148a9b952eb855beb4834",
+    "sourcePath": "maplestory/mob/5120001/move/0",
+    "sourceSize": [
+      60,
+      60
+    ],
+    "croppedSize": [
+      60,
+      57
+    ],
+    "artSize": [
+      216,
+      205
+    ],
+    "sha256": "1f66561acb15386c238f111b00bf12f900adc501f1016a97a78a480cb52aca6d"
+  },
+  {
+    "id": "M036",
+    "name": "스타픽시",
+    "kind": "monster",
+    "file": "monster/M036.png",
+    "spriteRuid": "c3ab86d885274a62b9a7e2e32411c3b5",
+    "sourcePath": "maplestory/mob/3230200/move/0",
+    "sourceSize": [
+      56,
+      52
+    ],
+    "croppedSize": [
+      55,
+      52
+    ],
+    "artSize": [
+      216,
+      204
+    ],
+    "sha256": "acf22a275f10ebc5d1867219b84326ea9c046c21217d83c076430158ac22e4dc"
+  },
+  {
+    "id": "M037",
+    "name": "루나픽시",
+    "kind": "monster",
+    "file": "monster/M037.png",
+    "spriteRuid": "9c9fd5de7c6149cbab60f3a0ff957d4c",
+    "sourcePath": "maplestory/mob/4230106/move/0",
+    "sourceSize": [
+      56,
+      52
+    ],
+    "croppedSize": [
+      55,
+      52
+    ],
+    "artSize": [
+      216,
+      204
+    ],
+    "sha256": "ca2e7725b0061df2a020a4432c4cc42fba29dead0ab3ad272c046d563c26f4f9"
+  },
+  {
+    "id": "M038",
+    "name": "러스터픽시",
+    "kind": "monster",
+    "file": "monster/M038.png",
+    "spriteRuid": "abf0547790c8484981e9b3ae3c7efdbd",
+    "sourcePath": "maplestory/mob/5120000/move/0",
+    "sourceSize": [
+      56,
+      52
+    ],
+    "croppedSize": [
+      55,
+      52
+    ],
+    "artSize": [
+      216,
+      204
+    ],
+    "sha256": "a9979656440408935d3df64c750757c5a4df4948a4295e750180740483421eba"
+  },
+  {
+    "id": "M039",
+    "name": "네펜데스",
+    "kind": "monster",
+    "file": "monster/M039.png",
+    "spriteRuid": "b9d227b02d8147f492056cefa92f0276",
+    "sourcePath": "maplestory/mob/4230105/stand/0",
+    "sourceSize": [
+      60,
+      52
+    ],
+    "croppedSize": [
+      60,
+      49
+    ],
+    "artSize": [
+      216,
+      176
+    ],
+    "sha256": "a76e16c75916591be9807864283e06a9fe263573fd26bf6db19495a1ae8b31d5"
+  },
+  {
+    "id": "M040",
+    "name": "다크 네펜데스",
+    "kind": "monster",
+    "file": "monster/M040.png",
+    "spriteRuid": "d050cfc0aab649b3bd57f7b0f8f8d238",
+    "sourcePath": "maplestory/mob/4130102/stand/0",
+    "sourceSize": [
+      72,
+      52
+    ],
+    "croppedSize": [
+      71,
+      49
+    ],
+    "artSize": [
+      216,
+      149
+    ],
+    "sha256": "72ecc47e7a535e711a9197475fbbadc4579425126a867ac141c61fb2ca89d9b6"
+  },
+  {
+    "id": "M041",
+    "name": "스톤볼",
+    "kind": "monster",
+    "file": "monster/M041.png",
+    "spriteRuid": "fca8448cc1a74bcaad8c6ad7adcefc86",
+    "sourcePath": "maplestory/mob/3000000/move/0",
+    "sourceSize": [
+      36,
+      36
+    ],
+    "croppedSize": [
+      36,
+      36
+    ],
+    "artSize": [
+      216,
+      216
+    ],
+    "sha256": "440255d4c31579cf2743772abde033030cd41dcab93ceaf6284bbcb6cfb5ee93"
+  },
+  {
+    "id": "M042",
+    "name": "주니어 스톤볼",
+    "kind": "monster",
+    "file": "monster/M042.png",
+    "spriteRuid": "39641e89739e4a27923035823e0c2892",
+    "sourcePath": "maplestory/mob/5200000/move/0",
+    "sourceSize": [
+      24,
+      24
+    ],
+    "croppedSize": [
+      21,
+      22
+    ],
+    "artSize": [
+      206,
+      216
+    ],
+    "sha256": "f4d5f31526887b2b484d88920219f62c294fc5d3fd7dfacd6a238c1e9a98cf7a"
+  },
+  {
+    "id": "M043",
+    "name": "파이어 스톤볼",
+    "kind": "monster",
+    "file": "monster/M043.png",
+    "spriteRuid": "1d76f84462574dc1a1f257b17b8063f4",
+    "sourcePath": "maplestory/mob/5200002/move/0",
+    "sourceSize": [
+      36,
+      36
+    ],
+    "croppedSize": [
+      36,
+      36
+    ],
+    "artSize": [
+      216,
+      216
+    ],
+    "sha256": "c6acfb3f641f113739abb60a8019b5b1b63f87d6413d7e337e2595927def660a"
+  },
+  {
+    "id": "M044",
+    "name": "아이스 스톤볼",
+    "kind": "monster",
+    "file": "monster/M044.png",
+    "spriteRuid": "a240d4f840414480b404f3cb94c7429d",
+    "sourcePath": "maplestory/mob/5200001/move/0",
+    "sourceSize": [
+      36,
+      36
+    ],
+    "croppedSize": [
+      36,
+      36
+    ],
+    "artSize": [
+      216,
+      216
+    ],
+    "sha256": "4f226c3ceacb701445a3c46f0fdd78e8c4d2894d82840c15126b90767ade622a"
+  },
+  {
+    "id": "M045",
+    "name": "주니어 페페",
+    "kind": "monster",
+    "file": "monster/M045.png",
+    "spriteRuid": "f6b8d57265cb4fae99afa745f4fe69c9",
+    "sourcePath": "maplestory/mob/5400000/move/0",
+    "sourceSize": [
+      36,
+      32
+    ],
+    "croppedSize": [
+      35,
+      32
+    ],
+    "artSize": [
+      216,
+      197
+    ],
+    "sha256": "5a024651f39b29da347bedab61bf44b2f737524494bffc69cddae32b56cdf662"
+  },
+  {
+    "id": "M046",
+    "name": "주니어 예티",
+    "kind": "monster",
+    "file": "monster/M046.png",
+    "spriteRuid": "18456c0f8ccd402da76ab0c219698c0d",
+    "sourcePath": "maplestory/mob/5100000/move/0",
+    "sourceSize": [
+      44,
+      44
+    ],
+    "croppedSize": [
+      44,
+      41
+    ],
+    "artSize": [
+      216,
+      201
+    ],
+    "sha256": "c59bb120f8bba804ea47a8899bf7d75e515aefdf838dc6d1e63e8137c9ac35b4"
+  },
+  {
+    "id": "M047",
+    "name": "다크 주니어 예티",
+    "kind": "monster",
+    "file": "monster/M047.png",
+    "spriteRuid": "e6a5ba04cb764a248c86dcd8b4b55f1f",
+    "sourcePath": "maplestory/mob/5130105/move/0",
+    "sourceSize": [
+      44,
+      44
+    ],
+    "croppedSize": [
+      44,
+      41
+    ],
+    "artSize": [
+      216,
+      201
+    ],
+    "sha256": "ec9d52f7470f306312cb2324919278229af7113f45594e0bef066bff2a577136"
+  },
+  {
+    "id": "M048",
+    "name": "헥터",
+    "kind": "monster",
+    "file": "monster/M048.png",
+    "spriteRuid": "173b761a95b84a1b8932a6e1874c699b",
+    "sourcePath": "maplestory/mob/5130104/move/0",
+    "sourceSize": [
+      112,
+      60
+    ],
+    "croppedSize": [
+      109,
+      57
+    ],
+    "artSize": [
+      216,
+      113
+    ],
+    "sha256": "726265d575d86efde22622ad264f652bd27f964c597407293b6dd05715ddc454"
+  },
+  {
+    "id": "M049",
+    "name": "화이트팽",
+    "kind": "monster",
+    "file": "monster/M049.png",
+    "spriteRuid": "bf5432cf47424764a4bb1cf1b2a8d911",
+    "sourcePath": "maplestory/mob/5140000/move/0",
+    "sourceSize": [
+      112,
+      60
+    ],
+    "croppedSize": [
+      109,
+      57
+    ],
+    "artSize": [
+      216,
+      113
+    ],
+    "sha256": "d5db933eee8e8a4abf40eeb69c27755cd597258d504f43c323b91cf966a3bb62"
+  },
+  {
+    "id": "M050",
+    "name": "예티",
+    "kind": "monster",
+    "file": "monster/M050.png",
+    "spriteRuid": "93828c6078964debaa5b849a8d91044b",
+    "sourcePath": "maplestory/mob/6300000/move/0",
+    "sourceSize": [
+      104,
+      112
+    ],
+    "croppedSize": [
+      104,
+      111
+    ],
+    "artSize": [
+      202,
+      216
+    ],
+    "sha256": "f81a1b4519e99eba2e1c90e5a0f544af1c6478db164338d164ecd09884507123"
+  },
+  {
+    "id": "M051",
+    "name": "다크 예티",
+    "kind": "monster",
+    "file": "monster/M051.png",
+    "spriteRuid": "48ec1bf2f77b45c396f5a39bf146f00c",
+    "sourcePath": "maplestory/mob/6400000/move/0",
+    "sourceSize": [
+      104,
+      112
+    ],
+    "croppedSize": [
+      104,
+      111
+    ],
+    "artSize": [
+      202,
+      216
+    ],
+    "sha256": "4fa54e9241058fbb56aa92738baaf3d3ccb03da36f9d1c0dcb3b32a35a6cd7ab"
+  },
+  {
+    "id": "M052",
+    "name": "예티와 페페",
+    "kind": "monster",
+    "file": "monster/M052.png",
+    "spriteRuid": "6569b8c2c15f497883f77aab497a05e1",
+    "sourcePath": "maplestory/mob/7130102/move/0",
+    "sourceSize": [
+      108,
+      160
+    ],
+    "croppedSize": [
+      105,
+      157
+    ],
+    "artSize": [
+      144,
+      216
+    ],
+    "sha256": "db41874ae2a437d8baadbc3ce5da559bfedbef72eb92244bd63f103b60fe4191"
+  },
+  {
+    "id": "M053",
+    "name": "다크 예티와 페페",
+    "kind": "monster",
+    "file": "monster/M053.png",
+    "spriteRuid": "c8590024649649359883fed24976ff9e",
+    "sourcePath": "maplestory/mob/8140100/move/0",
+    "sourceSize": [
+      108,
+      160
+    ],
+    "croppedSize": [
+      105,
+      157
+    ],
+    "artSize": [
+      144,
+      216
+    ],
+    "sha256": "cd47112b27fa5e7ef56248e43509b489fbb8a608367dcdae13de1e0833f4db8e"
+  },
+  {
+    "id": "M054",
+    "name": "웨어울프",
+    "kind": "monster",
+    "file": "monster/M054.png",
+    "spriteRuid": "8ac6ab548d734ee2832d0e84ea5187af",
+    "sourcePath": "maplestory/mob/7130200/move/0",
+    "sourceSize": [
+      140,
+      168
+    ],
+    "croppedSize": [
+      137,
+      166
+    ],
+    "artSize": [
+      178,
+      216
+    ],
+    "sha256": "f084da205d47d5acc44d9c30db9f64aa0b6e339681cfe573f2ad356f3d1bc488"
+  },
+  {
+    "id": "M055",
+    "name": "라이칸스로프",
+    "kind": "monster",
+    "file": "monster/M055.png",
+    "spriteRuid": "2e53e95c3d8a4cb98aa6d5a04b13e311",
+    "sourcePath": "maplestory/mob/8140000/move/0",
+    "sourceSize": [
+      140,
+      168
+    ],
+    "croppedSize": [
+      137,
+      166
+    ],
+    "artSize": [
+      178,
+      216
+    ],
+    "sha256": "ef7290f69fbee90152ab7a40e1e08da21fd8f7db52f70e935eb459b1fce8fedc"
+  },
+  {
+    "id": "M056",
+    "name": "쿨리 좀비",
+    "kind": "monster",
+    "file": "monster/M056.png",
+    "spriteRuid": "14d3309c428b476f93348963897ea0a9",
+    "sourcePath": "maplestory/mob/5130107/move/1",
+    "sourceSize": [
+      60,
+      92
+    ],
+    "croppedSize": [
+      60,
+      91
+    ],
+    "artSize": [
+      142,
+      216
+    ],
+    "sha256": "3ff3ac0657bc1b20fab767e6406ee11771d7c2304dd4347f9ed4b56e87b7e579"
+  },
+  {
+    "id": "M057",
+    "name": "마이너 좀비",
+    "kind": "monster",
+    "file": "monster/M057.png",
+    "spriteRuid": "b0d1be6a2e0e4de9a0f4c0bbd606386c",
+    "sourcePath": "maplestory/mob/9833540/move/1",
+    "sourceSize": [
+      60,
+      92
+    ],
+    "croppedSize": [
+      60,
+      89
+    ],
+    "artSize": [
+      146,
+      216
+    ],
+    "sha256": "f795756b0f9acae716ee5f0cba359b270e10227c81ff8ff5104a391284ae312b"
+  },
+  {
+    "id": "M058",
+    "name": "리치",
+    "kind": "monster",
+    "file": "monster/M058.png",
+    "spriteRuid": "087f3e38aae34e3c9097e26f6baf9c72",
+    "sourcePath": "maplestory/mob/6090000/move/1",
+    "sourceSize": [
+      112,
+      132
+    ],
+    "croppedSize": [
+      111,
+      131
+    ],
+    "artSize": [
+      183,
+      216
+    ],
+    "sha256": "e0e490aa56f597b200117ee7e20cb5a85e707712193c88595724a8221c772a20"
+  },
+  {
+    "id": "M059",
+    "name": "주니어 불독",
+    "kind": "monster",
+    "file": "monster/M059.png",
+    "spriteRuid": "be15552430bf480e894e32c1cbcabb11",
+    "sourcePath": "maplestory/mob/4230108/move/0",
+    "sourceSize": [
+      40,
+      40
+    ],
+    "croppedSize": [
+      38,
+      39
+    ],
+    "artSize": [
+      210,
+      216
+    ],
+    "sha256": "8562256c4a7555d62a1b72e60d7de5eea777816d3a4e3744ce20d091d933c3f9"
+  },
+  {
+    "id": "M060",
+    "name": "불독",
+    "kind": "monster",
+    "file": "monster/M060.png",
+    "spriteRuid": "8fbc72880eea42c29d332b4db7f1a51c",
+    "sourcePath": "maplestory/mob/7130001/move/0",
+    "sourceSize": [
+      108,
+      80
+    ],
+    "croppedSize": [
+      106,
+      79
+    ],
+    "artSize": [
+      216,
+      161
+    ],
+    "sha256": "5868a238f89a52747ee278f6905c3ca9b7970a721df6f536176ad7adb2a0fef9"
+  },
+  {
+    "id": "M061",
+    "name": "파이어독",
+    "kind": "monster",
+    "file": "monster/M061.png",
+    "spriteRuid": "412d3586580b47b0a8ef0a93bfb3677a",
+    "sourcePath": "maplestory/mob/9010159/move/0",
+    "sourceSize": [
+      108,
+      80
+    ],
+    "croppedSize": [
+      106,
+      79
+    ],
+    "artSize": [
+      216,
+      161
+    ],
+    "sha256": "141f38b1eb6805a05135a08fc66972cc96bccdabb0618c49b27eaaf967af74ac"
+  },
+  {
+    "id": "B02",
+    "name": "자쿰",
+    "kind": "boss",
+    "file": "boss/B02.png",
+    "spriteRuid": "282f519bb66c4e499e1992b9993e1457",
+    "sourcePath": "maplestory/mob/9390301/stand/0",
+    "sourceSize": [
+      344,
+      260
+    ],
+    "croppedSize": [
+      342,
+      257
+    ],
+    "artSize": [
+      216,
+      162
+    ],
+    "sha256": "6a441bce4c8a71d602e08f4afa97565f1f703a2f87768f2f31926ff81f6f5ace"
+  },
+  {
+    "id": "M062",
+    "name": "망둥이",
+    "kind": "monster",
+    "file": "monster/M062.png",
+    "spriteRuid": "25b24206a71a4e47b6754784bbfec702",
+    "sourcePath": "maplestory/mob/7130020/fly/0",
+    "sourceSize": [
+      68,
+      52
+    ],
+    "croppedSize": [
+      67,
+      49
+    ],
+    "artSize": [
+      216,
+      158
+    ],
+    "sha256": "2240cbb20d49668db2bd2f2340da005df7bff7b8d789c43bb59ca39c1912df00"
+  },
+  {
+    "id": "M063",
+    "name": "망둥이 집",
+    "kind": "monster",
+    "file": "monster/M063.png",
+    "spriteRuid": "07cca4597ad74bac9d3877040d70fab5",
+    "sourcePath": "maplestory/mob/8140555/stand/0",
+    "sourceSize": [
+      140,
+      124
+    ],
+    "croppedSize": [
+      139,
+      121
+    ],
+    "artSize": [
+      216,
+      188
+    ],
+    "sha256": "08443d5a3b2f947838929a58f534a597df345d078bf1238789904947c86e7a85"
+  },
+  {
+    "id": "M064",
+    "name": "본피쉬",
+    "kind": "monster",
+    "file": "monster/M064.png",
+    "spriteRuid": "2e3cad8b586e482db9b97dd14302f7ea",
+    "sourcePath": "maplestory/mob/8140600/move/0",
+    "sourceSize": [
+      112,
+      72
+    ],
+    "croppedSize": [
+      109,
+      71
+    ],
+    "artSize": [
+      216,
+      141
+    ],
+    "sha256": "c682dd55929375f699e161ddce71bfccc9202ee7e75cdf10fa51e50602c2c7c8"
+  },
+  {
+    "id": "M065",
+    "name": "샤크",
+    "kind": "monster",
+    "file": "monster/M065.png",
+    "spriteRuid": "86b72ceeaf1547b0b52dbaaa8789c0de",
+    "sourcePath": "maplestory/mob/8150100/move/1",
+    "sourceSize": [
+      120,
+      100
+    ],
+    "croppedSize": [
+      119,
+      97
+    ],
+    "artSize": [
+      216,
+      176
+    ],
+    "sha256": "422380e0f7bc6a58909df70da84ad6cc43283e49c2c0e837cee3577aecc9ba2d"
+  },
+  {
+    "id": "M066",
+    "name": "콜드샤크",
+    "kind": "monster",
+    "file": "monster/M066.png",
+    "spriteRuid": "0eabdf98ffd74656a3e8a0ee728154a9",
+    "sourcePath": "maplestory/mob/8150101/move/1",
+    "sourceSize": [
+      140,
+      104
+    ],
+    "croppedSize": [
+      137,
+      103
+    ],
+    "artSize": [
+      216,
+      162
+    ],
+    "sha256": "663f62934eb630b37b23d67753d257a26d1a163cb8265694d14452ee74cefe70"
+  },
+  {
+    "id": "B03",
+    "name": "피아누스",
+    "kind": "boss",
+    "file": "boss/B03.png",
+    "spriteRuid": "780b1754c3c74644ba16e0715d51e406",
+    "sourcePath": "maplestory/mob/8510000/stand/2",
+    "sourceSize": [
+      420,
+      368
+    ],
+    "croppedSize": [
+      418,
+      368
+    ],
+    "artSize": [
+      216,
+      190
+    ],
+    "sha256": "cdb21f08ce3211280ef0d9815ac34144f51614174c5c8bc48edd924f91a95b77"
+  },
+  {
+    "id": "M067",
+    "name": "미요캐츠",
+    "kind": "monster",
+    "file": "monster/M067.png",
+    "spriteRuid": "16d6fe796664478994f1b193a4ca2305",
+    "sourcePath": "maplestory/mob/2100108/move/0",
+    "sourceSize": [
+      48,
+      80
+    ],
+    "croppedSize": [
+      46,
+      80
+    ],
+    "artSize": [
+      124,
+      216
+    ],
+    "sha256": "677e8dc1cd89826204c7ac6eb031cf78c154a8f6e08d90c35b523204df42d03f"
+  },
+  {
+    "id": "M068",
+    "name": "키요",
+    "kind": "monster",
+    "file": "monster/M068.png",
+    "spriteRuid": "bbdfc1606be643f5b0b6b92e6026a42a",
+    "sourcePath": "maplestory/mob/3100102/move/0",
+    "sourceSize": [
+      80,
+      76
+    ],
+    "croppedSize": [
+      77,
+      75
+    ],
+    "artSize": [
+      216,
+      210
+    ],
+    "sha256": "1c105d8b2aeaa7212a3f2b7cf9d9fa13f89cec7cf6a4d9897e82704be28ca0c5"
+  },
+  {
+    "id": "M069",
+    "name": "모래난쟁이",
+    "kind": "monster",
+    "file": "monster/M069.png",
+    "spriteRuid": "015b24ab06ca4310b48dabcd03a5dcfc",
+    "sourcePath": "maplestory/mob/3100101/move/2",
+    "sourceSize": [
+      100,
+      112
+    ],
+    "croppedSize": [
+      99,
+      112
+    ],
+    "artSize": [
+      191,
+      216
+    ],
+    "sha256": "8f8829c7dbd8000f2dd58a60a58b55920bbfc52355513b8c7aa87495975437cb"
+  },
+  {
+    "id": "M070",
+    "name": "스콜피언",
+    "kind": "monster",
+    "file": "monster/M070.png",
+    "spriteRuid": "96ea105367fd458e84fb7eaec66abb69",
+    "sourcePath": "maplestory/mob/2110301/move/2",
+    "sourceSize": [
+      76,
+      60
+    ],
+    "croppedSize": [
+      74,
+      59
+    ],
+    "artSize": [
+      216,
+      172
+    ],
+    "sha256": "ba326e949fda455665750291ef62d5ea8e3644d60050f0c4feb782aaa9060b04"
+  },
+  {
+    "id": "M071",
+    "name": "모래두더지",
+    "kind": "monster",
+    "file": "monster/M071.png",
+    "spriteRuid": "1133aa3f572745ee96d06fecbbb101aa",
+    "sourcePath": "maplestory/mob/2110300/move/0",
+    "sourceSize": [
+      100,
+      48
+    ],
+    "croppedSize": [
+      100,
+      47
+    ],
+    "artSize": [
+      216,
+      102
+    ],
+    "sha256": "20ccbcc17acfba1b7d0c65a3cadb4a9c420a767d380d8ca652df80941cc94803"
+  },
+  {
+    "id": "M072",
+    "name": "로이드",
+    "kind": "monster",
+    "file": "monster/M072.png",
+    "spriteRuid": "cefbd19951f04c72be8deb5bc5cc8533",
+    "sourcePath": "maplestory/mob/5110301/move/0",
+    "sourceSize": [
+      36,
+      68
+    ],
+    "croppedSize": [
+      33,
+      66
+    ],
+    "artSize": [
+      108,
+      216
+    ],
+    "sha256": "62f990445e27669b8d0c4fd8de601715cccc00742434f2393720d1fef3a49a05"
+  },
+  {
+    "id": "M073",
+    "name": "네오 휴로이드",
+    "kind": "monster",
+    "file": "monster/M073.png",
+    "spriteRuid": "ec132a18136c48adae27d9d984f7ad53",
+    "sourcePath": "maplestory/mob/5110302/move/2",
+    "sourceSize": [
+      56,
+      72
+    ],
+    "croppedSize": [
+      54,
+      71
+    ],
+    "artSize": [
+      164,
+      216
+    ],
+    "sha256": "6575768ad0520e0a14142846b5a3175270ffc3b8cea8cb1ebf1de4236807b4f3"
+  },
+  {
+    "id": "M074",
+    "name": "호문쿨루스",
+    "kind": "monster",
+    "file": "monster/M074.png",
+    "spriteRuid": "9546e311b1514299812e6e6ade21805a",
+    "sourcePath": "maplestory/mob/7110301/move/2",
+    "sourceSize": [
+      76,
+      104
+    ],
+    "croppedSize": [
+      75,
+      104
+    ],
+    "artSize": [
+      156,
+      216
+    ],
+    "sha256": "0ba3d4b1e86b431374c7d7abb2c2ffa217da189bcdc004c414ebc635ae82e9ec"
+  },
+  {
+    "id": "M075",
+    "name": "비틀",
+    "kind": "monster",
+    "file": "monster/M075.png",
+    "spriteRuid": "364b548c4c2f467991777a2453a90609",
+    "sourcePath": "maplestory/mob/7130002/move/0",
+    "sourceSize": [
+      104,
+      68
+    ],
+    "croppedSize": [
+      104,
+      68
+    ],
+    "artSize": [
+      216,
+      141
+    ],
+    "sha256": "f0e261029b891d457b580fcf431955e818437abc009e11430a49b59bc5b0ede4"
+  },
+  {
+    "id": "M076",
+    "name": "듀얼 비틀",
+    "kind": "monster",
+    "file": "monster/M076.png",
+    "spriteRuid": "e5de6d28fa7d4ca088785e4ddac1d41f",
+    "sourcePath": "maplestory/mob/7130003/move/0",
+    "sourceSize": [
+      104,
+      68
+    ],
+    "croppedSize": [
+      104,
+      68
+    ],
+    "artSize": [
+      216,
+      141
+    ],
+    "sha256": "7e07be2dd52f92a3b8913ca03fbc02fe107bcc65dc4dabe68b1aee7118f665e6"
+  },
+  {
+    "id": "M077",
+    "name": "하프",
+    "kind": "monster",
+    "file": "monster/M077.png",
+    "spriteRuid": "b059fd9edd8b4376b1bdc2739b35f3e7",
+    "sourcePath": "maplestory/mob/8140001/move/0",
+    "sourceSize": [
+      68,
+      92
+    ],
+    "croppedSize": [
+      66,
+      92
+    ],
+    "artSize": [
+      155,
+      216
+    ],
+    "sha256": "65d4463d754f0b508c283259fe493df235bc9af4661cca8c12aaff1697259dd5"
+  },
+  {
+    "id": "M078",
+    "name": "블러드 하프",
+    "kind": "monster",
+    "file": "monster/M078.png",
+    "spriteRuid": "03311089f9324a769e5dd843aedf74b3",
+    "sourcePath": "maplestory/mob/8140002/move/0",
+    "sourceSize": [
+      68,
+      92
+    ],
+    "croppedSize": [
+      66,
+      92
+    ],
+    "artSize": [
+      155,
+      216
+    ],
+    "sha256": "bfca79b2020fcdd1cb115c6004a81e85e6c6a98e9878712f82f9697da441689c"
+  },
+  {
+    "id": "M079",
+    "name": "붉은 켄타우로스",
+    "kind": "monster",
+    "file": "monster/M079.png",
+    "spriteRuid": "bc20d76d036745a9b2f45bf60b0adef8",
+    "sourcePath": "maplestory/mob/8140102/move/0",
+    "sourceSize": [
+      136,
+      116
+    ],
+    "croppedSize": [
+      133,
+      116
+    ],
+    "artSize": [
+      216,
+      188
+    ],
+    "sha256": "9d68e3e482c9b33b9b70865e919f273c04308ddaf0f43ad796adbf755011b18a"
+  },
+  {
+    "id": "M080",
+    "name": "검은 켄타우로스",
+    "kind": "monster",
+    "file": "monster/M080.png",
+    "spriteRuid": "24c5cda697534ba3b8289c2e34bc2af2",
+    "sourcePath": "maplestory/mob/8140101/move/1",
+    "sourceSize": [
+      128,
+      120
+    ],
+    "croppedSize": [
+      127,
+      119
+    ],
+    "artSize": [
+      216,
+      202
+    ],
+    "sha256": "5bdbe2054aac0d73f85c54410478c0719488dfa7f6fd101efaf8058a906bdba0"
+  },
+  {
+    "id": "M081",
+    "name": "블루 드래곤 터틀",
+    "kind": "monster",
+    "file": "monster/M081.png",
+    "spriteRuid": "00baf506674947a7a178d1534388c236",
+    "sourcePath": "maplestory/mob/8140700/move/0",
+    "sourceSize": [
+      132,
+      112
+    ],
+    "croppedSize": [
+      130,
+      112
+    ],
+    "artSize": [
+      216,
+      186
+    ],
+    "sha256": "789558d9e8a274e7ecd30af34bd801b8b7fe3b20aaf6a1d4e90dec764cc041b5"
+  },
+  {
+    "id": "M082",
+    "name": "레드 드래곤 터틀",
+    "kind": "monster",
+    "file": "monster/M082.png",
+    "spriteRuid": "74e9df36cbe044bdacd3a8a1c5ea69c8",
+    "sourcePath": "maplestory/mob/8140701/move/2",
+    "sourceSize": [
+      132,
+      128
+    ],
+    "croppedSize": [
+      130,
+      128
+    ],
+    "artSize": [
+      216,
+      213
+    ],
+    "sha256": "40993901fdbf3237d5ee838f8abc40672a5590c0633dff270caa6f8d6ed58809"
+  },
+  {
+    "id": "M083",
+    "name": "리스톤",
+    "kind": "monster",
+    "file": "monster/M083.png",
+    "spriteRuid": "f79137b11fdc4815b4b2c860bf7bef77",
+    "sourcePath": "maplestory/mob/8140702/move/2",
+    "sourceSize": [
+      176,
+      152
+    ],
+    "croppedSize": [
+      173,
+      149
+    ],
+    "artSize": [
+      216,
+      186
+    ],
+    "sha256": "02e183a3f106415daeac7ebb78434d774c78c9111e7361fed8e75adf09669688"
+  },
+  {
+    "id": "M084",
+    "name": "브레스톤",
+    "kind": "monster",
+    "file": "monster/M084.png",
+    "spriteRuid": "a5b834477099442fa0548189a1e7d996",
+    "sourcePath": "maplestory/mob/8140703/move/2",
+    "sourceSize": [
+      176,
+      152
+    ],
+    "croppedSize": [
+      173,
+      152
+    ],
+    "artSize": [
+      216,
+      190
+    ],
+    "sha256": "1bbe7aca808cbc92c2f1b14860a5db9ebb97382142a533bfe1094f4a8e3f421a"
+  },
+  {
+    "id": "M085",
+    "name": "레드 와이번",
+    "kind": "monster",
+    "file": "monster/M085.png",
+    "spriteRuid": "3edb1a1024db46c98ac30a9db05bce34",
+    "sourcePath": "maplestory/mob/8150300/move/0",
+    "sourceSize": [
+      164,
+      156
+    ],
+    "croppedSize": [
+      161,
+      156
+    ],
+    "artSize": [
+      216,
+      209
+    ],
+    "sha256": "97a226d635d1514c66113a141fef0ff178b922ffaa94b36666804d6effab2638"
+  },
+  {
+    "id": "M086",
+    "name": "블루 와이번",
+    "kind": "monster",
+    "file": "monster/M086.png",
+    "spriteRuid": "34f5985043af4e8d8da1f730682e67e0",
+    "sourcePath": "maplestory/mob/8150301/move/0",
+    "sourceSize": [
+      164,
+      156
+    ],
+    "croppedSize": [
+      161,
+      156
+    ],
+    "artSize": [
+      216,
+      209
+    ],
+    "sha256": "c3302f83bbb6888729df211f57e34fc5ccb0134ac2ef3d169e7bc5b9290d70a2"
+  },
+  {
+    "id": "M087",
+    "name": "다크 와이번",
+    "kind": "monster",
+    "file": "monster/M087.png",
+    "spriteRuid": "7d265747e2294d46bb4f3a17f5bbbd60",
+    "sourcePath": "maplestory/mob/8150302/move/0",
+    "sourceSize": [
+      164,
+      156
+    ],
+    "croppedSize": [
+      161,
+      156
+    ],
+    "artSize": [
+      216,
+      209
+    ],
+    "sha256": "1765f5ee3f83c0833fa20456dd047be9e13b6bb824d86a82e438d032843b9042"
+  },
+  {
+    "id": "M088",
+    "name": "뉴트 주니어",
+    "kind": "monster",
+    "file": "monster/M088.png",
+    "spriteRuid": "9ad007e33cad456ea741b6e0c4761bc2",
+    "sourcePath": "maplestory/mob/8190000/stand/0",
+    "sourceSize": [
+      92,
+      92
+    ],
+    "croppedSize": [
+      91,
+      92
+    ],
+    "artSize": [
+      214,
+      216
+    ],
+    "sha256": "ca4c1064dabfe63f402f457110db86b30e69487b775b890f70073669d3f20011"
+  },
+  {
+    "id": "M089",
+    "name": "네스트 골렘",
+    "kind": "monster",
+    "file": "monster/M089.png",
+    "spriteRuid": "753e3bcf77174e82b2abced012fded37",
+    "sourcePath": "maplestory/mob/8190002/move/0",
+    "sourceSize": [
+      112,
+      160
+    ],
+    "croppedSize": [
+      112,
+      160
+    ],
+    "artSize": [
+      151,
+      216
+    ],
+    "sha256": "f9d55af13a0f8d95fda102e1f98b0fec9396e003df33d053171236f274e188d7"
+  },
+  {
+    "id": "M090",
+    "name": "스켈레곤",
+    "kind": "monster",
+    "file": "monster/M090.png",
+    "spriteRuid": "e88006cf4db34917a9ca482baf5544be",
+    "sourcePath": "maplestory/mob/8190003/move/2",
+    "sourceSize": [
+      104,
+      120
+    ],
+    "croppedSize": [
+      101,
+      118
+    ],
+    "artSize": [
+      185,
+      216
+    ],
+    "sha256": "3f173a099bfa15f4af01b2a360086038f5d9d36c605fcc91e1a0dae7616fe0ba"
+  },
+  {
+    "id": "M091",
+    "name": "스켈레스",
+    "kind": "monster",
+    "file": "monster/M091.png",
+    "spriteRuid": "12b9db812d8c428880d0c84a329e79ba",
+    "sourcePath": "maplestory/mob/8190004/move/2",
+    "sourceSize": [
+      88,
+      116
+    ],
+    "croppedSize": [
+      87,
+      116
+    ],
+    "artSize": [
+      162,
+      216
+    ],
+    "sha256": "4ead5b275e0018ea60ed0bc63baba1b4d49e6ceddfa4e546d8e04c2392ebc0cb"
+  },
+  {
+    "id": "B04",
+    "name": "혼테일",
+    "kind": "boss",
+    "file": "boss/B04.png",
+    "spriteRuid": "adf2ed1199434cbd9d1b2fae8b157aab",
+    "sourcePath": "maplestory/mob/8810003/stand/0",
+    "sourceSize": [
+      164,
+      332
+    ],
+    "croppedSize": [
+      161,
+      332
+    ],
+    "artSize": [
+      105,
+      216
+    ],
+    "sha256": "37f0985a777aa1d7b53788e8e31ca64f6dc9de6082120e60362e5fef39c22062"
+  },
+  {
+    "id": "M092",
+    "name": "추억의 사제",
+    "kind": "monster",
+    "file": "monster/M092.png",
+    "spriteRuid": "039e4466a4ea47628f2368e74359fcc8",
+    "sourcePath": "maplestory/mob/8200001/move/0",
+    "sourceSize": [
+      68,
+      188
+    ],
+    "croppedSize": [
+      66,
+      186
+    ],
+    "artSize": [
+      77,
+      216
+    ],
+    "sha256": "ad1b8ae87ec0d86ea17f7c7278a0786a12d5078d6bda648cd30f2e6bb37f0810"
+  },
+  {
+    "id": "M093",
+    "name": "추억의 수호병",
+    "kind": "monster",
+    "file": "monster/M093.png",
+    "spriteRuid": "d87de075228a4021b3cfde6e77ebe5b5",
+    "sourcePath": "maplestory/mob/8200003/move/0",
+    "sourceSize": [
+      140,
+      208
+    ],
+    "croppedSize": [
+      140,
+      205
+    ],
+    "artSize": [
+      148,
+      216
+    ],
+    "sha256": "867bb0446108011cbb7f04f7917a5b378644b14cda8445ae3c960f8d956d9835"
+  },
+  {
+    "id": "M094",
+    "name": "후회의 사제",
+    "kind": "monster",
+    "file": "monster/M094.png",
+    "spriteRuid": "4d2348e79bfc49deb173d9e1ff1003c4",
+    "sourcePath": "maplestory/mob/8200005/move/0",
+    "sourceSize": [
+      68,
+      188
+    ],
+    "croppedSize": [
+      66,
+      186
+    ],
+    "artSize": [
+      77,
+      216
+    ],
+    "sha256": "2bf3b5dd9113fa1026f57c27215b0c002897dfbe3124778cfc70d2997e13b804"
+  },
+  {
+    "id": "M095",
+    "name": "후회의 수호병",
+    "kind": "monster",
+    "file": "monster/M095.png",
+    "spriteRuid": "836fc80a45534d2b9b4765eccaa183ff",
+    "sourcePath": "maplestory/mob/8200007/move/0",
+    "sourceSize": [
+      140,
+      208
+    ],
+    "croppedSize": [
+      140,
+      205
+    ],
+    "artSize": [
+      148,
+      216
+    ],
+    "sha256": "ad2ab96bad88d1091b72becf2fce3476f380c0874321609c25e7939fa290846c"
+  },
+  {
+    "id": "M096",
+    "name": "망각의 사제",
+    "kind": "monster",
+    "file": "monster/M096.png",
+    "spriteRuid": "5f3b4190c02a4da58f43c09ed8ed4697",
+    "sourcePath": "maplestory/mob/8200009/move/0",
+    "sourceSize": [
+      68,
+      188
+    ],
+    "croppedSize": [
+      66,
+      186
+    ],
+    "artSize": [
+      77,
+      216
+    ],
+    "sha256": "f061c0942d59f699b313136307f511a963655eb6f32bd708da8c387d4890e08c"
+  },
+  {
+    "id": "M097",
+    "name": "망각의 수호병",
+    "kind": "monster",
+    "file": "monster/M097.png",
+    "spriteRuid": "9498d0e2403a4109b970d16f61b5fba3",
+    "sourcePath": "maplestory/mob/8200011/move/0",
+    "sourceSize": [
+      140,
+      208
+    ],
+    "croppedSize": [
+      140,
+      205
+    ],
+    "artSize": [
+      148,
+      216
+    ],
+    "sha256": "d1c7207ded5e195a8b2664977a829bded4dfd9dcd99e9b43f60fe0a43e18b656"
+  },
+  {
+    "id": "B05",
+    "name": "핑크빈",
+    "kind": "boss",
+    "file": "boss/B05.png",
+    "spriteRuid": "98a47e617b8b44cb96da597ad949e7b1",
+    "sourcePath": "maplestory/mob/8820000/stand/0",
+    "sourceSize": [
+      92,
+      88
+    ],
+    "croppedSize": [
+      89,
+      85
+    ],
+    "artSize": [
+      216,
+      206
+    ],
+    "sha256": "3de3c1fb56ef40e33029261ad0f864f6051664b10d05e3569e81b0eaf21c07c7"
+  },
+  {
+    "id": "M098",
+    "name": "변형된 달팽이",
+    "kind": "monster",
+    "file": "monster/M098.png",
+    "spriteRuid": "c097b2eca2804c278568b9e007f41659",
+    "sourcePath": "maplestory/mob/8600000/move/2",
+    "sourceSize": [
+      144,
+      148
+    ],
+    "croppedSize": [
+      144,
+      145
+    ],
+    "artSize": [
+      215,
+      216
+    ],
+    "sha256": "8492e0b69e6e5f1a2054ef74c7342334f9a75222bfbe47cc12e16513dff86435"
+  },
+  {
+    "id": "M099",
+    "name": "변형된 주황버섯",
+    "kind": "monster",
+    "file": "monster/M099.png",
+    "spriteRuid": "679c2fb6dca24287b1ae410c7edc8753",
+    "sourcePath": "maplestory/mob/8600001/move/2",
+    "sourceSize": [
+      92,
+      112
+    ],
+    "croppedSize": [
+      90,
+      111
+    ],
+    "artSize": [
+      175,
+      216
+    ],
+    "sha256": "c2c6e7af35cc600e1903dec6befdb7ea26e68291f18ed5e3b86a884deab6de6d"
+  },
+  {
+    "id": "M100",
+    "name": "변형된 슬라임",
+    "kind": "monster",
+    "file": "monster/M100.png",
+    "spriteRuid": "145a1d10d6804926850929f822320f66",
+    "sourcePath": "maplestory/mob/8600002/move/2",
+    "sourceSize": [
+      192,
+      152
+    ],
+    "croppedSize": [
+      189,
+      149
+    ],
+    "artSize": [
+      216,
+      170
+    ],
+    "sha256": "984970952eac4e1134dc410a8593bb189da715f0acb51bdf92211ba50b97ac0a"
+  },
+  {
+    "id": "M101",
+    "name": "변형된 리본돼지",
+    "kind": "monster",
+    "file": "monster/M101.png",
+    "spriteRuid": "d6f8add5b3054f05929ecbe8869b9aa1",
+    "sourcePath": "maplestory/mob/8600003/move/0",
+    "sourceSize": [
+      152,
+      152
+    ],
+    "croppedSize": [
+      150,
+      149
+    ],
+    "artSize": [
+      216,
+      215
+    ],
+    "sha256": "1e3ed1e8b876aafcee0696690373b64780923b0ce1a4ab06fde0b0edbaa33b99"
+  },
+  {
+    "id": "M102",
+    "name": "변형된 스텀프",
+    "kind": "monster",
+    "file": "monster/M102.png",
+    "spriteRuid": "48bf64743b2b435f9fb65b8ba486fda4",
+    "sourcePath": "maplestory/mob/8620000/move/0",
+    "sourceSize": [
+      112,
+      120
+    ],
+    "croppedSize": [
+      112,
+      120
+    ],
+    "artSize": [
+      202,
+      216
+    ],
+    "sha256": "1d84ad16706361a7e991069f70ac1d16ce307df6942e0fbb4c57a5c777da9a17"
+  },
+  {
+    "id": "M103",
+    "name": "변형된 다크 스텀프",
+    "kind": "monster",
+    "file": "monster/M103.png",
+    "spriteRuid": "49d78d40c3974d5796f41981d062f0c6",
+    "sourcePath": "maplestory/mob/8620001/move/0",
+    "sourceSize": [
+      112,
+      120
+    ],
+    "croppedSize": [
+      112,
+      120
+    ],
+    "artSize": [
+      202,
+      216
+    ],
+    "sha256": "08cd2ebf49a71a193aa6e680993244f536524024773a8b4d951d9e4994a40bcf"
+  },
+  {
+    "id": "M104",
+    "name": "변형된 다크 엑스텀프",
+    "kind": "monster",
+    "file": "monster/M104.png",
+    "spriteRuid": "3535d3be29e149ed89a97aa14d002e98",
+    "sourcePath": "maplestory/mob/8620002/move/0",
+    "sourceSize": [
+      100,
+      156
+    ],
+    "croppedSize": [
+      97,
+      154
+    ],
+    "artSize": [
+      136,
+      216
+    ],
+    "sha256": "bdfe73801dfd728be7c6358f46c782b475341038e46f37ec6ae9379d6740daa5"
+  },
+  {
+    "id": "M105",
+    "name": "변형된 스톤 마스크",
+    "kind": "monster",
+    "file": "monster/M105.png",
+    "spriteRuid": "9a3ac2a5220944fab20f34ed0511514a",
+    "sourcePath": "maplestory/mob/8620007/move/1",
+    "sourceSize": [
+      128,
+      148
+    ],
+    "croppedSize": [
+      125,
+      147
+    ],
+    "artSize": [
+      184,
+      216
+    ],
+    "sha256": "a99051b8c15e09bf4770a22dba2a1b3fc968e45ddf1a70bd0910cc47fb586759"
+  },
+  {
+    "id": "M106",
+    "name": "변형된 스틸 마스크",
+    "kind": "monster",
+    "file": "monster/M106.png",
+    "spriteRuid": "db018657155644ce90b807d88e911cac",
+    "sourcePath": "maplestory/mob/8620008/move/1",
+    "sourceSize": [
+      128,
+      148
+    ],
+    "croppedSize": [
+      125,
+      147
+    ],
+    "artSize": [
+      184,
+      216
+    ],
+    "sha256": "ef2181b53eff8153cc1db2d9535d9dce965fc3d16b17fefdedf0cb667153220d"
+  },
+  {
+    "id": "M107",
+    "name": "에이션트 다크골렘",
+    "kind": "monster",
+    "file": "monster/M107.png",
+    "spriteRuid": "66f206bdefc043b5963ad34f639afbcb",
+    "sourcePath": "maplestory/mob/8620010/move/2",
+    "sourceSize": [
+      232,
+      192
+    ],
+    "croppedSize": [
+      231,
+      192
+    ],
+    "artSize": [
+      216,
+      180
+    ],
+    "sha256": "127ac60e8921b5bc94f5656105b268ab0183fb1f74db13cb78911619e562c979"
+  },
+  {
+    "id": "M108",
+    "name": "에이션트 믹스골렘",
+    "kind": "monster",
+    "file": "monster/M108.png",
+    "spriteRuid": "3a6bce09a7564b2d9c82ab17e671da49",
+    "sourcePath": "maplestory/mob/8620011/move/2",
+    "sourceSize": [
+      232,
+      192
+    ],
+    "croppedSize": [
+      231,
+      190
+    ],
+    "artSize": [
+      216,
+      178
+    ],
+    "sha256": "b5ebbfd39b1c7ce470eae3c4cfaab2623eb2e14e841abdb7e44c8f44be828ff9"
+  },
+  {
+    "id": "M109",
+    "name": "정식기사A",
+    "kind": "monster",
+    "file": "monster/M109.png",
+    "spriteRuid": "ab3efeaaf66146039e2a4e60555e2892",
+    "sourcePath": "maplestory/mob/8610005/move/0",
+    "sourceSize": [
+      44,
+      68
+    ],
+    "croppedSize": [
+      44,
+      68
+    ],
+    "artSize": [
+      140,
+      216
+    ],
+    "sha256": "7ef3bda508595f671fe62e463171a53452aab0924f5ea37142380ba96ec28aec"
+  },
+  {
+    "id": "M110",
+    "name": "정식기사B",
+    "kind": "monster",
+    "file": "monster/M110.png",
+    "spriteRuid": "c01eeec46cf34a43aa1a536d2b17cf6f",
+    "sourcePath": "maplestory/mob/8610006/move/0",
+    "sourceSize": [
+      72,
+      72
+    ],
+    "croppedSize": [
+      70,
+      69
+    ],
+    "artSize": [
+      216,
+      213
+    ],
+    "sha256": "22b7611ac4d637a8316a990bd73d77676e71e2dedcfc88ca209a2dd9b23e6cba"
+  },
+  {
+    "id": "M111",
+    "name": "정식기사C",
+    "kind": "monster",
+    "file": "monster/M111.png",
+    "spriteRuid": "d293a523619849a983f0012a95068318",
+    "sourcePath": "maplestory/mob/8610007/move/0",
+    "sourceSize": [
+      44,
+      68
+    ],
+    "croppedSize": [
+      43,
+      66
+    ],
+    "artSize": [
+      141,
+      216
+    ],
+    "sha256": "801437f017c1bf778c7db0a9adc605d5f88dc8ba9fc7f8bf8a84fea41d043f1c"
+  },
+  {
+    "id": "M112",
+    "name": "정식기사D",
+    "kind": "monster",
+    "file": "monster/M112.png",
+    "spriteRuid": "3ccb26d3a21949208f0f64339c1c0e03",
+    "sourcePath": "maplestory/mob/8610008/move/0",
+    "sourceSize": [
+      72,
+      68
+    ],
+    "croppedSize": [
+      72,
+      66
+    ],
+    "artSize": [
+      216,
+      198
+    ],
+    "sha256": "b70da3d15a6996ab4150b9c357e4d8ea3a20237a9ca5d925a9b8b127b10a72c0"
+  },
+  {
+    "id": "M113",
+    "name": "정식기사E",
+    "kind": "monster",
+    "file": "monster/M113.png",
+    "spriteRuid": "6c282b45115c4269a60a1d5caed79d72",
+    "sourcePath": "maplestory/mob/8610009/move/0",
+    "sourceSize": [
+      68,
+      72
+    ],
+    "croppedSize": [
+      65,
+      72
+    ],
+    "artSize": [
+      195,
+      216
+    ],
+    "sha256": "a487a6d61d9f66eb472e353046bd389dd2f610b4ed6fdc72717b32e9ac30810d"
+  },
+  {
+    "id": "M114",
+    "name": "상급기사A",
+    "kind": "monster",
+    "file": "monster/M114.png",
+    "spriteRuid": "00a6919d7e7c4ab6b4b7cff15b5fa463",
+    "sourcePath": "maplestory/mob/8610010/move/0",
+    "sourceSize": [
+      44,
+      72
+    ],
+    "croppedSize": [
+      43,
+      70
+    ],
+    "artSize": [
+      133,
+      216
+    ],
+    "sha256": "012f4ae430c3d93c8e8ee131a38f0e95bcfef2837e5806a2612b90ef8526264c"
+  },
+  {
+    "id": "M115",
+    "name": "상급기사B",
+    "kind": "monster",
+    "file": "monster/M115.png",
+    "spriteRuid": "9e081ef95b3d4fc980f47e09e6db6d7f",
+    "sourcePath": "maplestory/mob/8610011/move/0",
+    "sourceSize": [
+      72,
+      88
+    ],
+    "croppedSize": [
+      70,
+      85
+    ],
+    "artSize": [
+      178,
+      216
+    ],
+    "sha256": "7a0476f58f615f9008406e4e73b3b7a10fad3195d5896f19117e57af9109ca57"
+  },
+  {
+    "id": "M116",
+    "name": "상급기사C",
+    "kind": "monster",
+    "file": "monster/M116.png",
+    "spriteRuid": "1701326efacf44a9a4029f251fae65d9",
+    "sourcePath": "maplestory/mob/8610012/move/0",
+    "sourceSize": [
+      60,
+      80
+    ],
+    "croppedSize": [
+      57,
+      80
+    ],
+    "artSize": [
+      154,
+      216
+    ],
+    "sha256": "edcc639b491b8972a7bc0ef4a935c592f5854d4442ec9c235e6e7bb1940b88f1"
+  },
+  {
+    "id": "M117",
+    "name": "상급기사D",
+    "kind": "monster",
+    "file": "monster/M117.png",
+    "spriteRuid": "8ae88a693f964164904be3397fb79d1f",
+    "sourcePath": "maplestory/mob/8610013/move/0",
+    "sourceSize": [
+      68,
+      84
+    ],
+    "croppedSize": [
+      67,
+      81
+    ],
+    "artSize": [
+      179,
+      216
+    ],
+    "sha256": "06fb264ca313a7b2354b7dc102cb5d336b705acfab065d948d516d591502841a"
+  },
+  {
+    "id": "M118",
+    "name": "상급기사E",
+    "kind": "monster",
+    "file": "monster/M118.png",
+    "spriteRuid": "9a2776acf3254bafaa3f870c588d11c7",
+    "sourcePath": "maplestory/mob/8610014/move/0",
+    "sourceSize": [
+      92,
+      76
+    ],
+    "croppedSize": [
+      92,
+      75
+    ],
+    "artSize": [
+      216,
+      176
+    ],
+    "sha256": "34963134adbf94d8d60c0cd73dda621d22e1b63a7c2b4563c39f159d8a180aa2"
+  },
+  {
+    "id": "B06",
+    "name": "시그너스",
+    "kind": "boss",
+    "file": "boss/B06.png",
+    "spriteRuid": "bf37346f627b4e009efd411f61f19fcc",
+    "sourcePath": "maplestory/mob/8850011/stand/2",
+    "sourceSize": [
+      140,
+      196
+    ],
+    "croppedSize": [
+      138,
+      193
+    ],
+    "artSize": [
+      154,
+      216
+    ],
+    "sha256": "c0077fa896f27ecd9f40d703d962988c1e7ee40b62895b447be52ebc2d3f5fbc"
+  },
+  {
+    "id": "M119",
+    "name": "개조당한 안드로이드 수송차",
+    "kind": "monster",
+    "file": "monster/M119.png",
+    "spriteRuid": "d7cfd2931a644624ac71bcce09ec5efc",
+    "sourcePath": "maplestory/mob/8250007/move/1",
+    "sourceSize": [
+      252,
+      192
+    ],
+    "croppedSize": [
+      249,
+      192
+    ],
+    "artSize": [
+      216,
+      167
+    ],
+    "sha256": "fad61974235398a6772f5e1ace8ed2a0aef354a95a24975f37b12486b7900fa2"
+  },
+  {
+    "id": "M120",
+    "name": "개조당한 레이저 안드로이드",
+    "kind": "monster",
+    "file": "monster/M120.png",
+    "spriteRuid": "0540720d0b7249669d8d6ba4cabb729b",
+    "sourcePath": "maplestory/mob/8250002/move/1",
+    "sourceSize": [
+      72,
+      108
+    ],
+    "croppedSize": [
+      71,
+      105
+    ],
+    "artSize": [
+      146,
+      216
+    ],
+    "sha256": "36f86d8602d317d39423ca92e29f316501333b21b3bc901ed6aa0b2da689d5e1"
+  },
+  {
+    "id": "M121",
+    "name": "수리로봇",
+    "kind": "monster",
+    "file": "monster/M121.png",
+    "spriteRuid": "31b676f999e14459932536805e00e28f",
+    "sourcePath": "maplestory/mob/8250013/move/0",
+    "sourceSize": [
+      84,
+      76
+    ],
+    "croppedSize": [
+      83,
+      74
+    ],
+    "artSize": [
+      216,
+      193
+    ],
+    "sha256": "ca592c17beafe6447b7afbd41a2c155fa7ee751df401588553b0da8c76678d6f"
+  },
+  {
+    "id": "M122",
+    "name": "미사일 안드로이드",
+    "kind": "monster",
+    "file": "monster/M122.png",
+    "spriteRuid": "25530a020b6840aeba41b7dfc51db353",
+    "sourcePath": "maplestory/mob/8250009/move/0",
+    "sourceSize": [
+      136,
+      132
+    ],
+    "croppedSize": [
+      134,
+      130
+    ],
+    "artSize": [
+      216,
+      210
+    ],
+    "sha256": "8d3ca799a7d9ce6b6cb0f214353e2b04d5feb3e465e7be327162a689b214c488"
+  },
+  {
+    "id": "M123",
+    "name": "미사일 안드로이드 블루",
+    "kind": "monster",
+    "file": "monster/M123.png",
+    "spriteRuid": "a8a28201c7964993be55efbf93b19ee9",
+    "sourcePath": "maplestory/mob/8250028/move/0",
+    "sourceSize": [
+      136,
+      132
+    ],
+    "croppedSize": [
+      134,
+      130
+    ],
+    "artSize": [
+      216,
+      210
+    ],
+    "sha256": "0c97792895398c6db4b35568cc573441d1bd605347ae8aef86f3aaf94a7df67a"
+  },
+  {
+    "id": "M124",
+    "name": "고철 제네로이드",
+    "kind": "monster",
+    "file": "monster/M124.png",
+    "spriteRuid": "7fc02925ca874e2391ce72c267db98af",
+    "sourcePath": "maplestory/mob/8250019/move/0",
+    "sourceSize": [
+      88,
+      76
+    ],
+    "croppedSize": [
+      88,
+      75
+    ],
+    "artSize": [
+      216,
+      184
+    ],
+    "sha256": "494071d94ba338f34e197d2cf0ec900f3285e71d02f8ed57592b56e95625a396"
+  },
+  {
+    "id": "M125",
+    "name": "강철 제네로이드",
+    "kind": "monster",
+    "file": "monster/M125.png",
+    "spriteRuid": "1f46e7eedc4f45f286c2b3390a56828d",
+    "sourcePath": "maplestory/mob/8250017/move/2",
+    "sourceSize": [
+      88,
+      76
+    ],
+    "croppedSize": [
+      88,
+      76
+    ],
+    "artSize": [
+      216,
+      187
+    ],
+    "sha256": "aa3e774e5bdc31f218eb64f85ddf8497c57b31e769621f0e7ac92b73eb53386f"
+  },
+  {
+    "id": "M126",
+    "name": "합금 제네로이드",
+    "kind": "monster",
+    "file": "monster/M126.png",
+    "spriteRuid": "3f59ba02b71448b28fdb1f04e3d75a34",
+    "sourcePath": "maplestory/mob/8250015/move/0",
+    "sourceSize": [
+      88,
+      76
+    ],
+    "croppedSize": [
+      88,
+      75
+    ],
+    "artSize": [
+      216,
+      184
+    ],
+    "sha256": "1082427f77eea034567399be3d44fd2fc1359e9b1b6caed789f5ff929b8d9276"
+  },
+  {
+    "id": "B07",
+    "name": "스우",
+    "kind": "boss",
+    "file": "boss/B07.png",
+    "spriteRuid": "31e69f48503d440fa383ef6ce3ef4816",
+    "sourcePath": "maplestory/mob/8240098/stand/0",
+    "sourceSize": [
+      88,
+      104
+    ],
+    "croppedSize": [
+      87,
+      104
+    ],
+    "artSize": [
+      181,
+      216
+    ],
+    "sha256": "ad842b9fe29d13a1a6ba501a3c6388091acf5cd94776fd6e7eac59aec46ac3e8"
+  },
+  {
+    "id": "M127",
+    "name": "오염된 수액",
+    "kind": "monster",
+    "file": "monster/M127.png",
+    "spriteRuid": "72a12b60109c41178a2b3d8b29eaf1c5",
+    "sourcePath": "maplestory/mob/3503000/move/0",
+    "sourceSize": [
+      92,
+      80
+    ],
+    "croppedSize": [
+      91,
+      77
+    ],
+    "artSize": [
+      216,
+      183
+    ],
+    "sha256": "450c6406beeebc0afefe64c3bf6cadac86704561e440a6b4b94c72190a6fd5d0"
+  },
+  {
+    "id": "M128",
+    "name": "부패한 수액",
+    "kind": "monster",
+    "file": "monster/M128.png",
+    "spriteRuid": "8b6e39c1aaf6404792e669403372c80f",
+    "sourcePath": "maplestory/mob/3503001/move/0",
+    "sourceSize": [
+      88,
+      80
+    ],
+    "croppedSize": [
+      87,
+      77
+    ],
+    "artSize": [
+      216,
+      191
+    ],
+    "sha256": "27c25bb8f8359f89ee8cc7b6bf1b629d22f2bfb591eb099f66bba749175b381e"
+  },
+  {
+    "id": "M129",
+    "name": "타락마족 검병",
+    "kind": "monster",
+    "file": "monster/M129.png",
+    "spriteRuid": "253465a18c6e4a9ead30271ad8c2134a",
+    "sourcePath": "maplestory/mob/3503002/move/0",
+    "sourceSize": [
+      76,
+      88
+    ],
+    "croppedSize": [
+      75,
+      88
+    ],
+    "artSize": [
+      184,
+      216
+    ],
+    "sha256": "d30db8379c3b8d49d49ed282423f3aac76122ba9527dbeefd4b843c71a9782c1"
+  },
+  {
+    "id": "M130",
+    "name": "타락마족 도끼병",
+    "kind": "monster",
+    "file": "monster/M130.png",
+    "spriteRuid": "e7fb0d25a64d4eb98a592c11db535321",
+    "sourcePath": "maplestory/mob/3503004/move/0",
+    "sourceSize": [
+      96,
+      92
+    ],
+    "croppedSize": [
+      95,
+      91
+    ],
+    "artSize": [
+      216,
+      207
+    ],
+    "sha256": "12cb4e4ccddd20c0376adc887d25cd0b97796f9d4bbb47f4aeee4a50a9f13289"
+  },
+  {
+    "id": "M131",
+    "name": "타락마족 방패병",
+    "kind": "monster",
+    "file": "monster/M131.png",
+    "spriteRuid": "b1fec8614df246278bd80af51f486bfe",
+    "sourcePath": "maplestory/mob/3503006/move/0",
+    "sourceSize": [
+      76,
+      120
+    ],
+    "croppedSize": [
+      74,
+      119
+    ],
+    "artSize": [
+      134,
+      216
+    ],
+    "sha256": "43da96c26f994239f3af9cb6b9161f24b8a7eb3e9b4c84f4906aaa74c61dfbd2"
+  },
+  {
+    "id": "M132",
+    "name": "타락마족 늑대기수",
+    "kind": "monster",
+    "file": "monster/M132.png",
+    "spriteRuid": "b9f390957d2641ad8e43b3306aafce6f",
+    "sourcePath": "maplestory/mob/3503008/move/1",
+    "sourceSize": [
+      208,
+      160
+    ],
+    "croppedSize": [
+      205,
+      158
+    ],
+    "artSize": [
+      216,
+      166
+    ],
+    "sha256": "1d2b966f59281ecf541a0e788870ee97f9709a1c6b8ce2efe1938bc88cee9c6a"
+  },
+  {
+    "id": "B08",
+    "name": "데미안",
+    "kind": "boss",
+    "file": "boss/B08.png",
+    "spriteRuid": "04e5f84747e14508b7cfb1818d78fd29",
+    "sourcePath": "maplestory/mob/8880101/stand/2",
+    "sourceSize": [
+      476,
+      292
+    ],
+    "croppedSize": [
+      473,
+      290
+    ],
+    "artSize": [
+      216,
+      132
+    ],
+    "sha256": "6406f330d0cddf1328431d296c029d9e52e120cfcc8334ea40d4a75fb6a43714"
+  },
+  {
+    "id": "M133",
+    "name": "기쁨의 에르다스",
+    "kind": "monster",
+    "file": "monster/M133.png",
+    "spriteRuid": "c2a6597473f1471eaebb59b9eec18a27",
+    "sourcePath": "maplestory/mob/8641000/move/2",
+    "sourceSize": [
+      88,
+      112
+    ],
+    "croppedSize": [
+      87,
+      107
+    ],
+    "artSize": [
+      176,
+      216
+    ],
+    "sha256": "b2d8b9306007357e1260e70dd1e21cf0d3ef1f2da973f14584178227cba10b30"
+  },
+  {
+    "id": "M134",
+    "name": "분노의 에르다스",
+    "kind": "monster",
+    "file": "monster/M134.png",
+    "spriteRuid": "b520902460a44fbc867f42d501189e97",
+    "sourcePath": "maplestory/mob/8641001/move/0",
+    "sourceSize": [
+      168,
+      176
+    ],
+    "croppedSize": [
+      165,
+      174
+    ],
+    "artSize": [
+      205,
+      216
+    ],
+    "sha256": "43c3a02425fc8e83cb2ac533f63fee4e7507d5ae0b0bd9556fdd1f19a752a59a"
+  },
+  {
+    "id": "M135",
+    "name": "슬픔의 에르다스",
+    "kind": "monster",
+    "file": "monster/M135.png",
+    "spriteRuid": "d0449215119341b285e5e4a77b7fe616",
+    "sourcePath": "maplestory/mob/8641002/move/0",
+    "sourceSize": [
+      128,
+      188
+    ],
+    "croppedSize": [
+      119,
+      183
+    ],
+    "artSize": [
+      140,
+      216
+    ],
+    "sha256": "5787d9b2991a9cffaf8598c6813d9c0d65a2ed5fd6d58a85a524bf9c73d27dda"
+  },
+  {
+    "id": "M136",
+    "name": "즐거움의 에르다스",
+    "kind": "monster",
+    "file": "monster/M136.png",
+    "spriteRuid": "0b1ba0f45be44fce8e017ce7d9c02bb4",
+    "sourcePath": "maplestory/mob/8641003/move/2",
+    "sourceSize": [
+      92,
+      188
+    ],
+    "croppedSize": [
+      89,
+      187
+    ],
+    "artSize": [
+      103,
+      216
+    ],
+    "sha256": "e7b0cbd6b3a08fc877a4aaf41add19fc4a8f6f4b20bf186ccad113dd9111bb94"
+  },
+  {
+    "id": "M137",
+    "name": "암석의 에르다스",
+    "kind": "monster",
+    "file": "monster/M137.png",
+    "spriteRuid": "33bcf30ff4fc4284991c0cdb3000a5bb",
+    "sourcePath": "maplestory/mob/8641004/move/2",
+    "sourceSize": [
+      152,
+      188
+    ],
+    "croppedSize": [
+      151,
+      186
+    ],
+    "artSize": [
+      175,
+      216
+    ],
+    "sha256": "0d1f5179e77ae8788beb2ae63641d28d30cf0393801cb73a3472bab2b6e336f9"
+  },
+  {
+    "id": "M138",
+    "name": "화염의 에르다스",
+    "kind": "monster",
+    "file": "monster/M138.png",
+    "spriteRuid": "f349e7366c3c48b9b93dae79f107b614",
+    "sourcePath": "maplestory/mob/8641005/move/0",
+    "sourceSize": [
+      208,
+      272
+    ],
+    "croppedSize": [
+      207,
+      272
+    ],
+    "artSize": [
+      164,
+      216
+    ],
+    "sha256": "2d973654c8fa6c982e1d237038f9ebef8221e435edededbc5bb847c2c77afd63"
+  },
+  {
+    "id": "M139",
+    "name": "강인한 영혼의 에르다스",
+    "kind": "monster",
+    "file": "monster/M139.png",
+    "spriteRuid": "05b426bfc10f45ea849b15dcd17630ec",
+    "sourcePath": "maplestory/mob/8641006/move/1",
+    "sourceSize": [
+      164,
+      116
+    ],
+    "croppedSize": [
+      161,
+      113
+    ],
+    "artSize": [
+      216,
+      152
+    ],
+    "sha256": "bc520fc26c532865c53fe801166cc1350eae79d0d9b235cb324585c7de24a571"
+  },
+  {
+    "id": "M140",
+    "name": "안식의 에르다스",
+    "kind": "monster",
+    "file": "monster/M140.png",
+    "spriteRuid": "a59361234ecc4852bb590de0c2aea89f",
+    "sourcePath": "maplestory/mob/8641007/move/0",
+    "sourceSize": [
+      172,
+      188
+    ],
+    "croppedSize": [
+      169,
+      185
+    ],
+    "artSize": [
+      197,
+      216
+    ],
+    "sha256": "2ce207b63d67a00444d8c5dfda304189a0ba0c322d4f3c9cffaa4e331128d150"
+  },
+  {
+    "id": "M141",
+    "name": "아르마",
+    "kind": "monster",
+    "file": "monster/M141.png",
+    "spriteRuid": "ccfc96ddc74e4a9d960beae71ce489d2",
+    "sourcePath": "maplestory/mob/8641010/stand/2",
+    "sourceSize": [
+      928,
+      476
+    ],
+    "croppedSize": [
+      869,
+      470
+    ],
+    "artSize": [
+      216,
+      117
+    ],
+    "sha256": "0dd01c62155a04156e670bce22c62e6693be7e9b027a9a45e85f913b9cf0dd8c"
+  },
+  {
+    "id": "M142",
+    "name": "아르마의 부하",
+    "kind": "monster",
+    "file": "monster/M142.png",
+    "spriteRuid": "f334aba19abe41128b1d3b8ac7e93c04",
+    "sourcePath": "maplestory/mob/8641009/move/0",
+    "sourceSize": [
+      92,
+      96
+    ],
+    "croppedSize": [
+      84,
+      87
+    ],
+    "artSize": [
+      209,
+      216
+    ],
+    "sha256": "a1b0d126daa43435dd6d27121f1284394b6c2c5af340c81ce1e87e0ee1addb1c"
+  },
+  {
+    "id": "M143",
+    "name": "파인디어",
+    "kind": "monster",
+    "file": "monster/M143.png",
+    "spriteRuid": "64ef879df19d47e19ff43ee2d2f33f63",
+    "sourcePath": "maplestory/mob/8642000/move/0",
+    "sourceSize": [
+      76,
+      124
+    ],
+    "croppedSize": [
+      75,
+      124
+    ],
+    "artSize": [
+      131,
+      216
+    ],
+    "sha256": "df75fca4e70e12ceb44d255c48e7d56191757c5fedeedcf883c0f7ab923d9e70"
+  },
+  {
+    "id": "M144",
+    "name": "큰뿔 파인디어",
+    "kind": "monster",
+    "file": "monster/M144.png",
+    "spriteRuid": "edc1f9dfcd9e4543b12584efa9e3bae3",
+    "sourcePath": "maplestory/mob/8642001/move/0",
+    "sourceSize": [
+      100,
+      144
+    ],
+    "croppedSize": [
+      100,
+      141
+    ],
+    "artSize": [
+      153,
+      216
+    ],
+    "sha256": "9ebddf8fce46ea7478de6ac308d57ca1b72e52716fb348437fa4cb27b24e7ec0"
+  },
+  {
+    "id": "M145",
+    "name": "유나나",
+    "kind": "monster",
+    "file": "monster/M145.png",
+    "spriteRuid": "5dbc7a4f6b1e402aac9b78a41b7b4e8c",
+    "sourcePath": "maplestory/mob/8642002/move/1",
+    "sourceSize": [
+      104,
+      108
+    ],
+    "croppedSize": [
+      101,
+      107
+    ],
+    "artSize": [
+      204,
+      216
+    ],
+    "sha256": "fb038cc677d0fe72ba6fcd55af5a06d4120ff2e7a742a34818549be4bdfbaa8c"
+  },
+  {
+    "id": "M146",
+    "name": "램나나",
+    "kind": "monster",
+    "file": "monster/M146.png",
+    "spriteRuid": "91425182771f436d89e75325b0f2fd6c",
+    "sourcePath": "maplestory/mob/8642003/move/1",
+    "sourceSize": [
+      108,
+      108
+    ],
+    "croppedSize": [
+      106,
+      107
+    ],
+    "artSize": [
+      214,
+      216
+    ],
+    "sha256": "62a9b7b47abb586b3b10d0b76911deb0a36eb3fc5007af22d9fa1db247e5a247"
+  },
+  {
+    "id": "M147",
+    "name": "설익은 울프롯",
+    "kind": "monster",
+    "file": "monster/M147.png",
+    "spriteRuid": "929260525f40400fada84144cd2b2311",
+    "sourcePath": "maplestory/mob/8642006/move/2",
+    "sourceSize": [
+      184,
+      92
+    ],
+    "croppedSize": [
+      181,
+      91
+    ],
+    "artSize": [
+      216,
+      109
+    ],
+    "sha256": "60bb64604202ab4db771f6bee6afecddc7b0e8b6191433969f8c4a5cb621c4bf"
+  },
+  {
+    "id": "M148",
+    "name": "잘익은 울프롯",
+    "kind": "monster",
+    "file": "monster/M148.png",
+    "spriteRuid": "7efd04f12474487c9013a97e8cf123e3",
+    "sourcePath": "maplestory/mob/8642007/move/2",
+    "sourceSize": [
+      184,
+      92
+    ],
+    "croppedSize": [
+      181,
+      91
+    ],
+    "artSize": [
+      216,
+      109
+    ],
+    "sha256": "422e25b6032d34877caea6d84c9f86cd9bd417c00e2dff16ccb0d2897f225b4e"
+  },
+  {
+    "id": "M149",
+    "name": "플리온",
+    "kind": "monster",
+    "file": "monster/M149.png",
+    "spriteRuid": "8bfdbd9cfb0b42e881f3d2d976c46f1d",
+    "sourcePath": "maplestory/mob/8642004/move/1",
+    "sourceSize": [
+      160,
+      124
+    ],
+    "croppedSize": [
+      158,
+      122
+    ],
+    "artSize": [
+      216,
+      167
+    ],
+    "sha256": "ecbeeea3388a5073baa1cc5c0a6464d165b35d42e0405807f21ff775a02ba0e6"
+  },
+  {
+    "id": "M150",
+    "name": "성난 플리온",
+    "kind": "monster",
+    "file": "monster/M150.png",
+    "spriteRuid": "5445da7a1a3b4fa3953fe22854d55b2f",
+    "sourcePath": "maplestory/mob/8642005/move/1",
+    "sourceSize": [
+      168,
+      136
+    ],
+    "croppedSize": [
+      166,
+      136
+    ],
+    "artSize": [
+      216,
+      177
+    ],
+    "sha256": "2d88eaa4d01f5a97428de535e042b883b035122388eeec29f651a73405979ddb"
+  },
+  {
+    "id": "M151",
+    "name": "그린 캣피쉬",
+    "kind": "monster",
+    "file": "monster/M151.png",
+    "spriteRuid": "717ce8dc7f884350817d40f4089fff3f",
+    "sourcePath": "maplestory/mob/8642008/move/0",
+    "sourceSize": [
+      136,
+      120
+    ],
+    "croppedSize": [
+      119,
+      98
+    ],
+    "artSize": [
+      216,
+      178
+    ],
+    "sha256": "8c1754cd1d22afe187980b07f23139ff9e496cd7e4cca461959832914be30751"
+  },
+  {
+    "id": "M152",
+    "name": "블루 캣피쉬",
+    "kind": "monster",
+    "file": "monster/M152.png",
+    "spriteRuid": "5964c26121c44b8786935d850c207334",
+    "sourcePath": "maplestory/mob/8642009/move/0",
+    "sourceSize": [
+      136,
+      120
+    ],
+    "croppedSize": [
+      119,
+      97
+    ],
+    "artSize": [
+      216,
+      176
+    ],
+    "sha256": "7425946d280518c4f1c42058e57564e865ddd7318b50ea053cdc37723c4559a6"
+  },
+  {
+    "id": "M153",
+    "name": "라이터틀",
+    "kind": "monster",
+    "file": "monster/M153.png",
+    "spriteRuid": "e702aa03c1884d6f902ba5ec8c86532a",
+    "sourcePath": "maplestory/mob/8642010/move/0",
+    "sourceSize": [
+      148,
+      84
+    ],
+    "croppedSize": [
+      148,
+      82
+    ],
+    "artSize": [
+      216,
+      120
+    ],
+    "sha256": "2f218ad14cb40d7c63ae23395189957df0568765947ad4282451f4547949e1f2"
+  },
+  {
+    "id": "M154",
+    "name": "대장 라이터틀",
+    "kind": "monster",
+    "file": "monster/M154.png",
+    "spriteRuid": "b431bfba831849eebfc34a84bfbf2cf0",
+    "sourcePath": "maplestory/mob/8642011/move/0",
+    "sourceSize": [
+      148,
+      88
+    ],
+    "croppedSize": [
+      148,
+      87
+    ],
+    "artSize": [
+      216,
+      127
+    ],
+    "sha256": "059e3eae712fc198c2acf764128a008b953fa5dda01f98597a28faa5e622980e"
+  },
+  {
+    "id": "M155",
+    "name": "크릴라",
+    "kind": "monster",
+    "file": "monster/M155.png",
+    "spriteRuid": "9d4fe2e1efeb45e1a2a8be110ba9afda",
+    "sourcePath": "maplestory/mob/8642012/move/2",
+    "sourceSize": [
+      100,
+      152
+    ],
+    "croppedSize": [
+      100,
+      149
+    ],
+    "artSize": [
+      145,
+      216
+    ],
+    "sha256": "44345674441abe32945041173871b64d06b81202e11c3cd5f949c1e0b6d6e043"
+  },
+  {
+    "id": "M156",
+    "name": "족장 크릴라",
+    "kind": "monster",
+    "file": "monster/M156.png",
+    "spriteRuid": "18cfbcef2ffb4eeb9a09b4b829f3540e",
+    "sourcePath": "maplestory/mob/8642013/move/2",
+    "sourceSize": [
+      100,
+      176
+    ],
+    "croppedSize": [
+      100,
+      174
+    ],
+    "artSize": [
+      124,
+      216
+    ],
+    "sha256": "5709fcfc312c01789889cd21e44b60a63f9e0bb38131b37373161ddb07efb38e"
+  },
+  {
+    "id": "M157",
+    "name": "버샤크",
+    "kind": "monster",
+    "file": "monster/M157.png",
+    "spriteRuid": "0beaa6bf6e5b4a9ca29da3303f7ed7d7",
+    "sourcePath": "maplestory/mob/8642014/move/2",
+    "sourceSize": [
+      160,
+      144
+    ],
+    "croppedSize": [
+      160,
+      144
+    ],
+    "artSize": [
+      216,
+      194
+    ],
+    "sha256": "496c20477a12a43bed7b43f1fd6591b3b9f881f7ef8b1b1a44105d218396d307"
+  },
+  {
+    "id": "M158",
+    "name": "족장 버샤크",
+    "kind": "monster",
+    "file": "monster/M158.png",
+    "spriteRuid": "15a72413b1ea4cfa815e96c78bd0c50d",
+    "sourcePath": "maplestory/mob/8642015/move/2",
+    "sourceSize": [
+      160,
+      144
+    ],
+    "croppedSize": [
+      160,
+      144
+    ],
+    "artSize": [
+      216,
+      194
+    ],
+    "sha256": "4ed69879098e57e7387f4e42ef432650e5256ef86cbec3d36cc44fd2c6129859"
+  },
+  {
+    "id": "M159",
+    "name": "갈리나",
+    "kind": "monster",
+    "file": "monster/M159.png",
+    "spriteRuid": "0a52236f7fe54645be7348b4c81961f5",
+    "sourcePath": "maplestory/mob/8643003/move/2",
+    "sourceSize": [
+      108,
+      124
+    ],
+    "croppedSize": [
+      108,
+      120
+    ],
+    "artSize": [
+      194,
+      216
+    ],
+    "sha256": "48c3abad3214c936731d296fc6c27e69ac96a59333bcda4e908afb04fee98bcf"
+  },
+  {
+    "id": "M160",
+    "name": "갈루스",
+    "kind": "monster",
+    "file": "monster/M160.png",
+    "spriteRuid": "bcd840e0a5f444449ff5eadd88d219d9",
+    "sourcePath": "maplestory/mob/8643004/move/2",
+    "sourceSize": [
+      116,
+      120
+    ],
+    "croppedSize": [
+      113,
+      120
+    ],
+    "artSize": [
+      203,
+      216
+    ],
+    "sha256": "17987bbc5cff8670d7a8ca193d49f35cdb360d3170c35283b26421f091452c2a"
+  },
+  {
+    "id": "M161",
+    "name": "성난 우승접시",
+    "kind": "monster",
+    "file": "monster/M161.png",
+    "spriteRuid": "1c63a11559ba44c0a40a72ce99bf56cb",
+    "sourcePath": "maplestory/mob/8643005/move/0",
+    "sourceSize": [
+      124,
+      132
+    ],
+    "croppedSize": [
+      124,
+      130
+    ],
+    "artSize": [
+      206,
+      216
+    ],
+    "sha256": "62e3ea69503bbeeb87936f3893082b3a84b6a9929ae9c471cc08be0983dd4117"
+  },
+  {
+    "id": "M162",
+    "name": "비뚤어진 우승접시",
+    "kind": "monster",
+    "file": "monster/M162.png",
+    "spriteRuid": "bea129f138cd4ee38c5b32427a5fe0e7",
+    "sourcePath": "maplestory/mob/8643006/move/0",
+    "sourceSize": [
+      124,
+      132
+    ],
+    "croppedSize": [
+      124,
+      130
+    ],
+    "artSize": [
+      206,
+      216
+    ],
+    "sha256": "4442a406d7a30642240aa037864818cbc8b588c7718fe74d5d4c5b675840d299"
+  },
+  {
+    "id": "M163",
+    "name": "종이봉투 뒷골목주민",
+    "kind": "monster",
+    "file": "monster/M163.png",
+    "spriteRuid": "b8575c7aec734c32b4c7645335b56653",
+    "sourcePath": "maplestory/mob/8643001/move/1",
+    "sourceSize": [
+      116,
+      104
+    ],
+    "croppedSize": [
+      113,
+      103
+    ],
+    "artSize": [
+      216,
+      197
+    ],
+    "sha256": "491a2f26cbadb54c28f335ed7d4e038e5159b681d57bcdb9378369ad61c7cc26"
+  },
+  {
+    "id": "M164",
+    "name": "나무판자 뒷골목주민",
+    "kind": "monster",
+    "file": "monster/M164.png",
+    "spriteRuid": "a24d7fe1a28849f1afb62b11650395ad",
+    "sourcePath": "maplestory/mob/8643002/move/1",
+    "sourceSize": [
+      116,
+      108
+    ],
+    "croppedSize": [
+      113,
+      107
+    ],
+    "artSize": [
+      216,
+      205
+    ],
+    "sha256": "e83b54e216ef9e4610a5f98c8a415d0d09ea4c30a291b462c7a52bf2c4f840d3"
+  },
+  {
+    "id": "M165",
+    "name": "성난 무도회주민",
+    "kind": "monster",
+    "file": "monster/M165.png",
+    "spriteRuid": "b5a1f65b7fdd4f179ec1c2cefd4d3be1",
+    "sourcePath": "maplestory/mob/8643008/move/1",
+    "sourceSize": [
+      144,
+      132
+    ],
+    "croppedSize": [
+      141,
+      132
+    ],
+    "artSize": [
+      216,
+      202
+    ],
+    "sha256": "8eaf7949551e647ffb99141856755c1a19f031f54e29c267f51b23dbfff09b85"
+  },
+  {
+    "id": "M166",
+    "name": "광기의 무도회주민",
+    "kind": "monster",
+    "file": "monster/M166.png",
+    "spriteRuid": "8490067d79964500b06166ff5a619856",
+    "sourcePath": "maplestory/mob/8643009/move/1",
+    "sourceSize": [
+      144,
+      132
+    ],
+    "croppedSize": [
+      141,
+      132
+    ],
+    "artSize": [
+      216,
+      202
+    ],
+    "sha256": "e315b3f17fc1aa99dc1d54bb01d08a5e1840c3af121752be41247f4b4f28229b"
+  },
+  {
+    "id": "M167",
+    "name": "약화된 클리너",
+    "kind": "monster",
+    "file": "monster/M167.png",
+    "spriteRuid": "850ba83297534c77a23b5c59bf1e34ed",
+    "sourcePath": "maplestory/mob/8643012/move/2",
+    "sourceSize": [
+      180,
+      208
+    ],
+    "croppedSize": [
+      178,
+      204
+    ],
+    "artSize": [
+      188,
+      216
+    ],
+    "sha256": "dd8f77fd263faf82064669562bec84a8f481421fabef1f1cb35ce147464d499c"
+  },
+  {
+    "id": "M168",
+    "name": "춤추는 빨간구두",
+    "kind": "monster",
+    "file": "monster/M168.png",
+    "spriteRuid": "fa2d93d6345e4a568696aaa454380979",
+    "sourcePath": "maplestory/mob/8643007/move/0",
+    "sourceSize": [
+      136,
+      68
+    ],
+    "croppedSize": [
+      133,
+      67
+    ],
+    "artSize": [
+      216,
+      109
+    ],
+    "sha256": "fb90e0d16ab5ed62ba0329e3c7403b86c042b74d9b213369fe472f28bab212a2"
+  },
+  {
+    "id": "M169",
+    "name": "클리너",
+    "kind": "monster",
+    "file": "monster/M169.png",
+    "spriteRuid": "56843d7fe97144468172f428b1981f4d",
+    "sourcePath": "maplestory/mob/8643000/move/2",
+    "sourceSize": [
+      180,
+      208
+    ],
+    "croppedSize": [
+      178,
+      204
+    ],
+    "artSize": [
+      188,
+      216
+    ],
+    "sha256": "dd8f77fd263faf82064669562bec84a8f481421fabef1f1cb35ce147464d499c"
+  },
+  {
+    "id": "M170",
+    "name": "푸른 눈의 가고일",
+    "kind": "monster",
+    "file": "monster/M170.png",
+    "spriteRuid": "f2b225d2c132483cb358f3f6a09a0c75",
+    "sourcePath": "maplestory/mob/8643010/move/2",
+    "sourceSize": [
+      160,
+      192
+    ],
+    "croppedSize": [
+      159,
+      180
+    ],
+    "artSize": [
+      191,
+      216
+    ],
+    "sha256": "0e20a9c2ad4d1dd8e71f2b0f15dbc65a15557030677c4d75a6d39973da40ba70"
+  },
+  {
+    "id": "M171",
+    "name": "붉은 눈의 가고일",
+    "kind": "monster",
+    "file": "monster/M171.png",
+    "spriteRuid": "df2e94a38abe48599d8421e0643ab162",
+    "sourcePath": "maplestory/mob/8643011/move/2",
+    "sourceSize": [
+      160,
+      188
+    ],
+    "croppedSize": [
+      159,
+      180
+    ],
+    "artSize": [
+      191,
+      216
+    ],
+    "sha256": "0054ca2295aba3d93511840b7e3201b223e2af3badb78898724c21b2050c3524"
+  },
+  {
+    "id": "B09",
+    "name": "루시드(보스)",
+    "kind": "boss",
+    "file": "boss/B09.png",
+    "spriteRuid": "e132ef136c30420288e046a8696eb4bc",
+    "sourcePath": "maplestory/mob/8880150/fly/0",
+    "sourceSize": [
+      356,
+      380
+    ],
+    "croppedSize": [
+      315,
+      340
+    ],
+    "artSize": [
+      200,
+      216
+    ],
+    "sha256": "f1b582add6068592b60dd52af8fc760028784205134a7200fd18c8faf3f5c93c"
+  },
+  {
+    "id": "M172",
+    "name": "물의 정령",
+    "kind": "monster",
+    "file": "monster/M172.png",
+    "spriteRuid": "732430c186554b41afdfc123b2434ee9",
+    "sourcePath": "maplestory/mob/8644000/move/2",
+    "sourceSize": [
+      124,
+      152
+    ],
+    "croppedSize": [
+      115,
+      144
+    ],
+    "artSize": [
+      172,
+      216
+    ],
+    "sha256": "a085015650d829f71962a63d708b53e037f064b4d9d16b2341cc2583eea97700"
+  },
+  {
+    "id": "M173",
+    "name": "햇살의 정령",
+    "kind": "monster",
+    "file": "monster/M173.png",
+    "spriteRuid": "f3b1667b98ae47dead7ede420bf011c8",
+    "sourcePath": "maplestory/mob/8644001/move/2",
+    "sourceSize": [
+      176,
+      200
+    ],
+    "croppedSize": [
+      168,
+      187
+    ],
+    "artSize": [
+      194,
+      216
+    ],
+    "sha256": "d84a1a7cc371b23b9c96274dbafd52f418a7ae967c1906362d12222590404211"
+  },
+  {
+    "id": "M174",
+    "name": "흙의 정령",
+    "kind": "monster",
+    "file": "monster/M174.png",
+    "spriteRuid": "147458a37a7f4e278a5366de711a07b7",
+    "sourcePath": "maplestory/mob/8644002/move/2",
+    "sourceSize": [
+      200,
+      140
+    ],
+    "croppedSize": [
+      195,
+      126
+    ],
+    "artSize": [
+      216,
+      140
+    ],
+    "sha256": "5f51d14af8b0e9bd8bb33fa4ef2b475c44d13ebe10917e1fab9f503e099455d8"
+  },
+  {
+    "id": "M175",
+    "name": "서리구름의 정령",
+    "kind": "monster",
+    "file": "monster/M175.png",
+    "spriteRuid": "221f32199dc34a98bfe435428aca0704",
+    "sourcePath": "maplestory/mob/8644003/move/1",
+    "sourceSize": [
+      244,
+      172
+    ],
+    "croppedSize": [
+      233,
+      163
+    ],
+    "artSize": [
+      216,
+      151
+    ],
+    "sha256": "739853c0db4f6b4da0ce9d0e33fc9970903ba50d7aba4bc39625b7de9429f6db"
+  },
+  {
+    "id": "M176",
+    "name": "번개구름의 정령",
+    "kind": "monster",
+    "file": "monster/M176.png",
+    "spriteRuid": "ff35f8c20a1b4d5484ce049db08f7320",
+    "sourcePath": "maplestory/mob/8644004/move/1",
+    "sourceSize": [
+      244,
+      176
+    ],
+    "croppedSize": [
+      233,
+      164
+    ],
+    "artSize": [
+      216,
+      152
+    ],
+    "sha256": "ed01f8e62c228f28029be16debbb33ce73333b1e7b385085f353ac5c6ccf299e"
+  },
+  {
+    "id": "M177",
+    "name": "맹독의 정령",
+    "kind": "monster",
+    "file": "monster/M177.png",
+    "spriteRuid": "75fbb75742254a5fbe2e1c5cc8e55642",
+    "sourcePath": "maplestory/mob/8644005/move/0",
+    "sourceSize": [
+      180,
+      204
+    ],
+    "croppedSize": [
+      163,
+      189
+    ],
+    "artSize": [
+      186,
+      216
+    ],
+    "sha256": "1911d3b205c859400a3b72f7d1791cc4700f92ec65d8409bfc0995ab2978246c"
+  },
+  {
+    "id": "M178",
+    "name": "폭발의 정령",
+    "kind": "monster",
+    "file": "monster/M178.png",
+    "spriteRuid": "6eb85e04b3944be2bce17a733c551222",
+    "sourcePath": "maplestory/mob/8644006/move/0",
+    "sourceSize": [
+      184,
+      144
+    ],
+    "croppedSize": [
+      179,
+      135
+    ],
+    "artSize": [
+      216,
+      163
+    ],
+    "sha256": "d2fdc1cf5ac269455399a0ebf4c62bc9e369941221540a96dc48c642ed9d64c8"
+  },
+  {
+    "id": "M179",
+    "name": "부조화의 정령",
+    "kind": "monster",
+    "file": "monster/M179.png",
+    "spriteRuid": "754999cc047349779cdd1244ae521825",
+    "sourcePath": "maplestory/mob/8644010/move/0",
+    "sourceSize": [
+      164,
+      184
+    ],
+    "croppedSize": [
+      154,
+      178
+    ],
+    "artSize": [
+      187,
+      216
+    ],
+    "sha256": "40a2438e59585a58e723eca9447277fba718b306679939a6d150126a4908d51d"
+  },
+  {
+    "id": "M180",
+    "name": "혼돈의 정령",
+    "kind": "monster",
+    "file": "monster/M180.png",
+    "spriteRuid": "a4139010325746f18f7e8cb3d59f83ed",
+    "sourcePath": "maplestory/mob/8644007/move/0",
+    "sourceSize": [
+      204,
+      204
+    ],
+    "croppedSize": [
+      192,
+      164
+    ],
+    "artSize": [
+      216,
+      184
+    ],
+    "sha256": "16760f7f9f71885f665127879fb6517c589881e4da30ea965b1fa859cc4df0b6"
+  },
+  {
+    "id": "M181",
+    "name": "비탄의 정령",
+    "kind": "monster",
+    "file": "monster/M181.png",
+    "spriteRuid": "6493acdacb2c40fa86d16b2954d67d53",
+    "sourcePath": "maplestory/mob/8644009/move/1",
+    "sourceSize": [
+      152,
+      176
+    ],
+    "croppedSize": [
+      150,
+      169
+    ],
+    "artSize": [
+      192,
+      216
+    ],
+    "sha256": "3c4bac2eb4cc5778e8bee0f5d1bb61b706a6b8de46d3a56f4795c05003d40720"
+  },
+  {
+    "id": "M182",
+    "name": "절망의 정령",
+    "kind": "monster",
+    "file": "monster/M182.png",
+    "spriteRuid": "22f043f44f0a4a1e8290432b35f604a2",
+    "sourcePath": "maplestory/mob/8644008/move/1",
+    "sourceSize": [
+      148,
+      252
+    ],
+    "croppedSize": [
+      141,
+      244
+    ],
+    "artSize": [
+      125,
+      216
+    ],
+    "sha256": "02c4fd4620be3d16dc33d70015741913ae63912b325d44eb35901c3aff1c9001"
+  },
+  {
+    "id": "M183",
+    "name": "기억속의 제네로이드 A형",
+    "kind": "monster",
+    "file": "monster/M183.png",
+    "spriteRuid": "11be2a6f7b3d40f9a4e8529613a74255",
+    "sourcePath": "maplestory/mob/8644400/move/0",
+    "sourceSize": [
+      92,
+      84
+    ],
+    "croppedSize": [
+      88,
+      79
+    ],
+    "artSize": [
+      216,
+      194
+    ],
+    "sha256": "ef25822d79e218b62bc1af7386e88a8fcc4be98ba8b102bba513736eddf1c9f1"
+  },
+  {
+    "id": "M184",
+    "name": "기억속의 제네로이드 B형",
+    "kind": "monster",
+    "file": "monster/M184.png",
+    "spriteRuid": "6d7a4fa7f1bd422d9baeaf6737da02e9",
+    "sourcePath": "maplestory/mob/8644401/move/0",
+    "sourceSize": [
+      116,
+      104
+    ],
+    "croppedSize": [
+      110,
+      101
+    ],
+    "artSize": [
+      216,
+      198
+    ],
+    "sha256": "e3b1672a710b50209e12de6cfebc6cb83101afaff7e1c35595aba6d056f688a4"
+  },
+  {
+    "id": "M185",
+    "name": "이름 모를 고양이",
+    "kind": "monster",
+    "file": "monster/M185.png",
+    "spriteRuid": "e9cfef9c538840aeab8105e21c619367",
+    "sourcePath": "maplestory/mob/8644402/move/0",
+    "sourceSize": [
+      72,
+      56
+    ],
+    "croppedSize": [
+      69,
+      55
+    ],
+    "artSize": [
+      216,
+      172
+    ],
+    "sha256": "ac8136f7ebb4b930a80cbef66a5314c78d9daeb2caca4a292dce416fd4155a92"
+  },
+  {
+    "id": "M186",
+    "name": "힘센 형님",
+    "kind": "monster",
+    "file": "monster/M186.png",
+    "spriteRuid": "16ed01610c2f4b9aa134b28840792c03",
+    "sourcePath": "maplestory/mob/8644403/move/0",
+    "sourceSize": [
+      108,
+      108
+    ],
+    "croppedSize": [
+      107,
+      108
+    ],
+    "artSize": [
+      214,
+      216
+    ],
+    "sha256": "1ca76bf273796f7b898f3c18b0b62eb77e22db88e660f3bb80ffed565397d39f"
+  },
+  {
+    "id": "M187",
+    "name": "강한 형님",
+    "kind": "monster",
+    "file": "monster/M187.png",
+    "spriteRuid": "740c77f01b0847de885e3d3b592b4d06",
+    "sourcePath": "maplestory/mob/8644404/move/0",
+    "sourceSize": [
+      108,
+      112
+    ],
+    "croppedSize": [
+      107,
+      109
+    ],
+    "artSize": [
+      212,
+      216
+    ],
+    "sha256": "fef7cdc002d9956a1226b9f9eff306f825019f448a144c13696f8c6df531ad9d"
+  },
+  {
+    "id": "M188",
+    "name": "푸른 그림자",
+    "kind": "monster",
+    "file": "monster/M188.png",
+    "spriteRuid": "666b68d3f5d241f7a13e7320520e3400",
+    "sourcePath": "maplestory/mob/8644405/move/0",
+    "sourceSize": [
+      92,
+      192
+    ],
+    "croppedSize": [
+      82,
+      184
+    ],
+    "artSize": [
+      96,
+      216
+    ],
+    "sha256": "4a6d78213fd300069f915c59123899e8feb20e8148fde2a4ac2f6993a244cffa"
+  },
+  {
+    "id": "M189",
+    "name": "붉은 그림자",
+    "kind": "monster",
+    "file": "monster/M189.png",
+    "spriteRuid": "6d9129a4600845d3bdf86abe56c1fa1b",
+    "sourcePath": "maplestory/mob/8644406/move/0",
+    "sourceSize": [
+      180,
+      200
+    ],
+    "croppedSize": [
+      168,
+      186
+    ],
+    "artSize": [
+      195,
+      216
+    ],
+    "sha256": "278e7857a66540362c7c3c3f9e21dd66d901814c10c0254cd7d79300a0524141"
+  },
+  {
+    "id": "M190",
+    "name": "실험의 부산물A",
+    "kind": "monster",
+    "file": "monster/M190.png",
+    "spriteRuid": "bb7c5c4447a14ca3a65e7270dbcca8bd",
+    "sourcePath": "maplestory/mob/8644407/move/0",
+    "sourceSize": [
+      232,
+      284
+    ],
+    "croppedSize": [
+      227,
+      280
+    ],
+    "artSize": [
+      175,
+      216
+    ],
+    "sha256": "8a9778eb5263442ab0b38db130edaf60ed0f5a6991c66f9f894877b33e895e56"
+  },
+  {
+    "id": "M191",
+    "name": "실험의 부산물B",
+    "kind": "monster",
+    "file": "monster/M191.png",
+    "spriteRuid": "5a7f294c2ec5410b8e759b890fbe97f7",
+    "sourcePath": "maplestory/mob/8644408/move/0",
+    "sourceSize": [
+      264,
+      256
+    ],
+    "croppedSize": [
+      253,
+      248
+    ],
+    "artSize": [
+      216,
+      212
+    ],
+    "sha256": "f90471d1f8ae6eb8b81b194bd037c78fbcd1685dd537f92e7bb2be19e685c89c"
+  },
+  {
+    "id": "M192",
+    "name": "의식에 휘말린 근위병",
+    "kind": "monster",
+    "file": "monster/M192.png",
+    "spriteRuid": "a12d96da48f541ca8b7fc8128ba5f439",
+    "sourcePath": "maplestory/mob/8644409/move/1",
+    "sourceSize": [
+      232,
+      200
+    ],
+    "croppedSize": [
+      213,
+      184
+    ],
+    "artSize": [
+      216,
+      187
+    ],
+    "sha256": "69aeca20a7a0c73c4bdea0608cf65b9de2920bdb380562ce6bb2902244f58d2f"
+  },
+  {
+    "id": "M193",
+    "name": "의식에 휘말린 망치병",
+    "kind": "monster",
+    "file": "monster/M193.png",
+    "spriteRuid": "6886ec9ba88f43008010024b87aec690",
+    "sourcePath": "maplestory/mob/8644410/move/1",
+    "sourceSize": [
+      252,
+      252
+    ],
+    "croppedSize": [
+      236,
+      237
+    ],
+    "artSize": [
+      215,
+      216
+    ],
+    "sha256": "d4581af0497103cafff41440f9eefcb61eb5cc1027d6b85380c539dcc7df6055"
+  },
+  {
+    "id": "M194",
+    "name": "의식에 휘말린 마법사",
+    "kind": "monster",
+    "file": "monster/M194.png",
+    "spriteRuid": "c6bab360d6294b3281ad59c27c03fb9a",
+    "sourcePath": "maplestory/mob/8644411/move/1",
+    "sourceSize": [
+      152,
+      180
+    ],
+    "croppedSize": [
+      134,
+      165
+    ],
+    "artSize": [
+      175,
+      216
+    ],
+    "sha256": "54a85f4274526380d4110910bbea596e4696744fe97662a86c54b2a90c20630a"
+  },
+  {
+    "id": "M195",
+    "name": "의식에 휘말린 궁병",
+    "kind": "monster",
+    "file": "monster/M195.png",
+    "spriteRuid": "40b5e757645c46668da95b8a9bb2207b",
+    "sourcePath": "maplestory/mob/8644412/move/1",
+    "sourceSize": [
+      164,
+      172
+    ],
+    "croppedSize": [
+      147,
+      154
+    ],
+    "artSize": [
+      206,
+      216
+    ],
+    "sha256": "20be2c1893fd5bca9113d426efd08ac5fadb4c86383b233f172b75e1f736f430"
+  },
+  {
+    "id": "M196",
+    "name": "아투인",
+    "kind": "monster",
+    "file": "monster/M196.png",
+    "spriteRuid": "28e06f865f514d0d859c42628c92030b",
+    "sourcePath": "maplestory/mob/8644500/move/0",
+    "sourceSize": [
+      172,
+      120
+    ],
+    "croppedSize": [
+      168,
+      114
+    ],
+    "artSize": [
+      216,
+      147
+    ],
+    "sha256": "6e63756f5f63e3c6161eae269672b1d318f0a9dbb48433ceb8168ba54958972d"
+  },
+  {
+    "id": "M197",
+    "name": "아투스",
+    "kind": "monster",
+    "file": "monster/M197.png",
+    "spriteRuid": "2632ac6008f942a58eb3642eedd95cab",
+    "sourcePath": "maplestory/mob/8644501/move/1",
+    "sourceSize": [
+      176,
+      120
+    ],
+    "croppedSize": [
+      168,
+      116
+    ],
+    "artSize": [
+      216,
+      149
+    ],
+    "sha256": "cb8bb19232c450bae0abf52490b1242c03f35dede1802b5e8f792ad5fff3ac24"
+  },
+  {
+    "id": "M198",
+    "name": "벨라리온",
+    "kind": "monster",
+    "file": "monster/M198.png",
+    "spriteRuid": "52591faa805d4d0abcbefa95cd5a6e7a",
+    "sourcePath": "maplestory/mob/8644502/move/0",
+    "sourceSize": [
+      196,
+      156
+    ],
+    "croppedSize": [
+      190,
+      151
+    ],
+    "artSize": [
+      216,
+      172
+    ],
+    "sha256": "19e86fb87829e43c9d659bf2c67500bf0074fca2ef3a8f368df72b0407b3642a"
+  },
+  {
+    "id": "M199",
+    "name": "벨라리스",
+    "kind": "monster",
+    "file": "monster/M199.png",
+    "spriteRuid": "d803f0d3161f4b45b11f57b5336df4ac",
+    "sourcePath": "maplestory/mob/8644503/move/0",
+    "sourceSize": [
+      196,
+      144
+    ],
+    "croppedSize": [
+      190,
+      141
+    ],
+    "artSize": [
+      216,
+      160
+    ],
+    "sha256": "09bd8a8f35403b65d3b5f1d1b7a435247ee6bd8fee4e3996854d893cf10f4269"
+  },
+  {
+    "id": "M200",
+    "name": "아라냐",
+    "kind": "monster",
+    "file": "monster/M200.png",
+    "spriteRuid": "75844b04b9924a8684e33d56c492b2b1",
+    "sourcePath": "maplestory/mob/8644504/move/2",
+    "sourceSize": [
+      276,
+      168
+    ],
+    "croppedSize": [
+      276,
+      165
+    ],
+    "artSize": [
+      216,
+      129
+    ],
+    "sha256": "3beec33866ea54130d7007ddfaea3538970fcda430fdc5d97f3d3d7fc63a1054"
+  },
+  {
+    "id": "M201",
+    "name": "아라네아",
+    "kind": "monster",
+    "file": "monster/M201.png",
+    "spriteRuid": "c62f428d855b4e28b11e36065275f7e9",
+    "sourcePath": "maplestory/mob/8644505/move/2",
+    "sourceSize": [
+      276,
+      168
+    ],
+    "croppedSize": [
+      276,
+      165
+    ],
+    "artSize": [
+      216,
+      129
+    ],
+    "sha256": "251c0684001503d7d3bb5c0bb539da81fdef207a2dbf1925f12d1d79daed42e0"
+  },
+  {
+    "id": "M202",
+    "name": "빛의 주시자",
+    "kind": "monster",
+    "file": "monster/M202.png",
+    "spriteRuid": "e35249a950a2471295b17f58dd1a84cd",
+    "sourcePath": "maplestory/mob/8644506/move/0",
+    "sourceSize": [
+      100,
+      120
+    ],
+    "croppedSize": [
+      97,
+      118
+    ],
+    "artSize": [
+      178,
+      216
+    ],
+    "sha256": "f9481355a6edcf2beabfb7e928852b51438ff2b94362b901cf8a3e5a31d6a2a8"
+  },
+  {
+    "id": "M203",
+    "name": "어둠의 주시자",
+    "kind": "monster",
+    "file": "monster/M203.png",
+    "spriteRuid": "43ce11b3175141d3919aedb9e085edd4",
+    "sourcePath": "maplestory/mob/8644507/move/0",
+    "sourceSize": [
+      100,
+      120
+    ],
+    "croppedSize": [
+      97,
+      118
+    ],
+    "artSize": [
+      178,
+      216
+    ],
+    "sha256": "2008e727583ee3f7aab9a3c2e663316097d40da401b0bb26ce76a9fb659e6c7e"
+  },
+  {
+    "id": "M204",
+    "name": "빛의 집행자",
+    "kind": "monster",
+    "file": "monster/M204.png",
+    "spriteRuid": "7873a3660d9542ffa1551f01e78f9349",
+    "sourcePath": "maplestory/mob/8644508/move/0",
+    "sourceSize": [
+      168,
+      172
+    ],
+    "croppedSize": [
+      166,
+      171
+    ],
+    "artSize": [
+      210,
+      216
+    ],
+    "sha256": "ec389cf6db75e8327b9c5063d4b77068365d8f4bfbfeb1c1f3f77edca0a526b0"
+  },
+  {
+    "id": "M205",
+    "name": "어둠의 집행자",
+    "kind": "monster",
+    "file": "monster/M205.png",
+    "spriteRuid": "c00e39eae26647d2a824d5c6f864c530",
+    "sourcePath": "maplestory/mob/8644509/move/0",
+    "sourceSize": [
+      168,
+      172
+    ],
+    "croppedSize": [
+      166,
+      171
+    ],
+    "artSize": [
+      210,
+      216
+    ],
+    "sha256": "a5055506f486bb5d7de68aac32a5b339377e094f67a14e8e75febb3f67abfe0f"
+  },
+  {
+    "id": "B10",
+    "name": "윌",
+    "kind": "boss",
+    "file": "boss/B10.png",
+    "spriteRuid": "8c7de85cd957478c876ed8c03ddc3fb5",
+    "sourcePath": "maplestory/mob/8230071/stand/2",
+    "sourceSize": [
+      196,
+      280
+    ],
+    "croppedSize": [
+      195,
+      277
+    ],
+    "artSize": [
+      152,
+      216
+    ],
+    "sha256": "08f8fc2955c23e339e743d5832a6ed2849e639f06416e1515ea720bd23647e89"
+  },
+  {
+    "id": "M206",
+    "name": "혼돈의 피조물",
+    "kind": "monster",
+    "file": "monster/M206.png",
+    "spriteRuid": "508d357674944f578497d19090c68d41",
+    "sourcePath": "maplestory/mob/8644614/move/0",
+    "sourceSize": [
+      172,
+      96
+    ],
+    "croppedSize": [
+      168,
+      93
+    ],
+    "artSize": [
+      216,
+      120
+    ],
+    "sha256": "2d0a327fa8c7d83a82bf78086ccde5cae0a9b2a56fde6f272dabc460188ad1b8"
+  },
+  {
+    "id": "M207",
+    "name": "파괴의 피조물",
+    "kind": "monster",
+    "file": "monster/M207.png",
+    "spriteRuid": "e74692affb474f7e9aa4164e5c16c461",
+    "sourcePath": "maplestory/mob/8644615/move/0",
+    "sourceSize": [
+      132,
+      156
+    ],
+    "croppedSize": [
+      127,
+      153
+    ],
+    "artSize": [
+      179,
+      216
+    ],
+    "sha256": "9ca0b3307dc2da62ffbb43ab2f24ab60565fa1dc238cf41061c283bbe625cc94"
+  },
+  {
+    "id": "M208",
+    "name": "엄습하는 공포",
+    "kind": "monster",
+    "file": "monster/M208.png",
+    "spriteRuid": "cba85f1aed6d4e3296c4b8448ddaabb3",
+    "sourcePath": "maplestory/mob/8644616/move/0",
+    "sourceSize": [
+      268,
+      220
+    ],
+    "croppedSize": [
+      259,
+      214
+    ],
+    "artSize": [
+      216,
+      178
+    ],
+    "sha256": "02da1afb401395b8e5b51c86b5f42e5c622b1bd388f5f67177d0433bbf34bdf6"
+  },
+  {
+    "id": "M209",
+    "name": "주시하는 공포",
+    "kind": "monster",
+    "file": "monster/M209.png",
+    "spriteRuid": "2a05ea38153f417c99c31e26a574e423",
+    "sourcePath": "maplestory/mob/8644617/move/0",
+    "sourceSize": [
+      212,
+      208
+    ],
+    "croppedSize": [
+      203,
+      202
+    ],
+    "artSize": [
+      216,
+      215
+    ],
+    "sha256": "c50246832ed8f53dc83de5ad7fbac59118230fcc0e740fc83799471776f9c908"
+  },
+  {
+    "id": "M210",
+    "name": "공허의 하수인",
+    "kind": "monster",
+    "file": "monster/M210.png",
+    "spriteRuid": "dee445eeea0946a098d6eb140dec0e63",
+    "sourcePath": "maplestory/mob/8644618/move/0",
+    "sourceSize": [
+      352,
+      308
+    ],
+    "croppedSize": [
+      339,
+      294
+    ],
+    "artSize": [
+      216,
+      187
+    ],
+    "sha256": "6ded77e7c18d30abaa1c563cce21cc85d13470b5b3fcce384e60f33cacdcc494"
+  },
+  {
+    "id": "M211",
+    "name": "황혼의 하수인",
+    "kind": "monster",
+    "file": "monster/M211.png",
+    "spriteRuid": "439358bc1dd74e5da7be8cae4ad810a4",
+    "sourcePath": "maplestory/mob/8644619/move/0",
+    "sourceSize": [
+      296,
+      224
+    ],
+    "croppedSize": [
+      290,
+      218
+    ],
+    "artSize": [
+      216,
+      162
+    ],
+    "sha256": "af8afd60e41537a3b9c11479cc76b73f4e81e4a9f65dd23d4ac0bf9be5be8e25"
+  },
+  {
+    "id": "B11",
+    "name": "더스크",
+    "kind": "boss",
+    "file": "boss/B11.png",
+    "spriteRuid": "4b03975b01724cc09a3653b8e338818f",
+    "sourcePath": "maplestory/mob/8950116/stand/0",
+    "sourceSize": [
+      168,
+      164
+    ],
+    "croppedSize": [
+      168,
+      151
+    ],
+    "artSize": [
+      216,
+      194
+    ],
+    "sha256": "f70caa80e281d384cb39d716d6673c0586d51016242b77b790836953b204378b"
+  },
+  {
+    "id": "M212",
+    "name": "뒤엉킨 파편",
+    "kind": "monster",
+    "file": "monster/M212.png",
+    "spriteRuid": "71958426a18d4f51a864456f535b6fe0",
+    "sourcePath": "maplestory/mob/8644700/move/2",
+    "sourceSize": [
+      156,
+      128
+    ],
+    "croppedSize": [
+      142,
+      125
+    ],
+    "artSize": [
+      216,
+      190
+    ],
+    "sha256": "b347692435587c44a429b032ed27013d0bb0b79565bd4501c3143c66aa6d94c7"
+  },
+  {
+    "id": "M213",
+    "name": "복종하는 파편",
+    "kind": "monster",
+    "file": "monster/M213.png",
+    "spriteRuid": "ec3f895882b24f87a4e21a96f95c6cbe",
+    "sourcePath": "maplestory/mob/8644701/move/2",
+    "sourceSize": [
+      156,
+      128
+    ],
+    "croppedSize": [
+      143,
+      124
+    ],
+    "artSize": [
+      216,
+      187
+    ],
+    "sha256": "a6e192c6d80f86eb03dbf7642c4c34dbd28d6c5b51921c97fba1eac4955cafe4"
+  },
+  {
+    "id": "M214",
+    "name": "어둠의 피조물",
+    "kind": "monster",
+    "file": "monster/M214.png",
+    "spriteRuid": "fb5904d49e0148eebf439c51924471b4",
+    "sourcePath": "maplestory/mob/8644703/move/1",
+    "sourceSize": [
+      216,
+      232
+    ],
+    "croppedSize": [
+      212,
+      231
+    ],
+    "artSize": [
+      198,
+      216
+    ],
+    "sha256": "c846ec30507f04badc4113687535fec53a9ed31c4419e69090640990974a3d1f"
+  },
+  {
+    "id": "M215",
+    "name": "거대한 골렘",
+    "kind": "monster",
+    "file": "monster/M215.png",
+    "spriteRuid": "cd207ffb3dd54a31af2712adbce99866",
+    "sourcePath": "maplestory/mob/8644814/move/0",
+    "sourceSize": [
+      440,
+      436
+    ],
+    "croppedSize": [
+      431,
+      421
+    ],
+    "artSize": [
+      216,
+      211
+    ],
+    "sha256": "f1fdb990a28f70d11e2d9f8512a6e7889d49b3b91f9a48da9c964d814e16902a"
+  },
+  {
+    "id": "M216",
+    "name": "절망의 날개",
+    "kind": "monster",
+    "file": "monster/M216.png",
+    "spriteRuid": "9951dab39c24482488aa65882f0aed92",
+    "sourcePath": "maplestory/mob/8644704/move/2",
+    "sourceSize": [
+      248,
+      228
+    ],
+    "croppedSize": [
+      240,
+      217
+    ],
+    "artSize": [
+      216,
+      195
+    ],
+    "sha256": "87e128ecb2471666cdd3a29bc33b21250b0900b0dc326bba5b1736fa27b63ff6"
+  },
+  {
+    "id": "M217",
+    "name": "절망의 칼날",
+    "kind": "monster",
+    "file": "monster/M217.png",
+    "spriteRuid": "45dbabf0c51d44a180df39d89a18fa4a",
+    "sourcePath": "maplestory/mob/8644705/move/2",
+    "sourceSize": [
+      248,
+      228
+    ],
+    "croppedSize": [
+      240,
+      217
+    ],
+    "artSize": [
+      216,
+      195
+    ],
+    "sha256": "5cc380bd87f8ccf1305909b48e124c835762ba9bacccab7ba71f0abc9d0d529b"
+  },
+  {
+    "id": "M218",
+    "name": "침묵의 기사",
+    "kind": "monster",
+    "file": "monster/M218.png",
+    "spriteRuid": "90e996de73fa43729aaa813b1e6b1b95",
+    "sourcePath": "maplestory/mob/8644706/move/0",
+    "sourceSize": [
+      228,
+      304
+    ],
+    "croppedSize": [
+      219,
+      164
+    ],
+    "artSize": [
+      216,
+      162
+    ],
+    "sha256": "a70bfc67f29796781e5a5216095d90814c8241620f21f66a3d99aa2a305b0c83"
+  },
+  {
+    "id": "M219",
+    "name": "침묵의 방랑자",
+    "kind": "monster",
+    "file": "monster/M219.png",
+    "spriteRuid": "278140fb5b2448c1bfe6ff1b42af4a0d",
+    "sourcePath": "maplestory/mob/8644708/move/0",
+    "sourceSize": [
+      228,
+      304
+    ],
+    "croppedSize": [
+      220,
+      161
+    ],
+    "artSize": [
+      216,
+      158
+    ],
+    "sha256": "1f9fd14d622f9f8a150d7631a63685e890c74c87339eb43ca577b8db99e469f5"
+  },
+  {
+    "id": "M220",
+    "name": "침묵의 정찰자",
+    "kind": "monster",
+    "file": "monster/M220.png",
+    "spriteRuid": "893135d89eae4307a9f69dccc747ee2b",
+    "sourcePath": "maplestory/mob/8644707/move/0",
+    "sourceSize": [
+      228,
+      304
+    ],
+    "croppedSize": [
+      215,
+      153
+    ],
+    "artSize": [
+      216,
+      154
+    ],
+    "sha256": "159c36eec6d4ab6b63b23102546a3dd6d21a115ada56006225c6c7881cbebf1b"
+  },
+  {
+    "id": "M221",
+    "name": "절망에 빠진 자",
+    "kind": "monster",
+    "file": "monster/M221.png",
+    "spriteRuid": "7b0f457bc5e3475a9cf894f77324fce3",
+    "sourcePath": "maplestory/mob/8644711/move/2",
+    "sourceSize": [
+      132,
+      196
+    ],
+    "croppedSize": [
+      129,
+      190
+    ],
+    "artSize": [
+      147,
+      216
+    ],
+    "sha256": "bd78ba693f198a4e07483d78477cbe8cd98f89f47db91f723e4461cdbde71081"
+  },
+  {
+    "id": "M222",
+    "name": "절망에 메인 자",
+    "kind": "monster",
+    "file": "monster/M222.png",
+    "spriteRuid": "f21eae7b0c0546f98809c6567ae16991",
+    "sourcePath": "maplestory/mob/8644712/move/2",
+    "sourceSize": [
+      132,
+      196
+    ],
+    "croppedSize": [
+      130,
+      190
+    ],
+    "artSize": [
+      148,
+      216
+    ],
+    "sha256": "2d5f41d5562cb68aff9e0156cbcaeace43e079c47ba4e312e831b444686bf7a9"
+  },
+  {
+    "id": "M223",
+    "name": "침묵의 감시자",
+    "kind": "monster",
+    "file": "monster/M223.png",
+    "spriteRuid": "6f3ddd5d04e344f7a6864d9a9b7a4115",
+    "sourcePath": "maplestory/mob/8644709/move/1",
+    "sourceSize": [
+      180,
+      132
+    ],
+    "croppedSize": [
+      179,
+      131
+    ],
+    "artSize": [
+      216,
+      158
+    ],
+    "sha256": "9e11198f66887bbf753508a6727ea96ed2db8176975d11590079cd4ac77c3b31"
+  },
+  {
+    "id": "M224",
+    "name": "침묵의 암살자",
+    "kind": "monster",
+    "file": "monster/M224.png",
+    "spriteRuid": "ac67780760964f858e8904a38eccbe37",
+    "sourcePath": "maplestory/mob/8644710/move/1",
+    "sourceSize": [
+      180,
+      132
+    ],
+    "croppedSize": [
+      179,
+      131
+    ],
+    "artSize": [
+      216,
+      158
+    ],
+    "sha256": "6394154d2b6935023ec3c06d9bbeb37580e755b5711d27a691a9231688b0c0b2"
+  },
+  {
+    "id": "B12",
+    "name": "진 힐라",
+    "kind": "boss",
+    "file": "boss/B12.png",
+    "spriteRuid": "8f2eb8ca8e0a4e729e306065ac8c4ded",
+    "sourcePath": "maplestory/mob/8880405/stand/2",
+    "sourceSize": [
+      236,
+      300
+    ],
+    "croppedSize": [
+      200,
+      272
+    ],
+    "artSize": [
+      159,
+      216
+    ],
+    "sha256": "ec62cb0cd2df009b9ae3f4aac6ddb2ea4159b181976988a1d0af1310cd0d2380"
+  },
+  {
+    "id": "M225",
+    "name": "안세스티온",
+    "kind": "monster",
+    "file": "monster/M225.png",
+    "spriteRuid": "3dd8e196683a492e9ebc5d7b11f26f6f",
+    "sourcePath": "maplestory/mob/8645010/move/0",
+    "sourceSize": [
+      328,
+      336
+    ],
+    "croppedSize": [
+      256,
+      273
+    ],
+    "artSize": [
+      203,
+      216
+    ],
+    "sha256": "df25bec16dd121e0dbc57cc285afde13613a0b70f6ccf689290e2466349a7010"
+  },
+  {
+    "id": "M226",
+    "name": "트랜센디온",
+    "kind": "monster",
+    "file": "monster/M226.png",
+    "spriteRuid": "cf86e9cc271640b985ea5b6eec33c579",
+    "sourcePath": "maplestory/mob/8645012/move/2",
+    "sourceSize": [
+      204,
+      304
+    ],
+    "croppedSize": [
+      191,
+      217
+    ],
+    "artSize": [
+      190,
+      216
+    ],
+    "sha256": "35c9216ce5f5057d4321d590fa4e525978c2b96a01464fd6e69535ae751c8111"
+  },
+  {
+    "id": "M227",
+    "name": "포어베리온",
+    "kind": "monster",
+    "file": "monster/M227.png",
+    "spriteRuid": "6390c501f5974d0dbbcc22242cfe9492",
+    "sourcePath": "maplestory/mob/8645023/move/0",
+    "sourceSize": [
+      184,
+      184
+    ],
+    "croppedSize": [
+      161,
+      138
+    ],
+    "artSize": [
+      216,
+      185
+    ],
+    "sha256": "9d94406f6607af645546722b2a25454411051c71ab899b9c4b4a8f57ad3172bf"
+  },
+  {
+    "id": "M228",
+    "name": "엠브리온",
+    "kind": "monster",
+    "file": "monster/M228.png",
+    "spriteRuid": "ee3dc0302823461490e143f1830948ac",
+    "sourcePath": "maplestory/mob/8645022/move/0",
+    "sourceSize": [
+      328,
+      332
+    ],
+    "croppedSize": [
+      260,
+      268
+    ],
+    "artSize": [
+      210,
+      216
+    ],
+    "sha256": "d3dd29e620cd79e10a9f22eb41050b3e6902166f45f17298fec16e521a7cd306"
+  },
+  {
+    "id": "M229",
+    "name": "어센시온",
+    "kind": "monster",
+    "file": "monster/M229.png",
+    "spriteRuid": "dee7b0f0234643ca92b80219c3f40898",
+    "sourcePath": "maplestory/mob/8645011/move/0",
+    "sourceSize": [
+      312,
+      336
+    ],
+    "croppedSize": [
+      226,
+      280
+    ],
+    "artSize": [
+      174,
+      216
+    ],
+    "sha256": "5d5a798044c31afa9619c20022e88f4102370fcfc01430f780cf157835e98c49"
+  },
+  {
+    "id": "B13",
+    "name": "친위대장 듄켈",
+    "kind": "boss",
+    "file": "boss/B13.png",
+    "spriteRuid": "1cf8ad77b6b44f4e8f943477c8f12a3b",
+    "sourcePath": "maplestory/mob/8645009/stand/0",
+    "sourceSize": [
+      488,
+      372
+    ],
+    "croppedSize": [
+      468,
+      350
+    ],
+    "artSize": [
+      216,
+      162
+    ],
+    "sha256": "dffd17971edb8c517b52c2a0b6d69a7261750e06171998ce9bf506fae37c74ad"
+  },
+  {
+    "id": "B14",
+    "name": "아이온",
+    "kind": "boss",
+    "file": "boss/B14.png",
+    "spriteRuid": "c468dd68a5f14c76951eb64a9ea2d253",
+    "sourcePath": "maplestory/mob/8880500/stand/2",
+    "sourceSize": [
+      344,
+      572
+    ],
+    "croppedSize": [
+      336,
+      565
+    ],
+    "artSize": [
+      128,
+      216
+    ],
+    "sha256": "cc1f68e3424e950e688b0f2f44dbb590291645e2cb56a0c8b10971e7913f92e8"
+  },
+  {
+    "id": "B15",
+    "name": "얄다바오트",
+    "kind": "boss",
+    "file": "boss/B15.png",
+    "spriteRuid": "1287d10c17f746d8956555ead5512c42",
+    "sourcePath": "maplestory/mob/8880501/stand/2",
+    "sourceSize": [
+      344,
+      572
+    ],
+    "croppedSize": [
+      326,
+      557
+    ],
+    "artSize": [
+      126,
+      216
+    ],
+    "sha256": "99974e4bd3f3cf41570bb30b3c17ec2e5cda560b7d688107a1d464ed7f518046"
+  },
+  {
+    "id": "B16",
+    "name": "검은마법사",
+    "kind": "boss",
+    "file": "boss/B16.png",
+    "spriteRuid": "59eb6f1604b244d49c28a006d1d0d2b7",
+    "sourcePath": "maplestory/mob/8880502/stand/0",
+    "sourceSize": [
+      456,
+      644
+    ],
+    "croppedSize": [
+      433,
+      487
+    ],
+    "artSize": [
+      192,
+      216
+    ],
+    "sha256": "77634387155e97ffffc2e6990fddb8319637408e7e65be7273dbab3ee00a4b12"
+  },
+  {
+    "id": "B17",
+    "name": "검은마법사",
+    "kind": "boss",
+    "file": "boss/B17.png",
+    "spriteRuid": "bcdb438c47784d0ab4e2331a6bb6e8e1",
+    "sourcePath": "maplestory/mob/8880503/stand/0",
+    "sourceSize": [
+      400,
+      548
+    ],
+    "croppedSize": [
+      364,
+      417
+    ],
+    "artSize": [
+      189,
+      216
+    ],
+    "sha256": "b68269337c970e7eb8fe241d40dbfd50153fd1d42fee934253a2010ce60e2eeb"
+  },
+  {
+    "id": "B18",
+    "name": "검은마법사",
+    "kind": "boss",
+    "file": "boss/B18.png",
+    "spriteRuid": "52676f92c4d24dd88692477b9d24e241",
+    "sourcePath": "maplestory/mob/8880504/stand/1",
+    "sourceSize": [
+      404,
+      636
+    ],
+    "croppedSize": [
+      372,
+      432
+    ],
+    "artSize": [
+      186,
+      216
+    ],
+    "sha256": "ae922bd3504818b7c7b148ff46c3a40a5049b6e057c7589d7d86c37438b048f7"
+  }
+]

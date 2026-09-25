@@ -1488,7 +1488,7 @@ script RtsPopupLogic extends Logic
 		cell.SpriteGUIRendererComponent.Color = bg
 		local ring = H:SpawnUI("model://uisprite", "RtsIconNoneRing", cell, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2(0, 6), Vector2(54, 54))
 		if H.CircleMaskRUID ~= "" then ring.SpriteGUIRendererComponent.ImageRUID = DataRef(H.CircleMaskRUID) end
-		ring.SpriteGUIRendererComponent.Color = Color(0.16, 0.14, 0.12, 1)
+		ring.SpriteGUIRendererComponent.Color = Color(1, 1, 1, 0.15)  -- '없음' 자리 표시용 옅은 원(아이콘 배경은 2026-09-25 투명으로)
 		ring.SpriteGUIRendererComponent.RaycastTarget = false
 		H:SpawnLabel("RtsIconNoneText", cell, Vector2(0.5, 0), Vector2(0.5, 0), Vector2(0, 4), Vector2(90, 22),
 			"없음", H:ColInk(), 14, TextAlignmentType.MiddleCenter, true)

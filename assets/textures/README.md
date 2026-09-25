@@ -77,6 +77,10 @@
 | `decor-kerning-construction.png` | 커닝 공사장 512×768 (추락주의 표식이 오른쪽 면) | `0dff7e125801459099ca68b008841616` (ThemeDecorKerningConstruction) | `GetKerningDecor` — col 18.1·row 10.0·scale 0.76·flip(표식을 전투판 쪽으로) |
 | `decor-lith-harbor-ship.png` | 리스 범선 601×653 | `4801d34b001d49dabda05a25d265ac42` (ThemeDecorLithShip) | `GetLithDecor` — col −1.7·row 9.8·scale 0.7 |
 
+## 몬스터·보스 썸네일 (2026-09-25 — ChatGPT 제작 `assets/design/monster-thumbnails/`)
+
+247종(몬스터 M001~M229 · 보스 B01~B18) 256×256 투명 PNG(그림 최대 216, 가운데)를 **각각 새 스프라이트**(sprite/etc, 이름 `RtsThumb<ID>`)로 올렸다. ID → RUID 표 = `assets/textures/monster-thumbs.tsv`(ID · RUID · 이름) → `python tools/gen-monster-thumbs.py` → `RtsMonsterThumbLogic.mlua` GENERATED 구간. `RtsHudLogic.SpawnMonsterPortrait`가 이 표를 먼저 본다 — 아이콘 탭·프로필 상자·유저 카드·아이콘 정보·획득 팝업·몬스터 정보 창 초상 전부. 그림을 바꾸면 새 리소스로 올려 tsv만 고치고 생성기를 다시 돌린다.
+
 ## 구역 트랙 — 스타디움 (폐기, 2026-09-14 화면 v2로 교체)
 
 | 파일 | 재질 | 생성기 | RUID | 상태 |

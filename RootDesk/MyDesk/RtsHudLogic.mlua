@@ -967,19 +967,14 @@ script RtsHudLogic extends Logic
 		local slot = nil
 		local face = nil
 		if icon ~= _RtsProfileLogic.IconNone then
-			local shadow = self:SpawnUI("model://uisprite", "RtsPlayerIconShadow", row, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2(0, 17), Vector2(88, 88))
-			if self.CircleMaskRUID ~= "" then shadow.SpriteGUIRendererComponent.ImageRUID = DataRef(self.CircleMaskRUID) end
-			shadow.SpriteGUIRendererComponent.Color = Color(0.08, 0.13, 0.11, 0.28)
-			shadow.SpriteGUIRendererComponent.RaycastTarget = false
+			-- 아이콘 뒤 그림자·배경 원 없음 — 투명(2026-09-25 사용자 "아이콘 쪽 투명한 색으로"). 칸은 원형 마스크 틀로만 남긴다
 			slot = self:SpawnUI("model://uisprite", "RtsPlayerIconSlot", row, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2(0, 20), Vector2(80, 80))
 			if self.CircleMaskRUID ~= "" then slot.SpriteGUIRendererComponent.ImageRUID = DataRef(self.CircleMaskRUID) end
-			slot.SpriteGUIRendererComponent.Color = Color(0.94, 0.91, 0.84, 0.72)
+			slot.SpriteGUIRendererComponent.Color = Color(1, 1, 1, 0)  -- 아이콘 배경 원 = 투명(2026-09-25 사용자 검정 → 흰색 → "투명한 색으로")
 			slot.SpriteGUIRendererComponent.RaycastTarget = false
-			if slot.MaskComponent == nil then slot:AddComponent("MaskComponent") end
-			face = self:SpawnMonsterPortrait(slot, icon, 80, false)
+			face = self:SpawnMonsterPortrait(slot, icon, 80, false)  -- 배경이 투명이라 원형 마스크 없이 썸네일 그대로
 			if face == nil then
 				slot:Destroy()
-				shadow:Destroy()
 				slot = nil
 			end
 		end
@@ -1045,9 +1040,8 @@ script RtsHudLogic extends Logic
 		row.SpriteGUIRendererComponent.Color = Color(1, 1, 1, 0)
 		local slot = self:SpawnUI("model://uisprite", "RtsProfileIconSlot", row, Vector2(0, 0.5), Vector2(0, 0.5), Vector2(10, 0), Vector2(48, 48))
 		if self.CircleMaskRUID ~= "" then slot.SpriteGUIRendererComponent.ImageRUID = DataRef(self.CircleMaskRUID) end
-		slot.SpriteGUIRendererComponent.Color = Color(0.16, 0.14, 0.12, 1)
+		slot.SpriteGUIRendererComponent.Color = Color(1, 1, 1, 0)  -- 아이콘 배경 원 = 투명(2026-09-25 사용자). 아이콘 없음일 때만 옅은 원(RefreshProfileBox)
 		slot.SpriteGUIRendererComponent.RaycastTarget = false
-		if slot.MaskComponent == nil then slot:AddComponent("MaskComponent") end
 		self.ProfileIconSlot = slot
 		self.ProfileIconFace = nil
 		self.ProfileIconId = ""
@@ -1083,8 +1077,8 @@ script RtsHudLogic extends Logic
 		if self.ProfileIconSlot ~= nil and isvalid(self.ProfileIconSlot) and self.ProfileIconId ~= P.MyIcon then
 			if self.ProfileIconFace ~= nil and isvalid(self.ProfileIconFace) then self.ProfileIconFace:Destroy() end
 			self.ProfileIconFace = self:SpawnMonsterPortrait(self.ProfileIconSlot, P.MyIcon, 48, false)
-			if self.ProfileIconFace == nil then self.ProfileIconSlot.SpriteGUIRendererComponent.Color = Color(0.16, 0.14, 0.12, 0.45)
-			else self.ProfileIconSlot.SpriteGUIRendererComponent.Color = Color(0.16, 0.14, 0.12, 1) end
+			if self.ProfileIconFace == nil then self.ProfileIconSlot.SpriteGUIRendererComponent.Color = Color(1, 1, 1, 0.15)
+			else self.ProfileIconSlot.SpriteGUIRendererComponent.Color = Color(1, 1, 1, 0) end
 			self.ProfileIconId = P.MyIcon
 		end
 		if self.ProfileSummary ~= nil and self.ProfileSummary.TextComponent ~= nil then
@@ -1111,10 +1105,22 @@ script RtsHudLogic extends Logic
 	--   칸(size×size) 가운데에 몬스터 그림: animated = 걷기 클립 반복(정보 창), 아니면 표 icon(걷기 첫 3프레임 중 크기 기준 프레임 스프라이트 — 없으면 걷기 클립).
 	--   클립·프레임은 기준점(발끝)이 칸 가운데에 오게 그려진다 → 원본 크기(NativeSize)로 두고, 표의 그림 테두리(boxW/0.7 · boxH/0.8, 기준점 → 그림 가운데 = boxX · boxY, 단위 100px)로
 	--   칸에 맞게 키운 뒤 그 가운데를 칸 가운데로(2026-09-24 사용자 "사각형 안에 점 찍고 거기에 몬스터 모습이 정중앙에"). 크기·위치는 RUID를 넣은 뒤에
+	--   2026-09-25 사용자 "썸네일 추가됐어 — 프로필·유저 목록 등 전부 이걸로": 썸네일(RtsMonsterThumbLogic, 256×256 정사각·가운데 정렬)이 있으면 그것을 칸 크기 그대로 —
+	--   걷기 클립(animated)보다 우선. 썸네일이 없는 ID만 아래 원작 스프라이트 맞춤
 	@ExecSpace("ClientOnly")
 	method Entity SpawnMonsterPortrait(Entity parent, string monsterId, number size, boolean animated)
 		local mon = _RtsStageTableLogic:GetMonster(monsterId)
 		if mon == nil or parent == nil then return nil end
+		local thumb = _RtsMonsterThumbLogic:GetThumb(monsterId)
+		if thumb ~= "" then
+			local t = self:SpawnUI("model://uisprite", "RtsPortrait", parent, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2(0, 0), Vector2(size, size))
+			if t == nil then return nil end
+			local tr = t.SpriteGUIRendererComponent
+			tr.RaycastTarget = false
+			tr.Color = Color(1, 1, 1, 1)
+			tr.ImageRUID = DataRef(thumb)
+			return t
+		end
 		local ruid = mon.icon
 		local clip = animated or ruid == nil or ruid == ""
 		if clip then ruid = mon.walk end
