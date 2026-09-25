@@ -60,6 +60,26 @@
           "Id": "82350139e9cc4b2f973123cb89997c39",
           "Name": "HenesysStone4",
           "IsCollidable": false
+        },
+        {
+          "Id": "e3089b8f17144a4ca0a3b80117627a8e",
+          "Name": "ElliniaMoss",
+          "IsCollidable": false
+        },
+        {
+          "Id": "272e8d94a1f8432c876b676c315bfe9d",
+          "Name": "PerionEarth",
+          "IsCollidable": false
+        },
+        {
+          "Id": "8dce7ba39e1447f0bd5e87cdb52bc936",
+          "Name": "KerningPavement",
+          "IsCollidable": false
+        },
+        {
+          "Id": "fa1020b1c467413bac7538a1f040a165",
+          "Name": "LithSand",
+          "IsCollidable": false
         }
       ]
     }

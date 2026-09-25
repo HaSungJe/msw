@@ -130,7 +130,7 @@ MSW(Maker 26.7) 실측으로 확인한 엔진 동작. 다시 실측하면 30분�
 - Priority: takes precedence over defaults
 
 ## 구역 그리드 16×13(2026-09-20) — 칸 수를 바꾸면 5곳을 같이
-- Rule: 그리드 = 16열×13행, 칸 1.7778유닛, `GridLeft −14.2222`(뷰 42.66 폭에 좌우 7.11 여백 = 대칭), `GridTop 11.5556`(위아래 0.44 여백). 텍스처 = `tools/gen-track-grid.js`(COLS/ROWS) → 1280×1040 PNG → 내 리소스 sprite 업로드(PPU 100, `GridTextureScale 2.2222`) → `RtsThemeLogic` 프리셋 gridRUID(헤네시스 `95b3ec9d377e46ecb9d394467d27dada`; 엘나스 `651583e1…`는 아직 18×12). 장식물(`GetHenesysDecor`)은 **좌우 여백에만**(col ≤ −0.6 / ≥ 16.9; 위아래 여백은 0.25칸뿐), 오른쪽 x 18칸 이후는 영입 HUD 밑이라 큰 건물은 8행 아래. 트랙 경로(GetTurnPoints·SEQ)는 최대 14열이라 그대로.
+- Rule: 그리드 = 16열×13행, 칸 1.7778유닛, `GridLeft −14.2222`(뷰 42.66 폭에 좌우 7.11 여백 = 대칭), `GridTop 11.5556`(위아래 0.44 여백). 텍스처 = `tools/gen-track-grid.js`(COLS/ROWS) → 1280×1040 PNG → 내 리소스 sprite 업로드(PPU 100, `GridTextureScale 2.2222`) → `RtsThemeLogic` 프리셋 gridRUID(헤네시스 `95b3ec9d377e46ecb9d394467d27dada`; 엘나스 `651583e1…`는 아직 18×12). 장식물(`RtsThemeLogic` 테마별 `decor` — 헤네시스는 2026-09-25부터 없음)은 **좌우 여백에만**(col ≤ −0.6 / ≥ 16.9; 위아래 여백은 0.25칸뿐), 오른쪽 x 18칸 이후는 영입 HUD 밑이라 큰 건물은 8행 아래. 트랙 경로(GetTurnPoints·SEQ)는 최대 14열이라 그대로.
 - Scope: project
 - Rationale: 사용자 "맨 우측 2줄 타일 삭제(좌우 대칭), 맨 아래 한 줄 추가(위 공간 활용해 위로 당김), 타일에 오브젝트 안 겹치게".
 - Priority: takes precedence over defaults

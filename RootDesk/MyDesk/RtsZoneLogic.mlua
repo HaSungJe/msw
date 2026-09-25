@@ -287,6 +287,7 @@ script RtsZoneLogic extends Logic
 
 		for n = 1, self:GetZoneCount() do
 			local c = _RtsConfigLogic:GetZoneCenter(n)
+			self:SetZoneBackground(n, preset.backgroundRUID, preset.backgroundAlpha)
 			local grid = self:SpawnProp("ZoneGrid" .. tostring(n), mapRoot, Vector2(c.x + offX, c.y + offY), ruid, 100)
 			if grid ~= nil then
 				grid.TransformComponent.Scale = Vector3(scale, scale, 1)
@@ -340,11 +341,31 @@ script RtsZoneLogic extends Logic
 				if d.scale ~= nil and d.scale ~= 1 then
 					e.TransformComponent.Scale = Vector3(d.scale, d.scale, 1)
 				end
+				if d.flip == true then e.SpriteRendererComponent.FlipX = true end  -- 2026-09-25 테마 장식 좌우 뒤집기(커닝 공사장 표식을 전투판 쪽으로)
 			end
 		end
 	end
 
-	-- 트랙 판(구역 하나): 이미 세워진 ZoneGrid{n}의 텍스처·색만 바꾼다(RtsThemeLogic.ApplyToZone — 임시 모양은 틴트로 테마 구분)
+	-- 마을 풍경(구역 하나): 바닥 타일 위·트랙 판 아래. 1920×1080/PPU 100을 화면 42.67×24유닛에 맞춘다.
+	@ExecSpace("ServerOnly")
+	method void SetZoneBackground(number zone, string ruid, number alpha)
+		if ruid == nil or ruid == "" then return end
+		local n = math.floor(zone + 0.5)
+		local name = "ZoneBackground" .. string.format("%d", n)
+		local bg = _EntityService:GetEntityByPath("/maps/RtsMap/" .. name)
+		if bg == nil then
+			local mapRoot = _EntityService:GetEntityByPath("/maps/RtsMap")
+			if mapRoot == nil then return end
+			bg = self:SpawnProp(name, mapRoot, _RtsConfigLogic:GetZoneCenter(n), ruid, 90)
+			if bg == nil then return end
+		end
+		local scale = _RtsConfigLogic:GetGridTextureScale()
+		bg.TransformComponent.Scale = Vector3(scale, scale, 1)
+		bg.SpriteRendererComponent.SpriteRUID = ruid
+		bg.SpriteRendererComponent.Color = Color(1, 1, 1, alpha or 1)
+	end
+
+	-- 트랙 판(구역 하나): 이미 세워진 ZoneGrid{n}의 텍스처·색만 바꾼다(RtsThemeLogic.ApplyToZone)
 	@ExecSpace("ServerOnly")
 	method void SetZoneGrid(number zone, string ruid, Color tint)
 		local grid = _EntityService:GetEntityByPath("/maps/RtsMap/ZoneGrid" .. string.format("%d", math.floor(zone + 0.5)))

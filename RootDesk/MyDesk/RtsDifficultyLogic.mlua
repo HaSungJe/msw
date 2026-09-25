@@ -188,7 +188,7 @@ script RtsDifficultyLogic extends Logic
 		local card = nil
 		if H.StageSubText ~= nil then card = H.StageSubText.Parent end
 		if card ~= nil then
-			self.RunText = H:SpawnLabel("RtsDiffCardText", card, Vector2(0, 1), Vector2(0, 1), Vector2(14, -64), Vector2(412, 24), "난이도 보통", H:ColGold(), 15, TextAlignmentType.MiddleLeft, true)
+			self.RunText = H:SpawnLabel("RtsDiffCardText", card, Vector2(0, 1), Vector2(0, 1), Vector2(14, -64), Vector2(372, 24), "난이도 보통", H:ColGold(), 15, TextAlignmentType.MiddleLeft, true)
 		end
 		self.Shown = ""
 	end

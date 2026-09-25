@@ -135,3 +135,10 @@
 - How to apply: 새 창·탭을 만들 때 처음부터 "고정 틀 / 바뀌는 칸"으로 나눠 짠다. 사용자가 말하기 전에 스스로 지킨다(새 기능·수정 모두).
 - CLAUDE.md application: 제안 대상(코드 작성 규칙) — ship 때 docs/ui-screens.md 7장 규칙으로 옮길지 묻는다
 - Priority: takes precedence over defaults
+
+## 디자인은 ChatGPT가 이미지·가이드라인, Claude가 구현 (2026-09-25)
+- Rule: 이미지 생성과 UI 디자인 판단(색·크기·배치·상태별 모양)은 ChatGPT가 한다. ChatGPT는 가이드라인을 `docs/design/<YYMMDD>-<주제>.md`(양식 `docs/design-handoff.md`)에, 이미지를 `assets/design/<YYMMDD>-<주제>/`에 둔다. Claude는 상태가 '구현 요청'인 가이드라인을 읽고 이미지를 새 리소스로 업로드 → 코드 반영 → Maker 확인 → ui-screens 표 갱신 → 가이드라인 상태 '구현됨(버전)'. 가이드라인에 없는 디자인 판단은 하지 않고 사용자에게 묻는다.
+- Why: 사용자 "ChatGPT에서 이미지 생성은 직접 하고, 그 외 UI 같은 것들 디자인적 조절할 때는 가이드라인을 만들어서 너가 이어받을 수 있게 할 거야" — 두 앱은 직접 연결되지 않아 같은 폴더·git·문서로 주고받는다.
+- How to apply: 세션을 시작하거나 사용자가 "디자인 반영"을 말하면 `docs/design/`부터 본다. 두 앱이 같은 파일·Maker Play를 동시에 만지지 않게, 작업 단위마다 커밋.
+- CLAUDE.md application: not needed(작업 분담 — AGENT.md·docs/design-handoff.md에 적음)
+- Priority: takes precedence over defaults

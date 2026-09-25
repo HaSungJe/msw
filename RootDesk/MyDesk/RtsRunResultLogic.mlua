@@ -16,7 +16,7 @@ script RtsRunResultLogic extends Logic
 	-- 구역 비석 엔티티(새 판에서 지운다)
 	property table Tombs = {}
 
-	-- 비석 그림·크기 = 그 구역 주인의 비석 프리셋(RtsTombLogic — 2026-09-25 사용자 "비석도 프리셋". 기본 비석 = 원작 묘비 map/obj/jpsengoku2014/east_out/gravestone, 스케일 5)
+	-- 비석 그림·크기 = 그 구역 주인의 비석 프리셋(RtsTombLogic). 기본 비석은 2026-09-25 카툰 단풍잎 비석(투명 컷아웃)
 
 	-- 비석 사운드 = 원작 sound/game/tombstone(캐릭터 사망 때 비석 떨어지는 소리, 2026-09-23 사용자 "사망 시 비석 사운드")
 	property string TombSound = "8727e134756141c58bf2f525a1598eee"

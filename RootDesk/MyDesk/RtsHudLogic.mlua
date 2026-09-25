@@ -54,20 +54,28 @@ script RtsHudLogic extends Logic
 
 	property Entity PlayersBox = nil
 
-	-- 좌상단 프로필 상자(2026-09-25 사용자 "맵 테마 창을 프로필 설정으로"): 내 테마 썸네일 · "프로필 설정" · "테마 ○○ · 비석 ○○". 누르면 프로필 창
-	property Entity ThemeThumb = nil
+	-- 좌상단 프로필 상자(2026-09-25 사용자 "맵 테마 창을 프로필 설정으로" → "좌측을 아이콘으로, 테마를 배경으로"): 배경 = 내 테마 썸네일 + 어두운 막,
+	--   왼쪽 동그란 내 아이콘 · "프로필 설정" · "테마 ○○". 누르면 프로필 창
+	property Entity ProfileBg = nil
+
+	property Entity ProfileIconSlot = nil
+
+	property Entity ProfileIconFace = nil
+
+	property string ProfileIconId = ""
 
 	property Entity ProfileSummary = nil
 
 	-- 원형 마스크 스프라이트(흰 원, assets/textures/circle-mask.png — 2026-09-25 업로드 RtsCircleMask) — 유저 카드의 동그란 아이콘 칸. ""면 네모 칸
 	property string CircleMaskRUID = "69e2dced65e443d3bb391464fd64b123"
 
-	-- 유저 카드 크기·간격(2026-09-25 사용자 "영역을 좀 키워서 — 배경 테마 썸네일, 좌측 동그라미 아이콘, 우측 닉네임")
-	property number CardW = 280
+	-- 유저 카드 크기·간격(2026-09-25 사용자 "영역을 좀 키워서 — 배경 테마 썸네일, 좌측 동그라미 아이콘, 우측 닉네임"
+	--   → "박스 크기를 배경 사진 비율에 맞게 — 총 4명으로 조절할 거라 조금 높아져도 됨": 280×56 → 5:3 250×150, 세로 4장)
+	property number CardW = 250
 
-	property number CardH = 56
+	property number CardH = 150
 
-	property number CardGap = 6
+	property number CardGap = 8
 
 	property Entity PlayerHead = nil
 
@@ -358,22 +366,21 @@ script RtsHudLogic extends Logic
 		-- 좌상단 정보 카드 한 장(2026-09-23 사용자 "글이 길어지면 깨진다 — 메소·필드·맵 정보 하나로 깔끔하게"):
 		--   윗줄 = "109라운드  스페셜"(굵게) + 오른쪽 남은 시간 / 둘째 줄 = "지역 - 맵"(카드 폭 전체) / 셋째 줄 = 난이도(금색, RtsDifficultyLogic) / 구분선 / 아랫줄 = 메소(동전) + 오른쪽 필드 n / 110
 		--   2026-09-24 사용자 "글자가 크면 높이를 늘려" — 난이도가 맵 이름 오른쪽 120px에 들어가지 않아 두 줄로 꺾여 겹쳤다 → 자기 줄로, 카드 112 → 138
-		-- 프로필 상자(맨 위, 440×64) — 그 아래 8px 띄워 정보 카드(2026-09-25)
-		self:BuildProfileBox(grp)
-		local card = self:SpawnPanel("RtsInfoCard", grp, Vector2(0, 1), Vector2(0, 1), Vector2(16, -88), Vector2(440, 138),
-			self:ColPanel(), self:ColBorder(), 1.5)
-		self.StageTitleText = self:SpawnLabel("RtsStageTitle", card, Vector2(0, 1), Vector2(0, 1), Vector2(14, -8), Vector2(320, 32),
+		-- 2026-09-25 사용자 "프로필 상자와 정보 카드를 하나로 합치고 배경을 보여줘": 상자 하나(400×240 = 테마 썸네일 원본 크기 — 늘리거나 자르지 않는다) 안에
+		--   위 64 = 프로필 줄(BuildTopBox), 그 아래 = 정보 칸 RtsInfoCard(투명, 400×168 — 안쪽 좌표는 예전 정보 카드와 같다. 난이도 줄은 RtsDifficultyLogic이 여기 붙인다)
+		local card = self:BuildTopBox(grp)
+		self.StageTitleText = self:SpawnLabel("RtsStageTitle", card, Vector2(0, 1), Vector2(0, 1), Vector2(14, -8), Vector2(290, 32),
 			"대기 중", self:ColInk(), 22, TextAlignmentType.MiddleLeft, true)
 		self.StageTitleText.TextComponent.IsRichText = true
 		self.StageTitleText.TextComponent.Overflow = OverflowType.Truncate
 		self.StageClockText = self:SpawnLabel("RtsStageClock", card, Vector2(1, 1), Vector2(1, 1), Vector2(-14, -8), Vector2(90, 32),
 			"", self:ColInk(), 22, TextAlignmentType.MiddleRight, true)
-		-- 맵 이름(2026-09-24 사용자 "맵 명이 너무 작게 표시됨" — 15 → 18). 카드 폭 전체(412) — 난이도는 아랫줄(RtsDifficultyLogic)
-		self.StageSubText = self:SpawnLabel("RtsStageSub", card, Vector2(0, 1), Vector2(0, 1), Vector2(14, -38), Vector2(412, 28),
-			"", self:ColMuted(), 18, TextAlignmentType.MiddleLeft, false)
+		-- 맵 이름(2026-09-24 사용자 "맵 명이 너무 작게 표시됨" — 15 → 18). 칸 폭 전체(372) — 난이도는 아랫줄(RtsDifficultyLogic)
+		self.StageSubText = self:SpawnLabel("RtsStageSub", card, Vector2(0, 1), Vector2(0, 1), Vector2(14, -38), Vector2(372, 28),
+			"", Color(0.86, 0.82, 0.74, 1), 18, TextAlignmentType.MiddleLeft, false)
 		self.StageSubText.TextComponent.Overflow = OverflowType.Truncate
 		self.StageSubText.TextComponent.UseNBSP = true
-		local line = self:SpawnUI("model://uisprite", "RtsInfoLine", card, Vector2(0, 1), Vector2(0, 1), Vector2(12, -94), Vector2(416, 1.5))
+		local line = self:SpawnUI("model://uisprite", "RtsInfoLine", card, Vector2(0, 1), Vector2(0, 1), Vector2(12, -110), Vector2(376, 1.5))
 		line.SpriteGUIRendererComponent.ImageRUID = DataRef(self.WhiteRUID)
 		line.SpriteGUIRendererComponent.Color = self:ColBorderSoft()
 		local coin = self:SpawnUI("model://uisprite", "RtsMesoCoin", card, Vector2(0, 0), Vector2(0, 0.5), Vector2(14, 22), Vector2(24, 24))
@@ -383,12 +390,12 @@ script RtsHudLogic extends Logic
 			"0", self:ColInk(), 22, TextAlignmentType.MiddleLeft, true)
 		-- 필드: 내 구역에 살아 있는 몹 수 / 110(탈락선). 90 이상 붉게
 		self:SpawnLabel("RtsFieldKey", card, Vector2(1, 0), Vector2(1, 0.5), Vector2(-122, 22), Vector2(44, 28),
-			"필드", self:ColMuted(), 15, TextAlignmentType.MiddleRight, false)
+			"필드", Color(0.86, 0.82, 0.74, 1), 15, TextAlignmentType.MiddleRight, false)
 		self.FieldText = self:SpawnLabel("RtsFieldText", card, Vector2(1, 0), Vector2(1, 0.5), Vector2(-14, 22), Vector2(104, 32),
 			"0 / 110", self:ColInk(), 20, TextAlignmentType.MiddleRight, true)
 
-		-- 좌측 유저 카드 목록 (카드는 RefreshPlayerList가 채움) — 정보 카드(y −88, 높이 138) 바로 아래
-		local box = self:SpawnUI("model://uisprite", "RtsPlayers", grp, Vector2(0, 1), Vector2(0, 1), Vector2(16, -236), Vector2(self.CardW, 520))
+		-- 좌측 유저 카드 목록 (카드는 RefreshPlayerList가 채움) — 합친 상자(y −16, 높이 240) 10px 아래. 머리 24 + 카드 4장(2026-09-25 사용자 "총 4명으로 조절할 거임")
+		local box = self:SpawnUI("model://uisprite", "RtsPlayers", grp, Vector2(0, 1), Vector2(0, 1), Vector2(16, -266), Vector2(self.CardW, 24 + 4 * (self.CardH + self.CardGap)))
 		self:Tint(box, 0, 0, 0, 0)
 		self.PlayersBox = box
 		self.PlayerHead = self:SpawnLabel("RtsPlayerHead", box, Vector2(0, 1), Vector2(0, 1), Vector2(6, 0), Vector2(200, 20),
@@ -932,8 +939,10 @@ script RtsHudLogic extends Logic
 		return false
 	end
 
-	-- 유저 카드(2026-09-25 사용자): 배경 = 그 유저 테마 썸네일(없으면 테마 색) + 어두운 막, 왼쪽 동그란 아이콘(원형 마스크 + 몬스터 초상), 오른쪽 닉네임.
-	--   내 카드 = "(나)" 글자 대신 조금 굵은 초록 테두리 + 오른쪽 위 [수정](아이콘 창). 카드 클릭 = 그 구역으로 카메라(OnPlayerRowClick)
+	-- 유저 카드(2026-09-25 사용자): 배경 = 그 유저 테마 썸네일(없으면 테마 색) + 얇은 막, 사진 영역 가운데 큰 동그란 아이콘(원형 마스크 + 몬스터 초상), 아래 어두운 띠에 닉네임.
+	--   카드 250×150 = 썸네일과 같은 5:3(2026-09-25 사용자 "박스 크기를 배경 사진 비율에 맞게") — 전엔 280×56에 썸네일을 늘려 찌그러졌다.
+	--   내 카드 = "(나)" 글자 대신 조금 굵은 초록 테두리. 카드 클릭 = 그 구역으로 카메라(OnPlayerRowClick).
+	--   아이콘 바꾸기는 프로필 창 [아이콘] 탭 — 2026-09-25 사용자 "회원 목록에서의 수정 버튼 삭제"로 카드의 [수정]을 뺐다
 	@ExecSpace("ClientOnly")
 	method void AddPlayerCard(number index, string userId, string nick, number zone, boolean alive, string theme, string icon)
 		local W = self.CardW
@@ -950,18 +959,34 @@ script RtsHudLogic extends Logic
 			row.SpriteGUIRendererComponent.Color = Color(1, 1, 1, 1)
 		end
 		local shade = self:SpawnStretch("model://uisprite", "RtsPlayerShade", row, Vector2(0, 0), Vector2(1, 1), Vector2(0, 0), Vector2(0, 0))
-		-- 동그란 아이콘 칸(지름 44) — 원형 마스크 스프라이트가 있으면 그 모양으로 잘린다
-		local slot = self:SpawnUI("model://uisprite", "RtsPlayerIconSlot", row, Vector2(0, 0.5), Vector2(0, 0.5), Vector2(6, 0), Vector2(H - 12, H - 12))
-		if self.CircleMaskRUID ~= "" then slot.SpriteGUIRendererComponent.ImageRUID = DataRef(self.CircleMaskRUID) end
-		slot.SpriteGUIRendererComponent.Color = Color(0.16, 0.14, 0.12, 1)
-		if slot.MaskComponent == nil then slot:AddComponent("MaskComponent") end
-		local face = self:SpawnMonsterPortrait(slot, icon, H - 12, false)
-		local nameW = W - (H - 12) - 20
-		if isMe then nameW = nameW - 50 end
-		local name = self:SpawnLabel("RtsPlayerName", row, Vector2(0, 0.5), Vector2(0, 0.5), Vector2(H - 2, 0), Vector2(nameW, 30),
+		-- 아래 띠(높이 40): 닉네임·비석 표시 자리 — 사진 위에서도 글자가 읽히게
+		local band = self:SpawnStretch("model://uisprite", "RtsPlayerBand", row, Vector2(0, 0), Vector2(1, 0), Vector2(0, 0), Vector2(0, 40))
+		band.SpriteGUIRendererComponent.Color = Color(0.06, 0.05, 0.04, 0.62)
+		band.SpriteGUIRendererComponent.RaycastTarget = false
+		-- 아이콘이 있을 때만 사진 영역 중앙에 작게 얹는다. 없으면 풍경 썸네일을 온전히 보여 준다.
+		local slot = nil
+		local face = nil
+		if icon ~= _RtsProfileLogic.IconNone then
+			local shadow = self:SpawnUI("model://uisprite", "RtsPlayerIconShadow", row, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2(0, 17), Vector2(88, 88))
+			if self.CircleMaskRUID ~= "" then shadow.SpriteGUIRendererComponent.ImageRUID = DataRef(self.CircleMaskRUID) end
+			shadow.SpriteGUIRendererComponent.Color = Color(0.08, 0.13, 0.11, 0.28)
+			shadow.SpriteGUIRendererComponent.RaycastTarget = false
+			slot = self:SpawnUI("model://uisprite", "RtsPlayerIconSlot", row, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2(0, 20), Vector2(80, 80))
+			if self.CircleMaskRUID ~= "" then slot.SpriteGUIRendererComponent.ImageRUID = DataRef(self.CircleMaskRUID) end
+			slot.SpriteGUIRendererComponent.Color = Color(0.94, 0.91, 0.84, 0.72)
+			slot.SpriteGUIRendererComponent.RaycastTarget = false
+			if slot.MaskComponent == nil then slot:AddComponent("MaskComponent") end
+			face = self:SpawnMonsterPortrait(slot, icon, 80, false)
+			if face == nil then
+				slot:Destroy()
+				shadow:Destroy()
+				slot = nil
+			end
+		end
+		local name = self:SpawnLabel("RtsPlayerName", row, Vector2(0, 0), Vector2(0, 0), Vector2(10, 5), Vector2(W - 44, 30),
 			nick, self:ColInk(), 17, TextAlignmentType.MiddleLeft, true)
 		if name.TextComponent ~= nil then name.TextComponent.IsRichText = false end
-		local tomb = self:SpawnUI("model://uisprite", "RtsPlayerTomb", row, Vector2(1, 0), Vector2(1, 0), Vector2(-8, 6), Vector2(14, 17))
+		local tomb = self:SpawnUI("model://uisprite", "RtsPlayerTomb", row, Vector2(1, 0), Vector2(1, 0), Vector2(-10, 11), Vector2(14, 17))
 		local tombIn = self:SpawnStretch("model://uisprite", "RtsPlayerTombIn", tomb, Vector2(0, 0), Vector2(1, 1), Vector2(1.5, 1.5), Vector2(-1.5, -1.5))
 		self:Tint(tomb, 0.29, 0.27, 0.235, 1)
 		self:Tint(tombIn, 0.55, 0.51, 0.45, 1)
@@ -969,18 +994,7 @@ script RtsHudLogic extends Logic
 		click:ConnectEvent(ButtonClickEvent, function(event)
 			self:OnPlayerRowClick(userId)
 		end)
-		-- 내 카드만 [수정] → 아이콘 창(2026-09-25 사용자 "내 카드에 작은 [수정] 버튼") — 카드 클릭 영역 위에
-		if isMe then
-			local edit = self:SpawnPanel("RtsPlayerEdit", row, Vector2(1, 1), Vector2(1, 1), Vector2(-6, -6), Vector2(44, 22),
-				Color(0.11, 0.094, 0.075, 0.9), self:ColGold(), 1)
-			self:SpawnLabel("RtsPlayerEditText", edit, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2(0, 0), Vector2(42, 20),
-				"수정", self:ColGold(), 12, TextAlignmentType.MiddleCenter, true)
-			local ec = self:SpawnClick("RtsPlayerEditClick", edit)
-			ec:ConnectEvent(ButtonClickEvent, function(event)
-				_RtsPopupLogic:Open("icon")
-			end)
-		end
-		local p = { row = row, shade = shade, slot = slot, face = face, tomb = tomb, name = name, zone = zone, alive = alive, nick = nick,
+		local p ={ row = row, shade = shade, slot = slot, face = face, tomb = tomb, name = name, zone = zone, alive = alive, nick = nick,
 			isMe = isMe, theme = theme, icon = icon }
 		self.Players[userId] = p
 		self.PlayerOrder[#self.PlayerOrder + 1] = userId
@@ -1001,7 +1015,7 @@ script RtsHudLogic extends Logic
 		end
 		p.row.Parent.SpriteGUIRendererComponent.Color = border
 		if p.alive then
-			p.shade.SpriteGUIRendererComponent.Color = Color(0.06, 0.05, 0.04, 0.35)
+			p.shade.SpriteGUIRendererComponent.Color = Color(0.06, 0.05, 0.04, 0.12)
 			p.name.TextComponent.FontColor = self:ColInk()
 			p.tomb:SetEnable(false)
 			if p.face ~= nil and isvalid(p.face) then p.face.SpriteGUIRendererComponent.Color = Color(1, 1, 1, 1) end
@@ -1013,36 +1027,69 @@ script RtsHudLogic extends Logic
 		end
 	end
 
-	-- ===== 프로필 상자(좌상단 맨 위 — 2026-09-25 테마 상자에서 바뀜) =====
+	-- ===== 좌상단 상자(프로필 + 정보 — 2026-09-25 테마 상자 → 프로필 상자 → "프로필·정보 카드 하나로 합치고 배경을 보여줘") =====
 
+	-- 상자 400×240(= 테마 썸네일 원본 크기, 늘리거나 자르지 않는다): 배경 = 내 테마 썸네일 + 어두운 막(글자 대비).
+	--   위 64 = 프로필 줄(왼쪽 동그란 내 아이콘 48 — 유저 카드와 같은 원형 마스크 + 몬스터 초상, 없음이면 빈 원 · "프로필 설정" · 요약 · 오른쪽 "변경 ›", 이 줄만 클릭 → 프로필 창),
+	--   구분선, 그 아래 = 정보 칸(투명, 돌려줌 — BuildHud가 라운드·맵·메소·필드를 채우고 RtsDifficultyLogic이 난이도 줄을 붙인다)
 	@ExecSpace("ClientOnly")
-	method void BuildProfileBox(Entity grp)
-		local box = self:SpawnPanel("RtsProfileBox", grp, Vector2(0, 1), Vector2(0, 1), Vector2(16, -16), Vector2(440, 64),
+	method Entity BuildTopBox(Entity grp)
+		local box = self:SpawnPanel("RtsTopBox", grp, Vector2(0, 1), Vector2(0, 1), Vector2(16, -16), Vector2(400, 240),
 			self:ColPanel(), self:ColBorder(), 1.5)
-		self.ThemeThumb = self:SpawnUI("model://uisprite", "RtsProfileThumb", box, Vector2(0, 0.5), Vector2(0, 0.5), Vector2(8, 0), Vector2(104, 48))
-		self:SpawnLabel("RtsProfileTitle", box, Vector2(0, 1), Vector2(0, 1), Vector2(124, -6), Vector2(200, 28),
+		self.ProfileBg = self:SpawnStretch("model://uisprite", "RtsProfileBg", box, Vector2(0, 0), Vector2(1, 1), Vector2(0, 0), Vector2(0, 0))
+		self.ProfileBg.SpriteGUIRendererComponent.RaycastTarget = false
+		local shade = self:SpawnStretch("model://uisprite", "RtsProfileShade", box, Vector2(0, 0), Vector2(1, 1), Vector2(0, 0), Vector2(0, 0))
+		shade.SpriteGUIRendererComponent.Color = Color(0.06, 0.05, 0.04, 0.55)
+		shade.SpriteGUIRendererComponent.RaycastTarget = false
+		local row = self:SpawnStretch("model://uisprite", "RtsProfileRow", box, Vector2(0, 1), Vector2(1, 1), Vector2(0, -64), Vector2(0, 0))
+		row.SpriteGUIRendererComponent.Color = Color(1, 1, 1, 0)
+		local slot = self:SpawnUI("model://uisprite", "RtsProfileIconSlot", row, Vector2(0, 0.5), Vector2(0, 0.5), Vector2(10, 0), Vector2(48, 48))
+		if self.CircleMaskRUID ~= "" then slot.SpriteGUIRendererComponent.ImageRUID = DataRef(self.CircleMaskRUID) end
+		slot.SpriteGUIRendererComponent.Color = Color(0.16, 0.14, 0.12, 1)
+		slot.SpriteGUIRendererComponent.RaycastTarget = false
+		if slot.MaskComponent == nil then slot:AddComponent("MaskComponent") end
+		self.ProfileIconSlot = slot
+		self.ProfileIconFace = nil
+		self.ProfileIconId = ""
+		self:SpawnLabel("RtsProfileTitle", row, Vector2(0, 1), Vector2(0, 1), Vector2(70, -6), Vector2(220, 28),
 			"프로필 설정", self:ColInk(), 18, TextAlignmentType.MiddleLeft, true)
-		self.ProfileSummary = self:SpawnLabel("RtsProfileSummary", box, Vector2(0, 1), Vector2(0, 1), Vector2(124, -34), Vector2(220, 24),
-			"", self:ColMuted(), 14, TextAlignmentType.MiddleLeft, false)
-		self:SpawnLabel("RtsProfileChange", box, Vector2(1, 0.5), Vector2(1, 0.5), Vector2(-14, 0), Vector2(90, 30),
+		self.ProfileSummary = self:SpawnLabel("RtsProfileSummary", row, Vector2(0, 1), Vector2(0, 1), Vector2(70, -34), Vector2(250, 24),
+			"", Color(0.86, 0.82, 0.74, 1), 14, TextAlignmentType.MiddleLeft, false)
+		self:SpawnLabel("RtsProfileChange", row, Vector2(1, 0.5), Vector2(1, 0.5), Vector2(-14, 0), Vector2(80, 30),
 			"변경 ›", self:ColGold(), 16, TextAlignmentType.MiddleRight, true)
-		local click = self:SpawnClick("RtsProfileClick", box)
+		local click = self:SpawnClick("RtsProfileClick", row)
 		click:ConnectEvent(ButtonClickEvent, function(event)
 			_RtsPopupLogic:Open("profile")
 		end)
+		local line = self:SpawnUI("model://uisprite", "RtsTopLine", box, Vector2(0, 1), Vector2(0, 1), Vector2(12, -67), Vector2(376, 1.5))
+		line.SpriteGUIRendererComponent.ImageRUID = DataRef(self.WhiteRUID)
+		line.SpriteGUIRendererComponent.Color = self:ColBorderSoft()
+		line.SpriteGUIRendererComponent.RaycastTarget = false
+		local info = self:SpawnStretch("model://uisprite", "RtsInfoCard", box, Vector2(0, 0), Vector2(1, 1), Vector2(0, 0), Vector2(0, -72))
+		info.SpriteGUIRendererComponent.Color = Color(1, 1, 1, 0)
+		info.SpriteGUIRendererComponent.RaycastTarget = false
 		self:RefreshProfileBox()
+		return info
 	end
 
-	-- 내 테마·비석(RtsProfileLogic.MyTheme·MyTomb — 서버가 보낸 값)으로 썸네일·요약 줄. 썸네일이 없으면 테마 색
+	-- 내 테마·아이콘(RtsProfileLogic.MyTheme·MyIcon — 서버가 보낸 값)으로 배경·아이콘·요약 줄. 썸네일이 없으면 테마 색.
+	--   아이콘 초상은 바뀌었을 때만 다시 만든다(서버 통지마다 부른다)
 	@ExecSpace("ClientOnly")
 	method void RefreshProfileBox()
-		if self.ThemeThumb == nil or not isvalid(self.ThemeThumb) then return end
-		local preset = _RtsThemeLogic:GetPreset(_RtsProfileLogic.MyTheme)
-		local tomb = _RtsTombLogic:GetPreset(_RtsProfileLogic.MyTomb)
-		self:PaintThumb(self.ThemeThumb, preset)
+		if self.ProfileBg == nil or not isvalid(self.ProfileBg) then return end
+		local P = _RtsProfileLogic
+		local preset = _RtsThemeLogic:GetPreset(P.MyTheme)
+		self:PaintThumb(self.ProfileBg, preset)
+		if self.ProfileIconSlot ~= nil and isvalid(self.ProfileIconSlot) and self.ProfileIconId ~= P.MyIcon then
+			if self.ProfileIconFace ~= nil and isvalid(self.ProfileIconFace) then self.ProfileIconFace:Destroy() end
+			self.ProfileIconFace = self:SpawnMonsterPortrait(self.ProfileIconSlot, P.MyIcon, 48, false)
+			if self.ProfileIconFace == nil then self.ProfileIconSlot.SpriteGUIRendererComponent.Color = Color(0.16, 0.14, 0.12, 0.45)
+			else self.ProfileIconSlot.SpriteGUIRendererComponent.Color = Color(0.16, 0.14, 0.12, 1) end
+			self.ProfileIconId = P.MyIcon
+		end
 		if self.ProfileSummary ~= nil and self.ProfileSummary.TextComponent ~= nil then
 			self.ProfileSummary.TextComponent.IsRichText = false
-			self.ProfileSummary.TextComponent.Text = "테마 " .. preset.name .. " · 비석 " .. tomb.name
+			self.ProfileSummary.TextComponent.Text = "테마 " .. preset.name
 		end
 	end
 

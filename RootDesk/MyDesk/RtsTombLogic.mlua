@@ -9,11 +9,11 @@ script RtsTombLogic extends Logic
 
 	-- key   저장 값(유저 DataStorage "tomb")·RPC 인자 — 한 번 정하면 바꾸지 않는다
 	-- name  화면 이름 · tab 창 안 종류(같은 이름끼리 한 줄, 지금 '기본'만)
-	-- ruid  월드 비석 스프라이트 · scale 월드 스케일(2026-09-23 "비석 5배") · w·h 원본 그림 px(프로필 창 카드에 비율 맞춰 넣을 때)
+	-- ruid  월드 비석 스프라이트 · scale 원본 크기에 맞춘 월드 배율 · w·h 원본 그림 px(프로필 창 카드에 비율 맞춰 넣을 때)
 	-- free  true = 누구나 보유(기본 지급). false면 보유 목록("tombs")에 있어야 고를 수 있다
 	method table GetPresets()
 		return {
-			{ key = "basic", name = "기본 비석", tab = "기본", ruid = "29e864c67e6c451d917b34519a4a9373", scale = 5.0, w = 148, h = 239, free = true },
+			{ key = "basic", name = "기본 비석", tab = "기본", ruid = "31d8e05805664acea73d37b04ca92f68", scale = 0.6, w = 1199, h = 1312, free = true },
 		}
 	end
 
