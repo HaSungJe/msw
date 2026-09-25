@@ -1,14 +1,17 @@
 {
   "version": 3,
   "packageVersion": "0.10.1",
-  "lastUpdated": "2026-07-31T01:59:01.832Z",
+  "lastUpdated": "2026-09-24T06:34:17.804Z",
   "files": {
     "mcp": [
-      ".mcp.json"
+      ".codex/config.toml"
     ]
   },
   "agents": {
     "claude-code": {
+      "mcp": "0.10.1"
+    },
+    "codex": {
       "mcp": "0.10.1"
     }
   },
