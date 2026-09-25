@@ -9,6 +9,7 @@
 실전 딜(attack.md): 공격 루프를 0.001초 단위 없이 사건 순서로 600초 돌린다 — 첫 공격 1초, 이후 주기마다. 쿨타임 스킬이 준비되면 기본 공격 대신(표에서 뒤 = 높은 레벨 우선),
   쓴 순간부터 쿨, 후딜(after) 동안 주기를 건너뛴다. 보스전 잠금(드래곤 로어)은 보스 상대에서 제외.
 출력: --jobs(레벨별 보스·사냥 DPS) · --augs(증강 1장 가치) · --clear(보스별 조합 × 증강 분배 클리어 배율) · 기본은 전부. --md = balance-detail.md용 마크다운
+      --radar(영입 상세 오각형 — 보스 잠재력·사냥 단계 → RtsJobTableLogic.GetRadar 상수 줄, 2026-09-25)
 """
 import io, os, re, sys, math, argparse
 sys.stdout.reconfigure(encoding="utf-8")
@@ -490,10 +491,55 @@ def clear_table(runs=30):
         out.append("")
     return out
 
+# ---------------------------------------------------------------- 영입 상세 오각형(2026-09-25 사용자): 5단계 = 매우 높음 5 … 매우 낮음 1, 전체 직업 최댓값 비율 80/60/40/20%
+JOB_ID = {"히어로": "hero", "팔라딘": "paladin", "다크나이트": "dk", "보우마스터": "bow", "신궁": "marks", "썬콜": "il", "불독": "fp",
+          "비숍": "bishop", "나이트로드": "nl", "섀도어": "shad", "팬텀": "phantom"}
+def radar_level(ratio):
+    if ratio >= 0.8: return 5
+    if ratio >= 0.6: return 4
+    if ratio >= 0.4: return 3
+    if ratio >= 0.2: return 2
+    return 1
+
+def radar_table():
+    """사냥 = 50레벨·증강 없음·프리즘 없음 사냥 DPS(40마리, 로테이션). 보스(성장 잠재력, 사용자 "최대 효율 증강 기준") = 50레벨 + 자기 프리즘(팬텀 제외) +
+    마지막 보스 전까지 받는 카드 전부(cards_before — 뽑기는 브론즈로)를 한 장씩 3택1 기대 최선(best_of_3의 가장 자주 고르는 카드)으로 그 유닛에 몰아준 보스 DPS(방어 0).
+    1티어 증강 배율은 카드가 30장을 넘으니 ×3(aug_mul 기본 n=30)"""
+    G = load_stages()
+    last = max(x["no"] for x in G["ST"] if x["kind"] == "boss")
+    cards = ["bronze" if g == "buy" else g for g in cards_before(last, G)]
+    hunt = {}; boss = {}
+    for j in JOBS:
+        st, sk = kit(j, 50)
+        hunt[j] = rotation_dps(st, sk, False, n_targets=40)
+        p = j != "팬텀"
+        st, sk = kit(j, 50, p)
+        cache = {}
+        for g in cards:
+            key = (g, round(st["atk"]), round(st["pct"], 3), round(st["boss"], 3), round(st["crit"], 3), round(st["cd"], 3))
+            if key not in cache: cache[key] = best_of_3(j, 50, p, st, sk, g)[1]
+            a = cache[key]
+            st = apply_aug(st, a[1], a[2], aug_mul(j, p, a[1]))
+        boss[j] = rotation_dps(st, sk, True)
+    mh = max(hunt.values()); mb = max(boss.values())
+    out = ["### 영입 상세 오각형 — 보스 잠재력 · 사냥 (카드 %d장 = 마지막 보스 %d 전까지)" % (len(cards), last), "",
+           "| 직업 | 사냥 DPS | 비율 | 단계 | 보스 잠재력 DPS | 비율 | 단계 |", "|---|---|---|---|---|---|---|"]
+    lua = []
+    for j in JOBS:
+        hr = hunt[j] / mh; br = boss[j] / mb
+        out.append(f"| {j} | {hunt[j]:,.0f} | {hr:.2f} | {radar_level(hr)} | {boss[j]:,.0f} | {br:.2f} | {radar_level(br)} |")
+        lua.append(f"\t\t\t{JOB_ID[j]} = {{ boss = {radar_level(br)}, hunt = {radar_level(hr)} }},")
+    out += ["", "RtsJobTableLogic.GetRadar 상수 줄:", "```"] + lua + ["```", ""]
+    return out
+
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("--jobs", action="store_true"); ap.add_argument("--augs", action="store_true"); ap.add_argument("--clear", action="store_true")
+    ap.add_argument("--radar", action="store_true")
     a = ap.parse_args()
+    if a.radar:
+        print("\n".join(radar_table()))
+        sys.exit(0)
     allp = not (a.jobs or a.augs or a.clear)
     lines = []
     if a.jobs or allp: lines += jobs_table()

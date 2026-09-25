@@ -16,11 +16,7 @@ script RtsRunResultLogic extends Logic
 	-- 구역 비석 엔티티(새 판에서 지운다)
 	property table Tombs = {}
 
-	-- 비석 = 원작 맵 오브젝트 묘비(map/obj/jpsengoku2014/east_out/gravestone, 148×239px 원점 가운데) — 원작 사망 비석 이펙트는 라이브러리에 없음
-	property string TombRUID = "29e864c67e6c451d917b34519a4a9373"
-
-	-- 비석 크기(2026-09-23 사용자 "5배 키워")
-	property number TombScale = 5.0
+	-- 비석 그림·크기 = 그 구역 주인의 비석 프리셋(RtsTombLogic — 2026-09-25 사용자 "비석도 프리셋". 기본 비석 = 원작 묘비 map/obj/jpsengoku2014/east_out/gravestone, 스케일 5)
 
 	-- 비석 사운드 = 원작 sound/game/tombstone(캐릭터 사망 때 비석 떨어지는 소리, 2026-09-23 사용자 "사망 시 비석 사운드")
 	property string TombSound = "8727e134756141c58bf2f525a1598eee"
@@ -374,16 +370,20 @@ script RtsRunResultLogic extends Logic
 		_RtsPopupLogic:SetRanking(diff, rows, myCount, myRank, myMore)
 	end
 
-	-- 구역 가운데 비석
+	-- 구역 가운데 비석 — 그 구역 주인이 고른 비석(주인이 없으면 기본)
 	@ExecSpace("ServerOnly")
 	method void SpawnTomb(number zone)
 		if zone < 1 then return end
 		local mapRoot = _EntityService:GetEntityByPath("/maps/RtsMap")
 		if mapRoot == nil then return end
 		local at = _RtsZoneLogic:GetBossPoint(zone)
-		local t = _RtsZoneLogic:SpawnProp("RtsTomb" .. string.format("%d", math.floor(zone + 0.5)), mapRoot, at, self.TombRUID, 210)
+		local owner = self:OwnerOfZone(zone)
+		local key = _RtsTombLogic.DefaultKey
+		if owner ~= "" then key = _RtsProfileLogic:TombOf(owner) end
+		local pr = _RtsTombLogic:GetPreset(key)
+		local t = _RtsZoneLogic:SpawnProp("RtsTomb" .. string.format("%d", math.floor(zone + 0.5)), mapRoot, at, pr.ruid, 210)
 		if t == nil then return end
-		t.TransformComponent.Scale = Vector3(self.TombScale, self.TombScale, 1)
+		t.TransformComponent.Scale = Vector3(pr.scale, pr.scale, 1)
 		self.Tombs[#self.Tombs + 1] = t
 		self:PlayTombSound(zone)
 	end

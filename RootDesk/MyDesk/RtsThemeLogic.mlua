@@ -1,7 +1,7 @@
 -- rts-base: 트랙/타일 테마 프리셋 (2026-09-14 사용자 지시 — "트랙/타일은 프리셋 가능하도록")
 --   프리셋 = 바닥 타일 이름(+변형 타일·비율) + 그리드 트랙 텍스처 RUID(+틴트) + 배경 사물 목록(공식 스프라이트, 칸 좌표) + 썸네일 묶음. 타일은 CaveFloorTileSet 안의 Name.
 --   2026-09-25 사용자 "맵 테마 여러 개 — 헤네시스/엘리니아/페리온/커닝시티/리스항구, 기본은 헤네시스, 선택하면 내 맵/트랙이 바뀜(보이는 것만)":
---   테마는 **유저마다(= 그 유저 구역만)** 적용한다(ApplyToZone). 고르기·저장은 RtsProfileLogic, 창은 RtsPopupLogic('theme').
+--   테마는 **유저마다(= 그 유저 구역만)** 적용한다(ApplyToZone). 고르기·저장·보유는 RtsProfileLogic, 창은 RtsPopupLogic('profile' [테마] 탭).
 --   헤네시스 외 4종은 기능 뼈대용 임시 모양(기존 타일 + 트랙 판 틴트, 장식·썸네일 없음) — 실제 디자인은 ChatGPT가 docs/theme-presets.md를 보고 이 표만 바꾼다.
 --   적용은 서버가 한다(타일·프롭이 서버 소유). 클라는 GetPreset·GetPresets로 읽기만.
 @Logic
@@ -63,20 +63,21 @@ script RtsThemeLogic extends Logic
 	--   key       저장 값(유저 DataStorage "theme")·RPC 인자 — 한 번 정하면 바꾸지 않는다
 	--   tab       테마 창 탭 이름(같은 이름끼리 한 탭). 지금은 '기본'만
 	--   gridTint  트랙 판 색 입히기(임시 모양용). 디자인 텍스처가 오면 흰색으로
-	--   thumb     썸네일 스프라이트 RUID("" = 없음 → color로 칠함) — 테마 창 카드·테마 상자·유저 카드 배경
+	--   thumb     썸네일 스프라이트 RUID("" = 없음 → color로 칠함) — 프로필 창 테마 카드·프로필 상자·유저 카드 배경
+	--   free      true = 누구나 보유(기본 지급). false면 유저 보유 목록(DataStorage "themes")에 있어야 고를 수 있다(2026-09-25 사용자 "테마·비석·아이콘 모두 영구 소유")
 	method table GetPresets()
 		return {
 			{ key = "henesys", name = "헤네시스", tab = "기본", floorTile = "HenesysGrass1", floorVariants = { "HenesysGrass2", "HenesysGrass3" }, variantRatio = 0.12,
-				gridRUID = "95b3ec9d377e46ecb9d394467d27dada", gridTint = Color(1, 1, 1, 1), decor = self:GetHenesysDecor(), thumb = "", color = Color(0.42, 0.66, 0.3, 1) }, -- 2026-09-20 16×13(ZoneTrackGridHenesys16)
+				gridRUID = "b1a2d2e1fde64330afe3dcf374b69a51", gridTint = Color(1, 1, 1, 1), decor = self:GetHenesysDecor(), thumb = "", color = Color(0.42, 0.66, 0.3, 1), free = true }, -- 2026-09-25 M2 경로(ZoneTrackGridM2 — 보스 가운데 2×2, S 화살표·E 되돌리기)
 			-- ↓ 임시 모양(2026-09-25 뼈대) — 기존 타일 + 트랙 판 틴트. ChatGPT가 floorTile·gridRUID·decor·thumb를 바꾼다
 			{ key = "ellinia", name = "엘리니아", tab = "기본", floorTile = "HenesysGrassFloor", floorVariants = {}, variantRatio = 0,
-				gridRUID = "95b3ec9d377e46ecb9d394467d27dada", gridTint = Color(0.7, 0.95, 0.86, 1), decor = {}, thumb = "", color = Color(0.25, 0.55, 0.47, 1) },
+				gridRUID = "b1a2d2e1fde64330afe3dcf374b69a51", gridTint = Color(0.7, 0.95, 0.86, 1), decor = {}, thumb = "", color = Color(0.25, 0.55, 0.47, 1), free = true },
 			{ key = "perion", name = "페리온", tab = "기본", floorTile = "HenesysSoil", floorVariants = {}, variantRatio = 0,
-				gridRUID = "95b3ec9d377e46ecb9d394467d27dada", gridTint = Color(1, 0.82, 0.64, 1), decor = {}, thumb = "", color = Color(0.66, 0.44, 0.26, 1) },
+				gridRUID = "b1a2d2e1fde64330afe3dcf374b69a51", gridTint = Color(1, 0.82, 0.64, 1), decor = {}, thumb = "", color = Color(0.66, 0.44, 0.26, 1), free = true },
 			{ key = "kerning", name = "커닝시티", tab = "기본", floorTile = "HenesysStone1", floorVariants = {}, variantRatio = 0,
-				gridRUID = "95b3ec9d377e46ecb9d394467d27dada", gridTint = Color(0.8, 0.78, 0.95, 1), decor = {}, thumb = "", color = Color(0.4, 0.4, 0.54, 1) },
+				gridRUID = "b1a2d2e1fde64330afe3dcf374b69a51", gridTint = Color(0.8, 0.78, 0.95, 1), decor = {}, thumb = "", color = Color(0.4, 0.4, 0.54, 1), free = true },
 			{ key = "lith", name = "리스항구", tab = "기본", floorTile = "ElnathSnowFloor", floorVariants = {}, variantRatio = 0,
-				gridRUID = "95b3ec9d377e46ecb9d394467d27dada", gridTint = Color(0.72, 0.88, 1, 1), decor = {}, thumb = "", color = Color(0.33, 0.56, 0.8, 1) },
+				gridRUID = "b1a2d2e1fde64330afe3dcf374b69a51", gridTint = Color(0.72, 0.88, 1, 1), decor = {}, thumb = "", color = Color(0.33, 0.56, 0.8, 1), free = true },
 		}
 	end
 

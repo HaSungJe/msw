@@ -147,7 +147,7 @@ script RtsDifficultyLogic extends Logic
 		end
 	end
 
-	-- 영입 버튼(상단 가운데, 높이 64) 아래: "난이도" + 6칸 + 안내 줄(판 시작 전에만). 정보 카드 맵 이름 오른쪽에 '난이도 보통'(항상)
+	-- 화면 최상단 가운데(2026-09-25 사용자 "난이도 선택창 화면 최상단에 붙게" — 전엔 영입 버튼 자리 밑 y −88): "난이도" + 6칸 + 안내 줄(판 시작 전에만). 정보 카드 맵 이름 오른쪽에 '난이도 보통'(항상)
 	@ExecSpace("ClientOnly")
 	method void Build()
 		local H = _RtsHudLogic
@@ -156,7 +156,7 @@ script RtsDifficultyLogic extends Logic
 		local gap = 6
 		local total = 86 + #names * w + (#names - 1) * gap + 12 + 124
 		-- 윗줄 = "난이도" + 6칸, 아랫줄 = 안내(남은 초 · 지금 선택)
-		local bar = H:SpawnPanel("RtsDiffBar", H.HudGroup, Vector2(0.5, 1), Vector2(0.5, 1), Vector2(0, -88), Vector2(total, 80),
+		local bar = H:SpawnPanel("RtsDiffBar", H.HudGroup, Vector2(0.5, 1), Vector2(0.5, 1), Vector2(0, 0), Vector2(total, 80),
 			H:ColPanel(), H:ColBorder(), 1.5)
 		if bar == nil then return end
 		H:SpawnLabel("RtsDiffTitle", bar, Vector2(0, 1), Vector2(0, 1), Vector2(12, -6), Vector2(70, 36), "난이도", H:ColMuted(), 16, TextAlignmentType.MiddleLeft, true)

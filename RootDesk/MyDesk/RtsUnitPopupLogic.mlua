@@ -1,6 +1,6 @@
 -- Phase 5 #19·#20 + Phase 4 #14 (부분, 2026-09-15): 유닛 정보 팝업 (아티팩트 v27 #unitModal 그대로)
 --   열기: 우측 유닛 슬롯 클릭 / 캐릭터 클릭 메뉴의 상세정보. 셸(딤·패널·제목·X·ESC)은 RtsPopupLogic("unit").
---   좌: 외형(스킨 2 — 기본 세트 / 월드 아바타 = 월드코인 1,600으로 영구 해금, 잠기면 클릭 → 구매창) + 능력치(RtsJobTableLogic.Calc, 파티 버프 반영 행은 ▲).
+--   좌: 외형(직업 기본 세트 하나 — 월드 아바타 스킨은 2026-09-25 삭제) + 능력치(RtsJobTableLogic.Calc, 파티 버프 반영 행은 ▲).
 --   우: 탭 3개 — 스킬(미획득 흐림, 액티브/패시브) / 증강 n(이 유닛에 지정된 증강, Phase 6 전엔 빈 목록) / 적용 중인 버프 n(RtsUnitBuffLogic). 증강·버프는 ScrollLayoutGroup 스크롤 목록. Tab 키로 순환(CycleTab).
 --   대상 지정 스킬(홀리 유니티) 행에는 셀렉트 박스(미지정 / 내 다른 유닛). 하단: [레벨업] 버튼만(2026-09-16 — 누적 투자·다음 벽·보유 메소·'(벽)' 문구는 유저에게 필요 없는 내부 정보라 삭제. 메소는 HUD 좌상단).
 --   위치 이동은 여기 없음 — 캐릭터 클릭 메뉴(RtsUnitSelectLogic)에서. 대상 변경·위치 이동은 유닛마다 3분 쿨.
@@ -43,6 +43,13 @@ script RtsUnitPopupLogic extends Logic
 
 	-- 마지막으로 통째로 그린 구조 서명(직업·프리즘·잠금·스킨·대상·탭·획득 스킬 수·버프·증강 수·해금·대상 쿨) — 달라질 때만 Render
 	property string Sig = ""
+
+	-- 부분 다시 그리기(2026-09-25): 오른쪽 탭 막대 · 오른쪽 내용 컨테이너 · 외형 서명(이것이 바뀔 때만 통째로)
+	property table TabBar = nil
+
+	property Entity RightBox = nil
+
+	property string LookSigNow = ""
 
 	-- 동기화가 한꺼번에 여러 번 와도(레벨·사용 메소·메소·알림) 한 번만 갱신
 	property boolean UpdatePending = false
@@ -90,6 +97,9 @@ script RtsUnitPopupLogic extends Logic
 		self.LvBtn = nil
 		self.LvRow = nil
 		self.Sig = ""
+		self.LookSigNow = ""
+		self.TabBar = nil
+		self.RightBox = nil
 		if self.TickId ~= 0 then
 			_TimerService:ClearTimer(self.TickId)
 			self.TickId = 0
@@ -119,10 +129,12 @@ script RtsUnitPopupLogic extends Logic
 			_RtsPopupLogic:Close()
 			return
 		end
-		if self:Signature(u) ~= self.Sig or #self.StatVals == 0 or self.LvBtn == nil then
+		if #self.StatVals == 0 or self.LvBtn == nil or self:LookSig(u) ~= self.LookSigNow then
 			self:Render()
 			return
 		end
+		-- 외형·틀은 그대로, 오른쪽(스킬·증강·버프)만 구조가 바뀌었으면 오른쪽만 다시(2026-09-25 "필요한 부분만 다시 그려")
+		if self:Signature(u) ~= self.Sig then self:RenderRight(u) end
 		self:ApplyTitle(u)
 		local rows = self:StatRowTexts(u)
 		for i = 1, #rows do
@@ -132,7 +144,12 @@ script RtsUnitPopupLogic extends Logic
 		self:ApplyLevelButton(u)
 	end
 
-	-- 통째로 다시 그려야 하는 구조의 서명
+	-- 통째로 다시 그려야 하는 구조의 서명(외형 칸 — 직업·프리즘 이름). 나머지는 오른쪽만 다시(Signature)
+	method string LookSig(any u)
+		return u.JobId .. "|" .. u.Prisms
+	end
+
+	-- 오른쪽 탭 내용 구조의 서명
 	@ExecSpace("ClientOnly")
 	method string Signature(any u)
 		local skills = _RtsJobTableLogic:GetSkillsFor(u)
@@ -141,13 +158,11 @@ script RtsUnitPopupLogic extends Logic
 			if u.Level >= skills[i].lv then got = got + 1 end
 		end
 		local B = _RtsUnitBuffLogic
-		local unlocked = "0"
-		if _RtsUnitLogic:IsAvatarUnlocked(u.Owner) then unlocked = "1" end
 		local bondLock = "0"
 		if u:BondCoolLeft() > 0 then bondLock = "1" end
-		return u.JobId .. "|" .. u.Prisms .. "|" .. u.SkillLocks .. "|" .. _RtsHudLogic:Int(u.Skin) .. "|" .. _RtsHudLogic:Int(u.BondNo) .. "|" .. self.Tab
+		return u.JobId .. "|" .. u.Prisms .. "|" .. u.SkillLocks .. "|" .. _RtsHudLogic:Int(u.BondNo) .. "|" .. self.Tab
 			.. "|" .. _RtsHudLogic:Int(got) .. "|" .. B:BuffSig(u.Zone, u.No) .. "|" .. _RtsHudLogic:Int(#B:GetAugmentsFor(u.Zone, u.No))
-			.. "|" .. unlocked .. "|" .. bondLock
+			.. "|" .. bondLock
 	end
 
 	-- 제목: "2. 팔라딘  Lv 40 · 모험가 · 전사"
@@ -235,60 +250,22 @@ script RtsUnitPopupLogic extends Logic
 		local buffs = B:GetBuffsFor(u.Zone, u.No)
 		self:ApplyTitle(u)
 
-		-- ----- 좌: 외형 + 스킨 -----
+		-- ----- 좌: 외형(직업 기본 세트 — 2026-09-25 사용자 "월드 아바타 없애고 기본 스킨이나 이쁘게 꾸며서 보여줘") -----
+		--   가운데에 크게 + 뒤에 은은한 금빛 원광 + 아래 이름판(프리즘으로 직업명이 바뀌면 그 이름 — 2026-09-22 "듀얼블레이더라고 나와야지")
+		--   2026-09-25 사용자 "모습이 너무 낮다 — '외형' 글자 빼고 캐릭터가 원 안에": 제목 줄 삭제, 캐릭터를 원 위쪽 가운데로 작게(무기까지 원 안)
 		local look = H:SpawnPanel("RtsUnitLook", content, Vector2(0, 1), Vector2(0, 1), Vector2(27, -10), Vector2(365, 236),
 			P:Mix(Color.white, 0.03), P:Mix(H:ColGold(), 0.25), 1.5)
-		H:SpawnLabel("RtsUnitLookK", look, Vector2(0, 1), Vector2(0, 1), Vector2(14, -10), Vector2(200, 18),
-			"외형", H:ColMuted(), 13, TextAlignmentType.MiddleLeft, false)
-		self:SpawnPreview(look, u)
-		local skins = T:GetSkinNames(u.JobId)
-		-- 프리즘으로 직업명이 바뀌면(자유전직 → 듀얼블레이더) 외형 이름도 그 이름으로(2026-09-22 사용자 "상세정보에도 모험가 - 섀도어라고 나오고. 듀얼블레이더라고 나와야지")
-		if u.JobId ~= "phantom" then skins[1] = "모험가 " .. T:GetJobNameFor(u) end
-		local unlocked = _RtsUnitLogic:IsAvatarUnlocked(u.Owner)
-		for i = 1, 2 do
-			local on = (u.Skin == i - 1)
-			local locked = (i == 2 and not unlocked)
-			local bg = P:Mix(Color.white, 0.04)
-			local border = P:Mix(Color.white, 0.12)
-			if on then
-				bg = P:Mix(H:ColGold(), 0.18)
-				border = H:ColGold()
-			end
-			if locked then
-				bg = P:Mix(Color.white, 0.03)
-				border = P:Mix(H:ColGold(), 0.55)
-			end
-			local b = H:SpawnPanel("RtsUnitSkin" .. tostring(i), look, Vector2(0, 1), Vector2(0, 1), Vector2(146, -34 - (i - 1) * 64), Vector2(205, 58), bg, border, 1.5)
-			H:SpawnLabel("RtsUnitSkinName", b, Vector2(0, 1), Vector2(0, 1), Vector2(10, -6), Vector2(190, 22),
-				skins[i], H:ColInk(), 15, TextAlignmentType.MiddleLeft, true)
-			local subText = "기본"
-			local subColor = H:ColMuted()
-			if i == 2 then
-				if locked then
-					subText = "1,600 월드코인 · 영구 해금"
-					subColor = H:ColGold()
-				else
-					subText = "내 메이플월드 코디"
-				end
-			end
-			H:SpawnLabel("RtsUnitSkinSub", b, Vector2(0, 1), Vector2(0, 1), Vector2(10, -30), Vector2(190, 18),
-				subText, subColor, 12, TextAlignmentType.MiddleLeft, false)
-			if locked then
-				-- 잠김: 클릭 → 월드 상점 구매창
-				local buy = H:SpawnClick("RtsUnitSkinBuy", b)
-				buy:ConnectEvent(ButtonClickEvent, function(event)
-					_RtsUnitLogic:RequestBuyAvatar()
-				end)
-			elseif not on then
-				local skinIdx = i - 1
-				local click = H:SpawnClick("RtsUnitSkinClick", b)
-				click:ConnectEvent(ButtonClickEvent, function(event)
-					_RtsUnitLogic:RequestSkin(self.CurNo, skinIdx)
-				end)
-			end
-		end
-		H:SpawnLabel("RtsUnitSkinNote", look, Vector2(0, 1), Vector2(0, 1), Vector2(146, -164), Vector2(205, 18),
-			"월드 아바타는 한 번 사면 영구 · 모든 유닛", H:ColMuted(), 11, TextAlignmentType.MiddleLeft, false)
+		local glow = H:SpawnUI("model://uisprite", "RtsUnitLookGlow", look, Vector2(0, 1), Vector2(0.5, 0.5), Vector2(181, -98), Vector2(176, 176))
+		if H.CircleMaskRUID ~= "" then glow.SpriteGUIRendererComponent.ImageRUID = DataRef(H.CircleMaskRUID) end
+		glow.SpriteGUIRendererComponent.Color = Color(0.79, 0.64, 0.29, 0.13)
+		glow.SpriteGUIRendererComponent.RaycastTarget = false
+		self:SpawnPreviewAt(look, u, Vector2(181, -90), Vector2(112, 140))
+		local skinName = "영웅 팬텀"
+		if u.JobId ~= "phantom" then skinName = "모험가 " .. T:GetJobNameFor(u) end
+		local plate = H:SpawnPanel("RtsUnitLookPlate", look, Vector2(0.5, 0), Vector2(0.5, 0), Vector2(0, 12), Vector2(220, 30),
+			P:Mix(H:ColGold(), 0.14), P:Mix(H:ColGold(), 0.55), 1)
+		H:SpawnLabel("RtsUnitLookName", plate, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2(0, 0), Vector2(214, 26),
+			skinName, H:ColInk(), 15, TextAlignmentType.MiddleCenter, true)
 
 		-- ----- 좌: 능력치 -----
 		local statsH = 34 + 30 * 8 + 16
@@ -345,34 +322,21 @@ script RtsUnitPopupLogic extends Logic
 			{ id = "aug", text = "증강 " .. H:Int(#augs), w = 130 },
 			{ id = "buff", text = "적용 중인 버프 " .. H:Int(#buffs), w = 190 },
 		}
-		local tx = rx
-		for i = 1, #tabs do
-			local tb = tabs[i]
-			local on = (self.Tab == tb.id)
-			local tab = P:SpawnTab("RtsUnitTab" .. tb.id, content, Vector2(tx, -10), Vector2(tb.w, 34), tb.text, on, 15)
-			if not on then
-				local id = tb.id
-				local click = H:SpawnClick("RtsUnitTabClick", tab)
-				click:ConnectEvent(ButtonClickEvent, function(event)
-					self.Tab = id
-					self:Render()
-				end)
-			end
-			tx = tx + tb.w + 8
-		end
+		-- 탭은 제자리(켜짐·개수 글자만 바뀜 — RenderRight), 누르면 오른쪽 내용만 다시(2026-09-25 "필요한 부분만")
+		local items = {}
+		for i = 1, #tabs do items[i] = { tabs[i].id, tabs[i].text, tabs[i].w } end
+		self.TabBar = P:SpawnTabBar(content, "RtsUnitTab", items, self.Tab, rx, -10, 120, 34, 8, 15, function(key)
+			self.Tab = key
+			self:RenderRight(_RtsUnitLogic:GetMyUnit(self.CurNo))
+		end)
+		local tx = self.TabBar.right
 		-- 단축키 표시: 탭 오른쪽 [Tab] — Tab 키로 스킬 → 증강 → 적용 중인 버프 순환(2026-09-23 사용자, RtsUnitSelectLogic.HandleKeyDownEvent → CycleTab)
 		local tkey = H:SpawnPanel("RtsUnitTabKey", content, Vector2(0, 1), Vector2(0, 1), Vector2(tx + 4, -14), Vector2(56, 26),
 			Color(0.12, 0.1, 0.08, 0.9), Color(0.95, 0.9, 0.75, 0.9), 1.2)
 		H:SpawnLabel("RtsUnitTabKeyText", tkey, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2(0, 0), Vector2(54, 24),
 			"Tab", Color(0.95, 0.9, 0.75, 1), 13, TextAlignmentType.MiddleCenter, true)
-		local top = -54
-		if self.Tab == "aug" then
-			self:BuildAugTabFor(content, u, rx, rw, top, augs)
-		elseif self.Tab == "buff" then
-			self:BuildBuffTab(content, rx, rw, top, buffs)
-		else
-			self:BuildSkillTab(content, u, rx, rw, top)
-		end
+		self.RightBox = nil
+		self:RenderRight(u)
 
 		-- ----- 하단: 레벨업 버튼만 -----
 		--   누적 투자·다음 벽까지 비용·보유 메소는 안 보인다(2026-09-16 사용자: 유저에게 필요 없는 내부 정보. 메소는 HUD 좌상단에 있음).
@@ -386,12 +350,10 @@ script RtsUnitPopupLogic extends Logic
 		lclick:ConnectEvent(ButtonClickEvent, function(event)
 			if self:CanLevelUp(_RtsUnitLogic:GetMyUnit(self.CurNo)) then _RtsUnitLogic:LevelUpNow(self.CurNo) end
 		end)
-		-- 단축키 표시: 레벨업 버튼 왼쪽 [Space] (2026-09-23 사용자 — 스페이스 = 레벨업, RtsUnitSelectLogic.HandleKeyDownEvent)
-		local key = H:SpawnPanel("RtsUnitLvKey", content, Vector2(1, 0), Vector2(1, 0), Vector2(-27 - 280 - 10, 20), Vector2(70, 26),
-			Color(0.12, 0.1, 0.08, 0.9), Color(0.95, 0.9, 0.75, 0.9), 1.2)
-		H:SpawnLabel("RtsUnitLvKeyText", key, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2(0, 0), Vector2(68, 24),
-			"Space", Color(0.95, 0.9, 0.75, 1), 13, TextAlignmentType.MiddleCenter, true)
+		-- 단축키 표시: 레벨업 버튼 안 오른쪽 [Space](2026-09-25 사용자 "Space가 LV.UP 우측에 — 버튼 하나로 합쳐서", 캐릭터 메뉴의 레벨업 줄과 같은 키캡 — RtsUnitSelectLogic.SpawnKeyCap)
+		_RtsUnitSelectLogic:SpawnKeyCap(lbtn, "Space")
 		self.Sig = self:Signature(u)
+		self.LookSigNow = self:LookSig(u)
 	end
 
 	-- 능력치 8줄 { 이름, 값(리치 텍스트) } — 버프 없는 원값(s0)과 버프 반영값(s)이 다른 행은 ▲. 프리즘은 둘 다에 반영(GetStatFor)
@@ -854,7 +816,7 @@ script RtsUnitPopupLogic extends Logic
 		end
 	end
 
-	-- Tab 키 = 우측 탭 순환: 스킬 → 증강 → 적용 중인 버프 → 스킬(2026-09-23 사용자). RtsUnitSelectLogic.HandleKeyDownEvent가 부른다
+	-- Tab 키 = 우측 탭 순환: 스킬 → 증강 → 적용 중인 버프 → 스킬(2026-09-23 사용자). RtsUnitSelectLogic.HandleKeyDownEvent가 부른다 — 오른쪽만 다시
 	@ExecSpace("ClientOnly")
 	method void CycleTab()
 		if self.CurNo == 0 or self.Body == nil then return end
@@ -865,7 +827,39 @@ script RtsUnitPopupLogic extends Logic
 		else
 			self.Tab = "skill"
 		end
-		self:Render()
+		self:RenderRight(_RtsUnitLogic:GetMyUnit(self.CurNo))
+	end
+
+	-- 오른쪽(탭 내용)만 다시: 탭 켜짐·개수 글자는 제자리, 목록은 컨테이너째 교체(옛 것은 0.12초 뒤 지움). 외형·능력치·레벨업 버튼은 그대로
+	@ExecSpace("ClientOnly")
+	method void RenderRight(any u)
+		if u == nil or self.Content == nil or not isvalid(self.Content) then return end
+		local H = _RtsHudLogic
+		local P = _RtsPopupLogic
+		local B = _RtsUnitBuffLogic
+		local buffs = B:GetBuffsFor(u.Zone, u.No)
+		local augs = B:GetAugmentsFor(u.Zone, u.No)
+		if self.TabBar ~= nil then
+			P:SetTabText(self.TabBar.tabs["aug"], "증강 " .. H:Int(#augs))
+			P:SetTabText(self.TabBar.tabs["buff"], "적용 중인 버프 " .. H:Int(#buffs))
+			P:BarSelect(self.TabBar, self.Tab)
+		end
+		self.Dropdown = nil
+		local old = self.RightBox
+		local box = P:SpawnBox(self.Content, "RtsUnitRight")
+		self.RightBox = box
+		local rx = 411
+		local rw = self.PanelW - rx - 27
+		local top = -54
+		if self.Tab == "aug" then
+			self:BuildAugTabFor(box, u, rx, rw, top, augs)
+		elseif self.Tab == "buff" then
+			self:BuildBuffTab(box, rx, rw, top, buffs)
+		else
+			self:BuildSkillTab(box, u, rx, rw, top)
+		end
+		P:DropLater(old)
+		self.Sig = self:Signature(u)
 	end
 
 	-- 1초마다: 쿨타임 글자 갱신, 쿨이 끝나는 순간 전체 다시 그림(버튼 활성)
@@ -875,7 +869,7 @@ script RtsUnitPopupLogic extends Logic
 		local u = _RtsUnitLogic:GetMyUnit(self.CurNo)
 		if u == nil then return end
 		if self.BondLocked and u:BondCoolLeft() <= 0 then
-			self:Render()
+			self:RenderRight(u)
 			return
 		end
 		self:ApplyBondCool(u)
@@ -884,41 +878,40 @@ script RtsUnitPopupLogic extends Logic
 	-- 외형 미리보기: UI 아바타(UIEmpty + CostumeManager + AvatarGUIRenderer). 모델이 없으면 조용히 건너뛴다
 	@ExecSpace("ClientOnly")
 	method void SpawnPreview(Entity parent, any u)
+		self:SpawnPreviewAt(parent, u, Vector2(92, -128), Vector2(120, 190))
+	end
+
+	-- 위치(부모 왼쪽 위 기준 가운데)·크기를 받는 판(2026-09-25 영입 상세 팝업 — RtsPopupLogic.BuildRecruitInfo가 { JobId } 표로 부른다). 직업 기본 세트만
+	@ExecSpace("ClientOnly")
+	method void SpawnPreviewAt(Entity parent, any u, Vector2 pos, Vector2 size)
 		local H = _RtsHudLogic
 		local e = _SpawnService:SpawnByModelId("model://uiempty", "RtsUnitPreview", Vector3.zero, parent)
 		if e == nil then
-			H:SpawnLabel("RtsUnitPreviewText", parent, Vector2(0, 1), Vector2(0, 1), Vector2(14, -34), Vector2(120, 190),
-				_RtsJobTableLogic:GetJobNameFor(u), H:ColMuted(), 14, TextAlignmentType.MiddleCenter, false)
+			H:SpawnLabel("RtsUnitPreviewText", parent, Vector2(0, 1), Vector2(0, 1), Vector2(pos.x - size.x / 2, pos.y + size.y / 2), size,
+				_RtsJobTableLogic:GetJobName(u.JobId), H:ColMuted(), 14, TextAlignmentType.MiddleCenter, false)
 			return
 		end
 		local t = e.UITransformComponent
 		t.AnchorsMin = Vector2(0, 1)
 		t.AnchorsMax = Vector2(0, 1)
 		t.Pivot = Vector2(0.5, 0.5)
-		t.anchoredPosition = Vector2(92, -128)
-		t.RectSize = Vector2(120, 190)
+		t.anchoredPosition = pos
+		t.RectSize = size
 		local cm = e:AddComponent("CostumeManagerComponent")
 		local ar = e:AddComponent("AvatarGUIRendererComponent")
 		if cm == nil or ar == nil then return end
 		ar.PreserveAvatar = PreserveSpriteType.AspectOnly
 		local set = _RtsJobTableLogic:GetCostume(u.JobId)
 		if set == nil then return end
-		if u.Skin == 1 then
-			cm.UseCustomEquipOnly = false
-			cm.DefaultEquipUserId = u.Owner
-			cm.CustomTwoHandedWeaponEquip = set.weapon2h or ""
-			cm.CustomOneHandedWeaponEquip = set.weapon1h or ""
-		else
-			cm.UseCustomEquipOnly = true
-			cm.CustomLongcoatEquip = set.longcoat
-			cm.CustomTwoHandedWeaponEquip = set.weapon2h or ""
-			cm.CustomOneHandedWeaponEquip = set.weapon1h or ""
-			cm.CustomShoesEquip = set.shoes
-			cm.CustomHairEquip = set.hair
-			cm.CustomCapEquip = set.cap or ""
-			cm.CustomFaceAccessoryEquip = set.faceAcc or ""
-			cm.CustomFaceEquip = set.face or ""
-		end
+		cm.UseCustomEquipOnly = true
+		cm.CustomLongcoatEquip = set.longcoat
+		cm.CustomTwoHandedWeaponEquip = set.weapon2h or ""
+		cm.CustomOneHandedWeaponEquip = set.weapon1h or ""
+		cm.CustomShoesEquip = set.shoes
+		cm.CustomHairEquip = set.hair
+		cm.CustomCapEquip = set.cap or ""
+		cm.CustomFaceAccessoryEquip = set.faceAcc or ""
+		cm.CustomFaceEquip = set.face or ""
 	end
 
 end

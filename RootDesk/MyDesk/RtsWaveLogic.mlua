@@ -76,7 +76,10 @@ script RtsWaveLogic extends Logic
 			mon = _RtsStageTableLogic:GetMonster(id)
 		end
 		local at = _RtsZoneLogic:GetTrackPoint(zone, 0)
-		local e = _RtsZoneLogic:SpawnProp(name, mapRoot, at, mon.walk, 200)
+		-- 그리는 순서: 일반 몬스터 200(유닛과 같음), 보스는 유닛 아래(RtsBossLogic.BossOrder — 2026-09-25 보스가 3×3으로 둘레 발판에 걸쳐서)
+		local order = 200
+		if isBoss then order = _RtsBossLogic.BossOrder end
+		local e = _RtsZoneLogic:SpawnProp(name, mapRoot, at, mon.walk, order)
 		if e == nil then return nil end
 		-- 크기 배율 size(일반 몬스터, 2026-09-25 사용자 "리프레 켄타우로스부터 2배 · 시간의 신전 3배 · 미래의 헤네시스·황혼의 페리온 2배"): 스케일 × size,
 		--   체력바 높이는 RtsMonsterComponent.SizeMul(표 barY × SizeMul), 피격 박스·겨냥점은 엔티티 스케일을 따라 같이 커진다. 보스는 RtsBossLogic이 SizeMul을 다시 정한다

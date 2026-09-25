@@ -44,6 +44,7 @@ MSW(Maker 26.7) 실측으로 확인한 엔진 동작. 다시 실측하면 30분�
 - Rule: `maker_execute_script`의 서버 실행 인자는 `context = "server_main"`(`execSpace`가 아님 — 잘못 주면 조용히 클라에서 돈다). Maker UI 자동화(마우스 이동·클릭)는 사용자 데스크톱을 가로채므로 하지 않는다 — 2026-09-18 사용자 게임 창 위에 클릭이 들어간 사고. 읽기 전용 화면 캡처(`System.Drawing.CopyFromScreen`)는 무해.
 
 ## CostumeManager 커스텀 슬롯은 비우지 않으면 남는다
+- (2026-09-25 월드 아바타 스킨은 삭제 — 지금은 기본 세트만 쓴다. 다시 코디 복제를 쓸 때의 엔진 사실로 남김)
 - Rule: 유닛 외형을 세트(Skin 0) → 월드 아바타(Skin 1, `UseCustomEquipOnly=false` + `DefaultEquipUserId`)로 바꿀 때 `CustomLongcoat/Shoes/Hair`뿐 아니라 **`CustomCapEquip`·`CustomFaceAccessoryEquip`·`CustomFaceEquip`도 ""로** 비워야 유저 본인 모자·얼굴이 나온다(2026-09-18 보우마스터 깃털 모자가 남아 있던 버그). 무기만 직업 것으로 유지. 캐시 무기(01703xxx·cashweapon49 등)는 afterImage가 검/폭발이라 공격 연출과 겹침 → 진짜 무기로: DK 타임리스 알슈피스 `164067c8…`, 보우마스터 타임리스 엔가우 `9e8fe977…`(afterImage bow).
 
 ## 원작 클립 프레임은 (ox 왼쪽에서, oy **아래**에서) px 원점을 엔티티 위치에 맞춰 그린다 — 원점·프레임 시간은 .win.mod에서 읽을 수 있다

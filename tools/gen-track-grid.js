@@ -1,7 +1,8 @@
-// 그리드 트랙 텍스처 — 화면 v2(아티팩트 v16). 16×13칸(2026-09-20: 18×12에서 우측 2열 삭제·아래 1행 추가, 좌우 대칭), 칸 80px → 1280×1040, 투명 배경.
-//   배경은 헤네시스 잔디(2026-09-14) — 빈 칸 = 짙은 초록 얇은 테두리 / 발판(트랙에 4방향으로 면한 칸) = 흰 반투명 채움 + 테두리
+// 그리드 트랙 텍스처 — 16×13칸, 칸 80px → 1280×1040, 투명 배경.
+//   경로 = 2026-09-25 M2(사용자 "보스 영역을 맵 가운데 2×2로 … 트랙·배치 칸 조정", "매듭 2개는 붙고 1개는 멀리, 난잡한 형태"): 77칸, 교차 4곳, 매듭 3곳
+//   배경은 헤네시스 잔디(2026-09-14) — 발판(트랙·보스 영역이 아닌 칸 전부 = 게임 RtsZoneLogic.IsPadCell) = 흰 반투명 채움 + 짙은 초록 테두리, 보스 영역 2×2는 비움(붉은 판은 게임이 그림)
 //   트랙 칸 = 헤네시스 포석(2줄 엇갈림) + 바깥 연석, 그 위에 흰 점선 진행선
-//   S(초록)·E(빨강) 원 + 글자, 3열 왼쪽 여백에 E→S 복귀 점선 화살표
+//   S = 초록 원 + 진행 방향 화살표, E = 짙은 빨강 원 + 되돌리기 화살(2026-09-25 사용자 — 글자 S/E와 E→S 복귀 점선은 삭제)
 // 사용: node gen-track-grid.js <out.png>
 const zlib = require('zlib');
 const fs = require('fs');
@@ -10,8 +11,10 @@ const OUT = process.argv[2] || 'track-grid.png';
 const COLS = 16, ROWS = 13, CS = 80;
 const W = COLS * CS, H = ROWS * CS;
 
-// 경로 꺾임점 (0-기반 [col,row], 아티팩트 seq 그대로). RtsZoneLogic의 1-기반 표와 같은 값.
-const SEQ = [[2,5],[2,1],[13,1],[13,5],[8,5],[8,7],[13,7],[13,9],[11,9],[11,3],[6,3],[6,7],[2,7],[2,9],[6,9],[6,11],[2,11]];
+// 경로 꺾임점 (0-기반 [col,row]). RtsZoneLogic.GetTurnPoints(1-기반)와 같은 값.
+const SEQ = [[14,8],[11,8],[11,12],[13,12],[13,10],[7,10],[7,8],[9,8],[9,12],[1,12],[1,10],[5,10],[5,1],[3,1],[3,3],[15,3],[15,0],[13,0],[13,5],[10,5]];
+// 보스 영역(0-기반 7~8열 × 5~6행 = 게임 8~9열 × 6~7행)
+const isBoss = (c, r) => c >= 7 && c <= 8 && r >= 5 && r <= 6;
 const PATH = [];
 for (let i = 0; i < SEQ.length - 1; i++) {
   const a = SEQ[i], b = SEQ[i + 1];
@@ -22,7 +25,7 @@ for (let i = 0; i < SEQ.length - 1; i++) {
 }
 const road = new Set(PATH.map(p => p[0] + ',' + p[1]));
 const isRoad = (c, r) => road.has(c + ',' + r);
-const isPad = (c, r) => !isRoad(c, r) && (isRoad(c + 1, r) || isRoad(c - 1, r) || isRoad(c, r + 1) || isRoad(c, r - 1));
+const isPad = (c, r) => c >= 0 && r >= 0 && c < COLS && r < ROWS && !isRoad(c, r) && !isBoss(c, r);
 
 // ── RGBA 캔버스 + 알파 합성 ──────────────────────────────────────
 const buf = new Float32Array(W * H * 4); // 0..1
@@ -78,14 +81,18 @@ function tri(p0, p1, p2, rgb, a) {
     if ((w0 >= 0 && w1 >= 0 && w2 >= 0) || (w0 <= 0 && w1 <= 0 && w2 <= 0)) blend(x, y, rgb[0], rgb[1], rgb[2], a);
   }
 }
-const GLYPH = {
-  S: ['.###.', '#...#', '#....', '.###.', '....#', '#...#', '.###.'],
-  E: ['#####', '#....', '#....', '####.', '#....', '#....', '#####'],
-};
-function glyph(ch, cx, cy, px, rgb, a) {
-  const g = GLYPH[ch];
-  const x0 = cx - 2.5 * px, y0 = cy - 3.5 * px;
-  for (let r = 0; r < 7; r++) for (let c = 0; c < 5; c++) if (g[r][c] === '#') fillRect(x0 + c * px, y0 + r * px, px, px, rgb, a);
+// 굵은 원호(가운데 cx·cy, 반지름 rad, 두께 t, 각도 a0 → a1 라디안 — 화면 좌표라 y는 아래가 +)
+function arc(cx, cy, rad, a0, a1, t, rgb, a) {
+  const half = t / 2;
+  for (let y = Math.floor(cy - rad - half - 1); y <= cy + rad + half + 1; y++) for (let x = Math.floor(cx - rad - half - 1); x <= cx + rad + half + 1; x++) {
+    const px = x + 0.5 - cx, py = y + 0.5 - cy;
+    const d = Math.abs(Math.hypot(px, py) - rad);
+    if (d > half + 0.5) continue;
+    let ang = Math.atan2(py, px);
+    while (ang < a0) ang += Math.PI * 2;
+    if (ang > a1) continue;
+    blend(x, y, rgb[0], rgb[1], rgb[2], a * Math.max(0, Math.min(1, half + 0.5 - d)));
+  }
 }
 
 const hex = h => [parseInt(h.slice(1, 3), 16) / 255, parseInt(h.slice(3, 5), 16) / 255, parseInt(h.slice(5, 7), 16) / 255];
@@ -93,15 +100,11 @@ const GRIDC = [30 / 255, 70 / 255, 20 / 255];   // 잔디 위 선색(짙은 초�
 const PADFILL = [1, 1, 1];                       // 발판 채움(흰 반투명)
 const cx = c => c * CS + CS / 2, cy = r => r * CS + CS / 2;
 
-// 1) 빈 칸 / 발판
+// 1) 발판(트랙·보스 영역이 아닌 칸 전부) — 보스 영역 칸은 비운다
 for (let r = 0; r < ROWS; r++) for (let c = 0; c < COLS; c++) {
-  if (isRoad(c, r)) continue;
-  if (isPad(c, r)) {
-    fillRect(c * CS, r * CS, CS, CS, PADFILL, 0.18);
-    strokeRect(c * CS + 0.5, r * CS + 0.5, CS - 1, CS - 1, 1.5, GRIDC, 0.35);
-  } else {
-    strokeRect(c * CS + 0.5, r * CS + 0.5, CS - 1, CS - 1, 1.5, GRIDC, 0.20);
-  }
+  if (!isPad(c, r)) continue;
+  fillRect(c * CS, r * CS, CS, CS, PADFILL, 0.18);
+  strokeRect(c * CS + 0.5, r * CS + 0.5, CS - 1, CS - 1, 1.5, GRIDC, 0.35);
 }
 
 // 2) 트랙 칸 — 헤네시스 포석 (gen-track-stone 톤), 칸 경계는 연석(트랙끼리 맞닿은 면은 생략)
@@ -145,16 +148,29 @@ for (let i = 0; i < PATH.length - 1; i++) {
   line(cx(a[0]), cy(a[1]), cx(b[0]), cy(b[1]), 3, LINE, 0.9, 14, 22);
 }
 
-// 4) S / E
+// 4) S = 진행 방향 화살표 / E = 되돌리기(끝에 닿은 몹은 S로 돌아간다 — 복귀 점선 대신 이 아이콘 하나로)
 const S = SEQ[0], E = SEQ[SEQ.length - 1];
-disc(cx(S[0]), cy(S[1]), 22, hex('#1f6b3f'), 0.95); glyph('S', cx(S[0]), cy(S[1]), 4, [1, 1, 1], 1);
-disc(cx(E[0]), cy(E[1]), 22, hex('#9a2a1d'), 0.95); glyph('E', cx(E[0]), cy(E[1]), 4, [1, 1, 1], 1);
-
-// 5) E→S 복귀 화살표 (3열 왼쪽 여백)
-const LX = 2 * CS - 22;
-const RET = hex('#c0392b');
-line(LX, cy(E[1]), LX, cy(S[1]) + 14, 3, RET, 0.7, 10, 8);
-tri([LX - 9, cy(S[1]) + 14], [LX + 9, cy(S[1]) + 14], [LX, cy(S[1]) - 2], RET, 0.7);
+const S2 = PATH[1];
+const WHITE = [1, 1, 1];
+{
+  const x = cx(S[0]), y = cy(S[1]);
+  disc(x, y, 22, hex('#1f6b3f'), 0.95);
+  const ux = Math.sign(S2[0] - S[0]), uy = Math.sign(S2[1] - S[1]); // 첫 칸 → 둘째 칸 방향
+  const vx = -uy, vy = ux;
+  line(x - ux * 11, y - uy * 11, x + ux * 2, y + uy * 2, 5, WHITE, 1);
+  tri([x + ux * 13, y + uy * 13], [x + vx * 10, y + vy * 10], [x - vx * 10, y - vy * 10], WHITE, 1);
+}
+{
+  const x = cx(E[0]), y = cy(E[1]);
+  disc(x, y, 22, hex('#9a2a1d'), 0.95);
+  // 시계 반대 방향 되돌리기: 원호 오른쪽 위(−60°)에서 시작해 한 바퀴 가까이 돌고, 시작점에 화살촉
+  const R = 10, A0 = -Math.PI / 3, A1 = A0 + Math.PI * 1.55;
+  arc(x, y, R, A0, A1, 4.5, WHITE, 1);
+  const hx = x + R * Math.cos(A0), hy = y + R * Math.sin(A0);
+  const tx = Math.sin(A0), ty = -Math.cos(A0); // 원호가 시작점에서 나아가는 반대쪽(= 화살 끝이 향하는 쪽)
+  const nx = Math.cos(A0), ny = Math.sin(A0);
+  tri([hx + tx * 8, hy + ty * 8], [hx + nx * 7 - tx * 2, hy + ny * 7 - ty * 2], [hx - nx * 7 - tx * 2, hy - ny * 7 - ty * 2], WHITE, 1);
+}
 
 // ── PNG 쓰기 ─────────────────────────────────────────────────────
 const raw = Buffer.alloc((W * 4 + 1) * H);

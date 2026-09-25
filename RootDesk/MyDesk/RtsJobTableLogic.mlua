@@ -242,12 +242,6 @@ script RtsJobTableLogic extends Logic
 		return nil
 	end
 
-	-- 스킨 2종: 1 기본 세트 / 2 월드 아바타(내 메이플월드 코디 — 월드코인 결제로 영구 해금). 인덱스는 0-기반 값 Skin(0/1)+1
-	method table GetSkinNames(string jobId)
-		if jobId == "phantom" then return { "영웅 팬텀", "월드 아바타" } end
-		return { "모험가 " .. self:GetJobName(jobId), "월드 아바타" }
-	end
-
 	-- 스킬 목록(획득 레벨 순). kind = 액티브/패시브, target = 대상 지정 스킬
 	--   fx(있으면) = 연출 정의: motion 아바타 액션 / frames 플립북 스프라이트 RUID(frameSec 간격, SpriteRUID 교체 재생) / scale 월드 스케일
 	--   / feetDx·feetDy 캔버스 중심→발 오프셋(×scale, 유닛 발에 맞춤) / sound 시전음 / hitSound 타격음. 전투(Phase 3)가 이걸 읽어 재생한다
@@ -883,6 +877,62 @@ script RtsJobTableLogic extends Logic
 
 	-- 직업 티어(2026-09-24 사용자 — .info/tier.md): 1 히어로·나이트로드·썬콜·보우마스터(보우 = 같은 날 2 → 1) /
 	--   2 섀도어·팬텀·불독·신궁·다크나이트(불독·신궁·다크 = 같은 날 3 → 2, 3티어 없음) / 4 팔라딘·비숍(서포터)
+	-- ===== 영입 상세(2026-09-25 사용자 "유닛 기본 외형 + 강점·약점 오각형 + 스킬 목록" — 직업 설명 문구는 같은 날 빼기로) =====
+
+	-- 기본 공격 사거리(레벨 L): 전투와 같은 규칙(RtsCombatLogic — 획득한 쿨 없는 액티브 중 뒤의 것, 레벨 강화 st.range가 있으면 그것, 없으면 스킬 range, 그것도 없으면 2)
+	method number BasicRange(string jobId, number L)
+		local st = self:GetStat(jobId, L)
+		local skills = self:GetSkills(jobId)
+		for i = #skills, 1, -1 do
+			local k = skills[i]
+			if k.kind == "액티브" and k.fx ~= nil and k.cd == nil and L >= (k.lv or 1) then
+				if st.range ~= nil then return st.range end
+				return k.range or 2
+			end
+		end
+		return st.range or 2
+	end
+
+	-- 오각형 5축 단계(5 매우 높음 … 1 매우 낮음, 50레벨 · 증강 없음 · 전체 직업 중 비교 — 2026-09-25 사용자):
+	--   speed = 기본 공격 속도 이름 / range = 기본 공격 사거리 ÷ 전체 최댓값 → 80·60·40·20% / aug = 증강 효율(1티어 5 · 팬텀 4 · 2티어 3 · 서포터 1, '낮음'은 비움 — 화면엔 티어 말 금지)
+	--   boss·hunt = tools/balance-calc.py --radar(2026-09-25: 보스 = 50레벨 + 자기 프리즘 + 마지막 보스 전 카드 43장을 3택1 최선으로 몰아준 보스 DPS, 사냥 = 50레벨·증강 없음 40마리 사냥 DPS) — 직업 수치가 바뀌면 다시 돌려 옮긴다
+	method table GetRadar(string jobId)
+		local fixed = {
+			hero = { boss = 4, hunt = 5 },
+			paladin = { boss = 1, hunt = 2 },
+			dk = { boss = 1, hunt = 3 },
+			bow = { boss = 5, hunt = 1 },
+			marks = { boss = 2, hunt = 4 },
+			il = { boss = 4, hunt = 3 },
+			fp = { boss = 2, hunt = 1 },
+			bishop = { boss = 1, hunt = 1 },
+			nl = { boss = 5, hunt = 1 },
+			shad = { boss = 2, hunt = 1 },
+			phantom = { boss = 3, hunt = 2 },
+		}
+		local f = fixed[jobId] or { boss = 1, hunt = 1 }
+		local sp = self:GetStat(jobId, 50).speed or "보통"
+		local speed = 3
+		if sp == "매우빠름" then speed = 5 elseif sp == "빠름" then speed = 4 elseif sp == "느림" then speed = 2 elseif sp == "매우느림" then speed = 1 end
+		local maxR = 1
+		local ids = self:GetJobIds()
+		for i = 1, #ids do maxR = math.max(maxR, self:BasicRange(ids[i], 50)) end
+		local range = self:RatioLevel(self:BasicRange(jobId, 50) / maxR)
+		local aug = 3
+		local tier = self:TierOf(jobId)
+		if jobId == "phantom" then aug = 4 elseif tier == 1 then aug = 5 elseif tier >= 4 then aug = 1 end
+		return { speed = speed, range = range, aug = aug, boss = f.boss, hunt = f.hunt }
+	end
+
+	-- 비율(0~1, 전체 최댓값 대비) → 단계: 80% 이상 5 · 60% 4 · 40% 3 · 20% 2 · 그 아래 1(tools/balance-calc.py radar_level과 같은 경계)
+	method number RatioLevel(number ratio)
+		if ratio >= 0.8 then return 5 end
+		if ratio >= 0.6 then return 4 end
+		if ratio >= 0.4 then return 3 end
+		if ratio >= 0.2 then return 2 end
+		return 1
+	end
+
 	method number TierOf(string jobId)
 		if jobId == "hero" or jobId == "nl" or jobId == "il" or jobId == "bow" then return 1 end
 		if jobId == "shad" or jobId == "phantom" or jobId == "fp" or jobId == "marks" or jobId == "dk" then return 2 end

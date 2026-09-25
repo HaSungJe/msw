@@ -16,11 +16,12 @@
 
 ## 구역 그리드 트랙 (화면 v2 — **16×13칸**, 칸 80px, 1280×1040, 투명 배경. 2026-09-20: 18×12에서 우측 2열 삭제·아래 1행 추가 — 좌우 대칭)
 
-현재 적용: **track-grid**(16×13). 이전 18×12는 `track-grid-18x12.png`로 보관
+현재 적용: **track-grid**(16×13, 2026-09-25 M2 경로). 이전 66칸 경로는 `track-grid-66.png`, 18×12는 `track-grid-18x12.png`로 보관
 
 | 파일 | 내용 | 생성기 | RUID | 상태 |
 |---|---|---|---|---|
-| `track-grid.png` | 아티팩트 v17 경로 그대로(16×13). 트랙 칸 = 헤네시스 포석 + 연석 + 흰 점선 진행선, 발판 = 흰 반투명 칸(잔디 위), 빈 칸 = 짙은 초록 선, S/E 원 + 글자, E→S 복귀 화살표 | `tools/gen-track-grid.js` | `95b3ec9d377e46ecb9d394467d27dada` (ZoneTrackGridHenesys16) | **적용 중** |
+| `track-grid.png` | M2 경로(2026-09-25 — 77칸, 교차 4곳, 매듭 3곳, 보스 영역 가운데 2×2는 비움). 트랙 칸 = 헤네시스 포석 + 연석 + 흰 점선 진행선, 발판 = 트랙·보스 영역이 아닌 칸 전부 흰 반투명(게임 `IsPadCell`과 같은 규칙), S = 초록 원 + 진행 방향 화살표, E = 짙은 빨강 원 + 되돌리기 화살(복귀 점선 없음) | `tools/gen-track-grid.js` | `b1a2d2e1fde64330afe3dcf374b69a51` (ZoneTrackGridM2, sprite/etc) | **적용 중**(테마 5종 공용) |
+| `track-grid-66.png` | 이전 66칸 경로(아티팩트 v17, 보스 영역 아래 4×5 시절) — S/E 글자 + E→S 복귀 화살표, 발판은 트랙에 붙은 칸만 | 같은 생성기(옛 SEQ) | `95b3ec9d377e46ecb9d394467d27dada` (ZoneTrackGridHenesys16) | 보관 |
 | `track-grid-18x12.png` | 이전 18×12 판 | 같은 생성기(COLS 18·ROWS 12) | `f8bf4274602c4d22b2e6643e114fbc5f` (ZoneTrackGridHenesys) | 보관 |
 | (눈 배경판) | 같은 경로, 회청 선·회청 발판(엘나스 눈 위 용) — **아직 18×12**, 다시 쓰려면 16×13 재생성 | `tools/gen-track-grid.js` (색만 다름) | `651583e1c1ee44cdb6d2a891755ab528` (ZoneTrackGrid) | 프리셋 `elnath` |
 
@@ -66,6 +67,8 @@
 | 파일 | 내용 | 생성 | RUID | 상태 |
 |---|---|---|---|---|
 | `circle-mask.png` | 128px 흰 원(가장자리 안티앨리어싱), 투명 배경. `MaskComponent` 칸의 이미지로 쓰면 자식(몬스터 초상)이 원 모양으로 잘린다 | PIL(4배 크기로 그린 뒤 축소) | `69e2dced65e443d3bb391464fd64b123` (RtsCircleMask, sprite/etc, 2026-09-25) → `RtsHudLogic.CircleMaskRUID` | **적용 중** |
+| `radar-web.png` | 512×512 투명 — 정오각형 5겹(단계 1~5, 반지름 = 단계 ÷ 5 × 240px) + 축 5개, 흰색(게임에서 α0.9). 영입 상세 오각형 바탕 | `tools/gen-radar-assets.py` | `de902441f2e74e89a7fefa81ef29da0e` (RtsRadarWeb, sprite/etc, 2026-09-25) | 적용(RtsPopupLogic.RadarWebRUID) |
+| `right-tri.png` | 128×128 흰 직각삼각형(직각 왼쪽 아래, 다리 = 아래·왼쪽 변). 오각형 값 다각형을 직각삼각형 10장으로 채울 때(회전 + 가로세로 크기) | `tools/gen-radar-assets.py` | `c62bf5fb88994fe48ca88e725fa458aa` (RtsRightTri, sprite/etc, 2026-09-25) | 적용(RtsPopupLogic.RightTriRUID) |
 
 헤네시스 배경 마을(그리드 아래 반투명 58개)은 공식 MSW 탑뷰 오브젝트 `maplestory/map/obj/msw/topview_henesys/{building,tree,acc,flag}/N/0`(msw-mcp `asset_search_resources` 쿼리 `*topview_henesys`). 월드 프롭 엔티티는 네이티브 모델 `model://MapObject`(Transform + SpriteRenderer).
 

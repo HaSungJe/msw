@@ -40,8 +40,20 @@ Maker(2026-09-25): 빌드 로그 오류 0(경고는 기존 것 + `ParseOwned` �
 - 헤네시스 외 4종 테마는 임시 모양(기존 타일 + 틴트, 장식·썸네일 없음) — 디자인은 ChatGPT(`docs/theme-presets.md`)
 - Maker 로컬 DataStorage에 시험으로 준 아이콘 14개·테마 perion이 남아 있다(Maker 전용 — 출시 월드와 무관, 필요하면 `maker_reset_data_storage`)
 
-## Change - 250925-1
+## Change - 260925-1
 - **Change summary**: 아이콘 창 쪽 넘기기 → 스크롤 격자(사용자 "페이징 말고 스크롤"), 맵 테마 창 고정 3열 → 스크롤 격자(사용자 "여러 개 생길 수도")
 - **Changed files**: `RtsPopupLogic.mlua`(`SpawnScrollGrid` 공용 · `SpawnIconCell` · `IconBatch` 나눠 채우기, 삭제: `IconPage`·`IconPerPage`·이전/다음 버튼) · `docs/ui-screens.md`
 - **Verification**: Maker 빌드 로그 오류 0, 아이콘 창 스크롤 막대 + 위에서부터 칸 채움 확인(사용자가 Maker에서 플레이 중이라 추가 확인은 중단)
 - **Remaining issues**: 테마 창 스크롤은 화면 확인 전(테마 5종이라 한 화면에 다 들어감)
+
+## Change - 260925-2
+- **Change summary**: 맵 테마 창 — 격자 스크롤이 설정을 늦게 받아 카드가 100px 간격으로 겹침(사용자 화면) → 세로 스크롤 + 줄마다 정사각형 카드 3장, 한 화면에 2줄(사용자 "맵별로 정사각형, 가로 3개 2줄, 스크롤"). 창 900×730. 목록 위 문구에서 "보이는 것만 달라지고 밸런스는 그대로"·"매우어려움에서 … 1% 확률로 획득" 삭제(사용자 "목록에 있을 내용이 아니다" — 획득 조건·확률은 아이콘 정보 창에만). 아이콘 격자는 설정을 0.05초 뒤 한 번 더 넣음
+- **Changed files**: `RtsPopupLogic.mlua`(`BuildTheme` 세로 목록 `RtsThemeList` + 줄 `RtsThemeRow{n}` 830×270 + 카드 270×270·썸네일 250×200, `theme` 높이 730, `SpawnScrollGrid` 설정 다시 넣기, 문구 2곳) · `docs/ui-screens.md` · `docs/theme-presets.md`
+- **Verification**: Maker 빌드 로그 오류 0, 테마 창 3장 × 2줄 한 화면·'사용 중' 금색 테두리 확인. Play 시작 직후(약 5초) 스크립트로 연 한 번은 창 안이 비었고(목록 부모 nil 경고), 닫고 다시 열면 정상 — 재현 안 됨
+- **Remaining issues**: 위 빈 창 1회(Play 직후 스크립트로 연 경우) — 다시 나오면 원인 조사
+
+## Change - 260925-3 (프로필 설정 — 테마·비석 탭, 비석 프리셋, 기본값)
+- **Change summary**: 사용자 2026-09-25 "비석도 프리셋, 좌상단 맵 테마 창을 프로필 설정으로, 탭 테마/비석, 기본값 아이콘 없음·테마 헤네시스·비석 기본, 설정값이 없으면 게임 시작 시 자동 설정", "테마·비석·아이콘 모두 영구 소유 — 선택 정보랑 보유 정보 서버 저장". revision: `.beaver/output/revision/rts-custom/theme-icon-preset-revision-260925-1.md`
+- **Changed files**: `RtsTombLogic`(새 — 비석 프리셋 1종 basic, w·h·free) · `RtsProfileLogic`(tomb·themes·tombs 키, FreeIcon M001 · IconNone "none", 입장 때 빈 선택 키 기본값 저장(읽기 성공일 때만), `PresetOwned`, `RequestSetTomb`, `SendProfileState` — 옛 `SendProfile` 삭제) · `RtsThemeLogic`(프리셋 free = true) · `RtsRunResultLogic.SpawnTomb`(주인 비석 — TombRUID·TombScale 삭제) · `RtsHudLogic`(프로필 상자 `BuildProfileBox`·`RefreshProfileBox` — 옛 테마 상자 삭제, 카드 아이콘 없음) · `RtsPopupLogic`(kind `profile`·`tombconfirm`, `SpawnPresetList·Row·Card` 공용, `BuildTabRowAt`, 아이콘 '없음' 칸) · docs(ui-screens·theme-presets 6절)
+- **Verification**(Maker 2026-09-25): 빌드 오류 0 · 프로필 상자 "프로필 설정 / 테마 커닝시티 · 비석 기본 비석" · 프로필 창 [비석] 탭(기본 비석 '사용 중') · 아이콘 창 첫 칸 '없음' · 비석 그림이 칸을 넘쳐 이름을 덮음 → 원본 w·h 비율로 250×190 안에 맞춤(재시작 뒤 사용자 확인 중)
+- **Remaining issues**: 기본값 저장은 `maker_reset_data_storage` 뒤 입장 로그("RtsProfile: default …")로 확인 전 · 빈 키를 읽을 때 엔진이 코드 0 + 빈 값을 주는지(아니면 기본값 저장이 안 됨) 실측 필요

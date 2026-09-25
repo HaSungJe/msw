@@ -108,3 +108,10 @@
 **신규 리소스**: ElnathSnowFloor `df8df44de6e64c25a74f465ef88ef4c8`, ZoneTrackHenesysStone `faf04ce588484d07847a8b34f13f4b9e` (레지스트리: `assets/textures/README.md`)
 
 > 타일셋 파일명은 `CaveFloorTileSet` 그대로입니다 — 맵이 `tileset://` GUID로 참조 중이라 이름 변경은 참조가 깨질 수 있어 손대지 않았습니다. 정리를 원하시면 따로 말씀해 주세요.
+
+## Change - 260925-1 (트랙 M2 · 보스 영역 가운데 2×2)
+- **Change summary**: 사용자 2026-09-25 "보스 영역을 맵 가운데 4칸으로, 트랙·배치 칸도 맞게" → 후보 비교 뒤 M2(불규칙한 길 + 매듭 3곳 — 둘은 붙고 하나는 멀리). 보스 영역 8~11열 × 9~13행 4×5 → **8~9열 × 6~7행 2×2**, 트랙 66 → **77칸**(교차 4곳, 매듭 칸 (9,10)·(13,12)·(5,3)), 발판 123 → **130칸**. 보스는 영역에 바로 서고 그림은 가운데 **3×3칸 상자**(2체면 가로 반씩), 그리는 순서는 유닛 아래(`BossOrder` 150). 트랙 그림 S = 진행 방향 화살표 · E = 되돌리기 아이콘, E→S 복귀 점선 삭제, 발판 채움 = 게임 규칙(배치 가능한 칸 전부). revision: `.beaver/output/revision/rts-base/zone-system-revision-260925-1.md`
+- **Changed files**: `RtsZoneLogic`(GetTurnPoints M2 · BossArea 8/6/2/2 · 주석) · `RtsBossLogic`(`BossFitCells` 3 · `BossOrder` 150 · 상자 크기) · `RtsWaveLogic.SpawnMonsterEntity`(보스 순서) · `RtsCombatLogic`(BossRange 주석) · `RtsConfigLogic`(주석) · `RtsThemeLogic`(5종 gridRUID) · `tools/gen-track-grid.js`(SEQ·발판 규칙·S/E 아이콘·복귀 점선 삭제, 글자 GLYPH 삭제 → 원호 `arc`) · `assets/textures/track-grid.png`(새) · `track-grid-66.png`(옛 판 보관) · `assets/textures/README.md` · `docs/ui-screens.md`(보스 영역·보스 몸·그리드 행, 보스전 설명) · `docs/theme-presets.md`
+- **New resource**: ZoneTrackGridM2 `b1a2d2e1fde64330afe3dcf374b69a51`(sprite/etc)
+- **Verification**(Maker 2026-09-25): 빌드 로그 오류 0 · 구역 화면 새 트랙(커닝시티 틴트)·가운데 붉은 2×2·S 화살표·E 되돌리기, 복귀 점선 없음 · 일반 라운드 몬스터가 새 길로 순환 · `[CASES:zone-grid]` 전부 통과(steps 77, pads 130, PathCells 78, 보스 칸 (8,6)(9,7) true·(10,6)(8,8) false, 발판 (9,6) false·(9,10)(13,12)(5,3)(11,10) true·(10,11) false, S = 15열 9행 · E = 11열 6행)
+- **Remaining issues**: 보스 라운드 확인 전 — 3×3 크기·2체 분할·유닛이 보스 위(메모리 msw-engine: 아바타는 Default 레이어, 몬스터·보스는 MapLayer0라 레이어만으로 유닛이 늘 위 — `BossOrder` 150은 맵 스프라이트끼리 순서)·겹친 곳 클릭(사용자가 Maker에서 플레이 중이라 보스 단계로 건너뛰지 않음). 사냥 밸런스(길 77칸·밀도 감소)는 사용자 판단

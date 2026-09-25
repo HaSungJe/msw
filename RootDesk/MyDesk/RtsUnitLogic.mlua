@@ -21,28 +21,7 @@ script RtsUnitLogic extends Logic
 	-- 서버: userId → { [no] = entity }
 	property table UnitsByUser = {}
 
-	-- 월드 아바타 영구 이용권(2026-09-24 사용자 "영구로 바꿔" — 전엔 30일·재구매 연장): 월드 상점 아이템 QK03ZI15E(1,600 월드코인). 한 번 사면 영구 해금.
-	--   2026-09-15 비공개 등록, 출시 때 공개
-	property string AvatarProductId = "QK03ZI15E"
-
-	-- 영구 해금 값(해금 만료 자리에 넣는 아주 먼 미래 — DateTime.UtcNow.Elapsed보다 늘 크다, 2^53 아래)
-	property number AvatarForever = 9000000000000000
-
-	-- 유저별 해금 만료(UTC ms, DateTime.UtcNow.Elapsed 기준). 0 = 잠김, AvatarForever = 영구. 원본은 유저 DataStorage "avatarUntil"
-	@Sync
-	property SyncTable<string, number> AvatarUntilByUser
-
-	property string AvatarKey = "avatarUntil"
-
-	method void OnBeginPlay()
-		if self:IsServer() then
-			_WorldShopService:SetProcessPurchaseCallback(self.ProcessPurchase)
-			-- 해금이 만료된 유닛은 기본 세트로 되돌린다(1분마다)
-			_TimerService:SetTimerRepeat(function()
-				self:ExpireAvatars()
-			end, 60)
-		end
-	end
+	-- 월드 아바타 스킨·월드 상점 이용권(QK03ZI15E)은 2026-09-25 삭제(사용자 "월드 아바타 판매 제거 — 아예 쓰지도 못하게", 상품은 공개 전이라 구매자 없음). 유닛 외형은 직업 기본 세트 하나
 
 	-- ===== 공통 =====
 
@@ -78,17 +57,6 @@ script RtsUnitLogic extends Logic
 		return out
 	end
 
-	-- ===== 월드 아바타 해금 (양쪽) =====
-
-	method number GetAvatarUntil(string userId)
-		local v = self.AvatarUntilByUser[userId]
-		if v == nil then return 0 end
-		return v
-	end
-
-	method boolean IsAvatarUnlocked(string userId)
-		return self:GetAvatarUntil(userId) > DateTime.UtcNow.Elapsed
-	end
 
 	-- ===== 클라 =====
 
@@ -151,13 +119,6 @@ script RtsUnitLogic extends Logic
 		_RtsUnitPopupLogic:OnUnitSynced(0)
 	end
 
-	-- 월드 상점 구매창 (Maker에선 코인 차감 없이 테스트 구매)
-	@ExecSpace("ClientOnly")
-	method void RequestBuyAvatar()
-		if self.AvatarProductId == "" then return end
-		_WorldShopService:PromptPurchase(self.AvatarProductId)
-	end
-
 	-- 서버 처리 결과 통지 (마지막 파라미터 = 그 클라에만)
 	@ExecSpace("Client")
 	method void OnChanged(number no, number meso, string userId)
@@ -188,7 +149,6 @@ script RtsUnitLogic extends Logic
 		if self.UnitsByUser[userId] == nil then self.UnitsByUser[userId] = {} end
 		if self.MesoByUser[userId] == nil then
 			self.MesoByUser[userId] = 0
-			self:LoadAvatarPass(userId)
 		end
 		self:OnChanged(0, self:GetMeso(userId), userId)
 	end
@@ -266,7 +226,6 @@ script RtsUnitLogic extends Logic
 		u.No = no
 		u.JobId = jobId
 		u.Level = level
-		u.Skin = 0
 		u.Col = col
 		u.Row = row
 		u.SkillLocks = _RtsJobTableLogic:DefaultLocks(jobId)
@@ -537,60 +496,6 @@ script RtsUnitLogic extends Logic
 		end
 		self.UnitsByUser[userId] = nil
 		self.MesoByUser[userId] = nil
-		self.AvatarUntilByUser[userId] = nil
-	end
-
-	-- 유저 DataStorage에서 해금 만료 시각을 읽는다(없으면 0)
-	@ExecSpace("ServerOnly")
-	method void LoadAvatarPass(string userId)
-		local ds = _DataStorageService:GetUserDataStorage(userId)
-		if ds == nil then return end
-		local code, value = ds:GetAndWait(self.AvatarKey)
-		local untilMs = 0
-		if code == 0 and value ~= nil and value ~= "" then untilMs = tonumber(value) or 0 end
-		self.AvatarUntilByUser[userId] = untilMs
-	end
-
-	-- 월드 상점 지급 콜백: 구매 = 영구 해금(이미 영구면 그대로 — 값만 다시 쓴다). true를 돌려줘야 구매 완료
-	@ExecSpace("ServerOnly")
-	method boolean ProcessPurchase(any info)
-		if info == nil or info.ProductId ~= self.AvatarProductId then
-			_RtsConfigLogic:Log("RtsUnit: unknown product " .. tostring(info ~= nil and info.ProductId or "nil"))
-			return false
-		end
-		local userId = info.UserId
-		local untilMs = self.AvatarForever
-		local ds = _DataStorageService:GetUserDataStorage(userId)
-		if ds ~= nil then
-			local code = ds:SetAndWait(self.AvatarKey, string.format("%d", untilMs))
-			if code ~= 0 then
-				_RtsConfigLogic:Log("RtsUnit: avatar pass save failed code=" .. tostring(code))
-				return false
-			end
-		end
-		self.AvatarUntilByUser[userId] = untilMs
-		_RtsConfigLogic:Log("RtsUnit: avatar pass permanent for " .. userId .. " (order " .. tostring(info.OrderNumber) .. ")")
-		self:OnChanged(0, self:GetMeso(userId), userId)
-		return true
-	end
-
-	-- 해금이 없는 유저의 월드 아바타 스킨을 기본 세트로(영구 이용권 전 30일권이 끝난 경우 등)
-	@ExecSpace("ServerOnly")
-	method void ExpireAvatars()
-		for userId, list in pairs(self.UnitsByUser) do
-			if not self:IsAvatarUnlocked(userId) then
-				local changed = false
-				for no, e in pairs(list) do
-					local u = e.RtsUnitComponent
-					if u ~= nil and u.Skin == 1 then
-						u.Skin = 0
-						u:ApplyLook()
-						changed = true
-					end
-				end
-				if changed then self:OnChanged(0, self:GetMeso(userId), userId) end
-			end
-		end
 	end
 
 	-- ===== 서버: 요청 처리 (클라에서 호출, senderUserId로 소유 검증) =====
@@ -705,21 +610,6 @@ script RtsUnitLogic extends Logic
 		if k == nil or k.kind ~= "액티브" then return end
 		if _RtsJobTableLogic:GetLock(u.SkillLocks, idx) == 3 then return end
 		u.SkillLocks = _RtsJobTableLogic:SetLock(u.SkillLocks, idx, 3)
-		self:OnChanged(no, self:GetMeso(userId), userId)
-	end
-
-	-- 스킨: 0 기본 세트 / 1 월드 아바타(해금 중일 때만)
-	@ExecSpace("Server")
-	method void RequestSkin(number no, number skin)
-		local userId = senderUserId
-		local e = self:GetUnit(userId, no)
-		if e == nil then return end
-		if skin ~= 0 and skin ~= 1 then return end
-		if skin == 1 and not self:IsAvatarUnlocked(userId) then return end
-		local u = e.RtsUnitComponent
-		if u.Skin == skin then return end
-		u.Skin = skin
-		u:ApplyLook()
 		self:OnChanged(no, self:GetMeso(userId), userId)
 	end
 

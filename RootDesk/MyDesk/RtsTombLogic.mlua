@@ -1,0 +1,50 @@
+-- rts-custom: 비석 프리셋(2026-09-25 사용자 "비석도 프리셋 만들자 … 현재 비석 스킨을 기본 스킨으로, 비석 스킨은 일단 1개만").
+--   테마 표(RtsThemeLogic.GetPresets)와 같은 짜임 — 한 줄 = 비석 하나. 고르기·저장·보유는 RtsProfileLogic(유저 DataStorage "tomb"·"tombs"), 창은 RtsPopupLogic 'profile' [비석] 탭,
+--   세우기는 RtsRunResultLogic.SpawnTomb(탈락한 구역 주인의 비석). 표 조회만 하는 Logic이라 서버·클라 모두 부른다.
+@Logic
+script RtsTombLogic extends Logic
+
+	-- 기본 비석 키(처음 입장·모르는 키·주인 없는 구역)
+	property string DefaultKey = "basic"
+
+	-- key   저장 값(유저 DataStorage "tomb")·RPC 인자 — 한 번 정하면 바꾸지 않는다
+	-- name  화면 이름 · tab 창 안 종류(같은 이름끼리 한 줄, 지금 '기본'만)
+	-- ruid  월드 비석 스프라이트 · scale 월드 스케일(2026-09-23 "비석 5배") · w·h 원본 그림 px(프로필 창 카드에 비율 맞춰 넣을 때)
+	-- free  true = 누구나 보유(기본 지급). false면 보유 목록("tombs")에 있어야 고를 수 있다
+	method table GetPresets()
+		return {
+			{ key = "basic", name = "기본 비석", tab = "기본", ruid = "29e864c67e6c451d917b34519a4a9373", scale = 5.0, w = 148, h = 239, free = true },
+		}
+	end
+
+	method table GetTabs()
+		local out = {}
+		local seen = {}
+		local list = self:GetPresets()
+		for i = 1, #list do
+			local t = list[i].tab or "기본"
+			if not seen[t] then
+				seen[t] = true
+				out[#out + 1] = t
+			end
+		end
+		return out
+	end
+
+	method boolean HasKey(string key)
+		local list = self:GetPresets()
+		for i = 1, #list do
+			if list[i].key == key then return true end
+		end
+		return false
+	end
+
+	-- 없는 키면 기본 비석
+	method table GetPreset(string key)
+		local list = self:GetPresets()
+		for i = 1, #list do
+			if list[i].key == key then return list[i] end
+		end
+		return list[1]
+	end
+end

@@ -1,9 +1,13 @@
--- 계정 꾸미기(2026-09-25 사용자 — 로드맵 Phase 10 테마 + Phase 14 아이콘): 유저별 맵 테마 · 선택 아이콘 · 보유 아이콘(획득 일시).
---   서버가 원본을 쥔다 — 유저 DataStorage "theme"·"icon"·"icons"에 영구 저장하고, 입장·변경·획득 때마다 그 유저에게 전체를 보낸다(SendProfile).
+-- 계정 꾸미기(2026-09-25 사용자 — 로드맵 Phase 10 테마 + Phase 14 아이콘 → 같은 날 비석 추가, 좌상단 '프로필 설정'): 유저별 테마 · 아이콘 · 비석의 **선택 + 보유**.
+--   서버가 원본을 쥔다 — 유저 DataStorage "theme"·"icon"·"tomb"(선택) · "icons"·"themes"·"tombs"(보유)에 영구 저장하고, 입장·변경·획득 때마다 그 유저에게 전체를 보낸다(SendProfileState).
+--   방이 바뀌어도 입장 때 다시 읽으니 그대로 유지(사용자 "비석/아이콘/테마 모두 영구 소유, 서버 저장이라 다른 게임에 들어갈 때마다 유지 — 선택 정보랑 보유 정보").
+--   기본값(사용자): 아이콘 없음("none") · 테마 헤네시스 · 비석 기본 — 선택 키가 저장돼 있지 않으면 입장 때 기본값을 저장한다("게임 시작 시 자동 설정").
+--   테마·비석은 프리셋 free = true면 누구나 보유(지금 전부), 아니면 보유 목록에 있어야 고른다. 초록달팽이(M001)는 늘 보유.
 --   (사용자 "아이콘이나 테마는 서버 쪽에서 항상 유저에게 전달해야 누적 — 영구 획득 정보", "획득일을 저장 — 나중에 집계할 수도")
 --   테마 = 내 구역만 외형 변경(RtsThemeLogic.ApplyToZone, 밸런스 영향 없음). 아이콘 = 몬스터 247종, 기본 초록달팽이(M001)만 보유,
 --   매우어려움(난이도 5)에서만 그 몬스터를 처치할 때 1%(보스 포함, 극악 제외 — 사용자 "무조건 매우어려움에서 1%").
---   창: RtsPopupLogic 'theme'·'themeconfirm'·'icon'·'iconinfo'·'iconconfirm'·'iconget'. 카드: RtsHudLogic 유저 카드(목록 줄의 테마·아이콘 칸).
+--   창: RtsPopupLogic 'profile'([테마]·[비석] 탭)·'themeconfirm'·'tombconfirm'·'icon'·'iconinfo'·'iconconfirm'·'iconget'. 상자: RtsHudLogic 프로필 상자. 카드: 유저 카드(목록 줄의 테마·아이콘 칸).
+--   비석 = RtsTombLogic 프리셋, 탈락 때 RtsRunResultLogic.SpawnTomb이 그 구역 주인 것으로 세운다.
 @Logic
 script RtsProfileLogic extends Logic
 
@@ -15,7 +19,18 @@ script RtsProfileLogic extends Logic
 	-- "M005:1790000000000,M131:1790000123456" — 몬스터 id : 획득 시각(UTC ms, DateTime.UtcNow.Elapsed). M001은 적지 않아도 보유
 	property string IconsKey = "icons"
 
-	property string DefaultIcon = "M001"
+	property string TombKey = "tomb"
+
+	-- 보유 목록(무료 프리셋은 적지 않는다) — "key1,key2"
+	property string ThemesKey = "themes"
+
+	property string TombsKey = "tombs"
+
+	-- 늘 보유하는 아이콘(초록달팽이 — 2026-09-25 사용자 "기본 보유는 유지")
+	property string FreeIcon = "M001"
+
+	-- 아이콘 없음(선택 기본값 — 2026-09-25 사용자 "아이콘: 없음"). 유저 카드는 빈 원
+	property string IconNone = "none"
 
 	-- 획득 확률·난이도(5 = 매우어려움 — RtsDifficultyLogic.GetNames)
 	property number DropRate = 0.01
@@ -27,16 +42,29 @@ script RtsProfileLogic extends Logic
 
 	property table IconByUser = {}
 
+	property table TombByUser = {}
+
+	-- userId → { [키] = true } 무료가 아닌 테마·비석 보유
+	property table ThemesByUser = {}
+
+	property table TombsByUser = {}
+
 	-- userId → { [몬스터 id] = 획득 시각 ms } (M001 = 0)
 	property table OwnedByUser = {}
 
 	-- 구역 → 주인 userId(입장·퇴장 때 갱신 — 처치마다 동기화 테이블 ZoneByUser를 훑지 않게)
 	property table OwnerByZone = {}
 
-	-- ===== 클라 상태(내 것 — SendProfile로만 바뀐다) =====
+	-- ===== 클라 상태(내 것 — SendProfileState로만 바뀐다) =====
 	property string MyTheme = "henesys"
 
-	property string MyIcon = "M001"
+	property string MyIcon = "none"
+
+	property string MyTomb = "basic"
+
+	property table MyThemes = {}
+
+	property table MyTombs = {}
 
 	property table MyOwned = {}
 
@@ -46,6 +74,8 @@ script RtsProfileLogic extends Logic
 	property string PendingTheme = ""
 
 	property string PendingIcon = ""
+
+	property string PendingTomb = ""
 
 	-- 획득 팝업 대기열(보스 3택1 등 다른 창이 먼저 떠 있으면 닫힌 뒤에)
 	property table GotQueue = {}
@@ -60,7 +90,7 @@ script RtsProfileLogic extends Logic
 	-- "M005:123,M131:456" → { M001 = 0, M005 = 123, M131 = 456 } (틀린 조각은 버린다)
 	method table ParseOwned(string packed)
 		local out = {}
-		out[self.DefaultIcon] = 0
+		out[self.FreeIcon] = 0
 		if packed == nil or packed == "" then return out end
 		for piece in string.gmatch(packed, "[^,]+") do
 			local id, at = string.match(piece, "^%s*([MB]%d+)%s*:%s*(%d+)%s*$")
@@ -76,7 +106,7 @@ script RtsProfileLogic extends Logic
 	method string SerializeOwned(table owned)
 		local ids = {}
 		for id, at in pairs(owned) do
-			if id ~= self.DefaultIcon then ids[#ids + 1] = id end
+			if id ~= self.FreeIcon then ids[#ids + 1] = id end
 		end
 		table.sort(ids)
 		local parts = {}
@@ -90,8 +120,36 @@ script RtsProfileLogic extends Logic
 	-- 클라 전달용(M001 포함)
 	method string PackOwned(table owned)
 		local s = self:SerializeOwned(owned)
-		if s == "" then return self.DefaultIcon .. ":0" end
-		return self.DefaultIcon .. ":0," .. s
+		if s == "" then return self.FreeIcon .. ":0" end
+		return self.FreeIcon .. ":0," .. s
+	end
+
+	-- 테마·비석 보유 목록: "a,b" ↔ { a = true, b = true }(틀린 조각은 버린다)
+	method table ParseKeys(string packed)
+		local out = {}
+		if packed == nil or packed == "" then return out end
+		for piece in string.gmatch(packed, "[^,]+") do
+			local k = string.match(piece, "^%s*([%w_]+)%s*$")
+			if k ~= nil then out[k] = true end
+		end
+		return out
+	end
+
+	method string SerializeKeys(table set)
+		local keys = {}
+		if set == nil then return "" end
+		for k, v in pairs(set) do
+			if v then keys[#keys + 1] = k end
+		end
+		table.sort(keys)
+		return table.concat(keys, ",")
+	end
+
+	-- 프리셋 보유 판정(서버·클라 공용): free면 누구나, 아니면 보유 목록
+	method boolean PresetOwned(table preset, table set)
+		if preset == nil then return false end
+		if preset.free then return true end
+		return set ~= nil and set[preset.key] == true
 	end
 
 	method string ThemeOf(string userId)
@@ -102,42 +160,89 @@ script RtsProfileLogic extends Logic
 
 	method string IconOf(string userId)
 		local k = self.IconByUser[userId]
-		if k == nil or k == "" then return self.DefaultIcon end
+		if k == nil or k == "" then return self.IconNone end
+		return k
+	end
+
+	method string TombOf(string userId)
+		local k = self.TombByUser[userId]
+		if k == nil or k == "" then return _RtsTombLogic.DefaultKey end
 		return k
 	end
 
 	-- ===== 서버: 입장·퇴장 =====
 
-	-- 입장(RtsBootstrapLogic.HandleUserEnterEvent): 저장소 3칸 읽기 → 틀린 값은 기본 → 내 구역에 테마 → 그 유저에게 전체 전달
+	-- 입장(RtsBootstrapLogic.HandleUserEnterEvent): 저장소 6칸 읽기 → 틀린 값은 기본(없던 선택 키는 기본값 저장) → 내 구역에 테마 → 그 유저에게 전체 전달
 	@ExecSpace("ServerOnly")
 	method void OnUserEnter(string userId, number zone)
 		self:Load(userId)
 		if zone > 0 then self.OwnerByZone[math.floor(zone + 0.5)] = userId end
 		if zone > 0 then _RtsThemeLogic:ApplyToZone(zone, self:ThemeOf(userId)) end
-		self:SendProfile(self:ThemeOf(userId), self:IconOf(userId), self:PackOwned(self.OwnedByUser[userId]), userId)
+		self:SendState(userId)
 	end
 
 	@ExecSpace("ServerOnly")
 	method void Load(string userId)
-		local theme = _RtsThemeLogic.DefaultKey
-		local icon = self.DefaultIcon
+		local theme = ""
+		local icon = ""
+		local tomb = ""
 		local packed = ""
+		local themes = ""
+		local tombs = ""
+		-- 선택 키 3개를 읽는 데 성공했는가(읽기 실패를 '값 없음'으로 보고 기본값을 덮어쓰지 않게)
+		local readTheme = false
+		local readIcon = false
+		local readTomb = false
 		local ds = _DataStorageService:GetUserDataStorage(userId)
 		if ds ~= nil then
 			local c1, v1 = ds:GetAndWait(self.ThemeKey)
-			if c1 == 0 and v1 ~= nil and v1 ~= "" then theme = v1 end
+			readTheme = c1 == 0
+			if c1 == 0 and v1 ~= nil then theme = v1 end
 			local c2, v2 = ds:GetAndWait(self.IconKey)
-			if c2 == 0 and v2 ~= nil and v2 ~= "" then icon = v2 end
+			readIcon = c2 == 0
+			if c2 == 0 and v2 ~= nil then icon = v2 end
 			local c3, v3 = ds:GetAndWait(self.IconsKey)
 			if c3 == 0 and v3 ~= nil then packed = v3 end
+			local c4, v4 = ds:GetAndWait(self.TombKey)
+			readTomb = c4 == 0
+			if c4 == 0 and v4 ~= nil then tomb = v4 end
+			local c5, v5 = ds:GetAndWait(self.ThemesKey)
+			if c5 == 0 and v5 ~= nil then themes = v5 end
+			local c6, v6 = ds:GetAndWait(self.TombsKey)
+			if c6 == 0 and v6 ~= nil then tombs = v6 end
 		end
-		if not _RtsThemeLogic:HasKey(theme) then theme = _RtsThemeLogic.DefaultKey end
 		local owned = self:ParseOwned(packed)
-		if owned[icon] == nil then icon = self.DefaultIcon end
+		local themeSet = self:ParseKeys(themes)
+		local tombSet = self:ParseKeys(tombs)
+		-- 선택 키가 없으면(처음 들어온 유저·새로 생긴 칸) 기본값을 저장 — 사용자 "설정값이 없으면 기본값으로 게임 시작 시 자동 설정"
+		if ds ~= nil then
+			if readTheme and theme == "" then self:SaveDefault(ds, self.ThemeKey, _RtsThemeLogic.DefaultKey) end
+			if readIcon and icon == "" then self:SaveDefault(ds, self.IconKey, self.IconNone) end
+			if readTomb and tomb == "" then self:SaveDefault(ds, self.TombKey, _RtsTombLogic.DefaultKey) end
+		end
+		-- 없는 프리셋·보유하지 않은 것은 기본으로(저장 값은 그대로 둔다)
+		if not _RtsThemeLogic:HasKey(theme) or not self:PresetOwned(_RtsThemeLogic:GetPreset(theme), themeSet) then theme = _RtsThemeLogic.DefaultKey end
+		if icon ~= self.IconNone and owned[icon] == nil then icon = self.IconNone end
+		if not _RtsTombLogic:HasKey(tomb) or not self:PresetOwned(_RtsTombLogic:GetPreset(tomb), tombSet) then tomb = _RtsTombLogic.DefaultKey end
 		self.ThemeByUser[userId] = theme
 		self.IconByUser[userId] = icon
+		self.TombByUser[userId] = tomb
 		self.OwnedByUser[userId] = owned
-		_RtsConfigLogic:Log("RtsProfile: load " .. userId .. " theme=" .. theme .. " icon=" .. icon .. " owned=" .. string.format("%d", self:CountOwned(owned)))
+		self.ThemesByUser[userId] = themeSet
+		self.TombsByUser[userId] = tombSet
+		_RtsConfigLogic:Log("RtsProfile: load " .. userId .. " theme=" .. theme .. " icon=" .. icon .. " tomb=" .. tomb .. " owned=" .. string.format("%d", self:CountOwned(owned)))
+	end
+
+	-- 기본값 저장(입장 때 빈 선택 키) — 실패는 로그만(다음 입장 때 다시)
+	@ExecSpace("ServerOnly")
+	method void SaveDefault(any ds, string key, string value)
+		ds:SetAsync(key, value, function(code, k)
+			if code ~= 0 then
+				_RtsConfigLogic:Log("RtsProfile: default save failed " .. key .. " code=" .. tostring(code))
+				return
+			end
+			_RtsConfigLogic:Log("RtsProfile: default " .. key .. "=" .. value)
+		end)
 	end
 
 	-- 퇴장: 빈 구역은 기본 테마로, 메모리 정리
@@ -149,7 +254,10 @@ script RtsProfileLogic extends Logic
 		end
 		self.ThemeByUser[userId] = nil
 		self.IconByUser[userId] = nil
+		self.TombByUser[userId] = nil
 		self.OwnedByUser[userId] = nil
+		self.ThemesByUser[userId] = nil
+		self.TombsByUser[userId] = nil
 	end
 
 	method number CountOwned(table owned)
@@ -159,12 +267,19 @@ script RtsProfileLogic extends Logic
 		return n
 	end
 
+	-- 그 유저에게만 전체(선택 3 + 보유 3)
+	@ExecSpace("ServerOnly")
+	method void SendState(string userId)
+		local owned = self.OwnedByUser[userId]
+		if owned == nil then owned = self:ParseOwned("") end
+		self:SendProfileState(self:ThemeOf(userId), self:IconOf(userId), self:TombOf(userId), self:PackOwned(owned),
+			self:SerializeKeys(self.ThemesByUser[userId]), self:SerializeKeys(self.TombsByUser[userId]), userId)
+	end
+
 	-- 그 유저에게 전체 + 전 클라 목록(카드 배경·아이콘)
 	@ExecSpace("ServerOnly")
 	method void PushProfile(string userId)
-		local owned = self.OwnedByUser[userId]
-		if owned == nil then owned = self:ParseOwned("") end
-		self:SendProfile(self:ThemeOf(userId), self:IconOf(userId), self:PackOwned(owned), userId)
+		self:SendState(userId)
 		_RtsBootstrapLogic:BroadcastPlayerList()
 	end
 
@@ -179,6 +294,10 @@ script RtsProfileLogic extends Logic
 		if zone < 1 then return end
 		if not _RtsThemeLogic:HasKey(key) then
 			_RtsConfigLogic:Log("RtsProfile: unknown theme " .. tostring(key) .. " from " .. userId)
+			return
+		end
+		if not self:PresetOwned(_RtsThemeLogic:GetPreset(key), self.ThemesByUser[userId]) then
+			_RtsConfigLogic:Log("RtsProfile: not owned theme " .. tostring(key) .. " from " .. userId)
 			return
 		end
 		if self:ThemeOf(userId) == key then
@@ -199,13 +318,13 @@ script RtsProfileLogic extends Logic
 		end)
 	end
 
-	-- 아이콘 변경: 보유한 것만
+	-- 아이콘 변경: 보유한 것만, 또는 없음("none")
 	@ExecSpace("Server")
 	method void RequestSetIcon(string id)
 		local userId = senderUserId
 		if userId == nil or userId == "" then return end
 		local owned = self.OwnedByUser[userId]
-		if owned == nil or owned[id] == nil then
+		if owned == nil or (id ~= self.IconNone and owned[id] == nil) then
 			_RtsConfigLogic:Log("RtsProfile: not owned icon " .. tostring(id) .. " from " .. userId)
 			return
 		end
@@ -222,6 +341,31 @@ script RtsProfileLogic extends Logic
 			end
 			self.IconByUser[userId] = id
 			self:PushProfile(userId)
+		end)
+	end
+
+	-- 비석 변경: 있는 프리셋 + 보유(free 포함)만. 저장 성공 뒤 반영(다음 탈락부터 그 비석)
+	@ExecSpace("Server")
+	method void RequestSetTomb(string key)
+		local userId = senderUserId
+		if userId == nil or userId == "" then return end
+		if not _RtsTombLogic:HasKey(key) or not self:PresetOwned(_RtsTombLogic:GetPreset(key), self.TombsByUser[userId]) then
+			_RtsConfigLogic:Log("RtsProfile: bad tomb " .. tostring(key) .. " from " .. userId)
+			return
+		end
+		if self:TombOf(userId) == key then
+			self:SendState(userId)
+			return
+		end
+		local ds = _DataStorageService:GetUserDataStorage(userId)
+		if ds == nil then return end
+		ds:SetAsync(self.TombKey, key, function(code, k)
+			if code ~= 0 then
+				_RtsConfigLogic:Log("RtsProfile: tomb save failed code=" .. tostring(code))
+				return
+			end
+			self.TombByUser[userId] = key
+			self:SendState(userId)
 		end)
 	end
 
@@ -263,16 +407,27 @@ script RtsProfileLogic extends Logic
 
 	-- ===== 클라 =====
 
-	-- 서버 → 그 유저(마지막 인자 userId): 내 테마·선택 아이콘·보유 전체. 받은 값 그대로 쓰고 열린 창·테마 상자를 다시 그린다
+	-- 서버 → 그 유저(마지막 인자 userId): 선택(테마·아이콘·비석) + 보유(아이콘·테마·비석) 전체. 받은 값 그대로 쓰고 열린 창·프로필 상자를 다시 그린다
+	--   (2026-09-25 비석이 붙어 인자가 늘어 SendProfile → 새 이름 — 분석기가 인자 수를 캐시한다, 메모리 msw-engine)
 	@ExecSpace("Client")
-	method void SendProfile(string theme, string icon, string owned, string userId)
+	method void SendProfileState(string theme, string icon, string tomb, string owned, string themes, string tombs, string userId)
 		self.MyTheme = theme
 		self.MyIcon = icon
+		self.MyTomb = tomb
 		self.MyOwned = self:ParseOwned(owned)
 		self.MyOwnedCount = self:CountOwned(self.MyOwned)
-		_RtsHudLogic:RefreshThemeBox()
+		self.MyThemes = self:ParseKeys(themes)
+		self.MyTombs = self:ParseKeys(tombs)
+		_RtsHudLogic:RefreshProfileBox()
+		-- 열린 창은 다시 열지 않고 바뀐 표시만(2026-09-25 "필요한 부분만 다시"): 프로필 = 사용 중 체크, 아이콘 = 칸 색·보유 수. 아이콘 정보(작은 창)만 다시
 		local k = _RtsPopupLogic.Kind
-		if k == "theme" or k == "icon" or k == "iconinfo" then _RtsPopupLogic:Open(k) end
+		if k == "profile" then
+			_RtsPopupLogic:RefreshPresetMarks()
+		elseif k == "icon" then
+			_RtsPopupLogic:RefreshIconCells()
+		elseif k == "iconinfo" then
+			_RtsPopupLogic:Open(k)
+		end
 	end
 
 	-- 서버 → 그 유저: 아이콘 획득 팝업(다른 창이 있으면 대기 — FlushGot)

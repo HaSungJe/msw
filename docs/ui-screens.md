@@ -149,12 +149,12 @@ y=1080 +------------------------------------------------------------------------
 ```
 | 기호 | 요소 (루트 엔티티) | 화면 절대 사각형 (x0~x1, y0~y1) | 근거 |
 |---|---|---|---|
-| T | 테마 상자 `RtsThemeBox` (2026-09-25 — 정보 카드 위) | 16~456, 16~80 | RtsHudLogic `BuildThemeBox` |
+| T | 프로필 상자 `RtsProfileBox` (2026-09-25 — 정보 카드 위, 테마 상자에서 바뀜) | 16~456, 16~80 | RtsHudLogic `BuildProfileBox` |
 | A | 정보 카드 `RtsInfoCard` (2026-09-25 테마 상자 아래로) | 16~456, 88~226 | RtsHudLogic `BuildHud` |
 | B | 유저 카드 목록 `RtsPlayers` (카드 y 260+62·(i−1), 280×56 — 2026-09-25 카드로) | 16~296, 236~756 | `AddPlayerCard` |
 | D | 다시 하기 `RtsRestartBtn` (2026-09-24 오른쪽 아래로) | 1704~1904, 1000~1064 | RtsHudLogic `RtsRestartBtn` |
 | E | 투표 패널 `RtsVotePanel` (다시 하기 바로 위) | 1644~1904, 916~992 | RtsHudLogic `RtsVotePanel` |
-| F | 난이도 막대 `RtsDiffBar` (폭 780 = 86+6·88+5·6+12+124) | 570~1350, 88~168 | RtsDifficultyLogic:157-159 |
+| F | 난이도 막대 `RtsDiffBar` (폭 780 = 86+6·88+5·6+12+124, 2026-09-25 화면 최상단으로) | 570~1350, 0~80 | RtsDifficultyLogic `Build` |
 | H | 안내 `RtsHint` | 600~1320, 92~136 | RtsHudLogic:456 |
 | G1~G6 | 유닛 슬롯 `RtsUnitSlot1~6` | 1774~1904, 104+50·(i−1) ~ +44 | :383-384 |
 | R | 영입/나가기 `RtsRecruitBtn` | 1774~1904, 404~460 | :339 |
@@ -179,14 +179,14 @@ y=1080 +------------------------------------------------------------------------
 
 패널은 `SpawnPanel`로 만들었으므로 바깥 이름이 `X`이고 안쪽 이름이 `XIn`이다. "만드는 곳"의 줄 번호는 따로 적지 않으면 `RtsHudLogic.mlua` 기준이다.
 
-### 3.0 좌상단 테마 상자 (T) — 2026-09-25 (사용자 "정보 박스 위에 공간 만들어 배치, 테마별 썸네일도 거기")
+### 3.0 좌상단 프로필 상자 (T) — 2026-09-25 (사용자 "맵 테마 창을 프로필 설정으로 변경" — 전엔 테마 상자)
 | 요소 | 엔티티 이름 | 만드는 곳 | anchor·pivot·위치·크기 | 색·글꼴 | 보이는 조건 | 클릭/동작 |
 |---|---|---|---|---|---|---|
-| 상자 틀 | `RtsThemeBox`/`In` | `BuildThemeBox` | a(0,1) p(0,1) (16,-16) 440×64, 테두리 1.5 | ColPanel / ColBorder | 항상 | 전체 클릭 → `_RtsPopupLogic:Open("theme")` |
-| 썸네일 | `RtsThemeThumb` | 〃 | a(0,0.5) p(0,0.5) (8,0) 104×48 | 프리셋 `thumb`(없으면 `color` 단색 — `PaintThumb`) | 항상 | — |
-| "맵 테마" | `RtsThemeKey` | 〃 | a(0,1) p(0,1) (124,-6) 200×20 | ColMuted 13 | 항상 | — |
-| 테마 이름 | `RtsThemeName` | 〃 | a(0,1) p(0,1) (124,-26) 220×30 | ColInk 20 굵게 | 항상 | `RefreshThemeBox`(서버 `SendProfile` 받을 때) |
-| "변경 ›" | `RtsThemeChange` | 〃 | a(1,0.5) p(1,0.5) (-14,0) 90×30 | ColGold 16 굵게 | 항상 | — |
+| 상자 틀 | `RtsProfileBox`/`In` | `BuildProfileBox` | a(0,1) p(0,1) (16,-16) 440×64, 테두리 1.5 | ColPanel / ColBorder | 항상 | 전체 클릭 → `_RtsPopupLogic:Open("profile")` |
+| 썸네일 | `RtsProfileThumb` | 〃 | a(0,0.5) p(0,0.5) (8,0) 104×48 | 내 테마 프리셋 `thumb`(없으면 `color` 단색 — `PaintThumb`) | 항상 | — |
+| "프로필 설정" | `RtsProfileTitle` | 〃 | a(0,1) p(0,1) (124,-6) 200×28 | ColInk 18 굵게 | 항상 | — |
+| 요약 | `RtsProfileSummary` | 〃 | a(0,1) p(0,1) (124,-34) 220×24 | ColMuted 14 | 항상 | "테마 ○○ · 비석 ○○" — `RefreshProfileBox`(서버 `SendProfileState` 받을 때) |
+| "변경 ›" | `RtsProfileChange` | 〃 | a(1,0.5) p(1,0.5) (-14,0) 90×30 | ColGold 16 굵게 | 항상 | — |
 
 테마 = 내 구역 바닥·트랙 판·장식만(밸런스 영향 없음). 프리셋·인계 절차는 `docs/theme-presets.md`.
 
@@ -228,7 +228,7 @@ y=1080 +------------------------------------------------------------------------
 | 투표 패널 | `RtsVotePanel`/`In` | :359 | a(1,0) p(1,0) (-16,88) 260×76, 테두리 1.5 (다시 하기 바로 위) | ColPanel / ColGold | 찬성+반대 > 0 (`RefreshVotePanel` :667) | — |
 | 투표 글 | `RtsVoteText` | :362 | a(0,1) p(0,1) (10,-4) 240×26 | ColInk 14 굵게 리치. `찬성 n`은 #8fd18a, `반대 m`은 #e88a7a, 그 뒤에 과반·남은 초 | 〃 | — |
 | 찬성 / 반대 | `RtsVoteYes`/`RtsVoteNo` (+`Text`, `Click`) | :365 / :372 | a(0,0) p(0,0) (10,8) / (135,8) 115×34 | 보통 ColPanel/ColBorder, 내 선택이면 (0.45,0.37,0.18,0.96)/(1,0.9,0.55). 글자 16 굵게 | 〃 | `_RtsStageLogic:RequestVoteChoice(1 또는 2)` (Server) |
-| 난이도 막대 | `RtsDiffBar`/`In` | RtsDifficultyLogic:159 | a(0.5,1) p(0.5,1) (0,-88) 780×80 | ColPanel / ColBorder | idle·countdown (:136) | — |
+| 난이도 막대 | `RtsDiffBar`/`In` | RtsDifficultyLogic `Build` | a(0.5,1) p(0.5,1) **(0,0)** 780×80 — 화면 최상단(2026-09-25 사용자 "최상단에 붙게", 전엔 y −88) | ColPanel / ColBorder | idle·countdown | — |
 | "난이도" | `RtsDiffTitle` | RtsDifficultyLogic:162 | a(0,1) p(0,1) (12,-6) 70×36 | ColMuted 16 굵게 | 〃 | — |
 | 난이도 6칸 | `RtsDiffBtn1~6` (+`Text`, `RtsDiffClick{i}`) | RtsDifficultyLogic:167 | a(0,1) p(0,1) (86+94·(i−1), -6) 88×36 | 선택: (0.3,0.24,0.12,0.96)/ColGold, 나머지: ColPanel/ColBorder. 글자 15 굵게 | 〃 | `RequestSet(i)` (Server, running이면 거부). 이름: 매우쉬움·쉬움·보통·어려움·매우어려움·극악 |
 | 바로 시작 | `RtsDiffStart` (+`Text`, `Click`) | RtsDifficultyLogic:178 | a(1,1) p(1,1) (-12,-6) 112×36, 테두리 2 | (0.3,0.24,0.12,0.96)/ColGold, 글자 (1,0.95,0.8) 15 | countdown만 (:132) | `_RtsStageLogic:RequestStartNow()` (Server). 여럿이면 "바로 시작 r/n", 내가 누른 뒤엔 "대기 r/n" |
@@ -317,7 +317,8 @@ y=1080 +------------------------------------------------------------------------
 ### 4.2 종류별 요약
 | kind | 제목 | 크기 | 여는 곳 | 구성 |
 |---|---|---|---|---|
-| `recruit` | 영입 | 1114×430 | HUD 영입 버튼(RtsHudLogic:707). 판 시작 첫 틱에 자동으로 한 번(RtsStageLogic:444-448). 칸 수가 바뀌면 다시 그림(RtsHudLogic:759) | 탭 2 + 계열 4열 × 직업 카드 + 하단 안내 |
+| `recruit` | 영입 | 1114×430 | HUD 영입 버튼(RtsHudLogic:707). 판 시작 첫 틱에 자동으로 한 번(RtsStageLogic:444-448). 칸 수가 바뀌면 다시 그림(RtsHudLogic:759) | 탭 2 + 계열 4열 × 직업 카드 + 하단 안내. **카드는 모두 클릭 → `PendingJob` → `recruitinfo`**(2026-09-25 — 보유 중·잠김·영입 불가도 보기) |
+| `recruitinfo` | 직업 이름(가운데 — 이 창만 제목 가운데) | 600×640 | 영입 카드 클릭 | 왼쪽 위: 외형 칸 150×170(기본 세트 UI 아바타 — `RtsUnitPopupLogic.SpawnPreviewAt`) + 계열 / 오른쪽 위: 오각형(`SpawnRadar`, 반지름 80 — 위부터 시계 방향 공격 속도·사거리·증강 효율·보스·사냥, 5단계 `GetRadar`, 축 이름만) / 아래: 탭 [액티브] [패시브] [프리즘 증강](`RiSkillTab`, [Tab] 키 순환) + 그 탭의 세로 스크롤 목록(줄 "Lv n  이름" + 바로 아래 설명이 늘 보임 — 펼침/접힘 없음, 길면 스크롤. 프리즘 증강 = 그 직업 프리즘, 팬텀은 '영웅 팬텀') / 맨 아래: [선택](→ 닫고 `BeginPlace` 발판 고르기) 또는 이유 줄(`RecruitBlockReason`) · [취소](→ `recruit`). 2026-09-25 사용자 피드백 반복: 폭 900 → 760 → 600 · 설명 문구·능력치 삭제 · 탭 · 영입 → 선택 |
 | `augment` | 증강 | 1114×960 | HUD 증강 버튼 | 등급 탭 5 + 왼쪽 보유 목록(스크롤) + 오른쪽 상세·대상 지정 + 숨기기 체크 |
 | `codex` | 증강 도감 | 900×820 | HUD 증강 도감 버튼 | 등급 탭 4 + 안내 줄 + 목록(스크롤, 프리즘은 펼치기) |
 | `restart` | 다시하기 | 640×280 | 오른쪽 아래 다시하기 · 결과 창 다시하기 · 판이 끝난 뒤 오른쪽 버튼(`OpenRestartConfirm`, 2026-09-24) | 안내 세 줄 + [다시하기](솔로) / [찬성](여럿) + [아니오]. 이미 찬성했으면 다시하기 버튼 = 바로 찬성 취소 |
@@ -327,11 +328,12 @@ y=1080 +------------------------------------------------------------------------
 | `dismiss` | 방출 | 640×290 | 메뉴 '방출' → `OpenDismiss`(:198) | 대상 줄 + 경고문 + [방출][취소] |
 | `result` | 결과 | 640×360 | 서버 `ShowResult` → `OpenResult`(:206). 탈락·클리어한 본인에게만 | 머리글 + 줄 4개 (+ 클리어 2줄) + 솔로 [닫기][다시 하기] / 여럿 [관전하기][나가기] |
 | `devprism` | 테스트 프리즘 증강 (개발용) | 1114×760 | V 버튼(DevTools일 때만) | 프리즘 2열 목록 + 전부 삭제 |
-| `theme` | 맵 테마 | 900×660 | 테마 상자(T) 클릭 · 확인에서 [아니오] | 탭 줄(`GetTabs` — 지금 '기본') + 안내 줄 + 테마 카드 **스크롤 격자** 3열(`SpawnScrollGrid`, 카드 270×220, 간격 12: 썸네일 250×150 `PaintThumb` + 이름 + '사용 중'/클릭). 카드 → `PendingTheme` → `themeconfirm` (2026-09-25) |
-| `themeconfirm` | 맵 테마 | 640×300 | 테마 카드 클릭 | "맵 테마를 변경하시겠습니까? → 이름" + [예](`RequestSetTheme`) / [아니오](→ `theme`) — `BuildConfirm` 공용 |
-| `icon` | 아이콘 | 900×700 | 내 유저 카드 [수정] · 정보에서 [목록으로] | 탭 줄('기본') + "보유 n / 247" 줄 + **스크롤 격자** 8열(`SpawnScrollGrid`, 칸 94, 간격 8 — 2026-09-25 사용자 "페이징 말고 스크롤"). 창은 바로 열고 칸은 `IconBatch`(40)개씩 0.03초 간격으로 위에서부터 채운다(`SpawnIconCell`). 보유 원색 · 미보유 실루엣 · 사용 중 금색 칸. 칸 → `PendingIcon` → `iconinfo` (2026-09-25) |
+| `profile` | 프로필 설정 | 900×730 | 프로필 상자(T) 클릭 · 확인 창 뒤 | 위 탭 [테마] [비석](`ProfileTab`) + 둘째 줄 종류 탭(`BuildKindTabs` 100×30 — 기본/프리미엄…, 지금 [기본]만, 늘 보임) + 그 오른쪽 안내 줄 + **세로 스크롤** 목록(846×554, `SpawnPresetList`) 안에 줄(830×270, 간격 10 — `SpawnPresetRow`)마다 **정사각 카드 3장**(270×270, x = 0·280·560 — `SpawnPresetCard`: 위 가운데 이름 + 오른쪽 위 체크 칸 26×26(사용 중 = 금색 칸 + 체크 `SpawnSegment` 2개) + 그림 칸 250×200(y −44) / 클릭). 한 화면 2줄. [테마] = 썸네일 `PaintThumb` → `themeconfirm` · [비석] = 비석 그림(원본 w·h 비율로 250×190 안) → `tombconfirm`. 보유하지 않은 프리셋(free 아님)은 흐리게·클릭 안 됨 (2026-09-25) |
+| `tombconfirm` | 비석 | 640×300 | 비석 카드 클릭 | "비석을 변경하시겠습니까? → 이름" + [예](`RequestSetTomb`) / [아니오](→ `profile`) — `BuildConfirm` 공용 |
+| `themeconfirm` | 맵 테마 | 640×300 | 테마 카드 클릭 | "맵 테마를 변경하시겠습니까? → 이름" + [예](`RequestSetTheme` → `profile`) / [아니오](→ `profile`) — `BuildConfirm` 공용 |
+| `icon` | 아이콘 | 900×700 | 내 유저 카드 [수정] · 정보에서 [목록으로] | 탭 줄('기본') + "보유 n / 247" 줄(획득 조건·확률은 목록에 적지 않는다 — 칸을 누른 `iconinfo`에만) + **스크롤 격자** 8열(`SpawnScrollGrid`, 칸 94, 간격 8 — 2026-09-25 사용자 "페이징 말고 스크롤"). **첫 칸 = '없음'**(`SpawnIconNoneCell` — 빈 원, 사용 중이면 금색, 누르면 바로 `iconconfirm`). 창은 바로 열고 칸은 `IconBatch`(40)개씩 0.03초 간격으로 위에서부터 채운다(`SpawnIconCell`). 보유 원색 · 미보유 실루엣 · 사용 중 금색 칸. 칸 → `PendingIcon` → `iconinfo` (2026-09-25) |
 | `iconinfo` | 아이콘 | 640×370 | 아이콘 칸 클릭 · 확인에서 [아니오] | 초상 140(보유면 움직임) + 이름 + 상태(사용 중 / 보유 · 획득일 / 미획득) + 획득처(`WhereText`: 매우어려움 · n라운드 · 지역 - 맵) + 확률 + [이 아이콘 사용](보유·미사용) · [목록으로] |
-| `iconconfirm` | 아이콘 | 640×280 | [이 아이콘 사용] | "아이콘을 변경하시겠습니까? → 이름" + [예](`RequestSetIcon`) / [아니오](→ `iconinfo`) |
+| `iconconfirm` | 아이콘 | 640×280 | [이 아이콘 사용] · '없음' 칸 | "아이콘을 변경하시겠습니까? → 이름"(없음이면 "아이콘을 없음으로 변경하시겠습니까?") + [예](`RequestSetIcon`) / [아니오](→ `iconinfo`, 없음이면 `icon`) |
 | `iconget` | 새 아이콘 획득! | 640×430 | 서버 `ShowIconGot` → `RtsProfileLogic.FlushGot`(보스 3택1·다른 획득 팝업이 떠 있으면 닫힌 뒤) | 획득음(PickSound) + 초상 140(움직임) + "이름 아이콘을 얻었어요!" + 획득처 · 획득일 + [확인] |
 
 ### 4.3 유닛 정보 팝업 (`unit`, RtsUnitPopupLogic, 1229×720 — :11-13)
@@ -340,7 +342,7 @@ y=1080 +------------------------------------------------------------------------
 |---|---|---|---|---|
 | 외형 패널 | `RtsUnitLook` | 232 | a(0,1) (27,-10) 365×236 | Mix(white,0.03) / Mix(Gold,0.25). "외형" 13 |
 | 미리보기 | `RtsUnitPreview` (uiempty + CostumeManager + AvatarGUIRenderer) | 835-871 | p(0.5,0.5) (92,-128) 120×190 | 모델이 없으면 직업명 글자로 대신 |
-| 스킨 버튼 2 | `RtsUnitSkin1/2` | 255 | (146, −34−64·(i−1)) 205×58 | 선택: Mix(Gold,0.18)/Gold. 잠김: 테두리 Mix(Gold,0.55)에 "1,600 월드코인 · 영구 해금", 클릭하면 월드 상점(`RequestBuyAvatar`). 해금: "내 메이플월드 코디"(남은 일수 표시 없음) |
+| 외형(기본 세트) | `RtsUnitLookGlow` · `RtsUnitPreview` · `RtsUnitLookPlate`/`Name` | `BuildBody` | 원광 a(0,1) p(0.5,0.5) (181,−98) 176×176 · 아바타 (181,−90) 112×140(원 안 — '외형' 제목 줄 없음) · 이름판 a(0.5,0) (0,12) 220×30 | 원광 금색 α0.13(원형 마스크) · 이름판 Mix(Gold,0.14)/Mix(Gold,0.55) · ColInk 15 굵게 | 항상 | 2026-09-25 월드 아바타 스킨 버튼 2개 삭제 → 기본 세트를 가운데 크게(사용자 "기본 스킨이나 이쁘게 꾸며서"). 이름 = "모험가 ○○"(프리즘 직업명) / "영웅 팬텀" |
 | 능력치 패널 | `RtsUnitStats` | 289 | (27,-256) 365×290 | 8줄, 줄 간격 30. 키 14 ColMuted, 값 15 ColInk 리치(버프가 반영된 줄은 `#9fd39a ▲`) |
 | 탭 | `RtsUnitTab{skill,aug,buff}` + 키캡 `RtsUnitTabKey`("Tab") | 310-334 | x 411부터 폭 120/130/190, 간격 8, 높이 34, 글자 15 | 탭 상태는 팝업을 닫아도 유지된다. Tab 키로 순환(`CycleTab` :808) |
 | 목록 | `RtsUnitSkillList` / `RtsUnitAugList` / `RtsUnitBuffList` | 615-636 | 스트레치 x 411~1202(폭 791), y는 −54에서 아래 66px 전까지 | ScrollLayoutGroup 세로, 간격 6. 넘칠 때만 스크롤. 스크롤바 8px, 손잡이 Gold |
@@ -402,15 +404,16 @@ y=1080 +------------------------------------------------------------------------
 | 요소 | 엔티티 이름 | 종류 | 만드는 곳 | 크기·층 | 비고 |
 |---|---|---|---|---|---|
 | 발 아래 버프 아이콘 | `RtsBuffIcon{gen}_{i}` (유닛 자식) | 월드 스프라이트 (`model://MapObject`) | RtsUnitBuffLogic:166-202 | 세계 스케일 2.2(유닛 스케일이 2라서 로컬 1.1), 간격 0.75, 발 아래 −0.52. MapLayer0 / order 210 | 아이콘 RUID는 `GetDefs`(:29-38). 동기화가 오면 0.2초 모아서 다시 그린다(`MarkDirty` :136). **이름 앞 11글자 `RtsBuffIcon`으로 지울 대상을 찾는다(:173)** |
-| 몬스터 체력바 | `RtsHpBack` / `RtsHpFill` (몬스터 자식) | 월드 스프라이트 (흰 사각 `WhiteRUID`를 Scale로 늘림) | RtsMonsterComponent:232-307 | 일반 1.4×0.12, 보스 **7.8×0.24**(2체 보스는 `BossBarFit` = 슬롯 폭−0.12, RtsBossLogic:111). 높이는 표의 `barY×SizeMul`, 없으면 1.15(보스 3.4). 테두리 +0.04. 몬스터 order +5/+6 | 배경 (0.1,0.1,0.1,0.9), 채움 (0.92,0.18,0.18,1). 보스 폭은 2026-09-23에 2.6에서 7.8로 바뀌었다(:62) |
+| 몬스터 체력바 | `RtsHpBack` / `RtsHpFill` (몬스터 자식) | 월드 스프라이트 (흰 사각 `WhiteRUID`를 Scale로 늘림) | RtsMonsterComponent:232-307 | 일반 1.4×0.12, 보스 폭 = `BossBarFit`(슬롯 폭 − 0.12 — 2026-09-25 3×3칸 상자라 1체 약 5.2, 2체 약 2.5) × 0.24, `BossBarFit`이 0이면 `BossBarW` 7.8. 높이는 표의 `barY×SizeMul`, 없으면 1.15(보스 3.4). 테두리 +0.04. 몬스터 order +5/+6 | 배경 (0.1,0.1,0.1,0.9), 채움 (0.92,0.18,0.18,1). 보스 폭은 2026-09-23에 2.6에서 7.8로 바뀌었다(:62) |
 | 빙결 결정체 | `RtsFrozenFx` | 월드 스프라이트 클립 | RtsMonsterComponent:313-352 | 체력바 바로 위, order +8 | — |
 | 데미지 숫자 | (엔진) `DamageSkinSpawnerComponent` 몬스터 / `DamageSkinSettingComponent` 유닛 | **엔진 컴포넌트** | RtsWaveLogic:89-90, RtsBossLogic:105, RtsUnitLogic:259-264 | 스킨 `7e39645a…`, 배율 2.0(RtsCombatLogic:47/49), 트윈 Blade. 시작 높이 = barY + 0.2 | 스크립트로 그리지 않는다 |
 | 타격 연출 | `RtsHitFx_*` | 월드 스프라이트 클립 | RtsMonsterComponent:549-566 | Default / order 320 | 마지막 프레임에서 제거 |
 | 레벨업 연출 | (EffectService) | 엔진 이펙트 | RtsUnitLogic:666 | Default / order 305 | 클릭하는 순간 클라에서 바로 재생 |
 | 발판 강조 틀 | `RtsPadFrame{gen}_{i}` (`/maps/RtsMap` 자식) | 월드 스프라이트 | RtsUnitSelectLogic:387-399 | `MarkerRUID` `2c03a06f…`, 스케일 2.12, MapLayer0 / order 150 | 빈 칸 금색 (1,0.82,0.25), 내 유닛 자리 파랑 (0.4,0.62,1)(맞교환). 위치 이동·영입 배치 모드에서만 |
-| 보스 영역 | `ZoneBossArea{n}` | 월드 스프라이트 (서버 생성) | RtsZoneLogic:299-308 | 8~11열 × 9~13행(4×5칸), order 105 | 반투명 붉은색 (0.85,0.16,0.12,0.28). 보스전이 아닐 때도 늘 보이고, 이 칸에는 배치할 수 없다 |
-| 비석 | `RtsTomb{zone}` | 월드 스프라이트 (서버 생성) | RtsRunResultLogic:301-306 | `TombRUID` `29e864c6…`, 스케일 5, order 210 | 탈락한 구역 가운데 |
-| 그리드·장식 | `ZoneGrid{n}` / `ZoneDecor{n}_{i}` | 월드 스프라이트 (서버 생성) | RtsZoneLogic:286 / :329 | order 100 / 110 | 테마 프리셋이 텍스처를 정한다(RtsThemeLogic:57-64): `henesys`(기본, `ActiveKey` :8)와 `elnath`. 적용은 `ApplyPreset`(ServerOnly, :113) |
+| 보스 영역 | `ZoneBossArea{n}` | 월드 스프라이트 (서버 생성) | RtsZoneLogic `SpawnBossArea` | **8~9열 × 6~7행(2×2칸, 2026-09-25 맵 가운데 — 13줄이라 반 칸 위)**, order 105 | 반투명 붉은색 (0.85,0.16,0.12,0.28). 보스전이 아닐 때도 늘 보이고, 이 칸에는 배치할 수 없다. 둘레 한 겹은 발판 |
+| 보스 몸 | `Boss{zone}_{n}` | 월드 스프라이트 (서버 생성, `RtsWaveLogic.SpawnMonsterEntity`) | RtsBossLogic `SpawnBoss` | 보스 영역 가운데 **3×3칸 상자**(`BossFitCells`)를 꽉 채우는 크기, 2체면 가로 반씩. MapLayer0 / order `BossOrder` 150(부위·체력바는 이 값 +) — 유닛(200)보다 **아래** | 2026-09-25 사용자 "3x3 정도로 조금 넘치게, 보스보다 유닛이 위로·클릭도 유닛 우선"(클릭은 `RtsUnitSelectLogic` 유닛 상자 → 넓힌 유닛 상자 → 몬스터 순) |
+| 비석 | `RtsTomb{zone}` | 월드 스프라이트 (서버 생성) | RtsRunResultLogic `SpawnTomb` | 그 구역 주인의 비석 프리셋(`RtsTombLogic` — 기본 `29e864c6…`, 스케일 5), order 210 | 탈락한 구역 가운데. 주인이 없으면 기본 비석 (2026-09-25 비석 프리셋) |
+| 그리드·장식 | `ZoneGrid{n}` / `ZoneDecor{n}_{i}` | 월드 스프라이트 (서버 생성) | RtsZoneLogic `SetZoneGrid` / `SetZoneDecor` | order 100 / 110 | 구역마다 그 구역 주인의 테마 프리셋(`RtsThemeLogic.ApplyToZone`)이 트랙 판 텍스처·틴트·장식을 정한다. 트랙 판 = `ZoneTrackGridM2`(2026-09-25 M2 경로 77칸·매듭 3곳, S = 초록 원 + 진행 방향 화살표, E = 빨강 원 + 되돌리기 화살, E→S 복귀 점선 없음 — `tools/gen-track-grid.js`) |
 | 마우스 커서 | (InputService) | 엔진 커서 | RtsUnitSelectLogic:100-113 | 기본 `3930c5d2…`, 누르는 동안 `5df970b4…` | 0.03초마다 버튼 상태를 확인 |
 
 월드와 UI의 경계에 있는 것: 캐릭터 메뉴(N)와 몬스터 정보(M)는 **UI**(HudGroup 자식)다. 몬스터 초상은 UI 스프라이트에 몬스터 걷기 클립을 넣은 것이다. 유닛 외형 미리보기는 UI 아바타(AvatarGUIRenderer)다.
@@ -453,7 +456,7 @@ y=1080 +------------------------------------------------------------------------
 
 **보스전**
 - 보스 준비(`BossPrep`, 5초): 카드가 "보스 준비"로 바뀌고 안내에 "○○ 등장까지 n초"가 뜬다.
-- 보스 라운드: 카드가 "보스"로 바뀐다. 보스는 붉은 보스 영역(4×5칸)에 고정으로 서고 긴 체력바가 붙는다. 몬스터 정보에 "보스" 딱지와 방어율이 보인다.
+- 보스 라운드: 카드가 "보스"로 바뀐다. 보스는 맵 가운데 붉은 보스 영역(2×2칸)에 바로 나타나 고정으로 서고(그림은 3×3칸 크기로 둘레 발판에 조금 걸침), 긴 체력바가 붙는다. 겹치는 자리의 유닛이 보스 위에 보이고 클릭도 유닛이 먼저다. 몬스터 정보에 "보스" 딱지와 방어율이 보인다.
 - 60초 안에 못 잡으면 결과가 "탈락 — 보스 시간 초과"가 된다. 보스를 잡은 뒤 프리즘 3택1이 오면 제목이 "보스 처치 — 프리즘 증강 선택"이다.
 
 **모드 (클라 전용)**

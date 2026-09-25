@@ -1,6 +1,7 @@
--- Phase 7 (2026-09-23): 보스 스테이지. 살아 있는 구역마다 스테이지 보스(어둠의 신전은 아이온·얄다바오트 2체 — 둘째는 1초 뒤)를 구역 보스 영역(RtsZoneLogic 2×2 칸)에 세운다.
+-- Phase 7 (2026-09-23): 보스 스테이지. 살아 있는 구역마다 스테이지 보스(어둠의 신전은 아이온·얄다바오트 2체 — 둘째는 1초 뒤)를 구역 보스 영역(RtsZoneLogic — 2026-09-25 가운데 2×2)에 세운다.
 --   트랙 이동 없음(2026-09-23 사용자 "보스의 트랙 이동을 빼고 화면 중앙 트랙에 고정" → 같은 날 "이쪽 4칸에 보스 영역 — 보스는 저기로": 화면 중앙 → 9~10열 × 12~13행).
---   보스 그림(스프라이트 테두리 = 피격 박스 ÷ 0.7·0.8)이 보스 영역(4×5칸, 2체면 가로로 반씩)을 꽉 채우게 키우거나 줄인다(SizeMul — 표 스케일 × 배율, 체력바 높이·폭도 따라감).
+--   보스 그림(스프라이트 테두리 = 피격 박스 ÷ 0.7·0.8)이 보스 영역 가운데 BossFitCells×BossFitCells칸 상자(3×3 — 2×2 영역보다 조금 넘치게, 2체면 가로로 반씩)를 꽉 채우게 키우거나 줄인다(SizeMul — 표 스케일 × 배율, 체력바 높이·폭도 따라감).
+--   보스는 유닛 아래에 그린다(BossOrder — 2026-09-25 사용자 "보스보다 유닛이 우선해서 위로 보이게, 클릭도 유닛 우선"; 클릭은 RtsUnitSelectLogic이 이미 유닛 먼저).
 --   스테이지 시간(60초)이 끝났는데 살아 있으면 그 구역 주인 탈락(보스 HP 깎은 비율 기록).
 --   구역 보스를 다 잡으면 그 구역은 통과, 살아 있는 구역이 모두 통과하면 3초 뒤 다음 스테이지(RtsStageLogic.ScheduleEarlyEnd).
 --   마지막 스테이지(검은 마법사 4페이즈)를 잡으면 클리어. 보스 방어율은 표(RtsStageTableLogic def — 주니어 발록~시그너스 50, 스우·데미안 100 · 루시드·윌 120 · 더스크·진 힐라·듄켈 130 · 검은 마법사 140/140/145/150 — 2026-09-24 합연산, 체력은 tools/difficulty-sim.py 티어 모드 보정)를 RtsMonsterComponent.Defense로.
@@ -16,8 +17,13 @@ script RtsBossLogic extends Logic
 	-- 서버: 구역 → 보스를 다 잡았는가
 	property table Down = {}
 
-	-- 보스 크기: 그림(스프라이트 테두리)이 보스 영역 슬롯(영역 ÷ 보스 수 가로, 영역 세로)에 꽉 차는 배율(2026-09-23 사용자 "가로 4칸 세로 5줄에 보스가 다 채워지도록" —
-	--   전엔 2×2 영역 × 1.5 + 1칸 위). 피격 박스 = 그림 × (0.7, 0.8)이라 그림 크기 = 박스 ÷ 그 비율
+	-- 보스 크기: 그림(스프라이트 테두리)이 슬롯(상자 ÷ 보스 수 가로, 상자 세로)에 꽉 차는 배율. 상자 = 보스 영역 가운데 BossFitCells칸 정사각
+	--   (2026-09-23 "가로 4칸 세로 5줄에 다 채워지도록"(4×5 영역) → 2026-09-25 영역 2×2 + "3x3정도로 조금 넘치게"). 피격 박스 = 그림 × (0.7, 0.8)이라 그림 크기 = 박스 ÷ 그 비율
+	property number BossFitCells = 3
+
+	-- 보스 몸 그리는 순서(MapLayer0) — 유닛 아바타(200)보다 아래, 보스 영역 판(105)·장식(110)보다 위. 부위(+p.order)·체력바(+5/+6)는 이 값을 따라간다
+	property number BossOrder = 150
+
 	property number BoxToSpriteW = 0.7
 
 	property number BoxToSpriteH = 0.8
@@ -70,7 +76,7 @@ script RtsBossLogic extends Logic
 			list = {}
 			self.ByZone[zone] = list
 		end
-		-- 제자리 고정: 트랙 걷기 멈춤(Paused) + 보스 영역. 영역을 보스 수만큼 가로로 나눈 슬롯에 피격 박스가 들어가게 줄이고, 몸 가운데(피격 박스 중심)를 슬롯 가운데에
+		-- 제자리 고정: 트랙 걷기 멈춤(Paused) + 보스 영역. 영역 가운데 상자(BossFitCells칸 정사각)를 보스 수만큼 가로로 나눈 슬롯에 그림이 들어가게 맞추고, 몸 가운데(피격 박스 중심)를 슬롯 가운데에
 		local w = e.RtsTrackWalkerComponent
 		if w ~= nil then
 			w.BossMode = true
@@ -82,8 +88,8 @@ script RtsBossLogic extends Logic
 		if st ~= nil and st.mobs ~= nil then count = #st.mobs end
 		local idx = #list + 1
 		local cell = _RtsConfigLogic:GetGridCell()
-		local areaW = cell * _RtsZoneLogic.BossAreaCols
-		local areaH = cell * _RtsZoneLogic.BossAreaRows
+		local areaW = cell * self.BossFitCells
+		local areaH = cell * self.BossFitCells
 		local slotW = areaW / count
 		local c = _RtsZoneLogic:GetBossAreaCenter(zone)
 		local cx = c.x + (idx - (count + 1) / 2) * slotW

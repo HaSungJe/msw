@@ -43,7 +43,7 @@ script RtsConfigLogic extends Logic
 
 	property number CameraViewHeight = 24
 
-	-- 그리드 트랙 (아티팩트 v16). 1유닛 = 45px(1920/42.66) → 칸 80px = 16/9 유닛
+	-- 그리드 트랙 (아티팩트 v16 칸 크기 — 경로는 2026-09-25 M2, RtsZoneLogic.GetTurnPoints). 1유닛 = 45px(1920/42.66) → 칸 80px = 16/9 유닛
 	--   2026-09-20 사용자: 18×12 → **16×13**(우측 2열 삭제로 좌우 대칭, 아래 1행 추가). 그리드 폭 28.44 = 뷰 42.66 − 여백 7.11×2 → GridLeft = −14.22.
 	--   높이 23.11 = 뷰 24 − 위아래 0.44씩 → GridTop = 11.56("위에 남는 공간 활용해 위로 살짝 당김"). 텍스처 1280×1040은 tools/gen-track-grid.js
 	--   그리드 좌상단 = 구역 중앙 + (GridLeft, GridTop). 행(row)은 위에서 아래로 센다

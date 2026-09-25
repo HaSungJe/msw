@@ -51,10 +51,10 @@
 - CLAUDE.md application: not needed
 - Priority: takes precedence over defaults
 
-## 과금 = 월드 아바타 스킨 영구 이용권 1,600 월드코인 (프리미엄 프리셋 없음) — 2026-09-24 30일 → 영구
-- Rule: 유닛 스킨은 기본(모험가 직업 세트) / 월드 아바타(내 메이플월드 코디 + 직업 무기) 둘뿐. 월드 아바타는 월드 상점 상품 `QK03ZI15E`(1,600 월드코인, 비공개 등록 상태 — 출시 때 공개)로 **한 번 사면 영구 해금**(2026-09-24 사용자 "영구로 바꿔" — 전엔 30일·재구매 연장). 상품 종류는 **아이템(ITEM) 유지** — 이용권(PASS)으로 바꾸려 했으나 상점이 카테고리 변경 불가(오류 3018), 사용자 "2번. 출시 전이라 괜찮"(09-24). 아이템이라 상점에서 재구매는 가능하므로 게임은 해금 뒤 구매 버튼을 숨긴다. 상점 이름 '월드 아바타 영구 이용권'·설명·썸네일(`assets/textures/world-avatar.png`, 파일 1790232456396.png) 09-24 갱신. UI엔 남은 일수 표시 없음(사용자 "남은 일수 지우고"). 지급은 `RtsUnitLogic.ProcessPurchase`(`_WorldShopService:SetProcessPurchaseCallback`), 해금 값은 유저 DataStorage `avatarUntil` = `AvatarForever`(아주 먼 미래 UTC ms). 결제 연동은 실측됨(Maker 테스트 구매창, 정산은 판매액의 35%). 새 유료 상품은 같은 경로: 썸네일 120px 업로드 → `world_item_create`(비공개) → 콜백에서 ProductId 분기.
+## 과금 없음 — 월드 아바타 스킨·이용권 삭제 (2026-09-25, 전엔 월드 아바타 영구 이용권 1,600 월드코인)
+- Rule: 유닛 외형은 **직업 기본 세트 하나**. 월드 아바타 스킨(내 메이플월드 코디)과 구매·해금 코드(`RtsUnitLogic` ProcessPurchase·avatarUntil·RequestSkin, `RtsUnitComponent.Skin`)는 전부 삭제 — "아예 쓰지도 못하게". 월드 상점 상품 `QK03ZI15E`('월드 아바타 영구 이용권')는 **공개한 적 없는 등록 상태 그대로 둔다**(구매자 없음 — 판매 종료는 판매 중 상품에만 가능). 대신 기본 스킨을 예쁘게 보여준다(유닛 정보 창 외형 = 가운데 크게 + 원광 + 이름판).
 - Scope: project
-- Rationale: User decision 2026-09-15 — "프리미엄 프리셋은 없어. 월드 아바타는 월드코인 결제해야 사용 가능. 30일 기간동안 해금. 월드코인 1600개", 결제 연동 확인 후 "ㅇㅇ"(상품 등록 승인)
+- Rationale: User decision 2026-09-25 — "월드 아바타 선택지 없애자. 월드 아바타 안 팔래. 기본 스킨이나 이쁘게 꾸며서 보여줄래", "아예 쓰지도 못하게", "산 사람 없어 애초에 출시 안 했음". (09-15 "월드 아바타는 월드코인 결제" → 09-24 "영구로 바꿔" → 09-25 폐기.) 새 유료 상품을 다시 만들 땐 같은 경로(썸네일 120px 업로드 → `world_item_create` 비공개 → `_WorldShopService:SetProcessPurchaseCallback`에서 ProductId 분기, 정산 35%)
 - CLAUDE.md application: not needed
 - Priority: takes precedence over defaults
 

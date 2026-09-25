@@ -1,6 +1,6 @@
 -- Phase 3 #15·#16 (2026-09-17) → Phase 6·7 (2026-09-23): 유닛 자동 공격 + 데미지 계산 + 피격 연출.
 --   공격 루프는 **모든 유닛이 각자** 돈다(RtsUnitLogic.SpawnUnit → StartLoop) — 사거리 안에 적이 있는 유닛만 공격하고, 메인 대상은 죽거나 사거리를 벗어나기 전까지 고정(Focus). 규칙 원문 = .info/attack.md.
---   대상 = 구역의 살아 있는 몬스터(RtsWaveLogic 웨이브 몹·RtsBossLogic 보스, 죽음·보관 제외). 보스 스테이지에선 모든 유닛·스킬 사거리 BossRange(16칸 — 보스 영역이 아래 구석이라 그리드 어디서든 닿게, 2026-09-23) — 보관된 일반 몹은 대상이 아니라 보스만 맞는다.
+--   대상 = 구역의 살아 있는 몬스터(RtsWaveLogic 웨이브 몹·RtsBossLogic 보스, 죽음·보관 제외). 보스 스테이지에선 모든 유닛·스킬 사거리 BossRange(16칸 — 그리드 어디서든 보스에 닿게, 2026-09-23. 보스 영역은 2026-09-25 가운데 2×2) — 보관된 일반 몹은 대상이 아니라 보스만 맞는다.
 --   데미지 = damage.md 8단계(RtsJobTableLogic.GetStatFor/CalcStat: ① 공격력 ② 공격력% ③ 보스 공격시 데미지(보스 상대만, bossMul) ⑤ 스킬 비율 → 1회 타격, ⑥ 최종, ⑦ 무기 난수, ④ 크리 확률로 굴림)
 --   + ⑧ 방어(DefenseMul: 남은 방어율 = 대상 방어율 − 방무, 0 미만 0 → × (1 − 남은 방어율). 보스 50%, 검은 마법사 4페이즈 100% — 데미지가 0이면 타격·숫자 없음).
 --   파티 버프(RtsUnitBuffLogic.ApplyToStat)와 프리즘(RtsUnitComponent.Prisms → GetSkillsFor/GetStatFor)은 서버 계산에 반영.
@@ -415,7 +415,7 @@ script RtsCombatLogic extends Logic
 						range = 999
 						count = 999
 					elseif bossRound and range < self.BossRange then
-						-- 보스 스테이지: 모든 유닛·스킬 사거리 16칸(2026-09-23 사용자 — 전원이 친다. 보스 영역(9~10열 × 12~13행)이 구석이라 10 → 16)
+						-- 보스 스테이지: 모든 유닛·스킬 사거리 16칸(2026-09-23 사용자 — 전원이 친다. 그리드 어디서든 닿게 10 → 16, 보스 영역은 2026-09-25 가운데 2×2)
 						range = self.BossRange
 					end
 					-- 다수 타격 범위(2026-09-19 사용자): 모든 범위 공격은 메인 대상 1마리 곁 1칸 안(k.aoe, 기본 1)만 — 트랙이 2칸 이상 벌어진 몬스터는 사거리 안이라도 안 맞는다. 체인 라이트닝만 aoe 3. 지대·구체는 예외

@@ -19,10 +19,6 @@ script RtsUnitComponent extends Component
 	@Sync
 	property number Level = 1
 
-	-- 0 기본 세트 / 1 월드 아바타(주인 코디, 월드코인 결제로 영구 해금)
-	@Sync
-	property number Skin = 0
-
 	@Sync
 	property number Col = 0
 
@@ -198,37 +194,23 @@ script RtsUnitComponent extends Component
 		return math.ceil(left)
 	end
 
-	-- 외형 적용: 기본 = 직업 세트만(UseCustomEquipOnly) / 내 아바타 = 주인 코디를 복제(DefaultEquipUserId) + 직업 무기
+	-- 외형 적용: 직업 기본 세트만(UseCustomEquipOnly — 월드 아바타 스킨은 2026-09-25 삭제)
 	@ExecSpace("ServerOnly")
 	method void ApplyLook()
 		local cm = self.Entity.CostumeManagerComponent
 		if cm == nil then return end
 		local set = _RtsJobTableLogic:GetCostume(self.JobId)
 		if set == nil then return end
-		if self.Skin == 1 then
-			-- 월드 아바타: 유저 본인 아바타 + 직업 무기만. 세트로 넣었던 모자·얼굴 장식·얼굴도 비워야 본인 것이 보인다(2026-09-18 사용자: 보우마스터 깃털 모자가 남아 있었음)
-			cm.UseCustomEquipOnly = false
-			cm.DefaultEquipUserId = self.Owner
-			cm.CustomLongcoatEquip = ""
-			cm.CustomShoesEquip = ""
-			cm.CustomHairEquip = ""
-			cm.CustomCapEquip = ""
-			cm.CustomFaceAccessoryEquip = ""
-			cm.CustomFaceEquip = ""
-			cm.CustomTwoHandedWeaponEquip = set.weapon2h or ""
-			cm.CustomOneHandedWeaponEquip = set.weapon1h or ""
-		else
-			cm.UseCustomEquipOnly = true
-			cm.DefaultEquipUserId = ""
-			cm.CustomLongcoatEquip = set.longcoat
-			cm.CustomTwoHandedWeaponEquip = set.weapon2h or ""
-			cm.CustomOneHandedWeaponEquip = set.weapon1h or ""
-			cm.CustomShoesEquip = set.shoes
-			cm.CustomHairEquip = set.hair
-			cm.CustomCapEquip = set.cap or ""
-			cm.CustomFaceAccessoryEquip = set.faceAcc or ""
-			cm.CustomFaceEquip = set.face or ""
-		end
+		cm.UseCustomEquipOnly = true
+		cm.DefaultEquipUserId = ""
+		cm.CustomLongcoatEquip = set.longcoat
+		cm.CustomTwoHandedWeaponEquip = set.weapon2h or ""
+		cm.CustomOneHandedWeaponEquip = set.weapon1h or ""
+		cm.CustomShoesEquip = set.shoes
+		cm.CustomHairEquip = set.hair
+		cm.CustomCapEquip = set.cap or ""
+		cm.CustomFaceAccessoryEquip = set.faceAcc or ""
+		cm.CustomFaceEquip = set.face or ""
 	end
 
 	-- 메인 대상 쪽을 본다: dirX > 0 오른쪽, < 0 왼쪽. FaceDir 동기화 → 클라 ApplyFace. 이후 되돌리지 않는다
