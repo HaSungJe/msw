@@ -496,6 +496,13 @@ y=1080 +------------------------------------------------------------------------
 - 팝업에 내부 설계 수치(누적 투자, 벽, 예산)를 보이지 않는다(로드맵 규칙).
 
 ### 7.3 작업 요령
+- **바뀐 칸만 다시 그린다 — 창 전체를 다시 열지 않는다**(2026-09-25 사용자 "화면 내용 바뀔 때마다 필요한 부분만 재랜더링하고 나머지 부분 좀 그만 건드려"): 탭 전환·선택·서버 값 갱신으로 일부가 바뀌면 `Open(같은 kind)`를 부르지 말고
+  - 탭 줄 = `RtsPopupLogic.SpawnTabBar`(누르면 제자리에서 켜짐만 — `BarSelect`·`SetTabOn`, 글자는 `SetTabText`, Tab 키 순환 `BarNext`)
+  - 바뀌는 목록·상세 = 투명 컨테이너(`SpawnBox`)째 새로 만들고 옛 것은 `DropLater`(0.12초 뒤 지움)
+  - 선택 표시(행 색·체크 칸·아이콘 칸 색)는 참조를 들고 있다가 제자리에서 색만(`RestyleAugRows`·`RefreshPresetMarks`·`RefreshIconCells`)
+  - 예: 증강 창(`RefreshAugment` = 목록·상세·아래 줄, 행 클릭 = 행 색 + `RefreshAugDetail`), 도감(`RefreshCodex`), 영입 목록(`RefreshRecruit`), 영입 상세(`BuildRiSkills`), 프로필(`RefreshProfileContent`), 유닛 상세(`RenderRight` — 외형은 직업·프리즘 이름이 바뀔 때만 `Render`)
+- UI 아바타(`AvatarGUIRendererComponent`, `RtsUnitPopupLogic.SpawnPreviewAt`)는 칸 **아래쪽에** 서서 칸이 크면 위가 빈다 — 칸을 캐릭터 크기에 맞게 낮게, 두손검·창은 캐릭터 왼쪽으로 길게 나오니 칸 안쪽으로(2026-09-25 실측)
+- 화면 문구에 개발용 분류(티어·서포터·1티어 등)를 쓰지 않는다(메모리 workflow) — 증강 효율은 오각형 모양으로만
 - **다시 그리기는 번쩍이지 않게**(2026-09-24): 같은 팝업을 다시 그릴 때(`RtsPopupLogic.Open`이 같은 kind로 불릴 때) 팝업 그룹은 끄지 않고 옛 body를 0.12초 남겼다가 지운다(`OldBody`/`KeepOldBody`). 유닛 창 `Render`도 옛 `Content`를 0.12초 뒤에 지운다. 엔진이 UI를 여러 프레임에 나눠 만들기 때문에, 지우자마자 새로 만들면 빈 창이 한순간 보인다 — 새 화면 코드도 같은 방식을 쓴다.
 - 자기 효과음이 따로 있는 버튼은 `SpawnClickQuiet`(클릭음 없음)로 만든다(예: HUD '펼치기' — 3택1 등장음과 겹쳤다).
 - UI 코드만 고치는 작업은 `@ExecSpace("ClientOnly")`(또는 `Client`) 메서드 안에서 끝낸다. 대상은 `Build*`, `Apply*`, `Refresh*`, `Set*`, `Spawn*` 계열이다. 새 스크립트가 필요하면 PascalCase에 `Logic`/`Component` 접미사를 붙이고 모든 메서드에 `@ExecSpace`를 적는다(CLAUDE.md).
