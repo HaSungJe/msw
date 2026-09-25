@@ -90,7 +90,7 @@ script RtsAugmentTableLogic extends Logic
 			local p = ps[i]
 			local w = jobW[p.id] or 7.5
 			if p.id == "phantom" then
-				self:AddPrism({ id = "phantom", name = "팬텀", w = w, unlock = "phantom", desc = "영웅 팬텀을 영입할 수 있게 된다. 팬텀은 모든 능력치 증강 효과가 75% 증가한다." })
+				self:AddPrism({ id = "phantom", name = "팬텀", w = w, unlock = "phantom", desc = "영웅 팬텀을 영입할 수 있게 된다. 팬텀은 증강의 효율이 높다." })
 			else
 				self:AddPrism({ id = p.id, name = p.name, w = w, job = p.job, desc = "[" .. _RtsJobTableLogic:GetJobName(p.job) .. " 전용] " .. p.desc })
 			end

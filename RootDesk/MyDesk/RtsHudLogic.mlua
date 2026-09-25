@@ -142,6 +142,15 @@ script RtsHudLogic extends Logic
 
 	property string RestartShown = ""
 
+	-- 일시정지(2026-09-25 사용자 "솔로 플레이 한정 일시정지"): 오른쪽 아래 버튼 · 가운데 안내(어두운 막 + 상자) · 지금 보이는 상태 키
+	property Entity PauseBtn = nil
+
+	property Entity PauseText = nil
+
+	property Entity PausePanel = nil
+
+	property string PauseShown = ""
+
 	-- 진행 중 실수 방지: 첫 클릭 뒤 이 시각(ElapsedSeconds)까지 한 번 더 누르면 찬성
 	property number RestartConfirmUntil = 0
 
@@ -422,6 +431,38 @@ script RtsHudLogic extends Logic
 			self:OnRestartButton()
 		end)
 		self.RestartBtn = restart
+		-- 멈춤 안내: 화면 전체 어두운 막(클릭은 통과 — 창 보기는 된다) + 위쪽 가운데 상자 "일시정지" · 안내 · [계속하기](창이 가운데 떠도 보이게 위로).
+		--   막을 버튼보다 먼저 만들어 오른쪽 아래 [계속하기] 버튼은 막 위에 밝게 보인다
+		local dim = self:SpawnStretch("model://uisprite", "RtsPauseDim", grp, Vector2(0, 0), Vector2(1, 1), Vector2(0, 0), Vector2(0, 0))
+		dim.SpriteGUIRendererComponent.Color = Color(0, 0, 0, 0.35)
+		dim.SpriteGUIRendererComponent.RaycastTarget = false
+		local pbox = self:SpawnPanel("RtsPauseBox", dim, Vector2(0.5, 1), Vector2(0.5, 1), Vector2(0, -70), Vector2(480, 200),
+			self:ColPanel(), self:ColGold(), 2)
+		self:SpawnLabel("RtsPauseTitle", pbox, Vector2(0.5, 1), Vector2(0.5, 1), Vector2(0, -16), Vector2(440, 48),
+			"일시정지", self:ColGold(), 34, TextAlignmentType.MiddleCenter, true)
+		self:SpawnLabel("RtsPauseSub", pbox, Vector2(0.5, 1), Vector2(0.5, 1), Vector2(0, -70), Vector2(440, 26),
+			"멈춘 동안에는 영입 · 레벨업 · 증강 · 이동을 할 수 없어요", self:ColMuted(), 15, TextAlignmentType.MiddleCenter, false)
+		local resume = self:SpawnPanel("RtsPauseResume", pbox, Vector2(0.5, 0), Vector2(0.5, 0), Vector2(0, 24), Vector2(220, 52),
+			self:ColGold(), self:ColGold(), 1.5)
+		self:SpawnLabel("RtsPauseResumeText", resume, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2(0, 0), Vector2(210, 44),
+			"계속하기 (P)", Color(0.133, 0.114, 0.09, 1), 18, TextAlignmentType.MiddleCenter, true)
+		local resumeClick = self:SpawnClick("RtsPauseResumeClick", resume)
+		resumeClick:ConnectEvent(ButtonClickEvent, function(event)
+			self:TogglePause()
+		end)
+		self.PausePanel = dim
+		dim:SetEnable(false)
+		-- 오른쪽 아래 '다시하기' 왼쪽: 일시정지 / 계속하기(솔로·진행 중에만 보인다 — RefreshPauseUi). P 키도 같다(RtsUnitSelectLogic.HandleKeyDownEvent)
+		local pause = self:SpawnPanel("RtsPauseBtn", grp, Vector2(1, 0), Vector2(1, 0), Vector2(-16 - 200 - 10, 16), Vector2(150, 64),
+			self:ColPanel(), self:ColBorder(), 2)
+		self.PauseText = self:SpawnLabel("RtsPauseLabel", pause, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2(0, 0), Vector2(142, 56),
+			"일시정지", self:ColInk(), 19, TextAlignmentType.MiddleCenter, true)
+		local pauseClick = self:SpawnClick("RtsPauseClick", pause)
+		pauseClick:ConnectEvent(ButtonClickEvent, function(event)
+			self:TogglePause()
+		end)
+		self.PauseBtn = pause
+		pause.Parent:SetEnable(false)
 		-- 다시 하기 투표 패널: 버튼 바로 위(투표 중에만)
 		local vp = self:SpawnPanel("RtsVotePanel", grp, Vector2(1, 0), Vector2(1, 0), Vector2(-16, 16 + 64 + 8), Vector2(260, 76),
 			self:ColPanel(), self:ColGold(), 1.5)
@@ -727,6 +768,43 @@ script RtsHudLogic extends Logic
 			outer.SpriteGUIRendererComponent.Color = self:ColBorderSoft()
 			self.RestartText.TextComponent.FontColor = self:ColMuted()
 		end
+	end
+
+	-- 일시정지 버튼·안내(RtsStageLogic.RefreshHud가 0.25초마다): 솔로 모드 판(RtsStageLogic.SoloMode)·혼자·진행 중이면 버튼 "일시정지", 멈춘 동안은 버튼 "계속하기"(금색) + 가운데 안내
+	@ExecSpace("ClientOnly")
+	method void RefreshPauseUi()
+		if self.PauseBtn == nil or not isvalid(self.PauseBtn) or self.PausePanel == nil then return end
+		local S = _RtsStageLogic
+		local paused = S.Paused
+		local show = paused or (S.SoloMode and S:IsSolo() and S.RunState == "running")
+		local key = tostring(show) .. "|" .. tostring(paused)
+		if key == self.PauseShown then return end
+		self.PauseShown = key
+		self.PauseBtn.Parent:SetEnable(show)
+		self.PausePanel:SetEnable(paused)
+		if paused then
+			self.PauseText.TextComponent.Text = "계속하기"
+			self.PauseBtn.SpriteGUIRendererComponent.Color = Color(0.45, 0.37, 0.18, 0.96)
+			self.PauseBtn.Parent.SpriteGUIRendererComponent.Color = Color(1, 0.9, 0.55, 1)
+			self.PauseText.TextComponent.FontColor = Color(1, 0.97, 0.85, 1)
+		else
+			self.PauseText.TextComponent.Text = "일시정지"
+			self.PauseBtn.SpriteGUIRendererComponent.Color = self:ColPanel()
+			self.PauseBtn.Parent.SpriteGUIRendererComponent.Color = self:ColBorder()
+			self.PauseText.TextComponent.FontColor = self:ColInk()
+		end
+	end
+
+	-- 버튼·P 키: 멈춰 있으면 풀기, 아니면 솔로·진행 중일 때만 멈추기(서버 RtsStageLogic.RequestPause가 다시 확인)
+	@ExecSpace("ClientOnly")
+	method void TogglePause()
+		local S = _RtsStageLogic
+		if S.Paused then
+			S:RequestPause(false)
+			return
+		end
+		if not S.SoloMode or not S:IsSolo() or S.RunState ~= "running" then return end
+		S:RequestPause(true)
 	end
 
 	-- 투표 패널: 누가 찬성·반대를 누르면(투표 중) 보이고, 찬성 n · 반대 m / 과반 k · 남은 초 + 내 선택 강조

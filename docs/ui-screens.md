@@ -153,6 +153,7 @@ y=1080 +------------------------------------------------------------------------
 | T+A | 좌상단 상자 `RtsTopBox` (2026-09-25 프로필 상자 + 정보 카드를 하나로, 배경 = 테마 썸네일) — 위 64 프로필 줄, 아래 정보 칸 `RtsInfoCard` | 16~416, 16~256 | RtsHudLogic `BuildTopBox` · `BuildHud` |
 | B | 유저 카드 목록 `RtsPlayers` (카드 y 290+158·(i−1), 250×150 — 2026-09-25 5:3, 4장) | 16~266, 266~922 | `AddPlayerCard` |
 | D | 다시 하기 `RtsRestartBtn` (2026-09-24 오른쪽 아래로) | 1704~1904, 1000~1064 | RtsHudLogic `RtsRestartBtn` |
+| P | 일시정지 `RtsPauseBtn` (2026-09-25 — 다시 하기 왼쪽, 솔로·진행 중에만) + 멈춤 안내 `RtsPauseDim`/`RtsPauseBox`(위쪽 가운데) | 1544~1694, 1000~1064 / 720~1200, 70~270 | RtsHudLogic `BuildHud` · `RefreshPauseUi` |
 | E | 투표 패널 `RtsVotePanel` (다시 하기 바로 위) | 1644~1904, 916~992 | RtsHudLogic `RtsVotePanel` |
 | F | 난이도 막대 `RtsDiffBar` (폭 780 = 86+6·88+5·6+12+124, 2026-09-25 화면 최상단으로) | 570~1350, 0~80 | RtsDifficultyLogic `Build` |
 | H | 안내 `RtsHint` | 600~1320, 92~136 | RtsHudLogic:456 |
@@ -231,6 +232,9 @@ y=1080 +------------------------------------------------------------------------
 | 요소 | 엔티티 이름 | 만드는 곳 | anchor·pivot·위치·크기 | 색·글꼴 | 보이는 조건 | 클릭/동작 |
 |---|---|---|---|---|---|---|
 | 다시 하기 | `RtsRestartBtn`/`In` | :349 | a(1,0) p(1,0) (-16,16) 200×64, 테두리 2 (오른쪽 아래) | 모드별(아래 표). 글자 `RtsRestartLabel` 192×56 19 굵게 | 항상 | `OnRestartButton`(:594). 진행 중에는 3초 안에 한 번 더 눌러야 찬성, 종료 뒤에는 바로 찬성, 이미 찬성했으면 취소 |
+| 일시정지 | `RtsPauseBtn`/`In` + `RtsPauseLabel` | BuildHud | a(1,0) p(1,0) (−226,16) 150×64, 테두리 2 | 보통 ColPanel/ColBorder·ColInk "일시정지" / 멈춤 중 (0.45,0.37,0.18,0.96)/(1,0.9,0.55)·(1,0.97,0.85) "계속하기". 글자 142×56 19 굵게 | **솔로 모드 판(`RtsStageLogic.SoloMode`)·방 인원 1·진행 중**이거나 멈춰 있을 때(`RefreshPauseUi`) — 멀티(매칭·방 만들기)로 시작한 판은 혼자여도 안 보인다 | `TogglePause` → `_RtsStageLogic:RequestPause(on)`(서버가 SoloMode·인원 1·진행 중·구역 주인 확인). **P 키**도 같다 |
+| 멈춤 막 | `RtsPauseDim` | 〃 | 화면 전체, 버튼보다 먼저 만든다(버튼은 막 위에 밝게) | (0,0,0,0.35), RaycastTarget 끔 — 창 보기(상세정보·도감 등)는 된다 | 멈춤 중 | — |
+| 멈춤 안내 | `RtsPauseBox` + `RtsPauseTitle`·`RtsPauseSub`·`RtsPauseResume` | 〃 | 막 안 a(0.5,1) p(0.5,1) (0,−70) 480×200 — 가운데 창이 떠도 보이게 위쪽 | ColPanel/ColGold 2. "일시정지" Gold 34 굵게 · "멈춘 동안에는 영입 · 레벨업 · 증강 · 이동을 할 수 없어요" ColMuted 15 · [계속하기 (P)] 220×52 Gold | 〃 | [계속하기] → `TogglePause` |
 | 투표 패널 | `RtsVotePanel`/`In` | :359 | a(1,0) p(1,0) (-16,88) 260×76, 테두리 1.5 (다시 하기 바로 위) | ColPanel / ColGold | 찬성+반대 > 0 (`RefreshVotePanel` :667) | — |
 | 투표 글 | `RtsVoteText` | :362 | a(0,1) p(0,1) (10,-4) 240×26 | ColInk 14 굵게 리치. `찬성 n`은 #8fd18a, `반대 m`은 #e88a7a, 그 뒤에 과반·남은 초 | 〃 | — |
 | 찬성 / 반대 | `RtsVoteYes`/`RtsVoteNo` (+`Text`, `Click`) | :365 / :372 | a(0,0) p(0,0) (10,8) / (135,8) 115×34 | 보통 ColPanel/ColBorder, 내 선택이면 (0.45,0.37,0.18,0.96)/(1,0.9,0.55). 글자 16 굵게 | 〃 | `_RtsStageLogic:RequestVoteChoice(1 또는 2)` (Server) |
@@ -357,9 +361,12 @@ y=1080 +------------------------------------------------------------------------
 | 프리즘 행 | `RtsUnitPrism{i}` | 551 | 스킬 행과 같음 | Mix(prism,0.08)/Mix(prism,0.45) |
 | 증강 합계 | `RtsUnitAugSum` | `BuildAugTabFor` | 목록 맨 위 (rw−12)×88, 셋째 줄이 없으면 ×62 | Mix(Gold,0.08)/Mix(Gold,0.4). "증강 n개 합계"(Gold 14) / 합계(Ink 15) / 방어구 부수기 수치(Muted 13 — 켜졌을 때만). **티어·서포터 같은 분류는 화면에 쓰지 않는다**(2026-09-24 사용자) |
 | 증강·버프 행 | `RtsUnitAug{i}` / `RtsUnitBuff{i}` | 697 / 723 | (rw−12)×64 | 버프 아이콘 40×40, 효과 글자 (0.624,0.827,0.604) |
-| 레벨업 | `RtsUnitLvUp` + 키캡 `RtsUnitLvKey`("Space") | 348-360 | a(1,0) p(1,0) (-27,10) 280×44 / (−317,20) 70×26 | 가능: Mix(Gold,0.92)/Gold, 글자 (0.133,0.114,0.09). 불가: 한 번 더 섞어 흐리게(`ApplyLevelButton` :175) |
+| 레벨업 | `RtsUnitLvUp` + 버튼 안 오른쪽 키캡 `RtsKeyCap`("Space", `SpawnKeyCap`) | 345-354 | a(1,0) p(1,0) (-27,10) 280×44 / 키캡 a·p(1,0.5) (-6,0) 58×24. 글자 줄 `SpawnLvRow(lbtn, 72, 16)` — 오른쪽 72를 키캡 자리로 비움(2026-09-25 겹침 수정) | 가능: Mix(Gold,0.92)/Gold, 글자 (0.133,0.114,0.09). 불가: 한 번 더 섞어 흐리게(`ApplyLevelButton` :175) |
 
 갱신 방식: 서버 값이 동기화되면 `OnUnitSynced`(:101)가 0.05초 동안 들어온 것을 모아 `UpdateInPlace`(:115)를 한 번 부른다. 구조 서명(`Signature` :137 — 직업·프리즘·잠금·스킨·대상·탭·획득 스킬 수·버프·증강 수·해금·쿨)이 같으면 제목·능력치 값·레벨업 버튼만 바꾼다. 다르면 `Render`(:211)가 통째로 다시 그린다. 통째로 다시 그리면 깜빡이므로 새 시각 요소는 가능하면 제자리 갱신 경로에 넣는다. 1초 타이머(`Tick` :822)는 대상 지정 쿨 글자를 갱신한다.
+
+
+**적용 중인 버프 탭(`BuildBuffTabFor`, 2026-09-25 사용자 "프리즘 코어의 증강 효율 증가가 버프 창에")**: 맨 위에 프리즘 증강 효율 줄 `RtsUnitBuffPrism`(높이 = 34 + 24 + 22 + 수치 줄 × 20 + 10, 프리즘 색 테두리 · 배지 · 이름 "거대화  프리즘 · 이 유닛" 17 · 설명 문장 초록 14 — "크리티컬 확률·크리티컬 데미지 증강 효과가 100% 증가한다." / 1티어 "능력치 증강 효과가 80% 증가한다(가진 증강 1개당 6.7%, 30개에서 200%)." / 팬텀 "모든 능력치 증강 효과가 75% 증가한다." · 머리 "증강 효과 증가로 더 받은 수치" Gold 13 · 그 아래 **능력치마다 한 칸씩 2열 격자**("크리티컬 확률 +18%", "크리티컬 데미지 +13%" … — 배율로 **더** 오른 몫, 없으면 "아직 없어요")). 값은 `RtsJobTableLogic.PrismAugBuff(u)` → { name, eff, gains }(AugMulFor가 켜진 유닛만: 자기 직업 프리즘이 있는 1티어·2티어, 팬텀). 탭 글자 개수 = 파티 버프 + 이 줄(`BuffCount`). 프리즘 설명(증강 목록·도감·영입 상세)은 "증강의 효율을 높인다 / 일부 증강의 효율을 높인다"로만 쓰고 자세한 문장·수치는 여기서 보인다.
 
 ### 4.4 나머지 팝업 세부
 **영입 (`BuildRecruit` :310-402)**
@@ -497,7 +504,7 @@ y=1080 +------------------------------------------------------------------------
 - **`SpawnPanel`의 반환 약속(안쪽을 돌려주고 바깥은 `.Parent`).** `RecruitBtn.Parent`, `AugBtn.Parent`, `vp.Parent:SetEnable`, `self.Hint = hint.Parent`, 난이도 카드 글자가 `StageSubText.Parent`를 카드로 쓰는 것(RtsDifficultyLogic:189) 등이 이 약속에 기대고 있다.
 - 값을 비교해 필요할 때만 다시 그리는 캐시 키(`StageShown`, `RecruitShown`, `RestartShown`, `VoteShown`, `BuyShown`, `ExpandShown`, `AugShown`, `Shown`, 유닛 팝업 `Sig`). 새 시각 상태를 추가하면 그 상태도 키에 넣어야 화면이 바뀐다.
 - `Environment/NativeScripts/**/*.d.mlua`는 엔진이 만든 파일이라 읽기 전용이다. 맵·설정 JSON(`*.map`, `*.config`)은 Maker 도구로만 다룬다.
-- 단축키: ESC(닫기·취소), Tab(유닛 팝업 탭), Space(레벨업·증강 지정), L/S(메뉴), F1~F8(구역). 처리하는 곳은 RtsPopupLogic:238, RtsUnitSelectLogic:503, RtsCameraAnchorComponent:132다.
+- 단축키: ESC(닫기·취소), Tab(유닛 팝업 탭), Space(레벨업·증강 지정), L/S(메뉴), **P(일시정지·계속 — 솔로·진행 중, 2026-09-25)**, F1~F8(구역). 처리하는 곳은 RtsPopupLogic:238, RtsUnitSelectLogic:503, RtsCameraAnchorComponent:132다.
 - 팝업에 내부 설계 수치(누적 투자, 벽, 예산)를 보이지 않는다(로드맵 규칙).
 
 ### 7.3 작업 요령

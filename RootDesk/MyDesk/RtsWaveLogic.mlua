@@ -141,6 +141,8 @@ script RtsWaveLogic extends Logic
 	-- 0.5초마다 구역마다 1마리. 줄이 다 비면 타이머를 멈춘다
 	@ExecSpace("ServerOnly")
 	method void SpawnTick()
+		-- 일시정지 중엔 건너뛴다(줄 위치는 그대로 — 풀리면 이어서, RtsStageLogic.Paused)
+		if _RtsStageLogic.Paused then return end
 		local spawned = false
 		for zone, list in pairs(self.Queue) do
 			local pos = self.QueuePos[zone] or 1
@@ -151,6 +153,22 @@ script RtsWaveLogic extends Logic
 			end
 		end
 		if not spawned then self:StopSpawn() end
+	end
+
+	-- 일시정지 모션(2026-09-25): 맵의 몬스터·보스 스프라이트 재생 속도 0 / 1(몬스터 본체 스프라이트는 기본 1 — 이펙트 자식은 건드리지 않는다)
+	@ExecSpace("ServerOnly")
+	method void SetMotionPaused(boolean on)
+		local mapRoot = _EntityService:GetEntityByPath("/maps/RtsMap")
+		if mapRoot == nil then return end
+		local rate = 1
+		if on then rate = 0 end
+		local comps = mapRoot:GetChildComponentsByTypeName("RtsMonsterComponent", false)
+		for i = 1, #comps do
+			local m = comps[i]
+			if m ~= nil and m.Entity ~= nil and isvalid(m.Entity) and m.Entity.SpriteRendererComponent ~= nil then
+				m.Entity.SpriteRendererComponent.PlayRate = rate
+			end
+		end
 	end
 
 	@ExecSpace("ServerOnly")

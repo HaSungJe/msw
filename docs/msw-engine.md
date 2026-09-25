@@ -34,3 +34,11 @@ Maker 26.7에서 실측으로 확인한 엔진 동작과 그에 따른 작성 �
 ## 스크립트로 만든 UI 그룹(model://uigroup)은 화면 전체로 늘려야 한다
 - `_SpawnService:SpawnByModelId("model://uigroup", …, /ui)`로 만든 그룹은 크기·앵커를 주지 않으면 **실제 클라이언트에서 작은 기본 크기로 화면 가운데에** 생긴다 → 그 안에서 모서리 anchor로 붙인 요소가 전부 화면 가운데로 몰린다. **Maker Play에서는 화면 크기로 잡혀 드러나지 않는다.** 만든 직후 `UITransformComponent`를 AnchorsMin (0,0) · AnchorsMax (1,1) · Pivot (0.5,0.5) · OffsetMin/OffsetMax (0,0)으로 늘린다(`RtsHudLogic.StretchFull`).
 - 근거: 2026-09-24 v260924-1 출시 클라이언트 스크린샷 — HUD 전체(정보 카드·순위/도감/뽑기/증강 버튼·유닛 슬롯·플레이어 목록)가 화면 가운데 약 100px 사각형에 겹쳐 그려짐.
+
+## 게임 시계는 RtsStageLogic.GameNow() — 일시정지 시간이 빠진다
+- 2026-09-25 솔로 일시정지(사용자 "솔로 플레이 한정 일시정지")부터 **판정용 시각은 전부 `_RtsStageLogic:GameNow()`로 적고 비교한다** — 스테이지 끝(`StageEndsAt`)·조기 종료, 스킬 쿨(`ReadyAt`)·후딜(`BusyUntil`)·방향 고정, 빙결·방어율 감소·받는 데미지 증가·중독 끝, 위치 이동·결속 쿨. `GameNow = ServerElapsedSeconds − PausedTotal`(멈춘 동안은 `PausedAt`에서 멈춤), 서버·클라 공용(동기화 값).
+- `_UtilLogic.ServerElapsedSeconds`를 그대로 쓰는 건 **실제 시간이 맞는 것만**: 다시 하기 투표 시간 제한(`VoteStartedAt`), 0.5초 계산 캐시(`ArmorCache`·`GuardCache`). 연출·소리 간격은 `ElapsedSeconds` 그대로.
+- 판정이 나는 지연 실행(연타 타격·구체·지속 피해 틱·보스 2차 소환)은 `_TimerService:SetTimerOnce` 대신 **`_RtsStageLogic:After(fn, sec)`**(같은 인자 순서) — 멈춘 동안 만료되면 풀릴 때까지 0.1초씩 미룬다. 반복 루프(라운드 틱·유닛 공격 루프·소환 틱·트랙 걷기 OnUpdate)는 `_RtsStageLogic.Paused`면 그 회차를 건너뛴다.
+- 멈춘 동안 게임 조작 RPC(영입·방출·레벨업·결속·스킬 잠금·위치 이동·증강 선택/지정/뽑기)는 서버 첫 줄에서 `if _RtsStageLogic.Paused then return end`. 몬스터 걷기 모션은 `RtsWaveLogic.SetMotionPaused`(본체 스프라이트 `PlayRate` 0/1).
+- 새 판정 시각·지연 판정을 추가할 때도 이 규칙을 따른다(서버 시계와 섞으면 한 번 멈춘 뒤부터 어긋난다).
+

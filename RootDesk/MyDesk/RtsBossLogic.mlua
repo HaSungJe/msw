@@ -51,7 +51,7 @@ script RtsBossLogic extends Logic
 				if k == 1 then
 					self:SpawnBoss(zone, mobId, hp, s.def, n)
 				else
-					_TimerService:SetTimerOnce(function()
+					_RtsStageLogic:After(function()
 						if _RtsStageLogic.StageNo == n and _RtsRunResultLogic:IsZoneAlive(zone) and self.ByZone[zone] ~= nil then
 							self:SpawnBoss(zone, mobId, hp, s.def, n)
 						end

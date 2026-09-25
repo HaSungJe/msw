@@ -40,7 +40,7 @@ script RtsMonsterComponent extends Component
 	@Sync
 	property number Zone = 0
 
-	-- 빙결(블리자드) 끝나는 서버 시각(ServerElapsedSeconds). 이 동안 RtsTrackWalkerComponent가 이동속도 × FreezeSlow(0.5), 클라는 파란 틴트 + 결정체 오버레이(SetFrozenFx)
+	-- 빙결(블리자드) 끝나는 게임 시각(RtsStageLogic.GameNow — 일시정지 시간 제외). 이 동안 RtsTrackWalkerComponent가 이동속도 × FreezeSlow(0.5), 클라는 파란 틴트 + 결정체 오버레이(SetFrozenFx)
 	@Sync
 	property number FrozenUntil = 0
 
@@ -413,7 +413,7 @@ script RtsMonsterComponent extends Component
 	@ExecSpace("ServerOnly")
 	method void Freeze(number sec)
 		if self.IsBoss or self.Dead then return end
-		self.FrozenUntil = _UtilLogic.ServerElapsedSeconds + sec
+		self.FrozenUntil = _RtsStageLogic:GameNow() + sec
 		self:ShowFreeze(sec)
 	end
 
@@ -436,14 +436,14 @@ script RtsMonsterComponent extends Component
 
 	-- 빙결 중인가(서버·클라 공용 — 걷기 감속은 서버가 FrozenUntil로 본다)
 	method boolean IsFrozenNow()
-		return self.FrozenUntil > _UtilLogic.ServerElapsedSeconds
+		return self.FrozenUntil > _RtsStageLogic:GameNow()
 	end
 
 	-- 방어율 감소 pct%를 sec초(이미 걸려 있으면 큰 % · 늦은 끝 시각)
 	@ExecSpace("ServerOnly")
 	method void ApplyShred(number pct, number sec)
 		if self.Dead then return end
-		local now = _UtilLogic.ServerElapsedSeconds
+		local now = _RtsStageLogic:GameNow()
 		if now >= self.ShredUntil or pct > self.ShredPct then self.ShredPct = pct end
 		if now + sec > self.ShredUntil then self.ShredUntil = now + sec end
 	end
@@ -452,19 +452,19 @@ script RtsMonsterComponent extends Component
 	@ExecSpace("ServerOnly")
 	method void ApplyVuln(number pct, number sec)
 		if self.Dead then return end
-		local now = _UtilLogic.ServerElapsedSeconds
+		local now = _RtsStageLogic:GameNow()
 		if now >= self.VulnUntil or pct > self.VulnPct then self.VulnPct = pct end
 		if now + sec > self.VulnUntil then self.VulnUntil = now + sec end
 	end
 
 	-- 지금 걸린 방어율 감소 % / 받는 데미지 증가 %(없으면 0) — 서버·클라 공용
 	method number ShredNow()
-		if self.ShredUntil > _UtilLogic.ServerElapsedSeconds then return self.ShredPct end
+		if self.ShredUntil > _RtsStageLogic:GameNow() then return self.ShredPct end
 		return 0
 	end
 
 	method number VulnNow()
-		if self.VulnUntil > _UtilLogic.ServerElapsedSeconds then return self.VulnPct end
+		if self.VulnUntil > _RtsStageLogic:GameNow() then return self.VulnPct end
 		return 0
 	end
 

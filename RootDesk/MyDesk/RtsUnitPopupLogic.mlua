@@ -320,7 +320,7 @@ script RtsUnitPopupLogic extends Logic
 		local tabs = {
 			{ id = "skill", text = "스킬", w = 120 },
 			{ id = "aug", text = "증강 " .. H:Int(#augs), w = 130 },
-			{ id = "buff", text = "적용 중인 버프 " .. H:Int(#buffs), w = 190 },
+			{ id = "buff", text = "적용 중인 버프 " .. H:Int(self:BuffCount(u, buffs)), w = 190 },
 		}
 		-- 탭은 제자리(켜짐·개수 글자만 바뀜 — RenderRight), 누르면 오른쪽 내용만 다시(2026-09-25 "필요한 부분만")
 		local items = {}
@@ -344,7 +344,8 @@ script RtsUnitPopupLogic extends Logic
 		-- 레벨업 → Lv n (메소 부족·최대 레벨은 흐리게). 모양·글자는 ApplyLevelButton이 제자리에서 바꾸고, 클릭은 누를 때 가능 여부를 본다
 		local lbtn = H:SpawnPanel("RtsUnitLvUp", content, Vector2(1, 0), Vector2(1, 0), Vector2(-27, 10), Vector2(280, 44), H:ColGold(), H:ColGold(), 1.5)
 		self.LvBtn = lbtn
-		self.LvRow = _RtsUnitSelectLogic:SpawnLvRow(lbtn, 14, 16)
+		-- 오른쪽 72 = [Space] 키캡(58, 여백 6) + 틈 8 — 전엔 14라 글자·메소 아이콘이 키캡과 겹쳤다(2026-09-25 사용자 "레벨업과 스페이스 버튼이 겹침")
+		self.LvRow = _RtsUnitSelectLogic:SpawnLvRow(lbtn, 72, 16)
 		self:ApplyLevelButton(u)
 		local lclick = H:SpawnClick("RtsUnitLvUpClick", lbtn)
 		lclick:ConnectEvent(ButtonClickEvent, function(event)
@@ -719,15 +720,62 @@ script RtsUnitPopupLogic extends Logic
 		end
 	end
 
-	-- 적용 중인 버프 탭: 아이콘 · 이름 + 범위 · 효과 (출처 유닛은 안 씀)
+	-- 탭 글자 '적용 중인 버프 n' = 파티 버프 수 + 프리즘 증강 효율 버프(있으면 1)
 	@ExecSpace("ClientOnly")
-	method void BuildBuffTab(Entity content, number rx, number rw, number top, table buffs)
+	method number BuffCount(any u, table buffs)
+		local n = #buffs
+		if _RtsJobTableLogic:PrismAugBuff(u) ~= nil then n = n + 1 end
+		return n
+	end
+
+	-- 적용 중인 버프 탭: 맨 위 = 프리즘 증강 효율(있으면 — 2026-09-25 사용자 "프리즘 버프가 버프 칸에, 증강이 얼마나 오르고 증강으로 오른 수치 +얼마"),
+	--   그 아래 파티 버프(아이콘 · 이름 + 범위 · 효과, 출처 유닛은 안 씀)
+	@ExecSpace("ClientOnly")
+	method void BuildBuffTabFor(Entity content, any u, number rx, number rw, number top, table buffs)
 		local H = _RtsHudLogic
 		local P = _RtsPopupLogic
 		local B = _RtsUnitBuffLogic
-		local list = self:SpawnScrollList(content, "RtsUnitBuffList", rx, rw, top, #buffs)
+		local pb = _RtsJobTableLogic:PrismAugBuff(u)
+		-- 프리즘 줄 높이: 이름 34 + 설명 24 + 머리 22 + 수치 2열 격자(줄마다 20) + 아래 10
+		local pbH = 0
+		if pb ~= nil then
+			local gl = math.max(1, math.ceil(#pb.gains / 2))
+			pbH = 34 + 24 + 22 + gl * 20 + 10
+		end
+		local rows = #buffs
+		if pb ~= nil then rows = rows + math.ceil(pbH / 64) + 1 end
+		local list = self:SpawnScrollList(content, "RtsUnitBuffList", rx, rw, top, rows)
 		if list == nil then return end
-		if #buffs == 0 then
+		if pb ~= nil then
+			local row = H:SpawnPanel("RtsUnitBuffPrism", list, Vector2(0, 1), Vector2(0, 1), Vector2(0, 0), Vector2(rw - 12, pbH),
+				P:Mix(P:GradeColor("prism"), 0.1), P:Mix(P:GradeColor("prism"), 0.45), 1.5)
+			local band = H:SpawnStretch("model://uisprite", "RtsUnitBuffPrismBand", row, Vector2(0, 0), Vector2(0, 1), Vector2(0, 0), Vector2(4, 0))
+			band.SpriteGUIRendererComponent.Color = P:GradeColor("prism")
+			P:SpawnBadge("RtsUnitBuffPrismBadge", row, Vector2(14, -20), "prism")
+			local nm = H:SpawnLabel("RtsUnitBuffPrismName", row, Vector2(0, 1), Vector2(0, 1), Vector2(92, -8), Vector2(rw - 120, 24),
+				pb.name .. "  <size=11><color=#d9cba6>프리즘 · 이 유닛</color></size>", H:ColInk(), 17, TextAlignmentType.MiddleLeft, true)
+			nm.TextComponent.IsRichText = true
+			-- 설명(2026-09-25 사용자 "크리티컬 확률·크리티컬 데미지 증강 효과가 100% 증가한다. 이런 식으로")
+			local ef = H:SpawnLabel("RtsUnitBuffPrismEff", row, Vector2(0, 1), Vector2(0, 1), Vector2(92, -34), Vector2(rw - 120, 22),
+				pb.eff, Color(0.624, 0.827, 0.604, 1), 14, TextAlignmentType.MiddleLeft, true)
+			ef.TextComponent.Overflow = OverflowType.Truncate
+			-- 증강 효과가 늘어 더 받은 수치 — 능력치마다 따로(2열 격자, 사용자 "증강으로 이득 본 수치 총합을 각각")
+			H:SpawnLabel("RtsUnitBuffPrismHead", row, Vector2(0, 1), Vector2(0, 1), Vector2(92, -58), Vector2(rw - 120, 20),
+				"증강 효과 증가로 더 받은 수치", H:ColGold(), 13, TextAlignmentType.MiddleLeft, true)
+			if #pb.gains == 0 then
+				H:SpawnLabel("RtsUnitBuffPrismGain0", row, Vector2(0, 1), Vector2(0, 1), Vector2(92, -80), Vector2(rw - 120, 20),
+					"아직 없어요(증강이 붙으면 늘어나요)", H:ColMuted(), 13, TextAlignmentType.MiddleLeft, false)
+			end
+			local colW = math.floor((rw - 120) / 2)
+			for gi = 1, #pb.gains do
+				local col = (gi - 1) % 2
+				local line = math.floor((gi - 1) / 2)
+				local g = H:SpawnLabel("RtsUnitBuffPrismGain", row, Vector2(0, 1), Vector2(0, 1), Vector2(92 + col * colW, -80 - line * 20), Vector2(colW - 6, 20),
+					pb.gains[gi], Color(0.902, 0.863, 0.769, 1), 13, TextAlignmentType.MiddleLeft, false)
+				g.TextComponent.Overflow = OverflowType.Truncate
+			end
+		end
+		if #buffs == 0 and pb == nil then
 			self:SpawnEmptyRow(list, rw, "적용 중인 버프가 없어요.")
 			return
 		end
@@ -841,7 +889,7 @@ script RtsUnitPopupLogic extends Logic
 		local augs = B:GetAugmentsFor(u.Zone, u.No)
 		if self.TabBar ~= nil then
 			P:SetTabText(self.TabBar.tabs["aug"], "증강 " .. H:Int(#augs))
-			P:SetTabText(self.TabBar.tabs["buff"], "적용 중인 버프 " .. H:Int(#buffs))
+			P:SetTabText(self.TabBar.tabs["buff"], "적용 중인 버프 " .. H:Int(self:BuffCount(u, buffs)))
 			P:BarSelect(self.TabBar, self.Tab)
 		end
 		self.Dropdown = nil
@@ -854,7 +902,7 @@ script RtsUnitPopupLogic extends Logic
 		if self.Tab == "aug" then
 			self:BuildAugTabFor(box, u, rx, rw, top, augs)
 		elseif self.Tab == "buff" then
-			self:BuildBuffTab(box, rx, rw, top, buffs)
+			self:BuildBuffTabFor(box, u, rx, rw, top, buffs)
 		else
 			self:BuildSkillTab(box, u, rx, rw, top)
 		end

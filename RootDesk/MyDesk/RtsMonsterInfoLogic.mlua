@@ -195,7 +195,7 @@ script RtsMonsterInfoLogic extends Logic
 	@ExecSpace("ClientOnly")
 	method table DebuffList(any m)
 		local H = _RtsHudLogic
-		local now = _UtilLogic.ServerElapsedSeconds
+		local now = _RtsStageLogic:GameNow()
 		local out = {}
 		if not m.IsBoss and m.FrozenUntil > now then
 			out[#out + 1] = { id = "freeze", name = "빙결", desc = "블리자드에 얼어 이동속도가 50% 감소한다.", short = "이속 −50%", left = m.FrozenUntil - now, ruid = "", color = Color(0.45, 0.78, 1, 1) }

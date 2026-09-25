@@ -318,6 +318,7 @@ script RtsUnitLogic extends Logic
 	--   거부: 판 진행 중(카운트다운·진행)이 아님 / 탈락·클리어한 유저 / 한도 초과 / 발판 아님 / 내 유닛이 서 있음 / 같은 직업 보유
 	@ExecSpace("Server")
 	method void RequestRecruitAt(string jobId, number col, number row)
+		if _RtsStageLogic.Paused then return end  -- 일시정지 중 게임 조작 막기(2026-09-25 사용자 "전부 막기")
 		local userId = senderUserId
 		if not _RtsJobTableLogic:HasJob(jobId) then return end
 		local state = _RtsStageLogic.RunState
@@ -385,6 +386,7 @@ script RtsUnitLogic extends Logic
 	--   이 유닛을 대상으로 지정한 홀리 유니티는 미지정으로, 번호는 비워 두어 다음 영입이 채운다. 증강 시스템(Phase 4 나머지)이 생기면 RtsAugmentLogic에 '유닛 방출' 훅으로 지정 증강을 지운다
 	@ExecSpace("Server")
 	method void RequestDismiss(number no)
+		if _RtsStageLogic.Paused then return end  -- 일시정지 중 게임 조작 막기(2026-09-25 사용자 "전부 막기")
 		local userId = senderUserId
 		local list = self.UnitsByUser[userId]
 		if list == nil then return end
@@ -502,6 +504,7 @@ script RtsUnitLogic extends Logic
 
 	@ExecSpace("Server")
 	method void RequestLevelUp(number no)
+		if _RtsStageLogic.Paused then return end  -- 일시정지 중 게임 조작 막기(2026-09-25 사용자 "전부 막기")
 		local userId = senderUserId
 		local e = self:GetUnit(userId, no)
 		if e == nil then return end
@@ -566,6 +569,7 @@ script RtsUnitLogic extends Logic
 	-- 대상 지정(홀리 유니티): 대상 지정 스킬을 가진 직업·레벨이어야 하고, 대상은 내 다른 유닛 또는 0(미지정). 바꾸면 3분 쿨
 	@ExecSpace("Server")
 	method void RequestBond(number no, number targetNo)
+		if _RtsStageLogic.Paused then return end  -- 일시정지 중 게임 조작 막기(2026-09-25 사용자 "전부 막기")
 		local userId = senderUserId
 		local e = self:GetUnit(userId, no)
 		if e == nil then return end
@@ -577,13 +581,14 @@ script RtsUnitLogic extends Logic
 		if u.BondNo == targetNo then return end
 		if u:BondCoolLeft() > 0 then return end
 		u.BondNo = targetNo
-		u.BondReadyAt = _UtilLogic.ServerElapsedSeconds + self.CooldownSec
+		u.BondReadyAt = _RtsStageLogic:GameNow() + self.CooldownSec
 		self:OnChanged(no, self:GetMeso(userId), userId)
 	end
 
 	-- 액티브 스킬 잠금 설정(2026-09-16): 획득한 액티브 스킬만, mode 0 사용 / 1 보스전 잠금 / 2 잠금. 쿨타임 없음. 영구 잠금(3)인 스킬은 못 바꾸고, 3으로 바꿀 수도 없다
 	@ExecSpace("Server")
 	method void RequestSkillLock(number no, number idx, number mode)
+		if _RtsStageLogic.Paused then return end  -- 일시정지 중 게임 조작 막기(2026-09-25 사용자 "전부 막기")
 		local userId = senderUserId
 		local e = self:GetUnit(userId, no)
 		if e == nil then return end
@@ -616,6 +621,7 @@ script RtsUnitLogic extends Logic
 	-- 위치 이동: 발판 칸이어야 하고, 내 다른 유닛이 있으면 자리를 맞바꾼다(둘 다 3분 쿨)
 	@ExecSpace("Server")
 	method void RequestMove(number no, number col, number row)
+		if _RtsStageLogic.Paused then return end  -- 일시정지 중 게임 조작 막기(2026-09-25 사용자 "전부 막기")
 		local userId = senderUserId
 		local e = self:GetUnit(userId, no)
 		if e == nil then return end
@@ -623,7 +629,7 @@ script RtsUnitLogic extends Logic
 		if u:MoveCoolLeft() > 0 then return end
 		if not _RtsZoneLogic:IsPadCell(col, row) then return end
 		if u.Col == col and u.Row == row then return end
-		local now = _UtilLogic.ServerElapsedSeconds
+		local now = _RtsStageLogic:GameNow()
 		local cool = self.CooldownSec
 		local list = self.UnitsByUser[userId]
 		for otherNo, oe in pairs(list) do

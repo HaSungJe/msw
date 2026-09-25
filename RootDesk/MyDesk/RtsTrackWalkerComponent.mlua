@@ -30,7 +30,8 @@ script RtsTrackWalkerComponent extends Component
 
 	@ExecSpace("ServerOnly")
 	method void OnUpdate(number delta)
-		if self.Paused or self.Reached then return end
+		-- 보관(Paused) · 도착 · 게임 일시정지(RtsStageLogic.Paused, 2026-09-25) 중엔 멈춤
+		if self.Paused or self.Reached or _RtsStageLogic.Paused then return end
 		local m = self.Entity.RtsMonsterComponent
 		if m ~= nil and m.Dead then return end
 		local len = _RtsZoneLogic:GetTrackLength()

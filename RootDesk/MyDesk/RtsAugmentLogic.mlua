@@ -234,6 +234,7 @@ script RtsAugmentLogic extends Logic
 	-- 3택1 수령(idx = 1~3). 팬텀은 바로 해금(-1), 나머지는 미지정(0)
 	@ExecSpace("Server")
 	method void RequestChoose(number idx)
+		if _RtsStageLogic.Paused then return end  -- 일시정지 중 게임 조작 막기(2026-09-25 사용자 "전부 막기")
 		local userId = senderUserId
 		if userId == nil or userId == "" or not _RtsRunResultLogic:IsAlive(userId) then return end
 		local offer = self:ParseOffer(self.OfferByUser[userId] or "")
@@ -255,6 +256,7 @@ script RtsAugmentLogic extends Logic
 	-- 보유 증강 k번째를 유닛 no에 지정(1회, 변경 불가)
 	@ExecSpace("Server")
 	method void RequestAssign(number k, number no)
+		if _RtsStageLogic.Paused then return end  -- 일시정지 중 게임 조작 막기(2026-09-25 사용자 "전부 막기")
 		local userId = senderUserId
 		if userId == nil or userId == "" or not _RtsRunResultLogic:IsAlive(userId) then return end
 		local list = self:GetOwned(userId)
@@ -325,6 +327,7 @@ script RtsAugmentLogic extends Logic
 	-- 서버: 증강 뽑기 — 살아 있고 판 진행 중(카운트다운·진행), 고르지 않은 선택지 < MaxPending, 메소 ≥ 가격이면 메소 차감 → 등급 굴림 → 그 등급 3택1(Offer)
 	@ExecSpace("Server")
 	method void RequestBuy()
+		if _RtsStageLogic.Paused then return end  -- 일시정지 중 게임 조작 막기(2026-09-25 사용자 "전부 막기")
 		local userId = senderUserId
 		if userId == nil or userId == "" or not _RtsRunResultLogic:IsAlive(userId) then return end
 		local st = _RtsStageLogic.RunState

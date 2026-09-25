@@ -183,13 +183,13 @@ script RtsUnitComponent extends Component
 
 	-- 남은 쿨타임(초). 양쪽 공간에서 서버 시계 기준
 	method number MoveCoolLeft()
-		local left = self.MoveReadyAt - _UtilLogic.ServerElapsedSeconds
+		local left = self.MoveReadyAt - _RtsStageLogic:GameNow()
 		if left < 0 then left = 0 end
 		return math.ceil(left)
 	end
 
 	method number BondCoolLeft()
-		local left = self.BondReadyAt - _UtilLogic.ServerElapsedSeconds
+		local left = self.BondReadyAt - _RtsStageLogic:GameNow()
 		if left < 0 then left = 0 end
 		return math.ceil(left)
 	end

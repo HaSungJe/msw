@@ -115,7 +115,7 @@ script RtsDifficultyLogic extends Logic
 		local msg = "판 시작 전 · 지금 선택: " .. name
 		local startText = "바로 시작"
 		if state == "countdown" then
-			local left = math.ceil(_RtsStageLogic.StageEndsAt - _UtilLogic.ServerElapsedSeconds)
+			local left = math.ceil(_RtsStageLogic.StageEndsAt - _RtsStageLogic:GameNow())
 			if left < 0 then left = 0 end
 			msg = H:Int(left) .. "초 후 자동으로 시작합니다 · 난이도를 고르고 '바로 시작'(지금: " .. name .. ")"
 			local S = _RtsStageLogic

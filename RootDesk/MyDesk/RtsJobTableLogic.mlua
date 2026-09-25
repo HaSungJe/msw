@@ -834,17 +834,17 @@ script RtsJobTableLogic extends Logic
 	--   연출 자산이 아직 없는 프리즘은 기존 스킬 연출을 그대로 쓴다(사용자가 자산을 하나씩 고르면 교체) — 인레이지만 확보(2026-09-20)
 	method table GetPrisms()
 		return {
-			{ id = "enrage", job = "hero", name = "인레이지", desc = "[프리즘] 레이징 블로우가 인레이지로 강화된다. 레이징 블로우의 데미지가 422% 증가하고, 사거리 3 안의 적을 최대 6마리까지 3회 공격한다. 이 유닛의 능력치 증강 효과가 가진 증강 1개당 6.7%씩 증가한다(30개에서 +200%)." },
+			{ id = "enrage", job = "hero", name = "인레이지", desc = "[프리즘] 레이징 블로우가 인레이지로 강화된다. 레이징 블로우의 데미지가 422% 증가하고, 사거리 3 안의 적을 최대 6마리까지 3회 공격한다. 증강의 효율을 높인다." },
 			{ id = "holyunity", job = "paladin", name = "홀리 유니티", desc = "[프리즘] 아군 유닛 1명을 지정해 그 유닛의 최종 데미지를 40% 증가시킨다. 자신에게는 사용할 수 없다." },
-			{ id = "giant", job = "dk", name = "거대화", desc = "[프리즘] 스피어 버스터가 거대해진다. 사거리가 6으로 늘고 데미지가 29% 증가하는 대신 6회로 나눠 찌른다(1회 데미지 = 절반 + 654%). 크리티컬 확률·크리티컬 데미지 증강 효과가 100% 증가한다." },
-			{ id = "arrowrain", job = "bow", name = "애로우 레인", desc = "[프리즘] 폭풍의 시 대신 애로우 레인을 사용한다. 하늘에서 화살비를 내려 사거리 6 안의 적 1마리를 395%의 데미지로 2회 공격하며, 공격속도와 관계없이 0.2초마다 발사한다. 이 유닛의 능력치 증강 효과가 가진 증강 1개당 6.7%씩 증가한다(30개에서 +200%).", locks = { "폭풍의 시" } },
-			{ id = "truesnipe", job = "marks", name = "트루 스나이핑", desc = "[프리즘] 스나이핑 대신 트루 스나이핑을 사용한다. 사거리 6 안의 적 1마리를 719.7%의 데미지로 10회 공격하며, 반드시 크리티컬로 적중한다. 재사용 대기시간 2초. 공격력·크리티컬 데미지 증강 효과가 100% 증가한다.", locks = { "스나이핑" } }, -- 피어싱 영구 잠금 뺌(2026-09-23 사용자 "트루 스나이핑 → 피어싱 영구 잠금 빼자")
-			{ id = "tempest", job = "il", name = "블리자드 템페스트", desc = "[프리즘] 블리자드의 재사용 대기시간이 2초로 줄고 데미지가 1001%가 되며, 보스전에서는 블리자드의 타격 중 9회가 보스 1마리에게 집중된다. 방어율 무시가 70% 증가한다. 이 유닛의 능력치 증강 효과가 가진 증강 1개당 6.7%씩 증가한다(30개에서 +200%)." }, -- 2026-09-23 엘릭서와 통합 · 2026-09-24 사용자 "1티어가 시너지화 → 썬콜 자체 시너지 없애고 방무로 쌔게": 방어율 감소·보스 최종 −47% 삭제, 방무 15 → 70
-			{ id = "transcend", job = "fp", name = "초월", desc = "[프리즘] 도트 퍼니셔가 초월한다. 구체가 60개로 늘고 구체와 폭발이 2배로 커지며, 재사용 대기시간이 3초로 줄어든다. 구체의 데미지는 314%가 된다. 크리티컬 확률·크리티컬 데미지 증강 효과가 100% 증가한다." },
+			{ id = "giant", job = "dk", name = "거대화", desc = "[프리즘] 스피어 버스터가 거대해진다. 사거리가 6으로 늘고 데미지가 29% 증가하는 대신 6회로 나눠 찌른다(1회 데미지 = 절반 + 654%). 일부 증강의 효율을 높인다." },
+			{ id = "arrowrain", job = "bow", name = "애로우 레인", desc = "[프리즘] 폭풍의 시 대신 애로우 레인을 사용한다. 하늘에서 화살비를 내려 사거리 6 안의 적 1마리를 395%의 데미지로 2회 공격하며, 공격속도와 관계없이 0.2초마다 발사한다. 증강의 효율을 높인다.", locks = { "폭풍의 시" } },
+			{ id = "truesnipe", job = "marks", name = "트루 스나이핑", desc = "[프리즘] 스나이핑 대신 트루 스나이핑을 사용한다. 사거리 6 안의 적 1마리를 719.7%의 데미지로 10회 공격하며, 반드시 크리티컬로 적중한다. 재사용 대기시간 2초. 일부 증강의 효율을 높인다.", locks = { "스나이핑" } }, -- 피어싱 영구 잠금 뺌(2026-09-23 사용자 "트루 스나이핑 → 피어싱 영구 잠금 빼자")
+			{ id = "tempest", job = "il", name = "블리자드 템페스트", desc = "[프리즘] 블리자드의 재사용 대기시간이 2초로 줄고 데미지가 1001%가 되며, 보스전에서는 블리자드의 타격 중 9회가 보스 1마리에게 집중된다. 방어율 무시가 70% 증가한다. 증강의 효율을 높인다." }, -- 2026-09-23 엘릭서와 통합 · 2026-09-24 사용자 "1티어가 시너지화 → 썬콜 자체 시너지 없애고 방무로 쌔게": 방어율 감소·보스 최종 −47% 삭제, 방무 15 → 70
+			{ id = "transcend", job = "fp", name = "초월", desc = "[프리즘] 도트 퍼니셔가 초월한다. 구체가 60개로 늘고 구체와 폭발이 2배로 커지며, 재사용 대기시간이 3초로 줄어든다. 구체의 데미지는 314%가 된다. 일부 증강의 효율을 높인다." },
 			{ id = "divinepunish", job = "bishop", name = "디바인 퍼니시먼트", desc = "[프리즘] 엔젤레이 대신 디바인 퍼니시먼트를 사용한다. 빛의 검을 내려 사거리 3 안의 적을 최대 6마리까지 49%의 데미지로 공격하며, 공격속도와 관계없이 0.2초마다 발동한다. 맞은 적은 3초 동안 받는 데미지가 20% 증가한다.", locks = { "엔젤레이" } },
-			{ id = "fuma", job = "nl", name = "풍마수리검", desc = "[프리즘] 쿼드러플 스로우 대신 거대한 풍마수리검을 던진다. 사거리 3 안의 적 1마리를 377%의 데미지로 4회 공격하며, 쉐도우 파트너도 함께 던진다. 방어율 무시가 70% 증가한다. 이 유닛의 능력치 증강 효과가 가진 증강 1개당 6.7%씩 증가한다(30개에서 +200%).", locks = { "쿼드러플 스로우" } },
-			{ id = "dualblade", job = "shad", name = "자유전직 - 듀얼블레이더", desc = "[프리즘] 듀얼블레이더로 전직한다. 새비지 블로우와 메소 익스플로전 대신 블레이드 토네이도와 카르마 퓨리를 함께 사용한다. 크리티컬 확률이 40%, 크리티컬 데미지가 80% 증가하고, 공격력 증강 효과가 100% 증가한다.", locks = { "새비지 블로우", "메소 익스플로전" } },
-			{ id = "phantom", job = "", name = "영웅 팬텀", desc = "팬텀 영입 해금. 팬텀은 모든 능력치 증강 효과가 75% 증가한다." }, -- 2026-09-24 사용자(RtsJobTableLogic.AugMulFor)
+			{ id = "fuma", job = "nl", name = "풍마수리검", desc = "[프리즘] 쿼드러플 스로우 대신 거대한 풍마수리검을 던진다. 사거리 3 안의 적 1마리를 377%의 데미지로 4회 공격하며, 쉐도우 파트너도 함께 던진다. 방어율 무시가 70% 증가한다. 증강의 효율을 높인다.", locks = { "쿼드러플 스로우" } },
+			{ id = "dualblade", job = "shad", name = "자유전직 - 듀얼블레이더", desc = "[프리즘] 듀얼블레이더로 전직한다. 새비지 블로우와 메소 익스플로전 대신 블레이드 토네이도와 카르마 퓨리를 함께 사용한다. 크리티컬 확률이 40%, 크리티컬 데미지가 80% 증가하며, 일부 증강의 효율을 높인다.", locks = { "새비지 블로우", "메소 익스플로전" } },
+			{ id = "phantom", job = "", name = "영웅 팬텀", desc = "팬텀 영입 해금. 팬텀은 증강의 효율이 높다." }, -- 2026-09-24 사용자(RtsJobTableLogic.AugMulFor)
 		}
 	end
 
@@ -969,6 +969,62 @@ script RtsJobTableLogic extends Logic
 		local n = self:AugCountOf(u)
 		if n > self.ArmorBreakCap then n = self.ArmorBreakCap end
 		return n * self.ArmorBreakPer
+	end
+
+	-- 프리즘 증강 효율 버프(2026-09-25 사용자 "프리즘 코어의 증강 효율 증가가 버프 창에 — 증강이 얼마나 오르는지, 증강으로 오른 수치 +얼마"):
+	--   프리즘 설명은 "증강의 효율을 높인다 / 일부 증강의 효율을 높인다"로만 쓰고, 실제 수치는 캐릭터 상세 '적용 중인 버프' 탭 맨 위 줄(RtsUnitPopupLogic.BuildBuffTabFor)에.
+	--   증강 효과 배율(AugMulFor)이 켜진 유닛만 — 자기 직업 프리즘이 있는 1티어(증강 0개면 +0%)·2티어, 팬텀. 없으면 nil
+	--   { name = 프리즘 이름(팬텀은 "영웅 팬텀"), eff = 설명 문장("크리티컬 확률·크리티컬 데미지 증강 효과가 100% 증가한다." — 2026-09-25 사용자 "버프 칸엔 이런 식으로"),
+	--     gains = 배율 덕분에 더 오른 몫을 능력치마다 한 줄씩 { "공격력 +40", "크리티컬 데미지 +12%" }(빈 표 = 아직 없음 — 사용자 "증강으로 이득 본 수치 총합을 각각") }
+	method any PrismAugBuff(any u)
+		if u == nil then return nil end
+		local m = self:AugMulFor(u)
+		local keys = { "atk", "pct", "boss", "crit", "critDmg" }
+		local label = { atk = "공격력", pct = "공격력%", boss = "보스 공격 시 데미지", crit = "크리티컬 확률", critDmg = "크리티컬 데미지" }
+		local on = {}
+		local same = true
+		for i = 1, #keys do
+			local x = m[keys[i]] or 1
+			if x ~= 1 then on[#on + 1] = keys[i] end
+			if math.abs(x - (m[keys[1]] or 1)) > 0.0001 then same = false end
+		end
+		local tier1 = self:TierOf(u.JobId) == 1 and self:HasOwnPrism(u)
+		if #on == 0 and not tier1 then return nil end
+		local name = "프리즘"
+		if u.JobId == "phantom" then
+			name = "영웅 팬텀"
+		else
+			local ids = self:PrismIds(u)
+			for i = 1, #ids do
+				local d = self:GetPrism(ids[i])
+				if d ~= nil and d.job == u.JobId then name = d.name end
+			end
+		end
+		local up = 0
+		if #on > 0 then up = (m[on[1]] - 1) * 100 end
+		local upText = string.format("%d", math.floor(up + 0.5)) .. "%"
+		local eff = "모든 능력치 증강 효과가 " .. upText .. " 증가한다."
+		if tier1 then
+			local per = (self.T1AugMulMax - 1) * 100 / self.ArmorBreakCap
+			eff = "능력치 증강 효과가 " .. upText .. " 증가한다(가진 증강 1개당 " .. string.format("%.1f", per) .. "%, " .. string.format("%d", self.ArmorBreakCap) .. "개에서 " .. string.format("%d", math.floor((self.T1AugMulMax - 1) * 100 + 0.5)) .. "%)."
+		elseif #on > 0 and not same then
+			local ns = {}
+			for i = 1, #on do ns[#ns + 1] = label[on[i]] end
+			eff = table.concat(ns, "·") .. " 증강 효과가 " .. upText .. " 증가한다."
+		end
+		local A = _RtsAugmentTableLogic
+		local t1 = A:TotalsMul(u.Augs, m)
+		local t0 = A:TotalsMul(u.Augs, nil)
+		local parts = {}
+		local function add(text, v, unit)
+			if v >= 0.5 then parts[#parts + 1] = text .. " +" .. string.format("%d", math.floor(v + 0.5)) .. unit end
+		end
+		add("공격력", t1.atk - t0.atk, "")
+		add("공격력", t1.pct - t0.pct, "%")
+		add("보스 공격 시 데미지", t1.boss - t0.boss, "%")
+		add("크리티컬 확률", t1.crit - t0.crit, "%")
+		add("크리티컬 데미지", t1.critDmg - t0.critDmg, "%")
+		return { name = name, eff = eff, gains = parts }
 	end
 
 	-- 증강 효과 배율 (2026-09-24 티어 재설계 — .info/tier.md, 값 = tools/balance-calc.py TUNE):
@@ -1171,7 +1227,7 @@ script RtsJobTableLogic extends Logic
 				fx.projSec = 0.2
 				fx.hitDelay = 0.2
 			end
-			list[#list + 1] = { lv = 1, kind = "액티브", prism = true, name = "애로우 레인", desc = "폭풍의 시 대신 애로우 레인을 사용한다. 하늘에서 화살비를 내려 사거리 6 안의 적 1마리를 395%의 데미지로 2회 공격하며, 공격속도와 관계없이 0.2초마다 발사한다. 이 유닛의 능력치 증강 효과가 가진 증강 1개당 6.7%씩 증가한다(30개에서 +200%).", target = false, range = 6, fx = fx }
+			list[#list + 1] = { lv = 1, kind = "액티브", prism = true, name = "애로우 레인", desc = "폭풍의 시 대신 애로우 레인을 사용한다. 하늘에서 화살비를 내려 사거리 6 안의 적 1마리를 395%의 데미지로 2회 공격하며, 공격속도와 관계없이 0.2초마다 발사한다. 증강의 효율을 높인다.", target = false, range = 6, fx = fx }
 		elseif id == "truesnipe" then
 			-- 트루 스나이핑 연출(2026-09-22 사용자 skillname#400031006): 원작 400031006에는 special(조준 십자선 7프레임 0.84초 — 잠금 3 → 발사 섬광 → 원 확산)과 use 소리만 있다.
 			--   스나이핑 fx를 복사해 표식만 십자선(markClip, 박스 긴 쪽 × 0.45, 0.85초)으로, 시전음은 400031006/use(1.44초), 타격은 섬광 프레임(0.36초)에 맞춰 0.05초 간격 10회·타격 클립 스케일 2.0. 모션·시전 이펙트·타격 클립·타격음은 스나이핑 것

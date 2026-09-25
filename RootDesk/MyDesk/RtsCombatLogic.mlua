@@ -33,10 +33,10 @@ script RtsCombatLogic extends Logic
 	--   전 0.25라 눈으로는 대각선 칸 안인데 칸 바깥쪽 절반에 있는 몹은 사거리 밖이었다. 멀어지는 몹은 그 구간을 금방 지나가 거의 안 맞았다)
 	property number RangeSlack = 0.5
 
-	-- 쿨타임 스킬 준비 시각: key = userId .. "_" .. no .. "_" .. idx → ServerElapsedSeconds
+	-- 쿨타임 스킬 준비 시각: key = userId .. "_" .. no .. "_" .. idx → 게임 시계(RtsStageLogic.GameNow — 일시정지 시간 제외)
 	property table ReadyAt = {}
 
-	-- 후딜(큰 스킬 뒤 다음 공격까지 쉬는 시각): key = userId .. "_" .. no → ServerElapsedSeconds. 사용자 2026-09-18 "생츄어리·블리자드·제네시스·드래곤 로어 후딜 1.5초"
+	-- 후딜(큰 스킬 뒤 다음 공격까지 쉬는 시각): key = userId .. "_" .. no → 게임 시계(GameNow). 사용자 2026-09-18 "생츄어리·블리자드·제네시스·드래곤 로어 후딜 1.5초"
 	property table BusyUntil = {}
 
 	-- 방향 고정(2026-09-23 사용자 "공격이 끝나기 전에 고개 돌리지 않게"): key = userId .. "_" .. no → 이 시각까지 몸 동작 중이라 FaceTo 안 함(MotionSec)
@@ -376,10 +376,12 @@ script RtsCombatLogic extends Logic
 	--   사거리 안에 1마리도 없으면 공격(모션·이펙트·사운드) 자체를 안 하고 쿨타임도 안 쓴다(character.md 헤더). 시전 연출은 즉시 전 클라에(대상 전부 전달), 판정은 fx.hitDelay 뒤 대상마다
 	@ExecSpace("ServerOnly")
 	method void DoAttack(string userId, number no)
+		-- 일시정지 중엔 공격 루프가 돌아도 치지 않는다(RtsStageLogic.Paused — 쿨타임은 게임 시계라 그대로 남는다)
+		if _RtsStageLogic.Paused then return end
 		local e = _RtsUnitLogic:GetUnit(userId, no)
 		if e == nil or not isvalid(e) then return end
 		local bkey = userId .. "_" .. string.format("%d", no)
-		if (self.BusyUntil[bkey] or 0) > _UtilLogic.ServerElapsedSeconds then return end
+		if (self.BusyUntil[bkey] or 0) > _RtsStageLogic:GameNow() then return end
 		local u = e.RtsUnitComponent
 		-- 프리즘 반영 표(2026-09-22): 스킬 목록·능력치 모두 그 유닛의 Prisms대로
 		local skills = _RtsJobTableLogic:GetSkillsFor(u)
@@ -389,7 +391,7 @@ script RtsCombatLogic extends Logic
 		local c = _RtsJobTableLogic:CalcStat(u.JobId, u.Level, st)
 		-- 쓸 스킬: 획득한 액티브(fx 있음) 중 잠금 2·3이 아닌 것. 쿨타임 스킬(cd)은 준비됐으면 기본 공격보다 우선(뒤에 있는 = 높은 레벨 스킬 먼저 본다)
 		--   사거리 = 스킬 range(기본 공격은 레벨 강화 st.range가 있으면 그것), 타겟 수 = 스킬 targets(없으면 st.targets). 지속 피해 지대(dot)는 구역 어디든 몬스터가 있으면
-		local now = _UtilLogic.ServerElapsedSeconds
+		local now = _RtsStageLogic:GameNow()
 		local bossRound = self:IsBossRound(u.Zone)
 		local idx = 0
 		local targets = {}
@@ -620,7 +622,7 @@ script RtsCombatLogic extends Logic
 			if stagger > 0 and not k.spread then
 				for j = 1, #tlist do
 					local t = tlist[j]
-					_TimerService:SetTimerOnce(function() strike(t, hitBase, hh) end, when + (j - 1) * stagger)
+					_RtsStageLogic:After(function() strike(t, hitBase, hh) end, when + (j - 1) * stagger)
 				end
 			else
 				-- 구체 재조준(2026-09-24 사용자 "도트 퍼니셔 구체가 날아가는 도중 적이 죽으면 그냥 불발"): 도착했는데 대상이 이미 죽었으면(다른 구체·유닛이 먼저 잡음)
@@ -644,7 +646,7 @@ script RtsCombatLogic extends Logic
 					local a2 = self:AimPoint(t2)
 					local dist = math.sqrt((a2.x - sx) * (a2.x - sx) + (a2.y - sy) * (a2.y - sy))
 					self:RedirectOrbFx(zone, no, idx, sx, sy, t2.Name)
-					_TimerService:SetTimerOnce(function()
+					_RtsStageLogic:After(function()
 						if not isvalid(e) then return end
 						if self:IsTargetable(t2) then
 							strike(t2, hitBase, hh)
@@ -653,7 +655,7 @@ script RtsCombatLogic extends Logic
 						end
 					end, _RtsJobTableLogic:OrbTravelSec(fx, dist))
 				end
-				_TimerService:SetTimerOnce(function()
+				_RtsStageLogic:After(function()
 					if not isvalid(e) then return end
 					for j = 1, #tlist do
 						local t = tlist[j]
@@ -671,7 +673,7 @@ script RtsCombatLogic extends Logic
 		if k.cd == nil and k.hits == nil then halfHits = st.halfHits or 0 end
 		for h = 1, halfHits do
 			local when = delay + (hits + h - 1) * gap
-			_TimerService:SetTimerOnce(function()
+			_RtsStageLogic:After(function()
 				if not isvalid(e) then return end
 				for j = 1, #targets do
 					local t = self:ResolveTarget(targets[j], e, u.Zone, useRange, avoid)
@@ -698,9 +700,9 @@ script RtsCombatLogic extends Logic
 			local perTick = math.floor(c.atk * (st.pct / 100) * (dotPct / 100) * (st.fin / 100) + 0.0001)
 			if perTick < 1 then perTick = 1 end
 			local ticks = math.floor(k.dot.dur / k.dot.period + 0.5)
-			local dotEnd = _UtilLogic.ServerElapsedSeconds + k.dot.dur + 0.2
+			local dotEnd = _RtsStageLogic:GameNow() + k.dot.dur + 0.2
 			for t = 1, ticks do
-				_TimerService:SetTimerOnce(function()
+				_RtsStageLogic:After(function()
 					if not isvalid(e) then return end
 					local list = self:GetZoneMonsters(u.Zone)
 					for j = 1, #list do
