@@ -1,22 +1,160 @@
 {
   "version": 3,
   "packageVersion": "0.10.1",
-  "lastUpdated": "2026-09-24T06:34:17.804Z",
+  "lastUpdated": "2026-09-25T16:05:13.165Z",
   "files": {
     "mcp": [
       ".codex/config.toml"
+    ],
+    "instruction": [
+      "AGENTS.md"
+    ],
+    "hooks": [
+      ".codex/hooks.json",
+      ".codex/hooks/_lib/log-root.cjs",
+      ".codex/hooks/core-version-check/core-version-check.cjs",
+      ".codex/hooks/mcp-log/mcp-log.cjs",
+      ".codex/hooks/mlua-lsp/lsp-log.cjs",
+      ".codex/hooks/mlua-lsp/mlua-diagnose-post-tool-use.cjs",
+      ".codex/hooks/mlua-lsp/mlua-session-end.cjs",
+      ".codex/hooks/mlua-lsp/mlua-session-start.cjs",
+      ".codex/hooks/mlua-lsp/resolve-cmd.cjs",
+      ".codex/hooks/skill-log/skill-log.cjs",
+      ".codex/hooks/skill-read-guard/skill-read-guard.cjs",
+      ".codex/hooks/skill-router-reminder/skill-router-reminder.cjs",
+      ".codex/hooks/structured-file-guard/structured-file-guard.cjs",
+      ".codex/hooks/update-check/update-check.cjs"
     ]
   },
   "agents": {
     "claude-code": {
-      "mcp": "0.10.1"
+      "mcp": "0.10.1",
+      "instruction": "0.10.1",
+      "hooks": "0.10.1"
     },
     "codex": {
-      "mcp": "0.10.1"
+      "mcp": "0.10.1",
+      "instruction": "0.10.1",
+      "hooks": "0.10.1"
     }
   },
   "mcpServers": [
     "msw-maker-mcp",
     "msw-mcp"
-  ]
+  ],
+  "hookEntries": {
+    ".claude/hooks": [
+      "_lib",
+      "core-version-check",
+      "mcp-log",
+      "mlua-lsp",
+      "skill-log",
+      "skill-read-guard",
+      "skill-router-reminder",
+      "structured-file-guard",
+      "update-check"
+    ],
+    ".codex/hooks": [
+      "_lib",
+      "core-version-check",
+      "mcp-log",
+      "mlua-lsp",
+      "skill-log",
+      "skill-read-guard",
+      "skill-router-reminder",
+      "structured-file-guard",
+      "update-check"
+    ]
+  },
+  "fileHashes": {
+    ".claude/hooks/core-version-check/core-version-check.cjs": "041d71eb4c57c9dd",
+    ".claude/hooks/mcp-log/mcp-log.cjs": "2369bcdf575ce41f",
+    ".claude/hooks/mlua-lsp/lsp-log.cjs": "2942af434e986a3e",
+    ".claude/hooks/mlua-lsp/mlua-diagnose-post-tool-use.cjs": "a8496e1100ac66ee",
+    ".claude/hooks/mlua-lsp/mlua-session-end.cjs": "9698a8210b3e82e4",
+    ".claude/hooks/mlua-lsp/mlua-session-start.cjs": "661374b0a8cd4760",
+    ".claude/hooks/mlua-lsp/resolve-cmd.cjs": "ff302d3368141475",
+    ".claude/hooks/skill-log/skill-log.cjs": "336b520c4e312ded",
+    ".claude/hooks/skill-read-guard/skill-read-guard.cjs": "5cb8a4fb1ffc8624",
+    ".claude/hooks/skill-router-reminder/skill-router-reminder.cjs": "af529f502b2b73bf",
+    ".claude/hooks/structured-file-guard/structured-file-guard.cjs": "02a80dad9b6f0429",
+    ".claude/hooks/update-check/update-check.cjs": "90a86b792491b4fa",
+    ".claude/hooks/_lib/log-root.cjs": "c064ed9c8134d15f",
+    ".codex/hooks/core-version-check/core-version-check.cjs": "041d71eb4c57c9dd",
+    ".codex/hooks/mcp-log/mcp-log.cjs": "2369bcdf575ce41f",
+    ".codex/hooks/mlua-lsp/lsp-log.cjs": "2942af434e986a3e",
+    ".codex/hooks/mlua-lsp/mlua-diagnose-post-tool-use.cjs": "a8496e1100ac66ee",
+    ".codex/hooks/mlua-lsp/mlua-session-end.cjs": "9698a8210b3e82e4",
+    ".codex/hooks/mlua-lsp/mlua-session-start.cjs": "661374b0a8cd4760",
+    ".codex/hooks/mlua-lsp/resolve-cmd.cjs": "ff302d3368141475",
+    ".codex/hooks/skill-log/skill-log.cjs": "336b520c4e312ded",
+    ".codex/hooks/skill-read-guard/skill-read-guard.cjs": "5cb8a4fb1ffc8624",
+    ".codex/hooks/skill-router-reminder/skill-router-reminder.cjs": "af529f502b2b73bf",
+    ".codex/hooks/structured-file-guard/structured-file-guard.cjs": "02a80dad9b6f0429",
+    ".codex/hooks/update-check/update-check.cjs": "90a86b792491b4fa",
+    ".codex/hooks/_lib/log-root.cjs": "c064ed9c8134d15f"
+  },
+  "skills": [
+    "msw-avatar",
+    "msw-behaviourtree",
+    "msw-combat-system",
+    "msw-defaultplayer",
+    "msw-general",
+    "msw-packages",
+    "msw-painter",
+    "msw-planning",
+    "msw-scripting",
+    "msw-search",
+    "msw-sprite-ruid",
+    "msw-ui-system"
+  ],
+  "skillsByDir": {
+    ".claude/skills": [
+      "msw-avatar",
+      "msw-behaviourtree",
+      "msw-combat-system",
+      "msw-defaultplayer",
+      "msw-general",
+      "msw-packages",
+      "msw-painter",
+      "msw-planning",
+      "msw-scripting",
+      "msw-search",
+      "msw-sprite-ruid",
+      "msw-ui-system"
+    ],
+    ".agents/skills": [
+      "msw-avatar",
+      "msw-behaviourtree",
+      "msw-combat-system",
+      "msw-defaultplayer",
+      "msw-general",
+      "msw-packages",
+      "msw-painter",
+      "msw-planning",
+      "msw-scripting",
+      "msw-search",
+      "msw-sprite-ruid",
+      "msw-ui-system"
+    ]
+  },
+  "contentSkillSets": {
+    "maplestory-skill-maker": {
+      "version": "1.0.1",
+      "dirs": [
+        ".agents/skills",
+        ".claude/skills"
+      ],
+      "agents": {
+        "claude-code": {
+          "version": "1.0.1",
+          "dir": ".claude/skills"
+        },
+        "codex": {
+          "version": "1.0.1",
+          "dir": ".agents/skills"
+        }
+      }
+    }
+  }
 }
