@@ -1,0 +1,28 @@
+{
+  "stat-atk": "c20a7884c1ec43d4ae28ef0945027cf8",
+  "stat-pct": "e4dbd47d70d64d63b8c68929eae037fa",
+  "stat-fin": "7535d4b6b3a443dc836b3f73f959a5a3",
+  "stat-boss": "f73c81d46aaf43c7aaecc580e6481099",
+  "stat-crit": "438966b61fce41809fdddee9f7d1b299",
+  "stat-critDmg": "1d48233d77ff4b338baba30628c92b97",
+  "stat-skill": "d172668aa61942cb9a8073ef2776fe62",
+  "rounded-outline": "13d3e61e769b40e1aea6a4b97eadb80d",
+  "water-flow": "851acbac33924851868ac5963c3a280a",
+  "grade-bronze": "5a539ae0ef084ae593cdf9742e058a25",
+  "grade-silver": "187b4995fe2d4ca0829d16f7d3d1ff7e",
+  "grade-gold": "b74dcd80d6984e8080f197a7ed7163ba",
+  "grade-prism": "3be02a668f1b462d93344f0e5352c20d",
+  "prismSkills": {
+    "enrage": "14c64ff02eb64da0be624eed933e9d9c",
+    "holyunity": "53a38855164a4b64accf68785761c283",
+    "arrowrain": "9b0c6f6554f04b6a8ef60ade19ff76fb",
+    "truesnipe": "f940c35ae6c7478692338475e401530e",
+    "tempest": "a05d13219caa4449aa541f0daaf32995",
+    "transcend": "d998c591786d40cebb85a06b6eed9e6b",
+    "divinepunish": "3c1471ba763140878c405f2aefa9047a",
+    "fuma": "459228cf9906473d91d0df063132f3dd",
+    "dualblade": "df6c35973fe84c799e7331cff4a6772f",
+    "phantom": "b2091f472da549bfa7bb5f1a77a3340c",
+    "giant": "012ff529f8c04302bc72128d83a19da6"
+  }
+}

@@ -1,0 +1,42 @@
+{
+  "key": "zakum_altar",
+  "name": "자쿰의 제단",
+  "tab": "액션",
+  "periodSeconds": 8,
+  "updateFps": 30,
+  "rendering": "client layered sprites; shared world/card motion",
+  "files": {
+    "keyframe.png": {
+      "ruid": "c1386854b1394861b23c8695a284e82d",
+      "width": 1672,
+      "height": 941,
+      "role": "theme selection thumbnail"
+    },
+    "background.png": {
+      "ruid": "be90451fd564466aafbade23743a3b03",
+      "width": 1672,
+      "height": 941
+    },
+    "arm.png": {
+      "ruid": "4b7bc780f2ca47e0bfd8f6c4adb9a61f",
+      "width": 1309,
+      "height": 1201
+    },
+    "body.png": {
+      "ruid": "474d655219e146cd87452fa292bfc332",
+      "width": 1477,
+      "height": 1065
+    },
+    "flame.png": {
+      "ruid": "905b59a732dd48abb8153f5f4650db75",
+      "width": 1277,
+      "height": 1231
+    },
+    "track.png": {
+      "ruid": "b867ada14eb24f99936178a38da2a3b6",
+      "width": 1280,
+      "height": 1040,
+      "generator": "tools/gen-track-grid.js"
+    }
+  }
+}

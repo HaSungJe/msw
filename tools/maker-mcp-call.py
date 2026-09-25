@@ -15,7 +15,12 @@ def request(payload):
 try:
     request({'jsonrpc':'2.0','id':1,'method':'initialize','params':{'protocolVersion':'2024-11-05','capabilities':{},'clientInfo':{'name':'codex-motion-inspect','version':'1.0'}}})
     proc.stdin.write(json.dumps({'jsonrpc':'2.0','method':'notifications/initialized'})+'\n'); proc.stdin.flush()
-    arguments=json.loads(sys.argv[2]) if len(sys.argv)>2 else {}
+    arguments={}
+    if len(sys.argv)>2:
+        raw=sys.argv[2]
+        if raw.startswith('@'):
+            with open(raw[1:],encoding='utf-8-sig') as source: raw=source.read()
+        arguments=json.loads(raw)
     if len(sys.argv)>3:
         with open(sys.argv[3],encoding='utf-8') as source: arguments['script']=source.read()
     print(json.dumps(request({'jsonrpc':'2.0','id':2,'method':'tools/call','params':{'name':sys.argv[1],'arguments':arguments}}),ensure_ascii=False))

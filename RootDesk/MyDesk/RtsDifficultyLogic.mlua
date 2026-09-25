@@ -16,8 +16,6 @@ script RtsDifficultyLogic extends Logic
 
 	property table Btns = {}
 
-	property Entity RunText = nil
-
 	-- 막대 아랫줄 안내(2026-09-24 사용자 "난이도 안 골랐는데 보통으로 시작 — n초 후 자동 시작된다고 떠야"): 카운트다운 남은 초 · 지금 선택
 	property Entity MsgText = nil
 
@@ -121,6 +119,8 @@ script RtsDifficultyLogic extends Logic
 			local S = _RtsStageLogic
 			if S.RoomCount > 1 then startText = "바로 시작 " .. H:Int(S.ReadyCount) .. "/" .. H:Int(S.RoomCount) end
 			if S:IsMyReady() and S.RoomCount > 1 then startText = "대기 " .. H:Int(S.ReadyCount) .. "/" .. H:Int(S.RoomCount) end
+		elseif state == "running" then
+			msg = "진행 중 · 난이도 " .. name
 		elseif state == "ended" then
 			msg = "판이 끝났어요 · 다음 판 난이도: " .. name
 		end
@@ -134,11 +134,10 @@ script RtsDifficultyLogic extends Logic
 		end
 		-- 판 시작 전(대기·카운트다운)에만 — 판이 끝난 뒤(혼자면 죽으면 곧 끝남)·관전 중엔 안 띄운다(2026-09-24 사용자 "죽어서 관전하기 눌렀는데 난이도 선택창이 나온다"). 다음 판은 다시 하기 → 카운트다운에서 고른다
 		self.Bar.Parent:SetEnable(state == "idle" or state == "countdown")
-		if self.RunText ~= nil then self.RunText.TextComponent.Text = "난이도 " .. name end
 		for i = 1, #self.Btns do
 			local b = self.Btns[i]
 			if i == my then
-				b.SpriteGUIRendererComponent.Color = Color(0.3, 0.24, 0.12, 0.96)
+				b.SpriteGUIRendererComponent.Color = Color(0.86, 0.85, 0.96, 0.95)
 				b.Parent.SpriteGUIRendererComponent.Color = H:ColGold()
 			else
 				b.SpriteGUIRendererComponent.Color = H:ColPanel()
@@ -147,24 +146,25 @@ script RtsDifficultyLogic extends Logic
 		end
 	end
 
-	-- 화면 최상단 가운데(2026-09-25 사용자 "난이도 선택창 화면 최상단에 붙게" — 전엔 영입 버튼 자리 밑 y −88): "난이도" + 6칸 + 안내 줄(판 시작 전에만). 정보 카드 맵 이름 오른쪽에 '난이도 보통'(항상)
+	-- 시작 전에는 화면 최상단에 난이도 선택, 그 아래에 바로 시작을 표시한다.
 	@ExecSpace("ClientOnly")
 	method void Build()
 		local H = _RtsHudLogic
 		local names = self:GetNames()
 		local w = 88
 		local gap = 6
-		local total = 86 + #names * w + (#names - 1) * gap + 12 + 124
+		local total = 86 + #names * w + (#names - 1) * gap + 12
 		-- 윗줄 = "난이도" + 6칸, 아랫줄 = 안내(남은 초 · 지금 선택)
-		local bar = H:SpawnPanel("RtsDiffBar", H.HudGroup, Vector2(0.5, 1), Vector2(0.5, 1), Vector2(0, 0), Vector2(total, 80),
+		local bar = H:SpawnRoundedPanel("RtsDiffBar", H.HudGroup, Vector2(0.5, 1), Vector2(0.5, 1), Vector2(0, -12), Vector2(total, 92),
 			H:ColPanel(), H:ColBorder(), 1.5)
 		if bar == nil then return end
+		H:SpawnWater(bar)
 		H:SpawnLabel("RtsDiffTitle", bar, Vector2(0, 1), Vector2(0, 1), Vector2(12, -6), Vector2(70, 36), "난이도", H:ColMuted(), 16, TextAlignmentType.MiddleLeft, true)
-		self.MsgText = H:SpawnLabel("RtsDiffMsg", bar, Vector2(0, 0), Vector2(0, 0), Vector2(12, 6), Vector2(total - 24, 26), "", Color(1, 0.86, 0.55, 1), 14, TextAlignmentType.MiddleLeft, false)
+		self.MsgText = H:SpawnLabel("RtsDiffMsg", bar, Vector2(0, 0), Vector2(0, 0), Vector2(12, 6), Vector2(total - 24, 26), "", H:ColMuted(), 14, TextAlignmentType.MiddleLeft, false)
 		self.Btns = {}
 		for i = 1, #names do
 			local x = 86 + (i - 1) * (w + gap)
-			local b = H:SpawnPanel("RtsDiffBtn" .. tostring(i), bar, Vector2(0, 1), Vector2(0, 1), Vector2(x, -6), Vector2(w, 36),
+			local b = H:SpawnRoundedPanel("RtsDiffBtn" .. tostring(i), bar, Vector2(0, 1), Vector2(0, 1), Vector2(x, -6), Vector2(w, 42),
 				H:ColPanel(), H:ColBorder(), 1.5)
 			H:SpawnLabel("RtsDiffBtnText" .. tostring(i), b, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2(0, 0), Vector2(w - 4, 32), names[i], H:ColInk(), 15, TextAlignmentType.MiddleCenter, true)
 			local click = H:SpawnClick("RtsDiffClick" .. tostring(i), b)
@@ -174,22 +174,16 @@ script RtsDifficultyLogic extends Logic
 			end)
 			self.Btns[#self.Btns + 1] = b
 		end
-		-- 오른쪽 끝: 바로 시작(카운트다운 중에만)
-		local sb = H:SpawnPanel("RtsDiffStart", bar, Vector2(1, 1), Vector2(1, 1), Vector2(-12, -6), Vector2(112, 36),
-			Color(0.3, 0.24, 0.12, 0.96), H:ColGold(), 2)
-		self.StartText = H:SpawnLabel("RtsDiffStartText", sb, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2(0, 0), Vector2(108, 32), "바로 시작", Color(1, 0.95, 0.8, 1), 15, TextAlignmentType.MiddleCenter, true)
+		-- 바로 시작은 난이도 아래에, 진행 후 다시하기는 숨겨진 난이도 선택 자리에 표시한다.
+		local sb = H:SpawnRoundedPanel("RtsDiffStart", bar, Vector2(0.5, 0), Vector2(0.5, 1), Vector2(0, -10), Vector2(200, 48),
+			Color(0.86, 0.85, 0.96, 0.95), H:ColGold(), 2)
+		self.StartText = H:SpawnLabel("RtsDiffStartText", sb, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2(0, 0), Vector2(192, 40), "바로 시작", H:ColInk(), 19, TextAlignmentType.MiddleCenter, true)
 		local sc = H:SpawnClick("RtsDiffStartClick", sb)
 		sc:ConnectEvent(ButtonClickEvent, function(event)
 			_RtsStageLogic:RequestStartNow()
 		end)
 		self.StartBtn = sb
 		self.Bar = bar
-		-- 정보 카드 셋째 줄(맵 이름 아래 — 2026-09-24 사용자 "글자가 크면 높이를 늘려": 맵 이름 오른쪽 120px에선 '난이도 매우어려움'이 두 줄로 꺾여 겹쳤다)
-		local card = nil
-		if H.StageSubText ~= nil then card = H.StageSubText.Parent end
-		if card ~= nil then
-			self.RunText = H:SpawnLabel("RtsDiffCardText", card, Vector2(0, 1), Vector2(0, 1), Vector2(14, -64), Vector2(372, 24), "난이도 보통", H:ColGold(), 15, TextAlignmentType.MiddleLeft, true)
-		end
 		self.Shown = ""
 	end
 

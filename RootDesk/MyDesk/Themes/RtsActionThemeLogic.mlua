@@ -1,0 +1,183 @@
+@Logic
+script RtsActionThemeLogic extends Logic
+
+	property string BackgroundRUID = "be90451fd564466aafbade23743a3b03"
+	property string ArmRUID = "4b7bc780f2ca47e0bfd8f6c4adb9a61f"
+	property string BodyRUID = "474d655219e146cd87452fa292bfc332"
+	property string FlameRUID = "905b59a732dd48abb8153f5f4650db75"
+	property table Scenes = {}
+	property number Elapsed = 0
+	property number ScanClock = 0
+	property number DrawClock = 0
+
+	@ExecSpace("ClientOnly")
+	method void OnBeginPlay()
+		-- 월드 배경과 유저 카드가 같은 8초 위상을 사용한다.
+		self.Scenes = {}
+		self.Elapsed = 0
+		self.ScanClock = 0
+		self.DrawClock = 0
+	end
+
+	@ExecSpace("ClientOnly")
+	method void OnEndPlay()
+		-- 클라이언트 장식만 정리하고 서버의 배경·저장값은 건드리지 않는다.
+		for i = #self.Scenes, 1, -1 do self:RemoveScene(i) end
+	end
+
+	@ExecSpace("ClientOnly")
+	method void OnUpdate(number delta)
+		-- 관전 구역 한 곳과 살아 있는 카드만 갱신한다. 프레임별 네트워크 전송은 없다.
+		self.Elapsed = (self.Elapsed + delta) % 8
+		self.ScanClock = self.ScanClock + delta
+		self.DrawClock = self.DrawClock + delta
+		if self.ScanClock >= 0.5 then
+			self.ScanClock = 0
+			self:ScanWorld()
+		end
+		if self.DrawClock < 1 / 30 then return end
+		self.DrawClock = 0
+		for i = #self.Scenes, 1, -1 do
+			local scene = self.Scenes[i]
+			if scene == nil then continue end
+			if not isvalid(scene.host) then
+				self:RemoveScene(i)
+			elseif not scene.ui and (scene.host.SpriteRendererComponent.SpriteRUID ~= self.BackgroundRUID or scene.zone ~= _RtsHudLogic.WatchedZone) then
+				self:RemoveScene(i)
+			else
+				self:DrawScene(scene)
+			end
+		end
+	end
+
+	@ExecSpace("ClientOnly")
+	method void ScanWorld()
+		-- 배경 RUID를 관찰하므로 테마 변경·늦은 입장도 같은 경로로 처리한다.
+		local zone = _RtsHudLogic.WatchedZone
+		if zone < 1 then return end
+		local host = _EntityService:GetEntityByPath("/maps/RtsMap/ZoneBackground" .. string.format("%d", zone))
+		if not isvalid(host) or host.SpriteRendererComponent == nil then return end
+		if host.SpriteRendererComponent.SpriteRUID ~= self.BackgroundRUID then return end
+		for _, scene in ipairs(self.Scenes) do if scene.host == host then return end end
+		self:CreateScene(host, false, zone, 1672, 941)
+	end
+
+	@ExecSpace("ClientOnly")
+	method void RegisterCard(Entity photo, string key, number width)
+		-- 정지 썸네일 대신 원화 배경과 같은 레이어를 카드의 마스크 안에 구성한다.
+		if key ~= "zakum_altar" or not isvalid(photo) then return end
+		photo.SpriteGUIRendererComponent.ImageRUID = DataRef(self.BackgroundRUID)
+		local height = width * 941 / 1672
+		photo.UITransformComponent.RectSize = Vector2(width, height)
+		photo.UITransformComponent.anchoredPosition = Vector2(0, -26)
+		self:CreateScene(photo, true, 0, width, height)
+	end
+
+	@ExecSpace("ClientOnly")
+	method void CreateScene(Entity host, boolean ui, number zone, number width, number height)
+		-- 팔8개·몸통1개·화로 불꽃8개를 만든다. 배경과 몸통은 고정된다.
+		local scene = { host = host, ui = ui, zone = zone, width = width, height = height, parts = {} }
+		for row = 0, 3 do
+			for _, side in ipairs({-1, 1}) do
+				local w = 320 - row * 15
+				local part = { kind = "arm", row = row, side = side, w = w, h = w * 1201 / 1309, sw = 1309, sh = 1201 }
+				part.entity = self:SpawnPart(scene, "Arm" .. tostring(row) .. tostring(side), self.ArmRUID, side == 1, 91 + row)
+				scene.parts[#scene.parts + 1] = part
+			end
+		end
+		local body = { kind = "body", x = 836, y = 352, w = 705, h = 508, sw = 1477, sh = 1065 }
+		body.entity = self:SpawnPart(scene, "Body", self.BodyRUID, false, 96)
+		scene.parts[#scene.parts + 1] = body
+		local flames = { {210,198,66,72}, {402,272,58,68}, {126,352,80,86}, {418,466,72,78},
+			{1461,178,64,74}, {1278,292,76,84}, {1458,355,66,74}, {1312,483,72,78} }
+		for i, f in ipairs(flames) do
+			local part = { kind = "flame", x = f[1], y = f[2], w = f[3], h = f[4], sw = 1277, sh = 1231, phase = i * 0.77 }
+			part.entity = self:SpawnPart(scene, "Flame" .. tostring(i), self.FlameRUID, i % 2 == 0, 97)
+			scene.parts[#scene.parts + 1] = part
+		end
+		self.Scenes[#self.Scenes + 1] = scene
+		self:DrawScene(scene)
+	end
+
+	@ExecSpace("ClientOnly")
+	method Entity SpawnPart(table scene, string name, string ruid, boolean flip, number order)
+		-- 기존 네이티브 스프라이트 모델을 클라이언트 장식으로 재사용한다.
+		local e = nil
+		if scene.ui then
+			e = _RtsHudLogic:SpawnUI("model://uisprite", "RtsAction" .. name, scene.host, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2.zero, Vector2(1, 1))
+			if not isvalid(e) then return nil end
+			local sr = e.SpriteGUIRendererComponent
+			sr.ImageRUID = DataRef(ruid)
+			sr.Color = Color.white
+			sr.FlipX = flip
+			sr.RaycastTarget = false
+		else
+			e = _SpawnService:SpawnByModelId("model://MapObject", "RtsAction" .. name, Vector3.zero, scene.host)
+			if not isvalid(e) then return nil end
+			local sr = e.SpriteRendererComponent
+			sr.SpriteRUID = ruid
+			sr.SortingLayer = "MapLayer0"
+			sr.OrderInLayer = order
+			sr.Color = Color.white
+			sr.FlipX = flip
+		end
+		return e
+	end
+
+	@ExecSpace("ClientOnly")
+	method void DrawScene(table scene)
+		-- 삼각함수의 정수 주기로 위치·속도 모두 반복 경계에서 이어진다.
+		local cycle = self.Elapsed * math.pi * 2 / 8
+		for _, part in ipairs(scene.parts) do
+			if not isvalid(part.entity) then continue end
+			local x = part.x or 0
+			local y = part.y or 0
+			local w = part.w
+			local h = part.h
+			local rotation = 0
+			local alpha = 1
+			if part.kind == "arm" then
+				local phase = part.row * 0.72
+				if part.side == 1 then phase = phase + 1.1 end
+				rotation = -part.side * (part.row * 9 + 10 * math.sin(cycle + phase) + 3 * math.sin(cycle * 2 + phase))
+				local rad = rotation * math.pi / 180
+				local dx = part.side * w * 0.39
+				local dy = h * 0.25
+				local rootX = 836 + part.side * 91
+				local rootY = 300 + part.row * 46
+				x = rootX + dx * math.cos(rad) - dy * math.sin(rad)
+				y = rootY - (dx * math.sin(rad) + dy * math.cos(rad))
+			elseif part.kind == "flame" then
+				local pulse = math.sin(cycle * 5 + part.phase)
+				h = h * (1 + 0.12 * pulse)
+				w = w * (1 - 0.06 * pulse)
+				y = y - (h - part.h) * 0.3
+				rotation = 5 * math.sin(cycle * 3 + part.phase)
+				alpha = 0.8 + 0.15 * math.sin(cycle * 4 + part.phase)
+			end
+			if scene.ui then
+				local t = part.entity.UITransformComponent
+				t.anchoredPosition = Vector2((x / 1672 - 0.5) * scene.width, (0.5 - y / 941) * scene.height)
+				t.RectSize = Vector2(w / 1672 * scene.width, h / 941 * scene.height)
+				t.ZRotation = rotation
+				part.entity.SpriteGUIRendererComponent.Color = Color(1, 1, 1, alpha)
+			else
+				local t = part.entity.TransformComponent
+				t.Position = Vector3((x - 836) / 100, (470.5 - y) / 100, 0)
+				t.Scale = Vector3(w / part.sw, h / part.sh, 1)
+				t.ZRotation = rotation
+				part.entity.SpriteRendererComponent.Color = Color(1, 1, 1, alpha)
+			end
+		end
+	end
+
+	@ExecSpace("ClientOnly")
+	method void RemoveScene(number index)
+		-- 테마 변경·카드 재생성·맵 종료 때 장식과 참조를 함께 해제한다.
+		local scene = self.Scenes[index]
+		if scene == nil then return end
+		table.remove(self.Scenes, index)
+		for _, part in ipairs(scene.parts) do if isvalid(part.entity) then part.entity:Destroy() end end
+	end
+
+end

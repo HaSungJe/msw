@@ -73,6 +73,8 @@ script RtsThemeLogic extends Logic
 				gridRUID = "e0721799e39d4ecebf723b842c013b74", gridTint = Color(1, 1, 1, 1), decor = self:GetKerningDecor(), backgroundRUID = "e2f7cda163294b3b8d8ab956f2966bda", backgroundAlpha = 0.78, thumb = "457ec944d357431ba1642520d7d4eb16", color = Color(0.4, 0.4, 0.54, 1), free = true },
 			{ key = "lith", name = "리스항구", tab = "기본", floorTile = "LithSand", floorVariants = {}, variantRatio = 0,
 				gridRUID = "7b1ad42ce59245eea17e52ab201b4dde", gridTint = Color(1, 1, 1, 1), decor = self:GetLithDecor(), backgroundRUID = "89b81c540feb454796ba78a0025b7223", backgroundAlpha = 0.78, thumb = "7653fa3a53314b43a2aa4b16ccae3adc", color = Color(0.33, 0.56, 0.8, 1), free = true },
+			{ key = "zakum_altar", name = "자쿰의 제단", tab = "액션", floorTile = "PerionEarth", floorVariants = {}, variantRatio = 0,
+				gridRUID = "b867ada14eb24f99936178a38da2a3b6", gridTint = Color(1, 1, 1, 1), decor = {}, backgroundRUID = "be90451fd564466aafbade23743a3b03", backgroundAlpha = 1, thumb = "c1386854b1394861b23c8695a284e82d", color = Color(0.55, 0.31, 0.19, 1), free = true },
 		}
 	end
 

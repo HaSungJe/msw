@@ -8,9 +8,9 @@
 @Logic
 script RtsUnitPopupLogic extends Logic
 
-	property number PanelW = 1229
+	property number PanelW = 1360
 
-	property number PanelH = 720
+	property number PanelH = 880
 
 	-- 지금 보고 있는 유닛 번호(0 = 닫힘)
 	property number CurNo = 0
@@ -22,7 +22,7 @@ script RtsUnitPopupLogic extends Logic
 	property Entity Dropdown = nil
 
 	-- 우측 탭: skill / aug / buff (팝업을 닫아도 유지)
-	property string Tab = "skill"
+	property string Tab = "active"
 
 	property Entity BondCoolText = nil
 
@@ -141,6 +141,7 @@ script RtsUnitPopupLogic extends Logic
 			local v = self.StatVals[i]
 			if v ~= nil and isvalid(v) and v.TextComponent.Text ~= rows[i][2] then v.TextComponent.Text = rows[i][2] end
 		end
+		self:UpdateStatChart(u)
 		self:ApplyLevelButton(u)
 	end
 
@@ -168,12 +169,13 @@ script RtsUnitPopupLogic extends Logic
 	-- 제목: "2. 팔라딘  Lv 40 · 모험가 · 전사"
 	@ExecSpace("ClientOnly")
 	method void ApplyTitle(any u)
-		local H = _RtsHudLogic
-		local T = _RtsJobTableLogic
+		-- 직업과 레벨은 흉상 아래에서 갱신한다.
 		local P = _RtsPopupLogic
-		local text = H:Int(u.No) .. ". " .. T:GetJobNameFor(u) .. "  <size=18><color=#c9b58a>Lv " .. H:Int(u.Level) .. " · " .. T:GetJobGroup(u.JobId) .. "</color></size>"
-		P.Title.TextComponent.IsRichText = true
-		if P.Title.TextComponent.Text ~= text then P.Title.TextComponent.Text = text end
+		P.Title.TextComponent.IsRichText = false
+		P.Title.TextComponent.Text = "캐릭터 상세정보"
+		if self._T.Identity ~= nil and isvalid(self._T.Identity) then
+			self._T.Identity.TextComponent.Text = _RtsJobTableLogic:GetJobNameFor(u) .. "\n<size=18>Lv. " .. _RtsHudLogic:Int(u.Level) .. "</size>"
+		end
 	end
 
 	-- 레벨업 가능 여부(최대 레벨 아님 + 메소 충분) — 버튼 모양과 클릭 판단 공용(서버도 다시 검사)
@@ -253,50 +255,42 @@ script RtsUnitPopupLogic extends Logic
 		-- ----- 좌: 외형(직업 기본 세트 — 2026-09-25 사용자 "월드 아바타 없애고 기본 스킨이나 이쁘게 꾸며서 보여줘") -----
 		--   가운데에 크게 + 뒤에 은은한 금빛 원광 + 아래 이름판(프리즘으로 직업명이 바뀌면 그 이름 — 2026-09-22 "듀얼블레이더라고 나와야지")
 		--   2026-09-25 사용자 "모습이 너무 낮다 — '외형' 글자 빼고 캐릭터가 원 안에": 제목 줄 삭제, 캐릭터를 원 위쪽 가운데로 작게(무기까지 원 안)
-		local look = H:SpawnPanel("RtsUnitLook", content, Vector2(0, 1), Vector2(0, 1), Vector2(27, -10), Vector2(365, 236),
-			P:Mix(Color.white, 0.03), P:Mix(H:ColGold(), 0.25), 1.5)
-		local glow = H:SpawnUI("model://uisprite", "RtsUnitLookGlow", look, Vector2(0, 1), Vector2(0.5, 0.5), Vector2(181, -98), Vector2(176, 176))
+		local look = H:SpawnRoundedPanel("RtsUnitLook", content, Vector2(0, 1), Vector2(0, 1), Vector2(27, -10), Vector2(190, 416),
+			P:Card(), P:Mix(H:ColGold(), 0.25), 1.5)
+		local glow = H:SpawnUI("model://uisprite", "RtsUnitLookGlow", look, Vector2(0, 1), Vector2(0.5, 0.5), Vector2(95, -126), Vector2(180, 180))
 		if H.CircleMaskRUID ~= "" then glow.SpriteGUIRendererComponent.ImageRUID = DataRef(H.CircleMaskRUID) end
-		glow.SpriteGUIRendererComponent.Color = Color(0.79, 0.64, 0.29, 0.13)
+		glow.SpriteGUIRendererComponent.Color = Color(0.76, 0.75, 0.9, 0.12)
 		glow.SpriteGUIRendererComponent.RaycastTarget = false
 		if u.JobId == "il" then
-			self:SpawnPreviewAt(look, u, Vector2(181, -98), Vector2(176, 176))
+			self:SpawnPreviewAt(look, u, Vector2(95, -126), Vector2(180, 180))
 		else
-			self:SpawnPreviewAt(look, u, Vector2(181, -90), Vector2(112, 140))
+			self:SpawnPreviewAt(look, u, Vector2(95, -134), Vector2(136, 170))
 		end
-		local skinName = "영웅 팬텀"
-		if u.JobId ~= "phantom" then skinName = "모험가 " .. T:GetJobNameFor(u) end
-		local plate = H:SpawnPanel("RtsUnitLookPlate", look, Vector2(0.5, 0), Vector2(0.5, 0), Vector2(0, 12), Vector2(220, 30),
-			P:Mix(H:ColGold(), 0.14), P:Mix(H:ColGold(), 0.55), 1)
-		H:SpawnLabel("RtsUnitLookName", plate, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2(0, 0), Vector2(214, 26),
-			skinName, H:ColInk(), 15, TextAlignmentType.MiddleCenter, true)
+		self._T.Identity = H:SpawnLabel("RtsUnitIdentity", look, Vector2(0.5, 0), Vector2(0.5, 0), Vector2(0, 48), Vector2(178, 74),
+			"", P:Ink(), 19, TextAlignmentType.MiddleCenter, true)
+		self._T.Identity.TextComponent.IsRichText = true
+		self:ApplyTitle(u)
 
-		-- ----- 좌: 능력치 -----
-		local statsH = 34 + 30 * 8 + 16
-		local stats = H:SpawnPanel("RtsUnitStats", content, Vector2(0, 1), Vector2(0, 1), Vector2(27, -256), Vector2(365, statsH),
-			P:Mix(Color.white, 0.03), P:Mix(H:ColGold(), 0.25), 1.5)
-		H:SpawnLabel("RtsUnitStatsK", stats, Vector2(0, 1), Vector2(0, 1), Vector2(14, -10), Vector2(200, 18),
-			"능력치", H:ColMuted(), 13, TextAlignmentType.MiddleLeft, false)
-		local rows = self:StatRowTexts(u)
+		-- 흉상 옆 실제 여섯 능력치. 숫자와 도형 모두 같은 버프 반영 값을 사용한다.
 		self.StatVals = {}
-		local y = -34
-		for i = 1, #rows do
-			H:SpawnLabel("RtsUnitStatK", stats, Vector2(0, 1), Vector2(0, 1), Vector2(14, y), Vector2(120, 26),
-				rows[i][1], H:ColMuted(), 14, TextAlignmentType.MiddleLeft, false)
-			local v = H:SpawnLabel("RtsUnitStatV", stats, Vector2(1, 1), Vector2(1, 1), Vector2(-14, y), Vector2(230, 26),
-				rows[i][2], H:ColInk(), 15, TextAlignmentType.MiddleRight, false)
-			v.TextComponent.IsRichText = true
-			self.StatVals[i] = v
-			y = y - 30
+		local stats = H:SpawnRoundedPanel("RtsUnitStats", content, Vector2(0, 1), Vector2(0, 1), Vector2(229, -10), Vector2(400, 416), P:Card(), P:Edge(), 1.5)
+		self:BuildStatChart(stats, u)
+		local rows = self:StatRowTexts(u)
+		for _, index in ipairs({1, 4}) do
+			local x = 27
+			if index == 4 then x = 307 end
+			H:SpawnLabel("RtsUnitExtraStatK", content, Vector2(0, 1), Vector2(0, 1), Vector2(x, -443), Vector2(160, 24), rows[index][1], P:Muted(), 16, TextAlignmentType.MiddleLeft, false)
+			self.StatVals[index] = H:SpawnLabel("RtsUnitExtraStatV", content, Vector2(0, 1), Vector2(0, 1), Vector2(x + 160, -443), Vector2(100, 24), rows[index][2], P:Ink(), 18, TextAlignmentType.MiddleRight, true)
 		end
+		H:SpawnLabel("RtsStatChartScale", content, Vector2(0, 1), Vector2(0, 1), Vector2(27, -642), Vector2(602, 70), "도형 기준: 공격력 1,000 · 공격력 증가 200%\n최종 데미지 300% · 보스 데미지 200% · 크확 100% · 크뎀 200%\n기준을 넘은 수치도 숫자에는 그대로 표시됩니다", P:Muted(), 13, TextAlignmentType.UpperLeft, false)
 
 		-- ----- 좌 아래: 증강으로 오른 수치(2026-09-24 사용자 "캐릭터 상세정보 아래에 박스 하나 더 — 증강으로 올라간 수치") -----
 		--   증강 탭 합계와 같은 계산(RtsAugmentTableLogic.TotalsMul × 티어 배율 RtsJobTableLogic.AugMulFor), 2열 격자
 		local at = _RtsAugmentTableLogic:TotalsMul(u.Augs, _RtsJobTableLogic:AugMulFor(u))
-		local augBox = H:SpawnPanel("RtsUnitAugGain", content, Vector2(0, 1), Vector2(0, 1), Vector2(27, -256 - statsH - 8), Vector2(365, 88),
+		local augBox = H:SpawnRoundedPanel("RtsUnitAugGain", content, Vector2(0, 1), Vector2(0, 1), Vector2(27, -486), Vector2(602, 130),
 			P:Mix(H:ColGold(), 0.06), P:Mix(H:ColGold(), 0.35), 1.5)
-		H:SpawnLabel("RtsUnitAugGainT", augBox, Vector2(0, 1), Vector2(0, 1), Vector2(14, -6), Vector2(335, 20),
-			"증강으로 오른 수치 (" .. H:Int(at.n) .. "개)", H:ColGold(), 13, TextAlignmentType.MiddleLeft, true)
+		H:SpawnLabel("RtsUnitAugGainT", augBox, Vector2(0, 1), Vector2(0, 1), Vector2(14, -6), Vector2(534, 24),
+			"증강으로 오른 수치 (" .. H:Int(at.n) .. "개)", P:AccentInk(), 16, TextAlignmentType.MiddleLeft, true)
 		local gains = {}
 		if at.atk > 0 then gains[#gains + 1] = "공격력 +" .. H:Int(at.atk) end
 		if at.pct > 0 then gains[#gains + 1] = "공격력 +" .. H:Int(at.pct) .. "%" end
@@ -305,40 +299,41 @@ script RtsUnitPopupLogic extends Logic
 		if at.critDmg > 0 then gains[#gains + 1] = "크리티컬 데미지 +" .. H:Int(at.critDmg) .. "%" end
 		if at.fin > 100.01 then gains[#gains + 1] = "최종 데미지 +" .. H:Int(at.fin - 100) .. "%" end
 		if #gains == 0 then
-			H:SpawnLabel("RtsUnitAugGainNone", augBox, Vector2(0, 1), Vector2(0, 1), Vector2(14, -32), Vector2(335, 22),
-				"적용된 증강이 없어요", H:ColMuted(), 14, TextAlignmentType.MiddleLeft, false)
+			H:SpawnLabel("RtsUnitAugGainNone", augBox, Vector2(0, 1), Vector2(0, 1), Vector2(14, -32), Vector2(534, 24),
+				"적용된 증강이 없어요", _RtsPopupLogic:Muted(), 16, TextAlignmentType.MiddleLeft, false)
 		else
 			for gi = 1, #gains do
 				local col = (gi - 1) % 2
 				local line = math.floor((gi - 1) / 2)
-				local gl = H:SpawnLabel("RtsUnitAugGainV", augBox, Vector2(0, 1), Vector2(0, 1), Vector2(14 + col * 172, -28 - line * 20), Vector2(166, 20),
-					gains[gi], H:ColInk(), 13, TextAlignmentType.MiddleLeft, false)
+				local gl = H:SpawnLabel("RtsUnitAugGainV", augBox, Vector2(0, 1), Vector2(0, 1), Vector2(14 + col * 275, -36 - line * 26), Vector2(262, 24),
+					gains[gi], _RtsPopupLogic:Ink(), 15, TextAlignmentType.MiddleLeft, false)
 				gl.TextComponent.Overflow = OverflowType.Truncate
 			end
 		end
 
 		-- ----- 우: 탭(스킬 / 증강 n / 적용 중인 버프 n) + 목록 -----
-		local rx = 411
+		local rx = 647
 		local rw = self.PanelW - rx - 27
 		local augs = B:GetAugmentsFor(u.Zone, u.No)
 		local tabs = {
-			{ id = "skill", text = "스킬", w = 120 },
+			{ id = "active", text = "액티브", w = 104 },
+			{ id = "passive", text = "패시브", w = 104 },
 			{ id = "aug", text = "증강 " .. H:Int(#augs), w = 130 },
-			{ id = "buff", text = "적용 중인 버프 " .. H:Int(self:BuffCount(u, buffs)), w = 190 },
+			{ id = "buff", text = "버프 " .. H:Int(self:BuffCount(u, buffs)), w = 130 },
 		}
 		-- 탭은 제자리(켜짐·개수 글자만 바뀜 — RenderRight), 누르면 오른쪽 내용만 다시(2026-09-25 "필요한 부분만")
 		local items = {}
 		for i = 1, #tabs do items[i] = { tabs[i].id, tabs[i].text, tabs[i].w } end
-		self.TabBar = P:SpawnTabBar(content, "RtsUnitTab", items, self.Tab, rx, -10, 120, 34, 8, 15, function(key)
+		self.TabBar = P:SpawnTabBar(content, "RtsUnitTab", items, self.Tab, rx, -10, 120, 48, 8, 18, function(key)
 			self.Tab = key
 			self:RenderRight(_RtsUnitLogic:GetMyUnit(self.CurNo))
 		end)
 		local tx = self.TabBar.right
 		-- 단축키 표시: 탭 오른쪽 [Tab] — Tab 키로 스킬 → 증강 → 적용 중인 버프 순환(2026-09-23 사용자, RtsUnitSelectLogic.HandleKeyDownEvent → CycleTab)
-		local tkey = H:SpawnPanel("RtsUnitTabKey", content, Vector2(0, 1), Vector2(0, 1), Vector2(tx + 4, -14), Vector2(56, 26),
-			Color(0.12, 0.1, 0.08, 0.9), Color(0.95, 0.9, 0.75, 0.9), 1.2)
+		local tkey = H:SpawnRoundedPanel("RtsUnitTabKey", content, Vector2(0, 1), Vector2(0, 1), Vector2(tx + 4, -20), Vector2(56, 26),
+			Color(0.92, 0.93, 0.98, 0.9), Color(0.72, 0.74, 0.84, 0.9), 1.2)
 		H:SpawnLabel("RtsUnitTabKeyText", tkey, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2(0, 0), Vector2(54, 24),
-			"Tab", Color(0.95, 0.9, 0.75, 1), 13, TextAlignmentType.MiddleCenter, true)
+			"Tab", Color(0.38, 0.39, 0.50, 1), 13, TextAlignmentType.MiddleCenter, true)
 		self.RightBox = nil
 		self:RenderRight(u)
 
@@ -346,7 +341,7 @@ script RtsUnitPopupLogic extends Logic
 		--   누적 투자·다음 벽까지 비용·보유 메소는 안 보인다(2026-09-16 사용자: 유저에게 필요 없는 내부 정보. 메소는 HUD 좌상단에 있음).
 		--   벽 레벨(10·20·…)도 유저에겐 그냥 다음 레벨 — 비용만 보여 주고 '(벽)' 문구·붉은색 없음
 		-- 레벨업 → Lv n (메소 부족·최대 레벨은 흐리게). 모양·글자는 ApplyLevelButton이 제자리에서 바꾸고, 클릭은 누를 때 가능 여부를 본다
-		local lbtn = H:SpawnPanel("RtsUnitLvUp", content, Vector2(1, 0), Vector2(1, 0), Vector2(-27, 10), Vector2(280, 44), H:ColGold(), H:ColGold(), 1.5)
+		local lbtn = H:SpawnRoundedPanel("RtsUnitLvUp", content, Vector2(1, 0), Vector2(1, 0), Vector2(-27, 10), Vector2(340, 54), H:ColGold(), H:ColGold(), 1.5)
 		self.LvBtn = lbtn
 		-- 오른쪽 72 = [Space] 키캡(58, 여백 6) + 틈 8 — 전엔 14라 글자·메소 아이콘이 키캡과 겹쳤다(2026-09-25 사용자 "레벨업과 스페이스 버튼이 겹침")
 		self.LvRow = _RtsUnitSelectLogic:SpawnLvRow(lbtn, 72, 16)
@@ -378,7 +373,7 @@ script RtsUnitPopupLogic extends Logic
 		local ignBossTotal = s.ign
 		if s.ignBoss > 0 then ignBossTotal = s.ign + s.ignBoss end
 		local ignText = H:Int(ignBossTotal) .. "%"
-		local up = " <color=#9fd39a>▲</color>"
+		local up = " <color=#356c32>▲</color>"
 		-- 최종 데미지는 배율(120%)이 아니라 추가분만(+20%; 기본 0%) — 2026-09-18 사용자 "이거는 +만 표시"
 		local function plusPct(v)
 			local d = v - 100
@@ -419,41 +414,58 @@ script RtsUnitPopupLogic extends Logic
 		local wide = math.floor(cont / 2)
 		local narrow = bytes - cont - wide
 		if narrow < 0 then narrow = 0 end
-		local px = wide * 13 + narrow * 8
+		local px = wide * 18 + narrow * 10
 		local lines = math.ceil(px / math.max(60, w))
 		if lines < 1 then lines = 1 end
-		if lines > 3 then lines = 3 end
+		if lines > 12 then lines = 12 end
 		return lines
 	end
 
 	method void BuildTargetRow(Entity row, any u, number rx, number sy)
 		local H = _RtsHudLogic
 		local P = _RtsPopupLogic
-		H:SpawnLabel("RtsUnitTgtK", row, Vector2(0, 1), Vector2(0, 1), Vector2(70, -62), Vector2(50, 30),
-			"대상:", H:ColMuted(), 14, TextAlignmentType.MiddleLeft, false)
+		local targetY = row.Parent.UITransformComponent.RectSize.y - 46
+		H:SpawnLabel("RtsUnitTgtK", row, Vector2(0, 1), Vector2(0, 1), Vector2(70, -targetY), Vector2(50, 30),
+			"대상:", _RtsPopupLogic:Muted(), 14, TextAlignmentType.MiddleLeft, false)
 		self.BondLocked = u:BondCoolLeft() > 0
-		local bg = P:Mix(Color(0, 0, 0, 1), 0.35)
+		local bg = P:Mix(Color.white, 0.55)
 		local border = P:Mix(Color.white, 0.28)
-		if self.BondLocked then border = P:Mix(Color.white, 0.12) end
-		local btn = H:SpawnPanel("RtsUnitTgtSel", row, Vector2(0, 1), Vector2(0, 1), Vector2(118, -62), Vector2(250, 30), bg, border, 1.5)
+		if self.BondLocked then border = P:Edge() end
+		local btn = H:SpawnRoundedPanel("RtsUnitTgtSel", row, Vector2(0, 1), Vector2(0, 1), Vector2(118, -targetY), Vector2(250, 30), bg, border, 1.5)
 		self.BondBtn = btn
-		local ink = H:ColInk()
+		local ink = _RtsPopupLogic:Ink()
 		if self.BondLocked then ink = Color(0.6, 0.56, 0.5, 1) end
 		H:SpawnLabel("RtsUnitTgtCur", btn, Vector2(0, 0.5), Vector2(0, 0.5), Vector2(10, 0), Vector2(200, 26),
 			self:TargetLabel(u.BondNo), ink, 14, TextAlignmentType.MiddleLeft, false)
 		H:SpawnLabel("RtsUnitTgtArrow", btn, Vector2(1, 0.5), Vector2(1, 0.5), Vector2(-8, 0), Vector2(20, 26),
-			"▼", H:ColMuted(), 11, TextAlignmentType.MiddleCenter, false)
-		local cool = H:SpawnLabel("RtsUnitTgtCool", row, Vector2(0, 1), Vector2(0, 1), Vector2(380, -62), Vector2(320, 30),
-			"", H:ColMuted(), 13, TextAlignmentType.MiddleLeft, false)
+			"▼", _RtsPopupLogic:Muted(), 11, TextAlignmentType.MiddleCenter, false)
+		local cool = H:SpawnLabel("RtsUnitTgtCool", row, Vector2(0, 1), Vector2(0, 1), Vector2(380, -targetY), Vector2(320, 30),
+			"", _RtsPopupLogic:Muted(), 13, TextAlignmentType.MiddleLeft, false)
 		self.BondCoolText = cool
 		self:ApplyBondCool(u)
 		if not self.BondLocked then
 			local click = H:SpawnClick("RtsUnitTgtClick", btn)
-			-- 드롭다운은 body에 마지막으로 만들어 다른 행 위에 그린다. 위치 = 행 위치 + 버튼 오프셋 + 버튼 높이
-			local listX = rx + 118
-			local listY = sy - 62 - 30 - 2
+			-- 스크롤된 버튼의 현재 위치를 읽어 목록을 바로 아래에 띄운다.
 			click:ConnectEvent(ButtonClickEvent, function(event)
-				self:ToggleDropdown(listX, listY)
+				local transform = self.Content.UITransformComponent
+				local bt = btn.UITransformComponent
+				local point = transform:ToLocalPoint(bt.WorldPosition)
+				local x = point.x + transform.Pivot.x * transform.RectSize.x - bt.Pivot.x * bt.RectSize.x
+				local y = point.y - (1 - transform.Pivot.y) * transform.RectSize.y - bt.Pivot.y * bt.RectSize.y - 2
+				-- 엔진 WorldPosition에는 ScrollLayout의 시각 이동이 빠져 있어 실제 행 경계로 보정한다.
+				local lists = self.RightBox:GetChildComponentsByTypeName("ScrollLayoutGroupComponent", true)
+				if #lists > 0 then
+					local scroll = lists[1]
+					local bottom = 0
+					for _, t in ipairs(scroll.Entity:GetChildComponentsByTypeName("UITransformComponent", false)) do
+						bottom = math.max(bottom, -t.anchoredPosition.y + t.Pivot.y * t.RectSize.y)
+					end
+					y = y + scroll:GetScrollNormalizedPosition().y * math.max(0, bottom - scroll.Entity.UITransformComponent.RectSize.y)
+				end
+				local count = #_RtsUnitLogic:ListZoneUnits(_RtsUnitLogic:MyZone())
+				x = math.max(16, math.min(x, transform.RectSize.x - 266))
+				y = math.max(-transform.RectSize.y + 30 * count + 20, y)
+				self:ToggleDropdown(x, y)
 			end)
 		end
 	end
@@ -481,33 +493,35 @@ script RtsUnitPopupLogic extends Logic
 		local rx = 0
 		local rw = rw0 - 12
 		local sy = 0
-		local rh0 = 64
+		local rh0 = 84
 		for i = 1, #skills do
 			local k = skills[i]
+			if (self.Tab == "active" and k.kind == "액티브") or (self.Tab == "passive" and k.kind ~= "액티브") then
 			local got = u.Level >= k.lv
 			local isTarget = k.target and got
 			local lockMode0 = _RtsJobTableLogic:GetLock(u.SkillLocks, i)
 			local lockable0 = k.kind == "액티브" and (got or lockMode0 == 3)
 			local descW = rw - 90
-			if lockable0 then descW = descW - 236 end
+
 			local lines = self:DescLines(k.desc, descW)
-			local rh = rh0 + (lines - 1) * 20
-			if isTarget then rh = rh + 36 end
-			local bg = P:Mix(Color.white, 0.04)
-			local border = P:Mix(Color.white, 0.1)
+			local rh = rh0 + (lines - 1) * 24
+			if lockable0 then rh = rh + 48 end
+			if isTarget then rh = rh + 52 end
+			local bg = P:Card()
+			local border = P:Edge()
 			if not got then
 				bg = P:Mix(Color.white, 0.02)
 				border = P:Mix(Color.white, 0.06)
 			end
-			local row = H:SpawnPanel("RtsUnitSkill" .. tostring(i), content, Vector2(0, 1), Vector2(0, 1), Vector2(rx, sy), Vector2(rw, rh), bg, border, 1.5)
+			local row = H:SpawnRoundedPanel("RtsUnitSkill" .. tostring(i), content, Vector2(0, 1), Vector2(0, 1), Vector2(rx, sy), Vector2(rw, rh), bg, border, 1.5)
 			local bar = H:SpawnStretch("model://uisprite", "RtsUnitSkillBar", row, Vector2(0, 0), Vector2(0, 1), Vector2(0, 0), Vector2(4, 0))
 			local barColor = Color(0.541, 0.498, 0.439, 1)
 			if k.kind == "액티브" then barColor = H:ColGold() end
 			if not got then barColor = Color(0.4, 0.37, 0.33, 0.6) end
 			bar.SpriteGUIRendererComponent.Color = barColor
-			local ink = H:ColInk()
-			local desc = Color(0.902, 0.863, 0.769, 1)
-			local mutedC = H:ColMuted()
+			local ink = _RtsPopupLogic:Ink()
+			local desc = _RtsPopupLogic:Ink()
+			local mutedC = _RtsPopupLogic:Muted()
 			if not got then
 				ink = Color(0.55, 0.51, 0.45, 1)
 				desc = Color(0.5, 0.46, 0.41, 1)
@@ -518,19 +532,19 @@ script RtsUnitPopupLogic extends Logic
 			lvLbl.TextComponent.IsRichText = true
 			-- 프리즘이 얹은 액티브(k.prism)는 태그를 '액티브 · 프리즘'으로(2026-09-22 사용자 "왜 풍마수리검이 2칸이지" — 같은 이름의 프리즘 행은 아래에서 생략)
 			local kindText = k.kind
-			if k.prism then kindText = k.kind .. " · <color=#c48cf0>프리즘</color>" end
-			local nameText = k.name .. "  <size=11><color=#d9cba6>" .. kindText .. "</color></size>"
+			if k.prism then kindText = k.kind .. " · <color=#784aa1>프리즘</color>" end
+			local nameText = k.name .. "  <size=11><color=#78624d>" .. kindText .. "</color></size>"
 			if not got then nameText = nameText .. "  <size=12><color=#8a8072>미획득</color></size>" end
 			-- 획득한 액티브는 우측에 잠금 설정 토글(사용 / 보스전 잠금 / 잠금)이 붙어 글자 폭을 그만큼 줄인다. 영구 잠금(3)은 미획득이어도 표시
 			local lockMode = _RtsJobTableLogic:GetLock(u.SkillLocks, i)
 			local isLockable = k.kind == "액티브" and (got or lockMode == 3)
 			local textW = rw - 90
-			if isLockable then textW = textW - 236 end
+
 			local nameLbl = H:SpawnLabel("RtsUnitSkillName", row, Vector2(0, 1), Vector2(0, 1), Vector2(70, -8), Vector2(textW, 24),
-				nameText, ink, 17, TextAlignmentType.MiddleLeft, true)
+				nameText, ink, 21, TextAlignmentType.MiddleLeft, true)
 			nameLbl.TextComponent.IsRichText = true
-			H:SpawnLabel("RtsUnitSkillDesc", row, Vector2(0, 1), Vector2(0, 1), Vector2(70, -34), Vector2(textW, 2 + lines * 20),
-				k.desc, desc, 14, TextAlignmentType.UpperLeft, false)
+			H:SpawnLabel("RtsUnitSkillDesc", row, Vector2(0, 1), Vector2(0, 1), Vector2(70, -42), Vector2(textW, 8 + lines * 24),
+				k.desc, desc, 18, TextAlignmentType.UpperLeft, false)
 			if isLockable then
 				self:BuildLockToggle(row, u, i, rh)
 			end
@@ -538,30 +552,32 @@ script RtsUnitPopupLogic extends Logic
 				self:BuildTargetRow(row, u, rx0, top0 + sy)
 			end
 			sy = sy - rh - 6
+			end
 		end
 		-- 적용된 프리즘 증강(2026-09-22 사용자 "프리즘 스킬들은 모두 상세정보 → 스킬에서 확인"): 스킬 표 뒤에 프리즘색 행으로. 기존 스킬을 바꾸는 프리즘(템페스트·엘릭서·인레이지·거대화·초월·풍마수리검)은 표에 새 항목이 없어 여기서만 보인다
 		for i = 1, #ids do
 			local pz = _RtsJobTableLogic:GetPrism(ids[i])
 			-- 같은 이름의 스킬 행이 이미 있으면(풍마수리검·애로우 레인·트루 스나이핑·디바인 퍼니시먼트) 프리즘 행은 생략
 			if pz ~= nil and _RtsJobTableLogic:FindSkill(skills, pz.name) > 0 then pz = nil end
-			if pz ~= nil then
+			if pz ~= nil and self.Tab == "passive" then
 				local pc = P:GradeColor("prism")
 				local plines = self:DescLines(pz.desc, rw - 90)
-				local rh = rh0 + (plines - 1) * 20
-				local row = H:SpawnPanel("RtsUnitPrism" .. tostring(i), content, Vector2(0, 1), Vector2(0, 1), Vector2(rx, sy), Vector2(rw, rh), P:Mix(pc, 0.08), P:Mix(pc, 0.45), 1.5)
+				local rh = rh0 + (plines - 1) * 24
+				local row = H:SpawnRoundedPanel("RtsUnitPrism" .. tostring(i), content, Vector2(0, 1), Vector2(0, 1), Vector2(rx, sy), Vector2(rw, rh), P:Mix(pc, 0.08), P:Mix(pc, 0.45), 1.5)
 				local bar = H:SpawnStretch("model://uisprite", "RtsUnitPrismBar", row, Vector2(0, 0), Vector2(0, 1), Vector2(0, 0), Vector2(4, 0))
 				bar.SpriteGUIRendererComponent.Color = pc
 				local lvLbl = H:SpawnLabel("RtsUnitPrismLv", row, Vector2(0, 0.5), Vector2(0, 0.5), Vector2(12, 0), Vector2(50, 40),
-					"Lv\n<b><size=17>1</size></b>", H:ColMuted(), 12, TextAlignmentType.MiddleCenter, false) -- 프리즘은 레벨 제한 없음(2026-09-24 사용자 — 전엔 50으로 적혀 있었다)
+					"Lv\n<b><size=17>1</size></b>", _RtsPopupLogic:Muted(), 12, TextAlignmentType.MiddleCenter, false) -- 프리즘은 레벨 제한 없음(2026-09-24 사용자 — 전엔 50으로 적혀 있었다)
 				lvLbl.TextComponent.IsRichText = true
 				local nameLbl = H:SpawnLabel("RtsUnitPrismName", row, Vector2(0, 1), Vector2(0, 1), Vector2(70, -8), Vector2(rw - 90, 24),
-					pz.name .. "  <size=11><color=#c48cf0>프리즘</color></size>", H:ColInk(), 17, TextAlignmentType.MiddleLeft, true)
+					pz.name .. "  <size=11><color=#784aa1>프리즘</color></size>", _RtsPopupLogic:Ink(), 17, TextAlignmentType.MiddleLeft, true)
 				nameLbl.TextComponent.IsRichText = true
-				H:SpawnLabel("RtsUnitPrismDesc", row, Vector2(0, 1), Vector2(0, 1), Vector2(70, -34), Vector2(rw - 90, 2 + plines * 20),
-					pz.desc, Color(0.902, 0.863, 0.769, 1), 14, TextAlignmentType.UpperLeft, false)
+				H:SpawnLabel("RtsUnitPrismDesc", row, Vector2(0, 1), Vector2(0, 1), Vector2(70, -42), Vector2(rw - 90, 8 + plines * 24),
+					pz.desc, _RtsPopupLogic:Ink(), 18, TextAlignmentType.UpperLeft, false)
 				sy = sy - rh - 6
 			end
 		end
+		if sy == 0 then self:SpawnEmptyRow(list, rw, "표시할 스킬이 없어요") end
 	end
 
 	-- 액티브 스킬 잠금 설정(2026-09-16): 행 우측 상단에 3분할 토글 [사용 | 보스전 잠금 | 잠금]. 선택 = 초록/주황/빨강, 나머지는 흐림. 클릭 즉시 서버 요청(쿨타임 없음)
@@ -574,30 +590,30 @@ script RtsUnitPopupLogic extends Logic
 		local cur = _RtsJobTableLogic:GetLock(u.SkillLocks, idx)
 		if cur == 3 then
 			local pc = P:GradeColor("prism")
-			local pill = H:SpawnPanel("RtsUnitLock" .. H:Int(idx) .. "_3", row, Vector2(1, 1), Vector2(1, 1), Vector2(-12, -(64 - 28) / 2), Vector2(120, 28), P:Mix(pc, 0.22), pc, 1.5)
-			H:SpawnLabel("RtsUnitLockText", pill, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2(0, 0), Vector2(116, 24),
-				"영구 잠금", Color(0.973, 0.925, 0.784, 1), 12, TextAlignmentType.MiddleCenter, true)   -- 이모지(🔒)는 게임 폰트에 없어 안 그려진다(실측)
+			local pill = H:SpawnRoundedPanel("RtsUnitLock" .. H:Int(idx) .. "_3", row, Vector2(0, 0), Vector2(0, 0), Vector2(70, 12), Vector2(150, 36), P:Mix(pc, 0.22), pc, 1.5)
+			H:SpawnLabel("RtsUnitLockText", pill, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2(0, 0), Vector2(146, 32),
+				"영구 잠금", _RtsPopupLogic:Ink(), 16, TextAlignmentType.MiddleCenter, true)   -- 이모지(🔒)는 게임 폰트에 없어 안 그려진다(실측)
 			return
 		end
-		local opts = { { m = 0, w = 56, c = Color(0.624, 0.827, 0.604, 1) }, { m = 1, w = 100, c = Color(0.91, 0.635, 0.416, 1) }, { m = 2, w = 56, c = Color(0.86, 0.47, 0.44, 1) } }
+		local opts = { { m = 0, w = 104, c = Color(0.624, 0.827, 0.604, 1) }, { m = 1, w = 154, c = Color(0.91, 0.635, 0.416, 1) }, { m = 2, w = 104, c = Color(0.86, 0.47, 0.44, 1) } }
 		local total = 0
 		for i = 1, #opts do total = total + opts[i].w end
 		total = total + 4 * (#opts - 1)
-		local x = -12 - total
+		local x = 70
 		for i = 1, #opts do
 			local o = opts[i]
 			local on = (o.m == cur)
-			local bg = P:Mix(Color.white, 0.04)
-			local border = P:Mix(Color.white, 0.12)
+			local bg = P:Card()
+			local border = P:Edge()
 			local ink = Color(0.6, 0.56, 0.5, 1)
 			if on then
 				bg = P:Mix(o.c, 0.22)
 				border = o.c
-				ink = Color(0.973, 0.925, 0.784, 1)
+				ink = _RtsPopupLogic:Ink()
 			end
-			local btn = H:SpawnPanel("RtsUnitLock" .. H:Int(idx) .. "_" .. H:Int(o.m), row, Vector2(1, 1), Vector2(0, 1), Vector2(x, -(64 - 28) / 2), Vector2(o.w, 28), bg, border, 1.5)
-			H:SpawnLabel("RtsUnitLockText", btn, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2(0, 0), Vector2(o.w - 4, 24),
-				_RtsJobTableLogic:LockName(o.m), ink, 12, TextAlignmentType.MiddleCenter, on)
+			local btn = H:SpawnRoundedPanel("RtsUnitLock" .. H:Int(idx) .. "_" .. H:Int(o.m), row, Vector2(0, 0), Vector2(0, 0), Vector2(x, 12), Vector2(o.w, 36), bg, border, 1.5)
+			H:SpawnLabel("RtsUnitLockText", btn, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2(0, 0), Vector2(o.w - 8, 32),
+				_RtsJobTableLogic:LockName(o.m), ink, 16, TextAlignmentType.MiddleCenter, on)
 			if not on then
 				local mode = o.m
 				local click = H:SpawnClick("RtsUnitLockClick", btn)
@@ -624,13 +640,13 @@ script RtsUnitPopupLogic extends Logic
 		if sg ~= nil then
 			sg.Type = LayoutGroupType.Vertical
 			sg.ChildAlignment = ChildAlignmentType.UpperLeft
-			sg.Spacing = 6
-			sg.UseScroll = not fits
+			sg.Spacing = 10
+			sg.UseScroll = true
 			-- 스크롤바 프로퍼티 이름은 d.mlua(Visible·Thickness…)와 달리 런타임엔 ScrollBar* (2026-09-16 실측: "cannot set Visible")
 			sg.ScrollBarVisible = ScrollBarVisibility.AlwaysShow
 			sg.ScrollBarThickness = 8
 			sg.ScrollBarHandleColor = H:ColGold()
-			sg.ScrollBarBackgroundColor = Color(1, 1, 1, 0.06)
+			sg.ScrollBarBackgroundColor = Color(0.42, 0.32, 0.22, 0.1)
 		end
 		return list
 	end
@@ -642,7 +658,7 @@ script RtsUnitPopupLogic extends Logic
 		local row = H:SpawnUI("model://uisprite", "RtsUnitEmptyRow", list, Vector2(0, 1), Vector2(0, 1), Vector2(0, 0), Vector2(rw - 12, 200))
 		H:Tint(row, 1, 1, 1, 0)
 		H:SpawnLabel("RtsUnitEmptyText", row, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2(0, 0), Vector2(rw - 40, 60),
-			text, H:ColMuted(), 15, TextAlignmentType.MiddleCenter, false)
+			text, _RtsPopupLogic:Muted(), 15, TextAlignmentType.MiddleCenter, false)
 	end
 
 	-- 증강 탭(2026-09-24): 맨 위에 증강 합계(공격력·공격력%·보스·크리 확률·크리 데미지·최종) + 방어구 부수기(켜졌을 때만), 그 아래 지정된 증강 목록
@@ -652,7 +668,7 @@ script RtsUnitPopupLogic extends Logic
 		local P = _RtsPopupLogic
 		-- 증강 효과 배율까지 곱한 합계(1티어 ×3 · 2티어 약점 ×2 — RtsJobTableLogic.AugMulFor, 2026-09-24)
 		local t = _RtsAugmentTableLogic:TotalsMul(u.Augs, _RtsJobTableLogic:AugMulFor(u))
-		local box = H:SpawnPanel("RtsUnitAugSum", content, Vector2(0, 1), Vector2(0, 1), Vector2(rx, top), Vector2(rw - 12, 88),
+		local box = H:SpawnRoundedPanel("RtsUnitAugSum", content, Vector2(0, 1), Vector2(0, 1), Vector2(rx, top), Vector2(rw - 12, 88),
 			P:Mix(H:ColGold(), 0.08), P:Mix(H:ColGold(), 0.4), 1.5)
 		local parts = {}
 		if t.atk > 0 then parts[#parts + 1] = "공격력 +" .. H:Int(t.atk) end
@@ -676,10 +692,10 @@ script RtsUnitPopupLogic extends Logic
 		local boxH = 88
 		if line3 == "" then boxH = 62 end
 		box.Parent.UITransformComponent.RectSize = Vector2(rw - 12, boxH)
-		H:SpawnLabel("RtsUnitAugSumT", box, Vector2(0, 1), Vector2(0, 1), Vector2(14, -6), Vector2(rw - 40, 22), line1, H:ColGold(), 14, TextAlignmentType.MiddleLeft, true)
-		H:SpawnLabel("RtsUnitAugSumV", box, Vector2(0, 1), Vector2(0, 1), Vector2(14, -30), Vector2(rw - 40, 24), line2, H:ColInk(), 15, TextAlignmentType.MiddleLeft, true)
+		H:SpawnLabel("RtsUnitAugSumT", box, Vector2(0, 1), Vector2(0, 1), Vector2(14, -6), Vector2(rw - 40, 22), line1, P:AccentInk(), 16, TextAlignmentType.MiddleLeft, true)
+		H:SpawnLabel("RtsUnitAugSumV", box, Vector2(0, 1), Vector2(0, 1), Vector2(14, -30), Vector2(rw - 40, 24), line2, _RtsPopupLogic:Ink(), 15, TextAlignmentType.MiddleLeft, true)
 		if line3 ~= "" then
-			H:SpawnLabel("RtsUnitAugSumE", box, Vector2(0, 1), Vector2(0, 1), Vector2(14, -58), Vector2(rw - 40, 22), line3, H:ColMuted(), 13, TextAlignmentType.MiddleLeft, false)
+			H:SpawnLabel("RtsUnitAugSumE", box, Vector2(0, 1), Vector2(0, 1), Vector2(14, -58), Vector2(rw - 40, 22), line3, _RtsPopupLogic:Muted(), 13, TextAlignmentType.MiddleLeft, false)
 		end
 		self:BuildAugTab(content, rx, rw, top - boxH - 8, augs)
 	end
@@ -700,7 +716,7 @@ script RtsUnitPopupLogic extends Logic
 			if string.len(d) > 150 then lines = math.max(lines, math.ceil(string.len(d) / 2.6 / 44)) end
 			if lines > 6 then lines = 6 end
 			descs[i] = d
-			heights[i] = 44 + lines * 20
+			heights[i] = math.max(100, 54 + lines * 22)
 			total = total + heights[i] + 6
 		end
 		local list = self:SpawnScrollList(content, "RtsUnitAugList", rx, rw, top, math.max(#augs, math.ceil(total / 70)))
@@ -712,15 +728,16 @@ script RtsUnitPopupLogic extends Logic
 		for i = 1, #augs do
 			local a = augs[i]
 			local rh = heights[i]
-			local row = H:SpawnPanel("RtsUnitAug" .. tostring(i), list, Vector2(0, 1), Vector2(0, 1), Vector2(0, 0), Vector2(rw - 12, rh),
-				P:Mix(Color.white, 0.04), P:Mix(Color.white, 0.1), 1.5)
+			local row = H:SpawnRoundedPanel("RtsUnitAug" .. tostring(i), list, Vector2(0, 1), Vector2(0, 1), Vector2(0, 0), Vector2(rw - 12, rh),
+				P:Card(), P:Edge(), 1.5)
 			local band = H:SpawnStretch("model://uisprite", "RtsUnitAugBand", row, Vector2(0, 0), Vector2(0, 1), Vector2(0, 0), Vector2(4, 0))
 			band.SpriteGUIRendererComponent.Color = P:GradeColor(a.g)
-			P:SpawnBadge("RtsUnitAugBadge", row, Vector2(14, -20), a.g)
-			H:SpawnLabel("RtsUnitAugT", row, Vector2(0, 1), Vector2(0, 1), Vector2(92, -8), Vector2(rw - 120, 24),
-				a.t, H:ColInk(), 17, TextAlignmentType.MiddleLeft, true)
-			H:SpawnLabel("RtsUnitAugD", row, Vector2(0, 1), Vector2(0, 1), Vector2(92, -34), Vector2(rw - 120, rh - 42),
-				descs[i], Color(0.902, 0.863, 0.769, 1), 14, TextAlignmentType.UpperLeft, false)
+			local definition = _RtsAugmentTableLogic:GetDef(a.id)
+			if definition ~= nil then P:SpawnAugIcon(row, definition, Vector2(14, -14), 64) end
+			H:SpawnLabel("RtsUnitAugT", row, Vector2(0, 1), Vector2(0, 1), Vector2(96, -12), Vector2(rw - 124, 26),
+				a.t, _RtsPopupLogic:Ink(), 17, TextAlignmentType.MiddleLeft, true)
+			H:SpawnLabel("RtsUnitAugD", row, Vector2(0, 1), Vector2(0, 1), Vector2(96, -46), Vector2(rw - 124, rh - 54),
+				descs[i], _RtsPopupLogic:Ink(), 14, TextAlignmentType.UpperLeft, false)
 		end
 	end
 
@@ -751,31 +768,31 @@ script RtsUnitPopupLogic extends Logic
 		local list = self:SpawnScrollList(content, "RtsUnitBuffList", rx, rw, top, rows)
 		if list == nil then return end
 		if pb ~= nil then
-			local row = H:SpawnPanel("RtsUnitBuffPrism", list, Vector2(0, 1), Vector2(0, 1), Vector2(0, 0), Vector2(rw - 12, pbH),
+			local row = H:SpawnRoundedPanel("RtsUnitBuffPrism", list, Vector2(0, 1), Vector2(0, 1), Vector2(0, 0), Vector2(rw - 12, pbH),
 				P:Mix(P:GradeColor("prism"), 0.1), P:Mix(P:GradeColor("prism"), 0.45), 1.5)
 			local band = H:SpawnStretch("model://uisprite", "RtsUnitBuffPrismBand", row, Vector2(0, 0), Vector2(0, 1), Vector2(0, 0), Vector2(4, 0))
 			band.SpriteGUIRendererComponent.Color = P:GradeColor("prism")
 			P:SpawnBadge("RtsUnitBuffPrismBadge", row, Vector2(14, -20), "prism")
-			local nm = H:SpawnLabel("RtsUnitBuffPrismName", row, Vector2(0, 1), Vector2(0, 1), Vector2(92, -8), Vector2(rw - 120, 24),
-				pb.name .. "  <size=11><color=#d9cba6>프리즘 · 이 유닛</color></size>", H:ColInk(), 17, TextAlignmentType.MiddleLeft, true)
+			local nm = H:SpawnLabel("RtsUnitBuffPrismName", row, Vector2(0, 1), Vector2(0, 1), Vector2(96, -12), Vector2(rw - 124, 26),
+				pb.name .. "  <size=11><color=#78624d>프리즘 · 이 유닛</color></size>", _RtsPopupLogic:Ink(), 17, TextAlignmentType.MiddleLeft, true)
 			nm.TextComponent.IsRichText = true
 			-- 설명(2026-09-25 사용자 "크리티컬 확률·크리티컬 데미지 증강 효과가 100% 증가한다. 이런 식으로")
 			local ef = H:SpawnLabel("RtsUnitBuffPrismEff", row, Vector2(0, 1), Vector2(0, 1), Vector2(92, -34), Vector2(rw - 120, 22),
-				pb.eff, Color(0.624, 0.827, 0.604, 1), 14, TextAlignmentType.MiddleLeft, true)
+				pb.eff, Color(0.23, 0.43, 0.21, 1), 16, TextAlignmentType.MiddleLeft, true)
 			ef.TextComponent.Overflow = OverflowType.Truncate
 			-- 증강 효과가 늘어 더 받은 수치 — 능력치마다 따로(2열 격자, 사용자 "증강으로 이득 본 수치 총합을 각각")
 			H:SpawnLabel("RtsUnitBuffPrismHead", row, Vector2(0, 1), Vector2(0, 1), Vector2(92, -58), Vector2(rw - 120, 20),
-				"증강 효과 증가로 더 받은 수치", H:ColGold(), 13, TextAlignmentType.MiddleLeft, true)
+				"증강 효과 증가로 더 받은 수치", P:AccentInk(), 15, TextAlignmentType.MiddleLeft, true)
 			if #pb.gains == 0 then
 				H:SpawnLabel("RtsUnitBuffPrismGain0", row, Vector2(0, 1), Vector2(0, 1), Vector2(92, -80), Vector2(rw - 120, 20),
-					"아직 없어요(증강이 붙으면 늘어나요)", H:ColMuted(), 13, TextAlignmentType.MiddleLeft, false)
+					"아직 없어요(증강이 붙으면 늘어나요)", _RtsPopupLogic:Muted(), 13, TextAlignmentType.MiddleLeft, false)
 			end
 			local colW = math.floor((rw - 120) / 2)
 			for gi = 1, #pb.gains do
 				local col = (gi - 1) % 2
 				local line = math.floor((gi - 1) / 2)
 				local g = H:SpawnLabel("RtsUnitBuffPrismGain", row, Vector2(0, 1), Vector2(0, 1), Vector2(92 + col * colW, -80 - line * 20), Vector2(colW - 6, 20),
-					pb.gains[gi], Color(0.902, 0.863, 0.769, 1), 13, TextAlignmentType.MiddleLeft, false)
+					pb.gains[gi], _RtsPopupLogic:Ink(), 13, TextAlignmentType.MiddleLeft, false)
 				g.TextComponent.Overflow = OverflowType.Truncate
 			end
 		end
@@ -785,8 +802,8 @@ script RtsUnitPopupLogic extends Logic
 		end
 		for i = 1, #buffs do
 			local b = buffs[i]
-			local row = H:SpawnPanel("RtsUnitBuff" .. tostring(i), list, Vector2(0, 1), Vector2(0, 1), Vector2(0, 0), Vector2(rw - 12, 64),
-				P:Mix(Color.white, 0.04), P:Mix(Color.white, 0.1), 1.5)
+			local row = H:SpawnRoundedPanel("RtsUnitBuff" .. tostring(i), list, Vector2(0, 1), Vector2(0, 1), Vector2(0, 0), Vector2(rw - 12, 64),
+				P:Card(), P:Edge(), 1.5)
 			local ic = nil
 			if b.def.icon ~= nil and b.def.icon ~= "" then
 				ic = H:SpawnUI("model://uisprite", "RtsUnitBuffIcon", row, Vector2(0, 0.5), Vector2(0, 0.5), Vector2(14, 0), Vector2(40, 40))
@@ -796,10 +813,10 @@ script RtsUnitPopupLogic extends Logic
 				ic.SpriteGUIRendererComponent.Color = Color.white
 			end
 			local name = H:SpawnLabel("RtsUnitBuffName", row, Vector2(0, 1), Vector2(0, 1), Vector2(70, -8), Vector2(rw - 100, 24),
-				b.def.name .. "  <size=11><color=#d9cba6>" .. B:ScopeText(b.def) .. "</color></size>", H:ColInk(), 17, TextAlignmentType.MiddleLeft, true)
+				b.def.name .. "  <size=11><color=#78624d>" .. B:ScopeText(b.def) .. "</color></size>", _RtsPopupLogic:Ink(), 17, TextAlignmentType.MiddleLeft, true)
 			name.TextComponent.IsRichText = true
 			H:SpawnLabel("RtsUnitBuffEff", row, Vector2(0, 1), Vector2(0, 1), Vector2(70, -34), Vector2(rw - 100, 22),
-				B:EffectText(b.def), Color(0.624, 0.827, 0.604, 1), 14, TextAlignmentType.MiddleLeft, false)
+				B:EffectText(b.def), Color(0.23, 0.43, 0.21, 1), 16, TextAlignmentType.MiddleLeft, false)
 		end
 	end
 
@@ -831,18 +848,18 @@ script RtsUnitPopupLogic extends Logic
 			end
 		end
 		local rowH = 30
-		local list = H:SpawnPanel("RtsUnitTgtList", self.Content, Vector2(0, 1), Vector2(0, 1), Vector2(x, y), Vector2(250, rowH * #options + 4),
-			P:Mix(Color(0, 0, 0, 1), 0.6), H:ColGold(), 1.5)
-		self.Dropdown = list
+		local list = H:SpawnRoundedPanel("RtsUnitTgtList", self.Content, Vector2(0, 1), Vector2(0, 1), Vector2(x, y), Vector2(250, rowH * #options + 4),
+			P:Card(), H:ColGold(), 1.5)
+		self.Dropdown = list.Parent
 		for i = 1, #options do
 			local o = options[i]
 			local on = (o.no == u.BondNo)
-			local bg = P:Mix(Color(0, 0, 0, 1), 0.6)
+			local bg = P:Card()
 			if on then bg = P:Mix(H:ColGold(), 0.2) end
 			local item = H:SpawnUI("model://uisprite", "RtsUnitTgtItem" .. tostring(i), list, Vector2(0, 1), Vector2(0, 1), Vector2(2, -2 - (i - 1) * rowH), Vector2(246, rowH))
 			item.SpriteGUIRendererComponent.Color = bg
 			H:SpawnLabel("RtsUnitTgtItemText", item, Vector2(0, 0.5), Vector2(0, 0.5), Vector2(10, 0), Vector2(230, 26),
-				o.text, H:ColInk(), 14, TextAlignmentType.MiddleLeft, false)
+				o.text, _RtsPopupLogic:Ink(), 14, TextAlignmentType.MiddleLeft, false)
 			local pick = o.no
 			local click = H:SpawnClick("RtsUnitTgtItemClick", item)
 			click:ConnectEvent(ButtonClickEvent, function(event)
@@ -872,12 +889,14 @@ script RtsUnitPopupLogic extends Logic
 	@ExecSpace("ClientOnly")
 	method void CycleTab()
 		if self.CurNo == 0 or self.Body == nil then return end
-		if self.Tab == "skill" then
+		if self.Tab == "active" then
+			self.Tab = "passive"
+		elseif self.Tab == "passive" then
 			self.Tab = "aug"
 		elseif self.Tab == "aug" then
 			self.Tab = "buff"
 		else
-			self.Tab = "skill"
+			self.Tab = "active"
 		end
 		self:RenderRight(_RtsUnitLogic:GetMyUnit(self.CurNo))
 	end
@@ -893,16 +912,23 @@ script RtsUnitPopupLogic extends Logic
 		local augs = B:GetAugmentsFor(u.Zone, u.No)
 		if self.TabBar ~= nil then
 			P:SetTabText(self.TabBar.tabs["aug"], "증강 " .. H:Int(#augs))
-			P:SetTabText(self.TabBar.tabs["buff"], "적용 중인 버프 " .. H:Int(self:BuffCount(u, buffs)))
+			P:SetTabText(self.TabBar.tabs["buff"], "버프 " .. H:Int(self:BuffCount(u, buffs)))
 			P:BarSelect(self.TabBar, self.Tab)
 		end
+		if self.Dropdown ~= nil and isvalid(self.Dropdown) then self.Dropdown:Destroy() end
 		self.Dropdown = nil
 		local old = self.RightBox
+		local scrollPos = nil
+		if self._T.RightTab == self.Tab and isvalid(old) then
+			local lists = old:GetChildComponentsByTypeName("ScrollLayoutGroupComponent", true)
+			if #lists > 0 then scrollPos = lists[1]:GetScrollNormalizedPosition() end
+		end
+		self._T.RightTab = self.Tab
 		local box = P:SpawnBox(self.Content, "RtsUnitRight")
 		self.RightBox = box
-		local rx = 411
+		local rx = 647
 		local rw = self.PanelW - rx - 27
-		local top = -54
+		local top = -74
 		if self.Tab == "aug" then
 			self:BuildAugTabFor(box, u, rx, rw, top, augs)
 		elseif self.Tab == "buff" then
@@ -910,7 +936,14 @@ script RtsUnitPopupLogic extends Logic
 		else
 			self:BuildSkillTab(box, u, rx, rw, top)
 		end
-		P:DropLater(old)
+		if scrollPos ~= nil then
+			_TimerService:SetTimerOnce(function()
+				if not isvalid(box) then return end
+				local lists = box:GetChildComponentsByTypeName("ScrollLayoutGroupComponent", true)
+				if #lists > 0 then lists[1]:SetScrollNormalizedPosition(UITransformAxis.Vertical, scrollPos.y) end
+			end, 0.2)
+		end
+		P:SwapContent(old, box)
 		self.Sig = self:Signature(u)
 	end
 
@@ -940,7 +973,7 @@ script RtsUnitPopupLogic extends Logic
 		local e = _SpawnService:SpawnByModelId("model://uiempty", "RtsUnitPreview", Vector3.zero, parent)
 		if e == nil then
 			H:SpawnLabel("RtsUnitPreviewText", parent, Vector2(0, 1), Vector2(0, 1), Vector2(pos.x - size.x / 2, pos.y + size.y / 2), size,
-				_RtsJobTableLogic:GetJobName(u.JobId), H:ColMuted(), 14, TextAlignmentType.MiddleCenter, false)
+				_RtsJobTableLogic:GetJobName(u.JobId), _RtsPopupLogic:Muted(), 14, TextAlignmentType.MiddleCenter, false)
 			return
 		end
 		local t = e.UITransformComponent
@@ -971,6 +1004,123 @@ script RtsUnitPopupLogic extends Logic
 		cm.CustomCapEquip = set.cap or ""
 		cm.CustomFaceAccessoryEquip = set.faceAcc or ""
 		cm.CustomFaceEquip = set.face or ""
+	end
+
+	@ExecSpace("ClientOnly")
+	method void SetChartLine(Entity line, Vector2 a, Vector2 b, number thick)
+		-- 기존 선의 위치와 길이만 갱신한다.
+		local dx = b.x - a.x
+		local dy = b.y - a.y
+		local t = line.UITransformComponent
+		t.Pivot = Vector2(0, 0.5)
+		t.anchoredPosition = a
+		t.RectSize = Vector2(math.max(0.01, math.sqrt(dx * dx + dy * dy)), thick)
+		t.ZRotation = math.deg(_RtsPopupLogic:Atan2(dy, dx))
+	end
+
+	@ExecSpace("ClientOnly")
+	method void BuildStatChart(Entity parent, any u)
+		-- 육각 격자·아이콘·값 라벨을 한 번 만들고 능력치가 바뀌면 재사용한다.
+		local H = _RtsHudLogic
+		local P = _RtsPopupLogic
+		local c = Vector2(200, -204)
+		local radius = 85
+		local ends = {}
+		local function line(name, color)
+			local e = H:SpawnUI("model://uisprite", name, parent, Vector2(0, 1), Vector2(0, 0.5), c, Vector2(1, 1))
+			e.SpriteGUIRendererComponent.Color = color
+			e.SpriteGUIRendererComponent.RaycastTarget = false
+			return e
+		end
+		for i = 1, 6 do
+			local a = math.rad((i - 1) * 60)
+			ends[i] = Vector2(c.x + math.sin(a) * radius, c.y + math.cos(a) * radius)
+		end
+		for level = 1, 4 do
+			for i = 1, 6 do
+				local v = ends[i]
+				local w = ends[i % 6 + 1]
+				local scale = level / 4
+				self:SetChartLine(line("RtsStatGrid", Color(0.64, 0.64, 0.76, 0.30)), c + (v - c) * scale, c + (w - c) * scale, 1)
+			end
+		end
+		for i = 1, 6 do self:SetChartLine(line("RtsStatAxis", Color(0.64, 0.64, 0.76, 0.23)), c, ends[i], 1) end
+		self._T.ChartLines = {}
+		self._T.ChartDots = {}
+		self._T.ChartFill = {}
+		for i = 1, 12 do
+			local e = line("RtsStatFill", Color(0.66, 0.60, 0.86, 0.20))
+			e.SpriteGUIRendererComponent.ImageRUID = DataRef(P.RightTriRUID)
+			self._T.ChartFill[i] = e
+		end
+		for i = 1, 6 do
+			self._T.ChartLines[i] = line("RtsStatValueEdge", Color(0.52, 0.46, 0.70, 0.95))
+			local dot = line("RtsStatValueDot", Color(0.45, 0.40, 0.63, 1))
+			dot.SpriteGUIRendererComponent.ImageRUID = DataRef(H.CircleMaskRUID)
+			dot.UITransformComponent.Pivot = Vector2(0.5, 0.5)
+			dot.UITransformComponent.RectSize = Vector2(6, 6)
+			self._T.ChartDots[i] = dot
+		end
+		local keys = {"atk", "pct", "fin", "boss", "crit", "critDmg"}
+		local names = {"공격력", "공격력%", "최종 데미지%", "보스 공격 시 데미지%", "크리티컬 확률", "크리티컬 데미지"}
+		local indices = {2, 3, 5, 6, 7, 8}
+		local spots = {Vector2(200, -14), Vector2(334, -96), Vector2(334, -244), Vector2(200, -321), Vector2(66, -244), Vector2(66, -96)}
+		local rows = self:StatRowTexts(u)
+		for i = 1, 6 do
+			local pos = spots[i]
+			H:SpawnStatIcon(parent, keys[i], Vector2(pos.x - 14, pos.y), 28)
+			H:SpawnLabel("RtsStatName", parent, Vector2(0, 1), Vector2(0.5, 1), Vector2(pos.x, pos.y - 29), Vector2(124, 32), names[i], P:Muted(), 13, TextAlignmentType.MiddleCenter, false)
+			local value = H:SpawnLabel("RtsStatValue", parent, Vector2(0, 1), Vector2(0.5, 1), Vector2(pos.x, pos.y - 59), Vector2(122, 24), rows[indices[i]][2], P:Ink(), 19, TextAlignmentType.MiddleCenter, true)
+			value.TextComponent.IsRichText = true
+			self.StatVals[indices[i]] = value
+		end
+		self:UpdateStatChart(u)
+	end
+
+	@ExecSpace("ClientOnly")
+	method void UpdateStatChart(any u)
+		-- 각 축의 고정 표시 척도는 직업·레벨에 따라 바뀌지 않는다. 게임 수치는 제한하지 않는다.
+		if self._T.ChartLines == nil then return end
+		local T = _RtsJobTableLogic
+		local s = T:GetStatFor(u)
+		_RtsUnitBuffLogic:ApplyToStat(s, _RtsUnitBuffLogic:GetBuffsFor(u.Zone, u.No))
+		local calc = T:CalcStat(u.JobId, u.Level, s)
+		local values = {calc.atk, s.pct - 100, s.fin - 100, s.bossAdd or 0, s.crit, s.critDmg}
+		local limits = {1000, 200, 300, 200, 100, 200}
+		local c = Vector2(200, -204)
+		local points = {}
+		for i = 1, 6 do
+			local angle = math.rad((i - 1) * 60)
+			local radius = 85 * math.max(0, math.min(1, values[i] / limits[i]))
+			points[i] = Vector2(c.x + math.sin(angle) * radius, c.y + math.cos(angle) * radius)
+		end
+		local function right(e, f, m, v)
+			local dx, dy = m.x - f.x, m.y - f.y
+			local vx, vy = v.x - f.x, v.y - f.y
+			if dx * vy - dy * vx < 0 then dx, dy, vx, vy = vx, vy, dx, dy end
+			local t = e.UITransformComponent
+			t.Pivot = Vector2(0, 0)
+			t.anchoredPosition = f
+			t.RectSize = Vector2(math.max(0.01, math.sqrt(dx * dx + dy * dy)), math.max(0.01, math.sqrt(vx * vx + vy * vy)))
+			t.ZRotation = math.deg(_RtsPopupLogic:Atan2(dy, dx))
+		end
+		for i = 1, 6 do
+			local a, b = points[i], points[i % 6 + 1]
+			self:SetChartLine(self._T.ChartLines[i], a, b, 2.5)
+			self._T.ChartDots[i].UITransformComponent.anchoredPosition = a
+			local ps = {c, a, b}
+			local best, length = 1, -1
+			for j = 1, 3 do
+				local v, w = ps[j], ps[j % 3 + 1]
+				local d = (v.x - w.x) ^ 2 + (v.y - w.y) ^ 2
+				if d > length then best, length = j, d end
+			end
+			local x, y, o = ps[best], ps[best % 3 + 1], ps[(best + 1) % 3 + 1]
+			local amount = ((o.x - x.x) * (y.x - x.x) + (o.y - x.y) * (y.y - x.y)) / math.max(0.01, length)
+			local foot = Vector2(x.x + (y.x - x.x) * amount, x.y + (y.y - x.y) * amount)
+			right(self._T.ChartFill[i * 2 - 1], foot, x, o)
+			right(self._T.ChartFill[i * 2], foot, y, o)
+		end
 	end
 
 end

@@ -104,6 +104,7 @@ const cx = c => c * CS + CS / 2, cy = r => r * CS + CS / 2;
 
 // 테마 프리셋: 발판 채움·선(가이드라인 표의 발판 선색·알파), 연석 색, 길 표면 그리기
 const TH = {
+  zakum_altar: { padFill: hex('#F3CF98'), padFillA: 0.07, padLine: hex('#DDBD82'), padLineA: 0.46, edge: hex('#553A32'), edgeHi: hex('#D4A365'), road: 'blocks', stone: hex('#8C7163'), mortar: hex('#44302C') },
   henesys: { padFill: [1, 1, 1], padFillA: 0.10, padLine: hex('#56835B'), padLineA: 0.34, edge: hex('#7D6048'), edgeHi: hex('#F5DCB0'), road: 'flag', stone: hex('#D8BA8C'), mortar: hex('#977554') },
   ellinia: { padFill: hex('#C6E8D4'), padFillA: 0.09, padLine: hex('#2F7567'), padLineA: 0.36, edge: hex('#456954'), edgeHi: hex('#B9D7AA'), road: 'cobble', stone: hex('#93B5A3'), mortar: hex('#567B69'), root: hex('#624E38') },
   perion: { padFill: hex('#F6DFBC'), padFillA: 0.10, padLine: hex('#A15D3E'), padLineA: 0.36, edge: hex('#8E4F34'), edgeHi: hex('#F8D29C'), road: 'blocks', stone: hex('#D99A65'), mortar: hex('#9F6342') },

@@ -361,6 +361,9 @@ script RtsZoneLogic extends Logic
 		end
 		local scale = _RtsConfigLogic:GetGridTextureScale()
 		bg.TransformComponent.Scale = Vector3(scale, scale, 1)
+		if ruid == _RtsActionThemeLogic.BackgroundRUID then
+			bg.TransformComponent.Scale = Vector3(scale * 1920 / 1672, scale * 1080 / 941, 1)
+		end
 		bg.SpriteRendererComponent.SpriteRUID = ruid
 		bg.SpriteRendererComponent.Color = Color(1, 1, 1, alpha or 1)
 	end

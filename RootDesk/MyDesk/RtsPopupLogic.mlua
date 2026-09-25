@@ -22,6 +22,9 @@ script RtsPopupLogic extends Logic
 	property Entity Body = nil
 
 	property string Kind = ""
+	property table HubBar = nil
+	property Entity HubPage = nil
+	property table DrawRefs = nil
 
 	property number PanelW = 1114
 
@@ -117,7 +120,6 @@ script RtsPopupLogic extends Logic
 	property string RecruitTab = "adv"
 
 	-- 증강 창 상태: 등급 탭(all/bronze/silver/gold/prism) · 선택한 보유 증강 번호(MyOwned 순번) · 지정하려고 고른 유닛 번호
-	property string AugGrade = "all"
 
 	-- 증강 도감 탭(2026-09-24 사용자 "좌측 아래 증강 도감 — 등급별 목록")
 	property string CodexGrade = "bronze"
@@ -132,13 +134,10 @@ script RtsPopupLogic extends Logic
 	-- 이미 적용된(유닛에 지정된·해금된) 증강 숨기기(2026-09-24 사용자 "증강 팝업 우측 하단에 체크박스, 기본 체크")
 	property boolean AugHideAssigned = true
 
-	-- 3택1 선택지 연출(2026-09-23 사용자 "특수한 사운드 + 테두리 반짝반짝, 선물 같은 느낌"): 뜰 때 원작 업적 달성음 sound/achievementeff/achievmentcomplete,
-	--   카드마다 뒤쪽 빛(등급색, 숨쉬듯 밝아졌다 어두워짐) + 테두리 색 반짝임 + 테두리 둘레에 반짝이는 십자 별
+	-- 3택1 등장음은 유지하고 카드의 지속 반짝임은 사용하지 않는다.
 	property string PickSound = "dbb38b4f04044499906bd7a2ca9c4d7c"
 
-	property number PickFxTimer = 0
 
-	property table PickFx = {}
 
 	-- ===== 셸 =====
 
@@ -173,7 +172,7 @@ script RtsPopupLogic extends Logic
 		local x = H:SpawnPanel("RtsPopupClose", panel, Vector2(1, 1), Vector2(1, 1), Vector2(-27, -20), Vector2(38, 38),
 			self:Base(), self:Mix(H:ColGold(), 0.5), 1.5)
 		H:SpawnLabel("RtsPopupCloseX", x, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2(0, 0), Vector2(36, 36),
-			"X", H:ColInk(), 20, TextAlignmentType.MiddleCenter, true)
+			"×", self:Ink(), 26, TextAlignmentType.MiddleCenter, true)
 		local xc = H:SpawnClick("RtsPopupCloseClick", x)
 		xc:ConnectEvent(ButtonClickEvent, function(event)
 			self:Close()
@@ -191,6 +190,21 @@ script RtsPopupLogic extends Logic
 	@ExecSpace("ClientOnly")
 	method void Open(string kind)
 		if not self.Built then return end
+		if self.Kind == "profile" then
+			if kind == "themeconfirm" or kind == "tombconfirm" or kind == "iconinfo" or kind == "iconconfirm" then
+				self:OpenProfileDialog(kind)
+				return
+			end
+			if kind == "profile" and isvalid(self._T.ProfileDialog) then
+				self:CloseProfileDialog()
+				return
+			end
+		end
+		self:CloseProfileDialog()
+		if self:IsHubKind(self.Kind) and self:IsHubKind(kind) then
+			self:SwitchHub(kind)
+			return
+		end
 		local wasOpen = self.Kind ~= ""
 		if wasOpen then
 			-- 다시 그리기: 팝업 그룹은 끄지 않고(어두운 배경이 한 프레임 사라져 번쩍였다), 같은 창이면 옛 body를 새 body 밑에 잠깐 남긴다
@@ -204,7 +218,7 @@ script RtsPopupLogic extends Logic
 		if not wasOpen and kind ~= "pick" then _RtsHudLogic:PlayUi(_RtsHudLogic.OpenSound) end
 		-- 팝업이 열리면 영입 배치 모드는 취소(= 영입 취소)
 		_RtsUnitSelectLogic:EndPlace()
-		if kind ~= "recruit" and kind ~= "recruitinfo" and kind ~= "augment" and kind ~= "pick" and kind ~= "unit" and kind ~= "devprism" and kind ~= "dismiss" and kind ~= "result" and kind ~= "codex" and kind ~= "rank" and kind ~= "restart"
+		if kind ~= "recruit" and kind ~= "recruitinfo" and kind ~= "augment" and kind ~= "pick" and kind ~= "unit" and kind ~= "devprism" and kind ~= "dismiss" and kind ~= "result" and kind ~= "codex" and kind ~= "draw" and kind ~= "rank" and kind ~= "restart"
 			and kind ~= "profile" and kind ~= "themeconfirm" and kind ~= "tombconfirm" and kind ~= "iconinfo" and kind ~= "iconconfirm" and kind ~= "iconget" then
 			_RtsConfigLogic:Log("RtsPopup: unknown kind " .. kind)
 			return
@@ -215,10 +229,10 @@ script RtsPopupLogic extends Logic
 		local height = 500
 		local title = ""
 		if kind == "recruit" then
-			height = 430
-			title = "영입"
+			height = 760
+			title = "캐릭터 영입"
 		elseif kind == "augment" then
-			height = 960
+			height = 880
 			title = "증강"
 		elseif kind == "devprism" then
 			height = 760
@@ -232,8 +246,8 @@ script RtsPopupLogic extends Logic
 			height = 290
 			title = "방출"
 		elseif kind == "codex" then
-			width = 900
-			height = 820
+			width = 1000
+			height = 840
 			title = "증강 도감"
 		elseif kind == "rank" then
 			width = 720
@@ -278,15 +292,24 @@ script RtsPopupLogic extends Logic
 			height = 360
 			title = "결과"
 		else
-			height = 580
+			height = 660
 			title = "보스 처치 — 증강 선택"
 		end
+		if self:IsHubKind(kind) then width = self.PanelW; height = 950; title = "증강" end
 		self.PanelOuter.UITransformComponent.RectSize = Vector2(width, height)
+		H:RoundPanel(self.Panel)
+		self.Panel.SpriteGUIRendererComponent.Color = self:Base()
+		-- 프로필과 연결된 설정/확인 화면은 맵이 비치지 않는 불투명 바탕이다.
+		if kind == "profile" or kind == "themeconfirm" or kind == "tombconfirm" or kind == "iconinfo" or kind == "iconconfirm" or kind == "iconget" then
+			self.Panel.SpriteGUIRendererComponent.Color = Color(0.98, 0.985, 1, 1)
+		end
+		self.PanelOuter.SpriteGUIRendererComponent.Color = Color(1, 1, 1, 0.9)
+		self.Title.TextComponent.FontColor = self:Ink()
 		self.Title.TextComponent.IsRichText = false
 		self.Title.TextComponent.Text = title
 		-- 제목 자리: 직업 상세만 가운데(2026-09-25 사용자 "직업명은 가운데로"), 나머지는 왼쪽
 		local tt = self.Title.UITransformComponent
-		if kind == "recruitinfo" then
+		if kind == "recruitinfo" or kind == "unit" then
 			tt.AnchorsMin = Vector2(0.5, 1)
 			tt.AnchorsMax = Vector2(0.5, 1)
 			tt.Pivot = Vector2(0.5, 1)
@@ -299,14 +322,20 @@ script RtsPopupLogic extends Logic
 			tt.anchoredPosition = Vector2(27, -20)
 			self.Title.TextComponent.Alignment = TextAlignmentType.MiddleLeft
 		end
-		self.CloseBtn:SetEnable(kind ~= "pick")
+		self.CloseBtn:SetEnable(true)
 
 		-- body는 열 때마다 새로 만든다 (닫을 때 통째로 제거)
 		local body = H:SpawnStretch("model://uisprite", "RtsPopupBody", self.Panel, Vector2(0, 0), Vector2(1, 1), Vector2(0, 0), Vector2(0, -70))
 		H:Tint(body, 0, 0, 0, 0)
+		body.SpriteGUIRendererComponent.ImageRUID = DataRef(H.RoundedPanelRUID)
+		body.SpriteGUIRendererComponent.Type = ImageType.Sliced
+		body.SpriteGUIRendererComponent.Color = Color(1, 1, 1, 0)
+		H:SpawnWater(body)
 		self.Body = body
 
-		if kind == "recruit" then
+		if self:IsHubKind(kind) then
+			self:BuildHub(body, kind)
+		elseif kind == "recruit" then
 			self:BuildRecruit(body)
 		elseif kind == "augment" then
 			self:BuildAugment(body)
@@ -389,12 +418,19 @@ script RtsPopupLogic extends Logic
 	@ExecSpace("ClientOnly")
 	method void Close()
 		if self.Kind == "" then return end
+		if isvalid(self._T.ProfileDialog) and not self.Reopening then
+			self:CloseProfileDialog()
+			return
+		end
 		if not self.Reopening and self.Kind ~= "pick" then _RtsHudLogic:PlayUi(_RtsHudLogic.CloseSound) end
+		if self.Kind == "pick" then _RtsAugmentLogic.PickFolded = true end
+		self.HubBar = nil
+		self.HubPage = nil
+		self.DrawRefs = nil
 		if self.Kind == "unit" then _RtsUnitPopupLogic:OnClosed() end
 		self.Kind = ""
 		self.AugTabs = {}
 		self.DismissNo = 0
-		self:StopPickFx()
 		if self.Body ~= nil then
 			if self.KeepOldBody then
 				if self.OldBody ~= nil and isvalid(self.OldBody) then self.OldBody:Destroy() end
@@ -420,21 +456,131 @@ script RtsPopupLogic extends Logic
 		end
 	end
 
+	method boolean IsHubKind(string kind)
+		-- 기존 보유·선택·도감 진입점은 증강 창 한 곳을 공유한다.
+		return kind == "augment" or kind == "draw" or kind == "pick" or kind == "codex"
+	end
+
+	@ExecSpace("ClientOnly")
+	method void OpenHubTab(string key)
+		-- 대기 선택지가 있으면 뽑기 탭에서 이어서 고른다.
+		local kind = key
+		if key == "draw" and #_RtsAugmentLogic:MyOffer().ids > 0 then
+			kind = "pick"
+			_RtsAugmentLogic.PickFolded = false
+			_RtsAugmentLogic.ShownOffer = _RtsAugmentLogic.OfferByUser[_RtsUnitLogic:MyUserId()] or ""
+		elseif key ~= "pick" then
+			_RtsAugmentLogic.PickFolded = true
+		end
+		self:Open(kind)
+	end
+
+	@ExecSpace("ClientOnly")
+	method void BuildHub(Entity body, string kind)
+		-- 창·메뉴 탭은 고정하고 그 아래 내용만 교체한다.
+		self.HubBar = self:SpawnTabBar(body, "RtsHubTab", { {"augment", "보유 증강", 240}, {"draw", "증강 뽑기", 240}, {"codex", "증강 도감", 240} }, "", 27, -12, 240, 48, 12, 21, function(key)
+			self:OpenHubTab(key)
+		end)
+		self.HubPage = nil
+		self:SwitchHub(kind)
+	end
+
+	@ExecSpace("ClientOnly")
+	method void SwitchHub(string kind)
+		-- 탭 전환은 팝업을 닫지 않는다. 현재 페이지 참조만 새로 연결한다.
+		local H = _RtsHudLogic
+		local old = self.HubPage
+		if self.Kind == "pick" and kind ~= "pick" then _RtsAugmentLogic.PickFolded = true end
+		self.Kind = kind
+		self.DrawRefs = nil
+		local key = kind
+		if key == "pick" then key = "draw" end
+		self:BarSelect(self.HubBar, key)
+		local page = H:SpawnStretch("model://uisprite", "RtsHubPage", self.Body, Vector2(0, 0), Vector2(1, 1), Vector2(0, 0), Vector2(0, -70))
+		page.SpriteGUIRendererComponent.Color = Color(1, 1, 1, 0)
+		self.HubPage = page
+		if kind == "augment" then self:BuildAugment(page)
+		elseif kind == "codex" then self:BuildCodex(page, self.PanelW)
+		elseif kind == "pick" then self:BuildPick(page)
+		else self:BuildDraw(page) end
+		self:SwapContent(old, self.HubPage)
+	end
+
+	@ExecSpace("ClientOnly")
+	method void BuildDraw(Entity body)
+		-- 실제 가격과 확률은 서버와 같은 계산 함수를 사용한다.
+		local H = _RtsHudLogic
+		local A = _RtsAugmentLogic
+		local panel = H:SpawnRoundedPanel("RtsDrawIntro", body, Vector2(0, 1), Vector2(0, 1), Vector2(27, -12), Vector2(self.PanelW - 54, 250), self:Card(), self:Edge(), 2)
+		H:SpawnLabel("RtsDrawTitle", panel, Vector2(0, 1), Vector2(0, 1), Vector2(28, -26), Vector2(960, 44), "새로운 증강으로 더 강하게", self:Ink(), 30, TextAlignmentType.MiddleLeft, true)
+		H:SpawnLabel("RtsDrawDesc", panel, Vector2(0, 1), Vector2(0, 1), Vector2(28, -82), Vector2(960, 64), "메소로 증강 선택지 세 장을 뽑고, 마음에 드는 한 장을 골라 주세요.\n받은 증강은 보유 증강 탭에서 캐릭터에게 지정할 수 있어요.", self:Muted(), 20, TextAlignmentType.MiddleLeft, false)
+		local wallet = H:SpawnLabel("RtsDrawWallet", panel, Vector2(0, 0), Vector2(0, 0), Vector2(28, 28), Vector2(940, 34), "", self:AccentInk(), 21, TextAlignmentType.MiddleLeft, true)
+		self.DrawRefs = { wallet = wallet, rates = {}, key = "" }
+		local grades = {"bronze", "silver", "gold", "prism"}
+		for i = 1, #grades do
+			local g = grades[i]
+			local card = H:SpawnRoundedPanel("RtsDrawGrade" .. tostring(i), body, Vector2(0, 1), Vector2(0, 1), Vector2(27 + (i - 1) * 268, -286), Vector2(254, 174), self:Mix(self:GradeColor(g), 0.12), self:GradeColor(g), 2)
+			self:SpawnBadge("RtsDrawBadge", card, Vector2(18, -18), g)
+			self.DrawRefs.rates[i] = H:SpawnLabel("RtsDrawRate", card, Vector2(0, 1), Vector2(0, 1), Vector2(18, -60), Vector2(218, 52), "", self:Ink(), 32, TextAlignmentType.MiddleLeft, true)
+			H:SpawnLabel("RtsDrawRateHint", card, Vector2(0, 0), Vector2(0, 0), Vector2(18, 18), Vector2(218, 28), "다음 뽑기 확률", self:Muted(), 16, TextAlignmentType.MiddleLeft, false)
+		end
+		self.DrawRefs.info = H:SpawnLabel("RtsDrawInfo", body, Vector2(0, 1), Vector2(0, 1), Vector2(30, -486), Vector2(self.PanelW - 60, 92), "", self:Muted(), 18, TextAlignmentType.UpperLeft, false)
+		local buy = H:SpawnRoundedPanel("RtsDrawBuy", body, Vector2(0.5, 0), Vector2(0.5, 0), Vector2(0, 74), Vector2(470, 76), H:ColGold(), self:Edge(), 2)
+		self.DrawRefs.buy = buy
+		self.DrawRefs.label = H:SpawnLabel("RtsDrawBuyText", buy, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2(0, 0), Vector2(444, 68), "", self:Ink(), 23, TextAlignmentType.MiddleCenter, true)
+		local click = H:SpawnClick("RtsDrawBuyClick", buy)
+		click:ConnectEvent(ButtonClickEvent, function(event) A:BuyFromHud() end)
+		self.DrawRefs.reason = H:SpawnLabel("RtsDrawReason", body, Vector2(0.5, 0), Vector2(0.5, 0), Vector2(0, 28), Vector2(1000, 32), "", self:Muted(), 17, TextAlignmentType.MiddleCenter, false)
+		A:ClientTick()
+	end
+
+	@ExecSpace("ClientOnly")
+	method void RefreshDraw(number price, boolean can)
+		-- 값 변화에만 반응하고 설명·카드·탭은 재생성하지 않는다.
+		if self.Kind ~= "draw" or self.DrawRefs == nil then return end
+		local H = _RtsHudLogic
+		local A = _RtsAugmentLogic
+		local me = _RtsUnitLogic:MyUserId()
+		local money = _RtsUnitLogic:GetMyMeso()
+		local pending = A.PendingByUser[me] or 0
+		local left = A:BuyPrismLeft(me)
+		local rate = A:BuyPrismRate(me)
+		local paused = _RtsStageLogic.Paused
+		local key = tostring(price) .. ":" .. tostring(can) .. ":" .. tostring(money) .. ":" .. tostring(pending) .. ":" .. tostring(left) .. ":" .. tostring(rate) .. ":" .. tostring(paused)
+		local r = self.DrawRefs
+		if r.key == key then return end
+		r.key = key
+		r.wallet.TextComponent.Text = "보유 메소  " .. H:FormatNumber(money)
+		local rates = {(100 - rate) * 75.5 / 95, (100 - rate) * 15 / 95, (100 - rate) * 4.5 / 95, rate}
+		for i = 1, 4 do r.rates[i].TextComponent.Text = string.format("%.1f%%", rates[i]) end
+		r.info.TextComponent.Text = "뽑기로 획득 가능한 프리즘  " .. H:Int(left) .. " / " .. H:Int(A.BuyPrismMax) .. "\n프리즘을 얻지 못하면 다음 뽑기의 프리즘 확률이 " .. H:Int(A.BuyPrismPityStep) .. "%p 올라요.\n선택 대기  " .. H:Int(pending) .. " / " .. H:Int(A.MaxPending)
+		r.label.TextComponent.Text = "증강 뽑기  ·  " .. H:FormatNumber(price) .. " 메소"
+		local reason = "세 장 중 한 장을 선택합니다"
+		if paused then reason = "일시정지를 해제한 뒤 뽑을 수 있어요"
+		elseif not _RtsRunResultLogic:IsMeAlive() then reason = "이번 판에서는 더 뽑을 수 없어요"
+		elseif pending >= A.MaxPending then reason = "대기 중인 선택지를 먼저 골라 주세요"
+		elseif money < price then reason = "메소가 " .. H:FormatNumber(price - money) .. " 더 필요해요"
+		elseif not can then reason = "게임 진행 중에 뽑을 수 있어요" end
+		r.reason.TextComponent.Text = reason
+		if can and not paused then r.buy.SpriteGUIRendererComponent.Color = H:ColGold() else r.buy.SpriteGUIRendererComponent.Color = self:Mix(self:Edge(), 0.5) end
+	end
+
+
 	-- ===== 공용 조각 =====
 
 	-- 작은 탭/버튼 (테두리 + 배경 + 글자). on이면 금색
 	@ExecSpace("ClientOnly")
 	method Entity SpawnTab(string name, Entity parent, Vector2 pos, Vector2 size, string text, boolean on, number fontSize)
 		local H = _RtsHudLogic
-		local bg = self:Mix(Color.white, 0.04)
-		local border = self:Mix(Color.white, 0.12)
-		local ink = Color(0.851, 0.796, 0.651, 1)
+		local bg = self:Card()
+		local border = self:Mix(Color(0.48, 0.36, 0.25, 1), 0.35)
+		local ink = self:Ink()
 		if on then
 			bg = self:Mix(H:ColGold(), 0.18)
 			border = H:ColGold()
-			ink = Color(0.973, 0.925, 0.784, 1)
+			ink = self:Ink()
 		end
-		local t = H:SpawnPanel(name, parent, Vector2(0, 1), Vector2(0, 1), pos, size, bg, border, 1.5)
+		local t = H:SpawnRoundedPanel(name, parent, Vector2(0, 1), Vector2(0, 1), pos, size, bg, border, 1.5)
 		H:SpawnLabel(name .. "Text", t, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2(0, 0), Vector2(size.x - 6, size.y - 4),
 			text, ink, fontSize, TextAlignmentType.MiddleCenter, true)
 		return t
@@ -445,13 +591,13 @@ script RtsPopupLogic extends Logic
 	method void SetTabOn(Entity t, boolean on)
 		if t == nil or not isvalid(t) then return end
 		local H = _RtsHudLogic
-		local bg = self:Mix(Color.white, 0.04)
-		local border = self:Mix(Color.white, 0.12)
-		local ink = Color(0.851, 0.796, 0.651, 1)
+		local bg = self:Card()
+		local border = self:Mix(Color(0.48, 0.36, 0.25, 1), 0.35)
+		local ink = self:Ink()
 		if on then
 			bg = self:Mix(H:ColGold(), 0.18)
 			border = H:ColGold()
-			ink = Color(0.973, 0.925, 0.784, 1)
+			ink = self:Ink()
 		end
 		t.SpriteGUIRendererComponent.Color = bg
 		local outer = t.Parent
@@ -531,12 +677,33 @@ script RtsPopupLogic extends Logic
 
 	-- 패널 배경색 위에 반투명 색을 미리 합성한 불투명 색 (테두리 백킹이 비쳐 보이지 않게)
 	method Color Base()
-		return Color(0.11, 0.094, 0.075, 1)
+		return Color(0.98, 0.985, 1, 0.90)
+	end
+
+
+	method Color Ink()
+		return Color(0.20, 0.22, 0.30, 1)
+	end
+
+	method Color Muted()
+		return Color(0.42, 0.44, 0.52, 1)
+	end
+
+	method Color AccentInk()
+		return Color(0.43, 0.42, 0.62, 1)
+	end
+
+	method Color Card()
+		return Color(1, 1, 1, 0.56)
+	end
+
+	method Color Edge()
+		return Color(0.80, 0.82, 0.89, 0.8)
 	end
 
 	method Color Mix(Color top, number a)
 		local b = self:Base()
-		return Color(b.r + (top.r - b.r) * a, b.g + (top.g - b.g) * a, b.b + (top.b - b.b) * a, 1)
+		return Color(b.r + (top.r - b.r) * a, b.g + (top.g - b.g) * a, b.b + (top.b - b.b) * a, 0.72)
 	end
 
 	method Color GradeColor(string g)
@@ -562,10 +729,7 @@ script RtsPopupLogic extends Logic
 		local c = self:GradeColor(g)
 		local b = H:SpawnUI("model://uisprite", name, parent, Vector2(0, 1), Vector2(0, 1), pos, Vector2(64, 22))
 		b.SpriteGUIRendererComponent.Color = Color(c.r, c.g, c.b, 0.3)
-		local ink = Color(1, 1, 1, 1)
-		if g == "bronze" then ink = Color(0.886, 0.627, 0.416, 1) end
-		if g == "silver" then ink = Color(0.875, 0.902, 0.933, 1) end
-		if g == "gold" then ink = Color(0.953, 0.851, 0.541, 1) end
+		local ink = self:Ink()
 		H:SpawnLabel(name .. "Text", b, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2(0, 0), Vector2(62, 20),
 			self:GradeName(g), ink, 13, TextAlignmentType.MiddleCenter, true)
 		return b
@@ -594,7 +758,7 @@ script RtsPopupLogic extends Logic
 		local box = self:SpawnBox(self.RecruitBody, "RtsRcContent")
 		self.RecruitContent = box
 		self:BuildRecruitCards(box)
-		self:DropLater(old)
+		self:SwapContent(old, box)
 	end
 
 	@ExecSpace("ClientOnly")
@@ -611,7 +775,7 @@ script RtsPopupLogic extends Logic
 		}
 		if self.RecruitTab == "hero" then groups = { { "영웅", { "phantom" } } } end
 		local myId = _RtsUnitLogic:MyUserId()
-		local colW = 200
+		local colW = 250
 		local gap = 14
 		local top = -66
 		local nos = _RtsUnitLogic:ListZoneUnits(_RtsUnitLogic:MyZone())
@@ -623,14 +787,14 @@ script RtsPopupLogic extends Logic
 			local gx = 27 + (gi - 1) * (colW + gap)
 			local g = groups[gi]
 			H:SpawnLabel("RtsRcGroup" .. tostring(gi), body, Vector2(0, 1), Vector2(0, 1), Vector2(gx, top), Vector2(colW, 26),
-				g[1], H:ColGold(), 18, TextAlignmentType.MiddleLeft, true)
+				g[1], self:AccentInk(), 18, TextAlignmentType.MiddleLeft, true)
 			local line = H:SpawnUI("model://uisprite", "RtsRcGroupLine" .. tostring(gi), body, Vector2(0, 1), Vector2(0, 1), Vector2(gx, top - 30), Vector2(colW, 1.5))
 			line.SpriteGUIRendererComponent.Color = H:ColBorderSoft()
 			local jobs = g[2]
 			for ji = 1, #jobs do
-				local jy = top - 42 - (ji - 1) * 48
-				local card = H:SpawnPanel("RtsRcJob" .. tostring(gi) .. "_" .. tostring(ji), body, Vector2(0, 1), Vector2(0, 1), Vector2(gx, jy), Vector2(colW, 40),
-					self:Mix(Color.white, 0.04), self:Mix(Color.white, 0.08), 1.5)
+				local jy = top - 42 - (ji - 1) * 162
+				local card = H:SpawnRoundedPanel("RtsRcJob" .. tostring(gi) .. "_" .. tostring(ji), body, Vector2(0, 1), Vector2(0, 1), Vector2(gx, jy), Vector2(colW, 150),
+					self:Card(), self:Edge(), 1.5)
 				local jid = jobs[ji]
 				-- 이미 보유한 직업은 흐리게 + '보유 중', 클릭 없음(동일 직업 중복 영입 불가 — 프리즘으로 이름이 바뀐 듀얼블레이더도 섀도어로 센다)
 				local ownedJob = false
@@ -639,17 +803,22 @@ script RtsPopupLogic extends Logic
 					if ou ~= nil and ou.JobId == jid then ownedJob = true end
 				end
 				local unlocked = _RtsUnitLogic:IsJobUnlocked(myId, jid)
-				local ink = H:ColInk()
+				local ink = self:Ink()
 				if ownedJob or not canRecruit or not unlocked then
-					ink = Color(0.55, 0.51, 0.45, 1)
-					card.SpriteGUIRendererComponent.Color = self:Mix(Color.white, 0.02)
+					ink = self:Muted()
+					card.SpriteGUIRendererComponent.Color = self:Card()
 				end
-				H:SpawnLabel("RtsRcJobName", card, Vector2(0, 0.5), Vector2(0, 0.5), Vector2(13, 0), Vector2(150, 30),
-					_RtsJobTableLogic:GetJobName(jid), ink, 17, TextAlignmentType.MiddleLeft, false)
+				if jid == "il" then
+					_RtsUnitPopupLogic:SpawnPreviewAt(card, { JobId = jid }, Vector2(125, -49), Vector2(96, 96))
+				else
+					_RtsUnitPopupLogic:SpawnPreviewAt(card, { JobId = jid }, Vector2(125, -47), Vector2(72, 86))
+				end
+				H:SpawnLabel("RtsRcJobName", card, Vector2(0, 0.5), Vector2(0, 0.5), Vector2(12, -30), Vector2(colW - 24, 28),
+					_RtsJobTableLogic:GetJobName(jid), ink, 19, TextAlignmentType.MiddleCenter, false)
 				local priceText = "Lv 1"
 				if ownedJob then priceText = "보유 중" elseif not unlocked then priceText = "잠김" end
-				H:SpawnLabel("RtsRcJobPrice", card, Vector2(1, 0.5), Vector2(1, 0.5), Vector2(-13, 0), Vector2(70, 30),
-					priceText, H:ColMuted(), 14, TextAlignmentType.MiddleRight, false)
+				H:SpawnLabel("RtsRcJobPrice", card, Vector2(1, 0.5), Vector2(1, 0.5), Vector2(-12, -58), Vector2(colW - 24, 22),
+					priceText, self:Muted(), 15, TextAlignmentType.MiddleCenter, false)
 				-- 카드 → 직업 상세(2026-09-25 사용자) — 보유 중·잠김·영입 불가도 보기는 된다. 영입은 상세의 [영입] → 발판 고르기
 				local click = H:SpawnClick("RtsRcJobClick", card)
 				click:ConnectEvent(ButtonClickEvent, function(event)
@@ -673,7 +842,7 @@ script RtsPopupLogic extends Logic
 			if nextNo > 0 then foot = foot .. "다음 영입 · " .. H:Int(nextNo) .. "라운드 (방출하면 빈 칸을 다시 영입)" else foot = foot .. "영입 완료" end
 		end
 		H:SpawnLabel("RtsRcFoot", body, Vector2(1, 0), Vector2(1, 0), Vector2(-27, 22), Vector2(700, 26),
-			foot, Color(0.851, 0.796, 0.651, 1), 15, TextAlignmentType.MiddleRight, false)
+			foot, self:Muted(), 15, TextAlignmentType.MiddleRight, false)
 	end
 
 	-- 이 직업을 지금 영입할 수 있나: "" = 가능, 아니면 이유 한 줄(영입 목록 카드의 흐림 판정과 같은 조건 — BuildRecruit)
@@ -705,15 +874,15 @@ script RtsPopupLogic extends Logic
 		local jid = self.PendingJob
 		if jid == nil or jid == "" or not T:HasJob(jid) then return end
 		-- 왼쪽 위: 외형(기본 스킨) 150×170 — 2026-09-25 사용자 "외형 높이가 너무 높다". UI 아바타는 칸 아래쪽에 서서 칸을 캐릭터 크기에 맞게 낮춘다
-		local frame = H:SpawnPanel("RtsRiAvatarBox", body, Vector2(0, 1), Vector2(0, 1), Vector2(27, -6), Vector2(150, 170),
-			self:Mix(Color.white, 0.03), self:Mix(Color.white, 0.1), 1.5)
+		local frame = H:SpawnRoundedPanel("RtsRiAvatarBox", body, Vector2(0, 1), Vector2(0, 1), Vector2(27, -6), Vector2(150, 170),
+			self:Card(), self:Edge(), 1.5)
 		if jid == "il" then
 			_RtsUnitPopupLogic:SpawnPreviewAt(frame, { JobId = jid }, Vector2(75, -85), Vector2(140, 140))
 		else
 			_RtsUnitPopupLogic:SpawnPreviewAt(frame, { JobId = jid }, Vector2(80, -84), Vector2(120, 150))
 		end
 		H:SpawnLabel("RtsRiGroup", body, Vector2(0, 1), Vector2(0, 1), Vector2(27, -182), Vector2(150, 24),
-			T:GetJobGroup(jid), H:ColMuted(), 15, TextAlignmentType.MiddleCenter, false)
+			T:GetJobGroup(jid), self:Muted(), 15, TextAlignmentType.MiddleCenter, false)
 		-- 오른쪽 위: 오각형 — 축 = 위부터 시계 방향 공격 속도 · 사거리 · 증강 효율 · 보스 · 사냥
 		local rd = T:GetRadar(jid)
 		self:SpawnRadar(body, 177 + (W - 204) / 2, -118, 80, { rd.speed, rd.range, rd.aug, rd.boss, rd.hunt },
@@ -725,10 +894,10 @@ script RtsPopupLogic extends Logic
 			self.RiSkillTab = key
 			self:BuildRiSkills(body, W)
 		end)
-		local tkey = H:SpawnPanel("RtsRiTabKey", body, Vector2(0, 1), Vector2(0, 1), Vector2(self.RiBar.right + 4, -224), Vector2(56, 26),
-			Color(0.12, 0.1, 0.08, 0.9), Color(0.95, 0.9, 0.75, 0.9), 1.2)
+		local tkey = H:SpawnRoundedPanel("RtsRiTabKey", body, Vector2(0, 1), Vector2(0, 1), Vector2(self.RiBar.right + 4, -224), Vector2(56, 26),
+			Color(0.92, 0.93, 0.98, 0.9), Color(0.72, 0.74, 0.84, 0.9), 1.2)
 		H:SpawnLabel("RtsRiTabKeyText", tkey, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2(0, 0), Vector2(54, 24),
-			"Tab", Color(0.95, 0.9, 0.75, 1), 13, TextAlignmentType.MiddleCenter, true)
+			"Tab", Color(0.38, 0.39, 0.50, 1), 13, TextAlignmentType.MiddleCenter, true)
 		self.RiSkillBox = nil
 		self:BuildRiSkills(body, W)
 		-- 맨 아래: [선택](가능할 때 — 2026-09-25 사용자 "영입 → 선택") / 이유 · [취소]
@@ -736,10 +905,10 @@ script RtsPopupLogic extends Logic
 		local bh = 44
 		local reason = self:RecruitBlockReason(jid)
 		if reason == "" then
-			local yes = H:SpawnPanel("RtsRiRecruit", body, Vector2(0.5, 0), Vector2(1, 0), Vector2(-10, 22), Vector2(bw, bh),
+			local yes = H:SpawnRoundedPanel("RtsRiRecruit", body, Vector2(0.5, 0), Vector2(1, 0), Vector2(-10, 22), Vector2(bw, bh),
 				self:Mix(H:ColGold(), 0.25), H:ColGold(), 1.5)
 			H:SpawnLabel("RtsRiRecruitText", yes, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2(0, 0), Vector2(bw - 8, bh - 6),
-				"선택", Color(1, 0.95, 0.8, 1), 17, TextAlignmentType.MiddleCenter, true)
+				"선택", self:Ink(), 17, TextAlignmentType.MiddleCenter, true)
 			local yc = H:SpawnClick("RtsRiRecruitClick", yes)
 			yc:ConnectEvent(ButtonClickEvent, function(event)
 				self:Close()
@@ -747,7 +916,7 @@ script RtsPopupLogic extends Logic
 			end)
 		else
 			H:SpawnLabel("RtsRiReason", body, Vector2(0.5, 0), Vector2(1, 0), Vector2(-10, 22), Vector2(250, bh),
-				reason, H:ColMuted(), 15, TextAlignmentType.MiddleRight, false)
+				reason, self:Muted(), 15, TextAlignmentType.MiddleRight, false)
 		end
 		local no = self:SpawnTab("RtsRiCancel", body, Vector2(0, 0), Vector2(bw, bh), "취소", false, 17)
 		local nt = no.Parent.UITransformComponent
@@ -802,7 +971,7 @@ script RtsPopupLogic extends Logic
 			if text ~= nil and text ~= "" then descH = descLines(text) * 20 end
 			local h = 36
 			if descH > 0 then h = 34 + descH + 10 end
-			local row = H:SpawnPanel("RtsRiSkillRow" .. H:Int(n), list, Vector2(0, 1), Vector2(0, 1), Vector2(0, 0), Vector2(rowW, h),
+			local row = H:SpawnRoundedPanel("RtsRiSkillRow" .. H:Int(n), list, Vector2(0, 1), Vector2(0, 1), Vector2(0, 0), Vector2(rowW, h),
 				self:Mix(Color.white, 0.035), self:Mix(Color.white, 0.12), 1)
 			row.SpriteGUIRendererComponent.RaycastTarget = false
 			local head = H:SpawnLabel("RtsRiSkillName", row, Vector2(0, 1), Vector2(0, 1), Vector2(14, -6), Vector2(textW, 24),
@@ -810,7 +979,7 @@ script RtsPopupLogic extends Logic
 			if head.TextComponent ~= nil then head.TextComponent.IsRichText = false end
 			if descH > 0 then
 				local desc = H:SpawnLabel("RtsRiSkillDesc", row, Vector2(0, 1), Vector2(0, 1), Vector2(14, -34), Vector2(textW, descH),
-					text, Color(0.85, 0.81, 0.72, 1), 14, TextAlignmentType.UpperLeft, false)
+					text, self:Ink(), 14, TextAlignmentType.UpperLeft, false)
 				if desc.TextComponent ~= nil then desc.TextComponent.IsRichText = false end
 			end
 		end
@@ -822,7 +991,7 @@ script RtsPopupLogic extends Logic
 				if pz.job == jid or (jid == "phantom" and pz.id == "phantom") then
 					local text = pz.desc or ""
 					if string.sub(text, 1, #"[프리즘] ") == "[프리즘] " then text = string.sub(text, #"[프리즘] " + 1) end
-					addItem(pz.name, Color(0.84, 0.72, 1, 1), text)
+					addItem(pz.name, Color(0.45, 0.27, 0.62, 1), text)
 				end
 			end
 		else
@@ -832,13 +1001,13 @@ script RtsPopupLogic extends Logic
 			for i = 1, #skills do
 				local k = skills[i]
 				if k.name ~= nil and k.name ~= "" and not k.prism and k.kind == want then
-					local ink = H:ColInk()
-					if want == "액티브" then ink = H:ColGold() end
+					local ink = self:Ink()
+					if want == "액티브" then ink = self:AccentInk() end
 					addItem("Lv " .. H:Int(k.lv or 1) .. "  " .. k.name, ink, k.desc)
 				end
 			end
 		end
-		if n == 0 then addItem("없음", H:ColMuted(), "") end
+		if n == 0 then addItem("없음", self:Muted(), "") end
 	end
 
 	-- 선분 한 개(흰 사각을 늘려 회전): parent 가운데 기준 (x1, y1) → (x2, y2), 두께 t — 체크 표시 등
@@ -866,11 +1035,6 @@ script RtsPopupLogic extends Logic
 			self.RiSkillTab = nx
 			self:BarSelect(self.RiBar, nx)
 			if self.Body ~= nil and isvalid(self.Body) then self:BuildRiSkills(self.Body, self.PanelOuter.UITransformComponent.RectSize.x) end
-		elseif self.Kind == "augment" then
-			local nx = self:BarNext(self.AugBar)
-			if nx == "" then return end
-			self.AugGrade = nx
-			self:RefreshAugment()
 		elseif self.Kind == "codex" then
 			local nx = self:BarNext(self.CodexBar)
 			if nx == "" then return end
@@ -883,10 +1047,10 @@ script RtsPopupLogic extends Logic
 	@ExecSpace("ClientOnly")
 	method void SpawnTabKeyHint(Entity body, number x)
 		local H = _RtsHudLogic
-		local tkey = H:SpawnPanel("RtsTabKeyHint", body, Vector2(0, 1), Vector2(0, 1), Vector2(x, -14), Vector2(56, 26),
-			Color(0.12, 0.1, 0.08, 0.9), Color(0.95, 0.9, 0.75, 0.9), 1.2)
+		local tkey = H:SpawnRoundedPanel("RtsTabKeyHint", body, Vector2(0, 1), Vector2(0, 1), Vector2(x, -14), Vector2(56, 26),
+			Color(0.92, 0.93, 0.98, 0.9), Color(0.72, 0.74, 0.84, 0.9), 1.2)
 		H:SpawnLabel("RtsTabKeyHintText", tkey, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2(0, 0), Vector2(54, 24),
-			"Tab", Color(0.95, 0.9, 0.75, 1), 13, TextAlignmentType.MiddleCenter, true)
+			"Tab", Color(0.38, 0.39, 0.50, 1), 13, TextAlignmentType.MiddleCenter, true)
 	end
 
 	-- 두 인자 아크탄젠트(라디안) — math.atan 두 인자판에 기대지 않는다
@@ -1001,7 +1165,7 @@ script RtsPopupLogic extends Logic
 			local lx = cx + (r + 46) * math.sin(a)
 			local ly = cy + (r + 22) * math.cos(a)
 			local lb = H:SpawnLabel("RtsRadarLabel" .. H:Int(i), parent, Vector2(0, 1), Vector2(0, 1), Vector2(0, 0), Vector2(120, 26),
-				names[i], H:ColInk(), 15, TextAlignmentType.MiddleCenter, true)
+				names[i], self:Ink(), 15, TextAlignmentType.MiddleCenter, true)
 			lb.UITransformComponent.Pivot = Vector2(0.5, 0.5)
 			lb.UITransformComponent.anchoredPosition = Vector2(lx, ly)
 		end
@@ -1020,9 +1184,9 @@ script RtsPopupLogic extends Logic
 		end
 		local total = _RtsStageTableLogic:GetStageCount()
 		local head = "클리어!"
-		local headColor = H:ColGold()
+		local headColor = self:AccentInk()
 		if not r.cleared then
-			headColor = Color(0.95, 0.45, 0.4, 1)
+			headColor = Color(0.66, 0.24, 0.18, 1)
 			if r.reason == "boss" then head = "탈락 — 보스 시간 초과" else head = "탈락 — 필드 110" end
 		end
 		H:SpawnLabel("RtsRsHead", body, Vector2(0, 1), Vector2(0, 1), Vector2(27, -4), Vector2(586, 40),
@@ -1031,11 +1195,11 @@ script RtsPopupLogic extends Logic
 		local reachedName = ""
 		if reached ~= nil then reachedName = " · " .. _RtsStageTableLogic:FullName(reached) end
 		H:SpawnLabel("RtsRsReach", body, Vector2(0, 1), Vector2(0, 1), Vector2(27, -54), Vector2(586, 28),
-			"도달: " .. H:Int(r.stageNo) .. " / " .. H:Int(total) .. reachedName, H:ColInk(), 19, TextAlignmentType.MiddleLeft, false)
+			"도달: " .. H:Int(r.stageNo) .. " / " .. H:Int(total) .. reachedName, self:Ink(), 19, TextAlignmentType.MiddleLeft, false)
 		local line3 = "처치 " .. H:FormatNumber(r.kills) .. "마리"
 		if not r.cleared and r.reason == "boss" then line3 = line3 .. "   ·   보스 HP " .. string.format("%.1f", r.pct * 100) .. "%" end
 		H:SpawnLabel("RtsRsKills", body, Vector2(0, 1), Vector2(0, 1), Vector2(27, -88), Vector2(586, 28),
-			line3, H:ColInk(), 19, TextAlignmentType.MiddleLeft, false)
+			line3, self:Ink(), 19, TextAlignmentType.MiddleLeft, false)
 		local best = "개인 최고: "
 		if r.bestClear then
 			best = best .. "클리어"
@@ -1045,7 +1209,7 @@ script RtsPopupLogic extends Logic
 			if bs ~= nil then best = best .. " · " .. _RtsStageTableLogic:FullName(bs) end
 		end
 		H:SpawnLabel("RtsRsBest", body, Vector2(0, 1), Vector2(0, 1), Vector2(27, -122), Vector2(586, 28),
-			best, H:ColMuted(), 17, TextAlignmentType.MiddleLeft, false)
+			best, self:Muted(), 17, TextAlignmentType.MiddleLeft, false)
 		local by = -186
 		-- (클리어 순위 두 줄은 뺐다 — 2026-09-25 사용자 "인게임 순위표 제거, 지금 저기서 보일 게 아니야". 클리어 기록 저장은 그대로, 순위는 대기방(Phase 13)에서)
 		-- 버튼: 여럿 = 관전하기 / 나가기(대기방 — 멀티 업데이트), 솔로(방 인원 1) = 닫기 / 다시 하기(바로 새 판, 2026-09-24 솔로 출시)
@@ -1065,14 +1229,14 @@ script RtsPopupLogic extends Logic
 			self:Close()
 		end)
 		local exitCol = Color(0.8, 0.35, 0.3, 1)
-		local exitInk = Color(0.98, 0.72, 0.66, 1)
+		local exitInk = Color(0.62, 0.19, 0.15, 1)
 		local exitText = "나가기"
 		if solo then
 			exitCol = H:ColGold()
-			exitInk = Color(1, 0.95, 0.8, 1)
+			exitInk = self:Ink()
 			exitText = "다시하기"
 		end
-		local exit = H:SpawnPanel("RtsRsExit", body, Vector2(0.5, 1), Vector2(0, 1), Vector2(10, by), Vector2(bw, bh),
+		local exit = H:SpawnRoundedPanel("RtsRsExit", body, Vector2(0.5, 1), Vector2(0, 1), Vector2(10, by), Vector2(bw, bh),
 			self:Mix(exitCol, 0.25), exitCol, 1.5)
 		H:SpawnLabel("RtsRsExitText", exit, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2(0, 0), Vector2(bw - 8, bh - 6),
 			exitText, exitInk, 17, TextAlignmentType.MiddleCenter, true)
@@ -1122,14 +1286,14 @@ script RtsPopupLogic extends Logic
 	method void BuildConfirm(Entity body, string msg, string yesText, any yesFn, any noFn)
 		local H = _RtsHudLogic
 		H:SpawnLabel("RtsRsConfirmMsg", body, Vector2(0, 1), Vector2(0, 1), Vector2(27, -10), Vector2(586, 110),
-			msg, H:ColInk(), 18, TextAlignmentType.MiddleCenter, false)
+			msg, self:Ink(), 18, TextAlignmentType.MiddleCenter, false)
 		local bw = 180
 		local bh = 44
 		local by = -140
-		local yes = H:SpawnPanel("RtsRsConfirmYes", body, Vector2(0.5, 1), Vector2(1, 1), Vector2(-10, by), Vector2(bw, bh),
+		local yes = H:SpawnRoundedPanel("RtsRsConfirmYes", body, Vector2(0.5, 1), Vector2(1, 1), Vector2(-10, by), Vector2(bw, bh),
 			self:Mix(H:ColGold(), 0.25), H:ColGold(), 1.5)
 		H:SpawnLabel("RtsRsConfirmYesText", yes, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2(0, 0), Vector2(bw - 8, bh - 6),
-			yesText, Color(1, 0.95, 0.8, 1), 17, TextAlignmentType.MiddleCenter, true)
+			yesText, self:Ink(), 17, TextAlignmentType.MiddleCenter, true)
 		local yc = H:SpawnClick("RtsRsConfirmYesClick", yes)
 		yc:ConnectEvent(ButtonClickEvent, function(event)
 			yesFn()
@@ -1209,18 +1373,65 @@ script RtsPopupLogic extends Logic
 		else
 			self:BuildThemeTab(box, self.ProfileW)
 		end
-		self:DropLater(old)
+		self:SwapContent(old, box)
 	end
 
 	-- 프로필 창을 그 탭으로(아이콘 정보·확인 창에서 돌아올 때). 이미 프로필 창이면 내용만 다시
 	@ExecSpace("ClientOnly")
 	method void OpenProfileTab(string tab)
+		local sameTab = self.Kind == "profile" and self.ProfileTab == tab
+		if isvalid(self._T.ProfileDialog) then
+			self:CloseProfileDialog()
+			if sameTab then return end
+		end
 		self.ProfileTab = tab
 		if self.Kind == "profile" then
 			self:RefreshProfileContent()
 		else
 			self:Open("profile")
 		end
+	end
+
+	-- 프로필 목록·스크롤은 유지하고 상세/확인창만 위에 얹는다.
+	@ExecSpace("ClientOnly")
+	method void OpenProfileDialog(string kind)
+		local H = _RtsHudLogic
+		local old = self._T.ProfileDialog
+		local layer = H:SpawnStretch("model://uisprite", "RtsProfileDialogLayer", self.Group, Vector2(0, 0), Vector2(1, 1), Vector2(0, 0), Vector2(0, 0))
+		layer.SpriteGUIRendererComponent.Color = Color(1, 1, 1, 0)
+		layer.SpriteGUIRendererComponent.RaycastTarget = false
+		self._T.ProfileDialog = layer
+		self._T.ProfileDialogKind = kind
+		local dim = H:SpawnStretch("model://uibutton", "RtsProfileDialogDim", layer, Vector2(0, 0), Vector2(1, 1), Vector2(0, 0), Vector2(0, 0))
+		dim.SpriteGUIRendererComponent.Color = Color(0.10, 0.12, 0.18, 0.22)
+		dim:ConnectEvent(ButtonClickEvent, function(event) self:CloseProfileDialog() end)
+		local title = "변경 확인"
+		local height = 300
+		if kind == "iconinfo" then title = "아이콘"; height = 370 end
+		local panel = H:SpawnRoundedPanel("RtsProfileDialogPanel", layer, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2(0, 0), Vector2(640, height),
+			Color(0.98, 0.985, 1, 1), H:ColGold(), 2)
+		H:SpawnLabel("RtsProfileDialogTitle", panel, Vector2(0, 1), Vector2(0, 1), Vector2(27, -18), Vector2(520, 34),
+			title, self:Ink(), 24, TextAlignmentType.MiddleLeft, true)
+		local close = H:SpawnRoundedPanel("RtsProfileDialogClose", panel, Vector2(1, 1), Vector2(1, 1), Vector2(-20, -18), Vector2(36, 36),
+			Color.white, self:Edge(), 1)
+		H:SpawnLabel("RtsProfileDialogCloseText", close, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2(0, 0), Vector2(34, 34),
+			"×", self:Ink(), 24, TextAlignmentType.MiddleCenter, true)
+		local click = H:SpawnClick("RtsProfileDialogCloseClick", close)
+		click:ConnectEvent(ButtonClickEvent, function(event) self:CloseProfileDialog() end)
+		local body = H:SpawnStretch("model://uisprite", "RtsProfileDialogBody", panel, Vector2(0, 0), Vector2(1, 1), Vector2(0, 0), Vector2(0, -70))
+		body.SpriteGUIRendererComponent.Color = Color(1, 1, 1, 0)
+		if kind == "themeconfirm" then self:BuildThemeConfirm(body)
+		elseif kind == "tombconfirm" then self:BuildTombConfirm(body)
+		elseif kind == "iconinfo" then self:BuildIconInfo(body, 640)
+		else self:BuildIconConfirm(body) end
+		self:SwapContent(old, layer)
+	end
+
+	@ExecSpace("ClientOnly")
+	method void CloseProfileDialog()
+		if isvalid(self._T.ProfileDialog) then self._T.ProfileDialog:Destroy() end
+		self._T.ProfileDialog = nil
+		self._T.ProfileDialogKind = ""
 	end
 
 	-- 지금 탭에서 사용 중인 프리셋인가
@@ -1243,7 +1454,7 @@ script RtsPopupLogic extends Logic
 				if on then border = H:ColGold() end
 				if c.card.Parent ~= nil then c.card.Parent.SpriteGUIRendererComponent.Color = border end
 				if c.box ~= nil and isvalid(c.box) then
-					if on then c.box.SpriteGUIRendererComponent.Color = H:ColGold() else c.box.SpriteGUIRendererComponent.Color = Color(0.12, 0.1, 0.08, 0.9) end
+					if on then c.box.SpriteGUIRendererComponent.Color = H:ColGold() else c.box.SpriteGUIRendererComponent.Color = Color(0.92, 0.93, 0.98, 0.9) end
 				end
 				for m = 1, #c.marks do
 					if c.marks[m] ~= nil and isvalid(c.marks[m]) then c.marks[m]:SetEnable(on) end
@@ -1320,13 +1531,13 @@ script RtsPopupLogic extends Logic
 		local cur = self:PresetIsCurrent(key)
 		local border = self:Mix(Color.white, 0.12)
 		if cur then border = H:ColGold() end
-		local card = H:SpawnPanel(prefix .. H:Int(k), row, Vector2(0, 1), Vector2(0, 1), Vector2(((k - 1) % 3) * 280, 0), Vector2(270, 270),
-			self:Mix(Color.white, 0.04), border, 2)
+		local card = H:SpawnRoundedPanel(prefix .. H:Int(k), row, Vector2(0, 1), Vector2(0, 1), Vector2(((k - 1) % 3) * 280, 0), Vector2(270, 270),
+			self:Card(), border, 2)
 		H:SpawnLabel(prefix .. "Name", card, Vector2(0.5, 1), Vector2(0.5, 1), Vector2(0, -8), Vector2(190, 30),
-			name, H:ColInk(), 18, TextAlignmentType.MiddleCenter, true)
-		local boxBg = Color(0.12, 0.1, 0.08, 0.9)
+			name, self:Ink(), 18, TextAlignmentType.MiddleCenter, true)
+		local boxBg = Color(0.92, 0.93, 0.98, 0.9)
 		if cur then boxBg = H:ColGold() end
-		local box = H:SpawnPanel(prefix .. "Check", card, Vector2(1, 1), Vector2(1, 1), Vector2(-10, -10), Vector2(26, 26), boxBg, H:ColGold(), 1.5)
+		local box = H:SpawnRoundedPanel(prefix .. "Check", card, Vector2(1, 1), Vector2(1, 1), Vector2(-10, -10), Vector2(26, 26), boxBg, H:ColGold(), 1.5)
 		local ink = Color(0.12, 0.1, 0.08, 1)
 		local ma = self:SpawnSegment(box, prefix .. "CheckA", -7, 0, -2, -5, 3.2, ink)
 		local mb = self:SpawnSegment(box, prefix .. "CheckB", -2, -5, 7, 6, 3.2, ink)
@@ -1354,7 +1565,7 @@ script RtsPopupLogic extends Logic
 		end)
 		local ix = self:KindInfoX(#T:GetTabs())
 		H:SpawnLabel("RtsThemeInfo", body, Vector2(0, 1), Vector2(0, 1), Vector2(ix, -52), Vector2(W - 27 - ix, 26),
-			"고르면 내 구역의 바닥 · 트랙이 바뀌어요", H:ColMuted(), 14, TextAlignmentType.MiddleLeft, false)
+			"고르면 내 구역의 바닥 · 트랙이 바뀌어요", self:Muted(), 14, TextAlignmentType.MiddleLeft, false)
 		local listE = self:SpawnPresetList(body, "RtsThemeList")
 		local list = T:GetPresets()
 		local k = 0
@@ -1389,7 +1600,7 @@ script RtsPopupLogic extends Logic
 		end)
 		local ix = self:KindInfoX(#B:GetTabs())
 		H:SpawnLabel("RtsTombInfo", body, Vector2(0, 1), Vector2(0, 1), Vector2(ix, -52), Vector2(W - 27 - ix, 26),
-			"탈락하면 내 구역 가운데에 이 비석이 서요", H:ColMuted(), 14, TextAlignmentType.MiddleLeft, false)
+			"탈락하면 내 구역 가운데에 이 비석이 서요", self:Muted(), 14, TextAlignmentType.MiddleLeft, false)
 		local listE = self:SpawnPresetList(body, "RtsTombList")
 		local list = B:GetPresets()
 		local k = 0
@@ -1462,9 +1673,10 @@ script RtsPopupLogic extends Logic
 		self.IconCells = {}
 		local ix = self:KindInfoX(1)
 		self.IconHead = H:SpawnLabel("RtsIconHead", body, Vector2(0, 1), Vector2(0, 1), Vector2(ix, -52), Vector2(W - 27 - ix, 26),
-			"보유 " .. H:Int(P.MyOwnedCount) .. " / " .. H:Int(#ids) .. "  ·  유저 카드에 보이는 아이콘이에요", H:ColMuted(), 14, TextAlignmentType.MiddleLeft, false)
-		local grid = self:SpawnScrollGrid(body, "RtsIconList", 86, 20, Vector2(94, 94), 8, 8)
-		self:SpawnIconNoneCell(grid)
+			"보유 " .. H:Int(P.MyOwnedCount) .. " / " .. H:Int(#ids) .. "  ·  유저 카드에 보이는 아이콘이에요", self:Muted(), 14, TextAlignmentType.MiddleLeft, false)
+		local grid = self:SpawnPresetList(body, "RtsIconList")
+		local iconRow = self:SpawnIconGridRow(grid, 0)
+		self:SpawnIconNoneCell(iconRow)
 		-- 탭은 바로 보이고 칸은 IconBatch개씩 나눠 만든다(위에서부터). 창이 닫히거나 탭이 바뀌면(내용 상자 교체) 멈춘다
 		local nextIdx = 1
 		local step = nil
@@ -1472,7 +1684,8 @@ script RtsPopupLogic extends Logic
 			if self.ProfileContent ~= body or grid == nil or not isvalid(grid) then return end
 			local last = math.min(#ids, nextIdx + self.IconBatch - 1)
 			for i = nextIdx, last do
-				self:SpawnIconCell(grid, ids[i], i)
+				if i % 6 == 0 then iconRow = self:SpawnIconGridRow(grid, i) end
+				self:SpawnIconCell(iconRow, ids[i], i)
 			end
 			nextIdx = last + 1
 			if nextIdx <= #ids then _TimerService:SetTimerOnce(step, 0.03) end
@@ -1480,73 +1693,102 @@ script RtsPopupLogic extends Logic
 		step()
 	end
 
-	-- 첫 칸 '없음'(2026-09-25 사용자 "아이콘 기본값 없음" + 다시 끌 수 있게): 빈 원 + "없음". 사용 중이면 금색, 누르면 바로 변경 확인
+	@ExecSpace("ClientOnly")
+	method Entity SpawnIconGridRow(Entity list, number index)
+		-- 카드 높이 140에 행 사이 여백 10을 더해 이름과 다음 행 썸네일을 분리한다.
+		local row = _RtsHudLogic:SpawnUI("model://uisprite", "RtsIconGridRow" .. tostring(index), list, Vector2(0, 1), Vector2(0, 1), Vector2(0, 0), Vector2(818, 150))
+		row.SpriteGUIRendererComponent.Color = Color(1, 1, 1, 0)
+		row.SpriteGUIRendererComponent.RaycastTarget = false
+		return row
+	end
+
+	-- 아이콘 컬렉션: 공통 둥근 카드·이름·사용 상태. 색만 바꿔 선택을 갱신한다.
+	@ExecSpace("ClientOnly")
+	method table CreateIconTile(Entity grid, string id, string caption, number index)
+		local H = _RtsHudLogic
+		local cell = H:SpawnRoundedPanel("RtsIconCell" .. H:Int(index), grid, Vector2(0, 1), Vector2(0, 1), Vector2((index % 6) * 138, 0), Vector2(128, 140),
+			Color.white, self:Edge(), 1.5)
+		local slot = H:SpawnUI("model://uisprite", "RtsIconPortraitSlot", cell, Vector2(0.5, 1), Vector2(0.5, 0.5), Vector2(0, -66), Vector2(76, 76))
+		slot.SpriteGUIRendererComponent.Color = Color(1, 1, 1, 0)
+		slot.SpriteGUIRendererComponent.RaycastTarget = false
+		local face = nil
+		if id ~= _RtsProfileLogic.IconNone then
+			face = H:SpawnMonsterPortrait(slot, id, 76, false)
+		else
+			H:SpawnLabel("RtsIconNoneMark", slot, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2(0, 0), Vector2(70, 50),
+				"—", self:Muted(), 28, TextAlignmentType.MiddleCenter, false)
+		end
+		local label = H:SpawnLabel("RtsIconName", cell, Vector2(0.5, 0), Vector2(0.5, 0), Vector2(0, 8), Vector2(112, 26),
+			caption, self:Ink(), 14, TextAlignmentType.MiddleCenter, true)
+		local mark = H:SpawnLabel("RtsIconState", cell, Vector2(0.5, 1), Vector2(0.5, 1), Vector2(0, -5), Vector2(112, 20),
+			"", self:AccentInk(), 12, TextAlignmentType.MiddleCenter, true)
+		local c = { cell = cell, face = face, label = label, mark = mark }
+		self.IconCells[id] = c
+		self:PaintIconCell(id, c)
+		return c
+	end
+
+	@ExecSpace("ClientOnly")
+	method void PaintIconCell(string id, table c)
+		if not isvalid(c.cell) then return end
+		local P = _RtsProfileLogic
+		local owned = id == P.IconNone or P:IsOwned(id)
+		local selected = id == P.MyIcon
+		local bg = Color(0.97, 0.975, 0.99, 1)
+		local edge = Color(0.87, 0.89, 0.94, 1)
+		if owned then bg = Color.white end
+		if selected then bg = Color(0.92, 0.91, 0.99, 1); edge = _RtsHudLogic:ColGold() end
+		c.cell.SpriteGUIRendererComponent.Color = bg
+		c.cell.Parent.SpriteGUIRendererComponent.Color = edge
+		c.label.TextComponent.FontColor = self:Muted()
+		if owned then c.label.TextComponent.FontColor = self:Ink() end
+		c.mark.TextComponent.Text = ""
+		if selected then c.mark.TextComponent.Text = "사용 중"
+		elseif not owned then c.mark.TextComponent.Text = "미획득" end
+		c.mark.TextComponent.FontColor = self:Muted()
+		if selected then c.mark.TextComponent.FontColor = self:AccentInk() end
+		if isvalid(c.face) then
+			if owned then c.face.SpriteGUIRendererComponent.Color = Color.white
+			else c.face.SpriteGUIRendererComponent.Color = Color(0.22, 0.25, 0.30, 0.68) end
+		end
+	end
+
 	@ExecSpace("ClientOnly")
 	method void SpawnIconNoneCell(Entity grid)
-		local H = _RtsHudLogic
 		local P = _RtsProfileLogic
-		local cell = H:SpawnUI("model://uibutton", "RtsIconCell0", grid, Vector2(0, 1), Vector2(0, 1), Vector2(0, 0), Vector2(94, 94))
-		if cell == nil then return end
-		local bg = self:Mix(Color.white, 0.08)
-		if P.MyIcon == P.IconNone then bg = self:Mix(H:ColGold(), 0.35) end
-		cell.SpriteGUIRendererComponent.Color = bg
-		local ring = H:SpawnUI("model://uisprite", "RtsIconNoneRing", cell, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2(0, 6), Vector2(54, 54))
-		if H.CircleMaskRUID ~= "" then ring.SpriteGUIRendererComponent.ImageRUID = DataRef(H.CircleMaskRUID) end
-		ring.SpriteGUIRendererComponent.Color = Color(1, 1, 1, 0.15)  -- '없음' 자리 표시용 옅은 원(아이콘 배경은 2026-09-25 투명으로)
-		ring.SpriteGUIRendererComponent.RaycastTarget = false
-		H:SpawnLabel("RtsIconNoneText", cell, Vector2(0.5, 0), Vector2(0.5, 0), Vector2(0, 4), Vector2(90, 22),
-			"없음", H:ColInk(), 14, TextAlignmentType.MiddleCenter, true)
-		self.IconCells[P.IconNone] = { cell = cell, face = nil }
-		cell:ConnectEvent(ButtonClickEvent, function(event)
+		local c = self:CreateIconTile(grid, P.IconNone, "선택 안 함", 0)
+		local click = _RtsHudLogic:SpawnClick("RtsIconNoneClick", c.cell)
+		click:ConnectEvent(ButtonClickEvent, function(event)
 			if P.MyIcon == P.IconNone then return end
-			H:PlayUi(H.ClickSound)
 			P.PendingIcon = P.IconNone
 			self:Open("iconconfirm")
 		end)
 	end
 
-	-- 아이콘 칸 하나(uibutton 94×94 + 초상 82): 보유 원색 · 미보유 실루엣 · 사용 중 금색 바탕. 누르면 정보
 	@ExecSpace("ClientOnly")
 	method void SpawnIconCell(Entity grid, string id, number index)
-		local H = _RtsHudLogic
 		local P = _RtsProfileLogic
-		local owned = P:IsOwned(id)
-		local cell = H:SpawnUI("model://uibutton", "RtsIconCell" .. H:Int(index), grid, Vector2(0, 1), Vector2(0, 1), Vector2(0, 0), Vector2(94, 94))
-		if cell == nil then return end
-		local bg = self:Mix(Color.white, 0.03)
-		if owned then bg = self:Mix(Color.white, 0.08) end
-		if id == P.MyIcon then bg = self:Mix(H:ColGold(), 0.35) end
-		cell.SpriteGUIRendererComponent.Color = bg
-		local face = H:SpawnMonsterPortrait(cell, id, 82, false)
-		if face ~= nil and not owned then face.SpriteGUIRendererComponent.Color = Color(0.05, 0.05, 0.06, 0.8) end
-		self.IconCells[id] = { cell = cell, face = face }
-		cell:ConnectEvent(ButtonClickEvent, function(event)
-			H:PlayUi(H.ClickSound)
+		local mon = _RtsStageTableLogic:GetMonster(id)
+		if mon == nil then return end
+		local c = self:CreateIconTile(grid, id, mon.name, index)
+		local click = _RtsHudLogic:SpawnClick("RtsIconCellClick", c.cell)
+		click:ConnectEvent(ButtonClickEvent, function(event)
 			P.PendingIcon = id
 			self:Open("iconinfo")
 		end)
 	end
 
-	-- [아이콘] 탭 칸 색만 제자리에서(서버가 선택·보유를 바꿔 보냈을 때 — 247칸을 다시 만들지 않는다, 2026-09-25)
 	@ExecSpace("ClientOnly")
 	method void RefreshIconCells()
 		if self.Kind ~= "profile" or self.ProfileTab ~= "icon" then return end
 		local H = _RtsHudLogic
 		local P = _RtsProfileLogic
-		if self.IconHead ~= nil and isvalid(self.IconHead) and self.IconHead.TextComponent ~= nil then
+		if isvalid(self.IconHead) then
 			self.IconHead.TextComponent.Text = "보유 " .. H:Int(P.MyOwnedCount) .. " / " .. H:Int(#P:IconIds()) .. "  ·  유저 카드에 보이는 아이콘이에요"
 		end
-		for id, c in pairs(self.IconCells) do
-			if c.cell ~= nil and isvalid(c.cell) then
-				local owned = id == P.IconNone or P:IsOwned(id)
-				local bg = self:Mix(Color.white, 0.03)
-				if owned then bg = self:Mix(Color.white, 0.08) end
-				if id == P.MyIcon then bg = self:Mix(H:ColGold(), 0.35) end
-				c.cell.SpriteGUIRendererComponent.Color = bg
-				if c.face ~= nil and isvalid(c.face) then
-					if owned then c.face.SpriteGUIRendererComponent.Color = Color(1, 1, 1, 1) else c.face.SpriteGUIRendererComponent.Color = Color(0.05, 0.05, 0.06, 0.8) end
-				end
-			end
+		for id, c in pairs(self.IconCells) do self:PaintIconCell(id, c) end
+		if isvalid(self._T.ProfileDialog) and self._T.ProfileDialogKind == "iconinfo" then
+			self:OpenProfileDialog("iconinfo")
 		end
 	end
 
@@ -1559,7 +1801,9 @@ script RtsPopupLogic extends Logic
 		local mon = _RtsStageTableLogic:GetMonster(id)
 		if mon == nil then return end
 		local slot = H:SpawnUI("model://uisprite", "RtsIconInfoSlot", body, Vector2(0, 1), Vector2(0, 1), Vector2(27, -10), Vector2(140, 140))
-		slot.SpriteGUIRendererComponent.Color = Color(0.2, 0.17, 0.15, 1)
+		slot.SpriteGUIRendererComponent.Color = Color(0.94, 0.94, 0.99, 1)
+		slot.SpriteGUIRendererComponent.ImageRUID = DataRef(H.RoundedPanelRUID)
+		slot.SpriteGUIRendererComponent.Type = ImageType.Sliced
 		if slot.MaskComponent == nil then slot:AddComponent("MaskComponent") end
 		local owned = P:IsOwned(id)
 		local face = H:SpawnMonsterPortrait(slot, id, 128, owned)
@@ -1567,12 +1811,12 @@ script RtsPopupLogic extends Logic
 		local tx = 187
 		local tw = W - tx - 27
 		H:SpawnLabel("RtsIconInfoName", body, Vector2(0, 1), Vector2(0, 1), Vector2(tx, -10), Vector2(tw, 34),
-			mon.name, H:ColInk(), 22, TextAlignmentType.MiddleLeft, true)
+			mon.name, self:Ink(), 22, TextAlignmentType.MiddleLeft, true)
 		local state = "미획득"
-		local stateCol = H:ColMuted()
+		local stateCol = self:Muted()
 		if id == P.MyIcon then
 			state = "사용 중"
-			stateCol = H:ColGold()
+			stateCol = self:AccentInk()
 		elseif owned then
 			state = "보유"
 			stateCol = Color(0.55, 0.85, 0.55, 1)
@@ -1582,16 +1826,16 @@ script RtsPopupLogic extends Logic
 		H:SpawnLabel("RtsIconInfoState", body, Vector2(0, 1), Vector2(0, 1), Vector2(tx, -48), Vector2(tw, 28),
 			state, stateCol, 17, TextAlignmentType.MiddleLeft, true)
 		H:SpawnLabel("RtsIconInfoWhere", body, Vector2(0, 1), Vector2(0, 1), Vector2(tx, -84), Vector2(tw, 26),
-			"획득처: " .. P:WhereText(id), H:ColInk(), 15, TextAlignmentType.MiddleLeft, false)
+			"획득처: " .. P:WhereText(id), self:Ink(), 15, TextAlignmentType.MiddleLeft, false)
 		H:SpawnLabel("RtsIconInfoRate", body, Vector2(0, 1), Vector2(0, 1), Vector2(tx, -114), Vector2(tw, 26),
-			"처치 시 확률: " .. P:IconDropText(true), H:ColInk(), 15, TextAlignmentType.MiddleLeft, false)
+			"처치 시 확률: " .. P:IconDropText(true), self:Ink(), 15, TextAlignmentType.MiddleLeft, false)
 		local bw = 200
 		local bh = 44
 		if owned and id ~= P.MyIcon then
-			local use = H:SpawnPanel("RtsIconUse", body, Vector2(0.5, 0), Vector2(1, 0), Vector2(-10, 24), Vector2(bw, bh),
+			local use = H:SpawnRoundedPanel("RtsIconUse", body, Vector2(0.5, 0), Vector2(1, 0), Vector2(-10, 24), Vector2(bw, bh),
 				self:Mix(H:ColGold(), 0.25), H:ColGold(), 1.5)
 			H:SpawnLabel("RtsIconUseText", use, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2(0, 0), Vector2(bw - 8, bh - 6),
-				"이 아이콘 사용", Color(1, 0.95, 0.8, 1), 17, TextAlignmentType.MiddleCenter, true)
+				"이 아이콘 사용", self:Ink(), 17, TextAlignmentType.MiddleCenter, true)
 			local uc = H:SpawnClick("RtsIconUseClick", use)
 			uc:ConnectEvent(ButtonClickEvent, function(event)
 				self:Open("iconconfirm")
@@ -1646,18 +1890,18 @@ script RtsPopupLogic extends Logic
 		if slot.MaskComponent == nil then slot:AddComponent("MaskComponent") end
 		H:SpawnMonsterPortrait(slot, id, 128, true)
 		H:SpawnLabel("RtsIconGotName", body, Vector2(0.5, 1), Vector2(0.5, 1), Vector2(0, -154), Vector2(W - 54, 34),
-			mon.name .. " 아이콘을 얻었어요!", H:ColGold(), 22, TextAlignmentType.MiddleCenter, true)
+			mon.name .. " 아이콘을 얻었어요!", self:AccentInk(), 22, TextAlignmentType.MiddleCenter, true)
 		local line = "획득처: " .. P:WhereText(id)
 		local date = P:OwnedDate(id)
 		if date ~= "" then line = line .. "   ·   획득일 " .. date end
 		H:SpawnLabel("RtsIconGotWhere", body, Vector2(0.5, 1), Vector2(0.5, 1), Vector2(0, -192), Vector2(W - 54, 26),
-			line, H:ColInk(), 15, TextAlignmentType.MiddleCenter, false)
+			line, self:Ink(), 15, TextAlignmentType.MiddleCenter, false)
 		local bw = 200
 		local bh = 44
-		local ok = H:SpawnPanel("RtsIconGotOk", body, Vector2(0.5, 0), Vector2(0.5, 0), Vector2(0, 22), Vector2(bw, bh),
+		local ok = H:SpawnRoundedPanel("RtsIconGotOk", body, Vector2(0.5, 0), Vector2(0.5, 0), Vector2(0, 22), Vector2(bw, bh),
 			self:Mix(H:ColGold(), 0.25), H:ColGold(), 1.5)
 		H:SpawnLabel("RtsIconGotOkText", ok, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2(0, 0), Vector2(bw - 8, bh - 6),
-			"확인", Color(1, 0.95, 0.8, 1), 17, TextAlignmentType.MiddleCenter, true)
+			"확인", self:Ink(), 17, TextAlignmentType.MiddleCenter, true)
 		local oc = H:SpawnClick("RtsIconGotOkClick", ok)
 		oc:ConnectEvent(ButtonClickEvent, function(event)
 			self:Close()
@@ -1685,12 +1929,12 @@ script RtsPopupLogic extends Logic
 			end
 		end
 		H:SpawnLabel("RtsRankInfo", body, Vector2(0, 1), Vector2(0, 1), Vector2(27, -52), Vector2(W - 54, 26),
-			"그 난이도에서 검은 마법사 4페이즈를 깬 횟수 순 · 같으면 먼저 달성한 사람이 위", H:ColMuted(), 14, TextAlignmentType.MiddleLeft, false)
+			"그 난이도에서 검은 마법사 4페이즈를 깬 횟수 순 · 같으면 먼저 달성한 사람이 위", self:Muted(), 14, TextAlignmentType.MiddleLeft, false)
 		local c = self.RankCache[self.RankDiff]
 		if c == nil or _UtilLogic.ElapsedSeconds - c.at > 20 then _RtsRunResultLogic:RequestRanking(self.RankDiff) end
 		if c == nil then
 			H:SpawnLabel("RtsRankWait", body, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2(0, 0), Vector2(W - 54, 40),
-				"불러오는 중…", H:ColMuted(), 18, TextAlignmentType.MiddleCenter, false)
+				"불러오는 중…", self:Muted(), 18, TextAlignmentType.MiddleCenter, false)
 			return
 		end
 		-- 아래: 내 순위
@@ -1700,10 +1944,10 @@ script RtsPopupLogic extends Logic
 			if c.myMore then rk = H:Int(c.myRank - 1) .. "위 밖" end
 			my = "내 순위 " .. rk .. "   ·   클리어 " .. H:Int(c.myCount) .. "회"
 		end
-		local mine = H:SpawnPanel("RtsRankMine", body, Vector2(0, 0), Vector2(0, 0), Vector2(27, 22), Vector2(W - 54, 46),
+		local mine = H:SpawnRoundedPanel("RtsRankMine", body, Vector2(0, 0), Vector2(0, 0), Vector2(27, 22), Vector2(W - 54, 46),
 			self:Mix(H:ColGold(), 0.14), self:Mix(H:ColGold(), 0.6), 1.5)
 		H:SpawnLabel("RtsRankMineText", mine, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2(0, 0), Vector2(W - 80, 40),
-			my, H:ColGold(), 17, TextAlignmentType.MiddleCenter, true)
+			my, self:AccentInk(), 17, TextAlignmentType.MiddleCenter, true)
 		-- 목록
 		local listW = W - 54
 		local list = H:SpawnStretch("model://uisprite", "RtsRankList", body, Vector2(0, 0), Vector2(1, 1), Vector2(27, 80), Vector2(-27, -86))
@@ -1715,7 +1959,7 @@ script RtsPopupLogic extends Logic
 		end
 		if #rows == 0 then
 			H:SpawnLabel("RtsRankEmpty", list, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2(0, 0), Vector2(listW - 20, 40),
-				"아직 기록이 없어요 — 첫 클리어의 주인공이 되어 보세요", H:ColMuted(), 17, TextAlignmentType.MiddleCenter, false)
+				"아직 기록이 없어요 — 첫 클리어의 주인공이 되어 보세요", self:Muted(), 17, TextAlignmentType.MiddleCenter, false)
 			return
 		end
 		local sg = list:AddComponent("ScrollLayoutGroupComponent")
@@ -1731,14 +1975,14 @@ script RtsPopupLogic extends Logic
 		end
 		for i = 1, #rows do
 			local top = i <= 3
-			local ink = H:ColInk()
-			if top then ink = H:ColGold() end
-			local row = H:SpawnPanel("RtsRankRow" .. tostring(i), list, Vector2(0, 1), Vector2(0, 1), Vector2(0, 0), Vector2(listW - 16, 44),
-				self:Mix(Color.white, 0.04), self:Mix(Color.white, 0.1), 1.5)
+			local ink = self:Ink()
+			if top then ink = self:AccentInk() end
+			local row = H:SpawnRoundedPanel("RtsRankRow" .. tostring(i), list, Vector2(0, 1), Vector2(0, 1), Vector2(0, 0), Vector2(listW - 16, 44),
+				self:Card(), self:Edge(), 1.5)
 			H:SpawnLabel("RtsRankNo", row, Vector2(0, 0.5), Vector2(0, 0.5), Vector2(14, 0), Vector2(70, 32),
 				H:Int(i) .. "위", ink, 17, TextAlignmentType.MiddleLeft, true)
 			H:SpawnLabel("RtsRankNick", row, Vector2(0, 0.5), Vector2(0, 0.5), Vector2(96, 0), Vector2(listW - 280, 32),
-				rows[i].nick, H:ColInk(), 17, TextAlignmentType.MiddleLeft, top)
+				rows[i].nick, self:Ink(), 17, TextAlignmentType.MiddleLeft, top)
 			H:SpawnLabel("RtsRankCnt", row, Vector2(1, 0.5), Vector2(1, 0.5), Vector2(-16, 0), Vector2(150, 32),
 				H:Int(rows[i].cnt) .. "회", ink, 17, TextAlignmentType.MiddleRight, true)
 		end
@@ -1761,7 +2005,7 @@ script RtsPopupLogic extends Logic
 			end
 		end
 		H:SpawnLabel("RtsDpSub", body, Vector2(0, 1), Vector2(0, 1), Vector2(27, -4), Vector2(1050, 24),
-			"누르면 그 직업인 내 유닛 전부에 적용(영구 잠금 포함), 적용된 걸 다시 누르면 해제. 연출 자산이 아직 없는 프리즘은 기존 스킬 연출을 그대로 쓴다", H:ColMuted(), 14, TextAlignmentType.MiddleLeft, false)
+			"누르면 그 직업인 내 유닛 전부에 적용(영구 잠금 포함), 적용된 걸 다시 누르면 해제. 연출 자산이 아직 없는 프리즘은 기존 스킬 연출을 그대로 쓴다", self:Muted(), 14, TextAlignmentType.MiddleLeft, false)
 		local prisms = T:GetPrisms()
 		local colW = 520
 		local n = 0
@@ -1787,7 +2031,7 @@ script RtsPopupLogic extends Logic
 				local tab = self:SpawnTab("RtsDp" .. pz.id, body, Vector2(x, y), Vector2(colW, 40), txt, has, 15)
 				if not hasUnit then tab.SpriteGUIRendererComponent.Color = self:Mix(Color.white, 0.02) end
 				H:SpawnLabel("RtsDpD" .. pz.id, body, Vector2(0, 1), Vector2(0, 1), Vector2(x + 4, y - 44), Vector2(colW - 8, 52),
-					pz.desc, Color(0.902, 0.863, 0.769, 1), 12, TextAlignmentType.UpperLeft, false)
+					pz.desc, self:Ink(), 12, TextAlignmentType.UpperLeft, false)
 				if hasUnit then
 					local pid = pz.id
 					local click = H:SpawnClick("RtsDpClick", tab)
@@ -1807,7 +2051,7 @@ script RtsPopupLogic extends Logic
 			self:Close()
 		end)
 		H:SpawnLabel("RtsDpFoot", body, Vector2(1, 0), Vector2(1, 0), Vector2(-27, 4), Vector2(700, 22),
-			"개발용 — 팬텀은 영입 팝업 '영웅' 탭에서 영입. RtsUnitLogic.DevTools가 꺼지면 이 버튼은 사라진다", Color(0.851, 0.796, 0.651, 1), 13, TextAlignmentType.MiddleRight, false)
+			"개발용 — 팬텀은 영입 팝업 '영웅' 탭에서 영입. RtsUnitLogic.DevTools가 꺼지면 이 버튼은 사라진다", self:Muted(), 13, TextAlignmentType.MiddleRight, false)
 	end
 
 	-- ===== 방출 확인: 대상 한 줄 + 안내 문구(사용자 지정 텍스트) + [방출][취소] =====
@@ -1826,18 +2070,18 @@ script RtsPopupLogic extends Logic
 		local pct = math.floor(_RtsUnitLogic.DismissRefundRate * 100 + 0.5)
 		-- 대상: "Lv.50 나이트로드 · 환급 3,000 메소"
 		H:SpawnLabel("RtsDmWho", body, Vector2(0, 1), Vector2(0, 1), Vector2(27, -6), Vector2(586, 26),
-			"Lv." .. string.format("%d", u.Level) .. " " .. T:GetJobNameFor(u) .. "   ·   환급 " .. H:FormatNumber(refund) .. " 메소", H:ColMuted(), 15, TextAlignmentType.MiddleLeft, false)
+			"Lv." .. string.format("%d", u.Level) .. " " .. T:GetJobNameFor(u) .. "   ·   환급 " .. H:FormatNumber(refund) .. " 메소", self:Muted(), 15, TextAlignmentType.MiddleLeft, false)
 		-- 안내 문구 (사용자 지정, 2026-09-22)
 		H:SpawnLabel("RtsDmMsg", body, Vector2(0, 1), Vector2(0, 1), Vector2(27, -44), Vector2(586, 90),
-			"적용된 증강은 모두 소멸하며, 사용된 메소의 " .. pct .. "%만 돌려받습니다." .. "\n" .. "정말 방출하시겠습니까?", H:ColInk(), 19, TextAlignmentType.MiddleCenter, true)
+			"적용된 증강은 모두 소멸하며, 사용된 메소의 " .. pct .. "%만 돌려받습니다." .. "\n" .. "정말 방출하시겠습니까?", self:Ink(), 19, TextAlignmentType.MiddleCenter, true)
 		-- 버튼: 방출(붉은 테두리) / 취소
 		local bw = 180
 		local bh = 44
 		local by = -150
-		local yes = H:SpawnPanel("RtsDmYes", body, Vector2(0.5, 1), Vector2(1, 1), Vector2(-10, by), Vector2(bw, bh),
+		local yes = H:SpawnRoundedPanel("RtsDmYes", body, Vector2(0.5, 1), Vector2(1, 1), Vector2(-10, by), Vector2(bw, bh),
 			self:Mix(Color(0.8, 0.35, 0.3, 1), 0.25), Color(0.8, 0.35, 0.3, 1), 1.5)
 		H:SpawnLabel("RtsDmYesText", yes, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2(0, 0), Vector2(bw - 8, bh - 6),
-			"방출", Color(0.98, 0.72, 0.66, 1), 17, TextAlignmentType.MiddleCenter, true)
+			"방출", Color(0.62, 0.19, 0.15, 1), 17, TextAlignmentType.MiddleCenter, true)
 		local yc = H:SpawnClick("RtsDmYesClick", yes)
 		yc:ConnectEvent(ButtonClickEvent, function(event)
 			local target = self.DismissNo
@@ -1860,16 +2104,9 @@ script RtsPopupLogic extends Logic
 	--   보유 = RtsAugmentLogic.MyOwned(). 미지정 증강은 오른쪽에서 내 유닛 칩을 골라 [n번 유닛에 지정](1회, 변경 불가). 직업 프리즘은 그 직업 유닛만, 특수 코어는 같은 코어가 없는 유닛만(방어구 부수기는 겹쳐 붙일 수 있음)
 	@ExecSpace("ClientOnly")
 	method void BuildAugment(Entity body)
-		-- 탭은 제자리(개수 글자·켜짐만 RefreshAugment가 바꿈), 목록·상세·아래 줄은 컨테이너(AugContent)로 — 2026-09-25 "필요한 부분만 다시"
+		-- 모든 등급을 한 목록에 표시하고 필터는 기존 행만 켜고 끈다.
 		self.AugBody = body
-		local grades = { "all", "bronze", "silver", "gold", "prism" }
-		local items = {}
-		for i = 1, #grades do items[i] = { grades[i], self:GradeName(grades[i]) } end
-		self.AugBar = self:SpawnTabBar(body, "RtsAugTab", items, self.AugGrade, 27, -10, 110, 34, 8, 16, function(key)
-			self.AugGrade = key
-			self:RefreshAugment()
-		end)
-		self:SpawnTabKeyHint(body, 27 + #grades * 118 + 4)
+		self.AugBar = nil
 		self.AugContent = nil
 		self.AugDetail = nil
 		self:RefreshAugment()
@@ -1882,13 +2119,13 @@ script RtsPopupLogic extends Logic
 		local A = _RtsAugmentLogic
 		local AT = _RtsAugmentTableLogic
 		-- 왼쪽 목록(선택 등급만). 행 = 등급 띠·배지·이름·지정 상태
-		local listW = 567
-		local top = -60
+		local listW = 440
+		local top = -70
 		local rows = {}
 		self.AugRowRefs = {}
 		for i = 1, #owned do
 			local d = AT:GetDef(owned[i].id)
-			if d ~= nil and (self.AugGrade == "all" or d.grade == self.AugGrade) and (not self.AugHideAssigned or owned[i].no == 0) then rows[#rows + 1] = { k = i, id = owned[i].id, no = owned[i].no, d = d } end
+			if d ~= nil then rows[#rows + 1] = { k = i, id = owned[i].id, no = owned[i].no, d = d } end
 		end
 		-- 숨긴 증강이 선택돼 있으면 선택 풀기(아래에서 첫 미지정으로)
 		if self.AugSel > 0 then
@@ -1917,19 +2154,21 @@ script RtsPopupLogic extends Logic
 			end
 		end
 		local list = H:SpawnStretch("model://uisprite", "RtsAugList", box, Vector2(0, 0), Vector2(0, 1), Vector2(27, 27), Vector2(27 + listW, top))
-		list.SpriteGUIRendererComponent.Color = self:Mix(Color.white, 0.02)
+		list.SpriteGUIRendererComponent.Color = Color(1, 1, 1, 0)
+		self._T.AugList = list
+		self._T.AugEmpty = H:SpawnLabel("RtsAugFilteredEmpty", box, Vector2(0, 1), Vector2(0, 1), Vector2(47, -230), Vector2(390, 110), "미지정 증강이 없어요\n숨기기를 해제하면 적용된 증강을 볼 수 있어요", self:Muted(), 17, TextAlignmentType.MiddleCenter, false)
 		if #rows == 0 then
 			local emptyText = "아직 얻은 증강이 없어요 — 지급 라운드가 시작되면 3개 중 1개를 고릅니다"
-			if #owned > 0 and self.AugHideAssigned then emptyText = "미지정 증강이 없어요 — 적용된 증강은 숨겨져 있어요(오른쪽 아래 체크 해제)" end
-			H:SpawnLabel("RtsAugEmpty", list, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2(0, 0), Vector2(520, 60),
-				emptyText, H:ColMuted(), 16, TextAlignmentType.MiddleCenter, false)
+			if #owned > 0 and self.AugHideAssigned then emptyText = "미지정 증강이 없어요 — 적용된 증강은 숨겨져 있어요(위의 숨기기 체크 해제)" end
+			H:SpawnLabel("RtsAugEmpty", list, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2(0, 0), Vector2(listW - 32, 100),
+				emptyText, self:Muted(), 16, TextAlignmentType.MiddleCenter, false)
 		else
 			local sg = list:AddComponent("ScrollLayoutGroupComponent")
 			if sg ~= nil then
 				sg.Type = LayoutGroupType.Vertical
 				sg.ChildAlignment = ChildAlignmentType.UpperLeft
 				sg.Spacing = 6
-				sg.UseScroll = #rows > 12
+				sg.UseScroll = #rows > 8
 				sg.ScrollBarVisible = ScrollBarVisibility.AlwaysShow
 				sg.ScrollBarThickness = 8
 				sg.ScrollBarHandleColor = H:ColGold()
@@ -1938,32 +2177,32 @@ script RtsPopupLogic extends Logic
 			for i = 1, #rows do
 				local r = rows[i]
 				local on = r.k == self.AugSel
-				local bg = self:Mix(Color.white, 0.04)
-				local border = self:Mix(Color.white, 0.1)
-				-- 미지정 표시(2026-09-23 사용자 "선택 안 한 것에 특수 표시"): 붉은 테두리·옅은 붉은 배경 + 오른쪽 붉은 '미지정' 딱지
+				local bg = self:Card()
+				local border = self:Edge()
+				-- 미지정은 작은 배지로, 현재 선택은 금색 테두리로 구분한다.
 				local unassigned = r.no == 0
 				if unassigned then
-					bg = self:Mix(Color(0.95, 0.45, 0.4, 1), 0.1)
-					border = Color(0.85, 0.36, 0.32, 1)
+					bg = self:Card()
+					border = self:Edge()
 				end
 				if on then
 					bg = self:Mix(H:ColGold(), 0.14)
 					border = H:ColGold()
 				end
-				local row = H:SpawnPanel("RtsAugRow" .. tostring(i), list, Vector2(0, 1), Vector2(0, 1), Vector2(0, 0), Vector2(listW - 16, 56), bg, border, 1.5)
+				local row = H:SpawnRoundedPanel("RtsAugRow" .. tostring(i), list, Vector2(0, 1), Vector2(0, 1), Vector2(0, 0), Vector2(listW - 16, 86), bg, border, 1.5)
 				local band = H:SpawnStretch("model://uisprite", "RtsAugRowBand", row, Vector2(0, 0), Vector2(0, 1), Vector2(0, 0), Vector2(4, 0))
 				band.SpriteGUIRendererComponent.Color = self:GradeColor(r.d.grade)
-				self:SpawnBadge("RtsAugRowBadge", row, Vector2(14, -16), r.d.grade)
-				H:SpawnLabel("RtsAugRowName", row, Vector2(0, 0.5), Vector2(0, 0.5), Vector2(90, 0), Vector2(270, 30),
-					r.d.name, H:ColInk(), 16, TextAlignmentType.MiddleLeft, true)
+				self:SpawnAugIcon(row, r.d, Vector2(10, -11), 64)
+				H:SpawnLabel("RtsAugRowName", row, Vector2(0, 0.5), Vector2(0, 0.5), Vector2(86, 0), Vector2(listW - 214, 48),
+					r.d.name, self:Ink(), 18, TextAlignmentType.MiddleLeft, true)
 				if unassigned then
-					local pill = H:SpawnPanel("RtsAugRowNew", row, Vector2(1, 0.5), Vector2(1, 0.5), Vector2(-12, 0), Vector2(86, 30),
+					local pill = H:SpawnRoundedPanel("RtsAugRowNew", row, Vector2(1, 0.5), Vector2(1, 0.5), Vector2(-12, 0), Vector2(86, 26),
 						Color(0.78, 0.25, 0.22, 1), Color(1, 0.62, 0.55, 1), 1.5)
 					H:SpawnLabel("RtsAugRowNewText", pill, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2(0, 0), Vector2(80, 26),
 						"미지정", Color(1, 0.97, 0.94, 1), 14, TextAlignmentType.MiddleCenter, true)
 				else
-					H:SpawnLabel("RtsAugRowState", row, Vector2(1, 0.5), Vector2(1, 0.5), Vector2(-12, 0), Vector2(170, 30),
-						self:AugStateText(r.no), H:ColMuted(), 14, TextAlignmentType.MiddleRight, false)
+					H:SpawnLabel("RtsAugRowState", row, Vector2(1, 0.5), Vector2(1, 0.5), Vector2(-12, 0), Vector2(96, 54),
+						self:AugStateText(r.no), self:Muted(), 13, TextAlignmentType.MiddleRight, false)
 				end
 				local kk = r.k
 				self.AugRowRefs[#self.AugRowRefs + 1] = { k = kk, row = row, un = unassigned }
@@ -1981,22 +2220,23 @@ script RtsPopupLogic extends Logic
 		self:BuildAugDetail(box, owned)
 
 		-- 우측 하단: [v] 적용된 증강 숨기기(기본 체크) — 누르면 켜고 끄기
-		local cb = H:SpawnUI("model://uisprite", "RtsAugHideBox", box, Vector2(1, 0), Vector2(1, 0), Vector2(-27, 4), Vector2(190, 24))
+		local cb = H:SpawnUI("model://uisprite", "RtsAugHideBox", box, Vector2(1, 1), Vector2(1, 1), Vector2(-27, -20), Vector2(210, 28))
 		cb.SpriteGUIRendererComponent.Color = Color(1, 1, 1, 0)
-		local sq = H:SpawnPanel("RtsAugHideSq", cb, Vector2(0, 0.5), Vector2(0, 0.5), Vector2(0, 0), Vector2(20, 20), Color(0.1, 0.086, 0.07, 1), H:ColGold(), 1.5)
-		if self.AugHideAssigned then
+		local sq = H:SpawnRoundedPanel("RtsAugHideSq", cb, Vector2(0, 0.5), Vector2(0, 0.5), Vector2(0, 0), Vector2(20, 20), Color(0.92, 0.93, 0.98, 0.9), H:ColGold(), 1.5)
+		do
 			local mark = H:SpawnUI("model://uisprite", "RtsAugHideMark", sq, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2(0, 0), Vector2(10, 10))
 			mark.SpriteGUIRendererComponent.Color = H:ColGold()
+			self._T.AugHideMark = mark
 		end
-		H:SpawnLabel("RtsAugHideText", cb, Vector2(0, 0.5), Vector2(0, 0.5), Vector2(28, 0), Vector2(162, 24), "적용된 증강 숨기기", H:ColInk(), 14, TextAlignmentType.MiddleLeft, false)
+		H:SpawnLabel("RtsAugHideText", cb, Vector2(0, 0.5), Vector2(0, 0.5), Vector2(28, 0), Vector2(182, 28), "적용된 증강 숨기기", self:Ink(), 16, TextAlignmentType.MiddleLeft, false)
 		local cbClick = H:SpawnClick("RtsAugHideClick", cb)
 		cbClick:ConnectEvent(ButtonClickEvent, function(event)
 			self.AugHideAssigned = not self.AugHideAssigned
-			self.AugSel = 0
-			self:RefreshAugment()
+			self:ApplyAugFilter()
 		end)
-		H:SpawnLabel("RtsAugFoot", box, Vector2(1, 0), Vector2(1, 0), Vector2(-27 - 200, 4), Vector2(620, 22),
-			"전체 " .. H:Int(#owned) .. "개 · 미지정 " .. H:Int(A:MyUnassigned()) .. "개 · 방출하면 그 유닛의 증강은 사라져요", Color(0.851, 0.796, 0.651, 1), 14, TextAlignmentType.MiddleRight, false)
+		H:SpawnLabel("RtsAugSummary", box, Vector2(0, 1), Vector2(0, 1), Vector2(27, -17), Vector2(620, 34), "보유 증강 " .. H:Int(#owned) .. "개 · 미지정 " .. H:Int(A:MyUnassigned()) .. "개", self:Ink(), 21, TextAlignmentType.MiddleLeft, true)
+		H:SpawnLabel("RtsAugFoot", box, Vector2(1, 0), Vector2(1, 0), Vector2(-27, 4), Vector2(1020, 22),
+			"전체 " .. H:Int(#owned) .. "개 · 미지정 " .. H:Int(A:MyUnassigned()) .. "개 · 방출하면 그 유닛의 증강은 사라져요", self:Ink(), 14, TextAlignmentType.MiddleRight, false)
 	end
 
 	-- 증강 창 오른쪽 상세(선택·유닛 칩이 바뀌면 이것만 다시 — RefreshAugDetail)
@@ -2005,33 +2245,34 @@ script RtsPopupLogic extends Logic
 		local H = _RtsHudLogic
 		local A = _RtsAugmentLogic
 		local AT = _RtsAugmentTableLogic
-		local listW = 567
-		local top = -60
+		local listW = 440
+		local top = -70
 		-- 오른쪽 상세 + 대상 지정
 		local dx = 27 + listW + 23
 		local dw = self.PanelW - dx - 27
-		local detail = H:SpawnPanel("RtsAugDetail", parent, Vector2(0, 1), Vector2(0, 1), Vector2(dx, top), Vector2(dw, 960 - 70 - 60 - 27),
-			self:Mix(Color.white, 0.03), self:Mix(H:ColGold(), 0.25), 1.5)
+		local detail = H:SpawnRoundedPanel("RtsAugDetail", parent, Vector2(0, 1), Vector2(0, 1), Vector2(dx, top), Vector2(dw, 880 - 70 - 70 - 40),
+			self:Card(), self:Mix(H:ColGold(), 0.25), 1.5)
 		self.AugDetail = detail.Parent
 		local item = owned[self.AugSel]
 		if item == nil then
 			H:SpawnLabel("RtsAugDetailNone", detail, Vector2(0, 1), Vector2(0, 1), Vector2(19, -20), Vector2(dw - 40, 60),
-				"증강을 고르면 여기에 효과와 대상 지정이 보여요", H:ColMuted(), 15, TextAlignmentType.UpperLeft, false)
+				"증강을 고르면 여기에 효과와 대상 지정이 보여요", self:Muted(), 15, TextAlignmentType.UpperLeft, false)
 		else
 			local d = AT:GetDef(item.id)
-			self:SpawnBadge("RtsAugDetailBadge", detail, Vector2(19, -17), d.grade)
-			H:SpawnLabel("RtsAugDetailT", detail, Vector2(0, 1), Vector2(0, 1), Vector2(19, -46), Vector2(dw - 40, 32),
-				d.name, H:ColInk(), 23, TextAlignmentType.MiddleLeft, true)
-			H:SpawnLabel("RtsAugDetailD", detail, Vector2(0, 1), Vector2(0, 1), Vector2(19, -86), Vector2(dw - 40, 170),
-				AT:EffectText(d.id), Color(0.902, 0.863, 0.769, 1), 15, TextAlignmentType.UpperLeft, false)
-			H:SpawnLabel("RtsAugDetailK", detail, Vector2(0, 1), Vector2(0, 1), Vector2(19, -270), Vector2(dw - 40, 22),
-				"적용 유닛", H:ColMuted(), 13, TextAlignmentType.MiddleLeft, false)
+			self:SpawnAugIcon(detail, d, Vector2(19, -16), 72)
+			H:SpawnLabel("RtsAugDetailGrade", detail, Vector2(0, 1), Vector2(0, 1), Vector2(108, -56), Vector2(dw - 128, 24), self:GradeName(d.grade), self:Muted(), 16, TextAlignmentType.MiddleLeft, false)
+			H:SpawnLabel("RtsAugDetailT", detail, Vector2(0, 1), Vector2(0, 1), Vector2(108, -18), Vector2(dw - 128, 32),
+				d.name, self:Ink(), 23, TextAlignmentType.MiddleLeft, true)
+			H:SpawnLabel("RtsAugDetailD", detail, Vector2(0, 1), Vector2(0, 1), Vector2(19, -112), Vector2(dw - 40, 156),
+				AT:EffectText(d.id), self:Ink(), 18, TextAlignmentType.UpperLeft, false)
+			H:SpawnLabel("RtsAugDetailK", detail, Vector2(0, 1), Vector2(0, 1), Vector2(19, -284), Vector2(dw - 40, 22),
+				"적용 유닛", self:Muted(), 13, TextAlignmentType.MiddleLeft, false)
 			if item.no ~= 0 then
-				H:SpawnLabel("RtsAugDetailU", detail, Vector2(0, 1), Vector2(0, 1), Vector2(19, -296), Vector2(dw - 40, 28),
-					self:AugStateText(item.no), H:ColInk(), 17, TextAlignmentType.MiddleLeft, true)
+				H:SpawnLabel("RtsAugDetailU", detail, Vector2(0, 1), Vector2(0, 1), Vector2(19, -312), Vector2(dw - 40, 28),
+					self:AugStateText(item.no), self:Ink(), 17, TextAlignmentType.MiddleLeft, true)
 			else
-				H:SpawnLabel("RtsAugDetailHint", detail, Vector2(0, 1), Vector2(0, 1), Vector2(19, -296), Vector2(dw - 40, 24),
-					"미지정 — 유닛을 고르고 지정(한 번 지정하면 바꿀 수 없어요)", Color(0.95, 0.45, 0.4, 1), 14, TextAlignmentType.MiddleLeft, false)
+				H:SpawnLabel("RtsAugDetailHint", detail, Vector2(0, 1), Vector2(0, 1), Vector2(19, -312), Vector2(dw - 40, 44),
+					"미지정 — 유닛을 고르고 지정(한 번 지정하면 바꿀 수 없어요)", Color(0.66, 0.26, 0.20, 1), 16, TextAlignmentType.MiddleLeft, false)
 				-- 내 유닛 칩(2열). 지정 불가 유닛은 흐리게
 				local nos = _RtsUnitLogic:ListZoneUnits(_RtsUnitLogic:MyZone())
 				local chipW = math.floor((dw - 38 - 10) / 2)
@@ -2042,23 +2283,25 @@ script RtsPopupLogic extends Logic
 						local ok = A:CanAssignTo(item.id, u)
 						local col = (i - 1) % 2
 						local rowi = math.floor((i - 1) / 2)
-						local cbg = self:Mix(Color(0.094, 0.082, 0.071, 1), 0.9)
+						local cbg = self:Mix(Color.white, 0.65)
 						local cborder = self:Mix(H:ColGold(), 0.3)
-						local ink = H:ColInk()
+						local ink = self:Ink()
 						if self.AugPickNo == no then
 							cbg = self:Mix(H:ColGold(), 0.2)
 							cborder = H:ColGold()
 						end
 						if not ok then
-							cborder = self:Mix(Color.white, 0.08)
+							cborder = self:Edge()
 							ink = Color(0.5, 0.47, 0.42, 1)
 						end
-						local chip = H:SpawnPanel("RtsAugChip" .. tostring(i), detail, Vector2(0, 1), Vector2(0, 1),
-							Vector2(19 + col * (chipW + 10), -330 - rowi * 42), Vector2(chipW, 36), cbg, cborder, 1.5)
+						local chip = H:SpawnRoundedPanel("RtsAugChip" .. tostring(i), detail, Vector2(0, 1), Vector2(0, 1),
+							Vector2(19 + col * (chipW + 10), -366 - rowi * 76), Vector2(chipW, 64), cbg, cborder, 1.5)
 						local bar = H:SpawnStretch("model://uisprite", "RtsAugChipBar", chip, Vector2(0, 0), Vector2(0, 1), Vector2(0, 0), Vector2(4, 0))
 						bar.SpriteGUIRendererComponent.Color = H:SeriesColor(_RtsJobTableLogic:GetSeries(u.JobId))
-						H:SpawnLabel("RtsAugChipText", chip, Vector2(0, 0.5), Vector2(0, 0.5), Vector2(12, 0), Vector2(chipW - 20, 30),
-							H:Int(no) .. ". " .. _RtsJobTableLogic:GetJobNameFor(u) .. "  Lv " .. H:Int(u.Level), ink, 14, TextAlignmentType.MiddleLeft, false)
+						H:SpawnLabel("RtsAugChipText", chip, Vector2(0, 0.5), Vector2(0, 0.5), Vector2(12, 0), Vector2(chipW - 94, 30),
+							_RtsJobTableLogic:GetJobNameFor(u), ink, 16, TextAlignmentType.MiddleLeft, true)
+						H:SpawnLabel("RtsAugChipLevel", chip, Vector2(1, 0.5), Vector2(1, 0.5), Vector2(-12, 0), Vector2(62, 30),
+							"Lv. " .. H:Int(u.Level), ink, 16, TextAlignmentType.MiddleRight, true)
 						if ok then
 							local pickNo = no
 							local c = H:SpawnClick("RtsAugChipClick", chip)
@@ -2071,7 +2314,7 @@ script RtsPopupLogic extends Logic
 				end
 				-- 지정 버튼(유닛을 골랐을 때만)
 				local canGo = self.AugPickNo > 0
-				local bbg = self:Mix(Color.white, 0.04)
+				local bbg = self:Card()
 				local bborder = self:Mix(H:ColGold(), 0.3)
 				local bink = Color(0.6, 0.55, 0.45, 1)
 				if canGo then
@@ -2079,7 +2322,7 @@ script RtsPopupLogic extends Logic
 					bborder = H:ColGold()
 					bink = Color(0.133, 0.114, 0.09, 1)
 				end
-				local go = H:SpawnPanel("RtsAugAssign", detail, Vector2(0, 0), Vector2(0, 0), Vector2(19, 19), Vector2(dw - 38, 46), bbg, bborder, 1.5)
+				local go = H:SpawnRoundedPanel("RtsAugAssign", detail, Vector2(0, 0), Vector2(0, 0), Vector2(19, 19), Vector2(dw - 38, 52), bbg, bborder, 1.5)
 				-- 버튼 글자 = 직업명(2026-09-23 사용자 "n번 유닛이 아니라 '신궁에게 지정'") + [Space] — 스페이스로도 지정(RtsUnitSelectLogic.HandleKeyDownEvent → AssignPicked)
 				local goText = "유닛을 골라 주세요"
 				if canGo then
@@ -2107,11 +2350,11 @@ script RtsPopupLogic extends Logic
 		for i = 1, #self.AugRowRefs do
 			local r = self.AugRowRefs[i]
 			if r.row ~= nil and isvalid(r.row) then
-				local bg = self:Mix(Color.white, 0.04)
-				local border = self:Mix(Color.white, 0.1)
+				local bg = self:Card()
+				local border = self:Edge()
 				if r.un then
-					bg = self:Mix(Color(0.95, 0.45, 0.4, 1), 0.1)
-					border = Color(0.85, 0.36, 0.32, 1)
+					bg = self:Card()
+					border = self:Edge()
 				end
 				if r.k == self.AugSel then
 					bg = self:Mix(H:ColGold(), 0.14)
@@ -2129,7 +2372,7 @@ script RtsPopupLogic extends Logic
 		if self.Kind ~= "augment" or self.AugContent == nil or not isvalid(self.AugContent) then return end
 		local old = self.AugDetail
 		self:BuildAugDetail(self.AugContent, _RtsAugmentLogic:MyOwned())
-		self:DropLater(old)
+		self:SwapContent(old, self.AugDetail)
 	end
 
 	-- 증강 창에서 고른 보유 증강(AugSel)을 고른 유닛(AugPickNo)에 지정 — 버튼·스페이스 공용
@@ -2159,20 +2402,12 @@ script RtsPopupLogic extends Logic
 		local H = _RtsHudLogic
 		local AT = _RtsAugmentTableLogic
 		local owned = _RtsAugmentLogic:MyOwned()
-		local counts = { all = #owned, bronze = 0, silver = 0, gold = 0, prism = 0 }
-		for i = 1, #owned do
-			local d = AT:GetDef(owned[i].id)
-			if d ~= nil then counts[d.grade] = counts[d.grade] + 1 end
-		end
-		if self.AugBar ~= nil then
-			for key, t in pairs(self.AugBar.tabs) do self:SetTabText(t, self:GradeName(key) .. " " .. H:Int(counts[key] or 0)) end
-			self:BarSelect(self.AugBar, self.AugGrade)
-		end
 		local old = self.AugContent
 		local box = self:SpawnBox(self.AugBody, "RtsAugContent")
 		self.AugContent = box
 		self:BuildAugContent(box, owned)
-		self:DropLater(old)
+		self:ApplyAugFilter()
+		self:SwapContent(old, box)
 	end
 
 	-- 설명 앞의 "[히어로 전용] [프리즘] " 같은 머리표 떼기(도감은 직업을 칩으로 따로 보여 준다)
@@ -2211,22 +2446,22 @@ script RtsPopupLogic extends Logic
 			if AT.ByGrade[grades[i]] ~= nil then n = #AT.ByGrade[grades[i]] end
 			items[i] = { grades[i], self:GradeName(grades[i]) .. " " .. H:Int(n) }
 		end
-		self.CodexBar = self:SpawnTabBar(body, "RtsCodexTab", items, self.CodexGrade, 27, -10, 120, 34, 8, 16, function(key)
+		self.CodexBar = self:SpawnTabBar(body, "RtsCodexTab", items, self.CodexGrade, 27, -10, 120, 44, 8, 18, function(key)
 			self.CodexGrade = key
 			self:RefreshCodex()
 		end)
 		self:SpawnTabKeyHint(body, 27 + #grades * 128 + 4)
-		self.CodexInfo = H:SpawnLabel("RtsCodexInfo", body, Vector2(0, 1), Vector2(0, 1), Vector2(27, -52), Vector2(W - 54, 26),
-			self:CodexInfoText(), H:ColMuted(), 14, TextAlignmentType.MiddleLeft, false)
+		self.CodexInfo = H:SpawnLabel("RtsCodexInfo", body, Vector2(0, 1), Vector2(0, 1), Vector2(27, -64), Vector2(W - 54, 26),
+			self:CodexInfoText(), self:Muted(), 16, TextAlignmentType.MiddleLeft, false)
 		self.CodexList = nil
 		self:BuildCodexList(body, W)
 	end
 
 	method string CodexInfoText()
-		local info = "라운드 지급 10장 · 증강 뽑기 75.5%"
-		if self.CodexGrade == "silver" then info = "라운드 지급 10장 · 증강 뽑기 15%" end
-		if self.CodexGrade == "gold" then info = "라운드 지급 7장 · 증강 뽑기 4.5%" end
-		if self.CodexGrade == "prism" then info = "자쿰 · 시그너스 · 루시드 처치 뒤 3택1 · 증강 뽑기 5%(판마다 최대 2개)" end
+		local info = "라운드 지급 10장 · 기본 뽑기 확률 75.5%"
+		if self.CodexGrade == "silver" then info = "라운드 지급 10장 · 기본 뽑기 확률 15%" end
+		if self.CodexGrade == "gold" then info = "라운드 지급 7장 · 기본 뽑기 확률 4.5%" end
+		if self.CodexGrade == "prism" then info = "자쿰 · 시그너스 · 루시드 처치 뒤 3택1 · 기본 뽑기 확률 5%(판마다 최대 2개)" end
 		return info .. "   ·   오른쪽 % = 이 등급 안에서 나올 확률"
 	end
 
@@ -2240,10 +2475,9 @@ script RtsPopupLogic extends Logic
 		local sum = 0
 		for i = 1, #ids do sum = sum + (AT.Defs[ids[i]].w or 0) end
 		local listW = W - 54
-		local list = H:SpawnStretch("model://uisprite", "RtsCodexList", body, Vector2(0, 0), Vector2(1, 1), Vector2(27, 27), Vector2(-27, -86))
+		local list = H:SpawnStretch("model://uisprite", "RtsCodexList", body, Vector2(0, 0), Vector2(1, 1), Vector2(27, 27), Vector2(-27, -104))
 		list.SpriteGUIRendererComponent.Color = self:Mix(Color.white, 0.02)
 		self.CodexList = list
-		self:DropLater(old)
 		local sg = list:AddComponent("ScrollLayoutGroupComponent")
 		if sg ~= nil then
 			sg.Type = LayoutGroupType.Vertical
@@ -2256,18 +2490,18 @@ script RtsPopupLogic extends Logic
 			sg.ScrollBarBackgroundColor = Color(1, 1, 1, 0.06)
 		end
 		local isPrism = self.CodexGrade == "prism"
-		local rowH = 56
+		local rowH = 96
 		for i = 1, #ids do
 			local d = AT.Defs[ids[i]]
-			local row = H:SpawnPanel("RtsCodexRow" .. tostring(i), list, Vector2(0, 1), Vector2(0, 1), Vector2(0, 0), Vector2(listW - 16, rowH),
-				self:Mix(Color.white, 0.04), self:Mix(Color.white, 0.1), 1.5)
+			local row = H:SpawnRoundedPanel("RtsCodexRow" .. tostring(i), list, Vector2(0, 1), Vector2(0, 1), Vector2(0, 0), Vector2(listW - 16, rowH),
+				self:Card(), self:Edge(), 1.5)
 			local band = H:SpawnStretch("model://uisprite", "RtsCodexBand", row, Vector2(0, 0), Vector2(0, 1), Vector2(0, 0), Vector2(4, 0))
 			band.SpriteGUIRendererComponent.Color = self:GradeColor(d.grade)
-			self:SpawnBadge("RtsCodexBadge", row, Vector2(14, -16), d.grade)
+			self:SpawnAugIcon(row, d, Vector2(12, -12), 68)
 			local pct = 0
 			if sum > 0 then pct = (d.w or 0) / sum * 100 end
 			H:SpawnLabel("RtsCodexPct", row, Vector2(1, 1), Vector2(1, 1), Vector2(-14, -12), Vector2(100, 30),
-				string.format("%.1f%%", pct), H:ColMuted(), 15, TextAlignmentType.MiddleRight, true)
+				string.format("%.1f%%", pct), self:Muted(), 15, TextAlignmentType.MiddleRight, true)
 			if isPrism then
 				-- 이름 왼쪽 = 직업명(직업 전용) / 공통(특수 코어) / 팬텀(영입 해금). 설명은 접어 두고 행을 누르면 그 자리에서 펼침(다시 누르면 접힘)
 				local tag = "공통"
@@ -2276,16 +2510,19 @@ script RtsPopupLogic extends Logic
 				elseif d.job ~= nil and d.job ~= "" then
 					tag = _RtsJobTableLogic:GetJobName(d.job)
 				end
-				local chip = H:SpawnPanel("RtsCodexJob", row, Vector2(0, 1), Vector2(0, 1), Vector2(90, -13), Vector2(140, 30),
+				local chip = H:SpawnRoundedPanel("RtsCodexJob", row, Vector2(0, 1), Vector2(0, 1), Vector2(90, -13), Vector2(140, 30),
 					self:Mix(self:GradeColor("prism"), 0.16), self:Mix(self:GradeColor("prism"), 0.55), 1.5)
 				H:SpawnLabel("RtsCodexJobText", chip, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2(0, 0), Vector2(134, 26),
-					tag, Color(0.9, 0.82, 1, 1), 14, TextAlignmentType.MiddleCenter, true)
+					tag, Color(0.43, 0.25, 0.58, 1), 14, TextAlignmentType.MiddleCenter, true)
 				H:SpawnLabel("RtsCodexName", row, Vector2(0, 1), Vector2(0, 1), Vector2(242, -13), Vector2(listW - 480, 30),
-					d.name, H:ColInk(), 17, TextAlignmentType.MiddleLeft, true)
+					d.name, self:Ink(), 20, TextAlignmentType.MiddleLeft, true)
 				local arrow = H:SpawnLabel("RtsCodexMore", row, Vector2(1, 1), Vector2(1, 1), Vector2(-124, -13), Vector2(110, 30),
-					"자세히 ▾", H:ColMuted(), 13, TextAlignmentType.MiddleRight, false)
-				local desc = H:SpawnLabel("RtsCodexDesc", row, Vector2(0, 1), Vector2(0, 1), Vector2(90, -52), Vector2(listW - 130, 70),
-					self:StripTags(AT:EffectText(d.id)), Color(0.902, 0.863, 0.769, 1), 14, TextAlignmentType.UpperLeft, false)
+					"자세히 ▾", self:Muted(), 13, TextAlignmentType.MiddleRight, false)
+				local description = self:StripTags(AT:EffectText(d.id))
+				local descH = 12 + _RtsUnitPopupLogic:DescLines(description, listW - 70) * 24
+				local expandedH = 96 + descH + 20
+				local desc = H:SpawnLabel("RtsCodexDesc", row, Vector2(0, 1), Vector2(0, 1), Vector2(24, -96), Vector2(listW - 70, descH),
+					description, self:Ink(), 18, TextAlignmentType.UpperLeft, false)
 				desc:SetEnable(false)
 				local outer = row.Parent
 				local rw2 = listW - 16
@@ -2294,108 +2531,22 @@ script RtsPopupLogic extends Logic
 				click:ConnectEvent(ButtonClickEvent, function(event)
 					open = not open
 					desc:SetEnable(open)
-					local h = 56
-					if open then h = 132 end
+					local h = 96
+					if open then h = expandedH end
 					outer.UITransformComponent.RectSize = Vector2(rw2, h)
 					if open then arrow.TextComponent.Text = "접기 ▴" else arrow.TextComponent.Text = "자세히 ▾" end
 				end)
 			else
-				H:SpawnLabel("RtsCodexName", row, Vector2(0, 0.5), Vector2(0, 0.5), Vector2(90, 0), Vector2(300, 30),
-					d.name, H:ColInk(), 16, TextAlignmentType.MiddleLeft, true)
-				H:SpawnLabel("RtsCodexEff", row, Vector2(0, 0.5), Vector2(0, 0.5), Vector2(400, 0), Vector2(300, 30),
-					AT:EffectText(d.id), Color(0.902, 0.863, 0.769, 1), 15, TextAlignmentType.MiddleLeft, false)
+				H:SpawnLabel("RtsCodexName", row, Vector2(0, 0.5), Vector2(0, 0.5), Vector2(90, 22), Vector2(listW - 240, 30),
+					d.name, self:Ink(), 19, TextAlignmentType.MiddleLeft, true)
+				H:SpawnLabel("RtsCodexEff", row, Vector2(0, 0.5), Vector2(0, 0.5), Vector2(90, -20), Vector2(listW - 236, 38),
+					AT:EffectText(d.id), self:Ink(), 18, TextAlignmentType.MiddleLeft, false)
 			end
 		end
+		self:SwapContent(old, list)
 	end
 
-	-- ===== 증강 3택1(2026-09-23 Phase 4 합류): 서버가 굴린 후보 3장(RtsAugmentLogic.MyOffer) — 닫기 없음, 하나를 받아야 닫힌다 =====
-	--   받은 증강은 미지정으로 보유 → 증강 창에서 유닛 1명에게 한 번 지정. 팬텀은 받는 즉시 영입 해금
-	@ExecSpace("ClientOnly")
-	-- 선택지 카드 한 장의 반짝임 등록: 빛·테두리 + 둘레 별 5개(가로·세로 막대 두 개로 된 십자). 한 타이머(StartPickFx)가 다 움직인다
-	@ExecSpace("ClientOnly")
-	method void AddPickFx(Entity body, Entity glow, Entity border, Color gc, number cx, number w, number h)
-		local stars = {}
-		for i = 1, 5 do
-			local hb = _RtsHudLogic:SpawnUI("model://uisprite", "RtsPickStarH", body, Vector2(0, 1), Vector2(0.5, 0.5), Vector2(cx, -40), Vector2(2, 2))
-			local vb = _RtsHudLogic:SpawnUI("model://uisprite", "RtsPickStarV", body, Vector2(0, 1), Vector2(0.5, 0.5), Vector2(cx, -40), Vector2(2, 2))
-			stars[i] = { h = hb, v = vb, off = (i - 1) / 5 + _UtilLogic:RandomDouble() * 0.15, prev = 1 }
-		end
-		self.PickFx[#self.PickFx + 1] = { glow = glow, border = border, gc = gc, cx = cx, w = w, h = h, stars = stars }
-		if self.PickFxTimer == 0 then self:StartPickFx() end
-	end
-
-	-- 카드 테두리 위 무작위 한 점(body 기준 좌표, 카드 왼쪽 위 = (cx, −40))
-	@ExecSpace("ClientOnly")
-	method Vector2 PickEdgePoint(table c)
-		local per = 2 * (c.w + c.h)
-		local u = _UtilLogic:RandomDouble() * per
-		local x = 0
-		local y = 0
-		if u < c.w then
-			x = u
-		elseif u < c.w + c.h then
-			x = c.w
-			y = u - c.w
-		elseif u < 2 * c.w + c.h then
-			x = c.w - (u - c.w - c.h)
-			y = c.h
-		else
-			y = c.h - (u - 2 * c.w - c.h)
-		end
-		return Vector2(c.cx + x, -40 - y)
-	end
-
-	@ExecSpace("ClientOnly")
-	method void StartPickFx()
-		local t0 = DateTime.UtcNow.Elapsed
-		self.PickFxTimer = _TimerService:SetTimerRepeat(function()
-			if self.Kind ~= "pick" or #self.PickFx == 0 then
-				self:StopPickFx()
-				return
-			end
-			local t = (DateTime.UtcNow.Elapsed - t0) / 1000
-			local pulse = 0.5 + 0.5 * math.sin(t * 4.2)
-			for ci = 1, #self.PickFx do
-				local c = self.PickFx[ci]
-				if c.glow ~= nil and isvalid(c.glow) then
-					c.glow.SpriteGUIRendererComponent.Color = Color(c.gc.r, c.gc.g, c.gc.b, 0.18 + 0.5 * pulse)
-				end
-				if c.border ~= nil and isvalid(c.border) then
-					local k = 0.35 + 0.65 * pulse
-					c.border.SpriteGUIRendererComponent.Color = Color(c.gc.r + (1 - c.gc.r) * k * 0.6, c.gc.g + (1 - c.gc.g) * k * 0.6, c.gc.b + (1 - c.gc.b) * k * 0.6, 1)
-				end
-				for si = 1, #c.stars do
-					local s = c.stars[si]
-					if s.h ~= nil and isvalid(s.h) and s.v ~= nil and isvalid(s.v) then
-						local ph = (t * 0.9 + s.off) % 1
-						if ph < s.prev then
-							local p = self:PickEdgePoint(c)
-							s.h.UITransformComponent.anchoredPosition = p
-							s.v.UITransformComponent.anchoredPosition = p
-						end
-						s.prev = ph
-						local a = math.sin(ph * math.pi)
-						local len = 4 + 22 * a
-						s.h.UITransformComponent.RectSize = Vector2(len, 3)
-						s.v.UITransformComponent.RectSize = Vector2(3, len)
-						local col = Color(1, 0.97, 0.82, a)
-						s.h.SpriteGUIRendererComponent.Color = col
-						s.v.SpriteGUIRendererComponent.Color = col
-					end
-				end
-			end
-		end, 0.04)
-	end
-
-	@ExecSpace("ClientOnly")
-	method void StopPickFx()
-		if self.PickFxTimer ~= 0 then
-			_TimerService:ClearTimer(self.PickFxTimer)
-			self.PickFxTimer = 0
-		end
-		self.PickFx = {}
-	end
-
+	-- 증강 선택 카드는 안정적인 등급 테두리로 표시한다.
 	@ExecSpace("ClientOnly")
 	method void BuildPick(Entity body)
 		local H = _RtsHudLogic
@@ -2407,54 +2558,142 @@ script RtsPopupLogic extends Logic
 		end
 		local title = self:GradeName(offer.grade) .. " 증강 선택"
 		if offer.grade == "prism" then title = "보스 처치 — 프리즘 증강 선택" end
-		self.Title.TextComponent.Text = title
 		local pending = _RtsAugmentLogic.PendingByUser[_RtsUnitLogic:MyUserId()] or 0
-		local sub = "3개 중 1개 — 받은 증강은 좌하단 증강 창에서 유닛 1명에게 한 번 지정합니다"
-		if pending > 1 then sub = sub .. "   ·   대기 중인 선택지 " .. H:Int(pending) .. "개(최대 3, 넘치면 오래된 것부터 사라짐)" end
-		H:SpawnLabel("RtsPickSub", body, Vector2(0, 1), Vector2(0, 1), Vector2(27, -4), Vector2(1060, 24),
-			sub, H:ColMuted(), 15, TextAlignmentType.MiddleLeft, false)
+		local sub = title .. " · 3개 중 하나를 골라 주세요. 받은 증강은 보유 증강 탭에서 지정할 수 있어요."
+		if pending > 1 then sub = sub .. "   ·   대기 중인 선택지 " .. H:Int(pending) .. "개 / " .. H:Int(_RtsAugmentLogic.MaxPending) .. "개" end
+		H:SpawnLabel("RtsPickSub", body, Vector2(0, 1), Vector2(0, 1), Vector2(27, -4), Vector2(1060, 44),
+			sub, self:Muted(), 15, TextAlignmentType.MiddleCenter, false)
 		-- 접기(2026-09-23 사용자): 창을 닫고 나중에 HUD '펼치기'로 고른다
-		local fold = H:SpawnPanel("RtsPickFold", body, Vector2(0.5, 0), Vector2(0.5, 0), Vector2(0, 16), Vector2(220, 44),
+		local fold = H:SpawnRoundedPanel("RtsPickFold", body, Vector2(0.5, 0), Vector2(0.5, 0), Vector2(0, 16), Vector2(220, 44),
 			self:Mix(Color.white, 0.06), self:Mix(Color.white, 0.3), 1.5)
 		H:SpawnLabel("RtsPickFoldText", fold, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2(0, 0), Vector2(210, 40),
-			"접기 (나중에 선택)", H:ColInk(), 16, TextAlignmentType.MiddleCenter, true)
+			"보유 증강으로", self:Ink(), 16, TextAlignmentType.MiddleCenter, true)
 		local foldClick = H:SpawnClick("RtsPickFoldClick", fold)
 		foldClick:ConnectEvent(ButtonClickEvent, function(event)
-			_RtsAugmentLogic:FoldPick()
+			self:OpenHubTab("augment")
 		end)
 		local cardW = 340
 		local gap = 19
-		self:StopPickFx()
 		_SoundService:PlaySound(self.PickSound, 1)
 		for ci = 1, #offer.ids do
 			local d = AT:GetDef(offer.ids[ci])
 			if d ~= nil then
 				local cx = 27 + (ci - 1) * (cardW + gap)
-				-- 카드 뒤 빛(카드보다 사방 7px 크게, 알파가 숨쉬듯)
-				local glow = H:SpawnUI("model://uisprite", "RtsPickGlow" .. tostring(ci), body, Vector2(0, 1), Vector2(0, 1), Vector2(cx - 7, -33), Vector2(cardW + 14, 374))
+				-- 등급색으로 카드 가장자리를 은은하게 강조한다.
+				local glow = H:SpawnUI("model://uisprite", "RtsPickGlow" .. tostring(ci), body, Vector2(0, 1), Vector2(0, 1), Vector2(cx - 3, -53), Vector2(cardW + 6, 666))
 				local gc = self:GradeColor(d.grade)
-				glow.SpriteGUIRendererComponent.Color = Color(gc.r, gc.g, gc.b, 0.4)
-				local card = H:SpawnPanel("RtsPickCard" .. tostring(ci), body, Vector2(0, 1), Vector2(0, 1), Vector2(cx, -40), Vector2(cardW, 360),
-					self:Mix(Color.white, 0.04), self:Mix(self:GradeColor(d.grade), 0.5), 2.5)
-				self:AddPickFx(body, glow, card.Parent, gc, cx, cardW, 360)
+				glow.SpriteGUIRendererComponent.Color = Color(gc.r, gc.g, gc.b, 0.12)
+				local card = H:SpawnRoundedPanel("RtsPickCard" .. tostring(ci), body, Vector2(0, 1), Vector2(0, 1), Vector2(cx, -56), Vector2(cardW, 660),
+					self:Card(), self:Mix(self:GradeColor(d.grade), 0.5), 2.5)
+				-- 본문이 흔들리지 않도록 지속 반짝임을 사용하지 않는다.
 				local band = H:SpawnStretch("model://uisprite", "RtsPickBand", card, Vector2(0, 1), Vector2(1, 1), Vector2(0, -6), Vector2(0, 0))
 				band.SpriteGUIRendererComponent.Color = self:GradeColor(d.grade)
-				self:SpawnBadge("RtsPickBadge", card, Vector2(19, -22), d.grade)
-				H:SpawnLabel("RtsPickT", card, Vector2(0, 1), Vector2(0, 1), Vector2(19, -54), Vector2(cardW - 38, 30),
-					d.name, H:ColInk(), 21, TextAlignmentType.MiddleLeft, true)
-				H:SpawnLabel("RtsPickD", card, Vector2(0, 1), Vector2(0, 1), Vector2(19, -92), Vector2(cardW - 38, 200),
-					AT:EffectText(d.id), Color(0.902, 0.863, 0.769, 1), 15, TextAlignmentType.UpperLeft, false)
-				local btn = H:SpawnPanel("RtsPickTake", card, Vector2(0.5, 0), Vector2(0.5, 0), Vector2(0, 19), Vector2(cardW - 38, 44),
+				self:SpawnAugIcon(card, d, Vector2((cardW - 104) / 2, -42), 104)
+				H:SpawnLabel("RtsPickGrade", card, Vector2(0, 1), Vector2(0, 1), Vector2(19, -12), Vector2(cardW - 38, 24), self:GradeName(d.grade), self:Muted(), 15, TextAlignmentType.MiddleCenter, true)
+				H:SpawnLabel("RtsPickT", card, Vector2(0, 1), Vector2(0, 1), Vector2(19, -158), Vector2(cardW - 38, 42),
+					d.name, self:Ink(), 21, TextAlignmentType.MiddleCenter, true)
+				H:SpawnLabel("RtsPickD", card, Vector2(0, 1), Vector2(0, 1), Vector2(19, -212), Vector2(cardW - 38, 364),
+					AT:EffectText(d.id), self:Ink(), 18, TextAlignmentType.UpperCenter, false)
+				local btn = H:SpawnRoundedPanel("RtsPickTake", card, Vector2(0.5, 0), Vector2(0.5, 0), Vector2(0, 19), Vector2(cardW - 38, 44),
 					self:Mix(H:ColGold(), 0.9), H:ColGold(), 1.5)
 				H:SpawnLabel("RtsPickTakeText", btn, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2(0, 0), Vector2(cardW - 50, 40),
 					"받기", Color(0.133, 0.114, 0.09, 1), 18, TextAlignmentType.MiddleCenter, true)
 				local idx = ci
 				local takeClick = H:SpawnClick("RtsPickTakeClick", btn)
 				takeClick:ConnectEvent(ButtonClickEvent, function(event)
-					self:Close()
+					if _RtsStageLogic.Paused then H:ShowHintFor("일시정지를 해제한 뒤 선택할 수 있어요", 2); return end
 					_RtsAugmentLogic:ChooseFromPopup(idx)
+					self:OpenHubTab("augment")
 				end)
 			end
+		end
+	end
+
+	method string AugStatKey(table d)
+		-- 능력치 증강은 정의 필드로, 스킬 강화는 전용 마름모로 표시한다.
+		for _, key in ipairs({"atk", "pct", "fin", "boss", "crit", "critDmg"}) do
+			if d[key] ~= nil then return key end
+		end
+		return "skill"
+	end
+
+	@ExecSpace("ClientOnly")
+	method void ApplyAugFilter()
+		-- 체크박스와 목록은 재생성하지 않는다. 선택 항목이 숨겨질 때만 상세를 바꾼다.
+		local first = 0
+		local count = 0
+		local selectedVisible = false
+		for _, ref in ipairs(self.AugRowRefs) do
+			local show = not self.AugHideAssigned or ref.un
+			ref.row.Parent:SetEnable(show)
+			if show then
+				count = count + 1
+				if first == 0 then first = ref.k end
+				if ref.k == self.AugSel then selectedVisible = true end
+			end
+		end
+		if isvalid(self._T.AugHideMark) then self._T.AugHideMark:SetEnable(self.AugHideAssigned) end
+		if isvalid(self._T.AugEmpty) then self._T.AugEmpty:SetEnable(count == 0 and #self.AugRowRefs > 0) end
+		if isvalid(self._T.AugList) and self._T.AugList.ScrollLayoutGroupComponent ~= nil then
+			self._T.AugList.ScrollLayoutGroupComponent.UseScroll = count > 8
+		end
+		if not selectedVisible and self.AugSel ~= first then
+			self.AugSel = first
+			self.AugPickNo = 0
+			self:RestyleAugRows()
+			self:RefreshAugDetail()
+		end
+	end
+
+	@ExecSpace("ClientOnly")
+	method void SwapContent(Entity old, Entity fresh)
+		-- 반투명 면이 겹쳐 밝아지지 않게 준비 후 한 프레임에서 교대한다.
+		if not isvalid(old) then return end
+		local canvas = fresh:AddComponent("CanvasGroupComponent")
+		canvas.GroupAlpha = 0
+		canvas.BlocksRaycasts = false
+		_TimerService:SetTimerOnce(function()
+			if isvalid(old) then old:SetEnable(false); old:Destroy() end
+			if isvalid(fresh) then canvas.GroupAlpha = 1; canvas.BlocksRaycasts = true end
+		end, 0.12)
+	end
+
+	@ExecSpace("ClientOnly")
+	method void SpawnAugIcon(Entity parent, table definition, Vector2 pos, number size)
+		-- 등급 문양과 속성/스킬 그림을 고정된 한 정사각형 안에 합성한다.
+		local H = _RtsHudLogic
+		local grades = {
+			bronze = "5a539ae0ef084ae593cdf9742e058a25",
+			silver = "187b4995fe2d4ca0829d16f7d3d1ff7e",
+			gold = "b74dcd80d6984e8080f197a7ed7163ba",
+			prism = "3be02a668f1b462d93344f0e5352c20d",
+		}
+		local skills = {
+			enrage = "14c64ff02eb64da0be624eed933e9d9c",
+			holyunity = "53a38855164a4b64accf68785761c283",
+			arrowrain = "9b0c6f6554f04b6a8ef60ade19ff76fb",
+			truesnipe = "f940c35ae6c7478692338475e401530e",
+			tempest = "a05d13219caa4449aa541f0daaf32995",
+			transcend = "d998c591786d40cebb85a06b6eed9e6b",
+			divinepunish = "3c1471ba763140878c405f2aefa9047a",
+			fuma = "459228cf9906473d91d0df063132f3dd",
+			dualblade = "df6c35973fe84c799e7331cff4a6772f",
+			phantom = "b2091f472da549bfa7bb5f1a77a3340c",
+			giant = "012ff529f8c04302bc72128d83a19da6",
+		}
+		local holder = H:SpawnUI("model://uisprite", "RtsAugIcon_" .. definition.id, parent, Vector2(0, 1), Vector2(0, 1), pos, Vector2(size, size))
+		holder.SpriteGUIRendererComponent.ImageRUID = DataRef(grades[definition.grade] or grades.bronze)
+		holder.SpriteGUIRendererComponent.Color = Color.white
+		holder.SpriteGUIRendererComponent.RaycastTarget = false
+		local inset = size * 0.28
+		local side = size * 0.44
+		if definition.grade == "prism" and skills[definition.id] ~= nil then
+			local icon = H:SpawnUI("model://uisprite", "RtsPrismSkill_" .. definition.id, holder, Vector2(0, 1), Vector2(0, 1), Vector2(inset, -inset), Vector2(side, side))
+			icon.SpriteGUIRendererComponent.ImageRUID = DataRef(skills[definition.id])
+			icon.SpriteGUIRendererComponent.Color = Color.white
+			icon.SpriteGUIRendererComponent.RaycastTarget = false
+		else
+			H:SpawnStatIcon(holder, self:AugStatKey(definition), Vector2(inset, -inset), side)
 		end
 	end
 

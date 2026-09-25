@@ -37,6 +37,9 @@
 | `perion` | 페리온 | `PerionEarth` | `9ed4e22a…` 붉은 사암·자갈 | 절벽 마을 1(왼쪽) | `cf6f24aa…` | `fd0451c4…` |
 | `kerning` | 커닝시티 | `KerningPavement` | `e0721799…` 벽돌·안전 표식 | 공사장 1(오른쪽 아래, 뒤집음) | `e2f7cda1…` | `457ec944…` |
 | `lith` | 리스항구 | `LithSand` | `7b1ad42c…` 목재 부두·항구석 | 범선 1(왼쪽 아래) | `89b81c54…` | `7653fa3a…` |
+| `zakum_altar` | 자쿰의 제단(액션) | `PerionEarth` | `b867ada1…` 화산석 | 팔8·몸통·불꽃8 클라이언트 레이어 | `be90451f…` + 8초 반복 | `c1386854…` |
+
+액션 테마는 게임 배경과 유저 카드 배경에서 같은 동작을 재생한다. 목록 썸네일만 정지 이미지다. `RtsActionThemeLogic`가 현재 관전 구역과 카드에 장식을 만들고 테마 변경·종료 때 정리한다. 자쿰의 원본 크기1672×941는 `SetZoneBackground`에서 기존 화면 크기에 맞춰 보정한다. 자세한 자산·검증·제한은 `docs/design/zakum-altar-action-theme.md`.
 
 트랙 판은 모두 `gridTint` 흰색. 전체 RUID·원본 PNG·생성기는 `assets/textures/README.md`(바닥 타일 · 구역 그리드 트랙 · 테마 썸네일·마을 장식 절).
 

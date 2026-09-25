@@ -161,8 +161,8 @@ script RtsUnitSelectLogic extends Logic
 		if my + menuH / 2 > maxY then my = maxY - menuH / 2 end
 		if my - menuH / 2 < minY then my = minY + menuH / 2 end
 		ui = Vector2(mx, my)
-		local menu = H:SpawnPanel("RtsUnitMenu", H.HudGroup, Vector2(0.5, 0.5), Vector2(0, 0.5), Vector2(ui.x, ui.y), Vector2(W, menuH),
-			Color(0.11, 0.094, 0.075, 0.97), H:ColGold(), 1.5)
+		local menu = H:SpawnRoundedPanel("RtsUnitMenu", H.HudGroup, Vector2(0.5, 0.5), Vector2(0, 0.5), Vector2(ui.x, ui.y), Vector2(W, menuH),
+			H:ColPanel(), H:ColGold(), 1.5)
 		self.Menu = menu.Parent
 		self.MenuNo = no
 		self.MenuRect = { x0 = ui.x - 6, y0 = ui.y - menuH / 2 - 6, x1 = ui.x + W + 6, y1 = ui.y + menuH / 2 + 6 }
@@ -181,8 +181,8 @@ script RtsUnitSelectLogic extends Logic
 			text = "이동 대기 " .. _RtsUnitPopupLogic:FmtSec(left)
 			ink = Color(0.6, 0.56, 0.5, 1)
 		end
-		local b1 = H:SpawnPanel("RtsUnitMenuMove", menu, Vector2(0, 1), Vector2(0, 1), Vector2(6, -6 - rowH), Vector2(W - 12, rowH - 4),
-			P:Mix(Color.white, 0.05), P:Mix(H:ColGold(), 0.35), 1.5)
+		local b1 = H:SpawnRoundedPanel("RtsUnitMenuMove", menu, Vector2(0, 1), Vector2(0, 1), Vector2(6, -6 - rowH), Vector2(W - 12, rowH - 4),
+			H:MixPanel(Color.white, 0.05), H:MixPanel(H:ColGold(), 0.35), 1.5)
 		H:SpawnLabel("RtsUnitMenuMoveText", b1, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2(0, 0), Vector2(W - 20, 30),
 			text, ink, 16, TextAlignmentType.MiddleCenter, true)
 		self:SpawnKeyCap(b1, "L")
@@ -194,8 +194,8 @@ script RtsUnitSelectLogic extends Logic
 		end
 
 		-- 2) 상세정보
-		local b2 = H:SpawnPanel("RtsUnitMenuInfo", menu, Vector2(0, 1), Vector2(0, 1), Vector2(6, -6 - rowH * 2), Vector2(W - 12, rowH - 4),
-			P:Mix(Color.white, 0.05), P:Mix(H:ColGold(), 0.35), 1.5)
+		local b2 = H:SpawnRoundedPanel("RtsUnitMenuInfo", menu, Vector2(0, 1), Vector2(0, 1), Vector2(6, -6 - rowH * 2), Vector2(W - 12, rowH - 4),
+			H:MixPanel(Color.white, 0.05), H:MixPanel(H:ColGold(), 0.35), 1.5)
 		H:SpawnLabel("RtsUnitMenuInfoText", b2, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2(0, 0), Vector2(W - 20, 30),
 			"상세정보", H:ColInk(), 16, TextAlignmentType.MiddleCenter, true)
 		self:SpawnKeyCap(b2, "S")
@@ -205,8 +205,8 @@ script RtsUnitSelectLogic extends Logic
 		end)
 
 		-- 3) LV.UP (비용 [메소]) + [Space] 키캡. 누르면 메뉴는 그대로 두고 레벨업(연달아 누를 수 있게), 글자·색은 RefreshMenuLevel이 제자리 갱신
-		local b4 = H:SpawnPanel("RtsUnitMenuLv", menu, Vector2(0, 1), Vector2(0, 1), Vector2(6, -6 - rowH * 3), Vector2(W - 12, rowH - 4),
-			P:Mix(H:ColGold(), 0.9), H:ColGold(), 1.5)
+		local b4 = H:SpawnRoundedPanel("RtsUnitMenuLv", menu, Vector2(0, 1), Vector2(0, 1), Vector2(6, -6 - rowH * 3), Vector2(W - 12, rowH - 4),
+			H:MixPanel(H:ColGold(), 0.9), H:ColGold(), 1.5)
 		self.MenuLvBtn = b4
 		self.MenuLvRow = self:SpawnLvRow(b4, 68, 15)
 		self:SpawnKeyCap(b4, "Space")
@@ -217,8 +217,8 @@ script RtsUnitSelectLogic extends Logic
 		self:RefreshMenuLevel()
 
 		-- 4) 방출 — 붉은 테두리. 누르면 메뉴 닫고 확인 팝업(정말 방출하시겠습니까?) → 팝업의 '방출'이 RtsUnitLogic.RequestDismiss
-		local b3 = H:SpawnPanel("RtsUnitMenuDismiss", menu, Vector2(0, 1), Vector2(0, 1), Vector2(6, -6 - rowH * 4), Vector2(W - 12, rowH - 4),
-			P:Mix(Color.white, 0.05), Color(0.8, 0.35, 0.3, 1), 1.5)
+		local b3 = H:SpawnRoundedPanel("RtsUnitMenuDismiss", menu, Vector2(0, 1), Vector2(0, 1), Vector2(6, -6 - rowH * 4), Vector2(W - 12, rowH - 4),
+			H:MixPanel(Color.white, 0.05), Color(0.8, 0.35, 0.3, 1), 1.5)
 		H:SpawnLabel("RtsUnitMenuDismissText", b3, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2(0, 0), Vector2(W - 20, 30),
 			"방출", Color(0.95, 0.6, 0.55, 1), 16, TextAlignmentType.MiddleCenter, true)
 		local c3 = H:SpawnClick("RtsUnitMenuDismissClick", b3)
@@ -263,8 +263,8 @@ script RtsUnitSelectLogic extends Logic
 		local H = _RtsHudLogic
 		local T = _RtsJobTableLogic
 		local maxed = u.Level >= T:GetMaxLevel()
-		local text = "LV.MAX"
-		if not maxed then text = "LV.UP (" .. H:FormatNumber(T:GetLevelCost(u.Level + 1)) end
+		local text = "최대 레벨 도달"
+		if not maxed then text = "레벨업 (" .. H:FormatNumber(T:GetLevelCost(u.Level + 1)) end
 		if r.text.TextComponent.Text ~= text then r.text.TextComponent.Text = text end
 		r.text.TextComponent.FontColor = ink
 		r.close.TextComponent.FontColor = ink
@@ -296,10 +296,10 @@ script RtsUnitSelectLogic extends Logic
 	@ExecSpace("ClientOnly")
 	method void SpawnKeyCap(Entity parent, string key)
 		local H = _RtsHudLogic
-		local cap = H:SpawnPanel("RtsKeyCap", parent, Vector2(1, 0.5), Vector2(1, 0.5), Vector2(-6, 0), Vector2(58, 24),
-			Color(0.12, 0.1, 0.08, 0.9), Color(0.95, 0.9, 0.75, 0.9), 1.2)
+		local cap = H:SpawnRoundedPanel("RtsKeyCap", parent, Vector2(1, 0.5), Vector2(1, 0.5), Vector2(-6, 0), Vector2(58, 24),
+			Color(0.92, 0.93, 0.98, 0.9), Color(0.72, 0.74, 0.84, 0.9), 1.2)
 		H:SpawnLabel("RtsKeyCapText", cap, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2(0, 0), Vector2(56, 22),
-			key, Color(0.95, 0.9, 0.75, 1), 12, TextAlignmentType.MiddleCenter, true)
+			key, Color(0.38, 0.39, 0.50, 1), 12, TextAlignmentType.MiddleCenter, true)
 	end
 
 	-- 메뉴의 레벨업 줄: "레벨업 → Lv 6 · 70" / 최대 레벨 / 메소 부족이면 흐리게
@@ -317,12 +317,12 @@ script RtsUnitSelectLogic extends Logic
 		end
 		local can = _RtsUnitPopupLogic:CanLevelUp(u)
 		if can then
-			self.MenuLvBtn.SpriteGUIRendererComponent.Color = P:Mix(H:ColGold(), 0.9)
+			self.MenuLvBtn.SpriteGUIRendererComponent.Color = H:MixPanel(H:ColGold(), 0.9)
 			self.MenuLvBtn.Parent.SpriteGUIRendererComponent.Color = H:ColGold()
 			self:ApplyLvRow(self.MenuLvRow, u, Color(0.133, 0.114, 0.09, 1))
 		else
-			self.MenuLvBtn.SpriteGUIRendererComponent.Color = P:Mix(H:ColGold(), 0.25)
-			self.MenuLvBtn.Parent.SpriteGUIRendererComponent.Color = P:Mix(H:ColGold(), 0.4)
+			self.MenuLvBtn.SpriteGUIRendererComponent.Color = H:MixPanel(H:ColGold(), 0.25)
+			self.MenuLvBtn.Parent.SpriteGUIRendererComponent.Color = H:MixPanel(H:ColGold(), 0.4)
 			self:ApplyLvRow(self.MenuLvRow, u, Color(0.6, 0.55, 0.45, 1))
 		end
 	end

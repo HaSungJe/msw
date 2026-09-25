@@ -122,7 +122,7 @@ script RtsAugmentLogic extends Logic
 		for i = 1, #list do
 			if math.floor(list[i].no + 0.5) == n then
 				local d = _RtsAugmentTableLogic:GetDef(list[i].id)
-				if d ~= nil then out[#out + 1] = { g = d.grade, t = d.name, d = _RtsAugmentTableLogic:EffectText(d.id) } end
+				if d ~= nil then out[#out + 1] = { id = d.id, g = d.grade, t = d.name, d = _RtsAugmentTableLogic:EffectText(d.id) } end
 			end
 		end
 		return out
@@ -460,8 +460,6 @@ script RtsAugmentLogic extends Logic
 		local price = self:BuyPrice(_RtsUnitLogic:MyUserId())
 		local st = _RtsStageLogic.RunState
 		local can = _RtsRunResultLogic:IsMeAlive() and (st == "countdown" or st == "running") and pending < self.MaxPending and _RtsUnitLogic:GetMyMeso() >= price
-		_RtsHudLogic:SetBuyPrism(self:BuyPrismLeft(_RtsUnitLogic:MyUserId()), self.BuyPrismMax)
-		_RtsHudLogic:SetBuyPrismRate(self:BuyPrismRate(_RtsUnitLogic:MyUserId()))
 		_RtsHudLogic:SetBuyButton(price, can)
 	end
 
