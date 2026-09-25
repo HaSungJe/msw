@@ -5,7 +5,7 @@
 --   테마·비석은 프리셋 free = true면 누구나 보유(지금 전부), 아니면 보유 목록에 있어야 고른다. 초록달팽이(M001)는 늘 보유.
 --   (사용자 "아이콘이나 테마는 서버 쪽에서 항상 유저에게 전달해야 누적 — 영구 획득 정보", "획득일을 저장 — 나중에 집계할 수도")
 --   테마 = 내 구역만 외형 변경(RtsThemeLogic.ApplyToZone, 밸런스 영향 없음). 아이콘 = 몬스터 247종, 기본 초록달팽이(M001)만 보유,
---   매우어려움(난이도 5)에서만 그 몬스터를 처치할 때 1%(보스 포함, 극악 제외 — 사용자 "무조건 매우어려움에서 1%").
+--   몬스터 처치 시 매우어려움(난이도 5) 1%, 극악(난이도 6) 2%(보스 포함).
 --   창: RtsPopupLogic 'profile'([테마]·[아이콘]·[비석] 탭)·'themeconfirm'·'tombconfirm'·'iconinfo'·'iconconfirm'·'iconget'. 상자: RtsHudLogic 프로필 상자(배경 = 테마 썸네일, 왼쪽 = 내 아이콘). 카드: 유저 카드(목록 줄의 테마·아이콘 칸).
 --   비석 = RtsTombLogic 프리셋, 탈락 때 RtsRunResultLogic.SpawnTomb이 그 구역 주인 것으로 세운다.
 @Logic
@@ -32,10 +32,26 @@ script RtsProfileLogic extends Logic
 	-- 아이콘 없음(선택 기본값 — 2026-09-25 사용자 "아이콘: 없음"). 유저 카드는 빈 원
 	property string IconNone = "none"
 
-	-- 획득 확률·난이도(5 = 매우어려움 — RtsDifficultyLogic.GetNames)
-	property number DropRate = 0.01
+	-- 서버 획득 판정과 클라이언트 안내가 공유하는 난이도별 확률.
+	property table IconDropRates = { [5] = 0.01, [6] = 0.02 }
 
-	property number DropDiff = 5
+	method number IconDropRateFor(number difficulty)
+		return self.IconDropRates[difficulty] or 0
+	end
+
+	method string IconDropText(boolean showRate)
+		local names = _RtsDifficultyLogic:GetNames()
+		local parts = {}
+		for i = 1, #names do
+			local rate = self:IconDropRateFor(i)
+			if rate > 0 then
+				local label = names[i]
+				if showRate then label = label .. string.format(" %d%%", math.floor(rate * 100 + 0.5)) end
+				parts[#parts + 1] = label
+			end
+		end
+		return table.concat(parts, " / ")
+	end
 
 	-- ===== 서버 상태(유저별) =====
 	property table ThemeByUser = {}
@@ -370,18 +386,19 @@ script RtsProfileLogic extends Logic
 	end
 
 	-- ===== 서버: 처치 → 아이콘 획득(RtsMonsterComponent.Die) =====
-	--   대상 = 그 구역 주인. 테스트 모드 · 매우어려움이 아님 · 이미 보유 · 난수 ≥ 1% → 아무것도 안 함.
+	--   대상 = 그 구역 주인. 테스트 모드 · 획득 확률 0 · 이미 보유 · 난수 ≥ 난이도별 확률 → 아무것도 안 함.
 	--   보유에 먼저 넣고(저장 중 같은 몬스터로 두 번 굴리지 않게) 저장 실패면 되돌린다
 	@ExecSpace("ServerOnly")
 	method void OnMonsterKilled(number zone, string monsterId)
 		if _RtsUnitLogic.DevTools then return end
 		local userId = self.OwnerByZone[math.floor(zone + 0.5)]
 		if userId == nil or userId == "" then return end
-		if _RtsDifficultyLogic:Of(userId) ~= self.DropDiff then return end
+		local dropRate = self:IconDropRateFor(_RtsDifficultyLogic:Of(userId))
+		if dropRate <= 0 then return end
 		local owned = self.OwnedByUser[userId]
 		if owned == nil or owned[monsterId] ~= nil then return end
 		if _RtsStageTableLogic:GetMonster(monsterId) == nil then return end
-		if _UtilLogic:RandomDouble() >= self.DropRate then return end
+		if _UtilLogic:RandomDouble() >= dropRate then return end
 		self:GrantIcon(userId, monsterId)
 	end
 
@@ -493,10 +510,10 @@ script RtsProfileLogic extends Logic
 		return nil
 	end
 
-	-- "매우어려움 · 12라운드 · 빅토리아 - 개미굴"
+	-- "매우어려움 / 극악 · 12라운드 · 빅토리아 - 개미굴"
 	method string WhereText(string id)
 		local s = self:FirstStageOf(id)
-		local diff = _RtsDifficultyLogic:GetNames()[self.DropDiff] or "매우어려움"
+		local diff = self:IconDropText(false)
 		if s == nil then return diff end
 		return diff .. " · " .. _RtsHudLogic:Int(s.no) .. "라운드 · " .. _RtsStageTableLogic:FullName(s)
 	end

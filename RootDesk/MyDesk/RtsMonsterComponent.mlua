@@ -399,7 +399,7 @@ script RtsMonsterComponent extends Component
 			_RtsWaveLogic:OnMobGone(self.Zone, e.Name)
 			_RtsRunResultLogic:OnMobKilled(self.Zone, self.Meso)
 		end
-		-- 아이콘 획득 굴림(2026-09-25 — 매우어려움에서만 1%, 보스 포함): RtsProfileLogic
+		-- 아이콘 획득 굴림: 매우어려움 1% · 극악 2%, 보스 포함(RtsProfileLogic).
 		_RtsProfileLogic:OnMonsterKilled(self.Zone, self.MonsterId)
 		local sec = 0.6
 		local mon = _RtsStageTableLogic:GetMonster(self.MonsterId)

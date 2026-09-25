@@ -317,3 +317,9 @@
 - How to apply: **v260924-1 솔로 출시 완료(Phase 12)**. 출시 노트 '개발 예정 로드맵' 순서 = ① 멀티플레이(Phase 8: 대기방·매칭·방 생성/참가) → ② 순위표(Phase 13: 대기방 순위표) → ③ 유저 개인 테마(트랙+배경) 프리셋(Phase 10) → ④ 유저 아이콘 프리셋(Phase 14) → ⑤ 전체 UI 개선(Phase 11: 플레이어 카드·디자인 패스). UI를 바꾸면 `docs/ui-screens.md`도 같이 갱신.
 - AGENTS.md application: not needed(non-code — 제품 방향)
 - Priority: takes precedence over defaults
+
+## 아이콘 획득 확률 — 난이도별
+- Rule: 몬스터 처치 시 매우어려움 1%, 극악 2%로 아이콘을 획득한다(일반·보스 동일). 나머지 난이도는 획득하지 않는다. 실제 판정과 획득처 안내는 RtsProfileLogic.IconDropRates를 공유한다.
+- Scope: project
+- Rationale: 사용자 2026-09-26 요청. 기존 매우어려움에서만 1% 규칙을 대체한다.
+- Priority: takes precedence over earlier icon drop rules

@@ -1584,7 +1584,7 @@ script RtsPopupLogic extends Logic
 		H:SpawnLabel("RtsIconInfoWhere", body, Vector2(0, 1), Vector2(0, 1), Vector2(tx, -84), Vector2(tw, 26),
 			"획득처: " .. P:WhereText(id), H:ColInk(), 15, TextAlignmentType.MiddleLeft, false)
 		H:SpawnLabel("RtsIconInfoRate", body, Vector2(0, 1), Vector2(0, 1), Vector2(tx, -114), Vector2(tw, 26),
-			"확률: 매우어려움에서 처치 시 1%", H:ColInk(), 15, TextAlignmentType.MiddleLeft, false)
+			"처치 시 확률: " .. P:IconDropText(true), H:ColInk(), 15, TextAlignmentType.MiddleLeft, false)
 		local bw = 200
 		local bh = 44
 		if owned and id ~= P.MyIcon then
