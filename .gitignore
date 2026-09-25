@@ -2,6 +2,7 @@
 .beaver/config.json
 .claude/worktrees/
 .claude/settings.json
+.vscode/
 .mcp.json
 .info
 __pycache__/

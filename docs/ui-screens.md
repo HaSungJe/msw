@@ -2,7 +2,7 @@
 
 이 문서는 화면에 보이는 요소를 모두 정리한 것이다. 요소마다 누가 어디서 만드는지, 어디에 어떤 크기로 놓이는지, 색·글꼴, 언제 보이는지, 누르면 무엇을 하는지를 적었다. 읽는 사람은 ChatGPT(디자인 담당)이고, 이 문서만 보고 게임 로직을 깨지 않고 화면을 다시 꾸밀 수 있게 하는 것이 목적이다.
 - 기준 코드: `RootDesk/MyDesk/*.mlua` (2026-09-24, 커밋 a75a69f 이후 작업 트리). 표기는 `파일:줄` 형식이며 파일 접두 `RootDesk/MyDesk/`는 생략했다.
-- 읽는 순서(AGENT.md): `AGENT.md` → `.beaver/memory/` → `CLAUDE.md` → 이 문서. 엔진 관례는 `docs/msw-engine.md`를 본다.
+- 읽는 순서: `.beaver/memory/` → `AGENTS.md` → 이 문서. 엔진 관례는 `docs/msw-engine.md`를 본다.
 - 시각 방향·공통 색·컴포넌트·Claude Code 구현 인계는 `docs/design-system.md`를 본다. 화면의 실제 동작과 좌표는 이 문서가 기준이다.
 
 ---
@@ -100,7 +100,7 @@
 - **Truncate와 리치텍스트는 같이 쓰지 않는다.** 태그가 잘려서 그대로 드러나기 때문에 잘릴 수 있는 라벨은 평문으로 둔다(RtsHudLogic:975). `UseNBSP = true`를 켜면 단어 중간에서 줄이 끊기지 않는다.
 - 이모지는 게임 글꼴에 없어서 안 그려진다(실측, RtsUnitPopupLogic:579). `✓ ▾ ▴ ▼ ▲ · —` 같은 기호는 쓰고 있다.
 - 글자 폭을 잴 수 없다. 여러 줄 설명의 높이는 어림으로 계산한다(`DescLines`: 14px 글꼴 기준 한글 13px, 그 외 8px, 1~3줄, RtsUnitPopupLogic:414-427).
-- 숫자를 화면에 보일 때는 `Int()`/`FormatNumber()`를 쓴다. 동기화된 number를 `tostring`하면 "1.0"이 된다(CLAUDE.md, docs/msw-engine.md:26-28).
+- 숫자를 화면에 보일 때는 `Int()`/`FormatNumber()`를 쓴다. 동기화된 number를 `tostring`하면 "1.0"이 된다(AGENTS.md, docs/msw-engine.md:26-28).
 
 ---
 
@@ -517,11 +517,11 @@ y=1080 +------------------------------------------------------------------------
 - 화면 문구에 개발용 분류(티어·서포터·1티어 등)를 쓰지 않는다(메모리 workflow) — 증강 효율은 오각형 모양으로만
 - **다시 그리기는 번쩍이지 않게**(2026-09-24): 같은 팝업을 다시 그릴 때(`RtsPopupLogic.Open`이 같은 kind로 불릴 때) 팝업 그룹은 끄지 않고 옛 body를 0.12초 남겼다가 지운다(`OldBody`/`KeepOldBody`). 유닛 창 `Render`도 옛 `Content`를 0.12초 뒤에 지운다. 엔진이 UI를 여러 프레임에 나눠 만들기 때문에, 지우자마자 새로 만들면 빈 창이 한순간 보인다 — 새 화면 코드도 같은 방식을 쓴다.
 - 자기 효과음이 따로 있는 버튼은 `SpawnClickQuiet`(클릭음 없음)로 만든다(예: HUD '펼치기' — 3택1 등장음과 겹쳤다).
-- UI 코드만 고치는 작업은 `@ExecSpace("ClientOnly")`(또는 `Client`) 메서드 안에서 끝낸다. 대상은 `Build*`, `Apply*`, `Refresh*`, `Set*`, `Spawn*` 계열이다. 새 스크립트가 필요하면 PascalCase에 `Logic`/`Component` 접미사를 붙이고 모든 메서드에 `@ExecSpace`를 적는다(CLAUDE.md).
+- UI 코드만 고치는 작업은 `@ExecSpace("ClientOnly")`(또는 `Client`) 메서드 안에서 끝낸다. 대상은 `Build*`, `Apply*`, `Refresh*`, `Set*`, `Spawn*` 계열이다. 새 스크립트가 필요하면 PascalCase에 `Logic`/`Component` 접미사를 붙이고 서버·클라이언트 경계를 넘는 메서드의 실행 공간을 명시한다. 공용 계산 메서드에는 주석이 없는 기존 사례도 있다(`RootDesk/MyDesk/RtsStageLogic.mlua:103-130`).
 - mlua API가 불확실하면 추측하지 말고 msw-mcp `mlua_api_retriever`로 확인한다. 런타임 이름이 선언 파일과 다른 경우가 있다. 예: 스크롤바는 `ScrollBar*`(RtsUnitPopupLogic:629). `AutoHide`/`Hide`는 쓰지 않는다(:613).
 - 엔진 동작 실측(텍스트 Truncate, 업로드 스프라이트 PPU, UI 좌표 변환, 입력)은 `docs/msw-engine.md`에 있다.
 - 목업 `.info/artifacts/hud-layout.html`(v16)과 플레이어 카드 스케치 `.info/artifacts/player-slot-sketch-260922.png`는 **로컬 전용**(.gitignore)이라 다른 기기에는 없을 수 있다. 목업이 실제와 다르면 **이 문서와 코드가 기준**이다.
-- 검증 순서(CLAUDE.md Testing): `maker_stop` → **`maker_refresh_workspace`** → `maker_save` → `maker_play` → `maker_logs(kind:"build")`로 문법 확인 → `maker_logs(kind:"normal")`로 런타임 확인 → `maker_screenshot` → `maker_stop`. refresh를 빼먹으면 옛 스크립트로 돈다. 문법 오류는 `[LEA-3016] InvalidFormat …`으로 normal 로그에 찍힐 수 있다(.beaver/memory/msw-engine.md:163).
+- 검증 순서(docs/testing.md): `maker_stop` → **`maker_refresh_workspace`** → `maker_save` → `maker_play` → `maker_logs(kind:"build")`로 문법 확인 → `maker_logs(kind:"normal")`로 런타임 확인 → `maker_screenshot` → `maker_stop`. refresh를 빼먹으면 옛 스크립트로 돈다. 문법 오류는 `[LEA-3016] InvalidFormat …`으로 normal 로그에 찍힐 수 있다(.beaver/memory/msw-engine.md:163).
 - UI를 바꾸면 이 문서의 해당 표도 같이 고친다(.beaver/memory/balance.md:313).
 
 ### 7.4 알려진 어긋남 (손대기 전에 확인)
@@ -541,7 +541,7 @@ y=1080 +------------------------------------------------------------------------
 |---|---|---|---|
 | 41 | 좌측 유저 카드 | **2026-09-25 뼈대 구현됨 — 3.2 참고**(배경 = 테마 썸네일, 원형 아이콘(`CircleMaskRUID` 69e2dced…), 닉네임, 내 카드 초록 테두리. [수정]은 2026-09-25 삭제 — 아이콘은 프로필 [아이콘] 탭) | 카드 디자인(ChatGPT) |
 | 40 | 아이콘 | **2026-09-25 구현됨 — 4.2 `icon`·`iconinfo`·`iconconfirm`·`iconget` 참고**. 몬스터 247종, 기본 초록달팽이, **매우어려움에서만 처치 시 1%(보스 포함)**, 획득 일시 저장(유저 DataStorage `icons`) | 아이콘 탭 추가(지금 '기본'만) |
-| 38 | 맵 테마 | **2026-09-25 뼈대 구현됨 — 3.0 테마 상자 · 4.2 `theme`·`themeconfirm` 참고**. 헤네시스·엘리니아·페리온·커닝시티·리스항구 5종 무료, 내 구역만. **2026-09-25 5종 디자인 적용됨**(바닥·테마별 트랙 판·마을 장식·400×240 썸네일 — `docs/design/260925-theme-presets.md`, Maker 검증) | 장식 추가 배치·길 점선 대비 등 다듬기 — `docs/theme-presets.md` |
+| 38 | 맵 테마 | **2026-09-25 뼈대 구현됨 — 3.0 테마 상자 · 4.2 `theme`·`themeconfirm` 참고**. 헤네시스·엘리니아·페리온·커닝시티·리스항구 5종 무료, 내 구역만. **2026-09-25 5종 디자인 적용됨**(바닥·테마별 트랙 판·마을 장식·400×240 썸네일 — `docs/design/theme-presets.md`, Maker 검증) | 장식 추가 배치·길 점선 대비 등 다듬기 — `docs/theme-presets.md` |
 | 44 | 순위 기준 교체 (**기록 저장만 동작** — 게임 안 순위 버튼·결과 창 순위 줄은 2026-09-25 제거, `rank` 창 코드는 #42에서 다시 씀) | 순위 = **어려움·매우어려움·극악에서 검은 마법사 4페이즈를 깬 횟수**. 클리어할 때마다 서버가 +1한다(테스트 모드 제외). 결과 창에 내 순위와 횟수를 보여 준다 | 세 난이도 합산 1개 표 vs 난이도별 탭 3개, 동점 2차 기준 |
 | 42 | 로비 전광판 | 로비에 #44 순위 Top 10을 보이고 스크롤로 100위까지 본다. 내 순위는 하단에 고정한다. 칸 = 아이콘(#40) · 닉네임 · 클리어 횟수. 엔진 리더보드는 ReleaseOnly라 Maker에서는 로컬 SortableDataStorage 경로를 쓴다 | 시즌(무한 vs 월간 리셋) |
 | 31 | 매칭·방(멀티 업데이트 — 솔로 출시 뒤) | 로비(매칭 / 방 만들기 / 혼자 시작) → 방(1~8인) 입장. 결과 창 '나가기'는 로비로 간다. 지금은 `RequestExit`가 안내 토스트만 띄운다(RtsRunResultLogic:340) | 정적 로비 + 인스턴스 방 구조, 빈자리 매칭 규칙 |

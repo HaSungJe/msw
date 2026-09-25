@@ -5,14 +5,16 @@
 > 화면 요소 이름·크기·만드는 곳은 `docs/ui-screens.md`, 테마·비석 프리셋은 `docs/theme-presets.md`, 엔진 관례는 `docs/msw-engine.md`.
 
 ## 1. 역할
+유닛 원화·대기/스킬 프레임·흉상 작업은 [docs/unit-art.md](unit-art.md)를 따른다. 이 작업에는 아래 일반 UI 인계의 에이전트별 역할 제한을 적용하지 않으며, 실행 에이전트가 사용자 요청 범위에서 이미지 생성부터 게임 적용·검증까지 수행한다.
+
 | 누가 | 하는 일 | 하지 않는 일 |
 |---|---|---|
 | ChatGPT | 이미지 생성(아이콘·썸네일·배경·프레임·버튼 등), 디자인 가이드라인 작성(색·크기·배치·글꼴·상태별 모양) | 게임 코드(.mlua) 수정, 리소스 업로드, Maker Play 조작 — 가이드라인에 "이렇게 바꿔 달라"로 적는다 |
 | Claude | 가이드라인을 읽고 이미지를 **새 리소스로** 업로드 → 코드 반영 → Maker에서 확인 → 문서 표 갱신 → 가이드라인 상태를 '구현됨'으로 | 가이드라인에 없는 디자인 판단(모르면 사용자에게 묻는다) |
 
 ## 2. 파일 두는 곳
-- 이미지: `assets/design/<YYMMDD>-<주제>/` — 원본 PNG(투명 배경이면 알파 포함). 파일명은 쓰임이 보이게(`profile-card-frame.png`, `icon-slot-bg.png`)
-- 가이드라인: `docs/design/<YYMMDD>-<주제>.md` — 아래 3절 양식 한 장에 한 주제(예: `260926-profile-window.md`, `260926-skill-list.md`)
+- 이미지: `assets/design/<주제>/` — 원본 PNG(투명 배경이면 알파 포함). 파일명은 쓰임이 보이게(`profile-card-frame.png`, `icon-slot-bg.png`)
+- 가이드라인: `docs/design/<주제>.md` — 아래 3절 양식 한 장에 한 주제(예: `profile-window.md`, `skill-list.md`)
 - 한 주제 = 한 번에 구현·확인할 수 있는 크기(창 하나, 버튼 한 종류 등). 여러 창이면 여러 장
 
 ## 3. 가이드라인 양식(복사해서 쓴다)

@@ -6,35 +6,35 @@ MSW(Maker 26.7) 실측으로 확인한 엔진 동작. 다시 실측하면 30분�
 - Rule: `asset_search_resources(cat=..., query="*키워드", source="maplestory")` → `asset_get_account_resource_metadata_bulk`(≤50개)의 `mapleImgFullPath`로 정체 확인(아바타 아이템은 `extraInfo.avatarItemInfo.mapleName`에 한글 이름). 미리보기는 `https://mod-thumbnail.dn.nexoncdn.co.kr/<r0-1>/<r2-3>/<ruid>_64.png`(64px만 존재). 메타데이터 결과가 크면 tool-results 파일로 떨어지니 Python으로 파싱. 검색 키 예: 탑뷰 헤네시스 오브젝트 `*topview_henesys`(sprite), 헤네시스 RectTile은 `*henesys` 결과에서 경로로 필터, 몹 사운드 `*<몹ID>`(audioclip → `sound/mob/<id>/die`), 스킬 사운드 `*<스킬ID>`(→ `sound/skill/<id>/use|hit`), 직업 코디 `*모험가 히어로`(avataritem — 한글 이름 검색 됨).
 - Scope: project
 - Rationale: 실측 2026-09-14
-- CLAUDE.md application: not needed(non-code — 자산 탐색 절차)
+- AGENTS.md application: not needed(non-code — 자산 탐색 절차)
 - Priority: takes precedence over defaults
 
 ## 클라 스폰·삭제는 프레임에 나눠 처리된다 / MCP 도구는 유령 클릭을 넣는다
 - Rule: 클라 `_SpawnService:SpawnByModelId`·`Destroy`는 호출 즉시 반환되지만 실제 생성·삭제는 여러 프레임(80개 ≈ 1초)에 걸친다 → 같은 이름을 바로 다시 스폰하면 실패하니 이름에 세대 번호를 붙인다. UI 아바타는 `model://uiempty` + `CostumeManagerComponent` + `AvatarGUIRendererComponent`로 그려진다. Maker MCP의 `maker_screenshot`/`maker_execute_script`는 플레이 화면에 **유령 클릭**(ScreenTouchEvent·TouchEvent)을 넣으므로, 클릭에 반응하는 모드(이동 모드 등)를 켜 둔 채 도구를 부르면 엉뚱한 입력이 들어간다 — 테스트할 땐 모드를 끄고 스크린샷을 찍거나 로그로 확인한다. `maker_mouse_input`은 월드 클릭(ScreenTouchEvent·TouchEvent)은 넣지만 UI 버튼은 못 누르고 실제 커서 위치도 안 바꾼다.
 - Scope: project
 - Rationale: 실측 2026-09-15
-- CLAUDE.md application: not needed
+- AGENTS.md application: not needed
 - Priority: takes precedence over defaults
 
 ## 스크롤 목록 = uisprite + ScrollLayoutGroupComponent (프로퍼티 이름은 ScrollBar*)
 - Rule: 스크립트로 스크롤 목록을 만들 땐 `model://uisprite`를 스폰해 `AddComponent("ScrollLayoutGroupComponent")` → `Type = LayoutGroupType.Vertical`, `ChildAlignment`, `Spacing`, `UseScroll`. 자식은 그냥 스폰하면 위에서부터 쌓이고(RectSize 높이 사용) 넘치면 휠 스크롤·핸들이 생긴다. 스크롤바 프로퍼티 이름은 로컬 d.mlua(`Visible`·`Thickness`·`HandleColor`·`BackgroundColor`)와 달리 런타임엔 **`ScrollBarVisible`·`ScrollBarThickness`·`ScrollBarHandleColor`·`ScrollBarBackgroundColor`**(d.mlua 이름으로 쓰면 "cannot set Visible, no such field"). `ScrollBarVisibility.AutoHide`는 내용이 짧아도 핸들이 트랙을 꽉 채운 채 보이고, `Hide`는 흰 트랙 띠가 남는다 → 내용이 다 들어가면 `UseScroll = false`로 끈다. 스크롤 위치는 `SetScrollNormalizedPosition(UITransformAxis.Vertical, v)`. 예: `RtsUnitPopupLogic.SpawnScrollList`.
 - Scope: project
 - Rationale: 2026-09-16 유닛 팝업 증강·버프 탭 실측(d.mlua 이름 실패 → mlua_api_retriever로 확인)
-- CLAUDE.md application: not needed
+- AGENTS.md application: not needed
 - Priority: takes precedence over defaults
 
 ## 월드 클릭은 ScreenTouchEvent 한 곳에서 — UI 우선은 IsPointerOverUI + 메뉴 사각형 판정
 - Rule: 유닛·발판 클릭은 전부 `RtsUnitSelectLogic.HandleScreenTouchEvent`(배치 모드 → 이동 모드 → 유닛 상자 → 빈 곳 순)에서 판정한다. UI 위 클릭은 `_InputService:IsPointerOverUI()`로 먼저 버리고, 팝업이 열려 있으면 `_RtsPopupLogic:IsOpen()`, 작은 메뉴는 `MenuRect`(UI 중앙 원점, 여백 6px) `IsOverMenu`로 한 번 더 거른다. 엔티티 `TouchEvent`는 2026-09-17엔 UI와 같이 발화하는 문제, 09-22엔 아예 안 오는 문제가 있어 폐기했다 — 새 월드 클릭 대상이 생기면 이 핸들러에 상자 판정을 추가할 것.
 - Scope: project
 - Rationale: User bug report 2026-09-17 "상세보기가 클릭이 아니라 섀도어 클릭이 우선시됨. 팝업이 항상 클릭 우선이어야"
-- CLAUDE.md application: not needed
+- AGENTS.md application: not needed
 - Priority: takes precedence over defaults
 
 ## 전투 = 엔진 AttackComponent/HitComponent + 데미지 스킨 파이프라인 위에 얹는다
 - Rule: 유닛에 `RtsUnitAttackComponent extends AttackComponent`(CalcDamage/CalcCritical/GetCriticalDamageRate/GetDisplayHitCount/IsAttackTarget을 같은 시그니처로 정의 = override, 값은 프로퍼티 Dmg/Crit/CritRate/Hits/TargetName으로 공격 직전 주입) + `DamageSkinSettingComponent`; 몬스터에 `HitComponent`(BoxSize·ColliderOffset, 기본 CollisionGroups.HitBox) + `DamageSkinSpawnerComponent` + `RtsMonsterComponent`(서버 HitEvent로 HP). 판정은 `atk:AttackFrom(Vector2 size, Vector2 worldPos, attackInfo, CollisionGroups.HitBox)` — 대상은 IsAttackTarget에서 이름으로 고른다(박스로 고르지 않음). 데미지 숫자는 엔진이 알아서 그림(크리는 CalcCritical true면 GetCriticalDamageRate 배). 새 스크립트의 .codeblock은 기존 것을 복제해 EntryKey/Id 새 GUID, Name, Type(Logic 5 / Component 1)만 바꾸면 Maker가 인식. 1회 재생 클립 이펙트 = SpriteRUID에 클립 + `SpriteAnimPlayerEndFrameEvent` 뒤 Destroy(`RtsSkillFxLogic.PlayClip`). 원작 스킬 클립은 왼쪽 보기 → `assetFacesLeft`로 유닛 방향에 맞춰 `FlipX`. **아바타 좌우: 메이플 아바타 기본은 왼쪽 보기(스케일 양수 = 왼쪽)**. 반전은 클라에서 `AvatarRendererComponent:GetAvatarRootEntity().TransformComponent.Scale.x = -1`(유닛 엔티티 스케일을 뒤집으면 자식 버프 아이콘까지 뒤집힌다). 서버는 `RtsUnitComponent.FaceDir`(@Sync, -1 왼쪽/+1 오른쪽)만 정하고 클라 `OnSyncProperty("FaceDir")` → `ApplyFace`. 이펙트 반전은 `RtsSkillFxLogic.FlipFor(fx, facingRight, which)`(assetFacesLeft를 기본으로, `clip/frames/body/loop/projFacesLeft`가 요소별 우선 / noFlip). 투사체는 `PlayProjectile`이 `_TweenLogic:MoveTo`로 직선 비행 + `ZRotation`을 비행 각도로(오른쪽: 반전+각도, 왼쪽: 무반전+각도−180). 2026-09-18 전까지 반대로(스케일 양수 = 오른쪽 가정) 돼 있어 팔라딘이 등 뒤로 이펙트를 쏨 — 사용자 지적으로 수정. 마지막 공격 방향 유지(되돌리지 않음). 시험대는 `RtsCombatLogic.TestBench`(입장 시 순회 정지 `RtsDemoLogic.StopWalkers` + 허수아비 `RtsDummy<zone>` (14,3) 체력 무제한 + 유닛 1을 (13,3)에 놓고 공격 반복) — 웨이브(#10)가 생기면 false.
 - Scope: project
 - Rationale: 실측 2026-09-17 — 히어로 레이징 블로우 시험대에서 데미지 86×2 표시·타격 클립·번쩍임·좌우 반전 확인
-- CLAUDE.md application: not needed
+- AGENTS.md application: not needed
 - Priority: takes precedence over defaults
 
 ## 데미지 스킨 리소스 = 숫자 글리프 아틀라스. **(유닛) 스킨은 만/억 글리프를 갖고 엔진이 자동 포맷한다**
@@ -53,14 +53,14 @@ MSW(Maker 26.7) 실측으로 확인한 엔진 동작. 다시 실측하면 30분�
 - 실측 방법(2026-09-18): 프레임 sprite GUID를 `SpriteRUID`로 스폰하고 옆에 표식(스나이핑 조준 0c76a3bd… 0.35배)을 같은 자리에 놓아 스크린샷 — 원점 위치가 바로 보인다. 연출 확인은 **슬로모 미리보기**: 시험대 루프를 `StopLoop`으로 멈추고 클라에서 `PlayCast(unit, no, fxCopy, target, targets)`(fx 복사본에 clipLife·markLife 60, sound nil) 직후 `mapRoot:GetChildComponentsByTypeName("SpriteRendererComponent")` 중 이름 `RtsFx*/RtsMark*/RtsBeam*`의 `PlayRate = 0.05` → 1초 연출이 20초로 늘어나 스크린샷(도구 지연 1~2초)으로 잡힌다. 몬스터 타격 클립(`RtsHitFx_*`)은 1초 뒤 지워지는 타이머가 있어 슬로모가 안 먹음.
 - Scope: project
 - Rationale: 2026-09-18 블리자드 tile이 위로 떠 보이고, 2221012 결정이 캐릭터 등 뒤에 그려진 원인 = 원점. 스크린샷 도구 지연으로 1초 연출을 못 잡아 헤맴 → 슬로모로 해결
-- CLAUDE.md application: not needed(non-code 절차)
+- AGENTS.md application: not needed(non-code 절차)
 - Priority: takes precedence over defaults
 
 ## 흰 사각 스프라이트 바(체력바)는 Scale로 늘린다 — TiledSize는 안 먹고, 자식은 부모 스케일을 나눠야 세계 크기가 고정된다
 - Rule: `RtsHudLogic.WhiteRUID`(47b5e516…)를 `SpriteRendererComponent.SpriteRUID`로 쓰면 ≈0.08유닛(스케일 10 → 0.8유닛 실측) 사각. `DrawMode = Tiled` + `TiledSize`는 이 스프라이트에 효과 없음(점만 그려짐) → `TransformComponent.Scale = (W/0.08, H/0.08)`. 몬스터 자식 엔티티(`SpawnByModelId(..., parent)`, 로컬 Position/Scale)로 붙이면 따라다니지만 부모 스케일(2.5)이 곱해지므로 로컬 = 세계 값 ÷ 부모 스케일 → 몬스터 크기가 달라도 같은 폭(사용자 "체력바 크기 통일, 보스만 길게"). 채움은 중심 기준이라 왼쪽 정렬 = Position.x −(W−w)/2. 상태 아이콘(빙결)은 HitComponent 박스 우측 위(ColliderOffset + BoxSize/2 + 여유)에 자식으로, 스킬 아이콘 sprite(32px → 로컬 0.8 × 부모 2.5 ≈ 0.64유닛)를 쓰면 딱 보인다. 색 틴트는 `sr.Color`(빙결 0.55/0.8/1) — 피격 번쩍임이 되돌릴 색은 `RestColor()`로 상태에 따라.
 - Scope: project
 - Rationale: 실측 2026-09-18 몬스터 체력바·빙결 표시 구현
-- CLAUDE.md application: not needed
+- AGENTS.md application: not needed
 - Priority: takes precedence over defaults
 
 ## 아바타 ActionStateChangedEvent — 같은 프레임에 두 번 보내면 뒤 액션이 늦거나 무시된다 / PlayRate로 슬로모 캡처
@@ -130,7 +130,7 @@ MSW(Maker 26.7) 실측으로 확인한 엔진 동작. 다시 실측하면 30분�
 - Priority: takes precedence over defaults
 
 ## 구역 그리드 16×13(2026-09-20) — 칸 수를 바꾸면 5곳을 같이
-- Rule: 그리드 = 16열×13행, 칸 1.7778유닛, `GridLeft −14.2222`(뷰 42.66 폭에 좌우 7.11 여백 = 대칭), `GridTop 11.5556`(위아래 0.44 여백). 텍스처 = `tools/gen-track-grid.js`(COLS/ROWS) → 1280×1040 PNG → 내 리소스 sprite 업로드(PPU 100, `GridTextureScale 2.2222`) → `RtsThemeLogic` 프리셋 gridRUID(헤네시스 `95b3ec9d377e46ecb9d394467d27dada`; 엘나스 `651583e1…`는 아직 18×12). 장식물(`RtsThemeLogic` 테마별 `decor` — 헤네시스는 2026-09-25부터 없음)은 **좌우 여백에만**(col ≤ −0.6 / ≥ 16.9; 위아래 여백은 0.25칸뿐), 오른쪽 x 18칸 이후는 영입 HUD 밑이라 큰 건물은 8행 아래. 트랙 경로(GetTurnPoints·SEQ)는 최대 14열이라 그대로.
+- Rule: 그리드 = 16열×13행, 칸 1.7778유닛, `GridLeft −14.2222`(뷰 42.66 폭에 좌우 7.11 여백 = 대칭), `GridTop 11.5556`(위아래 0.44 여백). 텍스처 = `tools/gen-track-grid.js`(COLS/ROWS) → 1280×1040 PNG → 내 리소스 sprite 업로드(PPU 100, `GridTextureScale 2.2222`) → `RtsThemeLogic` 프리셋 gridRUID(현재 트랙 5종은 `assets/design/themes/tracks/track-v3-*.png`, RUID는 `assets/textures/README.md` 기준). 장식물(`RtsThemeLogic` 테마별 `decor` — 헤네시스는 2026-09-25부터 없음)은 **좌우 여백에만**(col ≤ −0.6 / ≥ 16.9; 위아래 여백은 0.25칸뿐), 오른쪽 x 18칸 이후는 영입 HUD 밑이라 큰 건물은 8행 아래. 트랙 경로(GetTurnPoints·SEQ)는 최대 14열이라 그대로.
 - Scope: project
 - Rationale: 사용자 "맨 우측 2줄 타일 삭제(좌우 대칭), 맨 아래 한 줄 추가(위 공간 활용해 위로 당김), 타일에 오브젝트 안 겹치게".
 - Priority: takes precedence over defaults

@@ -1,32 +1,28 @@
-# Architecture
+# 구조와 실행 경계
 
-## 스택
-| 항목 | 값 | 근거 |
-|---|---|---|
-| 엔진 | MapleStory Worlds Maker, CoreVersion 26.7.0.0 | Environment/config:1 |
-| 스크립트 | mlua (ExtendedScriptFormat) | Global/WorldConfig.config:21 |
-| 소스 언어 | ko | Global/WorldConfig.config:20 |
-| 월드 | 개인 월드 (worldId c7127d5fb5e64537bf0520c1418932e4) | maker_get_world_info 측정 |
-| MCP | msw-maker-mcp(로컬 Maker 제어), msw-mcp(원격: mlua 문서/API, 월드 아이템·배지, 리소스 스토리지) | .mcp.json |
+## 현재 구성
 
-## 디렉터리 레이아웃
-- `map/map01.map` — 유일한 맵. 엔티티: `/maps/map01` (MapComponent + FootholdComponent), Background, MapleMapLayer, TileMap(타일 비어 있음). (측정: map/map01.map:15-168)
-- `Global/` — 월드 전역 자산:
-  - `WorldConfig.config` — 월드 설정(권한 체크 활성: PlayerEntityAuthorityCheck/ServiceAuthorityCheck true)
-  - `common.gamelogic` — 공용 게임로직 루트 엔티티 `/common` (아직 컴포넌트 없음)
-  - `DefaultPlayer.model`, `CustomAvatarAction`/`CustomBodyAction`, `CollisionGroupSet`, `CustomFontGroupSet`
-- `RootDesk/MyDesk.directory` — 사용자 작업 공간 루트. 새 스크립트·모델·UI는 Maker를 통해 이 아래에 생성된다.
-- `Environment/NativeScripts/` — 엔진 제공 `.d.mlua` 선언(Component/Logic/Service/Struct 등 약 600파일). **읽기 전용 API 레퍼런스** — 사용 가능한 컴포넌트·이벤트·서비스 시그니처는 여기서 확인.
+| 위치 | 역할과 근거 |
+|---|---|
+| `map/RtsMap.map` | 현재 맵과 RectTileMap 직렬화 자산 (`map/RtsMap.map:4,18-42,109-164`). 맵 구조는 Maker에서 다룬다. |
+| `Global/` | 월드 설정과 공용 엔티티. `Global/WorldConfig.config:16-21`은 권한 검사와 ExtendedScriptFormat을 켠다. `Global/common.gamelogic:17-32`는 현재 비어 있다. |
+| `RootDesk/MyDesk/` | 게임 코드: `Rts*.mlua` 30개와 대응하는 `.codeblock` 30개. `Logic`은 게임 규칙·UI·테이블을, `Component`는 엔티티 수명주기·상태를 담당한다 (`RtsBootstrapLogic.mlua:2-3`, `RtsUnitComponent.mlua:1-58`). |
+| `Environment/NativeScripts/` | 엔진이 제공하는 `.d.mlua` 선언과 API 서명. 프로젝트 코드가 아니므로 수정하지 않는다. |
+| `tools/`, `assets/`, `docs/` | 오프라인 생성·검산 도구, 게임 자산, 제작·검증 절차. `RtsStageTableLogic.mlua:1-8`은 표의 생성 원본을 `tools/gen-stage-table.py`로 지정한다. |
 
-## 레이어/유닛 경계 (standard: MSW 권장)
-- **Component** — 엔티티에 부착되는 동작 단위. 엔티티 수명주기(OnBeginPlay/OnUpdate 등) 이벤트를 받는다.
-- **Logic** — 엔티티와 무관한 전역 로직/유틸. `_LogicName`으로 어디서든 접근.
-- **EventType** — 커스텀 이벤트 정의. Component/Logic 간 통신은 이벤트 발행·핸들러로.
-- 실행 공간: Server(권한 로직·저장), Client(입력·연출), ServerOnly/ClientOnly 프로퍼티 sync 규칙을 따른다.
+## 시작에서 화면과 전투까지
 
-## 새 도메인(기능) 추가 최소 구조 (standard: MSW 권장)
-1. `RootDesk/MyDesk` 아래에 `<Domain>Component` (엔티티 동작) 및 필요 시 `<Domain>Logic` (전역 규칙) 생성.
-2. 서버 권한 로직은 `@ExecSpace("Server")`, 클라이언트 입력/연출은 `@ExecSpace("Client")`로 분리.
-3. Component ↔ Logic 통신이 느슨해야 하면 EventType 정의 후 이벤트로 연결.
-4. 맵 배치가 필요하면 Maker에서 엔티티에 Component 부착(모델화 권장).
-5. Play Test로 검증(→ docs/testing.md).
+1. `RtsBootstrapLogic`의 입장·퇴장 이벤트가 구역을 배정하고 지형을 준비하고 `RtsCameraAnchorComponent`를 붙이고 스테이지와 프로필 로드를 시작한다 (`RtsBootstrapLogic.mlua:5-38`).
+2. 카메라 앵커의 클라이언트 `OnBeginPlay`가 HUD를 만들고, HUD는 `/ui` 그룹을 채운다 (`RtsCameraAnchorComponent.mlua:10-15,28-54`; `RtsHudLogic.mlua:353-373`).
+3. `RtsStageLogic`의 서버 타이머가 카운트다운과 스테이지를 진행하며 웨이브 또는 보스를 호출한다 (`RtsStageLogic.mlua:103-108,154-164,363-408`).
+4. `RtsWaveLogic`은 몬스터에 `RtsMonsterComponent`와 `RtsTrackWalkerComponent`를 붙인다 (`RtsWaveLogic.mlua:68-111`). `RtsUnitLogic`은 영입 유닛에 `RtsUnitAttackComponent`와 `RtsUnitComponent`를 붙이고 공격 루프를 시작한다 (`RtsUnitLogic.mlua:195-239`).
+5. 화면 입력은 `RtsUnitSelectLogic` 등을 거쳐 서버 요청으로 들어간다. 서버는 `senderUserId`, 판 상태, 구역, 발판, 한도를 다시 확인한다 (`RtsUnitSelectLogic.mlua:459-470`; `RtsUnitLogic.mlua:322-361`).
+
+스크립트 간 호출은 엔진 전역 `_RtsXLogic`을 사용한다. `@Sync` 프로퍼티와 `@ExecSpace`로 서버·클라이언트 경계를 표시한다 (`RtsStageLogic.mlua:9-10,190-199`). 공용 읽기·계산 메서드는 실행 공간 주석 없이 정의된 경우도 있다 (`RtsStageLogic.mlua:103-130`).
+
+## 새 기능을 붙이는 순서
+
+1. 상태가 전역 게임 규칙인지 엔티티별 수명주기인지 결정한다. 전자는 `Rts…Logic`, 후자는 `Rts…Component`의 기존 책임을 확인한다 (`RtsStageLogic.mlua:5-18`; `RtsUnitComponent.mlua:1-58`).
+2. 게임 진입점과 실제 호출 지점을 연결한다. 파일 정의만으로 활성 기능으로 기록하지 않는다. 예를 들어 `RtsBossLogic:OnBossReachedEnd`의 호출은 존재하지만 현재 보스는 `Paused=true`로 생성되어 이동 종료 경로는 일반 플레이에서 닿지 않는다 (`RtsTrackWalkerComponent.mlua:65-67`; `RtsBossLogic.mlua:79-85`).
+3. 클라이언트 입력·연출과 서버 판정·저장을 나누고, 서버 요청에서 사용자 소유권을 검증한다. [코딩 규약](conventions.md)과 [데이터](data-layer.md)를 따른다.
+4. 맵·모델·설정은 Maker 직렬화 자산이므로 Maker에서 연결하고 [Play Test 절차](testing.md)로 확인한다.
