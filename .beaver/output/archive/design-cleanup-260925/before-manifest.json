@@ -1,0 +1,1787 @@
+[
+  {
+    "Path": "assets\\design\\README.md",
+    "Bytes": 169,
+    "SHA256": "A44769C63F89F106D90E7A6242CFFD04E58F6A21210559EBFFF9634F7542739A"
+  },
+  {
+    "Path": "assets\\design\\260925-cartoon-tomb\\basic-cartoon-source.png",
+    "Bytes": 1294482,
+    "SHA256": "03BEE3397D0BD97BE229786FC9152B558BCA6FBF1AE53EBD1B854BE8412273A5"
+  },
+  {
+    "Path": "assets\\design\\260925-cartoon-tomb\\README.md",
+    "Bytes": 772,
+    "SHA256": "31E89F00B1445DA16F63626637074740D0E6A4C0B263B8E3D10358AC485A5372"
+  },
+  {
+    "Path": "assets\\design\\260925-ice-lightning-mage-redesign\\character-master.png",
+    "Bytes": 1908262,
+    "SHA256": "EF4B855F26D8FDF56869DF46604E07CB944F0A15793ABFACCE0F3654F35481C1"
+  },
+  {
+    "Path": "assets\\design\\260925-ice-lightning-mage-redesign\\layout-prompt.txt",
+    "Bytes": 1029,
+    "SHA256": "4AADD39DE349FE74A3E094D57B7A6D71392A178E52FBA836ED0AE7326E162B71"
+  },
+  {
+    "Path": "assets\\design\\260925-ice-lightning-mage-redesign\\prompt.txt",
+    "Bytes": 2622,
+    "SHA256": "2D5EA9F34D182E14F2DA97286172BCD7907E16E5B5CD1C9E429AA89BF6FB1AE7"
+  },
+  {
+    "Path": "assets\\design\\260925-ice-lightning-mage-redesign\\sprite-sheet-layout-rejected.png",
+    "Bytes": 1672275,
+    "SHA256": "CEC3DF143BEFB2CFAE4B0D3D3FDD4B2A9D534EC7C6028189E28787E2795EEA7C"
+  },
+  {
+    "Path": "assets\\design\\260925-ice-lightning-mage-redesign\\sprite-sheet-source.png",
+    "Bytes": 2111594,
+    "SHA256": "0EE1DB6DC99D17C52F322F3E33C6BE3C2DF4606E0A5263934239CE1E1222F09D"
+  },
+  {
+    "Path": "assets\\design\\260925-ice-lightning-mage-redesign\\sprites-prompt.txt",
+    "Bytes": 4351,
+    "SHA256": "50FE0D9106941FED236A2926400380329C23A6B206A5AA8C1ACD1C807A641DBC"
+  },
+  {
+    "Path": "assets\\design\\260925-ice-lightning-mage-redesign\\reference\\maker_call.py",
+    "Bytes": 1455,
+    "SHA256": "92CB28BC84853CA3BC53DA823CCCC493B93F24121F37EDA0E3D62D7DB9A739EC"
+  },
+  {
+    "Path": "assets\\design\\260925-ice-lightning-mage-redesign\\reference\\maker-tools.json",
+    "Bytes": 17286,
+    "SHA256": "7C199B31CB5EE583160DEE0CC587B9174CBE9AE7F78325CE34D5509E0F2BA1A8"
+  },
+  {
+    "Path": "assets\\design\\260925-ice-lightning-mage-redesign\\reference\\original-delays.json",
+    "Bytes": 751,
+    "SHA256": "35108B4BFF8910A9177ECBD3E4D3AAD2DF3C073A769C3D469F0E6506DB777AF4"
+  },
+  {
+    "Path": "assets\\design\\260925-ice-lightning-mage-redesign\\reference\\original-motion-reference.png",
+    "Bytes": 46944,
+    "SHA256": "012FAF25BC84F8261004ECC55D719FB807E52482D73266DCDB783FC0F54BE5F6"
+  },
+  {
+    "Path": "assets\\design\\260925-ice-lightning-mage-redesign\\reference\\stand1-0.json",
+    "Bytes": 94,
+    "SHA256": "BB190602EC2B9C43CA50391758AC963219609A60E31F4B5BD0E23BED5CA5281E"
+  },
+  {
+    "Path": "assets\\design\\260925-ice-lightning-mage-redesign\\reference\\stand1-0.png",
+    "Bytes": 3647,
+    "SHA256": "4F38999B88BC88B08496DDDA8E038D135E4A09A555453BC357CB6EBD87E6FC01"
+  },
+  {
+    "Path": "assets\\design\\260925-ice-lightning-mage-redesign\\reference\\stand1-1.json",
+    "Bytes": 94,
+    "SHA256": "BB190602EC2B9C43CA50391758AC963219609A60E31F4B5BD0E23BED5CA5281E"
+  },
+  {
+    "Path": "assets\\design\\260925-ice-lightning-mage-redesign\\reference\\stand1-1.png",
+    "Bytes": 3644,
+    "SHA256": "C27CF67936D90BE58FDA8A95EFD9014C757A30631AD273BD7CC9B939D7753E4F"
+  },
+  {
+    "Path": "assets\\design\\260925-ice-lightning-mage-redesign\\reference\\stand1-2.json",
+    "Bytes": 94,
+    "SHA256": "BB190602EC2B9C43CA50391758AC963219609A60E31F4B5BD0E23BED5CA5281E"
+  },
+  {
+    "Path": "assets\\design\\260925-ice-lightning-mage-redesign\\reference\\stand1-2.png",
+    "Bytes": 3639,
+    "SHA256": "F4CD22A6A4191022FD7924C87892354245CA5C2ABBB743A75F8C016A0224B1A9"
+  },
+  {
+    "Path": "assets\\design\\260925-ice-lightning-mage-redesign\\reference\\swingO1-0.json",
+    "Bytes": 94,
+    "SHA256": "BB190602EC2B9C43CA50391758AC963219609A60E31F4B5BD0E23BED5CA5281E"
+  },
+  {
+    "Path": "assets\\design\\260925-ice-lightning-mage-redesign\\reference\\swingO1-0.png",
+    "Bytes": 3174,
+    "SHA256": "147B2B27F0E5AB26C90363A6D29AEEB823EA024CD17F490AF434061C1A5D0E38"
+  },
+  {
+    "Path": "assets\\design\\260925-ice-lightning-mage-redesign\\reference\\swingO1-1.json",
+    "Bytes": 94,
+    "SHA256": "BB190602EC2B9C43CA50391758AC963219609A60E31F4B5BD0E23BED5CA5281E"
+  },
+  {
+    "Path": "assets\\design\\260925-ice-lightning-mage-redesign\\reference\\swingO1-1.png",
+    "Bytes": 3326,
+    "SHA256": "3A95099B15F5D3048BCFAFB7625E8AE7622727FECBEB7F6EF4BB5FF678F55C41"
+  },
+  {
+    "Path": "assets\\design\\260925-ice-lightning-mage-redesign\\reference\\swingO1-2.json",
+    "Bytes": 94,
+    "SHA256": "BB190602EC2B9C43CA50391758AC963219609A60E31F4B5BD0E23BED5CA5281E"
+  },
+  {
+    "Path": "assets\\design\\260925-ice-lightning-mage-redesign\\reference\\swingO1-2.png",
+    "Bytes": 3504,
+    "SHA256": "230CCB1FF71402F0DA4803CA35B3CB26E9527F4F692493BEFC4B63133954E36C"
+  },
+  {
+    "Path": "assets\\design\\260925-ice-lightning-mage-redesign\\reference\\swingO3-0.json",
+    "Bytes": 94,
+    "SHA256": "BB190602EC2B9C43CA50391758AC963219609A60E31F4B5BD0E23BED5CA5281E"
+  },
+  {
+    "Path": "assets\\design\\260925-ice-lightning-mage-redesign\\reference\\swingO3-0.png",
+    "Bytes": 3530,
+    "SHA256": "5BEBB2DE3F11BE526D4CBDF024B2339943C5AE88C0603ACB52550FF968ECB23D"
+  },
+  {
+    "Path": "assets\\design\\260925-ice-lightning-mage-redesign\\reference\\swingO3-1.json",
+    "Bytes": 94,
+    "SHA256": "BB190602EC2B9C43CA50391758AC963219609A60E31F4B5BD0E23BED5CA5281E"
+  },
+  {
+    "Path": "assets\\design\\260925-ice-lightning-mage-redesign\\reference\\swingO3-1.png",
+    "Bytes": 3334,
+    "SHA256": "99E8D90587D6FADE395E82ABEA5480BE52F0B8875A2EB78B20E981040541A8CF"
+  },
+  {
+    "Path": "assets\\design\\260925-ice-lightning-mage-redesign\\reference\\swingO3-2.json",
+    "Bytes": 94,
+    "SHA256": "BB190602EC2B9C43CA50391758AC963219609A60E31F4B5BD0E23BED5CA5281E"
+  },
+  {
+    "Path": "assets\\design\\260925-ice-lightning-mage-redesign\\reference\\swingO3-2.png",
+    "Bytes": 3120,
+    "SHA256": "E426280DE6C3480801ACDC2D88CBC36792BCAF0AF35A2BF565B8E19AE074078E"
+  },
+  {
+    "Path": "assets\\design\\260925-ice-lightning-mage-redesign\\reference\\live\\idle-pose-reference.png",
+    "Bytes": 32895,
+    "SHA256": "67294FFA12CF185C10A83C377919E10F1F810C6B68E05B35BDBEFCAAD767AAE5"
+  },
+  {
+    "Path": "assets\\design\\260925-ice-lightning-mage-redesign\\reference\\live\\idle-screen.png",
+    "Bytes": 262264,
+    "SHA256": "7B8F058ED253CC9D9DCF686AD0042907414417E20CD762B77458F6E71060B1E2"
+  },
+  {
+    "Path": "assets\\design\\260925-theme-presets\\ellinia-floor-256.png",
+    "Bytes": 168229,
+    "SHA256": "4C9394D85466E305832A9EE7C88E0A4E8C6B1C61D887F8DAAC72835AB0D046F5"
+  },
+  {
+    "Path": "assets\\design\\260925-theme-presets\\ellinia-floor-source.png",
+    "Bytes": 3020034,
+    "SHA256": "BA81E10010CA4B374A639817A62A0F57E62F656CF2B5D510ADACD72AE0B27E84"
+  },
+  {
+    "Path": "assets\\design\\260925-theme-presets\\ellinia-giant-tree.png",
+    "Bytes": 2787723,
+    "SHA256": "6762E8F1C7244B6A44EDA1888AC5A7DBE081DABC1C40659C4010F2D957597BE7"
+  },
+  {
+    "Path": "assets\\design\\260925-theme-presets\\ellinia-thumb.png",
+    "Bytes": 212814,
+    "SHA256": "2B5C37377BDA438618E55C0BD5880939FE3E1617F7381AAAF23453E2EFEE0810"
+  },
+  {
+    "Path": "assets\\design\\260925-theme-presets\\henesys-thumb.png",
+    "Bytes": 197030,
+    "SHA256": "9952A0B72D1F716F15542B93C2C9A42A25BA41B5A9198CF31352DFE415D264ED"
+  },
+  {
+    "Path": "assets\\design\\260925-theme-presets\\kerning-construction.png",
+    "Bytes": 2600147,
+    "SHA256": "DFC8A1E38EF5CE877E16B8A5ACE3BD72F0E028DAD39B774ED1C06DE768D70A8D"
+  },
+  {
+    "Path": "assets\\design\\260925-theme-presets\\kerning-floor-256.png",
+    "Bytes": 98207,
+    "SHA256": "92C6072D56919E7B4322EB860D7381D142EB166D86D07ED8EB3DFDBFF134FB68"
+  },
+  {
+    "Path": "assets\\design\\260925-theme-presets\\kerning-floor-source.png",
+    "Bytes": 2046581,
+    "SHA256": "CBE3AA7CEF573BB89721F3636C69A57FFC75A2983E5DDB83E597BB2E2216EFEB"
+  },
+  {
+    "Path": "assets\\design\\260925-theme-presets\\kerning-thumb.png",
+    "Bytes": 183781,
+    "SHA256": "9CE4778DC6ECAB2DC68DA401A261962B009B60EAEC95D25D805DF1EACBC958FD"
+  },
+  {
+    "Path": "assets\\design\\260925-theme-presets\\lith-floor-256.png",
+    "Bytes": 103875,
+    "SHA256": "DDDC1CCFC632DE551F66228812F2FD25C57504B82D92DB24A67A6EFC20C8D315"
+  },
+  {
+    "Path": "assets\\design\\260925-theme-presets\\lith-floor-source.png",
+    "Bytes": 2041934,
+    "SHA256": "76903925EACC518EB92F7F7A14545E8D4C81743676AF220380C797DAED4B6FE7"
+  },
+  {
+    "Path": "assets\\design\\260925-theme-presets\\lith-harbor-ship.png",
+    "Bytes": 1906353,
+    "SHA256": "EA4FCE94D03D871E3B302ECD785213E92FED3CA0F496C85ACBFF792D06789DEE"
+  },
+  {
+    "Path": "assets\\design\\260925-theme-presets\\lith-thumb.png",
+    "Bytes": 191899,
+    "SHA256": "E9842A014F837C68FC975A1AF9CD2F1F0925F24DB870BD4FB86509785A30CD94"
+  },
+  {
+    "Path": "assets\\design\\260925-theme-presets\\perion-cliff-village.png",
+    "Bytes": 1899462,
+    "SHA256": "7FD5D9459E65E38894ABF8CF14A7BAD268DD8B7850883EA555B5F2D9AA181964"
+  },
+  {
+    "Path": "assets\\design\\260925-theme-presets\\perion-floor-256.png",
+    "Bytes": 123979,
+    "SHA256": "559CAE20F3C42DE0B3D6E4D6AFDC79C994217AA096818F11376536F9B895688F"
+  },
+  {
+    "Path": "assets\\design\\260925-theme-presets\\perion-floor-source.png",
+    "Bytes": 2468554,
+    "SHA256": "EC0C76B07906FAEED10C2530DFE490E0371005CE3C1BC7C9DF4054780374BCB4"
+  },
+  {
+    "Path": "assets\\design\\260925-theme-presets\\perion-thumb.png",
+    "Bytes": 197277,
+    "SHA256": "B8D6BD9046AF343651BC97D02D3FC1E89370EEE1F215E9AA10B9118BDB939B96"
+  },
+  {
+    "Path": "assets\\design\\260925-theme-scenery\\ellinia-background-1920x1080.png",
+    "Bytes": 3536725,
+    "SHA256": "30B1B486FCD24CD5D71145129D5D857F36BDD7174970883401BD7531C52E9842"
+  },
+  {
+    "Path": "assets\\design\\260925-theme-scenery\\ellinia-scene-source.png",
+    "Bytes": 2733839,
+    "SHA256": "E2E4E6B011EEFB45A37DE1D14AA2509E44410E5B36F522EEDCFFC799DDC7AB9E"
+  },
+  {
+    "Path": "assets\\design\\260925-theme-scenery\\ellinia-thumb-400x240.png",
+    "Bytes": 224575,
+    "SHA256": "2F6135C19867FBC3A3F9AAD360691323795A3D89E43910FB96861278CF5A247E"
+  },
+  {
+    "Path": "assets\\design\\260925-theme-scenery\\henesys-background-1920x1080.png",
+    "Bytes": 3143796,
+    "SHA256": "89150C6B2DE6DB5BC6CB3107BE431581EC48F55DD03BB2B5A1728B18408EF13B"
+  },
+  {
+    "Path": "assets\\design\\260925-theme-scenery\\henesys-scene-source.png",
+    "Bytes": 2430719,
+    "SHA256": "1018BC0968FC6282A8D96D129E9CA8DB666A78B807DDDE398FBE4BE6692EB4A0"
+  },
+  {
+    "Path": "assets\\design\\260925-theme-scenery\\henesys-thumb-400x240.png",
+    "Bytes": 211022,
+    "SHA256": "13CE81A7DB567BD5410653ECFDC5F07A79816F9E2DE5D72EBBCCCBB32E8F0B88"
+  },
+  {
+    "Path": "assets\\design\\260925-theme-scenery\\kerning-background-1920x1080.png",
+    "Bytes": 2803437,
+    "SHA256": "90B3D81C7A22BF8F1AFED28A794139CC75162B73AEAFB8EDFDD341239159F5B1"
+  },
+  {
+    "Path": "assets\\design\\260925-theme-scenery\\kerning-scene-source.png",
+    "Bytes": 2169299,
+    "SHA256": "8AEFD70EF43792AF45DB4BE1C6DD3A5B44E4F81BB465AE47365EFD30522CCDBA"
+  },
+  {
+    "Path": "assets\\design\\260925-theme-scenery\\kerning-thumb-400x240.png",
+    "Bytes": 184140,
+    "SHA256": "6D400859EA6921C95CE082BB69933104A47FEDF02009BC3FD7A556E2CE4228EB"
+  },
+  {
+    "Path": "assets\\design\\260925-theme-scenery\\lith-background-1920x1080.png",
+    "Bytes": 3078875,
+    "SHA256": "F4FF36DCE3B373AA1E1C28660892F6E16C07E7864C94181263CAB39025A347B7"
+  },
+  {
+    "Path": "assets\\design\\260925-theme-scenery\\lith-scene-source.png",
+    "Bytes": 2373591,
+    "SHA256": "557AF4E2A612B4A2ED93F8F915C55369E38E2FFBBC2D33D6DDBAA95F3C8CDE2D"
+  },
+  {
+    "Path": "assets\\design\\260925-theme-scenery\\lith-thumb-400x240.png",
+    "Bytes": 200062,
+    "SHA256": "1EED0540A9EE25A2897305F2E450D8DF2E1B13BF38545A213C5733B16B3F0B60"
+  },
+  {
+    "Path": "assets\\design\\260925-theme-scenery\\perion-background-1920x1080.png",
+    "Bytes": 2860291,
+    "SHA256": "E626E6E8D72F93FEA0A7BAB9C2CC2B075D46648EAD31CF152B07CE04CBC19463"
+  },
+  {
+    "Path": "assets\\design\\260925-theme-scenery\\perion-scene-source.png",
+    "Bytes": 2236487,
+    "SHA256": "3E8B79313E6CC9B8366387C6E8BD33D8A03EFF36BB1746DD155768CA74E2FE73"
+  },
+  {
+    "Path": "assets\\design\\260925-theme-scenery\\perion-thumb-400x240.png",
+    "Bytes": 191127,
+    "SHA256": "3017F601722AB8F2360B74A82038571AE7457DE63DB502E24F5447DFF2C7DFC6"
+  },
+  {
+    "Path": "assets\\design\\260925-theme-tracks\\track-v2-ellinia.png",
+    "Bytes": 466059,
+    "SHA256": "1FA8933BFF3E40393033A493BC0506D56732B05A691C6D8CBBD836CBA8A94D28"
+  },
+  {
+    "Path": "assets\\design\\260925-theme-tracks\\track-v2-henesys.png",
+    "Bytes": 100106,
+    "SHA256": "96C7193FAA6DBD1DB12B752CAFC3E92A310557E4EFAF5F367994D4D48630E84A"
+  },
+  {
+    "Path": "assets\\design\\260925-theme-tracks\\track-v2-kerning.png",
+    "Bytes": 78162,
+    "SHA256": "A18C87951C318107478A346A43B8693154A5B70101C719795EAB0744C4442CAE"
+  },
+  {
+    "Path": "assets\\design\\260925-theme-tracks\\track-v2-lith.png",
+    "Bytes": 198714,
+    "SHA256": "DC9A92B259417AB098EDC7105CA23A1578E513CED6C24EBD7D88C687D63AFD0C"
+  },
+  {
+    "Path": "assets\\design\\260925-theme-tracks\\track-v2-perion.png",
+    "Bytes": 63285,
+    "SHA256": "274833294B161EA236288B3264A6F96CAEA6BED5E86F1B14465FC69CC764D234"
+  },
+  {
+    "Path": "assets\\design\\260925-theme-tracks\\track-v3-ellinia.png",
+    "Bytes": 467022,
+    "SHA256": "325B1FFEDE2C5AC1F1FF5632AD879286A8E4B3424746F75AD932145ABB95F948"
+  },
+  {
+    "Path": "assets\\design\\260925-theme-tracks\\track-v3-henesys.png",
+    "Bytes": 99362,
+    "SHA256": "8332406EE5A9103705D62F7F101B3AF7CD5D72D8E0DB980864F897733E5FB0FB"
+  },
+  {
+    "Path": "assets\\design\\260925-theme-tracks\\track-v3-kerning.png",
+    "Bytes": 77241,
+    "SHA256": "D08950544DB53368A25F2EBE36D62240B4BC35A98646828C3229EA9C1B21F226"
+  },
+  {
+    "Path": "assets\\design\\260925-theme-tracks\\track-v3-lith.png",
+    "Bytes": 198450,
+    "SHA256": "465D70BF4EB26D5458CEDFE3828C8B20148F1CD370DF480775C2624D54287A25"
+  },
+  {
+    "Path": "assets\\design\\260925-theme-tracks\\track-v3-perion.png",
+    "Bytes": 62568,
+    "SHA256": "0D46100A2EEE9827AFE441BDFA210F5E1C76A0F7B6A520B9013510A2E125BA9B"
+  },
+  {
+    "Path": "assets\\design\\260925-world-thumbnail\\prompt-v2.md",
+    "Bytes": 3277,
+    "SHA256": "2EB37C714FC8727812906209C01E57248396160DFAA7A017E3D73E8040E95B36"
+  },
+  {
+    "Path": "assets\\design\\260925-world-thumbnail\\prompt-v3.md",
+    "Bytes": 3749,
+    "SHA256": "75EF8C1A528D68748B16C0803E9B0307F7AC97CA550FF523F42C185C6E0054FF"
+  },
+  {
+    "Path": "assets\\design\\260925-world-thumbnail\\prompt-v4.md",
+    "Bytes": 4703,
+    "SHA256": "8BFBFF33DFBE9C1BB9FECDD001EE7B4E1EE678C1654F2C9DB5399659D44E7B6C"
+  },
+  {
+    "Path": "assets\\design\\260925-world-thumbnail\\prompt-v5.md",
+    "Bytes": 4230,
+    "SHA256": "1FD108C94D61145B9074C0684544EC9AA6E45B3CAD14239352A04CA76EC32D04"
+  },
+  {
+    "Path": "assets\\design\\260925-world-thumbnail\\prompt-v6.md",
+    "Bytes": 3787,
+    "SHA256": "4D91300CC52116513A4B25D8DA6EB794D96535D5E69C8CDEDAD2E507713CA745"
+  },
+  {
+    "Path": "assets\\design\\260925-world-thumbnail\\prompt.md",
+    "Bytes": 2920,
+    "SHA256": "E99CE0CB26836C03C4B98AC58193145A255A78A9BB0F3E9AA9E70B43BBC8F04D"
+  },
+  {
+    "Path": "assets\\design\\260925-world-thumbnail\\thumbnail-16x9-astra-v1.png",
+    "Bytes": 2580656,
+    "SHA256": "F05F287EBA1B0FAD9FED5E1B0EC65BC4AF782CA3B52F3C8F7CF8A40FD8567E39"
+  },
+  {
+    "Path": "assets\\design\\260925-world-thumbnail\\thumbnail-16x9-astra-v2-classic.png",
+    "Bytes": 2529555,
+    "SHA256": "C1F52737D40E7FE4C5C559DDF7AEE4EE3400A2E1C85B10DAED0402E6FDC27E08"
+  },
+  {
+    "Path": "assets\\design\\260925-world-thumbnail\\thumbnail-16x9-astra-v3-ingame.png",
+    "Bytes": 2754026,
+    "SHA256": "F6E165E1FC5909FB94C0EF9766901FC58C0FAC82CB34B5483170BB77389BB7F6"
+  },
+  {
+    "Path": "assets\\design\\260925-world-thumbnail\\thumbnail-16x9-astra-v4-henesys-defense.png",
+    "Bytes": 2639927,
+    "SHA256": "1AE7CE3C9ACA0FE359CDAB2A92A9616850C016CA4E997B297EEDEB6260E73216"
+  },
+  {
+    "Path": "assets\\design\\260925-world-thumbnail\\thumbnail-16x9-astra-v5-awakening.png",
+    "Bytes": 2730133,
+    "SHA256": "31D1C88A169E6065AE9945AE070A678F6F1E1F8E96B35EAF4CAD5F2E414A07AF"
+  },
+  {
+    "Path": "assets\\design\\260925-world-thumbnail\\thumbnail-16x9-astra-v6-monster-defense.png",
+    "Bytes": 2197039,
+    "SHA256": "768A0A862E0108D2F617779D2C5AA470077C84DAC9D395A07516326326643540"
+  },
+  {
+    "Path": "assets\\design\\characters\\ice-lightning-mage\\animation.json",
+    "Bytes": 1098,
+    "SHA256": "96A83F1A0D6FB0869E4AE7F27CE2987D910D8C63E49474BC1AB9A56353C3D281"
+  },
+  {
+    "Path": "assets\\design\\characters\\ice-lightning-mage\\build.py",
+    "Bytes": 5161,
+    "SHA256": "A7F22B035659CD471CF399AB33752CBAA87F5F681CE8A68B0E4080480BFF4F38"
+  },
+  {
+    "Path": "assets\\design\\characters\\ice-lightning-mage\\game-scale-preview.png",
+    "Bytes": 29506,
+    "SHA256": "0A17605CC962FD3128AB5003D6F896751D50A2E1E47339527014466F3CB98F6D"
+  },
+  {
+    "Path": "assets\\design\\characters\\ice-lightning-mage\\pose-preview.png",
+    "Bytes": 331209,
+    "SHA256": "D37AB4C912A739D79DB9628A89F1AE987336FBDDF5CD81205B53420DB74AA5B2"
+  },
+  {
+    "Path": "assets\\design\\characters\\ice-lightning-mage\\preview-stand1.gif",
+    "Bytes": 95582,
+    "SHA256": "90B45AA14A6E6CCFCBCDD746EBE0E17F29ACB57EFCA225A8B1127DD0E2507FFA"
+  },
+  {
+    "Path": "assets\\design\\characters\\ice-lightning-mage\\preview-swingO1.gif",
+    "Bytes": 72156,
+    "SHA256": "7706D8E12723E17A303538F50A33FDFB01B8444549A843C26372E5808BF914F5"
+  },
+  {
+    "Path": "assets\\design\\characters\\ice-lightning-mage\\README.md",
+    "Bytes": 3151,
+    "SHA256": "C9AC5847BCAE086687042C25432FB3DC75A4729F009DB9A04095A3D42208204D"
+  },
+  {
+    "Path": "assets\\design\\characters\\ice-lightning-mage\\frames\\stand1\\00.png",
+    "Bytes": 204519,
+    "SHA256": "68345F8692B915DFEFE09AED90EA6A61059E09BF88FD18AD6E5B70E3696D80CD"
+  },
+  {
+    "Path": "assets\\design\\characters\\ice-lightning-mage\\frames\\stand1\\01.png",
+    "Bytes": 204519,
+    "SHA256": "E2D3AA81400BAE1581220BA0DC7246C01AB0E9E8319900DDF8C268B9C7502770"
+  },
+  {
+    "Path": "assets\\design\\characters\\ice-lightning-mage\\frames\\stand1\\02.png",
+    "Bytes": 204516,
+    "SHA256": "BF09DC3897FDAAC5EEEBF83A400C0037B87FB22F46FF6677C672020D083C6494"
+  },
+  {
+    "Path": "assets\\design\\characters\\ice-lightning-mage\\frames\\swingO1\\00.png",
+    "Bytes": 207362,
+    "SHA256": "CE3BF2FB59E5637E899E2AD190181ACB7058D9882B98DDFFADE4962A2E07A0D2"
+  },
+  {
+    "Path": "assets\\design\\characters\\ice-lightning-mage\\frames\\swingO1\\01.png",
+    "Bytes": 209171,
+    "SHA256": "053BD8A4946CAA294D3FBB466B1C4379D242FD03485690BB8A8929243DB78705"
+  },
+  {
+    "Path": "assets\\design\\characters\\ice-lightning-mage\\frames\\swingO1\\02.png",
+    "Bytes": 242659,
+    "SHA256": "E5B982653D5A55682DA62CB24C8DB3A370C54F174DFFD21B90FBBC6020299F7D"
+  },
+  {
+    "Path": "assets\\design\\characters\\ice-lightning-mage\\source\\stand1.png",
+    "Bytes": 940209,
+    "SHA256": "282D30994B3A23F233A15CB3AD542CF6083870CE0DFCDADB94656173B301DCA1"
+  },
+  {
+    "Path": "assets\\design\\characters\\ice-lightning-mage\\source\\swingO1-0.png",
+    "Bytes": 959426,
+    "SHA256": "13ED30BFBE2E5A3A8EDAB93B09E71279BFC1AA5918DD7DC5E85B0343F141B1A6"
+  },
+  {
+    "Path": "assets\\design\\characters\\ice-lightning-mage\\source\\swingO1-1.png",
+    "Bytes": 982807,
+    "SHA256": "9BF1C309D9A1B0ECCEDAC3176D8E6EBE600BC2D24CFFCBB9ED3514FD91173452"
+  },
+  {
+    "Path": "assets\\design\\characters\\ice-lightning-mage\\source\\swingO1-2.png",
+    "Bytes": 1136598,
+    "SHA256": "1EA0CAEF7022E05166E971679921DE925164F14CA0559129A949104A6EDBBF2F"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\build.py",
+    "Bytes": 5787,
+    "SHA256": "2BA5CDAE57AFD31E19CB7D46E62E30B60C0ED35C9884E264C1CD2B203F20529A"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\contact-sheet-boss.jpg",
+    "Bytes": 133995,
+    "SHA256": "7AD72B81AAB17860ED9CC11E5742B0C381EA258BAAEA713685F57B2BC221CD51"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\contact-sheet-monster.jpg",
+    "Bytes": 1021298,
+    "SHA256": "522FDDA7CDAED1953F00A6BE5AEDEF7B27B4E725DE79B57385F2D5FB2F746B3A"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\manifest.json",
+    "Bytes": 114024,
+    "SHA256": "360DBFF90AD8B4074877E96A1190ECA08E29BD8E4835E2A717F5483AAA229D0D"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\README.md",
+    "Bytes": 1945,
+    "SHA256": "31F4095AF98F9F98118AB0F156E9605765A39CA4E5DB5E8C13D34B6D01CE7553"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\source-manifest.json",
+    "Bytes": 64564,
+    "SHA256": "4A166CD67ECA9D591E94A1EEA4A5139953ABAFF31B9F76EE2D76769EB2802994"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\boss\\B01.png",
+    "Bytes": 7756,
+    "SHA256": "0EF648F865FE2D7FEE6D1D6BF8DF4823F3F4BED5ABFCEEC371FB3464E18502A7"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\boss\\B02.png",
+    "Bytes": 77145,
+    "SHA256": "6A441BCE4C8A71D602E08F4AFA97565F1F703A2F87768F2F31926FF81F6F5ACE"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\boss\\B03.png",
+    "Bytes": 41413,
+    "SHA256": "CDB21F08CE3211280EF0D9815AC34144F51614174C5C8BC48EDD924F91A95B77"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\boss\\B04.png",
+    "Bytes": 36907,
+    "SHA256": "37F0985A777AA1D7B53788E8E31CA64F6DC9DE6082120E60362E5FEF39C22062"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\boss\\B05.png",
+    "Bytes": 3841,
+    "SHA256": "3DE3C1FB56EF40E33029261AD0F864F6051664B10D05E3569E81B0EAF21C07C7"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\boss\\B06.png",
+    "Bytes": 25766,
+    "SHA256": "C0077FA896F27ECD9F40D703D962988C1E7EE40B62895B447BE52EBC2D3F5FBC"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\boss\\B07.png",
+    "Bytes": 9137,
+    "SHA256": "AD842B9FE29D13A1A6BA501A3C6388091ACF5CD94776FD6E7EAC59AEC46AC3E8"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\boss\\B08.png",
+    "Bytes": 30092,
+    "SHA256": "6406F330D0CDDF1328431D296C029D9E52E120CFCC8334EA40D4A75FB6A43714"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\boss\\B09.png",
+    "Bytes": 83517,
+    "SHA256": "F1B582ADD6068592B60DD52AF8FC760028784205134A7200FD18C8FAF3F5C93C"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\boss\\B10.png",
+    "Bytes": 62263,
+    "SHA256": "08F8FC2955C23E339E743D5832A6ED2849E639F06416E1515EA720BD23647E89"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\boss\\B11.png",
+    "Bytes": 33213,
+    "SHA256": "F70CAA80E281D384CB39D716D6673C0586D51016242B77B790836953B204378B"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\boss\\B12.png",
+    "Bytes": 65253,
+    "SHA256": "EC62CB0CD2DF009B9AE3F4AAC6DDB2EA4159B181976988A1D0AF1310CD0D2380"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\boss\\B13.png",
+    "Bytes": 51716,
+    "SHA256": "DFFD17971EDB8C517B52C2A0B6D69A7261750E06171998CE9BF506FAE37C74AD"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\boss\\B14.png",
+    "Bytes": 40320,
+    "SHA256": "CC1F68E3424E950E688B0F2F44DBB590291645E2CB56A0C8B10971E7913F92E8"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\boss\\B15.png",
+    "Bytes": 36172,
+    "SHA256": "99974E4BD3F3CF41570BB30B3C17EC2E5CDA560B7D688107A1D464ED7F518046"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\boss\\B16.png",
+    "Bytes": 54953,
+    "SHA256": "77634387155E97FFFFC2E6990FDDB8319637408E7E65BE7273DBAB3EE00A4B12"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\boss\\B17.png",
+    "Bytes": 53165,
+    "SHA256": "B68269337C970E7EB8FE241D40DBFD50153FD1D42FEE934253A2010CE60E2EEB"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\boss\\B18.png",
+    "Bytes": 64505,
+    "SHA256": "AE922BD3504818B7C7B148FF46C3A40A5049B6E057C7589D7D86C37438B048F7"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M001.png",
+    "Bytes": 2022,
+    "SHA256": "56D911C1380D850FBA0F3FE9670B8CDC9816C272D5F5CA16CEDB1F8FEE088F1F"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M002.png",
+    "Bytes": 2125,
+    "SHA256": "CE168FE92E69ABA981238FD7394F3A17D56BCADAAE935CE7A8C0FA9CC8319A48"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M003.png",
+    "Bytes": 2152,
+    "SHA256": "49916BE9EF32381446BF9E2DAD8528CE5D16FFAE451FA68A129AE3591ECF94BA"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M004.png",
+    "Bytes": 1942,
+    "SHA256": "3E0889D40EC75257EF40F7278C262D6DC3E53F6A4C28999756412E30B592A38A"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M005.png",
+    "Bytes": 2985,
+    "SHA256": "C6C6F54BCBF7BEBC75F662A3981EDFF0D7A96AF86C0BF1EC92DCF70B723BC5C6"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M006.png",
+    "Bytes": 3279,
+    "SHA256": "89511399E2B2621B9E2F15302244ED03C44FE588EE7CD70C4CB6B1BD7A7D94E4"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M007.png",
+    "Bytes": 2744,
+    "SHA256": "1F766ED89435800658A2C539AD048249FEF94D081018D669BC355753B34FFB60"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M008.png",
+    "Bytes": 5041,
+    "SHA256": "57D17991943937735580829EE58653A2C1408A1DC5CD45356A664504ED5D238F"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M009.png",
+    "Bytes": 3888,
+    "SHA256": "6DA636E6DBD8AC757E35605889BE07F17CA6B6F313AC40123FD8E27FE0CD8F26"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M010.png",
+    "Bytes": 3171,
+    "SHA256": "BA82B4DDDFBD6D6AB8005D3643AA20B1365D4A3FED1FC344DF75459893172730"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M011.png",
+    "Bytes": 3920,
+    "SHA256": "AF2D1E593D6D914E2F6DC90C9BFEB89C025A59E949689C6F9EDB58A92ED9248C"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M012.png",
+    "Bytes": 3077,
+    "SHA256": "504C0DB3CAFC36886D019CCCA0C9F8CE42855D3CD59A6B6FA5BE053156EC18F1"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M013.png",
+    "Bytes": 3071,
+    "SHA256": "C4950BA9C8C01C0B01757DB3123080FBF2A123382790DD1B21574B015AFAC149"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M014.png",
+    "Bytes": 4950,
+    "SHA256": "1AA3D4B1D39B404F96AA57BF8580F5246D11D3F3E088E2A2AEF854FCAF4D7D00"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M015.png",
+    "Bytes": 5295,
+    "SHA256": "7A557802B116CA223ABA84C6517F1E5ED3B9ADD986CCC0252C26D2E2A7CC701E"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M016.png",
+    "Bytes": 5413,
+    "SHA256": "F331702BCE9A4447D08D2F8A0231A2A29B47A7AC9E9C68D43BDAEF88BE16E78D"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M017.png",
+    "Bytes": 4972,
+    "SHA256": "9F5611F38D02DB0441F242AD83B963E2D763F581110C69B3440C3B70FCD66300"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M018.png",
+    "Bytes": 8444,
+    "SHA256": "3D99B17F2BD571E67DAE331042841E68711FAA43F3836F8F37A29BC3CE81D745"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M019.png",
+    "Bytes": 8033,
+    "SHA256": "B2D72B0235DD04E23EBF7A4654460AA88D7771D07E17651CB3F6CD101F43F3BC"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M020.png",
+    "Bytes": 3659,
+    "SHA256": "2F897240478286F1FB183BD2162DB5F6FA63733A7E375A46E7989E50E782BF99"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M021.png",
+    "Bytes": 5726,
+    "SHA256": "552522CCC54729D84B57FA925429F9699A7C9202FDD24D1EAA74FDD35CC16B07"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M022.png",
+    "Bytes": 2532,
+    "SHA256": "2ADCB921DC6E89B163A594881FE39FD51CBA8B8024D117C850E4EAB7CCBF8DC8"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M023.png",
+    "Bytes": 2547,
+    "SHA256": "464A0A54B2B12E2F306CC1AED23B415AB446A4AEF953A928FD74A0A95791A28E"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M024.png",
+    "Bytes": 3688,
+    "SHA256": "C096CA4F6CDEC03A47E4F765182BF67F1291711594428C5FA201E7CDA0371A6E"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M025.png",
+    "Bytes": 5452,
+    "SHA256": "A58E7096A5FEE4DC67DFDD903A943B460DF1E03817092C8895D3F1C5C5AC4FAA"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M026.png",
+    "Bytes": 5637,
+    "SHA256": "CBF1C98CDFAEC9B6BC40BC26123FB0CB5AF9804E6292C62B6DB2167D2473491F"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M027.png",
+    "Bytes": 4601,
+    "SHA256": "FC539545B33C383199834A4BBFAC0351A944FE76443BB19633666BFF2A612E84"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M028.png",
+    "Bytes": 3923,
+    "SHA256": "D45B1C26BD0A3366F92FD3A0CE365C0EBD07E1FC7841270C1337014718FB0D0F"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M029.png",
+    "Bytes": 4708,
+    "SHA256": "E18FABC69542400824F07DF08335998D99BA6E53A9D9C4279AF8ADCFA9D56606"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M030.png",
+    "Bytes": 2311,
+    "SHA256": "744B2BEB6B1F8AF52D408294FDD25A5C6E6EF0F39B7588BFE76A70AEB9A5A9AF"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M031.png",
+    "Bytes": 2312,
+    "SHA256": "4EA0B642A8D92808E5FC15666414043AC6A7AD5F246B3FC78709525405DCF66E"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M032.png",
+    "Bytes": 2269,
+    "SHA256": "78B390C02F0418DF8F1B525D69D07293B3D07FFC9FAE31A5AF0BA92D3C173F77"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M033.png",
+    "Bytes": 3320,
+    "SHA256": "4EFE685B7C3F83D5669FE9AF3372AE52378D31033CCCF8A3191413ED03B3EE52"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M034.png",
+    "Bytes": 3363,
+    "SHA256": "B451AA6F61EB190AE39AC07289BF4047BE4D11C3BE3A8E0C55FC41DBD073429D"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M035.png",
+    "Bytes": 3215,
+    "SHA256": "1F66561ACB15386C238F111B00BF12F900ADC501F1016A97A78A480CB52ACA6D"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M036.png",
+    "Bytes": 2179,
+    "SHA256": "ACF22A275F10EBC5D1867219B84326EA9C046C21217D83C076430158AC22E4DC"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M037.png",
+    "Bytes": 2216,
+    "SHA256": "CA2E7725B0061DF2A020A4432C4CC42FBA29DEAD0AB3AD272C046D563C26F4F9"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M038.png",
+    "Bytes": 2247,
+    "SHA256": "A9979656440408935D3DF64C750757C5A4DF4948A4295E750180740483421EBA"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M039.png",
+    "Bytes": 2662,
+    "SHA256": "A76E16C75916591BE9807864283E06A9FE263573FD26BF6DB19495A1AE8B31D5"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M040.png",
+    "Bytes": 2512,
+    "SHA256": "72ECC47E7A535E711A9197475FBBADC4579425126A867AC141C61FB2CA89D9B6"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M041.png",
+    "Bytes": 1838,
+    "SHA256": "440255D4C31579CF2743772ABDE033030CD41DCAB93CEAF6284BBCB6CFB5EE93"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M042.png",
+    "Bytes": 1323,
+    "SHA256": "F4D5F31526887B2B484D88920219F62C294FC5D3FD7DFACD6A238C1E9A98CF7A"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M043.png",
+    "Bytes": 1841,
+    "SHA256": "C6ACFB3F641F113739ABB60A8019B5B1B63F87D6413D7E337E2595927DEF660A"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M044.png",
+    "Bytes": 1835,
+    "SHA256": "4F226C3CEACB701445A3C46F0FDD78E8C4D2894D82840C15126B90767ADE622A"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M045.png",
+    "Bytes": 1468,
+    "SHA256": "5A024651F39B29DA347BEDAB61BF44B2F737524494BFFC69CDDAE32B56CDF662"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M046.png",
+    "Bytes": 1635,
+    "SHA256": "C59BB120F8BBA804EA47A8899BF7D75E515AEFDF838DC6D1E63E8137C9AC35B4"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M047.png",
+    "Bytes": 1641,
+    "SHA256": "EC9D52F7470F306312CB2324919278229AF7113F45594E0BEF066BFF2A577136"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M048.png",
+    "Bytes": 2672,
+    "SHA256": "726265D575D86EFDE22622AD264F652BD27F964C597407293B6DD05715DDC454"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M049.png",
+    "Bytes": 2777,
+    "SHA256": "D5DB933EEE8E8A4ABF40EEB69C27755CD597258D504F43C323B91CF966A3BB62"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M050.png",
+    "Bytes": 8694,
+    "SHA256": "F81A1B4519E99EBA2E1C90E5A0F544AF1C6478DB164338D164ECD09884507123"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M051.png",
+    "Bytes": 4568,
+    "SHA256": "4FA54E9241058FBB56AA92738BAAF3D3CCB03DA36F9D1C0DCB3B32A35A6CD7AB"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M052.png",
+    "Bytes": 6780,
+    "SHA256": "DB41874AE2A437D8BAADBC3CE5DA559BFEDBEF72EB92244BD63F103B60FE4191"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M053.png",
+    "Bytes": 6706,
+    "SHA256": "CD47112B27FA5E7EF56248E43509B489FBB8A608367DCDAE13DE1E0833F4DB8E"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M054.png",
+    "Bytes": 6857,
+    "SHA256": "F084DA205D47D5ACC44D9C30DB9F64AA0B6E339681CFE573F2AD356F3D1BC488"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M055.png",
+    "Bytes": 6756,
+    "SHA256": "EF7290F69FBEE90152AB7A40E1E08DA21FD8F7DB52F70E935EB459B1FCE8FEDC"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M056.png",
+    "Bytes": 6371,
+    "SHA256": "3FF3AC0657BC1B20FAB767E6406EE11771D7C2304DD4347F9ED4B56E87B7E579"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M057.png",
+    "Bytes": 6279,
+    "SHA256": "F795756B0F9ACAE716EE5F0CBA359B270E10227C81FF8FF5104A391284AE312B"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M058.png",
+    "Bytes": 6322,
+    "SHA256": "E0E490AA56F597B200117EE7E20CB5A85E707712193C88595724A8221C772A20"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M059.png",
+    "Bytes": 1869,
+    "SHA256": "8562256C4A7555D62A1B72E60D7DE5EEA777816D3A4E3744CE20D091D933C3F9"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M060.png",
+    "Bytes": 4760,
+    "SHA256": "5868A238F89A52747EE278F6905C3CA9B7970A721DF6F536176AD7ADB2A0FEF9"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M061.png",
+    "Bytes": 5030,
+    "SHA256": "141F38B1EB6805A05135A08FC66972CC96BCCDABB0618C49B27EAAF967AF74AC"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M062.png",
+    "Bytes": 1967,
+    "SHA256": "2240CBB20D49668DB2BD2F2340DA005DF7BFF7B8D789C43BB59CA39C1912DF00"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M063.png",
+    "Bytes": 7609,
+    "SHA256": "08443D5A3B2F947838929A58F534A597DF345D078BF1238789904947C86E7A85"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M064.png",
+    "Bytes": 3407,
+    "SHA256": "C682DD55929375F699E161DDCE71BFCCC9202EE7E75CDF10FA51E50602C2C7C8"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M065.png",
+    "Bytes": 4543,
+    "SHA256": "422380E0F7BC6A58909DF70DA84AD6CC43283E49C2C0E837CEE3577AECC9BA2D"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M066.png",
+    "Bytes": 4945,
+    "SHA256": "663F62934EB630B37B23D67753D257A26D1A163CB8265694D14452EE74CEFE70"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M067.png",
+    "Bytes": 2825,
+    "SHA256": "677E8DC1CD89826204C7AC6EB031CF78C154A8F6E08D90C35B523204DF42D03F"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M068.png",
+    "Bytes": 4241,
+    "SHA256": "1C105D8B2AEAA7212A3F2B7CF9D9FA13F89CEC7CF6A4D9897E82704BE28CA0C5"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M069.png",
+    "Bytes": 3205,
+    "SHA256": "8F8829C7DBD8000F2DD58A60A58B55920BBFC52355513B8C7AA87495975437CB"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M070.png",
+    "Bytes": 3309,
+    "SHA256": "BA326E949FDA455665750291EF62D5EA8E3644D60050F0C4FEB782AAA9060B04"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M071.png",
+    "Bytes": 2297,
+    "SHA256": "20CCBCC17ACFBA1B7D0C65A3CADB4A9C420A767D380D8CA652DF80941CC94803"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M072.png",
+    "Bytes": 2422,
+    "SHA256": "62F990445E27669B8D0C4FD8DE601715CCCC00742434F2393720D1FEF3A49A05"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M073.png",
+    "Bytes": 3714,
+    "SHA256": "6575768AD0520E0A14142846B5A3175270FFC3B8CEA8CB1EBF1DE4236807B4F3"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M074.png",
+    "Bytes": 3957,
+    "SHA256": "0BA3D4B1E86B431374C7D7ABB2C2FFA217DA189BCDC004C414EBC635AE82E9EC"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M075.png",
+    "Bytes": 3085,
+    "SHA256": "F0E261029B891D457B580FCF431955E818437ABC009E11430A49B59BC5B0EDE4"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M076.png",
+    "Bytes": 3333,
+    "SHA256": "7E07BE2DD52F92A3B8913CA03FBC02FE107BCC65DC4DABE68B1AEE7118F665E6"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M077.png",
+    "Bytes": 3950,
+    "SHA256": "65D4463D754F0B508C283259FE493DF235BC9AF4661CCA8C12AAFF1697259DD5"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M078.png",
+    "Bytes": 3971,
+    "SHA256": "BFCA79B2020FCDD1CB115C6004A81E85E6C6A98E9878712F82F9697DA441689C"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M079.png",
+    "Bytes": 5891,
+    "SHA256": "9D68E3E482C9B33B9B70865E919F273C04308DDAF0F43AD796ADBF755011B18A"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M080.png",
+    "Bytes": 6753,
+    "SHA256": "5BDBE2054AAC0D73F85C54410478C0719488DFA7F6FD101EFAF8058A906BDBA0"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M081.png",
+    "Bytes": 8353,
+    "SHA256": "789558D9E8A274E7ECD30AF34BD801B8B7FE3B20AAF6A1D4E90DEC764CC041B5"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M082.png",
+    "Bytes": 8918,
+    "SHA256": "40993901FDBF3237D5EE838F8ABC40672A5590C0633DFF270CAA6F8D6ED58809"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M083.png",
+    "Bytes": 9838,
+    "SHA256": "02E183A3F106415DAEAC7EBB78434D774C78C9111E7361FED8E75ADF09669688"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M084.png",
+    "Bytes": 10881,
+    "SHA256": "1BBE7ACA808CBC92C2F1B14860A5DB9EBB97382142A533BFE1094F4A8E3F421A"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M085.png",
+    "Bytes": 7255,
+    "SHA256": "97A226D635D1514C66113A141FEF0FF178B922FFAA94B36666804D6EFFAB2638"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M086.png",
+    "Bytes": 7564,
+    "SHA256": "C3302F83BBB6888729DF211F57E34FC5CCB0134AC2EF3D169E7BC5B9290D70A2"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M087.png",
+    "Bytes": 7548,
+    "SHA256": "1765F5EE3F83C0833FA20456DD047BE9E13B6BB824D86A82E438D032843B9042"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M088.png",
+    "Bytes": 5280,
+    "SHA256": "CA4C1064DABFE63F402F457110DB86B30E69487B775B890F70073669D3F20011"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M089.png",
+    "Bytes": 8524,
+    "SHA256": "F9D55AF13A0F8D95FDA102E1F98B0FEC9396E003DF33D053171236F274E188D7"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M090.png",
+    "Bytes": 5633,
+    "SHA256": "3F173A099BFA15F4AF01B2A360086038F5D9D36C605FCC91E1A0DAE7616FE0BA"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M091.png",
+    "Bytes": 5772,
+    "SHA256": "4EAD5B275E0018EA60ED0BC63BABA1B4D49E6CEDDFA4E546D8E04C2392EBC0CB"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M092.png",
+    "Bytes": 4920,
+    "SHA256": "AD1B8AE87EC0D86EA17F7C7278A0786A12D5078D6BDA648CD30F2E6BB37F0810"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M093.png",
+    "Bytes": 7803,
+    "SHA256": "867BB0446108011CBB7F04F7917A5B378644B14CDA8445AE3C960F8D956D9835"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M094.png",
+    "Bytes": 4853,
+    "SHA256": "2BF3B5DD9113FA1026F57C27215B0C002897DFBE3124778CFC70D2997E13B804"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M095.png",
+    "Bytes": 7811,
+    "SHA256": "AD2AB96BAD88D1091B72BECF2FCE3476F380C0874321609C25E7939FA290846C"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M096.png",
+    "Bytes": 4831,
+    "SHA256": "F061C0942D59F699B313136307F511A963655EB6F32BD708DA8C387D4890E08C"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M097.png",
+    "Bytes": 7747,
+    "SHA256": "D1C7207DED5E195A8B2664977A829BDED4DFD9DCD99E9B43F60FE0A43E18B656"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M098.png",
+    "Bytes": 7964,
+    "SHA256": "8492E0B69E6E5F1A2054EF74C7342334F9A75222BFBE47CC12E16513DFF86435"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M099.png",
+    "Bytes": 9387,
+    "SHA256": "C2C6E7AF35CC600E1903DEC6BEFDB7EA26E68291F18ED5E3B86A884DEAB6DE6D"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M100.png",
+    "Bytes": 7487,
+    "SHA256": "984970952EAC4E1134DC410A8593BB189DA715F0ACB51BDF92211BA50B97AC0A"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M101.png",
+    "Bytes": 8424,
+    "SHA256": "1E3ED1E8B876AAFCEE0696690373B64780923B0CE1A4AB06FDE0B0EDBAA33B99"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M102.png",
+    "Bytes": 4783,
+    "SHA256": "1D84AD16706361A7E991069F70AC1D16CE307DF6942E0FBB4C57A5C777DA9A17"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M103.png",
+    "Bytes": 4672,
+    "SHA256": "08CD2EBF49A71A193AA6E680993244F536524024773A8B4D951D9E4994A40BCF"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M104.png",
+    "Bytes": 5299,
+    "SHA256": "BDFE73801DFD728BE7C6358F46C782B475341038E46F37EC6AE9379D6740DAA5"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M105.png",
+    "Bytes": 8904,
+    "SHA256": "A99051B8C15E09BF4770A22DBA2A1B3FC968E45DDF1A70BD0910CC47FB586759"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M106.png",
+    "Bytes": 8795,
+    "SHA256": "EF2181B53EFF8153CC1DB2D9535D9DCE965FC3D16B17FEFDEDF0CB667153220D"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M107.png",
+    "Bytes": 52436,
+    "SHA256": "127AC60E8921B5BC94F5656105B268AB0183FB1F74DB13CB78911619E562C979"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M108.png",
+    "Bytes": 58161,
+    "SHA256": "B5EBBFD39B1C7CE470EAE3C4CFAAB2623EB2E14E841ABDB7E44C8F44BE828FF9"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M109.png",
+    "Bytes": 2672,
+    "SHA256": "7EF3BDA508595F671FE62E463171A53452AAB0924F5EA37142380BA96EC28AEC"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M110.png",
+    "Bytes": 3213,
+    "SHA256": "22B7611AC4D637A8316A990BD73D77676E71E2DEDCFC88CA209A2DD9B23E6CBA"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M111.png",
+    "Bytes": 3169,
+    "SHA256": "801437F017C1BF778C7DB0A9ADC605D5F88DC8BA9FC7F8BF8A84FEA41D043F1C"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M112.png",
+    "Bytes": 3138,
+    "SHA256": "B70DA3D15A6996AB4150B9C357E4D8EA3A20237A9CA5D925A9B8B127B10A72C0"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M113.png",
+    "Bytes": 3404,
+    "SHA256": "A487A6D61D9F66EB472E353046BD389DD2F610B4ED6FDC72717B32E9AC30810D"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M114.png",
+    "Bytes": 3477,
+    "SHA256": "012F4AE430C3D93C8E8EE131A38F0E95BCFEF2837E5806A2612B90EF8526264C"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M115.png",
+    "Bytes": 3813,
+    "SHA256": "7A0476F58F615F9008406E4E73B3B7A10FAD3195D5896F19117E57AF9109CA57"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M116.png",
+    "Bytes": 4651,
+    "SHA256": "EDCC639B491B8972A7BC0EF4A935C592F5854D4442EC9C235E6E7BB1940B88F1"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M117.png",
+    "Bytes": 3726,
+    "SHA256": "06FB264CA313A7B2354B7DC102CB5D336B705ACFAB065D948D516D591502841A"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M118.png",
+    "Bytes": 4441,
+    "SHA256": "34963134ADBF94D8D60C0CD73DDA621D22E1B63A7C2B4563C39F159D8A180AA2"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M119.png",
+    "Bytes": 47973,
+    "SHA256": "FAD61974235398A6772F5E1ACE8ED2A0AEF354A95A24975F37B12486B7900FA2"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M120.png",
+    "Bytes": 5606,
+    "SHA256": "36F86D8602D317D39423CA92E29F316501333B21B3BC901ED6AA0B2DA689D5E1"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M121.png",
+    "Bytes": 3707,
+    "SHA256": "CA592C17BEAFE6447B7AFBD41A2C155FA7EE751DF401588553B0DA8C76678D6F"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M122.png",
+    "Bytes": 13062,
+    "SHA256": "8D3CA799A7D9CE6B6CB0F214353E2B04D5FEB3E465E7BE327162A689B214C488"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M123.png",
+    "Bytes": 13404,
+    "SHA256": "0C97792895398C6DB4B35568CC573441D1BD605347AE8AEF86F3AAF94A7DF67A"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M124.png",
+    "Bytes": 7821,
+    "SHA256": "494071D94BA338F34E197D2CF0EC900F3285E71D02F8ED57592B56E95625A396"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M125.png",
+    "Bytes": 7622,
+    "SHA256": "AA3E774E5BDC31F218EB64F85DDF8497C57B31E769621F0E7AC92B73EB53386F"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M126.png",
+    "Bytes": 6340,
+    "SHA256": "1082427F77EEA034567399BE3D44FD2FC1359E9B1B6CAED789F5FF929B8D9276"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M127.png",
+    "Bytes": 4749,
+    "SHA256": "450C6406BEEEBC0AFEFE64C3BF6CADAC86704561E440A6B4B94C72190A6FD5D0"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M128.png",
+    "Bytes": 4479,
+    "SHA256": "27C25BB8F8359F89EE8CC7B6BF1B629D22F2BFB591EB099F66BBA749175B381E"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M129.png",
+    "Bytes": 3823,
+    "SHA256": "D30DB8379C3B8D49D49ED282423F3AAC76122BA9527DBEEFD4B843C71A9782C1"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M130.png",
+    "Bytes": 4624,
+    "SHA256": "12CB4E4CCDDD20C0376ADC887D25CD0B97796F9D4BBB47F4AEEE4A50A9F13289"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M131.png",
+    "Bytes": 4662,
+    "SHA256": "43DA96C26F994239F3AF9CB6B9161F24B8A7EB3E9B4C84F4906AAA74C61DFBD2"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M132.png",
+    "Bytes": 12172,
+    "SHA256": "1D2B966F59281ECF541A0E788870EE97F9709A1C6B8CE2EFE1938BC88CEE9C6A"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M133.png",
+    "Bytes": 3422,
+    "SHA256": "B2D8B9306007357E1260E70DD1E21CF0D3EF1F2DA973F14584178227CBA10B30"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M134.png",
+    "Bytes": 8048,
+    "SHA256": "43C3A02425FC8E83CB2AC533F63FEE4E7507D5AE0B0BD9556FDD1F19A752A59A"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M135.png",
+    "Bytes": 7626,
+    "SHA256": "5787D9B2991A9CFFAF8598C6813D9C0D65A2ED5FD6D58A85A524BF9C73D27DDA"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M136.png",
+    "Bytes": 7301,
+    "SHA256": "E7B0CBD6B3A08FC877A4AAF41ADD19FC4A8F6F4B20BF186CCAD113DD9111BB94"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M137.png",
+    "Bytes": 8500,
+    "SHA256": "0D1F5179E77AE8788BEB2AE63641D28D30CF0393801CB73A3472BAB2B6E336F9"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M138.png",
+    "Bytes": 28604,
+    "SHA256": "2D973654C8FA6C982E1D237038F9EBEF8221E435EDEDEDBC5BB847C2C77AFD63"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M139.png",
+    "Bytes": 5743,
+    "SHA256": "BC520FC26C532865C53FE801166CC1350EAE79D0D9B235CB324585C7DE24A571"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M140.png",
+    "Bytes": 6921,
+    "SHA256": "2CE207B63D67A00444D8C5DFDA304189A0BA0C322D4F3C9CFFAA4E331128D150"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M141.png",
+    "Bytes": 38813,
+    "SHA256": "0DD01C62155A04156E670BCE22C62E6693BE7E9B027A9A45E85F913B9CF0DD8C"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M142.png",
+    "Bytes": 5675,
+    "SHA256": "A1B0D126DAA43435DD6D27121F1284394B6C2C5AF340C81CE1E87E0EE1ADDB1C"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M143.png",
+    "Bytes": 4709,
+    "SHA256": "DF75FCA4E70E12CEB44D255C48E7D56191757C5FEDEEDCF883C0F7AB923D9E70"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M144.png",
+    "Bytes": 5933,
+    "SHA256": "9EBDDF8FCE46EA7478DE6AC308D57CA1B72E52716FB348437FA4CB27B24E7EC0"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M145.png",
+    "Bytes": 3277,
+    "SHA256": "FB038CC677D0FE72BA6FCD55AF5A06D4120FF2E7A742A34818549BE4BDFBAA8C"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M146.png",
+    "Bytes": 4142,
+    "SHA256": "62A9B7B47ABB586B3B10D0B76911DEB0A36EB3FC5007AF22D9FA1DB247E5A247"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M147.png",
+    "Bytes": 4225,
+    "SHA256": "60BB64604202AB4DB771F6BEE6AFECDDC7B0E8B6191433969F8C4A5CB621C4BF"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M148.png",
+    "Bytes": 4379,
+    "SHA256": "422E25B6032D34877CAEA6D84C9F86CD9BD417C00E2DFF16CCB0D2897F225B4E"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M149.png",
+    "Bytes": 6840,
+    "SHA256": "ECBEEEA3388A5073BAA1CC5C0A6464D165B35D42E0405807F21FF775A02BA0E6"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M150.png",
+    "Bytes": 7598,
+    "SHA256": "2D88EAA4D01F5A97428DE535E042B883B035122388EEEC29F651A73405979DDB"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M151.png",
+    "Bytes": 5075,
+    "SHA256": "8C1754CD1D22AFE187980B07F23139FF9E496CD7E4CCA461959832914BE30751"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M152.png",
+    "Bytes": 4940,
+    "SHA256": "7425946D280518C4F1C42058E57564E865DDD7318B50EA053CDC37723C4559A6"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M153.png",
+    "Bytes": 5174,
+    "SHA256": "2F218AD14CB40D7C63AE23395189957DF0568765947AD4282451F4547949E1F2"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M154.png",
+    "Bytes": 5515,
+    "SHA256": "059E3EAE712FC198C2ACF764128A008B953FA5DDA01F98597A28FAA5E622980E"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M155.png",
+    "Bytes": 6017,
+    "SHA256": "44345674441ABE32945041173871B64D06B81202E11C3CD5F949C1E0B6D6E043"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M156.png",
+    "Bytes": 6779,
+    "SHA256": "5709FCFC312C01789889CD21E44B60A63F9E0BB38131B37373161DDB07EFB38E"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M157.png",
+    "Bytes": 6679,
+    "SHA256": "496C20477A12A43BED7B43F1FD6591B3B9F881F7EF8B1B1A44105D218396D307"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M158.png",
+    "Bytes": 7289,
+    "SHA256": "4ED69879098E57E7387F4E42EF432650E5256EF86CBEC3D36CC44FD2C6129859"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M159.png",
+    "Bytes": 4026,
+    "SHA256": "48C3ABAD3214C936731D296FC6C27E69AC96A59333BCDA4E908AFB04FEE98BCF"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M160.png",
+    "Bytes": 4403,
+    "SHA256": "17987BBC5CFF8670D7A8CA193D49F35CDB360D3170C35283B26421F091452C2A"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M161.png",
+    "Bytes": 4865,
+    "SHA256": "62E3EA69503BBEEB87936F3893082B3A84B6A9929AE9C471CC08BE0983DD4117"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M162.png",
+    "Bytes": 4787,
+    "SHA256": "4442A406D7A30642240AA037864818CBC8B588C7718FE74D5D4C5B675840D299"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M163.png",
+    "Bytes": 4266,
+    "SHA256": "491A2F26CBADB54C28F335ED7D4E038E5159B681D57BCDB9378369AD61C7CC26"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M164.png",
+    "Bytes": 4380,
+    "SHA256": "E83B54E216EF9E4610A5F98C8A415D0D09EA4C30A291B462C7A52BF2C4F840D3"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M165.png",
+    "Bytes": 7959,
+    "SHA256": "8EAF7949551E647FFB99141856755C1A19F031F54E29C267F51B23DBFFF09B85"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M166.png",
+    "Bytes": 8111,
+    "SHA256": "E315B3F17FC1AA99DC1D54BB01D08A5E1840C3AF121752BE41247F4B4F28229B"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M167.png",
+    "Bytes": 10813,
+    "SHA256": "DD8F77FD263FAF82064669562BEC84A8F481421FABEF1F1CB35CE147464D499C"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M168.png",
+    "Bytes": 3212,
+    "SHA256": "FB90E0D16AB5ED62BA0329E3C7403B86C042B74D9B213369FE472F28BAB212A2"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M169.png",
+    "Bytes": 10813,
+    "SHA256": "DD8F77FD263FAF82064669562BEC84A8F481421FABEF1F1CB35CE147464D499C"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M170.png",
+    "Bytes": 10612,
+    "SHA256": "0E20A9C2AD4D1DD8E71F2B0F15DBC65A15557030677C4D75A6D39973DA40BA70"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M171.png",
+    "Bytes": 10630,
+    "SHA256": "0054CA2295ABA3D93511840B7E3201B223E2AF3BADB78898724C21B2050C3524"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M172.png",
+    "Bytes": 8674,
+    "SHA256": "A085015650D829F71962A63D708B53E037F064B4D9D16B2341CC2583EEA97700"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M173.png",
+    "Bytes": 13032,
+    "SHA256": "D84A1A7CC371B23B9C96274DBAFD52F418A7AE967C1906362D12222590404211"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M174.png",
+    "Bytes": 14388,
+    "SHA256": "5F51D14AF8B0E9BD8BB33FA4EF2B475C44D13EBE10917E1FAB9F503E099455D8"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M175.png",
+    "Bytes": 31507,
+    "SHA256": "739853C0DB4F6B4DA0CE9D0E33FC9970903BA50D7ABA4BC39625B7DE9429F6DB"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M176.png",
+    "Bytes": 33048,
+    "SHA256": "ED01F8E62C228F28029BE16DEBBB33CE73333B1E7B385085F353AC5C6CCF299E"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M177.png",
+    "Bytes": 13843,
+    "SHA256": "1911D3B205C859400A3B72F7D1791CC4700F92EC65D8409BFC0995AB2978246C"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M178.png",
+    "Bytes": 8188,
+    "SHA256": "D2FDC1CF5AC269455399A0EBF4C62BC9E369941221540A96DC48C642ED9D64C8"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M179.png",
+    "Bytes": 29446,
+    "SHA256": "40A2438E59585A58E723ECA9447277FBA718B306679939A6D150126A4908D51D"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M180.png",
+    "Bytes": 13454,
+    "SHA256": "16760F7F9F71885F665127879FB6517C589881E4DA30EA965B1FA859CC4DF0B6"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M181.png",
+    "Bytes": 22205,
+    "SHA256": "3C4BAC2EB4CC5778E8BEE0F5D1BB61B706A6B8DE46D3A56F4795C05003D40720"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M182.png",
+    "Bytes": 29661,
+    "SHA256": "02C4FD4620BE3D16DC33D70015741913AE63912B325D44EB35901C3AFF1C9001"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M183.png",
+    "Bytes": 6647,
+    "SHA256": "EF25822D79E218B62BC1AF7386E88A8FCC4BE98BA8B102BBA513736EDDF1C9F1"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M184.png",
+    "Bytes": 7432,
+    "SHA256": "E3B1672A710B50209E12DE6CFEBC6CB83101AFAFF7E1C35595ABA6D056F688A4"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M185.png",
+    "Bytes": 2791,
+    "SHA256": "AC8136F7EBB4B930A80CBEF66A5314C78D9DAEB2CACA4A292DCE416FD4155A92"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M186.png",
+    "Bytes": 5364,
+    "SHA256": "1CA76BF273796F7B898F3C18B0B62EB77E22DB88E660F3BB80FFED565397D39F"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M187.png",
+    "Bytes": 5398,
+    "SHA256": "FEF7CDC002D9956A1226B9F9EFF306F825019F448A144C13696F8C6DF531AD9D"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M188.png",
+    "Bytes": 3498,
+    "SHA256": "4A6D78213FD300069F915C59123899E8FEB20E8148FDE2A4AC2F6993A244CFFA"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M189.png",
+    "Bytes": 3199,
+    "SHA256": "278E7857A66540362C7C3C3F9E21DD66D901814C10C0254CD7D79300A0524141"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M190.png",
+    "Bytes": 63993,
+    "SHA256": "8A9778EB5263442AB0B38DB130EDAF60ED0F5A6991C66F9F894877B33E895E56"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M191.png",
+    "Bytes": 58167,
+    "SHA256": "F90471D1F8AE6EB8B81B194BD037C78FBCD1685DD537F92E7BB2BE19E685C89C"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M192.png",
+    "Bytes": 17654,
+    "SHA256": "69AECA20A7A0C73C4BDEA0608CF65B9DE2920BDB380562CE6BB2902244F58D2F"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M193.png",
+    "Bytes": 77866,
+    "SHA256": "D4581AF0497103CAFFF41440F9EEFCB61EB5CC1027D6B85380C539DCC7DF6055"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M194.png",
+    "Bytes": 15635,
+    "SHA256": "54A85F4274526380D4110910BBEA596E4696744FE97662A86C54B2A90C20630A"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M195.png",
+    "Bytes": 14727,
+    "SHA256": "20BE2C1893FD5BCA9113D426EFD08AC5FADB4C86383B233F172B75E1F736F430"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M196.png",
+    "Bytes": 17221,
+    "SHA256": "6E63756F5F63E3C6161EAE269672B1D318F0A9DBB48433CEB8168BA54958972D"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M197.png",
+    "Bytes": 21155,
+    "SHA256": "CB8BB19232C450BAE0ABF52490B1242C03F35DEDE1802B5E8F792AD5FFF3AC24"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M198.png",
+    "Bytes": 20094,
+    "SHA256": "19E86FB87829E43C9D659BF2C67500BF0074FCA2EF3A8F368DF72B0407B3642A"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M199.png",
+    "Bytes": 20602,
+    "SHA256": "09BD8A8F35403B65D3B5F1D1B7A435247EE6BD8FEE4E3996854D893CF10F4269"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M200.png",
+    "Bytes": 45179,
+    "SHA256": "3BEEC33866EA54130D7007DDFAEA3538970FCDA430FDC5D97F3D3D7FC63A1054"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M201.png",
+    "Bytes": 46997,
+    "SHA256": "251C0684001503D7D3BB5C0BB539DA81FDEF207A2DBF1925F12D1D79DAED42E0"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M202.png",
+    "Bytes": 9224,
+    "SHA256": "F9481355A6EDCF2BEABFB7E928852B51438FF2B94362B901CF8A3E5A31D6A2A8"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M203.png",
+    "Bytes": 8325,
+    "SHA256": "2008E727583EE3F7AAB9A3C2E663316097D40DA401B0BB26CE76A9FB659E6C7E"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M204.png",
+    "Bytes": 15995,
+    "SHA256": "EC389CF6DB75E8327B9C5063D4B77068365D8F4BFBFEB1C1F3F77EDCA0A526B0"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M205.png",
+    "Bytes": 16163,
+    "SHA256": "A5055506F486BB5D7DE68AAC32A5B339377E094F67A14E8E75FEBB3F67ABFE0F"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M206.png",
+    "Bytes": 11024,
+    "SHA256": "2D0A327FA8C7D83A82BF78086CCDE5CAE0A9B2A56FDE6F272DABC460188AD1B8"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M207.png",
+    "Bytes": 12065,
+    "SHA256": "9CA0B3307DC2DA62FFBB43AB2F24AB60565FA1DC238CF41061C283BBE625CC94"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M208.png",
+    "Bytes": 58245,
+    "SHA256": "02DA1AFB401395B8E5B51C86B5F42E5C622B1BD388F5F67177D0433BBF34BDF6"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M209.png",
+    "Bytes": 30048,
+    "SHA256": "C50246832ED8F53DC83DE5AD7FBAC59118230FCC0E740FC83799471776F9C908"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M210.png",
+    "Bytes": 63358,
+    "SHA256": "6DED77E7C18D30ABAA1C563CCE21CC85D13470B5B3FCCE384E60F33CACDCC494"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M211.png",
+    "Bytes": 62559,
+    "SHA256": "AF8AFD60E41537A3B9C11479CC76B73F4E81E4A9F65DD23D4AC0BF9BE5BE8E25"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M212.png",
+    "Bytes": 13638,
+    "SHA256": "B347692435587C44A429B032ED27013D0BB0B79565BD4501C3143C66AA6D94C7"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M213.png",
+    "Bytes": 7062,
+    "SHA256": "A6E192C6D80F86EB03DBF7642C4C34DBD28D6C5B51921C97FBA1EAC4955CAFE4"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M214.png",
+    "Bytes": 64449,
+    "SHA256": "C846EC30507F04BADC4113687535FEC53A9ED31C4419E69090640990974A3D1F"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M215.png",
+    "Bytes": 65683,
+    "SHA256": "F1FDB990A28F70D11E2D9F8512A6E7889D49B3B91F9A48DA9C964D814E16902A"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M216.png",
+    "Bytes": 71827,
+    "SHA256": "87E128ECB2471666CDD3A29BC33B21250B0900B0DC326BBA5B1736FA27B63FF6"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M217.png",
+    "Bytes": 73724,
+    "SHA256": "5CC380BD87F8CCF1305909B48E124C835762BA9BACCCAB7BA71F0ABC9D0D529B"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M218.png",
+    "Bytes": 45891,
+    "SHA256": "A70BFC67F29796781E5A5216095D90814C8241620F21F66A3D99AA2A305B0C83"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M219.png",
+    "Bytes": 44647,
+    "SHA256": "1F9FD14D622F9F8A150D7631A63685E890C74C87339EB43CA577B8DB99E469F5"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M220.png",
+    "Bytes": 18237,
+    "SHA256": "159C36EEC6D4AB6B63B23102546A3DD6D21A115ADA56006225C6C7881CBEBF1B"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M221.png",
+    "Bytes": 15477,
+    "SHA256": "BD78BA693F198A4E07483D78477CBE8CD98F89F47DB91F723E4461CDBDE71081"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M222.png",
+    "Bytes": 16510,
+    "SHA256": "2D5F41D5562CB68AFF9E0156CBCAEACE43E079C47BA4E312E831B444686BF7A9"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M223.png",
+    "Bytes": 14902,
+    "SHA256": "9E11198F66887BBF753508A6727EA96ED2DB8176975D11590079CD4AC77C3B31"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M224.png",
+    "Bytes": 14360,
+    "SHA256": "6394154D2B6935023EC3C06D9BBEB37580E755B5711D27A691A9231688B0C0B2"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M225.png",
+    "Bytes": 57297,
+    "SHA256": "DF25BEC16DD121E0DBC57CC285AFDE13613A0B70F6CCF689290E2466349A7010"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M226.png",
+    "Bytes": 68196,
+    "SHA256": "35C9216CE5F5057D4321D590FA4E525978C2B96A01464FD6E69535AE751C8111"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M227.png",
+    "Bytes": 45182,
+    "SHA256": "9D94406F6607AF645546722B2A25454411051C71AB899B9C4B4A8F57AD3172BF"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M228.png",
+    "Bytes": 51941,
+    "SHA256": "D3DD29E620CD79E10A9F22EB41050B3E6902166F45F17298FEC16E521A7CD306"
+  },
+  {
+    "Path": "assets\\design\\monster-thumbnails\\monster\\M229.png",
+    "Bytes": 51026,
+    "SHA256": "5D5A798044C31AFA9619C20022E88F4102370FCFC01430F780CF157835E98C49"
+  }
+]

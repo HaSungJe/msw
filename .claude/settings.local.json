@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__msw-maker-mcp__maker_get_current_map",
+      "mcp__msw-maker-mcp__maker_get_world_info"
+    ]
+  },
+  "enabledMcpjsonServers": [
+    "msw-maker-mcp",
+    "msw-mcp"
+  ]
+}
