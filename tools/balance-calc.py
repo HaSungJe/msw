@@ -23,7 +23,7 @@ def wmean(w): a, b = WEAPON[w]; return (a + b) / 2
 # ---------------------------------------------------------------- 2026-09-24 티어 재설계(.info/tier.md) — 목표 맞춤 수치(--tune이 다시 계산해 출력)
 #   1티어(히어로·나이트로드·썬콜·보우): 보스 가산 = damage.md ⑤ 스킬 데미지 '보스 공격 시 +m%p'(bossRatio) · 모든 증강(브~골) 효과 ×3 · 50레벨 프리즘 증강 0장 2.5만
 #   2티어(섀도어·팬텀·불독·신궁·다크): 약점 증강만 효과 ×2(프리즘) · 팬텀은 모든 증강 ×1.75(2티어 1등) · 50레벨 프리즘 증강 0장 4만(팬텀 4.4만)
-TUNE = dict(hero_V=45, hero_E=422, nl_F=247, sun_BH=9, bow_W=142.92, bow_A=341, shad_D=82, shad_crit=40, shad_cd=80, phantom_PH=143, fp_TR=314, marks_TS=503, dk_GI=654, shad_RTD=88, bishop_DP=22, sun_BZ=36)
+TUNE = dict(hero_V=45, hero_E=422, nl_F=247, sun_BH=30, sun_BT=180, bow_W=142.92, bow_A=341, shad_D=82, shad_crit=40, shad_cd=80, phantom_PH=143, fp_TR=314, marks_TS=503, dk_GI=654, shad_RTD=88, bishop_DP=22, sun_BZ=36)
 T1_JOBS = ("히어로", "나이트로드", "썬콜", "보우마스터")
 def aug_mul(job, p, stat, n=30):
     """증강 효과 배율(tier.md): 1티어 = 1 + 2 × min(n, 30) ÷ 30(그 1티어가 가진 증강 수 n — 이미 받은 것까지 다 같이, 30개에서 ×3) · 팬텀 ×1.75 전부(2티어 1등) · 나머지 2티어는 약점만 ×2(프리즘이 있을 때)"""
@@ -92,8 +92,11 @@ def kit(job, L, p=False):
         if L >= 50: st["fin"] *= 4 / 3; st["finBoss"] *= 4 / 3       # 인피니티 최종 +33%(보스 최종 +40%는 09-24 삭제 — 1티어 보스 가산은 템페스트)
         sk.append(cl)
         if L >= 30:
-            bz = dict(name="블리자드", ratio=965, hits=1, targets=15, cd=15, after=3.0, mobMul=2.0)
-            if p: bz.update(cd=2, bossHits=TUNE["sun_BH"], ratio=bz["ratio"] + TUNE["sun_BZ"]); st["ign"] += 70   # 템페스트: 쿨 2 · 보스에게 BH회 집중 · 보스 공격 시 +BZ%p(⑤) · 방무 70
+            bz = dict(name="블리자드", ratio=965, hits=1, targets=15, cd=15, after=1.8, mobMul=2.0)   # 후딜 1.8초(2026-09-26 모션 교체 — 전 3.0)
+            if p:   # 템페스트: 쿨 2 · 일반 몬스터 30마리 · 보스에게 BH회 집중(1회 BT% — ⑤ 보스 공격 시 BT − 비율) · 모든 대상 +BZ%p · 방무 70 (2026-09-26 30마리·30회)
+                bz.update(cd=2, targets=30, bossHits=TUNE["sun_BH"], ratio=bz["ratio"] + TUNE["sun_BZ"])
+                bz["bossRatio"] = TUNE["sun_BT"] - bz["ratio"]
+                st["ign"] += 70
             sk.append(bz)
     elif job == "불독":                     # 20 + 5, 보통, 스태프(weapon.md)
         base, per, spd, w = 20, 5, "보통", "스태프"

@@ -338,14 +338,14 @@ script RtsSkillFxLogic extends Logic
 		end
 		-- 대상 위 표식: fx의 markClip/markClips 1벌 + marks = { {clip, clips, delay, life, scale, at, dx, dy, fit, pivotDy, loop, stagger, pattern} … } 추가 벌(블레이드 토네이도 → 카르마 퓨리처럼 시각이 다른 표식 여러 개)
 		local function playMarks(mfx)
-			-- 같은 대상이 여러 번 들어오면(보스 집중 15타) 표식을 가로로 조금씩 흩뿌린다(PlayMark dup)
+			-- 같은 대상이 여러 번 들어오면(보스 집중 30타) 표식을 가로로 조금씩 흩뿌린다(PlayMark dup)
 			local seen = {}
 			for j = 1, #targets do
 				local t = targets[j]
 				if isvalid(t) then
 					seen[t.Name] = (seen[t.Name] or 0) + 1
 					local dup = seen[t.Name]
-					-- markStagger(초): 대상 j마다 (j−1)×markStagger 늦게(블리자드 템페스트 얼음 15개가 차례로 — 서버 hitStagger와 같은 값)
+					-- markStagger(초): 대상 j마다 (j−1)×markStagger 늦게(블리자드 템페스트 얼음 30개가 차례로 — 서버 hitStagger와 같은 값)
 					local md = (mfx.markDelay or 0) + (mfx.markStagger or 0) * (j - 1)
 					if md > 0 then
 						_TimerService:SetTimerOnce(function()
@@ -1116,7 +1116,7 @@ script RtsSkillFxLogic extends Logic
 		end
 		-- 클립 원점이 아래쪽이면 그림 중심이 위로 뜬다 → markPivotDy(스케일 1당 유닛) 만큼 내려 정중앙에 맞춘다
 		cy = cy - (fx.markPivotDy or 0) * s
-		-- 같은 대상 반복 타격(보스 집중 15타): 2번째부터 가로 ±1.2유닛·세로 ±0.3유닛 무작위로 흩뿌려 얼음 15개가 한 점에 겹치지 않게
+		-- 같은 대상 반복 타격(보스 집중 30타): 2번째부터 가로 ±1.2유닛·세로 ±0.3유닛 무작위로 흩뿌려 얼음 30개가 한 점에 겹치지 않게
 		--   markPattern "alternate"(블리자드 템페스트, 2026-09-22 사용자 "좌우 각각 7~8개씩 번갈아 파바박"): 홀수 번째 왼쪽·짝수 번째 오른쪽, 거리는 markAltDists 순환(기본 0.5·1.0·0.75·1.25·0.6·1.1·0.9·1.3),
 		--   세로는 ±0.15 번갈아. 원작 tile 얼음은 오른쪽 위 고리에서 왼쪽 아래로 떨어지므로 오른쪽 자리는 반전해 고리가 보스 위로 모이게
 		local flipMark = false

@@ -1,6 +1,6 @@
 -- Phase 4 합류(2026-09-23, revision-1 §2): 증강 표 — 정의·지급 라운드·굴림·능력치 오버레이. 서버·클라 공용 읽기 전용.
---   원본 = .info/augmentation.md(사용자 확정 — 이름·효과·가중치 [n/100]). 브론즈~골드 = 능력치만(크리 확률·크리 데미지·공격력 +n·공격력 %·보스 공격시 데미지·방어율 무시(2026-09-23 추가), 전부 합연산).
---   프리즘 = 특수 코어 3(모든 직업, 중복 등장 가능·같은 유닛 중복 적용 불가 — 방어구 부수기만 중복 적용 가능) + 팬텀 잠금 해제 + 직업 전용 11(RtsJobTableLogic.GetPrisms의 id와 같다).
+--   원본 = .info/augmentation.md(사용자 확정 — 이름·효과·가중치 [n/100]). 브론즈~골드 = 능력치만(크리 확률·크리 데미지·공격력 +n·공격력 %·보스 공격시 데미지, 전부 합연산 — 방어율 무시 증강은 2026-09-24 삭제).
+--   프리즘 = 특수 코어 2(일격필살·보스 슬레이어 — 모든 직업, 중복 등장 가능·같은 유닛 중복 적용 불가) + 팬텀 잠금 해제 + 직업 전용 10(RtsJobTableLogic.GetPrisms의 id와 같다).
 --   지급: 브~골 = 몬스터 스테이지 태그 표(라운드 시작 때), 프리즘 = 보스 순번(처치 직후). 한 판 30개(브 10·실 10·골 7·프리즘 3 — 자쿰·시그너스·루시드).
 @Logic
 script RtsAugmentTableLogic extends Logic
@@ -234,7 +234,7 @@ script RtsAugmentTableLogic extends Logic
 		self:ApplyToStatMul(st, augs, nil)
 	end
 
-	-- 증강 효과 배율 mul = { crit, critDmg, atk, pct, boss }(RtsJobTableLogic.AugMulFor — 1티어 ×3 · 팬텀 ×1.5 · 2티어 약점 ×2, 2026-09-24 티어 재설계(.info/tier.md · tools/balance-calc.py TUNE)).
+	-- 증강 효과 배율 mul = { crit, critDmg, atk, pct, boss }(RtsJobTableLogic.AugMulFor — 1티어 증강 수에 따라 최대 ×3 · 팬텀 ×1.75 · 2티어 약점 ×2, 2026-09-24 티어 재설계(.info/tier.md · tools/balance-calc.py TUNE)).
 	--   브론즈~골드만 곱한다(특수 코어 = 프리즘 등급은 그대로). nil이면 전부 1
 	method number MulOf(table mul, any d, string key)
 		if mul == nil or d.grade == "prism" or mul[key] == nil then return 1 end
