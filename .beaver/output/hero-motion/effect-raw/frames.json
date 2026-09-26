@@ -1,0 +1,128 @@
+[
+  {
+    "index": 0,
+    "duration": 0.06,
+    "guid": "a585a770b6a84a338ca3df6ede22e599",
+    "width": 1,
+    "height": 1,
+    "ox": 0,
+    "oy": 1
+  },
+  {
+    "index": 1,
+    "duration": 0.06,
+    "guid": "2a7030c031b34a7794944124922f866e",
+    "width": 218,
+    "height": 82,
+    "ox": 27,
+    "oy": 23
+  },
+  {
+    "index": 2,
+    "duration": 0.06,
+    "guid": "2f898cfa3ad7409dbdde2078a4b801a4",
+    "width": 206,
+    "height": 77,
+    "ox": 34,
+    "oy": 22
+  },
+  {
+    "index": 3,
+    "duration": 0.06,
+    "guid": "96a0b502bb9043579fe4cd8a267931eb",
+    "width": 236,
+    "height": 69,
+    "ox": 39,
+    "oy": 17
+  },
+  {
+    "index": 4,
+    "duration": 0.06,
+    "guid": "539cdcfe5d5a448c85f8baf3caeffb89",
+    "width": 230,
+    "height": 225,
+    "ox": 231,
+    "oy": 32
+  },
+  {
+    "index": 5,
+    "duration": 0.06,
+    "guid": "9795f915f1c543bb9fb36f6cfd60a280",
+    "width": 230,
+    "height": 247,
+    "ox": 219,
+    "oy": 21
+  },
+  {
+    "index": 6,
+    "duration": 0.06,
+    "guid": "6f8c8d40a4dd4452a3b73a5a3f10c94a",
+    "width": 215,
+    "height": 242,
+    "ox": 148,
+    "oy": 14
+  },
+  {
+    "index": 7,
+    "duration": 0.06,
+    "guid": "401333f49d25465aa08b4205a7f2a169",
+    "width": 128,
+    "height": 219,
+    "ox": 66,
+    "oy": 15
+  },
+  {
+    "index": 8,
+    "duration": 0.06,
+    "guid": "eef4b656fe1640eeae4de95ad78ca0cb",
+    "width": 300,
+    "height": 204,
+    "ox": 230,
+    "oy": 24
+  },
+  {
+    "index": 9,
+    "duration": 0.06,
+    "guid": "ee34eb8cefdb4c8b8601e09291a9fd67",
+    "width": 337,
+    "height": 123,
+    "ox": 260,
+    "oy": 27
+  },
+  {
+    "index": 10,
+    "duration": 0.06,
+    "guid": "59e480123e60417f8af78202b9750f6d",
+    "width": 338,
+    "height": 95,
+    "ox": 260,
+    "oy": 16
+  },
+  {
+    "index": 11,
+    "duration": 0.06,
+    "guid": "6eaa5c0b81c64d2fa2077a3b6c2b0cbf",
+    "width": 339,
+    "height": 59,
+    "ox": 256,
+    "oy": 5
+  },
+  {
+    "index": 12,
+    "duration": 0.03,
+    "guid": "e2f221ec23be49ec9c641b1f7f875569",
+    "width": 350,
+    "height": 69,
+    "ox": 259,
+    "oy": 7
+  },
+  {
+    "index": 13,
+    "duration": 0.03,
+    "guid": "d81177b816e044538b3c2056781bb6fc",
+    "width": 224,
+    "height": 52,
+    "ox": 254,
+    "oy": 0
+  }
+]

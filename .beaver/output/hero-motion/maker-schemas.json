@@ -1,0 +1,266 @@
+{
+  "jsonrpc": "2.0",
+  "id": 2,
+  "result": {
+    "tools": [
+      {
+        "name": "maker_stop",
+        "description": "Stops the ongoing Maker Play Test and returns the Maker to edit mode. Idempotent: already-stopped or transitioning state returns a success response.",
+        "inputSchema": {
+          "type": "object"
+        }
+      },
+      {
+        "name": "maker_play",
+        "description": "Starts the Maker Play Test from the current edit state. Idempotent: already-playing or transitioning state returns a success response. Returns 'busy' if the Maker is currently transitioning back to edit mode.",
+        "inputSchema": {
+          "type": "object"
+        }
+      },
+      {
+        "name": "maker_refresh_workspace",
+        "description": "Refreshes the Maker local workspace (reimports entries and rebuilds related caches). Only available in edit mode; returns 'unavailable' during Play Test.",
+        "inputSchema": {
+          "type": "object"
+        }
+      },
+      {
+        "name": "maker_logs",
+        "description": "Returns the Maker console logs. Choose 'normal' for runtime/client/server logs shown in the main Console panel, or 'build' for syntax/validation errors shown in the Build Console panel. Response contains: status, kind, count, and a logs array.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "type": "string",
+              "enum": [
+                "normal",
+                "build"
+              ],
+              "description": "Which log bucket to return. 'normal' = runtime/client/server logs shown in the main Console panel; 'build' = syntax/validation errors shown in the Build Console panel."
+            }
+          },
+          "required": [
+            "kind"
+          ]
+        }
+      },
+      {
+        "name": "maker_clear_logs",
+        "description": "Clears only the 'normal' (runtime/client/server) logs in the main Console panel. Build logs (syntax/validation errors) are preserved. Equivalent to the Console panel's 'Remove All' button.",
+        "inputSchema": {
+          "type": "object"
+        }
+      },
+      {
+        "name": "maker_screenshot",
+        "description": "Captures the current Maker screen and saves it as a PNG file under the Maker's screenshot output directory. In edit mode captures the full Maker screen including editor UI. In play mode captures only the play camera's rendering. Response contains: status, mode ('edit' or 'play'), path (absolute file path), width, height, and — in play mode — a resolution object reporting the simulated screen width/height used as the coordinate space for maker_mouse_input.",
+        "inputSchema": {
+          "type": "object"
+        }
+      },
+      {
+        "name": "maker_save",
+        "description": "Saves the current Maker map (equivalent to the File > Save menu action). Only available in edit mode. Returns 'ok' immediately after dispatching the save; the actual save completes asynchronously. May open UI popups if the world name or local workspace path is not set.",
+        "inputSchema": {
+          "type": "object"
+        }
+      },
+      {
+        "name": "maker_get_current_map",
+        "description": "Returns the currently active Maker map's display name and id. Works in both edit and play mode; response includes the current mode. Returns 'unavailable' if the Maker has not yet loaded a map.",
+        "inputSchema": {
+          "type": "object"
+        }
+      },
+      {
+        "name": "maker_move_map",
+        "description": "Switches the Maker editor to a different map in the current workspace by its id, reloading it into the existing scene. Edit mode only — returns 'unavailable' with reason 'play' during Play Test, or 'coop_active' while CoOp is active. Returns 'error' with reason 'id_not_found' if the id is not in the workspace (matching is case-insensitive). Returns 'ok' with note 'already_current' if the requested map is already open. Does NOT auto-save the current map — call maker_save first if there are unsaved edits, otherwise they are discarded on switch. The id parameter is the target map's name within the workspace (the map entity name).",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "description": "The target map's name within the current workspace (the map entity name; matching is case-insensitive)."
+            }
+          },
+          "required": [
+            "id"
+          ]
+        }
+      },
+      {
+        "name": "maker_get_world_info",
+        "description": "Returns identity information for the world currently loaded in the Maker: isGroup, worldId, and groupId when isGroup is true or userId when isGroup is false. Returns 'unavailable' if the world context has not been initialized.",
+        "inputSchema": {
+          "type": "object"
+        }
+      },
+      {
+        "name": "maker_list_maplestory_maps",
+        "description": "Returns the list of MapleStory maps available in the Maker. Each item includes id (9-digit numeric map ID), area (area/region name), and name (human-readable map name). Optional 'search' parameter applies a case-insensitive partial match across all three fields. Omit search to receive the full list. Works in both edit and play mode. Returns 'unavailable' if the Maker workspace or map area dataset is not ready.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "search": {
+              "type": "string",
+              "description": "Optional partial-match filter applied to id, area, and name fields (case-insensitive). Omit or pass empty string to return all maps."
+            }
+          }
+        }
+      },
+      {
+        "name": "maker_get_context_keys",
+        "description": "Returns the list of context keys for every currently running Play Test execution context. Use this before maker_execute_script to discover valid 'context' values. Only available while a Play Test is running; returns 'unavailable' otherwise. Keys follow the form 'client', 'server_main', or 'server_instance_<instanceKey>'. Response contains: status and a keys array.",
+        "inputSchema": {
+          "type": "object"
+        }
+      },
+      {
+        "name": "maker_reset_data_storage",
+        "description": "Deletes the local DataStorage database for the world currently loaded in the Maker, resetting all persisted DataStorage (User/Global) data back to empty. This is destructive and cannot be undone. Edit mode only — returns 'unavailable' with mode 'play' during Play Test, and 'unavailable' if the world context is not initialized. Returns 'error' if the local database files could not be deleted. Response contains: status and worldId.",
+        "inputSchema": {
+          "type": "object"
+        }
+      },
+      {
+        "name": "maker_execute_script",
+        "description": "Runs a Lua snippet in a running Play Test execution context. Returns 'ok' when the script is dispatched to the target context, NOT when it finishes — runtime errors raised inside the script surface only in maker_logs (kind='normal'). Pass an empty 'script' to stop the currently running script. 'context' selects 'client' (default), 'server_main', or 'server_instance_<instanceKey>'. Use maker_get_context_keys to enumerate valid context keys.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "script": {
+              "type": "string",
+              "description": "Lua source to evaluate. Pass an empty string to stop the currently running script in the target context."
+            },
+            "context": {
+              "type": "string",
+              "description": "Target execution context key — one of 'client', 'server_main', or 'server_instance_<instanceKey>'. Defaults to 'client' when omitted. Call maker_get_context_keys first to discover the keys actually running in the current Play Test."
+            }
+          },
+          "required": [
+            "script"
+          ]
+        }
+      },
+      {
+        "name": "maker_import_maplestory_map",
+        "description": "Imports a MapleStory map into the current Maker map by its 9-digit map ID. Waits for the asset load to complete, then returns 'ok'; the actual import continues asynchronously. Edit mode only; returns 'unavailable' if the Maker is in play mode or CoOp is active. Returns 'error' if the id is not found or if asset loading fails. Use maker_list_maplestory_maps to discover valid id values.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "description": "9-digit MapleStory map ID (e.g. '100000000'). Must exist in the MapleStory map table."
+            }
+          },
+          "required": [
+            "id"
+          ]
+        }
+      },
+      {
+        "name": "maker_mouse_input",
+        "description": "Simulates a sequence of mouse actions in Play mode. All actions run in order within a single call, which returns one response when the entire sequence has finished — so a full drag (move → down → move → up) or any other multi-step gesture is a single tool call. Buttons are referenced by name: 'left', 'right', 'middle'. CURSOR MODEL: the tool keeps a single 'cursor position' across the sequence. Only 'move' changes it; click/down/up/wait/scroll always act on the current cursor position. The first cursor-dependent step (click/down/up) must therefore be preceded by a 'move'. ACTIONS: 'move' requires position and duration — duration=0 snaps the cursor instantly without any hold event; duration>0 lets time pass, and if a button is currently down (drag), it also emits hold events while interpolating to the target. 'click' requires button — press + 1 frame + release at the current cursor. 'down' requires button — press only, leaves the touch held. 'up' requires button — release the matching touch. 'wait' requires duration — if a button is currently down it keeps emitting hold events for the duration (keeps the touch alive); otherwise it just sleeps. 'scroll' requires delta — emits a scroll-wheel event to in-game listeners (positive = up/forward, negative = down/backward). 'position' is given in the simulated screen-pixel space (origin at bottom-left) — the same coordinate system maker_screenshot reports its width/height in. Coordinates are automatically rebased onto the active Maker scene rect, so clicks land correctly even when the Maker scene is letterboxed or scaled inside the editor preview. LIMITATIONS: cannot move the OS cursor. Does NOT click engine-managed UI elements (e.g., buttons / input fields routed through the standard event system). Does NOT set the keyboard-side mouse-button flags. Response contains: status ('ok' on completion) and an actions-executed count.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "sequence": {
+              "type": "array",
+              "minItems": 1,
+              "description": "Ordered list of mouse actions executed in a single call. Required fields per action — 'click'/'down'/'up': button. 'move': position, duration. 'wait': duration. 'scroll': delta. Examples: single click → [{move, position, duration:0}, {click, button:'left'}]. Drag → [{move, posA, duration:0}, {down, button:'left'}, {move, posB, duration:500}, {up, button:'left'}]. Held click → [{move, pos, duration:0}, {down, button:'left'}, {wait, duration:500}, {up, button:'left'}].",
+              "items": {
+                "type": "object",
+                "required": [
+                  "action"
+                ],
+                "properties": {
+                  "action": {
+                    "type": "string",
+                    "enum": [
+                      "move",
+                      "click",
+                      "down",
+                      "up",
+                      "wait",
+                      "scroll"
+                    ]
+                  },
+                  "button": {
+                    "type": "string",
+                    "enum": [
+                      "left",
+                      "right",
+                      "middle"
+                    ],
+                    "description": "Required for 'click'/'down'/'up'. Selects which mouse button to act on."
+                  },
+                  "position": {
+                    "type": "object",
+                    "required": [
+                      "x",
+                      "y"
+                    ],
+                    "properties": {
+                      "x": {
+                        "type": "number"
+                      },
+                      "y": {
+                        "type": "number"
+                      }
+                    },
+                    "description": "Required for 'move'. Pixel coordinate in the simulated screen-pixel space (bottom-left origin) — the same width/height range maker_screenshot reports."
+                  },
+                  "duration": {
+                    "type": "integer",
+                    "description": "Required for 'move' and 'wait'. Milliseconds. For 'move': 0 = instant cursor snap; >0 = time to pass (and, if a button is down, drag-interpolate from current cursor to target). For 'wait': time to hold (if pressed) or sleep."
+                  },
+                  "delta": {
+                    "type": "number",
+                    "description": "Required for 'scroll'. Scroll-wheel axis value (positive = up/forward, negative = down/backward)."
+                  }
+                }
+              }
+            }
+          },
+          "required": [
+            "sequence"
+          ]
+        }
+      },
+      {
+        "name": "maker_keyboard_input",
+        "description": "Simulates a keyboard key event for the Maker. The injected key follows the same path as a real keyboard press, so gameplay scripts polling the keyboard observe matching KeyDown / KeyHold / KeyRelease / KeyUp events for the chosen keys. 'keys' is a list of key names that are pressed together; for combos put modifiers first (e.g. ['ctrl', 's'] for Ctrl+S) so the modifier is already held when the primary key fires KeyDown. Keys are pressed in array order and released in reverse order, mirroring how a person performs a chord. action='tap' presses every key, holds for duration_ms (default 50ms ≈ 3 frames at 60fps; values below ~32ms may not be detected), then releases them and returns when the release is finished. action='down' presses without releasing — the keys stay held until a follow-up call with action='up'; useful for continuous movement or building chords across calls. action='up' releases the keys in reverse order. Key names accept any standard Unity KeyCode (e.g. 'A', 'Space', 'F5', 'LeftArrow', 'Keypad7', 'BackQuote') plus common aliases ('shift'→LeftShift, 'ctrl'/'control'→LeftControl, 'alt'→LeftAlt, 'cmd'/'command'→LeftCommand, 'enter'/'return'→Return, 'esc'→Escape, 'del'→Delete, 'up'/'down'/'left'/'right'→arrow keys, '0'-'9'→Alpha0-Alpha9). LIMITATIONS: does NOT type characters into UI text input fields, and does NOT fire Maker editor shortcuts that read raw input directly. Like a real keyboard, input is suppressed (released) while a text field, modal popup, purchase popup, or webview is focused. Response contains: status and the list of normalized key names that were dispatched.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "action": {
+              "type": "string",
+              "enum": [
+                "tap",
+                "down",
+                "up"
+              ],
+              "description": "'tap' = press + wait duration_ms + release (async, returns after release). 'down' = press only, keys stay held until a separate 'up' call. 'up' = release the keys (in reverse order)."
+            },
+            "keys": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "minItems": 1,
+              "description": "List of key names or aliases to press together (e.g. ['Space'] for a single key, ['ctrl', 's'] for Ctrl+S, ['shift', 'ctrl', 'z'] for Shift+Ctrl+Z). Pressed in given order, released in reverse — put modifiers first so they are down before the primary key fires KeyDown. Aliases: 'shift', 'ctrl'/'control', 'alt', 'cmd'/'command', 'enter'/'return', 'esc', 'up'/'down'/'left'/'right' (arrows), '0'-'9' (=Alpha0-Alpha9). Case-insensitive."
+            },
+            "duration_ms": {
+              "type": "integer",
+              "description": "Hold duration in milliseconds. Only used when action='tap'. Defaults to 50ms (~3 frames at 60fps). Recommended minimum 32ms — shorter holds may finish before KeyDown is dispatched."
+            }
+          },
+          "required": [
+            "action",
+            "keys"
+          ]
+        }
+      }
+    ]
+  }
+}

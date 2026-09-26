@@ -1,0 +1,82 @@
+[
+  {
+    "key": "idle",
+    "file": "exec-0cbe09cb-c304-4b2e-94ab-914b71191f05.png",
+    "scale": 0.34,
+    "feet": [
+      618,
+      1215
+    ],
+    "size": 576,
+    "dest": [
+      "frames/wait/motion01.png"
+    ]
+  },
+  {
+    "key": "rb01",
+    "file": "exec-7b9e3acc-4980-4593-9bfd-e43976ae4998.png",
+    "scale": 0.35,
+    "feet": [
+      637,
+      1200
+    ],
+    "size": 704,
+    "dest": [
+      "frames/raging-blow/motion01.png"
+    ]
+  },
+  {
+    "key": "en01",
+    "file": "exec-19fee4dc-bae9-47f0-9d77-0e9953603711.png",
+    "scale": 0.32,
+    "feet": [
+      528,
+      1185
+    ],
+    "size": 704,
+    "dest": [
+      "frames/enraged-raging-blow/motion01.png"
+    ]
+  },
+  {
+    "key": "up",
+    "file": "exec-d9de8bb4-2a61-401a-8669-8b8b928f516b.png",
+    "scale": 0.37,
+    "feet": [
+      629,
+      1214
+    ],
+    "size": 704,
+    "dest": [
+      "frames/enraged-raging-blow/motion02.png"
+    ]
+  },
+  {
+    "key": "down",
+    "file": "exec-32533b6c-e406-406e-bdbd-dbf56750551d.png",
+    "scale": 0.35,
+    "feet": [
+      749,
+      1168
+    ],
+    "size": 704,
+    "dest": [
+      "frames/raging-blow/motion02.png",
+      "frames/enraged-raging-blow/motion03.png"
+    ]
+  },
+  {
+    "key": "thrust",
+    "file": "exec-eacc4a37-af94-426c-932d-71d9e9739f0e.png",
+    "scale": 0.415,
+    "feet": [
+      794,
+      1020
+    ],
+    "size": 704,
+    "dest": [
+      "frames/raging-blow/motion03.png",
+      "frames/enraged-raging-blow/motion04.png"
+    ]
+  }
+]

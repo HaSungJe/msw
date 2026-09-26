@@ -1,0 +1,43 @@
+<!doctype html><html lang="ko"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>히어로 레이징 블로우</title>
+<style>*{box-sizing:border-box}body{margin:0;background:#11191d;color:#f4eee5;font:15px/1.6 system-ui,"Malgun Gothic",sans-serif}main{max-width:1200px;margin:24px auto;padding:0 24px}header{display:flex;gap:18px;align-items:center}header img{width:82px;height:82px;object-fit:contain;background:#29343b;border-radius:18px}h1{font-size:29px;line-height:1.25;margin:4px 0}p{color:#b1b9bd;margin:8px 0}.tag{font-size:12px;color:#edb76b;letter-spacing:2px}.tools{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:20px 0}button,select{background:#26333a;color:#fff;border:1px solid #47535a;border-radius:8px;padding:8px 12px;font:inherit;cursor:pointer}button:hover{background:#3a4d57}button.primary{background:#be653f}label{display:flex;align-items:center;gap:6px}.panel{border:1px solid #33424a;border-radius:16px;overflow:hidden;background:#1a252b}.title{padding:16px 22px 0;display:flex;justify-content:space-between}h2{margin:0;font-size:19px}small{color:#adb8bd}canvas{width:100%;display:block;background:radial-gradient(ellipse at 50% 80%,#34464f,#202c32 65%)}.phase{display:flex;justify-content:space-between;padding:12px 22px;border-top:1px solid #33424a}.phase b{color:#ffc389}.timeline{display:flex;align-items:center;gap:12px;margin:16px 0}input[type=range]{flex:1;accent-color:#e59a68}details{border-top:1px solid #34424a;padding:16px 0}details img{width:100%}.note{font-size:13px;color:#aab6bd}.error{color:#ff8274}.compare{display:grid;grid-template-columns:1fr 1fr;gap:16px}summary{cursor:pointer}@media(max-width:760px){main{padding:0 12px}h1{font-size:22px}.compare{grid-template-columns:1fr}.phase{font-size:12px}}#normal{height:min(45vw,410px);object-fit:contain}</style>
+<main><header><img src="../../../assets/design/characters/hero/portrait.png" alt="히어로 흉상"><div><div class="tag">HERO · RAGING BLOW</div><h1>뒤로 당기고, 원호를 그린 뒤, 앞으로</h1><p>일반 레이징 블로우 8장 · 준비와 연결 자세, 회수 동작 추가</p></div></header>
+<div class="tools"><button class="primary" id="play">일시정지</button><button id="restart">처음부터</button><button id="prev">이전 프레임</button><button id="next">다음 프레임</button><label>속도<select id="speed"><option value=".25">0.25배</option><option value=".5">0.5배</option><option value="1" selected>1배</option></select></label><button id="flip">오른쪽 보기</button><label><input id="effect" type="checkbox" checked>이펙트 합성</label><label><input id="ground" type="checkbox" checked>발 기준선</label></div>
+<section class="panel"><div class="title"><h2>일반 레이징 블로우</h2><small id="loading">불러오는 중…</small></div><canvas id="normal" width="1152" height="640"></canvas><div class="phase"><b id="normalLabel"></b><span id="fxLabel"></span><span>타격 0.40 · 0.65초</span></div></section>
+<div class="timeline"><span id="clock">0.00초</span><input id="seek" aria-label="시전 시각" type="range" min="0" max="1200" value="0" step="1"><span>1.20초 반복</span></div>
+<p class="note">원본 이펙트 14프레임을 손잡이 위치에 맞춰 합성한 모션 연구입니다. 공격 0.78초 + 회수 0.12초 후 대기로 돌아옵니다. 이펙트를 끄면 검 없는 공격 원화를 확인할 수 있습니다. 게임 적용 전이며, 현재 게임의 고정 위치·크기를 재현한 화면은 아닙니다.</p>
+<details><summary>일반기 8장 한눈에 보기</summary><img src="normal-contact-sheet.png" alt="일반기 8프레임"></details>
+<details><summary>원본 이펙트 · 실제 크기와 원점 비교</summary><p>왼쪽 위부터 14프레임. 원본 텍스처 크기와 피벗을 보존한 시트입니다.</p><img src="effect-raw/sheet.png" alt="일반기 원본 14프레임"></details>
+<details><summary>인레이지 모션도 보기</summary><div class="compare"><div><h2>인레이지 레이징 블로우</h2><p>아래 → 위 · 위 → 아래 · 찌르기</p><canvas id="enrage" width="704" height="544"></canvas><p id="enrageLabel"></p></div><div><h2>인레이지 이펙트 참고</h2><p>기존 4장 유지 · 별도 비교</p><canvas id="enrageFx" width="500" height="300"></canvas></div></div></details></main>
+<script>
+const $=id=>document.getElementById(id),base='../../../assets/design/characters/hero/',M={"bounds":[0.06,0.24,0.3,0.42,0.48,0.6,0.78,0.9],"durations":[0.06,0.18,0.06,0.12,0.06,0.12,0.18,0.12],"names":["검을 뒤로 당기기","뒤쪽 수평 준비","원호 진입","원호 베기","검 방향 전환","수평 공격","수평 마무리","검 회수"],"hand":[[400,495],[426,479],[369,468],[376,499],[334,504],[225,486],[228,486]],"effectGrip":[[0,0],[25,48],[25,45],[25,41],[200,151],[184,211],[108,212],[29,192],[207,158],[210,74],[211,56],[206,34],[210,40],[207,35]],"effectScale":1.8,"effectDurations":[0.06,0.06,0.06,0.06,0.06,0.06,0.06,0.06,0.06,0.06,0.06,0.06,0.03,0.03],"note":"일반기 검 없는 PNG + 원본 FX를 손 위치에 맞춰 재배치한 브라우저 합성 연구. 기존 런타임 scale2/feet(0,0) 재현이 아님. 적용 시 같은 프레임별 손잡이 앵커 재생 필요."};
+const load=src=>new Promise((resolve,reject)=>{const im=new Image();im.onload=()=>resolve(im);im.onerror=()=>reject(Error(src));im.src=src});
+let time=0,playing=true,rate=1,flip=false,last=0,images;
+const enBounds=[.18,.36,.54,.78],enNames=['낮게 준비','아래 → 위','위 → 아래','찌르기'];
+const boundaries=[0,.06,.12,.18,.24,.30,.36,.40,.42,.48,.54,.60,.65,.66,.72,.75,.78,.90,1.05];
+function effectIndex(t){let end=0;for(let i=0;i<M.effectDurations.length;i++){end+=M.effectDurations[i];if(t<end-.00001)return i}return -1}
+function char(ctx,im,w,h){ctx.drawImage(im,(w-im.width)/2,h-im.height)}
+function render(){
+if(!images)return;
+const idx=M.bounds.findIndex(v=>time<v),ctx=$('normal').getContext('2d'),fi=effectIndex(time);
+ctx.clearRect(0,0,1152,640);
+if($('ground').checked){ctx.strokeStyle='#8ea8b560';ctx.setLineDash([5,6]);ctx.beginPath();ctx.moveTo(70,576);ctx.lineTo(1082,576);ctx.stroke();ctx.setLineDash([]);ctx.fillStyle='#bfd1d67e';ctx.fillRect(575,570,2,12)}
+ctx.save();if(flip){ctx.translate(1152,0);ctx.scale(-1,1)}char(ctx,idx<0?images.idle:images.normal[idx],1152,640);
+if($('effect').checked&&fi>0&&idx>=0&&idx<7){const hand=M.hand[idx],grip=M.effectGrip[fi],im=images.fx[fi],s=M.effectScale;ctx.drawImage(im,224+hand[0]-grip[0]*s,-64+hand[1]-grip[1]*s,im.width*s,im.height*s)}
+ctx.restore();$('normalLabel').textContent=idx<0?'대기':(idx+1)+' / 8 · '+M.names[idx];$('fxLabel').textContent=fi<0?'이펙트 종료':'이펙트 '+(fi+1)+' / 14';
+const ei=enBounds.findIndex(v=>time<v),ec=$('enrage').getContext('2d');ec.clearRect(0,0,704,544);ec.save();if(flip){ec.translate(704,0);ec.scale(-1,1)}char(ec,ei<0?images.idle:images.enrage[ei],704,544);ec.restore();$('enrageLabel').textContent=ei<0?'대기':enNames[ei];
+const ef=$('enrageFx').getContext('2d');ef.clearRect(0,0,500,300);if(time<.78){const j=Math.min(12,Math.floor(time/.06));ef.save();if(flip){ef.translate(500,0);ef.scale(-1,1)}ef.imageSmoothingEnabled=false;ef.drawImage(images.enrageFx,202+j*68,70,64,64,130,25,240,240);ef.restore()}
+$('clock').textContent=time.toFixed(2)+'초';$('seek').value=Math.round(time*1000);
+}
+function pause(){playing=false;$('play').textContent='재생'}
+$('play').onclick=()=>{playing=!playing;$('play').textContent=playing?'일시정지':'재생'};
+$('restart').onclick=()=>{time=0;render()};
+$('next').onclick=()=>{pause();time=boundaries.find(v=>v>time+.001)??0;render()};
+$('prev').onclick=()=>{pause();time=[...boundaries].reverse().find(v=>v<time-.001)??1.05;render()};
+$('speed').onchange=e=>rate=Number(e.target.value);
+$('flip').onclick=()=>{flip=!flip;$('flip').textContent=flip?'왼쪽 보기':'오른쪽 보기';render()};
+$('ground').onchange=render;$('effect').onchange=render;
+$('seek').oninput=e=>{pause();time=Number(e.target.value)/1000;render()};
+async function init(){images={idle:await load(base+'frames/wait/motion01.png')};images.normal=await Promise.all(Array.from({length:8},(_,i)=>load(base+'frames/raging-blow/motion'+String(i+1).padStart(2,'0')+'.png')));images.enrage=await Promise.all(Array.from({length:4},(_,i)=>load(base+'frames/enraged-raging-blow/motion'+String(i+1).padStart(2,'0')+'.png')));images.fx=await Promise.all(Array.from({length:14},(_,i)=>load('effect-raw/'+String(i).padStart(2,'0')+'.png')));images.enrageFx=await load('effect-enrage.png');$('loading').textContent='원화 8장 + 원본 이펙트 14장';render();requestAnimationFrame(tick)}
+function tick(now){if(last&&playing)time=(time+Math.min((now-last)/1000,.1)*rate)%1.2;last=now;render();requestAnimationFrame(tick)}
+init().catch(e=>{$('loading').textContent='파일 로드 실패: '+e.message;$('loading').className='error'});
+</script></html>

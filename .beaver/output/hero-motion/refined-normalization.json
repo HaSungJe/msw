@@ -1,0 +1,122 @@
+[
+  {
+    "frame": 1,
+    "file": "C:/workspace/msw/assets/design/characters/hero/frames/raging-blow/motion01.png",
+    "scale": 0.35,
+    "sourceFoot": [
+      647,
+      1207
+    ],
+    "pivot": [
+      352,
+      640
+    ],
+    "alpha": true,
+    "handOnly": true
+  },
+  {
+    "frame": 2,
+    "file": "C:/workspace/msw/assets/design/characters/hero/frames/raging-blow/motion02.png",
+    "scale": 0.34,
+    "sourceFoot": [
+      613,
+      1207
+    ],
+    "pivot": [
+      352,
+      640
+    ],
+    "alpha": true,
+    "handOnly": true
+  },
+  {
+    "frame": 3,
+    "file": "C:/workspace/msw/assets/design/characters/hero/frames/raging-blow/motion03.png",
+    "scale": 0.35,
+    "sourceFoot": [
+      631,
+      1220
+    ],
+    "pivot": [
+      352,
+      640
+    ],
+    "alpha": true,
+    "handOnly": true
+  },
+  {
+    "frame": 4,
+    "file": "C:/workspace/msw/assets/design/characters/hero/frames/raging-blow/motion04.png",
+    "scale": 0.34,
+    "sourceFoot": [
+      599,
+      1214
+    ],
+    "pivot": [
+      352,
+      640
+    ],
+    "alpha": true,
+    "handOnly": true
+  },
+  {
+    "frame": 5,
+    "file": "C:/workspace/msw/assets/design/characters/hero/frames/raging-blow/motion05.png",
+    "scale": 0.345,
+    "sourceFoot": [
+      622,
+      1203
+    ],
+    "pivot": [
+      352,
+      640
+    ],
+    "alpha": true,
+    "handOnly": true
+  },
+  {
+    "frame": 6,
+    "file": "C:/workspace/msw/assets/design/characters/hero/frames/raging-blow/motion06.png",
+    "scale": 0.34,
+    "sourceFoot": [
+      611,
+      1203
+    ],
+    "pivot": [
+      352,
+      640
+    ],
+    "alpha": true,
+    "handOnly": true
+  },
+  {
+    "frame": 7,
+    "file": "C:/workspace/msw/assets/design/characters/hero/frames/raging-blow/motion07.png",
+    "scale": 0.345,
+    "sourceFoot": [
+      643,
+      1183
+    ],
+    "pivot": [
+      352,
+      640
+    ],
+    "alpha": true,
+    "handOnly": true
+  },
+  {
+    "frame": 8,
+    "file": "C:/workspace/msw/assets/design/characters/hero/frames/raging-blow/motion08.png",
+    "scale": 0.36,
+    "sourceFoot": [
+      624,
+      1224
+    ],
+    "pivot": [
+      352,
+      640
+    ],
+    "alpha": true,
+    "handOnly": false
+  }
+]
