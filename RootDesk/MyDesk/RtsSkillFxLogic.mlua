@@ -1039,7 +1039,7 @@ script RtsSkillFxLogic extends Logic
 		end
 	end
 
-	-- 맹독지대(포이즌 리전 — "모든 타일에 10초간"): 유닛 구역의 트랙 칸 전부에 zoneClips 중 하나를 zoneLife초 동안 루프(원작 2111003/tile 독안개, 반투명·무작위 반전). 같은 구역에 이미 있으면 갈아 끼운다.
+	-- 맹독지대(포이즌 리전 — "모든 타일에 12초간", 2026-09-26 10 → 12): 유닛 구역의 트랙 칸 전부에 zoneClips 중 하나를 zoneLife초 동안 루프(원작 2111003/tile 독안개, 반투명·무작위 반전). 같은 구역에 이미 있으면 갈아 끼운다.
 	--   피해는 서버(RtsCombatLogic.DoAttack의 dot)가 따로 준다 — 이 클립은 그림만
 	@ExecSpace("ClientOnly")
 	method void PlayZone(Entity unitEntity, table fx)
@@ -1086,7 +1086,7 @@ script RtsSkillFxLogic extends Logic
 				if isvalid(list[i]) then list[i]:Destroy() end
 			end
 			if self.ActiveZone[key] == list then self.ActiveZone[key] = nil end
-		end, fx.zoneLife or 10)
+		end, fx.zoneLife or 12)
 	end
 
 	-- 대상 표식: 시전 순간 대상 몬스터 위에 클립 1회(스나이핑 조준 표식 3221007/mob — 사용자 2026-09-18 "화살이 아니라 표식이 뜨면서 데미지"). 방향 무관.

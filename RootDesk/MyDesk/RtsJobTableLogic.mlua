@@ -515,12 +515,12 @@ script RtsJobTableLogic extends Logic
 		end
 		if jobId == "fp" then
 			return {
-				-- 포이즌 리전 연출(2026-09-18): 원작 포이즌 리전(2121055) 클립은 라이브러리에 사운드만 있어 3차 포이즌 미스트(2111003)로 — 시전 클립 effect(독 폭발, 1.62초, 대칭) + 트랙 모든 칸에 독안개 tile/0~8(zoneClips, 10초 루프, 반투명) + 틱마다 몬스터 위 mob(초록 고리), 사운드 use/hit.
-				--   피해 = dot(2초마다 × 10초 = 5틱, 직접 타격 없음 hits 0). 비율(기본 30% · 강화(L20) 60%)·방무 100%는 GetStatRaw dotPct·dotIgn이 우선(dot.pct는 예비값)
-				{ lv = 1, kind = "액티브", name = "포이즌 리전", desc = "모든 타일에 10초 동안 맹독지대를 설치한다. 맹독지대 위의 적은 2초마다 30%의 데미지를 입으며 방어율을 무시한다. 일반 몬스터는 추가로 20 + 레벨×2의 고정 데미지를 입는다. 중첩되지 않는다. 재사용 대기시간 15초", target = false, cd = 15, ratio = 0, hits = 0, dot = { pct = 30, period = 2, dur = 10 },
+				-- 포이즌 리전 연출(2026-09-18): 원작 포이즌 리전(2121055) 클립은 라이브러리에 사운드만 있어 3차 포이즌 미스트(2111003)로 — 시전 클립 effect(독 폭발, 1.62초, 대칭) + 트랙 모든 칸에 독안개 tile/0~8(zoneClips, 12초 루프, 반투명 — 2026-09-26 10 → 12초) + 틱마다 몬스터 위 mob(초록 고리), 사운드 use/hit.
+				--   피해 = dot(2초마다 × 12초 = 6틱 — 2026-09-26 사용자 "지속시간 12초로"(전 10초 5틱), 직접 타격 없음 hits 0). 비율(기본 50% · 강화(L20) 80%)·방무 100%는 GetStatRaw dotPct·dotIgn이 우선(dot.pct는 예비값)
+				{ lv = 1, kind = "액티브", name = "포이즌 리전", desc = "모든 타일에 12초 동안 맹독지대를 설치한다. 맹독지대 위의 적은 2초마다 50%의 데미지를 입으며 방어율을 무시한다. 일반 몬스터는 추가로 20 + 레벨×3의 고정 데미지를 입는다. 중첩되지 않는다. 재사용 대기시간 15초", target = false, cd = 15, ratio = 0, hits = 0, dot = { pct = 50, period = 2, dur = 12 },
 					fx = { motion = "poisonRegion", zoneDelay = 0.40, clipDelay = 0.40, soundDelay = 0.40, clip = "b0d47a8948314a5ea04a00690d921fc3", scale = 1.2, feetDx = 0, feetDy = 0.6, noFlip = true, clipLife = 1.7, sound = "eb7f504670a14802a48cc94f4eb66848",
 						zoneClips = { "eaed7d6a19f0483aa51dc5ff151f7acf", "7f743e56d7cd43c7a3baf9f7061abd3d", "302b1c7f241b400b8544f3b7378eacce", "550d34dd449242c9b3df7daebac8f259", "8bfddf0644494979ba02ef5a59b5a336", "53f3500a48814dd0b97b2825d781583c", "ce9db043ed324af5865e8fa21ce41dc1", "92f82ee141f24246b462856f3ecd1493", "3a6509634ee24b789f5446afb10fe357" },
-						zoneScale = 1.6, zoneAlpha = 0.7, zoneLife = 10,
+						zoneScale = 1.6, zoneAlpha = 0.7, zoneLife = 12,
 						hitClip = "e42be518ee2f4b838e52deba8bf1316b", hitScale = 1.4, hitDy = 0.6, hitSound = "fbc82c9f2524497c81aea0a647043ab9", hitSoundVol = 0.35, hitSoundGap = 0.3 } },
 				{ lv = 10, kind = "패시브", name = "메디테이션", desc = "공격력이 100 증가한다.", target = false },
 				{ lv = 20, kind = "패시브", name = "포이즌 리전 강화", desc = "포이즌 리전의 데미지가 30% 증가한다.", target = false },
@@ -787,17 +787,17 @@ script RtsJobTableLogic extends Logic
 			return s
 		end
 		if jobId == "fp" then
-			-- 기본 공격 없음 — 포이즌 리전(지속 피해 지대 dotPct%/2초 × 10초, 방무 100%, 쿨 15)·도트 퍼니셔(구체 100%, 쿨 15)만. 아래 2026-09-19 패치 값 참조
+			-- 기본 공격 없음 — 포이즌 리전(지속 피해 지대 dotPct%/2초 × 12초, 방무 100%, 쿨 15)·도트 퍼니셔(구체 100%, 쿨 15)만. 아래 2026-09-19 패치 값 참조
 			--   ratio·hits·targets 0 = 표의 기본 DPS 0(지속 피해는 팝업 DPS에 아직 안 넣음)
 			local s = { pct = 100, flat = 0, ratio = 0, hits = 0, targets = 0, ign = 0, fin = 100, finBoss = 100, ignBoss = -1, speed = "보통", crit = self.BaseCritRate, critDmg = self.BaseCritDamage, dotPct = 10, dotIgn = 0 }
 			--   2026-09-19 밸런스 패치: 포이즌 리전 기본 15%·방무 100%, 메디테이션 +100, 강화(20) +15%(→ 30%), 아케인 에임 +50%, 인피니티 최종 +30%(3차)
 			--   2026-09-23 사용자 "포이즌 리전 데미지 2배, 너무 약하네": 기본 15 → 30%, 강화(20) 30 → 60%
-			s.dotPct = 30
+			s.dotPct = 50 -- 2026-09-26 사용자 "포이즌 리전 좀 많이 세게 — 50%, 강화 80%"(전 30 · 60)
 			s.dotIgn = 100
-			-- 일반 몬스터(보스 제외)에 틱마다 고정 데미지(RtsCombatLogic 지대 피해): 2026-09-26 사용자 "상향 — 20 + 레벨×2"(전 5 + 레벨×1.5 버림 · 그 전 10 + 레벨×3 → "너무 쎄다")
-			s.dotFlat = 20 + 2 * L
+			-- 일반 몬스터(보스 제외)에 틱마다 고정 데미지(RtsCombatLogic 지대 피해): 2026-09-26 사용자 "상향 — 20 + 레벨×2" → 같은 날 "레벨업 증가량 3배로" 20 + 레벨×3(전 5 + 레벨×1.5 버림 · 그 전 10 + 레벨×3 → "너무 쎄다")
+			s.dotFlat = 20 + 3 * L
 			if L >= 10 then s.flat = 100 end
-			if L >= 20 then s.dotPct = 60 end
+			if L >= 20 then s.dotPct = 80 end
 			if L >= 40 then s.pct = 150 end
 			if L >= 50 then
 				s.fin = 130

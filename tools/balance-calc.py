@@ -100,12 +100,12 @@ def kit(job, L, p=False):
             sk.append(bz)
     elif job == "불독":                     # 20 + 5, 보통, 스태프(weapon.md)
         base, per, spd, w = 20, 5, "보통", "스태프"
-        dotpct = 30
+        dotpct = 50   # 2026-09-26 30 → 50, 강화 60 → 80
         if L >= 10: st["flat"] += 100
-        if L >= 20: dotpct = 60
+        if L >= 20: dotpct = 80
         if L >= 40: st["pct"] += 50
         if L >= 50: st["fin"] *= 1.3; st["finBoss"] *= 1.3; st["boss"] += 10; st["ign"] += 50   # 2티어 방무 50
-        sk.append(dict(name="포이즌 리전", ratio=0, hits=0, targets=0, cd=15, dot=dict(pct=dotpct, period=2, dur=10)))
+        sk.append(dict(name="포이즌 리전", ratio=0, hits=0, targets=0, cd=15, dot=dict(pct=dotpct, period=2, dur=12)))
         if L >= 30:
             dp = dict(name="도트 퍼니셔", ratio=290, hits=30, targets=1, cd=15, mobMul=0.5)
             if p: dp.update(ratio=TUNE["fp_TR"], hits=60, cd=3)   # 초월(보스 최종 삭제 09-24 — 구체 비율로 맞춤)

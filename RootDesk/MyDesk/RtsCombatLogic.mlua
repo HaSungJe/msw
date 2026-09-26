@@ -736,7 +736,7 @@ script RtsCombatLogic extends Logic
 						if defMul > 0 then
 							local crit = (_UtilLogic:RandomDouble() * 100) < st.crit
 							local dmg = math.max(1, math.floor(perTick * _RtsJobTableLogic:RollWeapon(u.JobId) * defMul + 0.0001))
-							-- 고정 데미지(st.dotFlat — 포이즌 리전 20 + 레벨 × 2): 일반 몬스터만, 난수·방어 없이 더한다
+							-- 고정 데미지(st.dotFlat — 포이즌 리전 20 + 레벨 × 3): 일반 몬스터만, 난수·방어 없이 더한다
 							if st.dotFlat ~= nil and m.RtsMonsterComponent ~= nil and not m.RtsMonsterComponent.IsBoss then dmg = dmg + st.dotFlat end
 							atk.Dmg = dmg + self:DevExtra()
 							atk.Hits = 1
