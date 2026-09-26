@@ -175,3 +175,9 @@ MSW(Maker 26.7) 실측으로 확인한 엔진 동작. 다시 실측하면 30분�
 - Rule: `RtsCombatLogic.strike`는 `ResolveTarget`(대상이 죽었으면 사거리 안에서 원래 자리와 가까운 적)으로 대상을 정하고 `HitOnce`(0.6 상자 → 빗나가면 3 상자, IsAttackTarget이 이름으로 거름)로 친다.
 - **Why:** 2026-09-23 사용자 "공격이 한 번씩 삑난다 — 판정이 나면 적중하도록". 시전과 판정 사이(hitDelay) 대상이 다른 유닛에 먼저 잡히면 헛방이었다.
 - **How to apply:** 새 타격 경로를 만들 땐 AttackFrom을 직접 부르지 말고 ResolveTarget + HitOnce를 쓴다.
+
+## 배속(2026-09-27) — 서버는 게임 시계·RealSpeed, 클라는 SetClientTimeScale
+- Rule: 2배속은 `RtsStageLogic.GameSpeed`(1/2, 진행 중에만 적용). 게임 시계 `GameNow = ClockBase + (ServerElapsedSeconds − ClockSince) × ClockRate`(멈춤 0 · 진행 중 GameSpeed · 그 밖 1) — 흐름 속도가 바뀌기 직전(일시정지·배속·`SetRunState`) `RebaseClock`. 실제 시계 서버 타이머는 `RealSpeed()`로 나눈다: 유닛 공격 루프(`RescaleLoops`) · 몬스터 생성(`RescaleSpawn`) · 트랙 걷기(delta × RealSpeed) · 지연 판정은 `After`(게임 시각 기준) · 몬스터 사망 제거도 `After`. 클라는 `_UtilLogic:SetClientTimeScale(GameSpeed)`(진행 중·안 멈췄을 때)로 연출·데미지 숫자·클라 타이머·애니메이션을 맞춘다(엔진: ElapsedSeconds·소리·서버는 영향 없음).
+- UI: 오른쪽 아래 일시정지 왼쪽(없으면 그 자리) 좌/우 스위치 `RtsSpeedBox` — 왼쪽 1배속(초록) · 오른쪽 2배속(빨강), 손잡이 = 내 선택. 여럿이면 전원 2배속일 때 2배, 스위치 위에 배속마다 고른 사람 수(솔로는 없음). 찬성표는 판이 바뀌어도 유지.
+- **Why:** 사용자 "배속모드 — 2배속", "일시정지 옆 토글 · 멀티는 전원 찬성 시 2배 · n/N", "솔로는 보일 필요 없겠지", "좌/우 스위치 — 1배속 초록 · 2배속 빨강, 멀티는 스위치 위에 배속마다 고른 사람 수". 엔진 SetClientTimeScale은 서버에 영향이 없어 화면만 빨라지면 판정과 어긋난다.
+- **How to apply:** 새 판정 시각은 GameNow, 새 지연 판정은 After, 새 서버 반복 타이머는 RealSpeed로 나누고 `RtsStageLogic.ApplySpeed`에 다시 걸기를 넣는다. 실측(2026-09-27): 서버 실제 2.00초 = 게임 4.01초, 클라 타이머 2초 = 실제 1.02초, 멈춤·끄기 때 시계 튐 0.

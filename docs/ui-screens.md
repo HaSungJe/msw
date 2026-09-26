@@ -154,6 +154,7 @@ y=1080 +------------------------------------------------------------------------
 | B | 유저 카드 목록 `RtsPlayers` (카드 y 290+104·(i−1), 400×96, 4장) | 16~416, 266~706 | `AddPlayerCard` |
 | D | 다시 하기 `RtsRestartBtn` (2026-09-24 오른쪽 아래로) | 1704~1904, 1000~1064 | RtsHudLogic `RtsRestartBtn` |
 | P | 일시정지 `RtsPauseBtn` (2026-09-25 — 다시 하기 왼쪽, 솔로·진행 중에만) + 멈춤 안내 `RtsPauseDim`/`RtsPauseBox`(위쪽 가운데) | 1544~1694, 1000~1064 / 720~1200, 70~270 | RtsHudLogic `BuildHud` · `RefreshPauseUi` |
+| S | 배속 스위치 `RtsSpeedBox` (2026-09-27 — 일시정지 왼쪽, 일시정지가 없으면 그 자리. 카운트다운·진행 중) | 1532~1744(일시정지 있을 때) · 1692~1904, 988~1064 | RtsHudLogic `BuildHud` · `RefreshSpeedUi` |
 | E | 투표 패널 `RtsVotePanel` (다시 하기 바로 위) | 1644~1904, 916~992 | RtsHudLogic `RtsVotePanel` |
 | F | 난이도 막대 `RtsDiffBar` (폭 780 = 86+6·88+5·6+12+124, 2026-09-25 화면 최상단으로) | 570~1350, 0~80 | RtsDifficultyLogic `Build` |
 | H | 안내 `RtsHint` | 600~1320, 92~136 | RtsHudLogic:456 |
@@ -223,7 +224,8 @@ y=1080 +------------------------------------------------------------------------
 | 요소 | 엔티티 이름 | 만드는 곳 | anchor·pivot·위치·크기 | 색·글꼴 | 보이는 조건 | 클릭/동작 |
 |---|---|---|---|---|---|---|
 | 다시 하기 | RtsRestartBtn/In | BuildHud | a(.5,1) p(.5,1) (0,-12), 200×48 | 공용 백색 패널 | running·ended | 확인 팝업 후 다시하기·투표, 이미 찬성했으면 취소 |
-| 일시정지 | `RtsPauseBtn`/`In` + `RtsPauseLabel` | BuildHud | a(1,0) p(1,0) (−16,16) 150×64, 테두리 2 | 보통 ColPanel/ColBorder·ColInk "일시정지" / 멈춤 중 (0.45,0.37,0.18,0.96)/(1,0.9,0.55)·(1,0.97,0.85) "계속하기". 글자 142×56 19 굵게 | **솔로 모드 판(`RtsStageLogic.SoloMode`)·방 인원 1·진행 중**이거나 멈춰 있을 때(`RefreshPauseUi`) — 멀티(매칭·방 만들기)로 시작한 판은 혼자여도 안 보인다 | `TogglePause` → `_RtsStageLogic:RequestPause(on)`(서버가 SoloMode·인원 1·진행 중·구역 주인 확인). **P 키**도 같다 |
+| 일시정지 | `RtsPauseBtn`/`In` + `RtsPauseLabel` | BuildHud | a(1,0) p(1,0) (−16,16) 150×64, 테두리 2 | 보통 ColPanel/ColBorder·ColInk "일시정지" / 멈춤 중 (0.45,0.37,0.18,0.96)/(1,0.9,0.55)·(1,0.97,0.85) "계속하기". 글자 104×56 19 굵게 (−16,0) + 오른쪽 안 단축키 `RtsPauseKey` [P] 30×26 (−8,0) 13 굵게(2026-09-27 사용자 "일시정지 버튼 옆에 단축키 P") | **솔로 모드 판(`RtsStageLogic.SoloMode`)·방 인원 1·진행 중**이거나 멈춰 있을 때(`RefreshPauseUi`) — 멀티(매칭·방 만들기)로 시작한 판은 혼자여도 안 보인다 | `TogglePause` → `_RtsStageLogic:RequestPause(on)`(서버가 SoloMode·인원 1·진행 중·구역 주인 확인). **P 키**도 같다 |
+| 배속 스위치 | `RtsSpeedBox` > `RtsSpeedTrack`(+`In`) > `RtsSpeedKnob`·`RtsSpeedHalf1/2`(`RtsSpeedSideText`·`RtsSpeedClick1/2`) + `RtsSpeedCount`×2 | BuildHud | 묶음 a(1,0) p(1,0) (−176,16) 212×92(일시정지가 숨으면 (−16,16)) · 트랙 212×64 테두리 2(안쪽 208×60, 반쪽 104) · 손잡이 100×52 x 4/104 · 인원 글자 트랙 위 y 66 100×24 | 트랙 ColPanel/ColBorder · 손잡이 1배속 초록 (0.3,0.66,0.36)/(0.2,0.5,0.26) · 2배속 빨강 (0.86,0.32,0.3)/(0.66,0.2,0.18) · 글자 "1배속"·"2배속" 18 굵게(손잡이 쪽 흰색, 반대 ColMuted) · 인원 "n명" 15 굵게(여럿일 때만, 솔로는 빈칸) | 카운트다운·진행 중(`RefreshSpeedUi` — 서명이 바뀔 때만 고침) | 반쪽을 누르면 `ChooseSpeed(1·2)` → `_RtsStageLogic:RequestSpeedChoice`(2 = 찬성, 1 = 취소 — 방 인원 전원이 2배속이면 2배, `TallySpeed`). 손잡이 = 내가 고른 배속. 2026-09-27 사용자 "좌/우 스위치 — 1배속 초록 · 2배속 빨강, 멀티는 스위치 위에 배속마다 고른 사람 수" |
 | 멈춤 막 | `RtsPauseDim` | 〃 | 화면 전체, 버튼보다 먼저 만든다(버튼은 막 위에 밝게) | (0,0,0,0.35), RaycastTarget 끔 — 창 보기(상세정보·도감 등)는 된다 | 멈춤 중 | — |
 | 멈춤 안내 | `RtsPauseBox` + `RtsPauseTitle`·`RtsPauseSub`·`RtsPauseResume` | 〃 | 막 안 a(0.5,1) p(0.5,1) (0,−190) 480×200 — 가운데 창이 떠도 보이게 위쪽 | ColPanel/ColGold 2. "일시정지" Gold 34 굵게 · "멈춘 동안에는 영입 · 레벨업 · 증강 · 이동을 할 수 없어요" ColMuted 15 · [계속하기 (P)] 220×52 Gold | 〃 | [계속하기] → `TogglePause` |
 | 투표 패널 | RtsVotePanel/In | BuildHud | a(.5,1) p(.5,1) (0,-68), 260×76 | 공용 패널 | 투표가 있을 때 | 다시하기 아래 |
@@ -375,7 +377,7 @@ Maker Play에서 두 탭의 5열·빈 카드·팬텀 도적 열 배치를 캡처
 
 보유 탭의 미선택 증강을 열면 선택지 카드를 표시한다. 브론즈~골드는 단계(I/II/III)만 무작위이고 그 단계의 종류 전부(`StatChoices` — 브론즈·실버 4장, 골드 5장)를 높이 660 카드로 한 줄에 늘어놓는다 — 카드 폭 = (1060 − 19 × (장 수 − 1)) ÷ 장 수(4장 250 · 5장 196), 제목·안내 '<등급> 증강 <단계> 선택 · 원하는 증강을 하나 골라 주세요', 카드 윗줄 '<등급> <단계>'(`GradeLevelName`)(2026-09-27 사용자 개편 — 전: 340×660 세 장). 프리즘은 가중치 무작위 3장을 340×660으로(제목 '프리즘 증강 선택' — 2026-09-27 잠깐 전체 목록·가로 스크롤이었다가 사용자 "다시 랜덤으로" 되돌림). 서버는 선택 번호를 선택지 수까지 받는다. 등급 띠·104px 합성 아이콘, 이름21px, 효과18px(카드 폭 − 38 × 230), 받기(카드 폭 − 38)×44. 아이콘·제목·설명의 시작 높이는 설명 길이에 관계없이 고정한다. 지속 반짝임 타이머는 제거하고 정적인 등급색 가장자리·등장음을 사용한다.
 
-받기는 기존 수령 요청 후 보유 탭으로 이동한다. 일시정지 상태에서는 선택을 닫지 않고 안내한다. 보유/도감으로 이동하거나 ×를 눌러도 선택지는 남으며 보유 탭의 미선택 목록에서 이어 고른다. 뽑기 탭은 구매 전용이다. 최대 대기 수는 `MaxPending` 값을 사용한다.
+받기는 기존 수령 요청 후 보유 탭으로 이동한다. 아래 '보유 증강으로' `RtsPickFold` 260×44(글자 180 (−30,0) + 오른쪽 [ESC] 키캡 — ESC도 같은 동작, 2026-09-27). 일시정지 상태에서는 선택을 닫지 않고 안내한다. 보유/도감으로 이동하거나 ×를 눌러도 선택지는 남으며 보유 탭의 미선택 목록에서 이어 고른다. 뽑기 탭은 구매 전용이다. 최대 대기 수는 `MaxPending` 값을 사용한다.
 
 **결과 (`BuildResult` :408-483)**
 - 머리글 `RtsRsHead`: (27,-4) 586×40, 28 굵게. "클리어!"는 Gold, "탈락 — 필드 110"·"탈락 — 보스 시간 초과"는 (0.95,0.45,0.4).
@@ -482,7 +484,7 @@ Maker Play에서 두 탭의 5열·빈 카드·팬텀 도적 열 배치를 캡처
 - **`SpawnPanel`의 반환 약속(안쪽을 돌려주고 바깥은 `.Parent`).** `RecruitBtn.Parent`, `AugBtn.Parent`, `vp.Parent:SetEnable`, `self.Hint = hint.Parent`, 난이도 카드 글자가 `StageSubText.Parent`를 카드로 쓰는 것(RtsDifficultyLogic:189) 등이 이 약속에 기대고 있다.
 - 값을 비교해 필요할 때만 다시 그리는 캐시 키(`StageShown`, `RecruitShown`, `RestartShown`, `VoteShown`, `BuyShown`, `ExpandShown`, `AugShown`, `Shown`, 유닛 팝업 `Sig`). 새 시각 상태를 추가하면 그 상태도 키에 넣어야 화면이 바뀐다.
 - `Environment/NativeScripts/**/*.d.mlua`는 엔진이 만든 파일이라 읽기 전용이다. 맵·설정 JSON(`*.map`, `*.config`)은 Maker 도구로만 다룬다.
-- 단축키: ESC(닫기·취소), Tab(유닛 팝업 탭), Space(레벨업·증강 지정), L/S(메뉴), **P(일시정지·계속 — 솔로·진행 중, 2026-09-25)**, F1~F8(구역). 처리하는 곳은 RtsPopupLogic:238, RtsUnitSelectLogic:503, RtsCameraAnchorComponent:132다.
+- 단축키: ESC(닫기·취소 — 증강 선택 화면에선 닫지 않고 '보유 증강으로', 버튼에 [ESC] 키캡 2026-09-27), Tab(유닛 팝업 탭), Space(레벨업·증강 지정), L/S(메뉴), **P(일시정지·계속 — 솔로·진행 중, 2026-09-25 · 버튼 안 오른쪽 [P] 키캡 2026-09-27)**, F1~F8(구역). 처리하는 곳은 RtsPopupLogic:238, RtsUnitSelectLogic:503, RtsCameraAnchorComponent:132다.
 - 팝업에 내부 설계 수치(누적 투자, 벽, 예산)를 보이지 않는다(로드맵 규칙).
 
 ### 7.3 작업 요령

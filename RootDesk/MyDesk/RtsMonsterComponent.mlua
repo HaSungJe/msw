@@ -404,7 +404,8 @@ script RtsMonsterComponent extends Component
 		local sec = 0.6
 		local mon = _RtsStageTableLogic:GetMonster(self.MonsterId)
 		if mon ~= nil and mon.dieSec ~= nil and mon.dieSec > 0 then sec = mon.dieSec end
-		_TimerService:SetTimerOnce(function()
+		-- 게임 시계로 잰다(RtsStageLogic.After — 2026-09-27 배속: 2배면 사망 그림도 클라에서 2배라 실제 절반 뒤 제거)
+		_RtsStageLogic:After(function()
 			if isvalid(e) then e:Destroy() end
 		end, sec + self.DieGrace)
 	end

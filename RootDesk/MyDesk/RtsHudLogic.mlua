@@ -132,6 +132,18 @@ script RtsHudLogic extends Logic
 
 	property string PauseShown = ""
 
+	-- 배속 스위치(2026-09-27 사용자 "좌/우 스위치 — 왼쪽 1배속(초록) · 오른쪽 2배속(빨강), 여럿이면 스위치 위에 배속마다 고른 사람 수, 솔로는 표시 없이"):
+	--   오른쪽 아래 일시정지 왼쪽(일시정지가 없으면 그 자리). SpeedBox = 스위치 + 인원 묶음, SpeedTrack = 트랙(안쪽), SpeedKnob = 손잡이, SpeedSide[1·2] = { label, count }
+	property Entity SpeedBox = nil
+
+	property Entity SpeedTrack = nil
+
+	property Entity SpeedKnob = nil
+
+	property table SpeedSide = {}
+
+	property string SpeedShown = ""
+
 	-- 진행 중 실수 방지: 첫 클릭 뒤 이 시각(ElapsedSeconds)까지 한 번 더 누르면 찬성
 	property number RestartConfirmUntil = 0
 
@@ -464,14 +476,52 @@ script RtsHudLogic extends Logic
 		-- 오른쪽 아래 '다시하기' 왼쪽: 일시정지 / 계속하기(솔로·진행 중에만 보인다 — RefreshPauseUi). P 키도 같다(RtsUnitSelectLogic.HandleKeyDownEvent)
 		local pause = self:SpawnRoundedPanel("RtsPauseBtn", grp, Vector2(1, 0), Vector2(1, 0), Vector2(-16, 16), Vector2(150, 64),
 			self:ColPanel(), self:ColBorder(), 2)
-		self.PauseText = self:SpawnLabel("RtsPauseLabel", pause, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2(0, 0), Vector2(142, 56),
+		-- 글자는 왼쪽으로 조금(−16), 오른쪽 안에 단축키 [P](2026-09-27 사용자 "일시정지 버튼 옆에 단축키 P 보이도록" — 레벨업 [Space]와 같은 키캡 모양)
+		self.PauseText = self:SpawnLabel("RtsPauseLabel", pause, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2(-16, 0), Vector2(104, 56),
 			"일시정지", self:ColInk(), 19, TextAlignmentType.MiddleCenter, true)
+		local pcap = self:SpawnRoundedPanel("RtsPauseKey", pause, Vector2(1, 0.5), Vector2(1, 0.5), Vector2(-8, 0), Vector2(30, 26),
+			Color(0.92, 0.93, 0.98, 0.9), Color(0.72, 0.74, 0.84, 0.9), 1.2)
+		pcap.SpriteGUIRendererComponent.RaycastTarget = false
+		pcap.Parent.SpriteGUIRendererComponent.RaycastTarget = false
+		self:SpawnLabel("RtsPauseKeyText", pcap, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2(0, 0), Vector2(28, 24),
+			"P", Color(0.38, 0.39, 0.50, 1), 13, TextAlignmentType.MiddleCenter, true)
 		local pauseClick = self:SpawnClick("RtsPauseClick", pause)
 		pauseClick:ConnectEvent(ButtonClickEvent, function(event)
 			self:TogglePause()
 		end)
 		self.PauseBtn = pause
 		pause.Parent:SetEnable(false)
+		-- 배속 스위치: 묶음 212×92(일시정지 왼쪽 −176, 일시정지가 숨으면 오른쪽 끝 −16 — RefreshSpeedUi). 아래 = 트랙 212×64(안쪽 208×60, 반쪽 104),
+		--   손잡이 100×52(1배속 왼쪽 초록 · 2배속 오른쪽 빨강), 반쪽마다 글자 1배속·2배속과 누르는 칸(RtsStageLogic.RequestSpeedChoice). 위 = 여럿일 때 배속마다 고른 사람 수
+		local sbox = self:SpawnUI("model://uisprite", "RtsSpeedBox", grp, Vector2(1, 0), Vector2(1, 0), Vector2(-176, 16), Vector2(212, 92))
+		sbox.SpriteGUIRendererComponent.Color = Color(1, 1, 1, 0)
+		sbox.SpriteGUIRendererComponent.RaycastTarget = false
+		local track = self:SpawnRoundedPanel("RtsSpeedTrack", sbox, Vector2(0, 0), Vector2(0, 0), Vector2(0, 0), Vector2(212, 64), self:ColPanel(), self:ColBorder(), 2)
+		local knob = self:SpawnRoundedPanel("RtsSpeedKnob", track, Vector2(0, 0.5), Vector2(0, 0.5), Vector2(4, 0), Vector2(100, 52),
+			Color(0.3, 0.66, 0.36, 1), Color(0.2, 0.5, 0.26, 1), 1.5)
+		knob.SpriteGUIRendererComponent.RaycastTarget = false
+		knob.Parent.SpriteGUIRendererComponent.RaycastTarget = false
+		self.SpeedBox = sbox
+		self.SpeedTrack = track
+		self.SpeedKnob = knob
+		self.SpeedSide = {}
+		for side = 1, 2 do
+			local half = self:SpawnUI("model://uisprite", "RtsSpeedHalf" .. tostring(side), track, Vector2(0, 0), Vector2(0, 0), Vector2((side - 1) * 104, 0), Vector2(104, 60))
+			half.SpriteGUIRendererComponent.Color = Color(1, 1, 1, 0)
+			local text = "1배속"
+			if side == 2 then text = "2배속" end
+			local label = self:SpawnLabel("RtsSpeedSideText", half, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2(0, 0), Vector2(100, 48),
+				text, self:ColMuted(), 18, TextAlignmentType.MiddleCenter, true)
+			local count = self:SpawnLabel("RtsSpeedCount", sbox, Vector2(0, 0), Vector2(0.5, 0), Vector2(2 + (side - 1) * 104 + 52, 66), Vector2(100, 24),
+				"", self:ColInk(), 15, TextAlignmentType.MiddleCenter, true)
+			local choice = side
+			local click = self:SpawnClick("RtsSpeedClick" .. tostring(side), half)
+			click:ConnectEvent(ButtonClickEvent, function(event)
+				self:ChooseSpeed(choice)
+			end)
+			self.SpeedSide[side] = { label = label, count = count }
+		end
+		sbox:SetEnable(false)
 		-- 다시 하기 투표 패널: 버튼 바로 위(투표 중에만)
 		local vp = self:SpawnRoundedPanel("RtsVotePanel", grp, Vector2(0.5, 1), Vector2(0.5, 1), Vector2(0, -68), Vector2(260, 76),
 			self:ColPanel(), self:ColGold(), 1.5)
@@ -742,6 +792,62 @@ script RtsHudLogic extends Logic
 			self.PauseBtn.Parent.SpriteGUIRendererComponent.Color = self:ColBorder()
 			self.PauseText.TextComponent.FontColor = self:ColInk()
 		end
+	end
+
+	-- 배속 스위치(RtsStageLogic.RefreshHud가 0.25초마다): 카운트다운·진행 중에 보인다. 손잡이 = 내가 고른 배속(1배속 왼쪽 초록 · 2배속 오른쪽 빨강 — 솔로는 곧 지금 배속),
+	--   손잡이 쪽 글자는 흰색, 반대쪽은 흐리게. 여럿이면 스위치 위에 배속마다 고른 사람 수("n명" — 전원이 2배속을 고르면 2배). 바뀐 것이 있을 때만 고친다
+	@ExecSpace("ClientOnly")
+	method void RefreshSpeedUi()
+		if self.SpeedBox == nil or not isvalid(self.SpeedBox) then return end
+		local S = _RtsStageLogic
+		local show = S.RunState == "countdown" or S.RunState == "running"
+		local pauseShown = self.PauseBtn ~= nil and isvalid(self.PauseBtn) and self.PauseBtn.Parent.Enable
+		local mine = S.SpeedVotes[_RtsUnitLogic:MyUserId()] ~= nil
+		local solo = S:IsSolo()
+		local fastN = S.SpeedVoteCount
+		local slowN = math.max(0, S.RoomCount - fastN)
+		local key = tostring(show) .. "|" .. tostring(pauseShown) .. "|" .. tostring(mine) .. "|" .. tostring(solo) .. "|" .. self:Int(fastN) .. "|" .. self:Int(slowN)
+		if key == self.SpeedShown then return end
+		self.SpeedShown = key
+		self.SpeedBox:SetEnable(show)
+		if not show then return end
+		-- 일시정지가 보이면 그 왼쪽(−176), 아니면 오른쪽 끝(−16)
+		local x = -16
+		if pauseShown then x = -176 end
+		self.SpeedBox.UITransformComponent.anchoredPosition = Vector2(x, 16)
+		-- 손잡이: 1배속 왼쪽(4) 초록 / 2배속 오른쪽(104) 빨강
+		local knob = self.SpeedKnob
+		if mine then
+			knob.Parent.UITransformComponent.anchoredPosition = Vector2(104, 0)
+			knob.SpriteGUIRendererComponent.Color = Color(0.86, 0.32, 0.3, 1)
+			knob.Parent.SpriteGUIRendererComponent.Color = Color(0.66, 0.2, 0.18, 1)
+		else
+			knob.Parent.UITransformComponent.anchoredPosition = Vector2(4, 0)
+			knob.SpriteGUIRendererComponent.Color = Color(0.3, 0.66, 0.36, 1)
+			knob.Parent.SpriteGUIRendererComponent.Color = Color(0.2, 0.5, 0.26, 1)
+		end
+		for side = 1, 2 do
+			local sd = self.SpeedSide[side]
+			if sd ~= nil and isvalid(sd.label) then
+				local on = (side == 2) == mine
+				if on then sd.label.TextComponent.FontColor = Color(1, 1, 1, 1) else sd.label.TextComponent.FontColor = self:ColMuted() end
+				local n = slowN
+				if side == 2 then n = fastN end
+				local txt = ""
+				if not solo then txt = self:Int(n) .. "명" end
+				sd.count.TextComponent.Text = txt
+			end
+		end
+	end
+
+	-- 배속 스위치 반쪽을 눌렀을 때: 그 배속을 고른다(서버가 전원 2배속이면 2배 — RtsStageLogic.RequestSpeedChoice). 이미 그쪽이면 아무것도 안 한다
+	@ExecSpace("ClientOnly")
+	method void ChooseSpeed(number choice)
+		local S = _RtsStageLogic
+		if S.RunState ~= "countdown" and S.RunState ~= "running" then return end
+		local mine = S.SpeedVotes[_RtsUnitLogic:MyUserId()] ~= nil
+		if (choice == 2) == mine then return end
+		S:RequestSpeedChoice(choice)
 	end
 
 	-- 버튼·P 키: 멈춰 있으면 풀기, 아니면 솔로·진행 중일 때만 멈추기(서버 RtsStageLogic.RequestPause가 다시 확인)

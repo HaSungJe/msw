@@ -135,7 +135,16 @@ script RtsWaveLogic extends Logic
 			self.QueuePos[zone] = 1
 		end
 		self.Spawning = true
-		self.SpawnTimer = _TimerService:SetTimerRepeat(function() self:SpawnTick() end, self.SpawnInterval, 0.05)
+		-- 실제 간격 = SpawnInterval ÷ 배속(2026-09-27 — RtsStageLogic.RealSpeed)
+		self.SpawnTimer = _TimerService:SetTimerRepeat(function() self:SpawnTick() end, self.SpawnInterval / _RtsStageLogic:RealSpeed(), 0.05)
+	end
+
+	-- 배속이 바뀌었을 때(RtsStageLogic.ApplySpeed): 생성 중이면 줄 위치는 그대로 두고 타이머만 새 간격으로 다시 건다
+	@ExecSpace("ServerOnly")
+	method void RescaleSpawn()
+		if not self.Spawning then return end
+		_TimerService:ClearTimer(self.SpawnTimer)
+		self.SpawnTimer = _TimerService:SetTimerRepeat(function() self:SpawnTick() end, self.SpawnInterval / _RtsStageLogic:RealSpeed(), self.SpawnInterval / _RtsStageLogic:RealSpeed())
 	end
 
 	-- 0.5초마다 구역마다 1마리. 줄이 다 비면 타이머를 멈춘다

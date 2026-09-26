@@ -458,7 +458,12 @@ script RtsPopupLogic extends Logic
 	handler HandleKeyDownEvent(KeyDownEvent event)
 		if not self.Built then return end
 		if event.key == KeyboardKey.Escape then
-			if self.Kind ~= "" and self.Kind ~= "pick" then self:Close() end
+			-- 증강 선택 화면은 닫지 않고 '보유 증강으로'(선택지는 보유 탭 미선택 목록에 남는다 — 2026-09-27 사용자 "ESC 단축키")
+			if self.Kind == "pick" then
+				self:OpenHubTab("augment")
+			elseif self.Kind ~= "" then
+				self:Close()
+			end
 		end
 	end
 
@@ -2638,11 +2643,12 @@ script RtsPopupLogic extends Logic
 		if pending > 1 then sub = sub .. "   ·   대기 중인 선택지 " .. H:Int(pending) .. "개 / " .. H:Int(_RtsAugmentLogic.MaxPending) .. "개" end
 		H:SpawnLabel("RtsPickSub", body, Vector2(0, 1), Vector2(0, 1), Vector2(27, -4), Vector2(1060, 44),
 			sub, self:Muted(), 15, TextAlignmentType.MiddleCenter, false)
-		-- 접기(2026-09-23 사용자): 창을 닫고 나중에 HUD '펼치기'로 고른다
-		local fold = H:SpawnRoundedPanel("RtsPickFold", body, Vector2(0.5, 0), Vector2(0.5, 0), Vector2(0, 16), Vector2(220, 44),
+		-- 접기(2026-09-23 사용자): 창을 닫고 나중에 HUD '펼치기'로 고른다. ESC도 같다(2026-09-27 사용자 "보유 증강으로 버튼 ESC 단축키" — 오른쪽 안에 [ESC] 키캡, HandleKeyDownEvent)
+		local fold = H:SpawnRoundedPanel("RtsPickFold", body, Vector2(0.5, 0), Vector2(0.5, 0), Vector2(0, 16), Vector2(260, 44),
 			self:Mix(Color.white, 0.06), self:Mix(Color.white, 0.3), 1.5)
-		H:SpawnLabel("RtsPickFoldText", fold, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2(0, 0), Vector2(210, 40),
+		H:SpawnLabel("RtsPickFoldText", fold, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2(-30, 0), Vector2(180, 40),
 			"보유 증강으로", self:Ink(), 16, TextAlignmentType.MiddleCenter, true)
+		_RtsUnitSelectLogic:SpawnKeyCap(fold, "ESC")
 		local foldClick = H:SpawnClick("RtsPickFoldClick", fold)
 		foldClick:ConnectEvent(ButtonClickEvent, function(event)
 			self:OpenHubTab("augment")

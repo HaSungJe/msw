@@ -44,7 +44,8 @@ script RtsTrackWalkerComponent extends Component
 			if not self.BossMode and m ~= nil and m:IsFrozenNow() then spd = spd * m.FreezeSlow end
 			ups = _RtsConfigLogic:SpeedToUnitsPerSec(spd)
 		end
-		self.T = self.T + ups * delta / len
+		-- 배속(2026-09-27 — RtsStageLogic.RealSpeed, 진행 중 2배속이면 두 배로 걷는다. 보스의 60초 한 바퀴도 게임 시간 기준)
+		self.T = self.T + ups * delta * _RtsStageLogic:RealSpeed() / len
 		if self.T >= 1 then
 			if self.Loop then
 				self.T = self.T - 1

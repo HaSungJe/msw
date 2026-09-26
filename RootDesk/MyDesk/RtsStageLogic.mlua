@@ -18,16 +18,34 @@ script RtsStageLogic extends Logic
 	property number StageEndsAt = 0
 
 	-- 일시정지(2026-09-25 사용자 "솔로 플레이 한정 일시정지" — 멈춘 동안 게임 조작은 전부 막고 창 보기만): 서버가 정하고 동기화.
-	--   게임 시계 GameNow() = ServerElapsedSeconds − 멈춘 시간 합(PausedTotal), 멈춘 동안은 PausedAt에서 멈춘다.
-	--   전투 쿨타임·스테이지 끝·빙결/약화 끝 등 판정 시각은 전부 이 시계로 적고 비교한다(투표 시간 제한·연출만 실제 시계)
+	--   전투 쿨타임·스테이지 끝·빙결/약화 끝 등 판정 시각은 전부 게임 시계 GameNow()로 적고 비교한다(투표 시간 제한·연출만 실제 시계)
 	@Sync
 	property boolean Paused = false
 
+	-- 게임 시계(2026-09-27 배속과 함께 — 전: ServerElapsedSeconds − 멈춘 시간 합): GameNow() = ClockBase + (ServerElapsedSeconds − ClockSince) × 흐름 속도(ClockRate —
+	--   일시정지 0 · 진행 중 GameSpeed · 그 밖 1). 흐름 속도가 바뀌기 직전마다(일시정지·배속·판 상태) RebaseClock으로 기준을 다시 잡아 시계가 끊기지 않는다
 	@Sync
-	property number PausedAt = 0
+	property number ClockBase = 0
 
 	@Sync
-	property number PausedTotal = 0
+	property number ClockSince = 0
+
+	-- 배속(2026-09-27 사용자 "2배속 — 일시정지 옆 좌/우 스위치(1배속 초록 · 2배속 빨강), 여럿이면 전원 2배속일 때 2배 · 스위치 위에 배속마다 고른 사람 수, 솔로는 표시 없이"): 1 또는 FastSpeed.
+	--   진행 중(running)에만 적용 — 카운트다운(난이도 고르는 시간)·종료는 1배. 판이 바뀌어도 유지(찬성표 SpeedVotes를 비우지 않음)
+	@Sync
+	property number GameSpeed = 1
+
+	property number FastSpeed = 2
+
+	-- 배속 찬성(userId → 1). 방 인원 전원이 찬성하면 GameSpeed = FastSpeed(TallySpeed)
+	@Sync
+	property SyncTable<string, number> SpeedVotes
+
+	@Sync
+	property number SpeedVoteCount = 0
+
+	-- 클라: 지금 건 클라 시간 배율(SetClientTimeScale — 같은 값이면 다시 안 건다)
+	property number ClientScaleNow = 1
 
 	-- 솔로 모드 판인가(일시정지 허용 조건 — 2026-09-25 사용자 "솔로 모드 전용. 멀티·방 만들어서 들어간 곳에선 혼자여도 불가").
 	--   지금 출시는 솔로뿐(월드 최대 인원 1)이라 true. 멀티 업데이트(대기방 → 매칭·방 만들기 → 인스턴스 룸)에서 매칭·방으로 시작한 판은 반드시 false로 둔다
@@ -126,25 +144,67 @@ script RtsStageLogic extends Logic
 		return left
 	end
 
-	-- 게임 시계(서버·클라 공용): 일시정지한 시간을 뺀 ServerElapsedSeconds. 멈춘 동안은 그대로 멈춰 있다
+	-- 게임 시계(서버·클라 공용): 멈춘 동안은 그대로, 2배속 진행 중엔 두 배로 흐른다(ClockBase·ClockSince·ClockRate)
 	method number GameNow()
-		local now = _UtilLogic.ServerElapsedSeconds
-		if self.Paused then now = self.PausedAt end
-		return now - self.PausedTotal
+		return self.ClockBase + (_UtilLogic.ServerElapsedSeconds - self.ClockSince) * self:ClockRate()
 	end
 
-	-- 게임 시간 지연 실행(서버, _TimerService:SetTimerOnce와 같은 인자 순서): sec초 뒤 fn — 그때 일시정지 중이면 풀릴 때까지 0.1초씩 미룬다(연타·구체·지속 피해·보스 2차 소환 판정)
+	-- 게임 시계 흐름 속도: 일시정지 0 · 진행 중 GameSpeed · 그 밖(카운트다운·종료·대기) 1
+	method number ClockRate()
+		if self.Paused then return 0 end
+		return self:RealSpeed()
+	end
+
+	-- 실제 시계로 도는 서버 타이머(공격 루프·몬스터 생성 간격·몬스터 이동)에 곱할 배속 — 일시정지는 각자 따로 멈춘다
+	method number RealSpeed()
+		if self.RunState == "running" and self.GameSpeed > 0 then return self.GameSpeed end
+		return 1
+	end
+
+	-- 흐름 속도가 바뀌기 직전에: 지금 게임 시각을 기준으로 다시 잡는다
+	@ExecSpace("ServerOnly")
+	method void RebaseClock()
+		self.ClockBase = self:GameNow()
+		self.ClockSince = _UtilLogic.ServerElapsedSeconds
+	end
+
+	-- 판 상태를 바꾼다(진행 중일 때만 배속이 걸리므로 시계 기준을 다시 잡고, 공격 루프·생성 간격을 새 배속으로)
+	@ExecSpace("ServerOnly")
+	method void SetRunState(string st)
+		if st == self.RunState then return end
+		self:RebaseClock()
+		self.RunState = st
+		self:ApplySpeed()
+	end
+
+	-- 배속이 바뀐 뒤: 실제 시계로 도는 타이머를 새 간격으로 다시 건다(몬스터 이동은 RtsTrackWalkerComponent가 매 프레임 RealSpeed를 곱한다)
+	@ExecSpace("ServerOnly")
+	method void ApplySpeed()
+		_RtsCombatLogic:RescaleLoops()
+		_RtsWaveLogic:RescaleSpawn()
+	end
+
+	-- 게임 시간 지연 실행(서버, _TimerService:SetTimerOnce와 같은 인자 순서): 게임 시계로 sec초 뒤 fn(연타·구체·지속 피해·보스 2차 소환·사망 뒤 제거 판정).
+	--   2배속이면 실제로는 절반, 일시정지 중이면 풀릴 때까지 0.1초씩 미룬다. 도중에 배속이 바뀌어도 게임 시각(target) 기준으로 맞춘다
 	@ExecSpace("ServerOnly")
 	method void After(any fn, number sec)
+		local target = self:GameNow() + sec
 		local run = nil
 		run = function()
 			if self.Paused then
 				_TimerService:SetTimerOnce(run, 0.1)
 				return
 			end
+			local left = target - self:GameNow()
+			if left > 0.02 then
+				_TimerService:SetTimerOnce(run, left / math.max(0.01, self:ClockRate()))
+				return
+			end
 			fn()
 		end
-		_TimerService:SetTimerOnce(run, sec)
+		local rate = self:ClockRate()
+		if rate <= 0 then rate = 1 end
+		_TimerService:SetTimerOnce(run, sec / rate)
 	end
 
 	-- ===== 서버: 입장·퇴장 =====
@@ -158,9 +218,10 @@ script RtsStageLogic extends Logic
 		_RtsUnitLogic:InitUser(userId)
 		_RtsRunResultLogic:InitUser(userId)
 		if self.RunState == "idle" then self:BeginCountdown() end
-		-- 방 인원이 늘었으니 과반 기준 갱신
+		-- 방 인원이 늘었으니 과반 기준 갱신(배속은 새로 온 사람이 찬성하기 전까지 1배)
 		self:TallyVotes()
 		self:TallyReady()
+		self:TallySpeed()
 	end
 
 	-- 퇴장(구역 반납 뒤): 그 구역 몹·보스 정리. 아무도 없으면 대기로, 남은 생존자가 없으면 판 종료
@@ -172,16 +233,19 @@ script RtsStageLogic extends Logic
 		_RtsAugmentLogic:ResetUser(userId)
 		self.RestartVotes[userId] = nil
 		self.ReadyByUser[userId] = nil
+		self.SpeedVotes[userId] = nil
 		local anyone = false
 		for uid, z in pairs(_RtsZoneLogic.ZoneByUser) do anyone = true end
 		if not anyone then
+			self:TallySpeed()
 			self:ResetRun()
 			return
 		end
 		if (self.RunState == "running" or self.RunState == "countdown") and _RtsRunResultLogic:AliveCount() == 0 then self:EndRun() end
-		-- 방 인원이 줄었으니 과반 기준 갱신(남은 사람들의 찬성이 과반이면 바로 다시 하기)
+		-- 방 인원이 줄었으니 과반 기준 갱신(남은 사람들의 찬성이 과반이면 바로 다시 하기 · 남은 사람이 모두 배속 찬성이면 2배)
 		self:TallyVotes()
 		self:TallyReady()
+		self:TallySpeed()
 	end
 
 	-- ===== 서버: 다시 하기 투표 (카운트다운·진행·종료 언제든) =====
@@ -198,6 +262,48 @@ script RtsStageLogic extends Logic
 		self:SetPaused(on)
 	end
 
+	-- 배속 선택(클라 스위치 — RtsHudLogic.ChooseSpeed): choice 1 = 1배속 · 2 = 2배속(찬성). 방 인원 전원이 2배속을 고르면 2배(솔로면 바로)
+	@ExecSpace("Server")
+	method void RequestSpeedChoice(number choice)
+		local userId = senderUserId
+		if userId == nil or userId == "" then return end
+		if _RtsZoneLogic:GetZoneOfUser(userId) < 1 then return end
+		local c = math.floor(choice + 0.5)
+		if c == 2 then
+			self.SpeedVotes[userId] = 1
+		elseif c == 1 then
+			self.SpeedVotes[userId] = nil
+		else
+			return
+		end
+		self:TallySpeed()
+	end
+
+	-- 찬성 수 갱신(나간 사람 표는 지운다) → 전원 찬성이면 FastSpeed, 아니면 1. 바뀌면 시계 기준을 다시 잡고 타이머를 새 간격으로
+	@ExecSpace("ServerOnly")
+	method void TallySpeed()
+		local stale = {}
+		for userId, v in pairs(self.SpeedVotes) do
+			if _RtsZoneLogic.ZoneByUser[userId] == nil then stale[#stale + 1] = userId end
+		end
+		for i = 1, #stale do self.SpeedVotes[stale[i]] = nil end
+		local total = 0
+		local yes = 0
+		for userId, zone in pairs(_RtsZoneLogic.ZoneByUser) do
+			total = total + 1
+			if self.SpeedVotes[userId] ~= nil then yes = yes + 1 end
+		end
+		self.SpeedVoteCount = yes
+		local want = 1
+		if total > 0 and yes >= total then want = self.FastSpeed end
+		if want ~= self.GameSpeed then
+			self:RebaseClock()
+			self.GameSpeed = want
+			self:ApplySpeed()
+			_RtsConfigLogic:Log("RtsStage: speed x" .. string.format("%d", want) .. " (" .. string.format("%d/%d", yes, total) .. ")")
+		end
+	end
+
 	-- 방 인원(구역을 가진 유저 수)
 	@ExecSpace("ServerOnly")
 	method number RoomUserCount()
@@ -206,18 +312,12 @@ script RtsStageLogic extends Logic
 		return total
 	end
 
-	-- 멈춤/풀기: 풀 때 멈춘 시간을 PausedTotal에 더한 뒤 Paused를 끈다(게임 시계가 끊김 없이 이어지게). 몬스터 걷기 모션도 같이 멈춘다
+	-- 멈춤/풀기: 게임 시계 기준을 다시 잡고(RebaseClock — 멈춘 동안 흐름 속도 0) Paused를 바꾼다. 몬스터 걷기 모션도 같이 멈춘다
 	@ExecSpace("ServerOnly")
 	method void SetPaused(boolean on)
 		if on == self.Paused then return end
-		local now = _UtilLogic.ServerElapsedSeconds
-		if on then
-			self.PausedAt = now
-			self.Paused = true
-		else
-			self.PausedTotal = self.PausedTotal + (now - self.PausedAt)
-			self.Paused = false
-		end
+		self:RebaseClock()
+		self.Paused = on
 		_RtsWaveLogic:SetMotionPaused(on)
 		_RtsConfigLogic:Log("RtsStage: paused " .. tostring(on))
 	end
@@ -351,7 +451,7 @@ script RtsStageLogic extends Logic
 	@ExecSpace("ServerOnly")
 	method void BeginCountdown()
 		self:SetPaused(false)
-		self.RunState = "countdown"
+		self:SetRunState("countdown")
 		self.StageNo = 0
 		self.EarlyEndAt = 0
 		self.StageEndsAt = self:GameNow() + self.CountdownSec
@@ -394,7 +494,7 @@ script RtsStageLogic extends Logic
 			self:EndRun()
 			return
 		end
-		self.RunState = "running"
+		self:SetRunState("running")
 		self.StageNo = n
 		self.EarlyEndAt = 0
 		self.BossPrep = false
@@ -458,7 +558,7 @@ script RtsStageLogic extends Logic
 	method void EndRun()
 		if self.RunState == "ended" then return end
 		self:SetPaused(false)
-		self.RunState = "ended"
+		self:SetRunState("ended")
 		self.EarlyEndAt = 0
 		self.BossPrep = false
 		self.StageEndsAt = self:GameNow()
@@ -482,7 +582,7 @@ script RtsStageLogic extends Logic
 		_RtsRunResultLogic:ResetAll()
 		self:ClearVotes()
 		self:SetPaused(false)
-		self.RunState = "idle"
+		self:SetRunState("idle")
 		self.BossPrep = false
 		self.StageNo = 0
 		self.EarlyEndAt = 0
@@ -527,6 +627,14 @@ script RtsStageLogic extends Logic
 		_RtsHudLogic:RefreshRecruitButton()
 		_RtsHudLogic:RefreshRestartButton()
 		_RtsHudLogic:RefreshPauseUi()
+		_RtsHudLogic:RefreshSpeedUi()
+		-- 배속(2026-09-27): 진행 중 2배면 클라 시간도 2배(엔진 SetClientTimeScale — 연출·데미지 숫자·클라 타이머·몬스터 걷기 그림, 소리는 그대로). 멈춤·그 밖은 1
+		local ts = 1
+		if self.RunState == "running" and not self.Paused then ts = self.GameSpeed end
+		if ts ~= self.ClientScaleNow then
+			self.ClientScaleNow = ts
+			_UtilLogic:SetClientTimeScale(ts)
+		end
 		-- 판이 시작되면(1라운드) 영입 팝업을 한 번 자동으로(이후 칸이 열리면 영입 버튼만 강조). 영입은 진행 중에만(2026-09-24 사용자 — 전엔 카운트다운 때)
 		if self.RunState == "running" then
 			if not self.AutoRecruitShown and _RtsPopupLogic.Built and not _RtsPopupLogic:IsOpen() and _RtsRunResultLogic:IsMeAlive() then
