@@ -898,6 +898,13 @@ script RtsHudLogic extends Logic
 		return tostring(math.floor(n + 0.5))
 	end
 
+	-- 소수 한 자리까지(정수면 정수로): 3 → "3", 3.5 → "3.5", 3.25 → "3.3" — 증강 수치(2026-09-27 3.5·5.5·7.5 단계)
+	method string Num(number n)
+		local t = math.floor(n * 10 + 0.5)
+		if t % 10 == 0 then return tostring(math.floor(t / 10)) end
+		return string.format("%.1f", t / 10)
+	end
+
 	method string FormatNumber(number n)
 		local s = tostring(math.floor(n))
 		local out = ""

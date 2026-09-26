@@ -145,7 +145,7 @@ script RtsBossLogic extends Logic
 		if #list < #s.mobs or self:AliveBossCount(z) > 0 then return end
 		self.Down[z] = true
 		_RtsConfigLogic:Log("RtsBoss: zone " .. string.format("%d", z) .. " down " .. s.name)
-		-- 프리즘 라운드(자쿰·시그너스·루시드 — 2026-09-23 3개로) 보스를 잡으면 그 구역 주인에게 프리즘 3택1
+		-- 프리즘 라운드(자쿰·시그너스·루시드 — 2026-09-23 3개로) 보스를 잡으면 그 구역 주인에게 프리즘 선택(아직 없는 프리즘 전체에서 1개 — 2026-09-27)
 		_RtsAugmentLogic:OnBossDown(_RtsRunResultLogic:OwnerOfZone(z), _RtsStageLogic.StageNo)
 		if _RtsStageLogic.StageNo >= _RtsStageTableLogic:GetStageCount() then
 			_RtsRunResultLogic:Clear(_RtsRunResultLogic:OwnerOfZone(z))

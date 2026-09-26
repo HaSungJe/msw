@@ -1,6 +1,6 @@
 -- Phase 5 #19·#20 + Phase 4 #14 (부분, 2026-09-15): 유닛 정보 팝업 (아티팩트 v27 #unitModal 그대로)
 --   열기: 우측 유닛 슬롯 클릭 / 캐릭터 클릭 메뉴의 상세정보. 셸(딤·패널·제목·X·ESC)은 RtsPopupLogic("unit").
---   좌: 외형(직업 기본 세트 하나 — 월드 아바타 스킨은 2026-09-25 삭제) + 능력치(RtsJobTableLogic.Calc, 파티 버프 반영 행은 ▲).
+--   좌: 외형(직업 기본 세트 하나 — 월드 아바타 스킨은 2026-09-25 삭제) + 능력치(RtsJobTableLogic.Calc, 파티 버프 반영 행은 ▲) + 증강으로 오른 수치 + 보스 DPS·증강 효율(2026-09-27).
 --   우: 탭 3개 — 스킬(미획득 흐림, 액티브/패시브) / 증강 n(이 유닛에 지정된 증강, Phase 6 전엔 빈 목록) / 적용 중인 버프 n(RtsUnitBuffLogic). 증강·버프는 ScrollLayoutGroup 스크롤 목록. Tab 키로 순환(CycleTab).
 --   대상 지정 스킬(홀리 유니티) 행에는 셀렉트 박스(미지정 / 내 다른 유닛). 하단: [레벨업] 버튼만(2026-09-16 — 누적 투자·다음 벽·보유 메소·'(벽)' 문구는 유저에게 필요 없는 내부 정보라 삭제. 메소는 HUD 좌상단).
 --   위치 이동은 여기 없음 — 캐릭터 클릭 메뉴(RtsUnitSelectLogic)에서. 대상 변경·위치 이동은 유닛마다 3분 쿨.
@@ -10,7 +10,8 @@ script RtsUnitPopupLogic extends Logic
 
 	property number PanelW = 1360
 
-	property number PanelH = 880
+	-- 2026-09-27 880 → 960(사용자 "아래쪽 공간이 너무 부족" — 왼쪽 아래 보스 DPS 상자가 들어오며 도형 기준 안내가 창 밖으로 잘렸다)
+	property number PanelH = 960
 
 	-- 지금 보고 있는 유닛 번호(0 = 닫힘)
 	property number CurNo = 0
@@ -100,6 +101,8 @@ script RtsUnitPopupLogic extends Logic
 		self.LookSigNow = ""
 		self.TabBar = nil
 		self.RightBox = nil
+		self._T.DpsVal = nil
+		self._T.EffRows = nil
 		if self.TickId ~= 0 then
 			_TimerService:ClearTimer(self.TickId)
 			self.TickId = 0
@@ -144,6 +147,7 @@ script RtsUnitPopupLogic extends Logic
 			if v ~= nil and isvalid(v) and v.TextComponent.Text ~= rows[i][2] then v.TextComponent.Text = rows[i][2] end
 		end
 		self:UpdateStatChart(u)
+		self:ApplyDps(u)
 		self:ApplyLevelButton(u)
 	end
 
@@ -295,21 +299,22 @@ script RtsUnitPopupLogic extends Logic
 			H:SpawnLabel("RtsUnitExtraStatK", content, Vector2(0, 1), Vector2(0, 1), Vector2(x, -443), Vector2(160, 24), rows[index][1], P:Muted(), 16, TextAlignmentType.MiddleLeft, false)
 			self.StatVals[index] = H:SpawnLabel("RtsUnitExtraStatV", content, Vector2(0, 1), Vector2(0, 1), Vector2(x + 160, -443), Vector2(100, 24), rows[index][2], P:Ink(), 18, TextAlignmentType.MiddleRight, true)
 		end
-		H:SpawnLabel("RtsStatChartScale", content, Vector2(0, 1), Vector2(0, 1), Vector2(27, -642), Vector2(602, 70), "도형 기준: 공격력 1,000 · 공격력 증가 200%\n최종 데미지 300% · 보스 데미지 200% · 크확 100% · 크뎀 200%\n기준을 넘은 수치도 숫자에는 그대로 표시됩니다", P:Muted(), 13, TextAlignmentType.UpperLeft, false)
+		-- 도형 기준 안내는 맨 아래(2026-09-27 보스 DPS 상자가 들어오며 −642 → −788 — 창 높이 960)
+		H:SpawnLabel("RtsStatChartScale", content, Vector2(0, 1), Vector2(0, 1), Vector2(27, -788), Vector2(602, 64), "도형 기준: 공격력 1,000 · 공격력 증가 200%\n최종 데미지 300% · 보스 데미지 200% · 크확 100% · 크뎀 200%\n기준을 넘은 수치도 숫자에는 그대로 표시됩니다", P:Muted(), 13, TextAlignmentType.UpperLeft, false)
 
 		-- ----- 좌 아래: 증강으로 오른 수치(2026-09-24 사용자 "캐릭터 상세정보 아래에 박스 하나 더 — 증강으로 올라간 수치") -----
 		--   증강 탭 합계와 같은 계산(RtsAugmentTableLogic.TotalsMul × 티어 배율 RtsJobTableLogic.AugMulFor), 2열 격자
 		local at = _RtsAugmentTableLogic:TotalsMul(u.Augs, _RtsJobTableLogic:AugMulFor(u))
-		local augBox = H:SpawnRoundedPanel("RtsUnitAugGain", content, Vector2(0, 1), Vector2(0, 1), Vector2(27, -486), Vector2(602, 130),
+		local augBox = H:SpawnRoundedPanel("RtsUnitAugGain", content, Vector2(0, 1), Vector2(0, 1), Vector2(27, -486), Vector2(602, 120),
 			P:Mix(H:ColGold(), 0.06), P:Mix(H:ColGold(), 0.35), 1.5)
 		H:SpawnLabel("RtsUnitAugGainT", augBox, Vector2(0, 1), Vector2(0, 1), Vector2(14, -6), Vector2(534, 24),
 			"증강으로 오른 수치 (" .. H:Int(at.n) .. "개)", P:AccentInk(), 16, TextAlignmentType.MiddleLeft, true)
 		local gains = {}
-		if at.atk > 0 then gains[#gains + 1] = "공격력 +" .. H:Int(at.atk) end
-		if at.pct > 0 then gains[#gains + 1] = "공격력 +" .. H:Int(at.pct) .. "%" end
-		if at.boss > 0 then gains[#gains + 1] = "보스 데미지 +" .. H:Int(at.boss) .. "%" end
-		if at.crit > 0 then gains[#gains + 1] = "크리티컬 확률 +" .. H:Int(at.crit) .. "%" end
-		if at.critDmg > 0 then gains[#gains + 1] = "크리티컬 데미지 +" .. H:Int(at.critDmg) .. "%" end
+		if at.atk > 0 then gains[#gains + 1] = "공격력 +" .. H:Num(at.atk) end
+		if at.pct > 0 then gains[#gains + 1] = "공격력 +" .. H:Num(at.pct) .. "%" end
+		if at.boss > 0 then gains[#gains + 1] = "보스 데미지 +" .. H:Num(at.boss) .. "%" end
+		if at.crit > 0 then gains[#gains + 1] = "크리티컬 확률 +" .. H:Num(at.crit) .. "%" end
+		if at.critDmg > 0 then gains[#gains + 1] = "크리티컬 데미지 +" .. H:Num(at.critDmg) .. "%" end
 		if at.fin > 100.01 then gains[#gains + 1] = "최종 데미지 +" .. H:Int(at.fin - 100) .. "%" end
 		if #gains == 0 then
 			H:SpawnLabel("RtsUnitAugGainNone", augBox, Vector2(0, 1), Vector2(0, 1), Vector2(14, -32), Vector2(534, 24),
@@ -323,6 +328,33 @@ script RtsUnitPopupLogic extends Logic
 				gl.TextComponent.Overflow = OverflowType.Truncate
 			end
 		end
+
+		-- ----- 좌 아래: 보스 DPS · 증강 효율(2026-09-27 사용자 "보스 기준 DPS — 방어율 없는 기준" + "공격력/공격력%/크리티컬 확률/크리티컬 데미지 4종 증강 중
+		--   현재 시점의 DPS 증가 효율 — 실버 1단계 기준 우선순위") — 값·순위는 ApplyDps가 제자리에서 바꾼다(2×2, 왼쪽 위부터 1~4위)
+		--   창 높이 960(2026-09-27 사용자 "아래쪽 공간이 너무 부족")에 맞춰 (27,−622) 602×150, 순위 줄 간격 34
+		local dpsBox = H:SpawnRoundedPanel("RtsUnitDps", content, Vector2(0, 1), Vector2(0, 1), Vector2(27, -622), Vector2(602, 150), P:Card(), P:Edge(), 1.5)
+		-- 한 줄 "보스 DPS (방어율 제외) 52"(2026-09-27 사용자 "너무 우측에 박혀 있어 — 이런 식으로") — 글자 폭을 잴 수 없어 리치 텍스트 한 라벨로 이어 쓴다(ApplyDps). 파티 버프는 반영된 값
+		self._T.DpsVal = H:SpawnLabel("RtsUnitDpsV", dpsBox, Vector2(0, 1), Vector2(0, 1), Vector2(14, -6), Vector2(574, 34), "", P:Ink(), 16, TextAlignmentType.MiddleLeft, true)
+		self._T.DpsVal.TextComponent.IsRichText = true
+		-- 안내 문구(2026-09-27 사용자 "'보스 기준 증강 효율 (실버 I 기준)'으로")
+		H:SpawnLabel("RtsUnitEffT", dpsBox, Vector2(0, 1), Vector2(0, 1), Vector2(14, -44), Vector2(574, 22), "보스 기준 증강 효율 (실버 I 기준)", P:Muted(), 14, TextAlignmentType.MiddleLeft, false)
+		self._T.EffRows = {}
+		for ri = 1, 4 do
+			local ex = 14 + ((ri - 1) % 2) * 290
+			local ey = -76 - math.floor((ri - 1) / 2) * 34
+			local rankFill = P:Mix(H:ColGold(), 0.18)
+			local rankInk = P:Muted()
+			if ri == 1 then
+				rankFill = H:ColGold()
+				rankInk = Color(0.133, 0.114, 0.09, 1)
+			end
+			local badge = H:SpawnRoundedPanel("RtsUnitEffRank", dpsBox, Vector2(0, 1), Vector2(0, 1), Vector2(ex, ey), Vector2(22, 22), rankFill, rankFill, 1)
+			H:SpawnLabel("RtsUnitEffRankN", badge, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2(0, 0), Vector2(22, 22), H:Int(ri), rankInk, 13, TextAlignmentType.MiddleCenter, true)
+			local name = H:SpawnLabel("RtsUnitEffName", dpsBox, Vector2(0, 1), Vector2(0, 1), Vector2(ex + 30, ey), Vector2(170, 22), "", P:Ink(), 15, TextAlignmentType.MiddleLeft, false)
+			local gain = H:SpawnLabel("RtsUnitEffGain", dpsBox, Vector2(0, 1), Vector2(0, 1), Vector2(ex + 200, ey), Vector2(76, 22), "", P:Ink(), 15, TextAlignmentType.MiddleRight, true)
+			self._T.EffRows[ri] = { name = name, gain = gain }
+		end
+		self:ApplyDps(u)
 
 		-- ----- 우: 탭(스킬 / 증강 n / 적용 중인 버프 n) + 목록 -----
 		local rx = 647
@@ -370,7 +402,7 @@ script RtsUnitPopupLogic extends Logic
 	end
 
 	-- 능력치 8줄 { 이름, 값(리치 텍스트) } — 버프 없는 원값(s0)과 버프 반영값(s)이 다른 행은 ▲. 프리즘은 둘 다에 반영(GetStatFor)
-	--   기본 공격 구성·보스 DPS·몬스터 DPS 줄은 2026-09-18 사용자 요청으로 제거(설계 수치 — 유저에게 불필요)
+	--   기본 공격 구성·보스 DPS·몬스터 DPS 줄은 2026-09-18 사용자 요청으로 제거(설계 수치 — 유저에게 불필요) → 보스 DPS는 2026-09-27 사용자 요청으로 왼쪽 아래 상자에 다시(스킬 로테이션 기준 — ApplyDps)
 	--   공격속도는 등급만(보통·빠름…; n초당 1회 없음), 공격력은 총합만(구성식 없음), 공격력 %는 추가되는 %의 합(+n%) — 2026-09-18 사용자
 	@ExecSpace("ClientOnly")
 	method table StatRowTexts(any u)
@@ -684,11 +716,11 @@ script RtsUnitPopupLogic extends Logic
 		local box = H:SpawnRoundedPanel("RtsUnitAugSum", content, Vector2(0, 1), Vector2(0, 1), Vector2(rx, top), Vector2(rw - 12, 88),
 			P:Mix(H:ColGold(), 0.08), P:Mix(H:ColGold(), 0.4), 1.5)
 		local parts = {}
-		if t.atk > 0 then parts[#parts + 1] = "공격력 +" .. H:Int(t.atk) end
-		if t.pct > 0 then parts[#parts + 1] = "공격력 +" .. H:Int(t.pct) .. "%" end
-		if t.boss > 0 then parts[#parts + 1] = "보스 공격 시 데미지 +" .. H:Int(t.boss) .. "%" end
-		if t.crit > 0 then parts[#parts + 1] = "크리티컬 확률 +" .. H:Int(t.crit) .. "%" end
-		if t.critDmg > 0 then parts[#parts + 1] = "크리티컬 데미지 +" .. H:Int(t.critDmg) .. "%" end
+		if t.atk > 0 then parts[#parts + 1] = "공격력 +" .. H:Num(t.atk) end
+		if t.pct > 0 then parts[#parts + 1] = "공격력 +" .. H:Num(t.pct) .. "%" end
+		if t.boss > 0 then parts[#parts + 1] = "보스 공격 시 데미지 +" .. H:Num(t.boss) .. "%" end
+		if t.crit > 0 then parts[#parts + 1] = "크리티컬 확률 +" .. H:Num(t.crit) .. "%" end
+		if t.critDmg > 0 then parts[#parts + 1] = "크리티컬 데미지 +" .. H:Num(t.critDmg) .. "%" end
 		if t.fin > 100.01 then parts[#parts + 1] = "최종 데미지 +" .. H:Int(t.fin - 100) .. "%" end
 		local line1 = "증강 " .. H:Int(t.n) .. "개 합계"
 		local line2 = "아직 없어요"
@@ -979,11 +1011,84 @@ script RtsUnitPopupLogic extends Logic
 		if self.CurNo == 0 or self.Body == nil then return end
 		local u = _RtsUnitLogic:GetMyUnit(self.CurNo)
 		if u == nil then return end
+		-- 파티 버프가 붙거나 빠져도 보스 DPS·증강 효율을 맞춘다(서명이 같으면 계산 없음 — DpsInfo)
+		self:ApplyDps(u)
 		if self.BondLocked and u:BondCoolLeft() <= 0 then
 			self:RenderRight(u)
 			return
 		end
 		self:ApplyBondCool(u)
+	end
+
+	-- 보스 DPS와 실버 I 증강 4종(공격력 +40 · 공격력 +5% · 크리티컬 확률 +5% · 크리티컬 데미지 +5%)의 보스 DPS 증가율(%) — 큰 순(같으면 표 순서)
+	--   증가율 = 이 유닛에 그 증강을 하나 더 지정했다고 친 보스 DPS ÷ 지금 보스 DPS − 1. 증강 효과 배율(AugMulFor — 1티어는 개수가 늘면 기존 증강까지 세짐)까지 그대로 들어간다.
+	--   보스 DPS = RtsJobTableLogic.BossDps(파티 버프 반영, 방어율 제외). 직업·레벨·프리즘·증강·스킬 잠금·버프가 같으면 앞 결과를 쓴다
+	property table EffAugIds = { "s1_atk", "s1_pct", "s1_crit", "s1_cdmg" }
+
+	@ExecSpace("ClientOnly")
+	method table DpsInfo(any u)
+		local B = _RtsUnitBuffLogic
+		local T = _RtsJobTableLogic
+		local augs0 = u.Augs or ""
+		local prisms = u.Prisms or ""
+		local locks = u.SkillLocks or ""
+		local key = u.JobId .. "|" .. _RtsHudLogic:Int(u.Level) .. "|" .. prisms .. "|" .. augs0 .. "|" .. locks .. "|" .. B:BuffSig(u.Zone, u.No)
+		if self._T.DpsKey == key and self._T.DpsInfo ~= nil then return self._T.DpsInfo end
+		local buffs = B:GetBuffsFor(u.Zone, u.No)
+		local function dpsWith(augs)
+			local v = { JobId = u.JobId, Level = u.Level, Prisms = prisms, Augs = augs, SkillLocks = locks }
+			local st = T:GetStatFor(v)
+			B:ApplyToStat(st, buffs)
+			return T:BossDps(v, st)
+		end
+		local base = dpsWith(augs0)
+		local rows = {}
+		for i, id in ipairs(self.EffAugIds) do
+			local augs = id
+			if augs0 ~= "" then augs = augs0 .. "," .. id end
+			local gain = 0
+			if base > 0 then gain = (dpsWith(augs) / base - 1) * 100 end
+			rows[#rows + 1] = { id = id, text = _RtsAugmentTableLogic:EffectText(id), gain = gain, order = i }
+		end
+		table.sort(rows, function(a, b)
+			if math.abs(a.gain - b.gain) > 0.0001 then return a.gain > b.gain end
+			return a.order < b.order
+		end)
+		local info = { dps = base, rows = rows }
+		self._T.DpsKey = key
+		self._T.DpsInfo = info
+		_RtsConfigLogic:Log("RtsUnitPopup: boss dps " .. u.JobId .. " Lv" .. _RtsHudLogic:Int(u.Level) .. " = " .. _RtsHudLogic:FormatNumber(base) .. " · 1위 " .. rows[1].id .. " +" .. _RtsHudLogic:Num(rows[1].gain) .. "%")
+		return info
+	end
+
+	-- 보스 DPS 상자(BuildContent)의 글자만 바꾼다 — 순위가 바뀌면 칸마다 이름·증가율을 새 순서로
+	@ExecSpace("ClientOnly")
+	method void ApplyDps(any u)
+		local v = self._T.DpsVal
+		if u == nil or v == nil or not isvalid(v) then return end
+		local H = _RtsHudLogic
+		local P = _RtsPopupLogic
+		local info = self:DpsInfo(u)
+		local text = "보스 DPS <size=13><color=#a3957a>(방어율 제외)</color></size>  <size=22>" .. H:FormatNumber(info.dps) .. "</size>"
+		if v.TextComponent.Text ~= text then v.TextComponent.Text = text end
+		local slots = self._T.EffRows or {}
+		for i = 1, #slots do
+			local s = slots[i]
+			local d = info.rows[i]
+			if d ~= nil and isvalid(s.name) and isvalid(s.gain) then
+				local g = "+" .. H:Num(d.gain) .. "%"
+				local col = Color(0.208, 0.424, 0.196, 1)
+				if d.gain < 0.05 then
+					g = "+0%"
+					col = P:Muted()
+				end
+				if s.name.TextComponent.Text ~= d.text then s.name.TextComponent.Text = d.text end
+				if s.gain.TextComponent.Text ~= g then
+					s.gain.TextComponent.Text = g
+					s.gain.TextComponent.FontColor = col
+				end
+			end
+		end
 	end
 
 	-- 외형 미리보기: UI 아바타(UIEmpty + CostumeManager + AvatarGUIRenderer). 모델이 없으면 조용히 건너뛴다

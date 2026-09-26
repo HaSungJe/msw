@@ -1,5 +1,6 @@
 -- Phase 4 합류(2026-09-23, revision-1 §2): 증강 표 — 정의·지급 라운드·굴림·능력치 오버레이. 서버·클라 공용 읽기 전용.
---   원본 = .info/augmentation.md(사용자 확정 — 이름·효과·가중치 [n/100]). 브론즈~골드 = 능력치만(크리 확률·크리 데미지·공격력 +n·공격력 %·보스 공격시 데미지, 전부 합연산 — 방어율 무시 증강은 2026-09-24 삭제).
+--   원본 = .info/augmentation.md(사용자 확정 — 이름·효과·단계 확률). 브론즈~골드 = 능력치만(크리 확률·크리 데미지·공격력 +n·공격력 %·보스 공격시 데미지(골드만), 전부 합연산 — 방어율 무시 증강은 2026-09-24 삭제).
+--   2026-09-27 개편: 단계(I 50 · II 35 · III 15%)만 무작위, 그 단계의 종류는 전부 보여 주고 선택(StatChoices). 프리즘은 아직 없는 프리즘 전체에서 선택(PrismChoices).
 --   프리즘 = 특수 코어 2(일격필살·보스 슬레이어 — 모든 직업, 중복 등장 가능·같은 유닛 중복 적용 불가) + 팬텀 잠금 해제 + 직업 전용 10(RtsJobTableLogic.GetPrisms의 id와 같다).
 --   지급: 브~골 = 몬스터 스테이지 태그 표(라운드 시작 때), 프리즘 = 보스 순번(처치 직후). 한 판 30개(브 10·실 10·골 7·프리즘 3 — 자쿰·시그너스·루시드).
 @Logic
@@ -13,6 +14,12 @@ script RtsAugmentTableLogic extends Logic
 	-- 등급 → id 목록(표 순서)
 	property table ByGrade = {}
 
+	-- 브론즈~골드: 등급 → 단계(1~3) → id 목록(종류 순서) — 2026-09-27 단계 무작위 + 종류 선택
+	property table ByLevel = {}
+
+	-- 단계 I/II/III가 나올 확률(%) — 라운드 보상·뽑기 공통(2026-09-27 사용자)
+	property table LevelWeights = { 50, 35, 15 }
+
 	-- 몬스터 스테이지 태그 → 등급(augmentation.md 지급 라운드표)
 	property table GradeByTag = {}
 
@@ -22,62 +29,65 @@ script RtsAugmentTableLogic extends Logic
 	method void Ensure()
 		if self.Loaded then return end
 		self.Loaded = true
+		-- 2026-09-27 사용자 "증강 완전 개편 — 브론즈/실버/골드는 단계(I/II/III)까지만 무작위, 그 중 종류는 선택, 수치 조정":
+		--   { id, 등급, 단계, 이름, 능력치, 값 }. 지급(라운드 보상·뽑기) = 등급 → 단계(LevelWeights 50/35/15) 굴림 → 그 단계의 종류 전부(4~5장)에서 하나 선택(RtsAugmentLogic.ActivatePending)
+		--   (전: 등급 안 가중치 [n/100]로 무작위 3장 — 실버 '보스 사냥꾼' 삭제, 골드 '거인 학살자' 10/12/15 → 20/25/30)
 		local list = {
-			-- 브론즈 [n/100]
-			{ "b_crit3", "bronze", "어설픈 약점 찾기 III", 5, "crit", 4 },
-			{ "b_cdmg3", "bronze", "어설픈 급소 찌르기 III", 5, "critDmg", 4 },
-			{ "b_atk3", "bronze", "어설픈 무기 연마 III", 5, "atk", 25 },
-			{ "b_pct3", "bronze", "어설픈 전투 감각 III", 5, "pct", 4 },
-			{ "b_crit2", "bronze", "어설픈 약점 찾기 II", 8, "crit", 3 },
-			{ "b_cdmg2", "bronze", "어설픈 급소 찌르기 II", 8, "critDmg", 3 },
-			{ "b_atk2", "bronze", "어설픈 무기 연마 II", 8, "atk", 20 },
-			{ "b_pct2", "bronze", "어설픈 전투 감각 II", 8, "pct", 3 },
-			{ "b_crit1", "bronze", "어설픈 약점 찾기 I", 12, "crit", 2 },
-			{ "b_cdmg1", "bronze", "어설픈 급소 찌르기 I", 12, "critDmg", 2 },
-			{ "b_atk1", "bronze", "어설픈 무기 연마 I", 12, "atk", 15 },
-			{ "b_pct1", "bronze", "어설픈 전투 감각 I", 12, "pct", 2 },
+			-- 브론즈
+			{ "b1_crit", "bronze", 1, "어설픈 약점 찾기 I", "crit", 3 },
+			{ "b1_cdmg", "bronze", 1, "어설픈 급소 찌르기 I", "critDmg", 3 },
+			{ "b1_atk", "bronze", 1, "어설픈 무기 연마 I", "atk", 20 },
+			{ "b1_pct", "bronze", 1, "어설픈 전투 감각 I", "pct", 3 },
+			{ "b2_crit", "bronze", 2, "어설픈 약점 찾기 II", "crit", 3.5 },
+			{ "b2_cdmg", "bronze", 2, "어설픈 급소 찌르기 II", "critDmg", 3.5 },
+			{ "b2_atk", "bronze", 2, "어설픈 무기 연마 II", "atk", 22 },
+			{ "b2_pct", "bronze", 2, "어설픈 전투 감각 II", "pct", 3.5 },
+			{ "b3_crit", "bronze", 3, "어설픈 약점 찾기 III", "crit", 4 },
+			{ "b3_cdmg", "bronze", 3, "어설픈 급소 찌르기 III", "critDmg", 4 },
+			{ "b3_atk", "bronze", 3, "어설픈 무기 연마 III", "atk", 25 },
+			{ "b3_pct", "bronze", 3, "어설픈 전투 감각 III", "pct", 4 },
 			-- 실버
-			{ "s_crit3", "silver", "능숙한 약점 찾기 III", 4.5, "crit", 7 },
-			{ "s_cdmg3", "silver", "능숙한 급소 찌르기 III", 4.5, "critDmg", 7 },
-			{ "s_atk3", "silver", "능숙한 무기 연마 III", 4.5, "atk", 60 },
-			{ "s_pct3", "silver", "능숙한 전투 감각 III", 4.5, "pct", 7 },
-			{ "s_boss3", "silver", "보스 사냥꾼 III", 2, "boss", 7 },
-			{ "s_crit2", "silver", "능숙한 약점 찾기 II", 9, "crit", 6 },
-			{ "s_cdmg2", "silver", "능숙한 급소 찌르기 II", 9, "critDmg", 6 },
-			{ "s_atk2", "silver", "능숙한 무기 연마 II", 9, "atk", 50 },
-			{ "s_pct2", "silver", "능숙한 전투 감각 II", 9, "pct", 6 },
-			{ "s_boss2", "silver", "보스 사냥꾼 II", 4, "boss", 6 },
-			{ "s_crit1", "silver", "능숙한 약점 찾기 I", 13.5, "crit", 5 },
-			{ "s_cdmg1", "silver", "능숙한 급소 찌르기 I", 13.5, "critDmg", 5 },
-			{ "s_atk1", "silver", "능숙한 무기 연마 I", 13.5, "atk", 40 },
-			{ "s_pct1", "silver", "능숙한 전투 감각 I", 13.5, "pct", 5 },
-			{ "s_boss1", "silver", "보스 사냥꾼 I", 6, "boss", 5 },
+			{ "s1_crit", "silver", 1, "능숙한 약점 찾기 I", "crit", 5 },
+			{ "s1_cdmg", "silver", 1, "능숙한 급소 찌르기 I", "critDmg", 5 },
+			{ "s1_atk", "silver", 1, "능숙한 무기 연마 I", "atk", 40 },
+			{ "s1_pct", "silver", 1, "능숙한 전투 감각 I", "pct", 5 },
+			{ "s2_crit", "silver", 2, "능숙한 약점 찾기 II", "crit", 5.5 },
+			{ "s2_cdmg", "silver", 2, "능숙한 급소 찌르기 II", "critDmg", 5.5 },
+			{ "s2_atk", "silver", 2, "능숙한 무기 연마 II", "atk", 45 },
+			{ "s2_pct", "silver", 2, "능숙한 전투 감각 II", "pct", 5.5 },
+			{ "s3_crit", "silver", 3, "능숙한 약점 찾기 III", "crit", 6 },
+			{ "s3_cdmg", "silver", 3, "능숙한 급소 찌르기 III", "critDmg", 6 },
+			{ "s3_atk", "silver", 3, "능숙한 무기 연마 III", "atk", 50 },
+			{ "s3_pct", "silver", 3, "능숙한 전투 감각 III", "pct", 6 },
 			-- 골드
-			{ "g_crit3", "gold", "완벽한 약점 찾기 III", 4, "crit", 15 },
-			{ "g_cdmg3", "gold", "완벽한 급소 찌르기 III", 4.5, "critDmg", 15 },
-			{ "g_atk3", "gold", "완벽한 무기 연마 III", 4.5, "atk", 90 },
-			{ "g_pct3", "gold", "완벽한 전투 감각 III", 4.5, "pct", 15 },
-			{ "g_boss3", "gold", "거인 학살자 III", 2, "boss", 15 },
-			{ "g_crit2", "gold", "완벽한 약점 찾기 II", 9, "crit", 12 },
-			{ "g_cdmg2", "gold", "완벽한 급소 찌르기 II", 9, "critDmg", 12 },
-			{ "g_atk2", "gold", "완벽한 무기 연마 II", 9, "atk", 80 },
-			{ "g_pct2", "gold", "완벽한 전투 감각 II", 9, "pct", 12 },
-			{ "g_boss2", "gold", "거인 학살자 II", 4, "boss", 12 },
-			{ "g_crit1", "gold", "완벽한 약점 찾기 I", 13.5, "crit", 10 },
-			{ "g_cdmg1", "gold", "완벽한 급소 찌르기 I", 13.5, "critDmg", 10 },
-			{ "g_atk1", "gold", "완벽한 무기 연마 I", 13.5, "atk", 70 },
-			{ "g_pct1", "gold", "완벽한 전투 감각 I", 13.5, "pct", 10 },
-			{ "g_boss1", "gold", "거인 학살자 I", 6, "boss", 10 },
+			{ "g1_crit", "gold", 1, "완벽한 약점 찾기 I", "crit", 7 },
+			{ "g1_cdmg", "gold", 1, "완벽한 급소 찌르기 I", "critDmg", 8 },
+			{ "g1_atk", "gold", 1, "완벽한 무기 연마 I", "atk", 70 },
+			{ "g1_pct", "gold", 1, "완벽한 전투 감각 I", "pct", 7 },
+			{ "g1_boss", "gold", 1, "거인 학살자 I", "boss", 20 },
+			{ "g2_crit", "gold", 2, "완벽한 약점 찾기 II", "crit", 7.5 },
+			{ "g2_cdmg", "gold", 2, "완벽한 급소 찌르기 II", "critDmg", 7.5 },
+			{ "g2_atk", "gold", 2, "완벽한 무기 연마 II", "atk", 75 },
+			{ "g2_pct", "gold", 2, "완벽한 전투 감각 II", "pct", 7.5 },
+			{ "g2_boss", "gold", 2, "거인 학살자 II", "boss", 25 },
+			{ "g3_crit", "gold", 3, "완벽한 약점 찾기 III", "crit", 8 },
+			{ "g3_cdmg", "gold", 3, "완벽한 급소 찌르기 III", "critDmg", 8 },
+			{ "g3_atk", "gold", 3, "완벽한 무기 연마 III", "atk", 80 },
+			{ "g3_pct", "gold", 3, "완벽한 전투 감각 III", "pct", 8 },
+			{ "g3_boss", "gold", 3, "거인 학살자 III", "boss", 30 },
 		}
 		self.Defs = {}
 		self.ByGrade = { bronze = {}, silver = {}, gold = {}, prism = {} }
+		self.ByLevel = { bronze = { {}, {}, {} }, silver = { {}, {}, {} }, gold = { {}, {}, {} } }
 		for i = 1, #list do
 			local r = list[i]
-			local d = { id = r[1], grade = r[2], name = r[3], w = r[4] }
+			local d = { id = r[1], grade = r[2], level = r[3], name = r[4], w = 1 }
 			d[r[5]] = r[6]
 			self.Defs[d.id] = d
 			local g = self.ByGrade[d.grade]
 			g[#g + 1] = d.id
+			local lv = self.ByLevel[d.grade][d.level]
+			lv[#lv + 1] = d.id
 		end
 		-- 프리즘 — 특수 코어(모든 직업, 중복 등장 가능, 같은 유닛 중복 적용 불가)
 		self:AddPrism({ id = "core_final", name = "일격필살", w = 5, core = true, fin = 15, desc = "[모든 직업] 최종 데미지가 15% 증가한다. 같은 유닛에 중복 적용 불가" })
@@ -139,18 +149,83 @@ script RtsAugmentTableLogic extends Logic
 		return false
 	end
 
-	-- 효과 한 줄: "크리티컬 확률 +4%" / 프리즘은 설명
+	-- 효과 한 줄: "크리티컬 확률 +3.5%" / 프리즘은 설명 — 소수 한 자리까지(RtsHudLogic.Num, 2026-09-27 3.5·5.5·7.5 단계)
 	method string EffectText(string id)
 		local d = self:GetDef(id)
 		if d == nil then return "" end
 		if d.desc ~= nil then return d.desc end
 		local I = _RtsHudLogic
-		if d.crit ~= nil then return "크리티컬 확률 +" .. I:Int(d.crit) .. "%" end
-		if d.critDmg ~= nil then return "크리티컬 데미지 +" .. I:Int(d.critDmg) .. "%" end
-		if d.atk ~= nil then return "공격력 +" .. I:Int(d.atk) end
-		if d.pct ~= nil then return "공격력 +" .. I:Int(d.pct) .. "%" end
-		if d.boss ~= nil then return "보스 공격 시 데미지 +" .. I:Int(d.boss) .. "%" end
+		if d.crit ~= nil then return "크리티컬 확률 +" .. I:Num(d.crit) .. "%" end
+		if d.critDmg ~= nil then return "크리티컬 데미지 +" .. I:Num(d.critDmg) .. "%" end
+		if d.atk ~= nil then return "공격력 +" .. I:Num(d.atk) end
+		if d.pct ~= nil then return "공격력 +" .. I:Num(d.pct) .. "%" end
+		if d.boss ~= nil then return "보스 공격 시 데미지 +" .. I:Num(d.boss) .. "%" end
 		return ""
+	end
+
+	-- 단계 표기 "I"·"II"·"III"
+	method string LevelName(number level)
+		local n = math.floor(level + 0.5)
+		if n == 2 then return "II" elseif n == 3 then return "III" end
+		return "I"
+	end
+
+	-- 단계 굴림(LevelWeights 50/35/15 → 1·2·3) — 서버
+	method number RollLevel()
+		self:Ensure()
+		local w = self.LevelWeights
+		local total = 0
+		for i = 1, #w do total = total + w[i] end
+		local r = _UtilLogic:RandomDouble() * total
+		for i = 1, #w do
+			r = r - w[i]
+			if r < 0 then return i end
+		end
+		return #w
+	end
+
+	-- 브론즈~골드 선택지: 그 등급·단계의 종류 전부(브론즈·실버 4장, 골드 5장 — 표 순서). level이 0이면 단계를 굴린다
+	method table StatChoices(string grade, number level)
+		self:Ensure()
+		local byGrade = self.ByLevel[grade]
+		if byGrade == nil then return {} end
+		local lv = math.floor(level + 0.5)
+		if lv < 1 or lv > 3 then lv = self:RollLevel() end
+		local out = {}
+		for _, id in ipairs(byGrade[lv] or {}) do out[#out + 1] = id end
+		return out
+	end
+
+	-- 프리즘 전체 선택지(2026-09-27 사용자 "프리즘 코어 종류를 선택할 수 있도록 — 전체 목록에서 1개, 보스 보상 + 뽑기 모두"): 아직 없는 프리즘 전부를
+	--   내 유닛 직업의 프리즘 → 다른 직업 프리즘 → 특수 코어 → 팬텀 잠금 해제 순서로(같은 묶음 안은 GetPrisms 순서). exclude[id] = true는 뺀다
+	--   (보유한 직업 프리즘·팬텀 — 특수 코어는 여러 개 가질 수 있어 늘 남는다). preferJobs[jobId] = true = 내가 가진 유닛 직업
+	method table PrismChoices(table exclude, table preferJobs)
+		self:Ensure()
+		local mine = {}
+		local other = {}
+		local core = {}
+		local unlock = {}
+		local ids = self.ByGrade.prism or {}
+		for i = 1, #ids do
+			local id = ids[i]
+			if exclude == nil or not exclude[id] then
+				local d = self.Defs[id]
+				if d.core then
+					core[#core + 1] = id
+				elseif d.unlock ~= nil then
+					unlock[#unlock + 1] = id
+				elseif preferJobs ~= nil and d.job ~= nil and preferJobs[d.job] then
+					mine[#mine + 1] = id
+				else
+					other[#other + 1] = id
+				end
+			end
+		end
+		local out = {}
+		for _, group in ipairs({ mine, other, core, unlock }) do
+			for _, id in ipairs(group) do out[#out + 1] = id end
+		end
+		return out
 	end
 
 	-- 서로 다른 3개를 가중치대로(exclude[id] = true인 것 제외). 후보가 모자라면 있는 만큼

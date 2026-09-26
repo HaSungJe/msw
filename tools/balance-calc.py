@@ -223,16 +223,24 @@ def defmul(defv, ign, guard=0, shred=0):
     return max(0.0, 1 - max(0.0, defv - guard - shred - ign) / 100)
 
 # ---------------------------------------------------------------- 증강(augmentation.md)
-AUG = {   # 등급: [(이름, 능력치, 값, 가중치)]
-    "bronze": [("약점 찾기", "crit", v, w) for v, w in ((4, 5), (3, 8), (2, 12))] + [("급소 찌르기", "cd", v, w) for v, w in ((4, 5), (3, 8), (2, 12))] +
-              [("무기 연마", "flat", v, w) for v, w in ((25, 5), (20, 8), (15, 12))] + [("전투 감각", "pct", v, w) for v, w in ((4, 5), (3, 8), (2, 12))],
-    "silver": [("약점 찾기", "crit", v, w) for v, w in ((7, 4.5), (6, 9), (5, 13.5))] + [("급소 찌르기", "cd", v, w) for v, w in ((7, 4.5), (6, 9), (5, 13.5))] +
-              [("무기 연마", "flat", v, w) for v, w in ((60, 4.5), (50, 9), (40, 13.5))] + [("전투 감각", "pct", v, w) for v, w in ((7, 4.5), (6, 9), (5, 13.5))] +
-              [("보스 사냥꾼", "boss", v, w) for v, w in ((7, 2), (6, 4), (5, 6))],
-    "gold": [("약점 찾기", "crit", v, w) for v, w in ((15, 4), (12, 9), (10, 13.5))] + [("급소 찌르기", "cd", v, w) for v, w in ((15, 4.5), (12, 9), (10, 13.5))] +
-            [("무기 연마", "flat", v, w) for v, w in ((90, 4.5), (80, 9), (70, 13.5))] + [("전투 감각", "pct", v, w) for v, w in ((15, 4.5), (12, 9), (10, 13.5))] +
-            [("거인 학살자", "boss", v, w) for v, w in ((15, 2), (12, 4), (10, 6))],
+# 2026-09-27 개편(augmentation.md — 게임 RtsAugmentTableLogic와 같은 값): 등급마다 단계 I/II/III(LEVEL_W 50/35/15%)만 무작위, 그 단계의 종류는 전부 보고 고른다.
+#   실버 '보스 사냥꾼' 삭제, 골드 '거인 학살자' 20/25/30. 뽑기 등급 = 브 50 · 실 35 · 골 10 · 프리즘 5(BUY_GRADE)
+AUG = {   # 등급: [(이름, 능력치, 값, 단계)]
+    "bronze": [(n, s, v, lv) for lv, vals in ((1, (3, 3, 20, 3)), (2, (3.5, 3.5, 22, 3.5)), (3, (4, 4, 25, 4)))
+               for (n, s), v in zip((("약점 찾기", "crit"), ("급소 찌르기", "cd"), ("무기 연마", "flat"), ("전투 감각", "pct")), vals)],
+    "silver": [(n, s, v, lv) for lv, vals in ((1, (5, 5, 40, 5)), (2, (5.5, 5.5, 45, 5.5)), (3, (6, 6, 50, 6)))
+               for (n, s), v in zip((("약점 찾기", "crit"), ("급소 찌르기", "cd"), ("무기 연마", "flat"), ("전투 감각", "pct")), vals)],
+    "gold": [(n, s, v, lv) for lv, vals in ((1, (7, 8, 70, 7, 20)), (2, (7.5, 7.5, 75, 7.5, 25)), (3, (8, 8, 80, 8, 30)))
+             for (n, s), v in zip((("약점 찾기", "crit"), ("급소 찌르기", "cd"), ("무기 연마", "flat"), ("전투 감각", "pct"), ("거인 학살자", "boss")), vals)],
 }
+LEVEL_W = {1: 50, 2: 35, 3: 15}
+BUY_GRADE = {"bronze": 50, "silver": 35, "gold": 10}   # + 프리즘 5(천장·판마다 최대 2)
+def buy_grade(r):
+    """뽑기 등급(프리즘 제외분 r ∈ [0, 1)) — 브·실·골 비율대로"""
+    tot = sum(BUY_GRADE.values()); x = r * tot
+    if x < BUY_GRADE["bronze"]: return "bronze"
+    if x < BUY_GRADE["bronze"] + BUY_GRADE["silver"]: return "silver"
+    return "gold"
 def apply_aug(st, stat, v, eff=1.0):
     st = dict(st)
     if stat == "flat": st["atk"] += v * eff
@@ -245,28 +253,18 @@ def apply_aug(st, stat, v, eff=1.0):
 
 def eff_of(job, L): return 1.0   # 증강 효율(AugEff) 삭제 2026-09-24 — 모든 직업 수치 그대로
 
-# 3택1에서 고르는 기대: 등급 풀에서 가중치대로 3장(중복 없음) → 그 유닛 보스 딜을 가장 많이 올리는 1장. 정확한 기대값 = 모든 3장 조합 열거
-from itertools import combinations
+# 한 장의 기대(2026-09-27 개편 — 이름은 옛 3택1 그대로 둔다): 단계를 LEVEL_W대로 굴리고 그 단계의 종류 중 그 유닛 보스 딜을 가장 많이 올리는 1장을 고른다
 def best_of_3(job, L, p, st, sk, grade, defv=0, ign=0, guard=0, shred=0):
     pool = AUG[grade]
     base = rotation_dps(st, sk, True)
     gains = [rotation_dps(apply_aug(st, a[1], a[2], aug_mul(job, p, a[1])), sk, True) / base - 1 for a in pool]
-    W = sum(a[3] for a in pool)
-    # 가중치 비복원 3장 추출 확률로 '셋 중 최대'의 기대 — 순서 있는 추출을 전부 더한다
+    W = sum(LEVEL_W.values())
     exp = 0.0; pick = {}
-    n = len(pool)
-    for i in range(n):
-        wi = pool[i][3] / W
-        for j in range(n):
-            if j == i: continue
-            wj = pool[j][3] / (W - pool[i][3])
-            for k in range(n):
-                if k in (i, j): continue
-                wk = pool[k][3] / (W - pool[i][3] - pool[j][3])
-                pr = wi * wj * wk
-                b = max((i, j, k), key=lambda x: gains[x])
-                exp += pr * gains[b]
-                pick[b] = pick.get(b, 0) + pr
+    for lv, w in LEVEL_W.items():
+        idx = [i for i, a in enumerate(pool) if a[3] == lv]
+        b = max(idx, key=lambda x: gains[x])
+        exp += w / W * gains[b]
+        pick[b] = pick.get(b, 0) + w / W
     top = max(pick, key=pick.get)
     return exp, pool[top]
 
@@ -313,9 +311,9 @@ def aug_table():
     out = []
     out.append("### 증강 1장의 가치 — 50레벨 프리즘 딜러 보스 DPS 상승률(실전 로테이션, 증강 효율 반영, 증강 0장 기준)")
     out.append("")
-    cards = [("브 무기 연마 II +20", "flat", 20), ("브 전투 감각 II +3%", "pct", 3), ("브 약점 찾기 II +3", "crit", 3), ("브 급소 찌르기 II +3", "cd", 3),
-             ("실 무기 연마 II +50", "flat", 50), ("실 전투 감각 II +6%", "pct", 6), ("실 보스 사냥꾼 II +6%", "boss", 6), ("실 약점 찾기 II +6", "crit", 6),
-             ("골 무기 연마 II +80", "flat", 80), ("골 전투 감각 II +12%", "pct", 12), ("골 거인 학살자 II +12%", "boss", 12), ("골 약점 찾기 II +12", "crit", 12), ("골 급소 찌르기 II +12", "cd", 12)]
+    cards = [("브 무기 연마 II +22", "flat", 22), ("브 전투 감각 II +3.5%", "pct", 3.5), ("브 약점 찾기 II +3.5", "crit", 3.5), ("브 급소 찌르기 II +3.5", "cd", 3.5),
+             ("실 무기 연마 II +45", "flat", 45), ("실 전투 감각 II +5.5%", "pct", 5.5), ("실 약점 찾기 II +5.5", "crit", 5.5), ("실 급소 찌르기 II +5.5", "cd", 5.5),
+             ("골 무기 연마 II +75", "flat", 75), ("골 전투 감각 II +7.5%", "pct", 7.5), ("골 거인 학살자 II +25%", "boss", 25), ("골 약점 찾기 II +7.5", "crit", 7.5), ("골 급소 찌르기 II +7.5", "cd", 7.5)]
     out.append("| 직업(효율) | " + " | ".join(c[0] for c in cards) + " |")
     out.append("|---|" + "---|" * len(cards))
     for j in JOBS:
@@ -324,7 +322,7 @@ def aug_table():
         cells = [f"+{(rotation_dps(apply_aug(st, s, v, aug_mul(j, pj, s)), sk, True) / base - 1) * 100:.1f}%" for _, s, v in cards]
         out.append(f"| {j} | " + " | ".join(cells) + " |")
     out.append("")
-    out.append("### 3택1 한 장의 기대 가치(가중치대로 뽑힌 3장 중 그 유닛에 가장 좋은 1장 — 50레벨 프리즘, 증강 0장 기준)")
+    out.append("### 한 장의 기대 가치(단계 I/II/III 50/35/15% 중 나온 단계에서 그 유닛에 가장 좋은 종류 — 50레벨 프리즘, 증강 0장 기준)")
     out.append("")
     out.append("| 직업 | 브론즈 | 실버 | 골드 | 주로 고르는 카드(브 / 실 / 골) |")
     out.append("|---|---|---|---|---|")
@@ -349,7 +347,7 @@ CARD_ROUNDS = {"bronze": [4, 17, 30, 38, 51, 63, 76, 84, 97, 110], "silver": [8,
 PRISM_ROUNDS = [26, 56, 89]   # 자쿰·시그너스·루시드 처치 뒤
 
 def cards_before(no, G, buy_share=0.5):
-    """이 보스 전에 받은 카드 등급 목록(받은 순서). 뽑기 = 90라운드부터 메소의 buy_share, 등급 80/15/4.5%(프리즘 0.5%는 골드로 셈)"""
+    """이 보스 전에 받은 카드 등급 목록(받은 순서). 뽑기 = 90라운드부터 메소의 buy_share, 등급은 쓰는 쪽에서 buy_grade(브 50 · 실 35 · 골 10 비율)"""
     out = []
     ev = []
     for g, rs in CARD_ROUNDS.items():
@@ -371,13 +369,12 @@ def power(st):
     return st["atk"] * st["pct"] * (1 + st["boss"] / 100) * (1 + c * st["cd"] / 100)
 
 def draw3(grade, rng):
-    pool = list(AUG[grade]); out = []
-    for _ in range(3):
-        tot = sum(a[3] for a in pool); r = rng.random() * tot
-        for i, a in enumerate(pool):
-            r -= a[3]
-            if r <= 0: out.append(pool.pop(i)); break
-    return out
+    """선택지(2026-09-27 개편 — 이름은 옛 3택1 그대로): 단계를 LEVEL_W대로 굴려 그 단계의 종류 전부(브·실 4장, 골 5장)"""
+    tot = sum(LEVEL_W.values()); r = rng.random() * tot; lv = 3
+    for k, w in LEVEL_W.items():
+        r -= w
+        if r < 0: lv = k; break
+    return [a for a in AUG[grade] if a[3] == lv]
 
 # 조합(보스 순번에 따라): 시그너스 전은 영입 순서(히어로 1 · 다크나이트 5 · 3번째 26 · 팔라딘 43 · 비숍 47 · 6번째 56), 스우부터는 후반 편성.
 #   프리즘 = (자쿰, 시그너스, 루시드) 순서, 받은 '뒤' 보스부터
@@ -443,8 +440,7 @@ def clear_ratio(scname, no, G, strategy, runs=40, seed=7):
         for i, g in enumerate(cards):
             grade = g
             if g == "buy":
-                r = rng.random() * 100
-                grade = "bronze" if r < 80 else ("silver" if r < 95 else "gold")
+                grade = buy_grade(rng.random())
             opts = draw3(grade, rng)
             if strategy == "몰아주기":
                 recv = [main]
@@ -506,7 +502,7 @@ def radar_level(ratio):
 
 def radar_table():
     """사냥 = 50레벨·증강 없음·프리즘 없음 사냥 DPS(40마리, 로테이션). 보스(성장 잠재력, 사용자 "최대 효율 증강 기준") = 50레벨 + 자기 프리즘(팬텀 제외) +
-    마지막 보스 전까지 받는 카드 전부(cards_before — 뽑기는 브론즈로)를 한 장씩 3택1 기대 최선(best_of_3의 가장 자주 고르는 카드)으로 그 유닛에 몰아준 보스 DPS(방어 0).
+    마지막 보스 전까지 받는 카드 전부(cards_before — 뽑기는 브론즈로)를 한 장씩 기대 최선(best_of_3 — 단계별로 그 유닛에 가장 좋은 종류 중 가장 자주 고르는 카드)으로 그 유닛에 몰아준 보스 DPS(방어 0).
     1티어 증강 배율은 카드가 30장을 넘으니 ×3(aug_mul 기본 n=30)"""
     G = load_stages()
     last = max(x["no"] for x in G["ST"] if x["kind"] == "boss")

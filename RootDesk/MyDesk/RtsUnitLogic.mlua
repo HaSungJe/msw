@@ -547,6 +547,28 @@ script RtsUnitLogic extends Logic
 		_SoundService:LoadSound(self.LevelUpSound)
 	end
 
+	-- 클라: 원화 유닛(히어로·썬콜·불독·비숍)의 프레임을 미리 받아 둔다 — 영입에서 직업을 고른 순간(RtsUnitSelectLogic.BeginPlace)부터 발판을 누르기 전까지
+	--   (2026-09-26 사용자 "유닛 소환 시 1초 딜레이" — 소환된 뒤 RtsUnitComponent.SetupMageSkin이 받기 시작하면 그동안 유닛이 안 보였다). 직업마다 한 번만
+	property table WarmedSkins = {}
+
+	@ExecSpace("ClientOnly")
+	method void WarmMageSkin(string jobId)
+		if not _RtsJobTableLogic:HasMageSkin(jobId) or self.WarmedSkins[jobId] then return end
+		self.WarmedSkins[jobId] = true
+		local frames = _RtsJobTableLogic:GetMageSkinFrames(jobId)
+		_TimerService:SetTimerOnce(function()
+			-- 대기(stand1)부터 — 소환되자마자 보이는 그림
+			local order = { "stand1" }
+			for action, _ in pairs(frames) do
+				if action ~= "stand1" then order[#order + 1] = action end
+			end
+			for _, action in ipairs(order) do
+				for _, ruid in ipairs(frames[action] or {}) do _ResourceService:LoadSpriteAndWait(ruid) end
+			end
+			_RtsConfigLogic:Log("RtsUnit: warmed skin " .. jobId)
+		end, 0)
+	end
+
 	-- 레벨업 효과음(원작 sound/game/levelup — 2026-09-23 사용자 "레벨업 사운드도") — 누른 사람에게만(LevelUpNow).
 	--   "레벨업 소리 좀 커야" — 볼륨 상한이 1.0이라 효과음 배율(SfxMaster) 없이 최대로, 같은 소리를 두 겹(SoundService + 효과음 풀) 동시에 틀어 더 크게
 	property string LevelUpSound = "c198d87b06b24707864b1ac73345cca8"

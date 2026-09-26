@@ -430,6 +430,8 @@ script RtsUnitSelectLogic extends Logic
 		if self.MoveNo > 0 then self:EndMove() end
 		if _RtsPopupLogic:IsOpen() then _RtsPopupLogic:Close() end
 		self.PlaceJob = jobId
+		-- 발판을 고르는 동안 그 직업 원화 프레임을 미리 받는다(소환 직후 바로 보이게 — 2026-09-26)
+		_RtsUnitLogic:WarmMageSkin(jobId)
 		local zone = _RtsUnitLogic:MyZone()
 		local mapRoot = _EntityService:GetEntityByPath("/maps/RtsMap")
 		self:ClearMarkers()

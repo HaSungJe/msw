@@ -74,6 +74,10 @@ script RtsJobTableLogic extends Logic
 	-- 레벨 L→L+1 비용(level.md 블록). 인덱스 = 도달 레벨(2~50)
 	property table Costs = {}
 
+	-- 41~50레벨 비용 할인(2026-09-27 사용자 "40 → 50 레벨업 가격을 지금보다 20% 싸게 — 크게 문제없이 클리어 가능하게"): 6,900 → 5,520 · 벽 47,580 → 38,060(10메소 단위).
+	--   아래 구간 표(blocks)는 할인 전 값 그대로 — tools/gen-stage-table.py LEVEL_COST_BLOCKS(몬스터·보스 체력 모델의 표준 빌드)와 같아야 하고, 체력은 일부러 그대로 둔다(싸진 만큼 쉬워지게)
+	property number LateLevelDiscount = 0.8
+
 	method void EnsureCosts()
 		if #self.Costs > 0 then return end
 		local c = { 0 }
@@ -82,6 +86,7 @@ script RtsJobTableLogic extends Logic
 			for i = 1, blocks[b][2] do c[#c + 1] = blocks[b][1] end
 			c[#c + 1] = blocks[b][3]
 		end
+		for L = 41, #c do c[L] = math.floor(c[L] * self.LateLevelDiscount / 10 + 0.5) * 10 end
 		self.Costs = c
 	end
 
@@ -916,6 +921,136 @@ script RtsJobTableLogic extends Logic
 		return { st = st, base = base, per = per, atk = atk, one = one, period = period, critMul = critMul, boss = boss, mob = mob }
 	end
 
+	-- 보스 1마리 상대 기대 DPS(방어율 제외 — 2026-09-27 사용자 "유닛별 상세보기에서 보스 기준 DPS, 방어율 없는 기준" · RtsUnitPopupLogic):
+	--   RtsCombatLogic.DoAttack과 같은 규칙으로 공격 루프를 돌린다 — 공격 주기(GetPeriod)마다, 후딜(after) 중엔 건너뛰고,
+	--   준비된 쿨타임 스킬(표 뒤에서부터) → 쿨 없는 액티브(뒤에서부터) 순으로 1개. 보스 라운드 기준이라 잠금 1(보스전 잠금)·2·3 스킬은 안 쓰고, 보스는 늘 사거리 안(보스전 사거리)으로 본다.
+	--   1타 = 내림(공격력 × 공격력% × 비율 × 최종) × 보스 배율(③ 보스 데미지 · ⑥ 보스 최종 · ⑤ 보스 공격 시 +n%p) × 무기 기대값 × 크리 기대값(1 + 확률 × 크뎀, 확정 크리면 1 + 크뎀).
+	--   보스 집중(bossHits)·구체(spread — 전부 보스에게)·타격별 비율(hitRatios)·쉐도우 파트너(halfHits, ½)·지대(dot — 보스 배율·고정 데미지 없음)까지.
+	--   받는 데미지 증가(디바인 퍼니시먼트)·방어구 부수기·가드 크러쉬·방어율은 보스 쪽 효과라 뺀다. u = 유닛(JobId·Level·Prisms·SkillLocks만 읽음), st = GetStatFor(+ 파티 버프) 결과.
+	--   첫 쿨타임 몰림을 빼려고 처음 30초 뒤 300초 평균(tools/balance-calc.py rotation_dps와 같은 방식)
+	method number BossDps(any u, table st)
+		local skills = self:GetSkillsFor(u)
+		local c = self:CalcStat(u.JobId, u.Level, st)
+		local period = self:GetPeriod(st)
+		if period <= 0 then return 0 end
+		local weapon = self:WeaponMean(u.JobId)
+		local critDmg = st.critDmg or 0
+		local critP = math.min(100, math.max(0, st.crit or 0)) / 100
+		local critExp = 1 + critP * critDmg / 100
+		local bossBaseSt = (1 + (st.bossAdd or 0) / 100) * ((st.finBoss or st.fin) / st.fin)
+		local order = {}
+		local function usable(i)
+			local k = skills[i]
+			if k.kind ~= "액티브" or k.fx == nil or u.Level < k.lv then return false end
+			return self:GetLock(u.SkillLocks or "", i) == 0
+		end
+		for i = #skills, 1, -1 do if skills[i].cd ~= nil and usable(i) then order[#order + 1] = i end end
+		for i = #skills, 1, -1 do if skills[i].cd == nil and usable(i) then order[#order + 1] = i end end
+		if #order == 0 then return 0 end
+		-- 시전 1번이 보스에게 주는 기대 데미지(스킬마다 한 번)
+		local castDmg = {}
+		for _, i in ipairs(order) do
+			local k = skills[i]
+			local ratio = k.ratio or st.ratio
+			local perHit = math.max(1, math.floor(c.atk * (st.pct / 100) * (ratio / 100) * (st.fin / 100) + 0.0001))
+			local hits = k.hits or st.hits
+			local bossBase = bossBaseSt * (k.bossFinal or 1)
+			local bossRatio = k.bossRatio
+			if bossRatio == nil and k.ratio == nil then bossRatio = st.bossRatio end
+			local function bossMulFor(r)
+				if bossRatio == nil or bossRatio == 0 or r == nil or r <= 0 then return bossBase end
+				return bossBase * (r + bossRatio) / r
+			end
+			local ce = critExp
+			if k.forceCrit == true then ce = 1 + critDmg / 100 end
+			local total = 0
+			for h = 1, hits do
+				local r = ratio
+				local hitBase = perHit
+				if k.hitRatios ~= nil and k.hitRatios[h] ~= nil then
+					r = k.hitRatios[h]
+					hitBase = math.max(1, math.floor(c.atk * (st.pct / 100) * (r / 100) * (st.fin / 100) + 0.0001))
+				end
+				total = total + hitBase * bossMulFor(r)
+			end
+			-- 보스 집중: 대상이 전부 보스면 bossHits번 반복(1체 기준)
+			if k.bossHits ~= nil then total = total * k.bossHits end
+			total = total * ce
+			-- 쉐도우 파트너: 기본 공격(쿨·자기 타격 수 없음) 뒤 ½ 데미지 halfHits회
+			if k.cd == nil and k.hits == nil and (st.halfHits or 0) > 0 then
+				total = total + st.halfHits * perHit * 0.5 * bossMulFor(ratio) * critExp
+			end
+			-- 지속 피해 지대: dur ÷ period틱, 보스 배율 없음(고정 데미지는 일반 몬스터만)
+			if k.dot ~= nil then
+				local dotPct = st.dotPct or k.dot.pct
+				local perTick = math.max(1, math.floor(c.atk * (st.pct / 100) * (dotPct / 100) * (st.fin / 100) + 0.0001))
+				total = total + perTick * math.floor(k.dot.dur / k.dot.period + 0.5) * critExp
+			end
+			castDmg[i] = total * weapon
+		end
+		-- 공격 틱 i의 시각 = 1 + i × 주기. 쿨 스킬 시전만 하나씩 따라가고, 그 사이 기본 공격은 다음 쿨 준비 틱까지 한 번에 센다(틱마다 돌면 0.1초 주기 팬텀이 3천 번 — 느림)
+		local eps = 0.000001
+		local function tickAt(time)
+			-- time 이후(같으면 포함) 첫 틱 번호
+			local i = math.ceil((time - 1) / period - eps)
+			if i < 0 then i = 0 end
+			return i
+		end
+		local cds = {}
+		local basic = 0
+		for _, i in ipairs(order) do
+			if skills[i].cd ~= nil then
+				cds[#cds + 1] = i
+			elseif basic == 0 then
+				basic = i
+			end
+		end
+		local warm = 30
+		local span = 300
+		local iStart = tickAt(1 + warm)
+		local iEnd = tickAt(1 + warm + span)
+		local readyAt = {}
+		local busy = 0
+		local sum = 0
+		local n = 0
+		while n < iEnd do
+			local t = 1 + n * period
+			if busy > t + eps then
+				n = math.max(n + 1, tickAt(busy))
+			else
+				local pick = 0
+				local nextReady = nil
+				for _, i in ipairs(cds) do
+					local r = readyAt[i] or 0
+					if r <= t + eps then
+						if pick == 0 then pick = i end
+					elseif nextReady == nil or r < nextReady then
+						nextReady = r
+					end
+				end
+				if pick > 0 then
+					local k = skills[pick]
+					readyAt[pick] = t + k.cd
+					if k.after ~= nil then busy = t + k.after end
+					if n >= iStart then sum = sum + castDmg[pick] end
+					n = n + 1
+				else
+					-- 다음 쿨 준비(없으면 끝)까지 기본 공격
+					local stop = iEnd
+					if nextReady ~= nil then stop = math.min(iEnd, math.max(n + 1, tickAt(nextReady))) end
+					if basic > 0 then
+						local from = math.max(n, iStart)
+						if stop > from then sum = sum + (stop - from) * castDmg[basic] end
+					end
+					n = stop
+				end
+			end
+		end
+		local secs = (iEnd - iStart) * period
+		if secs <= 0 then return 0 end
+		return sum / secs
+	end
+
 	-- ===== 프리즘 증강(2026-09-22 개발모드 선행 — 정의·수치는 .info/character.md '종류: 프리즘', 규칙은 .beaver/memory/balance.md) =====
 	--   유닛의 RtsUnitComponent.Prisms(쉼표 목록 "enrage,core…")에 든 id를 직업 표 위에 얹는다. GetSkillsFor/GetStatFor = GetSkills/GetStat의 유닛판 —
 	--   전투(RtsCombatLogic)·팝업(RtsUnitPopupLogic)·연출(CastFx/HitFx)·잠금(RtsUnitLogic)은 전부 이걸 쓴다. locks = 획득 시 영구 잠금(3)할 스킬 이름(RtsUnitLogic.ApplyPrism).
@@ -983,16 +1118,16 @@ script RtsJobTableLogic extends Logic
 
 	-- 오각형 5축 단계(5 매우 높음 … 1 매우 낮음, 50레벨 · 증강 없음 · 전체 직업 중 비교 — 2026-09-25 사용자):
 	--   speed = 기본 공격 속도 이름 / range = 기본 공격 사거리 ÷ 전체 최댓값 → 80·60·40·20% / aug = 증강 효율(1티어 5 · 팬텀 4 · 2티어 3 · 서포터 1, '낮음'은 비움 — 화면엔 티어 말 금지)
-	--   boss·hunt = tools/balance-calc.py --radar(2026-09-25: 보스 = 50레벨 + 자기 프리즘 + 마지막 보스 전 카드 43장을 3택1 최선으로 몰아준 보스 DPS, 사냥 = 50레벨·증강 없음 40마리 사냥 DPS) — 직업 수치가 바뀌면 다시 돌려 옮긴다
+	--   boss·hunt = tools/balance-calc.py --radar(2026-09-27 증강 개편 반영: 보스 = 50레벨 + 자기 프리즘 + 마지막 보스 전 카드 43장을 한 장씩 단계별 최선 종류로 몰아준 보스 DPS, 사냥 = 50레벨·증강 없음 40마리 사냥 DPS) — 직업 수치가 바뀌면 다시 돌려 옮긴다
 	method table GetRadar(string jobId)
 		local fixed = {
-			hero = { boss = 4, hunt = 5 },
+			hero = { boss = 5, hunt = 5 },
 			paladin = { boss = 1, hunt = 2 },
 			dk = { boss = 1, hunt = 3 },
 			bow = { boss = 5, hunt = 1 },
 			marks = { boss = 2, hunt = 4 },
-			il = { boss = 4, hunt = 3 },
-			fp = { boss = 2, hunt = 1 },
+			il = { boss = 5, hunt = 3 },
+			fp = { boss = 2, hunt = 2 },
 			bishop = { boss = 1, hunt = 1 },
 			nl = { boss = 5, hunt = 1 },
 			shad = { boss = 2, hunt = 1 },
@@ -1105,7 +1240,7 @@ script RtsJobTableLogic extends Logic
 		local t0 = A:TotalsMul(u.Augs, nil)
 		local parts = {}
 		local function add(text, v, unit)
-			if v >= 0.5 then parts[#parts + 1] = text .. " +" .. string.format("%d", math.floor(v + 0.5)) .. unit end
+			if v >= 0.05 then parts[#parts + 1] = text .. " +" .. _RtsHudLogic:Num(v) .. unit end -- 소수 한 자리(2026-09-27 증강 3.5·5.5·7.5 단계)
 		end
 		add("공격력", t1.atk - t0.atk, "")
 		add("공격력", t1.pct - t0.pct, "%")

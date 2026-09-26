@@ -69,6 +69,9 @@ script RtsUnitComponent extends Component
 	property string MageSkinAction = "stand1"
 	property number MageSkinTries = 0
 	property boolean MageSkinLoading = false
+	-- 원화 프레임을 이 유닛 전용 표로 받기 시작했는가 · 모든 동작(과 히어로 검)을 다 받았는가 — SetupMageSkin
+	property boolean MageSkinInit = false
+	property boolean MageSkinDone = false
 	property number MageActionClock = 0
 	property boolean MageActionLoop = false
 	property table MageFrameDurations = {}
@@ -122,38 +125,61 @@ script RtsUnitComponent extends Component
 
 	@ExecSpace("ClientOnly")
 	method void SetupMageSkin()
-		-- 직업별 원화 프레임을 한 번 읽고 같은 발 기준점으로 표시한다.
-		if not _RtsJobTableLogic:HasMageSkin(self.JobId) or isvalid(self.MageSkinEntity) or self.MageSkinLoading then return end
+		-- 직업별 원화 프레임을 읽어 같은 발 기준점으로 표시한다. 대기(stand1)를 먼저 받아 바로 유닛을 보이고, 나머지 동작·히어로 검은 이어서 받는다
+		--   (2026-09-26 사용자 "유닛 소환 시 1초 딜레이" — 전엔 모든 동작 프레임(히어로 18장)과 검 14장까지 다 받은 뒤에야 유닛이 보였다).
+		--   아직 안 받은 동작으로 시전하면 DrawMageSkin이 그 동작 표가 없어 직전 그림(대기)을 그대로 둔다
+		if not _RtsJobTableLogic:HasMageSkin(self.JobId) or self.MageSkinDone or self.MageSkinLoading then return end
 		if self.MageSkinTries >= 10 then return end
 		self.MageSkinTries = self.MageSkinTries + 1
 		local frames = _RtsJobTableLogic:GetMageSkinFrames(self.JobId)
 		self.MageFrameDurations = _RtsJobTableLogic:GetMageSkinFrameDurations(self.JobId)
 		if frames.stand1 == nil or #frames.stand1 == 0 then return end
-		local loaded = {}
+		-- 유닛마다 따로 쓰는 표(기본값 표를 여러 유닛이 같이 쓰지 않게 처음 한 번 새로 만든다) — 재시도 때는 이미 받은 동작을 그대로 둔다
+		if not self.MageSkinInit then
+			self.MageSkinSprites = {}
+			self.MageSkinInit = true
+		end
+		local order = { "stand1" }
+		for action, _ in pairs(frames) do
+			if action ~= "stand1" then order[#order + 1] = action end
+		end
 		self.MageSkinLoading = true
-		for action, sequence in pairs(frames) do
-			loaded[action] = {}
-			for i, ruid in ipairs(sequence) do
-				local sprite = _ResourceService:LoadSpriteAndWait(ruid)
-				if sprite == nil or not sprite.IsLoadComplete then
+		for _, action in ipairs(order) do
+			if self.MageSkinSprites[action] == nil then
+				local seq = {}
+				for i, ruid in ipairs(frames[action]) do
+					local sprite = _ResourceService:LoadSpriteAndWait(ruid)
+					if sprite == nil or not sprite.IsLoadComplete then
+						self.MageSkinLoading = false
+						_TimerService:SetTimerOnce(function()
+							if isvalid(self.Entity) then self:SetupMageSkin() end
+						end, 1)
+						return
+					end
+					seq[i] = sprite
+				end
+				if not isvalid(self.Entity) then
 					self.MageSkinLoading = false
-					_TimerService:SetTimerOnce(function()
-						if isvalid(self.Entity) then self:SetupMageSkin() end
-					end, 1)
 					return
 				end
-				loaded[action][i] = sprite
+				self.MageSkinSprites[action] = seq
+				-- 대기 프레임이 오면 곧바로 유닛을 보인다
+				if action == "stand1" and not isvalid(self.MageSkinEntity) then
+					local skin = _SpawnService:SpawnByModelId("model://MapObject", "MageSkin", Vector3.zero, self.Entity)
+					if skin ~= nil then
+						skin.SpriteRendererComponent.OrderInLayer = 0
+						skin.SpriteRendererComponent.SortingLayer = "Default"
+						self.MageSkinEntity = skin
+						self:DrawMageSkin()
+						_RtsConfigLogic:Log("unit skin shown(stand1): " .. self.JobId .. " / " .. tostring(self.No))
+					end
+				end
 			end
 		end
 		self.MageSkinLoading = false
 		if not isvalid(self.Entity) then return end
-		local skin = _SpawnService:SpawnByModelId("model://MapObject", "MageSkin", Vector3.zero, self.Entity)
-		if skin == nil then return end
-		skin.SpriteRendererComponent.OrderInLayer = 0
-		skin.SpriteRendererComponent.SortingLayer = "Default"
-		self.MageSkinSprites = loaded
-		self.MageSkinEntity = skin
-		if self.JobId == "hero" then self:SetupHeroSword() end
+		if self.JobId == "hero" and not isvalid(self.HeroSwordEntity) then self:SetupHeroSword() end
+		self.MageSkinDone = true
 		self:DrawMageSkin()
 		_RtsConfigLogic:Log("unit skin loaded: " .. self.JobId .. " / " .. tostring(self.No))
 	end

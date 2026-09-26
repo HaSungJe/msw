@@ -190,22 +190,24 @@ script RtsMonsterInfoLogic extends Logic
 	end
 
 	-- 지금 걸린 디버프: { id, name, desc, left(남은 초, −1 = 조건이 있는 동안), ruid(아이콘 — 없으면 ""), color(칩 왼쪽 색 띠 — 아이콘이 없을 때) }
+	--   이름 = 거는 스킬 이름(블리자드·블리자드 템페스트·디바인 퍼니시먼트·포이즌 리전·가드 크러쉬·방어구 부수기), 설명 = 효과만(스킬 이름을 다시 붙이지 않는다 — 2026-09-27 사용자 "디버프에 항상 스킬명, 설명은 스킬명 빼고, 모든 것 해당")
 	@ExecSpace("ClientOnly")
 	method table DebuffList(any m)
 		local H = _RtsHudLogic
 		local now = _RtsStageLogic:GameNow()
 		local out = {}
 		if not m.IsBoss and m.FrozenUntil > now then
-			out[#out + 1] = { id = "freeze", name = "빙결", desc = "블리자드에 얼어 이동속도가 50% 감소한다.", short = "이속 −50%", left = m.FrozenUntil - now, ruid = "", color = Color(0.45, 0.78, 1, 1) }
+			out[#out + 1] = { id = "freeze", name = "블리자드", desc = "빙결로 인해 이동속도가 50% 감소한다.", short = "이속 −50%", left = m.FrozenUntil - now, ruid = "", color = Color(0.45, 0.78, 1, 1) }
 		end
 		if m.ShredUntil > now and m.ShredPct > 0 then
-			out[#out + 1] = { id = "shred", name = "방어율 감소", desc = "블리자드 템페스트: 방어율이 " .. H:Int(m.ShredPct) .. "%p 감소한다.", short = "방어 −" .. H:Int(m.ShredPct) .. "%p", left = m.ShredUntil - now, ruid = "", color = Color(0.3, 0.55, 0.95, 1) }
+			out[#out + 1] = { id = "shred", name = "블리자드 템페스트", desc = "방어율이 " .. H:Int(m.ShredPct) .. "%p 감소한다.", short = "방어 −" .. H:Int(m.ShredPct) .. "%p", left = m.ShredUntil - now, ruid = "", color = Color(0.3, 0.55, 0.95, 1) }
 		end
 		if m.VulnUntil > now and m.VulnPct > 0 then
-			out[#out + 1] = { id = "vuln", name = "받는 데미지 증가", desc = "디바인 퍼니시먼트: 받는 데미지가 " .. H:Int(m.VulnPct) .. "% 증가한다.", short = "피해 +" .. H:Int(m.VulnPct) .. "%", left = m.VulnUntil - now, ruid = "", color = Color(0.95, 0.8, 0.35, 1) }
+			-- 이름은 스킬 이름으로, 설명엔 스킬 이름을 다시 붙이지 않는다(2026-09-27 사용자 "디바인 퍼니시먼트라고 안 나오고 받는 데미지 증가라고 나온다", "중독 → 포이즌 리전, 설명에 '스킬명:' 또 나오는 거 없애") — 가드 크러쉬·방어구 부수기처럼
+			out[#out + 1] = { id = "vuln", name = "디바인 퍼니시먼트", desc = "받는 데미지가 " .. H:Int(m.VulnPct) .. "% 증가한다.", short = "피해 +" .. H:Int(m.VulnPct) .. "%", left = m.VulnUntil - now, ruid = "", color = Color(0.95, 0.8, 0.35, 1) }
 		end
 		if m.PoisonUntil > now then
-			out[#out + 1] = { id = "poison", name = "중독", desc = "포이즌 리전: 맹독 지대 안에서 2초마다 지속 피해를 입는다.", short = "지속 피해", left = m.PoisonUntil - now, ruid = "", color = Color(0.45, 0.8, 0.35, 1) }
+			out[#out + 1] = { id = "poison", name = "포이즌 리전", desc = "맹독 지대 안에서 2초마다 지속 피해를 입는다.", short = "지속 피해", left = m.PoisonUntil - now, ruid = "", color = Color(0.45, 0.8, 0.35, 1) }
 		end
 		if m.Defense > 0 then
 			local g = self:GuardCrushOf(m.Zone)
