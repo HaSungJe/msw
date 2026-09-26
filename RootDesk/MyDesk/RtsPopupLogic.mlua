@@ -2531,8 +2531,8 @@ script RtsPopupLogic extends Logic
 		local info = "라운드 지급 10장 · 기본 뽑기 확률 50%"
 		if self.CodexGrade == "silver" then info = "라운드 지급 10장 · 기본 뽑기 확률 35%" end
 		if self.CodexGrade == "gold" then info = "라운드 지급 7장 · 기본 뽑기 확률 10%" end
-		-- 프리즘은 나오면 아직 없는 프리즘 중 원하는 것을 고르므로(2026-09-27) 등급 안 확률(%)을 쓰지 않는다
-		if self.CodexGrade == "prism" then return "자쿰 · 시그너스 · 루시드 처치 뒤 · 뽑기 5%(판마다 최대 2개) — 나오면 아직 없는 프리즘 중 원하는 것을 골라요" end
+		-- 프리즘은 가중치 무작위 3장 중 선택(2026-09-27 전체 선택에서 되돌림) — 오른쪽 % = 프리즘 안에서 나올 확률
+		if self.CodexGrade == "prism" then return "자쿰 · 시그너스 · 루시드 처치 뒤 3택1 · 기본 뽑기 확률 5%(판마다 최대 2개)   ·   오른쪽 % = 프리즘 안에서 나올 확률" end
 		return info .. "   ·   단계 I 50% · II 35% · III 15%, 종류는 선택"
 	end
 
@@ -2569,14 +2569,11 @@ script RtsPopupLogic extends Logic
 			local band = H:SpawnStretch("model://uisprite", "RtsCodexBand", row, Vector2(0, 0), Vector2(0, 1), Vector2(0, 0), Vector2(4, 0))
 			band.SpriteGUIRendererComponent.Color = self:GradeColor(d.grade)
 			self:SpawnAugIcon(row, d, Vector2(12, -12), 68)
-			-- 등급 안 확률(%) — 프리즘은 고르는 방식이라 표시하지 않는다(2026-09-27)
-			if not isPrism then
-				-- 브론즈~골드: 그 단계가 나올 확률(LevelWeights — 종류는 고르므로 단계 확률만)
-				local pct = 0
-				if d.level ~= nil then pct = AT.LevelWeights[d.level] or 0 elseif sum > 0 then pct = (d.w or 0) / sum * 100 end
-				H:SpawnLabel("RtsCodexPct", row, Vector2(1, 1), Vector2(1, 1), Vector2(-14, -12), Vector2(100, 30),
-					string.format("%.1f%%", pct), self:Muted(), 15, TextAlignmentType.MiddleRight, true)
-			end
+			-- 오른쪽 % — 브론즈~골드: 그 단계가 나올 확률(LevelWeights — 종류는 고르므로 단계 확률만) / 프리즘: 프리즘 안 가중치 확률(무작위 3장)
+			local pct = 0
+			if d.level ~= nil then pct = AT.LevelWeights[d.level] or 0 elseif sum > 0 then pct = (d.w or 0) / sum * 100 end
+			H:SpawnLabel("RtsCodexPct", row, Vector2(1, 1), Vector2(1, 1), Vector2(-14, -12), Vector2(100, 30),
+				string.format("%.1f%%", pct), self:Muted(), 15, TextAlignmentType.MiddleRight, true)
 			if isPrism then
 				-- 이름 왼쪽 = 직업명(직업 전용) / 공통(특수 코어) / 팬텀(영입 해금). 설명은 접어 두고 행을 누르면 그 자리에서 펼침(다시 누르면 접힘)
 				local tag = "공통"
@@ -2631,16 +2628,13 @@ script RtsPopupLogic extends Logic
 			self:Close()
 			return
 		end
-		-- 프리즘은 아직 없는 프리즘 전체(RtsAugmentTableLogic.PrismChoices)에서 하나를 고른다 — 같은 카드를 가로 스크롤로 늘어놓는다(2026-09-27 사용자 "프리즘 종류를 선택할 수 있도록, 스크롤링")
-		local scroll = offer.grade == "prism"
 		local title = self:GradeName(offer.grade) .. " 증강 선택"
-		-- 브론즈~골드는 단계(I/II/III)까지 무작위, 그 단계의 종류는 전부 보여 주고 고른다(2026-09-27 사용자 개편) — 제목에 단계
+		-- 브론즈~골드는 단계(I/II/III)까지 무작위, 그 단계의 종류는 전부 보여 주고 고른다(2026-09-27 사용자 개편) — 제목에 단계. 프리즘은 무작위 3장(같은 날 전체 선택·가로 스크롤을 되돌림)
 		local first = AT:GetDef(offer.ids[1])
-		if not scroll and first ~= nil and first.level ~= nil then title = self:GradeName(offer.grade) .. " 증강 " .. AT:LevelName(first.level) .. " 선택" end
-		if scroll then title = "프리즘 증강 선택" end
+		if first ~= nil and first.level ~= nil then title = self:GradeName(offer.grade) .. " 증강 " .. AT:LevelName(first.level) .. " 선택" end
+		if offer.grade == "prism" then title = "프리즘 증강 선택" end
 		local pending = _RtsAugmentLogic.PendingByUser[_RtsUnitLogic:MyUserId()] or 0
 		local sub = title .. " · 원하는 증강을 하나 골라 주세요. 받은 증강은 보유 증강 탭에서 지정할 수 있어요."
-		if scroll then sub = title .. " · 원하는 프리즘을 하나 골라 주세요(좌우로 넘겨 보기 · " .. H:Int(#offer.ids) .. "종). 받은 증강은 보유 증강 탭에서 지정할 수 있어요." end
 		if pending > 1 then sub = sub .. "   ·   대기 중인 선택지 " .. H:Int(pending) .. "개 / " .. H:Int(_RtsAugmentLogic.MaxPending) .. "개" end
 		H:SpawnLabel("RtsPickSub", body, Vector2(0, 1), Vector2(0, 1), Vector2(27, -4), Vector2(1060, 44),
 			sub, self:Muted(), 15, TextAlignmentType.MiddleCenter, false)
@@ -2655,48 +2649,19 @@ script RtsPopupLogic extends Logic
 		end)
 		local cardW = 340
 		local gap = 19
-		-- 카드 크기: 3장 고정 배치는 660 높이, 프리즘 가로 스크롤은 아래 스크롤 막대 자리만큼 줄인다(600 — 아이콘·제목·설명 위치도 그만큼 위로)
 		local cardH = 660
 		local cardTop = -56
 		local contentTop = 150
 		local descH = 230
-		local parent = body
-		if scroll then
-			cardH = 600
-			contentTop = 120
-			descH = 200
-			local list = H:SpawnStretch("model://uisprite", "RtsPickScroll", body, Vector2(0, 0), Vector2(1, 1), Vector2(27, 70), Vector2(-27, -50))
-			list.SpriteGUIRendererComponent.Color = Color(1, 1, 1, 0)
-			local sg = list:AddComponent("ScrollLayoutGroupComponent")
-			if sg ~= nil then
-				sg.Type = LayoutGroupType.Horizontal
-				sg.ChildAlignment = ChildAlignmentType.UpperLeft
-				sg.Spacing = gap
-				sg.UseScroll = true
-				sg.ScrollBarVisible = ScrollBarVisibility.AlwaysShow
-				sg.ScrollBarThickness = 10
-				sg.ScrollBarHandleColor = H:ColGold()
-				sg.ScrollBarBackgroundColor = Color(1, 1, 1, 0.06)
-			end
-			parent = list
-		end
-		-- 스크롤이 아니면 선택지 수(브론즈·실버 4장, 골드 5장)에 맞춰 카드 폭을 줄여 한 줄에 다 보인다(최대 340)
-		if not scroll and #offer.ids > 3 then cardW = math.floor((1060 - gap * (#offer.ids - 1)) / #offer.ids) end
+		-- 선택지 수(브론즈·실버 4장, 골드 5장, 프리즘 3장)에 맞춰 카드 폭을 줄여 한 줄에 다 보인다(최대 340)
+		if #offer.ids > 3 then cardW = math.floor((1060 - gap * (#offer.ids - 1)) / #offer.ids) end
 		_SoundService:PlaySound(self.PickSound, 1)
 		for ci = 1, #offer.ids do
 			local d = AT:GetDef(offer.ids[ci])
 			if d ~= nil then
-				-- 고정 배치 = body 위 절대 위치 / 스크롤 = 칸(빛 테두리 포함 크기) 하나를 목록에 넣고 그 안에 빛·카드
-				local host = parent
+				local host = body
 				local cx = 27 + (ci - 1) * (cardW + gap)
 				local cy = cardTop
-				if scroll then
-					host = H:SpawnUI("model://uisprite", "RtsPickSlot" .. tostring(ci), parent, Vector2(0, 1), Vector2(0, 1), Vector2(0, 0), Vector2(cardW + 6, cardH + 6))
-					host.SpriteGUIRendererComponent.Color = Color(1, 1, 1, 0)
-					host.SpriteGUIRendererComponent.RaycastTarget = false
-					cx = 3
-					cy = -3
-				end
 				-- 등급색으로 카드 가장자리를 은은하게 강조한다.
 				local glow = H:SpawnUI("model://uisprite", "RtsPickGlow" .. tostring(ci), host, Vector2(0, 1), Vector2(0, 1), Vector2(cx - 3, cy + 3), Vector2(cardW + 6, cardH + 6))
 				local gc = self:GradeColor(d.grade)
