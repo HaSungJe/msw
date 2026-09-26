@@ -117,11 +117,12 @@ script RtsUnitComponent extends Component
 
 	@ExecSpace("ClientOnly")
 	method void SetupMageSkin()
-		if self.JobId ~= "il" or isvalid(self.MageSkinEntity) or self.MageSkinLoading then return end
+		-- 직업별 원화 프레임을 한 번 읽고 같은 발 기준점으로 표시한다.
+		if not _RtsJobTableLogic:HasMageSkin(self.JobId) or isvalid(self.MageSkinEntity) or self.MageSkinLoading then return end
 		if self.MageSkinTries >= 10 then return end
 		self.MageSkinTries = self.MageSkinTries + 1
-		local frames = _RtsJobTableLogic:GetMageSkinFrames()
-		self.MageFrameDurations = _RtsJobTableLogic:GetMageSkinFrameDurations()
+		local frames = _RtsJobTableLogic:GetMageSkinFrames(self.JobId)
+		self.MageFrameDurations = _RtsJobTableLogic:GetMageSkinFrameDurations(self.JobId)
 		if frames.stand1 == nil or #frames.stand1 == 0 then return end
 		local loaded = {}
 		self.MageSkinLoading = true
@@ -148,11 +149,12 @@ script RtsUnitComponent extends Component
 		self.MageSkinSprites = loaded
 		self.MageSkinEntity = skin
 		self:DrawMageSkin()
+		_RtsConfigLogic:Log("unit skin loaded: " .. self.JobId .. " / " .. tostring(self.No))
 	end
 
 	@ExecSpace("ClientOnly")
 	method void OnUpdate(number delta)
-		if self.JobId ~= "il" or not isvalid(self.MageSkinEntity) then return end
+		if not isvalid(self.MageSkinEntity) then return end
 		if self.MageSkinAction == "stand1" then return end
 		self.MageActionClock = self.MageActionClock + delta
 		self:DrawMageSkin()
@@ -160,7 +162,7 @@ script RtsUnitComponent extends Component
 
 	@ExecSpace("ClientOnly")
 	method void PlayMageAction(string name)
-		if name ~= "swingO1" and name ~= "swingO3" then name = "stand1" end
+		if self.MageFrameDurations[name] == nil then name = "stand1" end
 		self.MageActionClock = 0
 		self.MageSkinAction = name
 		self:DrawMageSkin()

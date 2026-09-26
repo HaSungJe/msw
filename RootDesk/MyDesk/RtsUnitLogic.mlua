@@ -206,8 +206,8 @@ script RtsUnitLogic extends Logic
 		local e = _SpawnService:SpawnByModelId("model://MapObject", self:UnitName(zone, no), Vector3(at.x, at.y - 0.75, 0), mapRoot)
 		if e == nil then return nil end
 		e:RemoveComponent("SpriteRendererComponent")
-		-- 썬콜은 PNG 프레임으로 그리는 스프라이트 유닛. 기본 아바타를 만들지 않는다.
-		if jobId ~= "il" then
+		-- 원화 유닛은 처음부터 PNG 프레임으로 표시해 기존 아바타가 잠깐 보이지 않게 한다.
+		if not _RtsJobTableLogic:HasMageSkin(jobId) then
 			local ar = e:AddComponent("AvatarRendererComponent")
 			if ar ~= nil then ar.OrderInLayer = 200 end
 			e:AddComponent("CostumeManagerComponent")

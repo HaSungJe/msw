@@ -2,7 +2,7 @@
 
 메월 아바타 대신 직접 그린 PNG로 유닛을 보여 주는 작업의 기준 문서다. 원화·프레임·흉상을 만들거나 바꿀 때 이 문서 하나를 따른다.
 - 사용자 결정과 그 이유: `.beaver/memory/_archived/character-art.md` (문서로 반영 후 보관)
-- 캐릭터별 적용 기록(RUID·재생 시간·검증): 썬콜 = `docs/design/ice-lightning-mage-motion.md`
+- 캐릭터별 적용 기록(RUID·재생 시간·검증): 썬콜 = `docs/design/ice-lightning-mage-motion.md`; 불·독 = `docs/design/fire-poison-mage-motion.md`.
 
 ## 1. 작업 순서
 
@@ -46,20 +46,20 @@ assets/design/characters/<character-id>/
 - **결과물만 둔다** — 원화 사본·레퍼런스·프롬프트·반려 시안·미리보기·스크립트·README는 넣지 않는다. 고칠 때는 같은 파일을 교체한다(`v2`·`final` 같은 복제 금지). 작업 기록은 캐릭터 적용 기록 문서나 `.beaver/output`에.
 - 폴더·문서 이름에 날짜 접두어를 붙이지 않는다.
 
-## 4. 게임 연결 (지금은 썬콜 전용)
+## 4. 게임 연결 (썬콜·불독)
 
 | 무엇 | 어디 |
 |---|---|
-| 액션 → 프레임 RUID 목록 | `RtsJobTableLogic.GetMageSkinFrames` |
-| 프레임별 재생 시간 | `RtsJobTableLogic.GetMageSkinFrameDurations` (썬콜: 체인 0.30/0.15/0.35초, 블리자드 0.50/1.70/0.80초 — 다른 스킬에 그대로 쓰지 않는다) |
-| 흉상 | `RtsJobTableLogic.GetMagePortraitRUID` → 상세정보 `RtsUnitPopupLogic.SpawnPreviewAt`(176×176) · 선택창 `RtsPopupLogic.BuildRecruitInfo`(140×140) |
+| 적용 직업·액션 → 프레임 RUID 목록 | `RtsJobTableLogic.HasMageSkin(jobId)` · `GetMageSkinFrames(jobId)` |
+| 프레임별 재생 시간 | `RtsJobTableLogic.GetMageSkinFrameDurations(jobId)` (썬콜: 체인 0.30/0.15/0.35초, 블리자드 0.50/1.70/0.80초; 불독: poisonRegion 0.40/0.45/0.35초, dotPunisher 0.35/0.40/0.45초) |
+| 흉상 | `RtsJobTableLogic.GetMagePortraitRUID(jobId)` → 상세정보 `RtsUnitPopupLogic.SpawnPreviewAt`(180×180) · 선택창 `RtsPopupLogic.BuildRecruitInfo`(140×140) |
 | 월드 표시 | `RtsUnitComponent.SetupMageSkin` · `PlayMageAction` · `DrawMageSkin` (대기 중엔 프레임 시계를 돌리지 않는다) |
 | 시전·대기 복귀 | `RtsSkillFxLogic.PlayCast` · `ReturnStand` |
-| 기본 아바타 빼기 | `RtsUnitLogic.SpawnUnit` (`jobId == "il"`이면 AvatarRenderer·CostumeManager를 붙이지 않는다) |
+| 기본 아바타 빼기 | `RtsUnitLogic.SpawnUnit` (`HasMageSkin(jobId)`이면 AvatarRenderer·CostumeManager를 붙이지 않는다) |
 
 - 캔버스: 대기 576×576·발 (288,512), 공격 704×704·발 (352,640). 픽셀당 로컬 0.002유닛 — 무기 때문에 캔버스가 커져도 캐릭터 배율은 같다.
 - 업로드는 msw-mcp 두 단계(`assets/textures/README.md` 절차). 같은 RUID에 덮어쓰지 않고 **새 RUID**로 올려 표를 바꾼다(Maker 캐시).
-- 다른 직업을 붙일 때는 그 직업의 연결을 새로 추가한다. 썬콜 표를 덮어쓰지 않는다(지금 함수들은 썬콜 이름·`il` 분기로 되어 있어 일반화가 필요하다).
+- 다른 직업은 적용 직업·프레임·시간·흉상 표에 새 분기를 추가한다. 기존 직업의 표를 덮어쓰지 않는다.
 
 ## 5. 적용 확인 (Maker)
 

@@ -28,6 +28,8 @@ script RtsPopupLogic extends Logic
 
 	property number PanelW = 1114
 
+	property number RecruitPanelW = 1014
+
 	-- 증강 탭 상태
 	property table AugTabs = {}
 
@@ -229,7 +231,8 @@ script RtsPopupLogic extends Logic
 		local height = 500
 		local title = ""
 		if kind == "recruit" then
-			height = 760
+			width = self.RecruitPanelW
+			height = 660
 			title = "캐릭터 영입"
 		elseif kind == "augment" then
 			height = 880
@@ -735,13 +738,13 @@ script RtsPopupLogic extends Logic
 		return b
 	end
 
-	-- ===== 영입: 직업군 탭 + 계열 4묶음 × 직업 10종 + 보유 0/6 =====
+	-- ===== 영입: 소속 탭 + 모든 소속 공통 계열 5열 + 보유 0/6 =====
 
 	@ExecSpace("ClientOnly")
 	method void BuildRecruit(Entity body)
 		-- 직업군 탭: 모험가 / 영웅(2026-09-23 사용자 "팬텀은 영웅 탭에, 개발 아님") — 탭은 제자리, 카드·안내만 다시(RefreshRecruit)
 		self.RecruitBody = body
-		self.RecruitBar = self:SpawnTabBar(body, "RtsRcCat", { { "adv", "모험가", 100 }, { "hero", "영웅", 90 } }, self.RecruitTab, 27, -10, 100, 36, 10, 17, function(key)
+		self.RecruitBar = self:SpawnTabBar(body, "RtsRcCat", _RtsJobTableLogic:GetRecruitFactions(), self.RecruitTab, 27, -10, 100, 36, 10, 17, function(key)
 			self.RecruitTab = key
 			self:RefreshRecruit()
 		end)
@@ -767,16 +770,11 @@ script RtsPopupLogic extends Logic
 
 		-- 직업 id 기준(2026-09-22): 카드 클릭 → 팝업 닫고 배치 모드(RtsUnitSelectLogic.BeginPlace — 빈 발판 클릭 → 서버 RequestRecruitAt, ESC = 영입 취소).
 		--   본편(2026-09-23): 무료·Lv1, 영입 한도(RtsStageTableLogic.RecruitLimit)가 남았을 때만 카드가 눌린다. 팬텀(영웅 탭)은 프리즘 '팬텀 잠금 해제'로 열린다(RtsUnitLogic.IsJobUnlocked)
-		local groups = {
-			{ "전사", { "hero", "paladin", "dk" } },
-			{ "궁수", { "bow", "marks" } },
-			{ "마법사", { "il", "fp", "bishop" } },
-			{ "도적", { "nl", "shad" } },
-		}
-		if self.RecruitTab == "hero" then groups = { { "영웅", { "phantom" } } } end
+		local groups = _RtsJobTableLogic:GetRecruitGroups(self.RecruitTab)
 		local myId = _RtsUnitLogic:MyUserId()
-		local colW = 250
-		local gap = 14
+		local gap = 12
+		local colW = (self.RecruitPanelW - 54 - gap * (#groups - 1)) / #groups
+		local cardH = 132
 		local top = -66
 		local nos = _RtsUnitLogic:ListZoneUnits(_RtsUnitLogic:MyZone())
 		local stageNo = _RtsStageLogic.StageNo
@@ -787,13 +785,19 @@ script RtsPopupLogic extends Logic
 			local gx = 27 + (gi - 1) * (colW + gap)
 			local g = groups[gi]
 			H:SpawnLabel("RtsRcGroup" .. tostring(gi), body, Vector2(0, 1), Vector2(0, 1), Vector2(gx, top), Vector2(colW, 26),
-				g[1], self:AccentInk(), 18, TextAlignmentType.MiddleLeft, true)
+				g[1], self:AccentInk(), 18, TextAlignmentType.MiddleCenter, true)
 			local line = H:SpawnUI("model://uisprite", "RtsRcGroupLine" .. tostring(gi), body, Vector2(0, 1), Vector2(0, 1), Vector2(gx, top - 30), Vector2(colW, 1.5))
 			line.SpriteGUIRendererComponent.Color = H:ColBorderSoft()
 			local jobs = g[2]
+			if #jobs == 0 then
+				local empty = H:SpawnRoundedPanel("RtsRcEmpty" .. tostring(gi), body, Vector2(0, 1), Vector2(0, 1), Vector2(gx, top - 42), Vector2(colW, cardH),
+					Color(1, 1, 1, 0.20), self:Edge(), 1)
+				H:SpawnLabel("RtsRcEmptyText", empty, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2.zero, Vector2(colW - 20, 44),
+					"출시 예정", self:Muted(), 16, TextAlignmentType.MiddleCenter, false)
+			end
 			for ji = 1, #jobs do
-				local jy = top - 42 - (ji - 1) * 162
-				local card = H:SpawnRoundedPanel("RtsRcJob" .. tostring(gi) .. "_" .. tostring(ji), body, Vector2(0, 1), Vector2(0, 1), Vector2(gx, jy), Vector2(colW, 150),
+				local jy = top - 42 - (ji - 1) * (cardH + gap)
+				local card = H:SpawnRoundedPanel("RtsRcJob" .. tostring(gi) .. "_" .. tostring(ji), body, Vector2(0, 1), Vector2(0, 1), Vector2(gx, jy), Vector2(colW, cardH),
 					self:Card(), self:Edge(), 1.5)
 				local jid = jobs[ji]
 				-- 이미 보유한 직업은 흐리게 + '보유 중', 클릭 없음(동일 직업 중복 영입 불가 — 프리즘으로 이름이 바뀐 듀얼블레이더도 섀도어로 센다)
@@ -808,17 +812,22 @@ script RtsPopupLogic extends Logic
 					ink = self:Muted()
 					card.SpriteGUIRendererComponent.Color = self:Card()
 				end
-				if jid == "il" then
-					_RtsUnitPopupLogic:SpawnPreviewAt(card, { JobId = jid }, Vector2(125, -49), Vector2(96, 96))
+				local status = ""
+				if ownedJob then status = "보유 중" elseif not unlocked then status = "잠김" end
+				local previewY = -55
+				local nameY = -106
+				if status ~= "" then previewY = -47; nameY = -98 end
+				if _RtsJobTableLogic:HasMageSkin(jid) then
+					_RtsUnitPopupLogic:SpawnPreviewAt(card, { JobId = jid }, Vector2(colW / 2, previewY), Vector2(84, 84))
 				else
-					_RtsUnitPopupLogic:SpawnPreviewAt(card, { JobId = jid }, Vector2(125, -47), Vector2(72, 86))
+					_RtsUnitPopupLogic:SpawnPreviewAt(card, { JobId = jid }, Vector2(colW / 2, previewY), Vector2(68, 78))
 				end
-				H:SpawnLabel("RtsRcJobName", card, Vector2(0, 0.5), Vector2(0, 0.5), Vector2(12, -30), Vector2(colW - 24, 28),
-					_RtsJobTableLogic:GetJobName(jid), ink, 19, TextAlignmentType.MiddleCenter, false)
-				local priceText = "Lv 1"
-				if ownedJob then priceText = "보유 중" elseif not unlocked then priceText = "잠김" end
-				H:SpawnLabel("RtsRcJobPrice", card, Vector2(1, 0.5), Vector2(1, 0.5), Vector2(-12, -58), Vector2(colW - 24, 22),
-					priceText, self:Muted(), 15, TextAlignmentType.MiddleCenter, false)
+				H:SpawnLabel("RtsRcJobName", card, Vector2(0.5, 1), Vector2(0.5, 0.5), Vector2(0, nameY), Vector2(colW - 16, 22),
+					_RtsJobTableLogic:GetJobName(jid), ink, 17, TextAlignmentType.MiddleCenter, false)
+				if status ~= "" then
+					H:SpawnLabel("RtsRcJobStatus", card, Vector2(0.5, 1), Vector2(0.5, 0.5), Vector2(0, -120), Vector2(colW - 16, 18),
+						status, self:Muted(), 13, TextAlignmentType.MiddleCenter, false)
+				end
 				-- 카드 → 직업 상세(2026-09-25 사용자) — 보유 중·잠김·영입 불가도 보기는 된다. 영입은 상세의 [영입] → 발판 고르기
 				local click = H:SpawnClick("RtsRcJobClick", card)
 				click:ConnectEvent(ButtonClickEvent, function(event)
@@ -832,7 +841,7 @@ script RtsPopupLogic extends Logic
 		local owned = #nos
 		local foot = "보유 " .. H:Int(owned) .. " / " .. H:Int(_RtsUnitLogic:GetMaxUnits()) .. " · "
 		if canRecruit then
-			foot = foot .. "영입 가능 " .. H:Int(room) .. " — 직업을 고른 뒤 세울 발판을 클릭 (Lv 1)"
+			foot = foot .. "영입 가능 " .. H:Int(room) .. " — 직업을 고른 뒤 세울 발판을 클릭"
 		elseif owned >= _RtsUnitLogic:GetMaxUnits() then
 			foot = foot .. "영입 완료"
 		elseif not _RtsRunResultLogic:IsMeAlive() or (state ~= "countdown" and state ~= "running") then
@@ -876,7 +885,7 @@ script RtsPopupLogic extends Logic
 		-- 왼쪽 위: 외형(기본 스킨) 150×170 — 2026-09-25 사용자 "외형 높이가 너무 높다". UI 아바타는 칸 아래쪽에 서서 칸을 캐릭터 크기에 맞게 낮춘다
 		local frame = H:SpawnRoundedPanel("RtsRiAvatarBox", body, Vector2(0, 1), Vector2(0, 1), Vector2(27, -6), Vector2(150, 170),
 			self:Card(), self:Edge(), 1.5)
-		if jid == "il" then
+		if T:HasMageSkin(jid) then
 			_RtsUnitPopupLogic:SpawnPreviewAt(frame, { JobId = jid }, Vector2(75, -85), Vector2(140, 140))
 		else
 			_RtsUnitPopupLogic:SpawnPreviewAt(frame, { JobId = jid }, Vector2(80, -84), Vector2(120, 150))

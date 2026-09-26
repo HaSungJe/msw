@@ -193,6 +193,7 @@ script RtsSkillFxLogic extends Logic
 	-- 유닛 엔티티(발 위치 = 엔티티 위치)에 fx 한 번 재생. no = 상태 표 키(LoopKey(구역, 번호) — 이름 접미사로도 씀), target = 메인 대상(투사체·빔의 기준), targets = 이번 공격의 대상 전부(없으면 {target}) — 빔은 대상들을 차례로 잇고, 표식·타격은 대상마다, 구체(projFrom around)는 대상들에 돌아가며
 	@ExecSpace("ClientOnly")
 	method void PlayCast(Entity unitEntity, number no, table fx, Entity target, table targets)
+		-- 원화 유닛의 프레임과 기존 스킬 이펙트를 함께 재생한다.
 		if unitEntity == nil or fx == nil then return end
 		local mapRoot = _EntityService:GetEntityByPath("/maps/RtsMap")
 		if mapRoot == nil then return end
@@ -205,15 +206,17 @@ script RtsSkillFxLogic extends Logic
 		local ar = unitEntity.AvatarRendererComponent
 		local body = nil
 		if ar ~= nil then body = ar:GetBodyEntity() end
-		if unitEntity.RtsUnitComponent ~= nil and unitEntity.RtsUnitComponent.JobId == "il" then body = unitEntity end
+		local unit = unitEntity.RtsUnitComponent
+		local hasSkin = unit ~= nil and _RtsJobTableLogic:HasMageSkin(unit.JobId)
+		if hasSkin then body = unitEntity end
 		-- hideWeapon: 스킬 동안 캐릭터의 무기(와 무기 잔상)를 투명하게 — 원작 레이징 블로우 이펙트는 금색 대검을 포함해서 실제 검이 옆에 따로 튀어나오면 어색(사용자 2026-09-19 "기본 칼이 애니메이션에 가려지는 게 맞다"). hideWeaponSec(없으면 clipLife, 없으면 0.9초) 뒤 복구
 		if fx.hideWeapon and ar ~= nil then self:HideWeapon(unitEntity, fx.hideWeaponSec or fx.clipLife or 0.9) end
 		local motions = fx.motions
 		if motions == nil and fx.motion ~= nil then motions = { fx.motion } end
 		local stand = self:StandName(unitEntity)
-		if unitEntity.RtsUnitComponent ~= nil and unitEntity.RtsUnitComponent.JobId == "il" and motions ~= nil and #motions > 0 then
-			-- 표시 프레임과 같은 시간표: 체인 0.8초, 블리자드 시전 전체 3초.
-			local durations = _RtsJobTableLogic:GetMageSkinFrameDurations()[motions[1]]
+		if hasSkin and motions ~= nil and #motions > 0 then
+			-- 직업별 표시 프레임 시간표와 대기 복귀 시점을 일치시킨다.
+			local durations = _RtsJobTableLogic:GetMageSkinFrameDurations(unit.JobId)[motions[1]] or { 0.45 }
 			local poseSec = 0
 			for _, duration in ipairs(durations) do poseSec = poseSec + duration end
 			self:SendAction(unitEntity, motions[1], 1, SpriteAnimClipPlayType.Onetime, nil, nil)
@@ -309,7 +312,20 @@ script RtsSkillFxLogic extends Logic
 		end
 		if fx.bodyClip ~= nil and fx.bodyClip ~= "" then self:PlayBody(unitEntity, no, fx) end
 		if fx.loopClip ~= nil and fx.loopClip ~= "" then self:EnsureLoopFx(unitEntity, no, fx, target) end
-		if ((fx.proj ~= nil and fx.proj ~= "") or (fx.projs ~= nil and #fx.projs > 0)) and target ~= nil and isvalid(target) then self:PlayProjectile(unitEntity, fx, target, targets) end
+		if ((fx.proj ~= nil and fx.proj ~= "") or (fx.projs ~= nil and #fx.projs > 0)) and target ~= nil and isvalid(target) then
+			local delay = math.min(fx.projDelay or 0, fx.projHover or 0)
+			if delay > 0 then
+				-- 시전 원호에서 구체를 나타내되, 대기 시간을 그만큼 빼서 기존 발사·서버 판정 시각을 유지한다.
+				local projectileFx = {}
+				for k, v in pairs(fx) do projectileFx[k] = v end
+				projectileFx.projHover = (fx.projHover or 0) - delay
+				_TimerService:SetTimerOnce(function()
+					if isvalid(unitEntity) and isvalid(target) then self:PlayProjectile(unitEntity, projectileFx, target, targets) end
+				end, delay)
+			else
+				self:PlayProjectile(unitEntity, fx, target, targets)
+			end
+		end
 		-- 대상 위 표식: fx의 markClip/markClips 1벌 + marks = { {clip, clips, delay, life, scale, at, dx, dy, fit, pivotDy, loop, stagger, pattern} … } 추가 벌(블레이드 토네이도 → 카르마 퓨리처럼 시각이 다른 표식 여러 개)
 		local function playMarks(mfx)
 			-- 같은 대상이 여러 번 들어오면(보스 집중 15타) 표식을 가로로 조금씩 흩뿌린다(PlayMark dup)
@@ -364,7 +380,15 @@ script RtsSkillFxLogic extends Logic
 				self:PlayBeam(unitEntity, fx, targets)
 			end
 		end
-		if fx.zoneClips ~= nil and #fx.zoneClips > 0 then self:PlayZone(unitEntity, fx) end
+		if fx.zoneClips ~= nil and #fx.zoneClips > 0 then
+			if (fx.zoneDelay or 0) > 0 then
+				_TimerService:SetTimerOnce(function()
+					if isvalid(unitEntity) then self:PlayZone(unitEntity, fx) end
+				end, fx.zoneDelay)
+			else
+				self:PlayZone(unitEntity, fx)
+			end
+		end
 		-- clips = { ruid 또는 { ruid, dx, dy, scale, delay } … }: 같은 원점에 동시에 띄우는 추가 클립들(스피어 버스터 80003291 — 마법진·용머리 + 시차 찌르기 3개가 각각 빈 프레임으로 자기 시작 시각을 갖고 있음)
 		if fx.clips ~= nil and #fx.clips > 0 then self:PlayExtraClips(unitEntity, no, fx) end
 		if fx.clip ~= nil and fx.clip ~= "" then
@@ -1116,7 +1140,7 @@ script RtsSkillFxLogic extends Logic
 	@ExecSpace("ClientOnly")
 	method void SendAction(Entity body, string name, any rate, any playType, any frameA, any frameB)
 		if body == nil or not isvalid(body) then return end
-		if body.RtsUnitComponent ~= nil and body.RtsUnitComponent.JobId == "il" then
+		if body.RtsUnitComponent ~= nil and _RtsJobTableLogic:HasMageSkin(body.RtsUnitComponent.JobId) then
 			body.RtsUnitComponent:PlayMageAction(name)
 			return
 		end

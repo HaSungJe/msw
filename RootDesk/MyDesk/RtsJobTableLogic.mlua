@@ -6,9 +6,22 @@ script RtsJobTableLogic extends Logic
 
 	property number MaxLevel = 50
 
-	-- 썬콜 전용 PNG: 고정 전투 대기 + 원본 순서의 체인/블리자드 각 3프레임.
+	method boolean HasMageSkin(string jobId)
+		-- 원화 프레임을 사용하는 직업은 서버 스폰과 클라이언트 표시에서 같은 분기를 쓴다.
+		return jobId == "il" or jobId == "fp"
+	end
+
+	-- 직업별 PNG: 고정 대기 1장과 스킬 액션별 3프레임.
 	@ExecSpace("ClientOnly")
-	method table GetMageSkinFrames()
+	method table GetMageSkinFrames(string jobId)
+		if jobId == "fp" then
+			return {
+				stand1 = { "762ba8485e584f60a94bc71631ee7881" },
+				poisonRegion = { "3d29ef1ad55541d2a91af4400a0a22ed", "413bb52e0b4f47cabe7600bab0a89919", "b987d27c6aba4867abfd690cf7960cd8" },
+				dotPunisher = { "61f1428a7d9d4bd7aa94d7f57ceb3ab2", "1f61ca3ebc5e46a381af77bdadf5e3d3", "2581e6d505a2401aab26d85c57cca9df" },
+			}
+		end
+		if jobId ~= "il" then return {} end
 		return {
 			stand1 = { "fe0c6be3795d49e29a311b3edb8e89ab" },
 			swingO1 = { "66b1f0af75c745bdaf10c9710486b867", "0c4635067dcc4aae9ed3987fc3820dcd", "307d3b6aa3d7485d932c9fcde44642ed" },
@@ -18,13 +31,18 @@ script RtsJobTableLogic extends Logic
 
 	-- 선택창·상세정보 공용 흉상. 전투 프레임과 별도로 관리한다.
 	@ExecSpace("ClientOnly")
-	method string GetMagePortraitRUID()
+	method string GetMagePortraitRUID(string jobId)
+		if jobId == "fp" then return "81c1c00cd1aa4ff3b08f9894b42c819b" end
+		if jobId ~= "il" then return "" end
 		return "f93cfcc7a46d428cb6ed2bb3d71fc986"
 	end
 
 	-- 블리자드는 준비 0.5초 → 시전 유지(타격 2.2초까지) → 마무리(총 3초).
 	@ExecSpace("ClientOnly")
-	method table GetMageSkinFrameDurations()
+	method table GetMageSkinFrameDurations(string jobId)
+		-- 불·독: 지팡이 내려찍기와 원호 휘두르기를 분리하고 효과 시작점을 두 번째 자세에 맞춘다.
+		if jobId == "fp" then return { stand1 = { 1 }, poisonRegion = { 0.40, 0.45, 0.35 }, dotPunisher = { 0.35, 0.40, 0.45 } } end
+		if jobId ~= "il" then return {} end
 		return {
 			stand1 = { 1 },
 			swingO1 = { 0.30, 0.15, 0.35 },
@@ -117,15 +135,45 @@ script RtsJobTableLogic extends Logic
 	end
 
 	method string GetJobGroup(string jobId)
-		local s = self:GetSeries(jobId)
-		if jobId == "phantom" then return "영웅 · 도적" end -- 2026-09-20 사용자: 팬텀은 모험가가 아니라 영웅 직업군
-		if s == "arc" then return "모험가 · 궁수" end
-		if s == "mag" then return "모험가 · 마법사" end
-		if s == "thf" then return "모험가 · 도적" end
-		return "모험가 · 전사"
+		-- 상세정보와 영입 목록이 같은 소속·계열 분류를 사용한다.
+		local faction = self:GetJobFaction(jobId)
+		local factionName = faction
+		for _, item in ipairs(self:GetRecruitFactions()) do
+			if item[1] == faction then factionName = item[2] end
+		end
+		local series = self:GetSeries(jobId)
+		for _, group in ipairs(self:GetRecruitGroups(faction)) do
+			if group[3] == series then return factionName .. " · " .. group[1] end
+		end
+		return factionName
 	end
 
-	-- 계열 키(HUD 슬롯 색): war/arc/mag/thf
+	method table GetRecruitFactions()
+		-- 출시된 소속 탭. 새 소속을 여기에 등록하면 동일한 다섯 계열 열을 사용한다.
+		return { { "adv", "모험가", 100 }, { "hero", "영웅", 90 } }
+	end
+
+	method string GetJobFaction(string jobId)
+		-- 히어로 직업(hero)은 모험가, 팬텀은 영웅 소속이다.
+		if jobId == "phantom" then return "hero" end
+		return "adv"
+	end
+
+	method table GetRecruitGroups(string faction)
+		-- 빈 계열도 반환하므로 모든 소속이 전사/궁수/마법사/도적/해적 순서를 유지한다.
+		local groups = { { "전사", {}, "war" }, { "궁수", {}, "arc" }, { "마법사", {}, "mag" }, { "도적", {}, "thf" }, { "해적", {}, "pir" } }
+		for _, jobId in ipairs(self:GetJobIds()) do
+			if self:GetJobFaction(jobId) == faction then
+				local series = self:GetSeries(jobId)
+				for _, group in ipairs(groups) do
+					if group[3] == series then table.insert(group[2], jobId) end
+				end
+			end
+		end
+		return groups
+	end
+
+	-- 계열 키(HUD 슬롯 색): war/arc/mag/thf/pir(해적 출시 시 사용)
 	method string GetSeries(string jobId)
 		if jobId == "bow" or jobId == "marks" then return "arc" end
 		if jobId == "il" or jobId == "fp" or jobId == "bishop" then return "mag" end
@@ -456,7 +504,7 @@ script RtsJobTableLogic extends Logic
 				-- 포이즌 리전 연출(2026-09-18): 원작 포이즌 리전(2121055) 클립은 라이브러리에 사운드만 있어 3차 포이즌 미스트(2111003)로 — 시전 클립 effect(독 폭발, 1.62초, 대칭) + 트랙 모든 칸에 독안개 tile/0~8(zoneClips, 10초 루프, 반투명) + 틱마다 몬스터 위 mob(초록 고리), 사운드 use/hit.
 				--   피해 = dot(2초마다 공격력 10% × 10초 = 5틱, 직접 타격 없음 hits 0). 강화(L20) 15%·방무 100%는 GetStatRaw dotPct·dotIgn
 				{ lv = 1, kind = "액티브", name = "포이즌 리전", desc = "모든 타일에 10초 동안 맹독지대를 설치한다. 맹독지대 위의 적은 2초마다 30%의 데미지를 입으며 방어율을 무시한다. 일반 몬스터는 추가로 5 + 레벨×1.5의 고정 데미지를 입는다. 중첩되지 않는다. 재사용 대기시간 15초", target = false, cd = 15, ratio = 0, hits = 0, dot = { pct = 15, period = 2, dur = 10 },
-					fx = { motion = "swingO2", clip = "b0d47a8948314a5ea04a00690d921fc3", scale = 1.2, feetDx = 0, feetDy = 0.6, noFlip = true, clipLife = 1.7, sound = "eb7f504670a14802a48cc94f4eb66848",
+					fx = { motion = "poisonRegion", zoneDelay = 0.40, clipDelay = 0.40, soundDelay = 0.40, clip = "b0d47a8948314a5ea04a00690d921fc3", scale = 1.2, feetDx = 0, feetDy = 0.6, noFlip = true, clipLife = 1.7, sound = "eb7f504670a14802a48cc94f4eb66848",
 						zoneClips = { "eaed7d6a19f0483aa51dc5ff151f7acf", "7f743e56d7cd43c7a3baf9f7061abd3d", "302b1c7f241b400b8544f3b7378eacce", "550d34dd449242c9b3df7daebac8f259", "8bfddf0644494979ba02ef5a59b5a336", "53f3500a48814dd0b97b2825d781583c", "ce9db043ed324af5865e8fa21ce41dc1", "92f82ee141f24246b462856f3ecd1493", "3a6509634ee24b789f5446afb10fe357" },
 						zoneScale = 1.6, zoneAlpha = 0.7, zoneLife = 10,
 						hitClip = "e42be518ee2f4b838e52deba8bf1316b", hitScale = 1.4, hitDy = 0.6, hitSound = "fbc82c9f2524497c81aea0a647043ab9", hitSoundVol = 0.35, hitSoundGap = 0.3 } },
@@ -466,7 +514,7 @@ script RtsJobTableLogic extends Logic
 				--   구체 30개(사용자 2026-09-18 "30개로" — hits 30 = 구체마다 100% 1회, 표 설명도 2026-09-23 30개로 맞춤) = **RtsDotOrb01~03**(사용자 2026-09-18 지정: 도트 퍼니셔 400021001 스킬 아이콘 d998c591…/iconmouseover 20a64945…를 원형으로 잘라 테두리를 없앤 64px 자체 업로드 sprite, assets/textures/dotorb/) 01→02→03→02 0.12초 맥동 루프, 1.8배 ≈ 1.15유닛 둥근 불구슬, 240°/초 자전(구체마다 방향 엇갈림, projSpin — 사용자 "더 키우고 회전") — 30개가 한 번에(projStagger 0 — 2026-09-22 사용자 "구체가 한번에 모두 생성되어야 함", 전엔 0.03초 간격) 손 높이 주위 동심원 고리(반지름 2.0부터 1.2 간격, 고리마다 둘레÷1.2개 = 10·16·4개)에 생성돼(캐릭터·서로 간 최소 구체 크기 간격) 떠 있다가(projHover 1.2 = 사운드 길이) 각자 생성 지점에서 가장 가까운 적(보스가 사거리 안이면 보스만)의 피격 박스 중앙으로 4.4유닛/초로 날아가(projSpeed — 2.2에서 2배, 사용자 2026-09-18) 박치기하는 순간 사라짐 + 판정 + 400021001/use2 + 폭발 12121055 hit/0(9b8b4484…, 230×270px → 0.7배, 0.9초 — 사용자 "달라붙으면 폭발 이펙트"). 이전: 플레임 위자드 12121055/effect 프레임(0~4 불접시 / 5~11 불구슬)은 사용자 "불접시" → 아이콘 구슬로 교체
 				--   서버(RtsCombatLogic.DoAttack)가 같은 식(OrbSpawnOffset)으로 생성 지점·대상·도착 시각(stagger + hover + 거리÷속도)을 계산해 판정을 예약하고 대상 목록을 클라에 넘긴다. 400021001엔 사운드·아이콘만 있고 클립은 라이브러리에 없음
 				{ lv = 30, kind = "액티브", name = "도트 퍼니셔", desc = "화염 구체 30개를 소환한다. 각 구체는 가장 가까운 적에게 달라붙어 폭발하며 290%의 데미지를 준다. 일반 몬스터에게는 데미지가 50% 감소한다. 재사용 대기시간 15초", target = false, cd = 15, ratio = 290, mobMul = 0.5, hits = 30, targets = 10, range = 6, spread = true,
-					fx = { motion = "swingO2", clip = "fce52ddb8a274e529790dc6264283f0a", scale = 1.2, feetDx = 0, feetDy = 0.8, assetFacesLeft = true, sound = "da2791e77cec477eb31dceb7b3c1961e",
+					fx = { motion = "dotPunisher", projDelay = 0.35, clipDelay = 0.35, clip = "fce52ddb8a274e529790dc6264283f0a", scale = 1.2, feetDx = 0, feetDy = 0.8, assetFacesLeft = true, sound = "da2791e77cec477eb31dceb7b3c1961e",
 						proj = "50781432c95d45b8876842c475c675f5", projCount = 30, projStagger = 0, projFrom = "around", projSpread = 2.0, projGap = 1.2, projHover = 1.2, projSpeed = 5.18, projNear = 0, projDashSec = 0, projScale = 1.8, projNoRotate = true, projSpin = 240, projFrameSec = 0.12,
 						projFlySprites = { "3769c672d4f94a2e9f37b2477ab66d5b", "b0b300d3c83749198c5c146ab1ac5e84", "da5ad791c75e4ef4941d722d39e1f334", "b0b300d3c83749198c5c146ab1ac5e84" },
 						hitClip = "9b8b44848e93472390cbd2799aa52bb0", hitScale = 0.7, hitDy = 0.6, hitSound = "4045608d11f4435385a2f3101852892e" } },

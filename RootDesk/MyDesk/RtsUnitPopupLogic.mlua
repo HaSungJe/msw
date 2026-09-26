@@ -123,6 +123,8 @@ script RtsUnitPopupLogic extends Logic
 	-- 구조가 그대로면 제목·능력치·레벨업 버튼만 제자리에서 바꾸고, 달라졌으면 통째로 다시 그린다
 	@ExecSpace("ClientOnly")
 	method void UpdateInPlace()
+		-- 스폰이 프레임을 넘기는 동안 메소·버프 동기화가 미완성 창을 다시 만들지 않게 한다.
+		if self._T.Rendering then return end
 		if self.CurNo == 0 or self.Body == nil then return end
 		local u = _RtsUnitLogic:GetMyUnit(self.CurNo)
 		if u == nil then
@@ -226,6 +228,17 @@ script RtsUnitPopupLogic extends Logic
 
 	@ExecSpace("ClientOnly")
 	method void Render()
+		-- 한 번에 한 내용만 생성한다. 중간 오류가 나도 다음 열기를 막지 않는다.
+		if self._T.Rendering then return end
+		self._T.Rendering = true
+		local ok, err = pcall(function() self:BuildContent() end)
+		self._T.Rendering = false
+		if not ok then error(err) end
+	end
+
+	@ExecSpace("ClientOnly")
+	method void BuildContent()
+		-- 상세정보의 전체 내용 생성은 Render의 중복 진입 보호 안에서만 수행한다.
 		if self.Body == nil then return end
 		local u = _RtsUnitLogic:GetMyUnit(self.CurNo)
 		if u == nil then
@@ -261,7 +274,7 @@ script RtsUnitPopupLogic extends Logic
 		if H.CircleMaskRUID ~= "" then glow.SpriteGUIRendererComponent.ImageRUID = DataRef(H.CircleMaskRUID) end
 		glow.SpriteGUIRendererComponent.Color = Color(0.76, 0.75, 0.9, 0.12)
 		glow.SpriteGUIRendererComponent.RaycastTarget = false
-		if u.JobId == "il" then
+		if _RtsJobTableLogic:HasMageSkin(u.JobId) then
 			self:SpawnPreviewAt(look, u, Vector2(95, -126), Vector2(180, 180))
 		else
 			self:SpawnPreviewAt(look, u, Vector2(95, -134), Vector2(136, 170))
@@ -969,6 +982,7 @@ script RtsUnitPopupLogic extends Logic
 	-- 위치(부모 왼쪽 위 기준 가운데)·크기를 받는 판(2026-09-25 영입 상세 팝업 — RtsPopupLogic.BuildRecruitInfo가 { JobId } 표로 부른다). 직업 기본 세트만
 	@ExecSpace("ClientOnly")
 	method void SpawnPreviewAt(Entity parent, any u, Vector2 pos, Vector2 size)
+		-- 원화가 등록된 직업은 각자의 흉상을 사용한다.
 		local H = _RtsHudLogic
 		local e = _SpawnService:SpawnByModelId("model://uiempty", "RtsUnitPreview", Vector3.zero, parent)
 		if e == nil then
@@ -982,9 +996,9 @@ script RtsUnitPopupLogic extends Logic
 		t.Pivot = Vector2(0.5, 0.5)
 		t.anchoredPosition = pos
 		t.RectSize = size
-		if u.JobId == "il" then
+		if _RtsJobTableLogic:HasMageSkin(u.JobId) then
 			local sprite = e:AddComponent("SpriteGUIRendererComponent")
-			sprite.ImageRUID = _RtsJobTableLogic:GetMagePortraitRUID()
+			sprite.ImageRUID = DataRef(_RtsJobTableLogic:GetMagePortraitRUID(u.JobId))
 			sprite.PreserveSprite = PreserveSpriteType.AspectOnly
 			sprite.RaycastTarget = false
 			return
