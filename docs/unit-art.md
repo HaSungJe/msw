@@ -1,13 +1,16 @@
 # 유닛 원화·프레임 (캐릭터 스킨)
 
+- 히어로: `docs/design/hero-motion.md` — 외형·대기·스킬·흉상 게임 연결 완료.
+- 프레임 확장 현황: `docs/design/unit-motion.md`. 새 PNG와 현재 게임에 연결된 RUID를 구분한다.
+
 메월 아바타 대신 직접 그린 PNG로 유닛을 보여 주는 작업의 기준 문서다. 원화·프레임·흉상을 만들거나 바꿀 때 이 문서 하나를 따른다.
 - 사용자 결정과 그 이유: `.beaver/memory/_archived/character-art.md` (문서로 반영 후 보관)
-- 캐릭터별 적용 기록(RUID·재생 시간·검증): 썬콜 = `docs/design/ice-lightning-mage-motion.md`; 불·독 = `docs/design/fire-poison-mage-motion.md`.
+- 캐릭터별 적용 기록(RUID·재생 시간·검증): 썬콜 = `docs/design/ice-lightning-mage-motion.md`; 불·독 = `docs/design/fire-poison-mage-motion.md`; 비숍 = `docs/design/bishop-motion.md`.
 
 ## 1. 작업 순서
 
 1. **컨셉·원화** — 직업의 외모·색·의상·소품·**표정 컨셉**을 정하고 원화 1장을 보여 준다. **사용자 OK 전에는 프레임을 만들지 않는다.** 이미 승인된 캐릭터를 고칠 때는 현재 결과물을 기준으로 필요한 부분만 고친다.
-2. **프레임** — 대기 1장 + 공격 스킬마다 약 3장(준비 · 시전 · 마무리). 시전이 끝나기 전에 대기로 돌아가지 않고 패시브에 공격 프레임을 늘리지 않는다. 메월 액션을 대체하므로 그 액션의 자세 순서·타격 시점을 따른다(썬콜: 대기 `stand1`, 체인 라이트닝 `swingO1`, 블리자드 `swingO3`). 직업·스킬 목록은 `.info/character.md`·`.info/skill.md`.
+2. **프레임** — 대기는 작은 호흡·옷자락 변화가 이어지는 복수 프레임으로 만든다. 공격은 준비 · 시전 · 마무리 사이의 연결 자세를 그려 부드럽게 이어 준다(현재 원화 4종: 대기 3장, 마법사 스킬 5장, 히어로 일반기 8장·인레이지 7장). 시전이 끝나기 전에 대기로 돌아가지 않고 패시브에 공격 프레임을 늘리지 않는다. 기존 액션의 자세 순서·타격 시점을 따른다. 직업·스킬 목록은 `.info/character.md`·`.info/skill.md`.
 3. **흉상** — `portrait.png` 512×512 투명. 얼굴·어깨·가슴 윗부분. 전투 프레임과 따로 만든다.
 4. **검수** — 모든 프레임을 같은 표시 크기·발 기준점으로 나란히 놓고 2절 기준으로 본다.
 5. **게임 적용**(요청이 있을 때) — 새 RUID로 업로드 → 4절 표에 연결 → Maker 확인(5절). 파일만 바꾸고 적용 완료라고 하지 않는다.
@@ -30,7 +33,7 @@
 - **크기 맞춤**: 이미지 전체 크기가 아니라 얼굴 폭·정수리~발로 맞춘다(무기를 들면 전체 크기가 달라진다).
 - **표정**: 직업마다 원화 단계에서 정한다. 썬콜 = 은은한 미소. 다른 직업은 미정(일괄 미소 금지).
 - 원화 승인 뒤 사용자가 비율 수정을 요청하면 그 요청을 우선한다.
-- **움직임**: 흔들림·호흡·회전·크기 변화 없음. 대기는 정지 1장.
+- **움직임**: 사용자의 최신 요청에 따라 작은 호흡을 그린 대기 프레임을 반복한다. 발 위치·얼굴 크기는 고정하고 머리카락·옷자락·상체만 미세하게 바꾼다. 몸 전체의 위치·회전·확대/축소나 크로스페이드로 프레임을 대신하지 않는다. 과거 정지 1장 규칙은 폐기한다.
 
 ## 3. 파일
 
@@ -38,23 +41,23 @@
 assets/design/characters/<character-id>/
   portrait.png
   frames/
-    wait/motion01.png
-    <english-skill-name>/motion01.png, motion02.png, motion03.png
+    wait/motion01.png, motion02.png, motion03.png
+    <english-skill-name>/motion01.png, motion02.png, ...
 ```
 
 - 번호는 01부터 재생 순서. 스킬 폴더명은 실제 스킬명을 영어 소문자·하이픈으로 표기한다(썬콜: `chain-lightning`, `blizzard`).
 - **결과물만 둔다** — 원화 사본·레퍼런스·프롬프트·반려 시안·미리보기·스크립트·README는 넣지 않는다. 고칠 때는 같은 파일을 교체한다(`v2`·`final` 같은 복제 금지). 작업 기록은 캐릭터 적용 기록 문서나 `.beaver/output`에.
 - 폴더·문서 이름에 날짜 접두어를 붙이지 않는다.
 
-## 4. 게임 연결 (썬콜·불독)
+## 4. 게임 연결 (히어로·썬콜·불독·비숍)
 
 | 무엇 | 어디 |
 |---|---|
 | 적용 직업·액션 → 프레임 RUID 목록 | `RtsJobTableLogic.HasMageSkin(jobId)` · `GetMageSkinFrames(jobId)` |
-| 프레임별 재생 시간 | `RtsJobTableLogic.GetMageSkinFrameDurations(jobId)` (썬콜: 체인 0.30/0.15/0.35초, 블리자드 0.50/1.70/0.80초; 불독: poisonRegion 0.40/0.45/0.35초, dotPunisher 0.35/0.40/0.45초) |
+| 프레임별 재생 시간 | `RtsJobTableLogic.GetMageSkinFrameDurations(jobId)` (직업별 장수·시간은 `docs/design/unit-motion.md`) |
 | 흉상 | `RtsJobTableLogic.GetMagePortraitRUID(jobId)` → 상세정보 `RtsUnitPopupLogic.SpawnPreviewAt`(180×180) · 선택창 `RtsPopupLogic.BuildRecruitInfo`(140×140) |
-| 월드 표시 | `RtsUnitComponent.SetupMageSkin` · `PlayMageAction` · `DrawMageSkin` (대기 중엔 프레임 시계를 돌리지 않는다) |
-| 시전·대기 복귀 | `RtsSkillFxLogic.PlayCast` · `ReturnStand` |
+| 월드 표시 | `RtsUnitComponent.SetupMageSkin` · `PlayMageAction` · `DrawMageSkin` (대기도 시계를 돌리고 시간표를 반복한다) |
+| 시전·대기 복귀 | `RtsSkillFxLogic.PlayCast` · `ReturnStand` · `CheckLoops` (비숍 디바인 퍼니시먼트는 `PlayMageLoop`로 5장 반복, 매 공격마다 시계를 초기화하지 않음) |
 | 기본 아바타 빼기 | `RtsUnitLogic.SpawnUnit` (`HasMageSkin(jobId)`이면 AvatarRenderer·CostumeManager를 붙이지 않는다) |
 
 - 캔버스: 대기 576×576·발 (288,512), 공격 704×704·발 (352,640). 픽셀당 로컬 0.002유닛 — 무기 때문에 캔버스가 커져도 캐릭터 배율은 같다.

@@ -79,7 +79,7 @@ script RtsUnitLogic extends Logic
 		return lp.RtsCameraAnchorComponent.MyZone
 	end
 
-	-- 구역 zone의 유닛 no 상태 컴포넌트 (없으면 nil). 남의 구역도 읽을 수 있다(버프 아이콘)
+	-- 구역 zone의 유닛 no 상태 컴포넌트 (없으면 nil). 남의 구역도 읽을 수 있다(버프 개수)
 	@ExecSpace("ClientOnly")
 	method any GetZoneUnit(number zone, number no)
 		if zone < 1 then return nil end

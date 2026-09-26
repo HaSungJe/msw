@@ -1,0 +1,581 @@
+{
+  "status": "ok",
+  "kind": "normal",
+  "count": 22,
+  "logs": [
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T13:12:04",
+      "isGeneratedFromServer": true,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY SPAWN il entity=true col=10.0 row=2.0",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 8,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T13:12:05",
+      "isGeneratedFromServer": true,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY SPAWN fp entity=true col=13.0 row=2.0",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 8,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T13:12:05",
+      "isGeneratedFromServer": true,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY SPAWN bishop entity=true col=2.0 row=3.0",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 8,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T13:12:05",
+      "isGeneratedFromServer": true,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY SPAWN hero entity=true col=7.0 row=3.0",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 8,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T13:12:13",
+      "isGeneratedFromServer": true,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "RtsStage: start 1 mob 달팽이 동산",
+      "stackTrace": [
+        {
+          "methodName": "RtsConfigLogic.Log",
+          "methodLineNum": 1,
+          "codeBlockFileId": "d37e9a35-70f8-4794-b601-8f32062cfc6c"
+        },
+        {
+          "methodName": "RtsStageLogic.OnStageStarted",
+          "methodLineNum": 2,
+          "codeBlockFileId": "2716de75-0acf-4b0e-a5c1-b2d5906ba601"
+        },
+        {
+          "methodName": "RtsStageLogic.BeginStage",
+          "methodLineNum": 17,
+          "codeBlockFileId": "2716de75-0acf-4b0e-a5c1-b2d5906ba601"
+        },
+        {
+          "methodName": "RtsStageLogic.Tick",
+          "methodLineNum": 10,
+          "codeBlockFileId": "2716de75-0acf-4b0e-a5c1-b2d5906ba601"
+        },
+        {
+          "methodName": "RtsStageLogic.OnBeginPlay",
+          "methodLineNum": 2,
+          "codeBlockFileId": "2716de75-0acf-4b0e-a5c1-b2d5906ba601"
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T13:12:24",
+      "isGeneratedFromServer": true,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "RtsUnit: move 4 -> (13,10)",
+      "stackTrace": [
+        {
+          "methodName": "RtsConfigLogic.Log",
+          "methodLineNum": 1,
+          "codeBlockFileId": "d37e9a35-70f8-4794-b601-8f32062cfc6c"
+        },
+        {
+          "methodName": "RtsUnitLogic.RequestMove",
+          "methodLineNum": 22,
+          "codeBlockFileId": "21b92bac-1582-4245-8236-ac5d05d50fd0"
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T13:12:33",
+      "isGeneratedFromServer": true,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "RtsStage: start 2 mob 오솔길",
+      "stackTrace": [
+        {
+          "methodName": "RtsConfigLogic.Log",
+          "methodLineNum": 1,
+          "codeBlockFileId": "d37e9a35-70f8-4794-b601-8f32062cfc6c"
+        },
+        {
+          "methodName": "RtsStageLogic.OnStageStarted",
+          "methodLineNum": 2,
+          "codeBlockFileId": "2716de75-0acf-4b0e-a5c1-b2d5906ba601"
+        },
+        {
+          "methodName": "RtsStageLogic.BeginStage",
+          "methodLineNum": 17,
+          "codeBlockFileId": "2716de75-0acf-4b0e-a5c1-b2d5906ba601"
+        },
+        {
+          "methodName": "RtsStageLogic.EndStage",
+          "methodLineNum": 25,
+          "codeBlockFileId": "2716de75-0acf-4b0e-a5c1-b2d5906ba601"
+        },
+        {
+          "methodName": "RtsStageLogic.Tick",
+          "methodLineNum": 22,
+          "codeBlockFileId": "2716de75-0acf-4b0e-a5c1-b2d5906ba601"
+        },
+        {
+          "methodName": "RtsStageLogic.OnBeginPlay",
+          "methodLineNum": 2,
+          "codeBlockFileId": "2716de75-0acf-4b0e-a5c1-b2d5906ba601"
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T13:12:50",
+      "isGeneratedFromServer": true,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "RtsUnit: move 2 -> (2,1)",
+      "stackTrace": [
+        {
+          "methodName": "RtsConfigLogic.Log",
+          "methodLineNum": 1,
+          "codeBlockFileId": "d37e9a35-70f8-4794-b601-8f32062cfc6c"
+        },
+        {
+          "methodName": "RtsUnitLogic.RequestMove",
+          "methodLineNum": 22,
+          "codeBlockFileId": "21b92bac-1582-4245-8236-ac5d05d50fd0"
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T13:12:53",
+      "isGeneratedFromServer": true,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "RtsStage: start 3 mob 세 갈래 길",
+      "stackTrace": [
+        {
+          "methodName": "RtsConfigLogic.Log",
+          "methodLineNum": 1,
+          "codeBlockFileId": "d37e9a35-70f8-4794-b601-8f32062cfc6c"
+        },
+        {
+          "methodName": "RtsStageLogic.OnStageStarted",
+          "methodLineNum": 2,
+          "codeBlockFileId": "2716de75-0acf-4b0e-a5c1-b2d5906ba601"
+        },
+        {
+          "methodName": "RtsStageLogic.BeginStage",
+          "methodLineNum": 17,
+          "codeBlockFileId": "2716de75-0acf-4b0e-a5c1-b2d5906ba601"
+        },
+        {
+          "methodName": "RtsStageLogic.EndStage",
+          "methodLineNum": 25,
+          "codeBlockFileId": "2716de75-0acf-4b0e-a5c1-b2d5906ba601"
+        },
+        {
+          "methodName": "RtsStageLogic.Tick",
+          "methodLineNum": 22,
+          "codeBlockFileId": "2716de75-0acf-4b0e-a5c1-b2d5906ba601"
+        },
+        {
+          "methodName": "RtsStageLogic.OnBeginPlay",
+          "methodLineNum": 2,
+          "codeBlockFileId": "2716de75-0acf-4b0e-a5c1-b2d5906ba601"
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T13:13:13",
+      "isGeneratedFromServer": true,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "RtsStage: start 4 mob 헤네시스 언덕",
+      "stackTrace": [
+        {
+          "methodName": "RtsConfigLogic.Log",
+          "methodLineNum": 1,
+          "codeBlockFileId": "d37e9a35-70f8-4794-b601-8f32062cfc6c"
+        },
+        {
+          "methodName": "RtsStageLogic.OnStageStarted",
+          "methodLineNum": 2,
+          "codeBlockFileId": "2716de75-0acf-4b0e-a5c1-b2d5906ba601"
+        },
+        {
+          "methodName": "RtsStageLogic.BeginStage",
+          "methodLineNum": 17,
+          "codeBlockFileId": "2716de75-0acf-4b0e-a5c1-b2d5906ba601"
+        },
+        {
+          "methodName": "RtsStageLogic.EndStage",
+          "methodLineNum": 25,
+          "codeBlockFileId": "2716de75-0acf-4b0e-a5c1-b2d5906ba601"
+        },
+        {
+          "methodName": "RtsStageLogic.Tick",
+          "methodLineNum": 22,
+          "codeBlockFileId": "2716de75-0acf-4b0e-a5c1-b2d5906ba601"
+        },
+        {
+          "methodName": "RtsStageLogic.OnBeginPlay",
+          "methodLineNum": 2,
+          "codeBlockFileId": "2716de75-0acf-4b0e-a5c1-b2d5906ba601"
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T13:13:13",
+      "isGeneratedFromServer": true,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "RtsAugment: offer bronze -> 20372100000235013 [b_cdmg3,b_cdmg2,b_atk2]",
+      "stackTrace": [
+        {
+          "methodName": "RtsConfigLogic.Log",
+          "methodLineNum": 1,
+          "codeBlockFileId": "d37e9a35-70f8-4794-b601-8f32062cfc6c"
+        },
+        {
+          "methodName": "RtsAugmentLogic.PopNext",
+          "methodLineNum": 22,
+          "codeBlockFileId": "f0bca8b6-82f4-4dd0-b6e6-55891ffa1bc8"
+        },
+        {
+          "methodName": "RtsAugmentLogic.Offer",
+          "methodLineNum": 18,
+          "codeBlockFileId": "f0bca8b6-82f4-4dd0-b6e6-55891ffa1bc8"
+        },
+        {
+          "methodName": "RtsAugmentLogic.OnStageStarted",
+          "methodLineNum": 4,
+          "codeBlockFileId": "f0bca8b6-82f4-4dd0-b6e6-55891ffa1bc8"
+        },
+        {
+          "methodName": "RtsStageLogic.OnStageStarted",
+          "methodLineNum": 3,
+          "codeBlockFileId": "2716de75-0acf-4b0e-a5c1-b2d5906ba601"
+        },
+        {
+          "methodName": "RtsStageLogic.BeginStage",
+          "methodLineNum": 17,
+          "codeBlockFileId": "2716de75-0acf-4b0e-a5c1-b2d5906ba601"
+        },
+        {
+          "methodName": "RtsStageLogic.EndStage",
+          "methodLineNum": 25,
+          "codeBlockFileId": "2716de75-0acf-4b0e-a5c1-b2d5906ba601"
+        },
+        {
+          "methodName": "RtsStageLogic.Tick",
+          "methodLineNum": 22,
+          "codeBlockFileId": "2716de75-0acf-4b0e-a5c1-b2d5906ba601"
+        },
+        {
+          "methodName": "RtsStageLogic.OnBeginPlay",
+          "methodLineNum": 2,
+          "codeBlockFileId": "2716de75-0acf-4b0e-a5c1-b2d5906ba601"
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T13:13:17",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY TTL initial=true maxLife=5",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 13,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T13:13:17",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY TEMPEST cast cd=2 after=1.8 hit=0.72",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 23,
+          "codeBlockFileId": null
+        },
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 25,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T13:13:18",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY HERO swordWorldScale=2.0",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 37,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T13:13:19",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY TEMPEST t=1.85 action=stand1",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 26,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T13:13:19",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY TEMPEST cast cd=2 after=1.8 hit=0.72",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 23,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T13:13:21",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY TEMPEST t=3.85 action=stand1",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 28,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T13:13:22",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY TTL t=4.8 alive=true",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 14,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T13:13:22",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY TTL t=5.2 alive=false",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 15,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T13:13:34",
+      "isGeneratedFromServer": true,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "RtsStage: start 5 mob 개미굴",
+      "stackTrace": [
+        {
+          "methodName": "RtsConfigLogic.Log",
+          "methodLineNum": 1,
+          "codeBlockFileId": "d37e9a35-70f8-4794-b601-8f32062cfc6c"
+        },
+        {
+          "methodName": "RtsStageLogic.OnStageStarted",
+          "methodLineNum": 2,
+          "codeBlockFileId": "2716de75-0acf-4b0e-a5c1-b2d5906ba601"
+        },
+        {
+          "methodName": "RtsStageLogic.BeginStage",
+          "methodLineNum": 17,
+          "codeBlockFileId": "2716de75-0acf-4b0e-a5c1-b2d5906ba601"
+        },
+        {
+          "methodName": "RtsStageLogic.EndStage",
+          "methodLineNum": 25,
+          "codeBlockFileId": "2716de75-0acf-4b0e-a5c1-b2d5906ba601"
+        },
+        {
+          "methodName": "RtsStageLogic.Tick",
+          "methodLineNum": 22,
+          "codeBlockFileId": "2716de75-0acf-4b0e-a5c1-b2d5906ba601"
+        },
+        {
+          "methodName": "RtsStageLogic.OnBeginPlay",
+          "methodLineNum": 2,
+          "codeBlockFileId": "2716de75-0acf-4b0e-a5c1-b2d5906ba601"
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T13:13:41",
+      "isGeneratedFromServer": true,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY restored all 4 server attack loops",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 4,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T13:13:54",
+      "isGeneratedFromServer": true,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "RtsStage: start 6 mob 빛을 잃은 동굴",
+      "stackTrace": [
+        {
+          "methodName": "RtsConfigLogic.Log",
+          "methodLineNum": 1,
+          "codeBlockFileId": "d37e9a35-70f8-4794-b601-8f32062cfc6c"
+        },
+        {
+          "methodName": "RtsStageLogic.OnStageStarted",
+          "methodLineNum": 2,
+          "codeBlockFileId": "2716de75-0acf-4b0e-a5c1-b2d5906ba601"
+        },
+        {
+          "methodName": "RtsStageLogic.BeginStage",
+          "methodLineNum": 17,
+          "codeBlockFileId": "2716de75-0acf-4b0e-a5c1-b2d5906ba601"
+        },
+        {
+          "methodName": "RtsStageLogic.EndStage",
+          "methodLineNum": 25,
+          "codeBlockFileId": "2716de75-0acf-4b0e-a5c1-b2d5906ba601"
+        },
+        {
+          "methodName": "RtsStageLogic.Tick",
+          "methodLineNum": 22,
+          "codeBlockFileId": "2716de75-0acf-4b0e-a5c1-b2d5906ba601"
+        },
+        {
+          "methodName": "RtsStageLogic.OnBeginPlay",
+          "methodLineNum": 2,
+          "codeBlockFileId": "2716de75-0acf-4b0e-a5c1-b2d5906ba601"
+        }
+      ]
+    }
+  ]
+}

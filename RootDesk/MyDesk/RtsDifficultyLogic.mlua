@@ -110,6 +110,7 @@ script RtsDifficultyLogic extends Logic
 		local state = _RtsStageLogic.RunState
 		local running = state == "running"
 		local name = self:GetNames()[my]
+		if isvalid(H.StageDifficultyText) then H.StageDifficultyText.TextComponent.Text = name end
 		local msg = "판 시작 전 · 지금 선택: " .. name
 		local startText = "바로 시작"
 		if state == "countdown" then

@@ -214,7 +214,17 @@ script RtsSkillFxLogic extends Logic
 		local motions = fx.motions
 		if motions == nil and fx.motion ~= nil then motions = { fx.motion } end
 		local stand = self:StandName(unitEntity)
-		if hasSkin and motions ~= nil and #motions > 0 then
+		if hasSkin and fx.motionLoop and fx.motion ~= nil then
+			unit:PlayMageLoop(fx.motion)
+			self.LoopMotion[no] = fx.motion
+			self.LoopLast[no] = DateTime.UtcNow.Elapsed
+			self.LoopUnit[no] = unitEntity
+			self.LastMotion[unitEntity.Id] = fx.motion
+			if self.LoopWatch == nil then
+				self.LoopWatch = _TimerService:SetTimerRepeat(function() self:CheckLoops() end, 0.25)
+			end
+		elseif hasSkin and motions ~= nil and #motions > 0 then
+			self.LoopMotion[no] = nil
 			-- 직업별 표시 프레임 시간표와 대기 복귀 시점을 일치시킨다.
 			local durations = _RtsJobTableLogic:GetMageSkinFrameDurations(unit.JobId)[motions[1]] or { 0.45 }
 			local poseSec = 0
@@ -548,6 +558,20 @@ script RtsSkillFxLogic extends Logic
 	@ExecSpace("ClientOnly")
 	method void CheckLoops()
 		local now = DateTime.UtcNow.Elapsed
+		-- 원화 채널링도 공격이 끊기면 복귀한다. 뒤이어 시작한 단발 시전은 건드리지 않는다.
+		for no, motion in pairs(self.LoopMotion) do
+			local u = self.LoopUnit[no]
+			if isvalid(u) then
+				local unit = u.RtsUnitComponent
+				if unit ~= nil and _RtsJobTableLogic:HasMageSkin(unit.JobId) and now - (self.LoopLast[no] or 0) > self.LoopTimeout * 1000 then
+					if unit.MageActionLoop and unit.MageSkinAction == motion then
+						unit:PlayMageAction("stand1")
+						self.LastMotion[u.Id] = "stand1"
+					end
+					self.LoopMotion[no] = nil
+				end
+			end
+		end
 		-- 모션 순환(motionCycle)만 있는 유닛: 공격이 끊기면 타이머를 멈추고 대기 자세로
 		for no, t in pairs(self.CycleTimer) do
 			local last = self.LoopLast[no] or 0
@@ -688,6 +712,7 @@ script RtsSkillFxLogic extends Logic
 		local f2 = {}
 		for key, v in pairs(fx) do f2[key] = v end
 		f2.projHover = 0
+		if fx.projMaxLife ~= nil and fx.projMaxLife <= 0 then return end
 		local tp = target.TransformComponent.WorldPosition
 		local to = Vector2(tp.x, tp.y + (fx.hitDy or 0.6))
 		if target.HitComponent ~= nil then
@@ -784,6 +809,63 @@ script RtsSkillFxLogic extends Logic
 		end
 		local hover = fx.projHover or 0
 		local arcTimer = nil
+		local arrivalTimer = nil
+		local hoverTimer = nil
+		local expiryTimer = nil
+		local expiresAt = 0
+		if fx.projMaxLife ~= nil then expiresAt = _UtilLogic.ElapsedSeconds + fx.projMaxLife end
+		-- 적중/수명 만료 모두 같은 폭발 그림을 사용한다. 피해 판정은 서버에서만 한다.
+		local function playHitFrames(entity)
+			if fx.projHitSprites == nil or #fx.projHitSprites == 0 then return false end
+			local step = fx.projFrameSec or 0.09
+			entity.SpriteRendererComponent.SpriteRUID = fx.projHitSprites[1]
+			for hi = 2, #fx.projHitSprites do
+				local frame = hi
+				_TimerService:SetTimerOnce(function()
+					if isvalid(entity) then entity.SpriteRendererComponent.SpriteRUID = fx.projHitSprites[frame] end
+				end, step * (frame - 1))
+			end
+			_TimerService:SetTimerOnce(function()
+				if isvalid(entity) then entity:Destroy() end
+			end, step * #fx.projHitSprites)
+			return true
+		end
+		local function expire()
+			stopFly()
+			if expiryTimer ~= nil then _TimerService:ClearTimer(expiryTimer) expiryTimer = nil end
+			if arcTimer ~= nil then _TimerService:ClearTimer(arcTimer) arcTimer = nil end
+			if arrivalTimer ~= nil then _TimerService:ClearTimer(arrivalTimer) arrivalTimer = nil end
+			if hoverTimer ~= nil then _TimerService:ClearTimer(hoverTimer) hoverTimer = nil end
+			if not isvalid(e) then return end
+			-- 기존 투사체의 Tween과 분리해 소멸 순간의 위치에서 폭발을 재생한다.
+			if (fx.projHitSprites ~= nil and #fx.projHitSprites > 0) or (fx.hitClip ~= nil and fx.hitClip ~= "") then
+				local burst = _SpawnService:SpawnByModelId("model://MapObject", "RtsProjExpiry_" .. e.Name, e.TransformComponent.WorldPosition, mapRoot)
+				if burst ~= nil then
+					local burstSprite = burst.SpriteRendererComponent
+					if burstSprite == nil then burstSprite = burst:AddComponent("SpriteRendererComponent") end
+					burstSprite.SortingLayer = "Default"
+					burstSprite.OrderInLayer = 310
+					burstSprite.FlipX = sr.FlipX
+					burstSprite.Color = sr.Color
+					burst.TransformComponent.Scale = e.TransformComponent.Scale
+					burst.TransformComponent.ZRotation = e.TransformComponent.ZRotation
+					if not playHitFrames(burst) then
+						burstSprite.SpriteRUID = fx.hitClip
+						local hitScale = fx.hitScale or 1
+						burst.TransformComponent.Scale = Vector3(hitScale, hitScale, 1)
+						burst.TransformComponent.ZRotation = 0
+						local function finishBurst()
+							if isvalid(burst) then burst:Destroy() end
+						end
+						burst:ConnectEvent(SpriteAnimPlayerEndFrameEvent, function(ev) _TimerService:SetTimerOnce(finishBurst, 0.03) end)
+						_TimerService:SetTimerOnce(finishBurst, fx.hitLife or 0.9)
+					end
+					_RtsConfigLogic:Log("dot orb expiry burst: " .. burst.Name)
+				end
+			end
+			e:Destroy()
+		end
+		if expiresAt > 0 then expiryTimer = _TimerService:SetTimerOnce(expire, fx.projMaxLife) end
 		local function fly()
 			if not isvalid(e) then return end
 			if fx.projArc ~= nil and fx.projArc ~= 0 then
@@ -859,7 +941,10 @@ script RtsSkillFxLogic extends Logic
 			else
 				_TweenLogic:MoveTo(e, to, sec, EaseType.Linear)
 			end
-			_TimerService:SetTimerOnce(function()
+			arrivalTimer = _TimerService:SetTimerOnce(function()
+				arrivalTimer = nil
+				if expiresAt > 0 and _UtilLogic.ElapsedSeconds >= expiresAt then expire() return end
+				if expiryTimer ~= nil then _TimerService:ClearTimer(expiryTimer) expiryTimer = nil end
 				stopFly()
 				if arcTimer ~= nil then
 					_TimerService:ClearTimer(arcTimer)
@@ -871,21 +956,7 @@ script RtsSkillFxLogic extends Logic
 					e:Destroy()
 					return
 				end
-				if fx.projHitSprites ~= nil and #fx.projHitSprites > 0 then
-					-- 닿음: 폭발 프레임들을 한 번 돌리고 제거(회전은 그대로)
-					local step = fx.projFrameSec or 0.09
-					local r2 = e.SpriteRendererComponent
-					if r2 ~= nil then r2.SpriteRUID = fx.projHitSprites[1] end
-					for hi = 2, #fx.projHitSprites do
-						local kk = hi
-						_TimerService:SetTimerOnce(function()
-							if isvalid(e) and e.SpriteRendererComponent ~= nil then e.SpriteRendererComponent.SpriteRUID = fx.projHitSprites[kk] end
-						end, step * (kk - 1))
-					end
-					_TimerService:SetTimerOnce(function()
-						if isvalid(e) then e:Destroy() end
-					end, step * #fx.projHitSprites)
-				else
+				if not playHitFrames(e) then
 					_TimerService:SetTimerOnce(function()
 						if isvalid(e) then e:Destroy() end
 					end, math.max(0.02, (fx.projLife or (sec + 0.02)) - sec))
@@ -893,7 +964,7 @@ script RtsSkillFxLogic extends Logic
 			end, sec)
 		end
 		if hover > 0 then
-			_TimerService:SetTimerOnce(fly, hover)
+			hoverTimer = _TimerService:SetTimerOnce(fly, hover)
 		else
 			fly()
 		end
@@ -1070,6 +1141,7 @@ script RtsSkillFxLogic extends Logic
 		sr.FlipX = flipMark
 		sr.SpriteRUID = clip
 		-- markScaleX = 가로만 따로 배율(제네시스 빛기둥 넓이 2배 — 사용자 2026-09-19)
+		sr.PlayRate = fx.markPlayRate or 1
 		e.TransformComponent.Scale = Vector3(s * (fx.markScaleX or 1), s, 1)
 		local function finish()
 			if isvalid(e) then e:Destroy() end
@@ -1211,6 +1283,8 @@ script RtsSkillFxLogic extends Logic
 		local wait = (self.MotionUntil[key] or 0) - _UtilLogic.ElapsedSeconds
 		local function send()
 			if not isvalid(body) then return end
+			local unit = body.RtsUnitComponent
+			if unit ~= nil and unit.MageActionLoop then return end
 			-- 그 사이 새 모션이 시작됐으면 건너뛴다
 			if (self.MotionUntil[key] or 0) - _UtilLogic.ElapsedSeconds > 0.02 then return end
 			self:SendAction(body, stand, 1, SpriteAnimClipPlayType.Loop, nil, nil)
@@ -1256,6 +1330,7 @@ script RtsSkillFxLogic extends Logic
 	@ExecSpace("ClientOnly")
 	method string StandName(Entity unitEntity)
 		if unitEntity ~= nil and isvalid(unitEntity) and unitEntity.RtsUnitComponent ~= nil then
+			if _RtsJobTableLogic:HasMageSkin(unitEntity.RtsUnitComponent.JobId) then return "stand1" end
 			local c = _RtsJobTableLogic:GetCostume(unitEntity.RtsUnitComponent.JobId)
 			if c ~= nil and c.weapon1h ~= nil and c.weapon1h ~= "" then return "stand1" end
 		end
@@ -1282,6 +1357,7 @@ script RtsSkillFxLogic extends Logic
 		sr.OrderInLayer = -10
 		sr.FlipX = flip
 		sr.SpriteRUID = fx.backClip
+		sr.PlayRate = fx.backPlayRate or 1
 		if fx.backAlpha ~= nil then sr.Color = Color(1, 1, 1, fx.backAlpha) end
 		e.TransformComponent.Scale = Vector3(s, s, 1)
 		local function finish()
@@ -1356,6 +1432,9 @@ script RtsSkillFxLogic extends Logic
 	-- 애니메이션 클립 이펙트 1회: SpriteRUID에 클립을 넣으면 Loop라 마지막 프레임 진입(SpriteAnimPlayerEndFrameEvent)에서 제거 (msw-engine 메모)
 	@ExecSpace("ClientOnly")
 	method void PlayClip(Entity unitEntity, number no, table fx, Entity body)
+		-- 원화 히어로의 일반 레이징 블로우는 몸과 같은 시계로 검 이펙트를 직접 그린다.
+		local unit = unitEntity.RtsUnitComponent
+		if unit ~= nil and unit.JobId == "hero" and _RtsJobTableLogic:HasMageSkin("hero") and fx.clip == "fa2bfe8ff4f543fb815dd7ee5e02eac9" then return end
 		local mapRoot = _EntityService:GetEntityByPath("/maps/RtsMap")
 		if mapRoot == nil then return end
 		local old = self.Active[no]
@@ -1378,6 +1457,7 @@ script RtsSkillFxLogic extends Logic
 		sr.OrderInLayer = fx.clipOrder or 300
 		sr.FlipX = flip
 		sr.SpriteRUID = fx.clip
+		sr.PlayRate = fx.clipPlayRate or 1
 		e.TransformComponent.Scale = Vector3(s, s, 1)
 		local stand = self:StandName(unitEntity)
 		local function finish()

@@ -63,14 +63,19 @@ script RtsUnitComponent extends Component
 	-- 클라: 그림자 분신 스타일 재시도 횟수(엔티티가 늦게 올 때)
 	property number ShadowTries = 0
 
-	-- 썬콜 전용 스프라이트 유닛. 아바타/코스튬 없이 프레임을 직접 재생한다.
+	-- 원화 스프라이트 유닛. 아바타/코스튬 없이 프레임을 직접 재생한다.
 	property Entity MageSkinEntity = nil
 	property table MageSkinSprites = {}
 	property string MageSkinAction = "stand1"
 	property number MageSkinTries = 0
 	property boolean MageSkinLoading = false
 	property number MageActionClock = 0
+	property boolean MageActionLoop = false
 	property table MageFrameDurations = {}
+	property Entity HeroSwordEntity = nil
+	property table HeroSwordSprites = {}
+	property table HeroSwordHands = { {400,495}, {426,479}, {369,468}, {376,499}, {334,504}, {225,486}, {228,486} }
+	property table HeroSwordGrips = { {0,0}, {25,48}, {25,45}, {25,41}, {200,151}, {184,211}, {108,212}, {29,192}, {207,158}, {210,74}, {211,56}, {206,34}, {210,40}, {207,35} }
 
 	method void OnBeginPlay()
 		if self:IsClient() then self:SetupClient() end
@@ -148,6 +153,7 @@ script RtsUnitComponent extends Component
 		skin.SpriteRendererComponent.SortingLayer = "Default"
 		self.MageSkinSprites = loaded
 		self.MageSkinEntity = skin
+		if self.JobId == "hero" then self:SetupHeroSword() end
 		self:DrawMageSkin()
 		_RtsConfigLogic:Log("unit skin loaded: " .. self.JobId .. " / " .. tostring(self.No))
 	end
@@ -155,17 +161,28 @@ script RtsUnitComponent extends Component
 	@ExecSpace("ClientOnly")
 	method void OnUpdate(number delta)
 		if not isvalid(self.MageSkinEntity) then return end
-		if self.MageSkinAction == "stand1" then return end
 		self.MageActionClock = self.MageActionClock + delta
 		self:DrawMageSkin()
 	end
 
 	@ExecSpace("ClientOnly")
 	method void PlayMageAction(string name)
+		-- 단발 시전과 대기는 새 시간표로 시작한다.
 		if self.MageFrameDurations[name] == nil then name = "stand1" end
+		-- 같은 대기 복귀 요청이 늦게 도착해도 호흡 반복의 위상을 끊지 않는다.
+		if name == "stand1" and self.MageSkinAction == "stand1" and not self.MageActionLoop then return end
+		self.MageActionLoop = false
 		self.MageActionClock = 0
 		self.MageSkinAction = name
 		self:DrawMageSkin()
+	end
+
+	@ExecSpace("ClientOnly")
+	method void PlayMageLoop(string name)
+		-- 연속 공격 RPC가 와도 진행 중인 프레임 시계를 초기화하지 않는다.
+		if self.MageActionLoop and self.MageSkinAction == name then return end
+		self:PlayMageAction(name)
+		self.MageActionLoop = self.MageSkinAction ~= "stand1"
 	end
 
 	@ExecSpace("ClientOnly")
@@ -176,10 +193,15 @@ script RtsUnitComponent extends Component
 		if sequence == nil then return end
 		-- 표시와 대기 복귀가 같은 스킬별 시간표를 사용한다.
 		local frame = 1
-		if self.MageSkinAction ~= "stand1" then
+		if #sequence > 1 then
 			local elapsed = self.MageActionClock
 			local durations = self.MageFrameDurations[self.MageSkinAction]
 			if durations == nil then return end
+			if self.MageActionLoop or self.MageSkinAction == "stand1" then
+				local cycle = 0
+				for _, duration in ipairs(durations) do cycle = cycle + duration end
+				if cycle > 0 then elapsed = elapsed % cycle end
+			end
 			for i = 1, #sequence - 1 do
 				if elapsed < durations[i] then break end
 				elapsed = elapsed - durations[i]
@@ -194,7 +216,7 @@ script RtsUnitComponent extends Component
 		local x = (sprite.PivotPixel.x - sprite.Width / 2) * pixelScale
 		if flip then x = -x end
 		local feetY = sprite.Height - 64
-		-- 대기 1장 고정·스킬별 3장 순서 재생. 회전·호흡 변형 없이 발을 맞춘다.
+		-- 대기·시전 모두 그림 프레임으로 재생하며 확대/회전 없이 발 기준점을 유지한다.
 		local y = (sprite.PivotPixel.y - (sprite.Height - feetY)) * pixelScale
 		skin.TransformComponent.Position = Vector3(x, y, 0)
 		skin.TransformComponent.ZRotation = 0
@@ -203,6 +225,56 @@ script RtsUnitComponent extends Component
 		if sr.SpriteRUID ~= sprite.RUID then sr.SpriteRUID = sprite.RUID end
 		sr.FlipX = flip
 		skin.Visible = true
+		if self.JobId == "hero" then self:DrawHeroSword(frame) end
+	end
+
+	-- 레이징 블로우 원본 이펙트의 검 손잡이를 원화 프레임의 양손 위치에 붙인다.
+	@ExecSpace("ClientOnly")
+	method void SetupHeroSword()
+		local ruids = { "a585a770b6a84a338ca3df6ede22e599", "2a7030c031b34a7794944124922f866e", "2f898cfa3ad7409dbdde2078a4b801a4", "96a0b502bb9043579fe4cd8a267931eb", "539cdcfe5d5a448c85f8baf3caeffb89", "9795f915f1c543bb9fb36f6cfd60a280", "6f8c8d40a4dd4452a3b73a5a3f10c94a", "401333f49d25465aa08b4205a7f2a169", "eef4b656fe1640eeae4de95ad78ca0cb", "ee34eb8cefdb4c8b8601e09291a9fd67", "59e480123e60417f8af78202b9750f6d", "6eaa5c0b81c64d2fa2077a3b6c2b0cbf", "e2f221ec23be49ec9c641b1f7f875569", "d81177b816e044538b3c2056781bb6fc" }
+		for i, ruid in ipairs(ruids) do
+			local sprite = _ResourceService:LoadSpriteAndWait(ruid)
+			if sprite ~= nil and sprite.IsLoadComplete then self.HeroSwordSprites[i] = sprite end
+		end
+		if not isvalid(self.Entity) then return end
+		local sword = _SpawnService:SpawnByModelId("model://MapObject", "HeroSword", Vector3.zero, self.Entity)
+		if sword == nil then return end
+		sword.SpriteRendererComponent.SortingLayer = "Default"
+		sword.SpriteRendererComponent.OrderInLayer = 300
+		sword.Visible = false
+		self.HeroSwordEntity = sword
+	end
+
+	@ExecSpace("ClientOnly")
+	method void DrawHeroSword(number bodyFrame)
+		local sword = self.HeroSwordEntity
+		if not isvalid(sword) then return end
+		local elapsed = self.MageActionClock
+		if self.MageSkinAction ~= "swingO3" or elapsed >= 0.78 or bodyFrame > 7 then
+			sword.Visible = false
+			return
+		end
+		local frame = math.floor(elapsed / 0.06) + 1
+		if elapsed >= 0.75 then frame = 14 elseif elapsed >= 0.72 then frame = 13 end
+		local sprite = self.HeroSwordSprites[frame]
+		if frame == 1 or sprite == nil then sword.Visible = false return end
+		local hand = self.HeroSwordHands[bodyFrame]
+		local grip = self.HeroSwordGrips[frame]
+		-- 기존 맵 직속 클립의 월드 배율 2.0을 보존한다. 손 정렬 때문에 불꽃까지 축소하지 않는다.
+		local parentScale = math.abs(self.Entity.TransformComponent.Scale.x)
+		if parentScale <= 0 or sprite.PixelPerUnit <= 0 then return end
+		local pixelScale = 2.0 / (parentScale * sprite.PixelPerUnit)
+		local x = (hand[1] - 352) * 0.002 + (sprite.PivotPixel.x - grip[1]) * pixelScale
+		local y = (640 - hand[2]) * 0.002 + (sprite.PivotPixel.y - (sprite.Height - grip[2])) * pixelScale
+		local flip = self:FaceNow() > 0
+		if flip then x = -x end
+		sword.TransformComponent.Position = Vector3(x, y, 0)
+		local scale = sprite.PixelPerUnit * pixelScale
+		sword.TransformComponent.Scale = Vector3(scale, scale, 1)
+		local sr = sword.SpriteRendererComponent
+		if sr.SpriteRUID ~= sprite.RUID then sr.SpriteRUID = sprite.RUID end
+		sr.FlipX = flip
+		sword.Visible = true
 	end
 
 	-- 쉐도우 파트너 그림자(서버가 30레벨부터 자식 "Shadow" 스프라이트로 세움 — 원작 4111002/special 검은 실루엣): 등 뒤(보는 방향 반대) 0.22(로컬, 부모 스케일 2라 세계 0.44)에 두고
@@ -255,7 +327,7 @@ script RtsUnitComponent extends Component
 	end
 
 
-	-- 서버가 바꾼 값이 도착하면 열려 있는 팝업·슬롯을 다시 그린다. 버프 아이콘은 남의 유닛도(구역 단위로 모아서)
+	-- 서버가 바꾼 값이 도착하면 열려 있는 팝업·슬롯을 다시 그린다. 버프 개수은 남의 유닛도(구역 단위로 모아서)
 	method void OnSyncProperty(string name, any value)
 		if not self:IsClient() then return end
 		if name == "JobId" then self:SetupMageSkin() end
@@ -265,7 +337,7 @@ script RtsUnitComponent extends Component
 			return
 		end
 		if name == "Prisms" then
-			-- 프리즘 적용(2026-09-22) → 새 스킬 연출 미리 올리고 팝업·슬롯·버프 아이콘 갱신
+			-- 프리즘 적용(2026-09-22) → 새 스킬 연출 미리 올리고 팝업·슬롯·버프 개수 갱신
 			local skills = _RtsJobTableLogic:GetSkillsFor(self)
 			for i = 1, #skills do
 				if skills[i].fx ~= nil then _RtsSkillFxLogic:Preload(skills[i].fx) end

@@ -24,6 +24,7 @@ script RtsHudLogic extends Logic
 	property Entity StageSubText = nil
 
 	property Entity StageClockText = nil
+	property Entity StageDifficultyText = nil
 
 	property Entity MesoText = nil
 
@@ -384,14 +385,17 @@ script RtsHudLogic extends Logic
 		--   위 64 = 프로필 줄(BuildTopBox), 그 아래 = 정보 칸 RtsInfoCard(투명, 400×168 — 안쪽 좌표는 예전 정보 카드와 같다. 난이도 줄은 RtsDifficultyLogic이 여기 붙인다)
 		local card = self:BuildTopBox(grp)
 		self.StageTitleText = self:SpawnLabel("RtsStageTitle", card, Vector2(0, 1), Vector2(0, 1), Vector2(14, -8), Vector2(290, 32),
-			"대기 중", self:ColInk(), 22, TextAlignmentType.MiddleLeft, true)
+			"대기 중", self:ColInk(), 18, TextAlignmentType.MiddleLeft, false)
 		self.StageTitleText.TextComponent.IsRichText = true
 		self.StageTitleText.TextComponent.Overflow = OverflowType.Truncate
 		self.StageClockText = self:SpawnLabel("RtsStageClock", card, Vector2(1, 1), Vector2(1, 1), Vector2(-14, -8), Vector2(90, 32),
-			"", self:ColInk(), 22, TextAlignmentType.MiddleRight, true)
+			"", self:ColInk(), 18, TextAlignmentType.MiddleRight, false)
 		-- 맵 이름(2026-09-24 사용자 "맵 명이 너무 작게 표시됨" — 15 → 18). 칸 폭 전체(372) — 난이도는 아랫줄(RtsDifficultyLogic)
-		self.StageSubText = self:SpawnLabel("RtsStageSub", card, Vector2(0, 1), Vector2(0, 1), Vector2(14, -38), Vector2(372, 28),
+		self.StageSubText = self:SpawnLabel("RtsStageSub", card, Vector2(0, 1), Vector2(0, 1), Vector2(14, -38), Vector2(258, 28),
 			"", self:ColMuted(), 18, TextAlignmentType.MiddleLeft, false)
+		self.StageDifficultyText = self:SpawnLabel("RtsStageDifficulty", card, Vector2(1, 1), Vector2(1, 1), Vector2(-14, -38), Vector2(104, 28),
+			_RtsDifficultyLogic:NameOf(_RtsUnitLogic:MyUserId()), self:ColMuted(), 18, TextAlignmentType.MiddleRight, false)
+		self.StageDifficultyText.TextComponent.UseNBSP = true
 		self.StageSubText.TextComponent.Overflow = OverflowType.Truncate
 		self.StageSubText.TextComponent.UseNBSP = true
 		local line = self:SpawnUI("model://uisprite", "RtsInfoLine", card, Vector2(0, 1), Vector2(0, 1), Vector2(12, -78), Vector2(376, 1.5))
@@ -401,12 +405,12 @@ script RtsHudLogic extends Logic
 		coin.SpriteGUIRendererComponent.ImageRUID = DataRef(self.CoinRUID)
 		coin.SpriteGUIRendererComponent.Color = Color(1, 1, 1, 1)
 		self.MesoText = self:SpawnLabel("RtsMesoText", card, Vector2(0, 0), Vector2(0, 0.5), Vector2(46, 22), Vector2(200, 32),
-			"0", self:ColInk(), 22, TextAlignmentType.MiddleLeft, true)
+			"0", self:ColInk(), 18, TextAlignmentType.MiddleLeft, false)
 		-- 필드: 내 구역에 살아 있는 몹 수 / 110(탈락선). 90 이상 붉게
 		self:SpawnLabel("RtsFieldKey", card, Vector2(1, 0), Vector2(1, 0.5), Vector2(-122, 22), Vector2(44, 28),
-			"필드", self:ColMuted(), 15, TextAlignmentType.MiddleRight, false)
+			"필드", self:ColMuted(), 18, TextAlignmentType.MiddleRight, false)
 		self.FieldText = self:SpawnLabel("RtsFieldText", card, Vector2(1, 0), Vector2(1, 0.5), Vector2(-14, 22), Vector2(104, 32),
-			"0 / 110", self:ColInk(), 20, TextAlignmentType.MiddleRight, true)
+			"0 / 110", self:ColInk(), 18, TextAlignmentType.MiddleRight, false)
 
 		-- 좌측 유저 카드 목록 (카드는 RefreshPlayerList가 채움) — 합친 상자(y −16, 높이 240) 10px 아래. 머리 24 + 카드 4장(2026-09-25 사용자 "총 4명으로 조절할 거임")
 		local box = self:SpawnUI("model://uisprite", "RtsPlayers", grp, Vector2(0, 1), Vector2(0, 1), Vector2(16, -234), Vector2(self.CardW, 24 + 4 * (self.CardH + self.CardGap)))
@@ -524,7 +528,7 @@ script RtsHudLogic extends Logic
 			"보유 · 뽑기 · 도감", Color(0.46, 0.34, 0.22, 1), 16, TextAlignmentType.MiddleLeft, false)
 		local augClick = self:SpawnClick("RtsAugClick", aug)
 		augClick:ConnectEvent(ButtonClickEvent, function(event)
-			if self.PendingShown > 0 then _RtsPopupLogic:OpenHubTab("draw") else _RtsPopupLogic:Open("augment") end
+			_RtsPopupLogic:OpenHubTab("augment")
 		end)
 
 		-- 우측 하단(다시 하기 왼쪽): 테스트 프리즘 버튼(개발 도구, 2026-09-22 사용자 "우측 하단에 테스트 프리즘 증강 버튼") → 프리즘 선택 팝업
@@ -1211,7 +1215,7 @@ script RtsHudLogic extends Logic
 		if anchor ~= nil then anchor:JumpToZone(p.zone) end
 	end
 
-	-- ===== 유닛 슬롯 (내 유닛 = RtsUnitLogic, 번호 = 슬롯) =====
+	-- ===== 유닛 슬롯 (표시 순서와 내부 유닛 번호를 분리한다) =====
 
 	-- 내 유닛 6칸을 다시 채운다. HUD가 아직 없으면 생성 뒤에 한 번
 	@ExecSpace("ClientOnly")
@@ -1221,14 +1225,21 @@ script RtsHudLogic extends Logic
 			return
 		end
 		self.PendingUnits = false
-		for i = 1, _RtsUnitLogic:GetMaxUnits() do
-			local u = _RtsUnitLogic:GetMyUnit(i)
+		local selectedNo = 0
+		local selected = self.UnitSlots[self.SelectedSlot]
+		if selected ~= nil then selectedNo = selected.no or 0 end
+		self.SelectedSlot = 0
+		local slot = 0
+		local maxUnits = _RtsUnitLogic:GetMaxUnits()
+		for no = 1, maxUnits do
+			local u = _RtsUnitLogic:GetMyUnit(no)
 			if u ~= nil then
-				self:SetUnitSlot(i, u.No, _RtsJobTableLogic:GetJobNameFor(u), u.Level, _RtsJobTableLogic:GetSeries(u.JobId))
-			else
-				self:ClearUnitSlot(i)
+				slot = slot + 1
+				if u.No == selectedNo then self.SelectedSlot = slot end
+				self:SetUnitSlot(slot, u.No, _RtsJobTableLogic:GetJobNameFor(u), u.Level, _RtsJobTableLogic:GetSeries(u.JobId))
 			end
 		end
+		for i = slot + 1, maxUnits do self:ClearUnitSlot(i) end
 	end
 
 	@ExecSpace("ClientOnly")
@@ -1236,8 +1247,9 @@ script RtsHudLogic extends Logic
 		local s = self.UnitSlots[i]
 		if s == nil then return end
 		s.filled = true
+		s.no = no
 		-- 리치텍스트 태그는 말줄임(ellipsis)에 잘려 그대로 노출되므로 평문으로
-		s.name.TextComponent.Text = self:Int(no) .. ". " .. jobName
+		s.name.TextComponent.Text = jobName
 		s.name.TextComponent.Alignment = TextAlignmentType.MiddleLeft
 		s.name.UITransformComponent.RectSize = Vector2(80, 30)
 		self:SetLabelSize(s.name, 13)
@@ -1277,6 +1289,7 @@ script RtsHudLogic extends Logic
 		local s = self.UnitSlots[i]
 		if s == nil then return end
 		s.filled = false
+		s.no = 0
 		s.name.TextComponent.Text = self:EmptySlotText(i)
 		s.name.TextComponent.Alignment = TextAlignmentType.MiddleCenter
 		s.name.UITransformComponent.RectSize = Vector2(114, 30)
@@ -1318,7 +1331,7 @@ script RtsHudLogic extends Logic
 		self.SelectedSlot = i
 		if prev > 0 then self:ApplySlotLook(prev) end
 		self:ApplySlotLook(i)
-		_RtsUnitPopupLogic:OpenUnit(i)
+		_RtsUnitPopupLogic:OpenUnit(s.no)
 	end
 
 	property string OutlineRUID = "13d3e61e769b40e1aea6a4b97eadb80d"

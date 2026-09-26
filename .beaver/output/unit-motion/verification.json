@@ -1,0 +1,3353 @@
+{
+  "kind": "normal",
+  "count": 192,
+  "logs": [
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T12:59:30",
+      "isGeneratedFromServer": true,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY SPAWN il entity=true col=10.0 row=2.0",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 8,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T12:59:30",
+      "isGeneratedFromServer": true,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY SPAWN fp entity=true col=13.0 row=2.0",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 8,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T12:59:30",
+      "isGeneratedFromServer": true,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY SPAWN bishop entity=true col=2.0 row=3.0",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 8,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T12:59:30",
+      "isGeneratedFromServer": true,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY SPAWN hero entity=true col=7.0 row=3.0",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 8,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T12:59:52",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY LOAD il avatar=false swingO1=5,swingO3=5,stand1=4,",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 11,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T12:59:52",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY LOAD fp avatar=false stand1=4,poisonRegion=5,dotPunisher=5,",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 11,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T12:59:52",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY LOAD bishop avatar=false swingO1=5,swingO3=5,stand1=4,divinePunishment=5,",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 11,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T12:59:52",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY LOAD hero avatar=false enragedRagingBlow=7,swingO3=8,stand1=4,",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 11,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T12:59:52",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY FRAME il/stand1 t=0.016 clock=20.050 frame=1 flip=false",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 57,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T12:59:52",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY FRAME fp/stand1 t=0.017 clock=4.915 frame=1 flip=false",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 57,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T12:59:52",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY FRAME bishop/stand1 t=0.017 clock=19.244 frame=1 flip=false",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 57,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T12:59:52",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY FRAME hero/stand1 t=0.017 clock=15.734 frame=1 flip=false",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 57,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T12:59:53",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY FRAME fp/stand1 t=0.153 clock=5.052 frame=2 flip=false",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 57,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T12:59:53",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY FRAME bishop/stand1 t=0.153 clock=19.380 frame=4 flip=false",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 57,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T12:59:53",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY FRAME hero/stand1 t=0.362 clock=16.079 frame=2 flip=false",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 57,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T12:59:53",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY FRAME il/stand1 t=0.430 clock=20.463 frame=2 flip=false",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 57,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T12:59:53",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY FRAME fp/stand1 t=0.604 clock=5.503 frame=1 flip=false",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 57,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T12:59:53",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY FRAME bishop/stand1 t=0.604 clock=19.831 frame=1 flip=false",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 57,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T12:59:53",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY FRAME hero/stand1 t=0.810 clock=16.527 frame=1 flip=false",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 57,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T12:59:53",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY FRAME il/stand1 t=0.877 clock=20.910 frame=1 flip=false",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 57,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T12:59:54",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY FRAME fp/stand1 t=1.254 clock=6.152 frame=4 flip=false",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 57,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T12:59:54",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY FRAME bishop/stand1 t=1.255 clock=20.481 frame=2 flip=false",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 57,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T12:59:54",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY FRAME hero/stand1 t=1.465 clock=17.182 frame=4 flip=false",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 57,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T12:59:54",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY FRAME il/stand1 t=1.534 clock=21.565 frame=4 flip=false",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 57,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T12:59:54",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY FRAME fp/stand1 t=1.707 clock=6.604 frame=1 flip=false",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 57,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T12:59:54",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY FRAME bishop/stand1 t=1.707 clock=20.933 frame=1 flip=false",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 57,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T12:59:54",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY FRAME hero/stand1 t=1.910 clock=17.627 frame=1 flip=false",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 57,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T12:59:54",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY FRAME il/stand1 t=1.979 clock=22.013 frame=1 flip=false",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 57,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T12:59:55",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY FRAME fp/stand1 t=2.355 clock=7.254 frame=2 flip=false",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 57,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T12:59:55",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY FRAME bishop/stand1 t=2.355 clock=21.582 frame=4 flip=false",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 57,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T12:59:55",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY FRAME hero/stand1 t=2.562 clock=18.279 frame=2 flip=false",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 57,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T12:59:55",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY FRAME il/stand1 t=2.633 clock=22.665 frame=2 flip=false",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 57,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T12:59:55",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY FRAME fp/stand1 t=2.806 clock=7.704 frame=1 flip=false",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 57,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T12:59:55",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY FRAME bishop/stand1 t=2.806 clock=22.033 frame=1 flip=false",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 57,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T12:59:55",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY CAST il 체인 라이트닝 action=swingO1 right=false",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 25,
+          "codeBlockFileId": null
+        },
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 28,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T12:59:55",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY CAST fp 포이즌 리전 action=poisonRegion right=false",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 25,
+          "codeBlockFileId": null
+        },
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 28,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T12:59:55",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY CAST bishop 엔젤레이 action=swingO1 right=false",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 25,
+          "codeBlockFileId": null
+        },
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 28,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T12:59:55",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY FRAME il/swingO1 t=2.978 clock=0.017 frame=1 flip=false",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 57,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T12:59:55",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY FRAME fp/poisonRegion t=2.978 clock=0.017 frame=1 flip=false",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 57,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T12:59:55",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY FRAME bishop/swingO1 t=2.978 clock=0.017 frame=1 flip=false",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 57,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T12:59:55",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY CAST hero 레이징 블로우 action=swingO3 right=false",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 25,
+          "codeBlockFileId": null
+        },
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 28,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T12:59:55",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY FRAME hero/swingO3 t=3.013 clock=0.018 frame=1 flip=false",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 57,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T12:59:55",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY FRAME bishop/swingO1 t=3.082 clock=0.122 frame=2 flip=false",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 57,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T12:59:55",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY FRAME hero/swingO3 t=3.082 clock=0.088 frame=2 flip=false",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 57,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T12:59:55",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY FRAME bishop/swingO1 t=3.118 clock=0.156 frame=3 flip=false",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 57,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T12:59:56",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY FRAME il/swingO1 t=3.151 clock=0.191 frame=2 flip=false",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 57,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T12:59:56",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY FRAME fp/poisonRegion t=3.222 clock=0.262 frame=2 flip=false",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 57,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T12:59:56",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY FRAME hero/swingO3 t=3.258 clock=0.263 frame=3 flip=false",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 57,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T12:59:56",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY FRAME il/swingO1 t=3.292 clock=0.332 frame=3 flip=false",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 57,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T12:59:56",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY FRAME bishop/swingO1 t=3.292 clock=0.332 frame=4 flip=false",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 57,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T12:59:56",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY FRAME hero/swingO3 t=3.326 clock=0.331 frame=4 flip=false",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 57,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T12:59:56",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY FRAME il/swingO1 t=3.360 clock=0.400 frame=4 flip=false",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 57,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T12:59:56",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY FRAME fp/poisonRegion t=3.394 clock=0.433 frame=3 flip=false",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 57,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T12:59:56",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY FRAME il/swingO1 t=3.427 clock=0.467 frame=5 flip=false",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 57,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T12:59:56",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY FRAME bishop/swingO1 t=3.427 clock=0.467 frame=5 flip=false",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 57,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T12:59:56",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY FRAME hero/swingO3 t=3.427 clock=0.433 frame=5 flip=false",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 57,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T12:59:56",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY FRAME hero/swingO3 t=3.496 clock=0.502 frame=6 flip=false",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 57,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T12:59:56",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY FRAME hero/swingO3 t=3.599 clock=0.604 frame=7 flip=false",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 57,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T12:59:56",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY FRAME fp/poisonRegion t=3.670 clock=0.710 frame=4 flip=false",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 57,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T12:59:56",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY FRAME il/stand1 t=3.774 clock=0.000 frame=1 flip=false",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 57,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T12:59:56",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY FRAME bishop/stand1 t=3.774 clock=0.000 frame=1 flip=false",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 57,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T12:59:56",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY FRAME hero/swingO3 t=3.809 clock=0.813 frame=8 flip=false",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 57,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T12:59:56",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY FRAME fp/poisonRegion t=3.841 clock=0.882 frame=5 flip=false",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 57,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T12:59:56",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY FRAME hero/stand1 t=3.912 clock=0.000 frame=1 flip=false",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 57,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T12:59:57",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY FRAME fp/stand1 t=4.179 clock=0.019 frame=1 flip=false",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 57,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T12:59:57",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY FRAME il/stand1 t=4.451 clock=0.677 frame=2 flip=false",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 57,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T12:59:57",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY FRAME bishop/stand1 t=4.451 clock=0.677 frame=2 flip=false",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 57,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T12:59:57",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY FRAME hero/stand1 t=4.593 clock=0.681 frame=2 flip=false",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 57,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T12:59:57",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY FRAME fp/stand1 t=4.839 clock=0.679 frame=2 flip=false",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 57,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T12:59:57",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY FRAME il/stand1 t=4.909 clock=1.135 frame=1 flip=false",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 57,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T12:59:57",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY FRAME bishop/stand1 t=4.909 clock=1.135 frame=1 flip=false",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 57,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T12:59:57",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY CAST il 블리자드 action=swingO3 right=true",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 25,
+          "codeBlockFileId": null
+        },
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 28,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T12:59:57",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY CAST fp 도트 퍼니셔 action=dotPunisher right=true",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 25,
+          "codeBlockFileId": null
+        },
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 28,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T12:59:57",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY CAST bishop 제네시스 action=swingO3 right=true",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 25,
+          "codeBlockFileId": null
+        },
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 28,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T12:59:57",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY FRAME il/swingO3 t=4.977 clock=0.017 frame=1 flip=true",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 57,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T12:59:57",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY FRAME fp/dotPunisher t=4.977 clock=0.017 frame=1 flip=true",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 57,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T12:59:57",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY FRAME bishop/swingO3 t=4.977 clock=0.000 frame=1 flip=true",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 57,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T12:59:57",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY CAST hero 레이징 블로우 action=enragedRagingBlow right=false",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 25,
+          "codeBlockFileId": null
+        },
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 28,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T12:59:57",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY FRAME hero/enragedRagingBlow t=5.011 clock=0.017 frame=1 flip=false",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 57,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T12:59:58",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY FRAME fp/dotPunisher t=5.182 clock=0.222 frame=2 flip=true",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 57,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T12:59:58",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY FRAME hero/enragedRagingBlow t=5.183 clock=0.189 frame=2 flip=false",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 57,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T12:59:58",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY FRAME il/swingO3 t=5.318 clock=0.358 frame=2 flip=true",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 57,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T12:59:58",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY FRAME fp/dotPunisher t=5.318 clock=0.358 frame=3 flip=true",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 57,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T12:59:58",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY FRAME hero/enragedRagingBlow t=5.318 clock=0.325 frame=3 flip=false",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 57,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T12:59:58",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY FRAME bishop/swingO3 t=5.353 clock=0.376 frame=2 flip=true",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 57,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T12:59:58",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY FRAME hero/enragedRagingBlow t=5.423 clock=0.429 frame=4 flip=false",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 57,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T12:59:58",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY FRAME il/swingO3 t=5.493 clock=0.531 frame=3 flip=true",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 57,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T12:59:58",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY FRAME bishop/swingO3 t=5.493 clock=0.515 frame=3 flip=true",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 57,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T12:59:58",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY FRAME hero/enragedRagingBlow t=5.527 clock=0.533 frame=5 flip=false",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 57,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T12:59:58",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY FRAME fp/dotPunisher t=5.561 clock=0.601 frame=4 flip=true",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 57,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T12:59:58",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY FRAME hero/enragedRagingBlow t=5.632 clock=0.638 frame=6 flip=false",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 57,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T12:59:58",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY FRAME hero/enragedRagingBlow t=5.703 clock=0.707 frame=7 flip=false",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 57,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T12:59:58",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY FRAME fp/dotPunisher t=5.736 clock=0.775 frame=5 flip=true",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 57,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T12:59:58",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY FRAME bishop/swingO3 t=5.806 clock=0.829 frame=4 flip=true",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 57,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T12:59:58",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY FRAME hero/stand1 t=5.911 clock=0.000 frame=1 flip=false",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 57,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T12:59:58",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY FRAME bishop/swingO3 t=5.944 clock=0.968 frame=5 flip=true",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 57,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T12:59:59",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY FRAME fp/stand1 t=6.185 clock=0.017 frame=1 flip=true",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 57,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T12:59:59",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY FRAME bishop/stand1 t=6.495 clock=0.017 frame=1 flip=true",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 57,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T12:59:59",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY FRAME hero/stand1 t=6.565 clock=0.655 frame=2 flip=false",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 57,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T12:59:59",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY FRAME fp/stand1 t=6.845 clock=0.676 frame=2 flip=true",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 57,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T12:59:59",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY CAST hero 레이징 블로우 action=swingO3 right=true",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 25,
+          "codeBlockFileId": null
+        },
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 28,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T12:59:59",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY FRAME il/swingO3 t=7.015 clock=2.055 frame=4 flip=true",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 57,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T12:59:59",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY FRAME hero/swingO3 t=7.015 clock=0.000 frame=1 flip=true",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 57,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T12:59:59",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY FRAME hero/swingO3 t=7.085 clock=0.069 frame=2 flip=true",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 57,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T13:00:00",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY FRAME bishop/stand1 t=7.156 clock=0.677 frame=2 flip=true",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 57,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T13:00:00",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY FRAME il/swingO3 t=7.192 clock=2.230 frame=5 flip=true",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 57,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T13:00:00",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY FRAME hero/swingO3 t=7.262 clock=0.246 frame=3 flip=true",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 57,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T13:00:00",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY FRAME fp/stand1 t=7.296 clock=1.127 frame=1 flip=true",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 57,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T13:00:00",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY FRAME hero/swingO3 t=7.331 clock=0.316 frame=4 flip=true",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 57,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T13:00:00",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY FRAME hero/swingO3 t=7.468 clock=0.452 frame=5 flip=true",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 57,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T13:00:00",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY FRAME hero/swingO3 t=7.503 clock=0.486 frame=6 flip=true",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 57,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T13:00:00",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY FRAME bishop/stand1 t=7.610 clock=1.131 frame=1 flip=true",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 57,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T13:00:00",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY FRAME hero/swingO3 t=7.645 clock=0.628 frame=7 flip=true",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 57,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T13:00:00",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY FRAME hero/swingO3 t=7.817 clock=0.801 frame=8 flip=true",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 57,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T13:00:00",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY FRAME fp/stand1 t=7.920 clock=1.751 frame=4 flip=true",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 57,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T13:00:00",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY FRAME hero/stand1 t=7.920 clock=0.000 frame=1 flip=true",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 57,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T13:00:00",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY CAST bishop 디바인 퍼니시먼트 action=divinePunishment right=false",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 25,
+          "codeBlockFileId": null
+        },
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 28,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T13:00:00",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY FRAME il/stand1 t=7.989 clock=0.018 frame=1 flip=true",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 57,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T13:00:00",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY FRAME bishop/divinePunishment t=7.989 clock=0.018 frame=1 flip=false",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 57,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T13:00:00",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY FRAME bishop/divinePunishment t=8.127 clock=0.155 frame=2 flip=false",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 57,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T13:00:01",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY CAST bishop 디바인 퍼니시먼트 action=divinePunishment right=false",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 25,
+          "codeBlockFileId": null
+        },
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 28,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T13:00:01",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY FRAME bishop/divinePunishment t=8.229 clock=0.258 frame=3 flip=false",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 57,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T13:00:01",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY CAST bishop 디바인 퍼니시먼트 action=divinePunishment right=false",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 25,
+          "codeBlockFileId": null
+        },
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 28,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T13:00:01",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY FRAME fp/stand1 t=8.399 clock=2.231 frame=1 flip=true",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 57,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T13:00:01",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY FRAME bishop/divinePunishment t=8.399 clock=0.427 frame=4 flip=false",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 57,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T13:00:01",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY FRAME bishop/divinePunishment t=8.503 clock=0.531 frame=5 flip=false",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 57,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T13:00:01",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY CAST bishop 디바인 퍼니시먼트 action=divinePunishment right=false",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 25,
+          "codeBlockFileId": null
+        },
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 28,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T13:00:01",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY FRAME hero/stand1 t=8.571 clock=0.652 frame=2 flip=true",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 57,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T13:00:01",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY FRAME il/stand1 t=8.642 clock=0.670 frame=2 flip=true",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 57,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T13:00:01",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY CAST bishop 디바인 퍼니시먼트 action=divinePunishment right=false",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 25,
+          "codeBlockFileId": null
+        },
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 28,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T13:00:01",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY FRAME bishop/divinePunishment t=8.782 clock=0.810 frame=1 flip=false",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 57,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T13:00:01",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY FRAME bishop/divinePunishment t=8.956 clock=0.983 frame=2 flip=false",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 57,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T13:00:01",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY CAST bishop 디바인 퍼니시먼트 action=divinePunishment right=false",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 25,
+          "codeBlockFileId": null
+        },
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 28,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T13:00:01",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY CAST hero 레이징 블로우 action=enragedRagingBlow right=true",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 25,
+          "codeBlockFileId": null
+        },
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 28,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T13:00:01",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY FRAME fp/stand1 t=9.025 clock=2.857 frame=2 flip=true",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 57,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T13:00:01",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY FRAME bishop/divinePunishment t=9.025 clock=1.053 frame=3 flip=false",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 57,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T13:00:01",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY FRAME hero/enragedRagingBlow t=9.025 clock=0.018 frame=1 flip=true",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 57,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T13:00:01",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY FRAME il/stand1 t=9.093 clock=1.121 frame=1 flip=true",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 57,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T13:00:02",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY CAST bishop 디바인 퍼니시먼트 action=divinePunishment right=false",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 25,
+          "codeBlockFileId": null
+        },
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 28,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T13:00:02",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY FRAME bishop/divinePunishment t=9.195 clock=1.223 frame=4 flip=false",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 57,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T13:00:02",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY FRAME hero/enragedRagingBlow t=9.195 clock=0.187 frame=2 flip=true",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 57,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T13:00:02",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY FRAME bishop/divinePunishment t=9.297 clock=1.324 frame=5 flip=false",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 57,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T13:00:02",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY FRAME hero/enragedRagingBlow t=9.332 clock=0.323 frame=3 flip=true",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 57,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T13:00:02",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY CAST bishop 디바인 퍼니시먼트 action=divinePunishment right=false",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 25,
+          "codeBlockFileId": null
+        },
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 28,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T13:00:02",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY FRAME hero/enragedRagingBlow t=9.436 clock=0.428 frame=4 flip=true",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 57,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T13:00:02",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY FRAME fp/stand1 t=9.472 clock=3.303 frame=1 flip=true",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 57,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T13:00:02",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY FRAME hero/enragedRagingBlow t=9.542 clock=0.534 frame=5 flip=true",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 57,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T13:00:02",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY FRAME bishop/divinePunishment t=9.577 clock=1.604 frame=1 flip=false",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 57,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T13:00:02",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY CAST bishop 디바인 퍼니시먼트 action=divinePunishment right=false",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 25,
+          "codeBlockFileId": null
+        },
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 28,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T13:00:02",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY FRAME hero/enragedRagingBlow t=9.643 clock=0.636 frame=6 flip=true",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 57,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T13:00:02",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY FRAME hero/enragedRagingBlow t=9.710 clock=0.702 frame=7 flip=true",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 57,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T13:00:02",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY FRAME il/stand1 t=9.744 clock=1.771 frame=4 flip=true",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 57,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T13:00:02",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY FRAME bishop/divinePunishment t=9.744 clock=1.771 frame=2 flip=false",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 57,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T13:00:02",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY CAST bishop 디바인 퍼니시먼트 action=divinePunishment right=false",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 25,
+          "codeBlockFileId": null
+        },
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 28,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T13:00:02",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY FRAME bishop/divinePunishment t=9.847 clock=1.874 frame=3 flip=false",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 57,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T13:00:02",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY FRAME hero/stand1 t=9.916 clock=0.000 frame=1 flip=true",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 57,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T13:00:02",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY FRAME bishop/divinePunishment t=9.985 clock=2.011 frame=4 flip=false",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 57,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T13:00:02",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY FRAME bishop/divinePunishment t=10.088 clock=2.116 frame=5 flip=false",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 57,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T13:00:02",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY FRAME fp/stand1 t=10.125 clock=3.955 frame=4 flip=true",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 57,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T13:00:03",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY FRAME il/stand1 t=10.194 clock=2.222 frame=1 flip=true",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 57,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T13:00:03",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY FRAME bishop/divinePunishment t=10.400 clock=2.429 frame=1 flip=false",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 57,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T13:00:03",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY FRAME bishop/divinePunishment t=10.541 clock=2.567 frame=2 flip=false",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 57,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T13:00:03",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY FRAME fp/stand1 t=10.576 clock=4.407 frame=1 flip=true",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 57,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T13:00:03",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY FRAME bishop/stand1 t=10.576 clock=0.000 frame=1 flip=false",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 57,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T13:00:03",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY FRAME hero/stand1 t=10.576 clock=0.660 frame=2 flip=true",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 57,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T13:00:03",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY FRAME il/stand1 t=10.856 clock=2.883 frame=2 flip=true",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 57,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T13:00:03",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY FRAME hero/stand1 t=11.028 clock=1.113 frame=1 flip=true",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 57,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T13:00:04",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY FRAME fp/stand1 t=11.237 clock=5.068 frame=2 flip=true",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 57,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T13:00:04",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY FRAME bishop/stand1 t=11.237 clock=0.661 frame=2 flip=false",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 57,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T13:00:04",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY FRAME il/stand1 t=11.307 clock=3.334 frame=1 flip=true",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 57,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T13:00:04",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY FRAME fp/stand1 t=11.683 clock=5.515 frame=1 flip=true",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 57,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T13:00:04",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY FRAME bishop/stand1 t=11.684 clock=1.108 frame=1 flip=false",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 57,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T13:00:04",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY FRAME hero/stand1 t=11.684 clock=1.768 frame=4 flip=true",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 57,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T13:00:04",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY FRAME il/stand1 t=11.923 clock=3.951 frame=4 flip=true",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 57,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T13:00:04",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY SEEN hero/stand1 unique=3",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 64,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T13:00:04",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY SEEN bishop/swingO1 unique=5",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 64,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T13:00:04",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY SEEN il/swingO1 unique=5",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 64,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T13:00:04",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY SEEN fp/dotPunisher unique=5",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 64,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T13:00:04",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY SEEN bishop/divinePunishment unique=5",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 64,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T13:00:04",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY SEEN fp/stand1 unique=3",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 64,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T13:00:04",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY SEEN hero/enragedRagingBlow unique=7",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 64,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T13:00:04",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY SEEN bishop/swingO3 unique=5",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 64,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T13:00:04",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY SEEN bishop/stand1 unique=3",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 64,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T13:00:04",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY SEEN il/swingO3 unique=5",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 64,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T13:00:04",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY SEEN hero/swingO3 unique=8",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 64,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T13:00:04",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY SEEN il/stand1 unique=3",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 64,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T13:00:04",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY SEEN fp/poisonRegion unique=5",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 64,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T13:00:04",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY END il action=stand1 clock=4.0365562960505",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 65,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T13:00:04",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY END fp action=stand1 clock=5.8401581961662",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 65,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T13:00:04",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY END bishop action=stand1 clock=1.4329789932817",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 65,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-26T13:00:04",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "FPVERIFY END hero action=stand1 clock=2.0928579941392",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 65,
+          "codeBlockFileId": null
+        }
+      ]
+    }
+  ]
+}

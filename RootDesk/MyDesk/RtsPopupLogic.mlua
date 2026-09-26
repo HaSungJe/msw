@@ -231,6 +231,7 @@ script RtsPopupLogic extends Logic
 		local height = 500
 		local title = ""
 		if kind == "recruit" then
+			self.RecruitTab = "adv"
 			width = self.RecruitPanelW
 			height = 660
 			title = "캐릭터 영입"
@@ -466,9 +467,9 @@ script RtsPopupLogic extends Logic
 
 	@ExecSpace("ClientOnly")
 	method void OpenHubTab(string key)
-		-- 대기 선택지가 있으면 뽑기 탭에서 이어서 고른다.
+		-- 미선택 증강은 보유 탭의 선택 카드에서도 바로 이어서 고른다.
 		local kind = key
-		if key == "draw" and #_RtsAugmentLogic:MyOffer().ids > 0 then
+		if key == "pick" and #_RtsAugmentLogic:MyOffer().ids > 0 then
 			kind = "pick"
 			_RtsAugmentLogic.PickFolded = false
 			_RtsAugmentLogic.ShownOffer = _RtsAugmentLogic.OfferByUser[_RtsUnitLogic:MyUserId()] or ""
@@ -497,7 +498,7 @@ script RtsPopupLogic extends Logic
 		self.Kind = kind
 		self.DrawRefs = nil
 		local key = kind
-		if key == "pick" then key = "draw" end
+		if key == "pick" then key = "augment" end
 		self:BarSelect(self.HubBar, key)
 		local page = H:SpawnStretch("model://uisprite", "RtsHubPage", self.Body, Vector2(0, 0), Vector2(1, 1), Vector2(0, 0), Vector2(0, -70))
 		page.SpriteGUIRendererComponent.Color = Color(1, 1, 1, 0)
@@ -541,6 +542,10 @@ script RtsPopupLogic extends Logic
 	method void RefreshDraw(number price, boolean can)
 		-- 값 변화에만 반응하고 설명·카드·탭은 재생성하지 않는다.
 		if self.Kind ~= "draw" or self.DrawRefs == nil then return end
+		-- 탭 내용을 만드는 중에도 동기화 타이머가 들어올 수 있다.
+		local ready = self.DrawRefs
+		if not isvalid(ready.wallet) or not isvalid(ready.info) or not isvalid(ready.label) or not isvalid(ready.reason) or not isvalid(ready.buy) then return end
+		for i = 1, 4 do if not isvalid(ready.rates[i]) then return end end
 		local H = _RtsHudLogic
 		local A = _RtsAugmentLogic
 		local me = _RtsUnitLogic:MyUserId()
@@ -2130,6 +2135,8 @@ script RtsPopupLogic extends Logic
 		-- 왼쪽 목록(선택 등급만). 행 = 등급 띠·배지·이름·지정 상태
 		local listW = 440
 		local top = -70
+		local pendingItems = A:MyPendingItems()
+		local pending = #pendingItems
 		local rows = {}
 		self.AugRowRefs = {}
 		for i = 1, #owned do
@@ -2166,7 +2173,8 @@ script RtsPopupLogic extends Logic
 		list.SpriteGUIRendererComponent.Color = Color(1, 1, 1, 0)
 		self._T.AugList = list
 		self._T.AugEmpty = H:SpawnLabel("RtsAugFilteredEmpty", box, Vector2(0, 1), Vector2(0, 1), Vector2(47, -230), Vector2(390, 110), "미지정 증강이 없어요\n숨기기를 해제하면 적용된 증강을 볼 수 있어요", self:Muted(), 17, TextAlignmentType.MiddleCenter, false)
-		if #rows == 0 then
+
+		if #rows == 0 and pending == 0 then
 			local emptyText = "아직 얻은 증강이 없어요 — 지급 라운드가 시작되면 3개 중 1개를 고릅니다"
 			if #owned > 0 and self.AugHideAssigned then emptyText = "미지정 증강이 없어요 — 적용된 증강은 숨겨져 있어요(위의 숨기기 체크 해제)" end
 			H:SpawnLabel("RtsAugEmpty", list, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2(0, 0), Vector2(listW - 32, 100),
@@ -2182,6 +2190,21 @@ script RtsPopupLogic extends Logic
 				sg.ScrollBarThickness = 8
 				sg.ScrollBarHandleColor = H:ColGold()
 				sg.ScrollBarBackgroundColor = Color(1, 1, 1, 0.06)
+			end
+			local gradeNames = { bronze = "브론즈", silver = "실버", gold = "골드", prism = "프리즘" }
+			local gradeIcons = { bronze = "5a539ae0ef084ae593cdf9742e058a25", silver = "187b4995fe2d4ca0829d16f7d3d1ff7e", gold = "b74dcd80d6984e8080f197a7ed7163ba", prism = "3be02a668f1b462d93344f0e5352c20d" }
+			for _, item in ipairs(pendingItems) do
+				local token = item.token
+				local row = H:SpawnRoundedPanel("RtsAugPendingRow" .. H:Int(token), list, Vector2(0, 1), Vector2(0, 1), Vector2.zero, Vector2(listW - 16, 86), self:Card(), self:GradeColor(item.grade), 1.5)
+				local icon = H:SpawnUI("model://uisprite", "RtsAugPendingIcon", row, Vector2(0, 0.5), Vector2(0, 0.5), Vector2(10, 0), Vector2(64, 64))
+				icon.SpriteGUIRendererComponent.ImageRUID = DataRef(gradeIcons[item.grade] or gradeIcons.bronze)
+				icon.SpriteGUIRendererComponent.RaycastTarget = false
+				H:SpawnStatIcon(icon, "skill", Vector2(18, -18), 28)
+				H:SpawnLabel("RtsAugPendingName", row, Vector2(0, 0.5), Vector2(0, 0.5), Vector2(86, 0), Vector2(listW - 214, 48), (gradeNames[item.grade] or "미선택") .. " 증강", self:Ink(), 18, TextAlignmentType.MiddleLeft, true)
+				H:SpawnLabel("RtsAugPendingState", row, Vector2(1, 0.5), Vector2(1, 0.5), Vector2(-12, 0), Vector2(96, 40), "미선택 ›", self:AccentInk(), 16, TextAlignmentType.MiddleRight, true)
+				self.AugRowRefs[#self.AugRowRefs + 1] = { k = 0, row = row, un = true, pending = true }
+				local click = H:SpawnClickQuiet("RtsAugPendingClick", row)
+				click:ConnectEvent(ButtonClickEvent, function(event) A:BrowsePending(token) end)
 			end
 			for i = 1, #rows do
 				local r = rows[i]
@@ -2245,7 +2268,7 @@ script RtsPopupLogic extends Logic
 		end)
 		H:SpawnLabel("RtsAugSummary", box, Vector2(0, 1), Vector2(0, 1), Vector2(27, -17), Vector2(620, 34), "보유 증강 " .. H:Int(#owned) .. "개 · 미지정 " .. H:Int(A:MyUnassigned()) .. "개", self:Ink(), 21, TextAlignmentType.MiddleLeft, true)
 		H:SpawnLabel("RtsAugFoot", box, Vector2(1, 0), Vector2(1, 0), Vector2(-27, 4), Vector2(1020, 22),
-			"전체 " .. H:Int(#owned) .. "개 · 미지정 " .. H:Int(A:MyUnassigned()) .. "개 · 방출하면 그 유닛의 증강은 사라져요", self:Ink(), 14, TextAlignmentType.MiddleRight, false)
+			"보유 " .. H:Int(#owned) .. "개 · 미지정 " .. H:Int(A:MyUnassigned()) .. "개 · 미선택 " .. H:Int(pending) .. "개 · 방출하면 그 유닛의 증강은 사라져요", self:Ink(), 14, TextAlignmentType.MiddleRight, false)
 	end
 
 	-- 증강 창 오른쪽 상세(선택·유닛 칩이 바뀌면 이것만 다시 — RefreshAugDetail)
@@ -2365,7 +2388,7 @@ script RtsPopupLogic extends Logic
 					bg = self:Card()
 					border = self:Edge()
 				end
-				if r.k == self.AugSel then
+				if r.k > 0 and r.k == self.AugSel then
 					bg = self:Mix(H:ColGold(), 0.14)
 					border = H:ColGold()
 				end
@@ -2597,12 +2620,17 @@ script RtsPopupLogic extends Logic
 				-- 본문이 흔들리지 않도록 지속 반짝임을 사용하지 않는다.
 				local band = H:SpawnStretch("model://uisprite", "RtsPickBand", card, Vector2(0, 1), Vector2(1, 1), Vector2(0, -6), Vector2(0, 0))
 				band.SpriteGUIRendererComponent.Color = self:GradeColor(d.grade)
-				self:SpawnAugIcon(card, d, Vector2((cardW - 104) / 2, -42), 104)
+				-- 아이콘·제목·설명을 하나의 묶음으로 카드 중앙에 배치한다.
+				local effectText = AT:EffectText(d.id)
+				local descH = math.min(230, math.max(52, math.ceil(#effectText / 48) * 26))
+				local contentH = 104 + 20 + 64 + 12 + descH
+				local contentTop = (660 - contentH) / 2 - 12
+				self:SpawnAugIcon(card, d, Vector2((cardW - 104) / 2, -contentTop), 104)
 				H:SpawnLabel("RtsPickGrade", card, Vector2(0, 1), Vector2(0, 1), Vector2(19, -12), Vector2(cardW - 38, 24), self:GradeName(d.grade), self:Muted(), 15, TextAlignmentType.MiddleCenter, true)
-				H:SpawnLabel("RtsPickT", card, Vector2(0, 1), Vector2(0, 1), Vector2(19, -158), Vector2(cardW - 38, 42),
+				H:SpawnLabel("RtsPickT", card, Vector2(0, 1), Vector2(0, 1), Vector2(19, -(contentTop + 124)), Vector2(cardW - 38, 64),
 					d.name, self:Ink(), 21, TextAlignmentType.MiddleCenter, true)
-				H:SpawnLabel("RtsPickD", card, Vector2(0, 1), Vector2(0, 1), Vector2(19, -212), Vector2(cardW - 38, 364),
-					AT:EffectText(d.id), self:Ink(), 18, TextAlignmentType.UpperCenter, false)
+				H:SpawnLabel("RtsPickD", card, Vector2(0, 1), Vector2(0, 1), Vector2(19, -(contentTop + 200)), Vector2(cardW - 38, descH),
+					effectText, self:Ink(), 18, TextAlignmentType.MiddleCenter, false)
 				local btn = H:SpawnRoundedPanel("RtsPickTake", card, Vector2(0.5, 0), Vector2(0.5, 0), Vector2(0, 19), Vector2(cardW - 38, 44),
 					self:Mix(H:ColGold(), 0.9), H:ColGold(), 1.5)
 				H:SpawnLabel("RtsPickTakeText", btn, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2(0, 0), Vector2(cardW - 50, 40),
@@ -2637,14 +2665,15 @@ script RtsPopupLogic extends Logic
 			ref.row.Parent:SetEnable(show)
 			if show then
 				count = count + 1
-				if first == 0 then first = ref.k end
+				if first == 0 and ref.k > 0 then first = ref.k end
 				if ref.k == self.AugSel then selectedVisible = true end
 			end
 		end
 		if isvalid(self._T.AugHideMark) then self._T.AugHideMark:SetEnable(self.AugHideAssigned) end
 		if isvalid(self._T.AugEmpty) then self._T.AugEmpty:SetEnable(count == 0 and #self.AugRowRefs > 0) end
 		if isvalid(self._T.AugList) and self._T.AugList.ScrollLayoutGroupComponent ~= nil then
-			self._T.AugList.ScrollLayoutGroupComponent.UseScroll = count > 8
+			-- 미선택 카드가 차지하는 높이까지 고려해 항상 스크롤 가능하게 둔다.
+			self._T.AugList.ScrollLayoutGroupComponent.UseScroll = count > 6
 		end
 		if not selectedVisible and self.AugSel ~= first then
 			self.AugSel = first

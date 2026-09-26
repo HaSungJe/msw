@@ -10,7 +10,7 @@ script RtsMonsterInfoLogic extends Logic
 	property Entity PanelIn = nil
 
 	-- 정보 창 높이(2026-09-24 사용자 "네모 박스 높이를 키워서 아래에 디버프" — 118 → 160, 아래 40px = 디버프 줄)
-	property number PanelH = 160
+	property number PanelH = 208
 
 	property Entity Target = nil
 
@@ -28,14 +28,14 @@ script RtsMonsterInfoLogic extends Logic
 	property number TickId = 0
 
 	-- 체력바 폭(오른쪽 PctW 칸에 체력 %)
-	property number BarW = 366
+	property number BarW = 400
 
-	property number PctW = 70
+	property number PctW = 90
 
 	-- 왼쪽 몬스터 아이콘(2026-09-23 사용자 "상태창 좌측에 몬스터 아이콘") — 이동 애니메이션을 칸 정중앙에 맞춰 반복. IconW 칸 + 여백 뒤에 이름·체력바·정보
-	property number IconW = 94
+	property number IconW = 96
 
-	property number LeftX = 118
+	property number LeftX = 128
 
 	-- 디버프(2026-09-24 사용자 "이동속도 감소 같은 디버프도 아이콘으로 — 마우스를 올리면 설명과 남은 시간" → 같은 날 "몬스터 우측에 디버프 정보 칸" → 같은 날 "네모 박스 높이를 키워서 아래에 디버프, 마우스 오버하면 박스 우측에"): 정보 창 안 아래 줄(DebuffRow = 그 줄, 칩 = 아이콘(또는 색 띠) + 디버프 이름).
 	--   목록 = DebuffList(동기화된 FrozenUntil·ShredUntil/Pct·VulnUntil/Pct·PoisonUntil + 구역 팔라딘 가드 크러쉬·방어구 부수기). 아이콘 RUID가 없으면 색 띠(ruid만 채우면 그림으로)
@@ -99,36 +99,34 @@ script RtsMonsterInfoLogic extends Logic
 		local H = _RtsHudLogic
 		if H.HudGroup == nil or target == nil or not isvalid(target) then return end
 		local same = self.Target == target
+		if same and self.Panel ~= nil and isvalid(self.Panel) then self:Refresh() return end
 		self:Close()
 		if not same then H:PlayUi(H.OpenSound) end -- 창 여는 소리(2026-09-24 사용자) — 같은 몬스터 다시 그리기는 빼고
 		self.Target = target
 		local x0 = self.LeftX
-		local panel = H:SpawnPanel("RtsMonInfo", H.HudGroup, Vector2(0.5, 0), Vector2(0.5, 0), Vector2(0, 16), Vector2(x0 + self.BarW + 4 + self.PctW + 18, self.PanelH),
-			Color(0.11, 0.094, 0.075, 0.95), H:ColGold(), 1.5)
+		local panel = H:SpawnRoundedPanel("RtsMonInfo", H.HudGroup, Vector2(0.5, 0), Vector2(0.5, 0), Vector2(0, 16), Vector2(x0 + self.BarW + 4 + self.PctW + 18, self.PanelH),
+			Color(0.98, 0.985, 1, 0.95), H:ColBorder(), 1.5)
 		self.Panel = panel.Parent
 		self.PanelIn = panel
-		-- 아이콘: 어두운 칸 + 몬스터 이동 애니메이션(표 walk 클립, 여러 부위 보스는 몸통)
-		local slot = H:SpawnUI("model://uisprite", "RtsMonInfoIconBack", panel, Vector2(0, 1), Vector2(0, 1), Vector2(12, -10), Vector2(self.IconW, self.IconW))
-		slot.SpriteGUIRendererComponent.ImageRUID = DataRef(H.WhiteRUID)
-		slot.SpriteGUIRendererComponent.Color = Color(0.2, 0.17, 0.15, 1)
-		-- 칸 밖으로 삐져나오는 걷기 클립(초록버섯 등 — 프레임이 크거나 기준점이 치우친 것)을 칸 안으로 자른다(2026-09-24 사용자 "칸 밖으로 빠져나옴")
+		H:SpawnWater(panel)
+		local slot = H:SpawnRoundedPanel("RtsMonInfoIconBack", panel, Vector2(0, 1), Vector2(0, 1), Vector2(16, -16), Vector2(self.IconW, self.IconW), Color(1, 1, 1, 0.85), H:ColBorderSoft(), 1)
 		if slot.MaskComponent == nil then slot:AddComponent("MaskComponent") end
-		-- 칸 정중앙에 걷기 클립 반복(공용 초상 RtsHudLogic.SpawnMonsterPortrait — 아이콘·유저 카드와 같은 맞춤 식, 2026-09-25 공용화)
 		H:SpawnMonsterPortrait(slot, target.RtsMonsterComponent.MonsterId, self.IconW - 8, true)
-		self.NameText = H:SpawnLabel("RtsMonInfoName", panel, Vector2(0, 1), Vector2(0, 1), Vector2(x0, -8), Vector2(self.BarW + 4 + self.PctW, 28),
-			"", H:ColInk(), 19, TextAlignmentType.MiddleLeft, true)
-		self.NameText.TextComponent.IsRichText = true
-		-- 체력바(배경·채움) + 가운데 글자
-		local back = H:SpawnUI("model://uisprite", "RtsMonInfoHpBack", panel, Vector2(0, 1), Vector2(0, 1), Vector2(x0, -42), Vector2(self.BarW, 26))
-		back.SpriteGUIRendererComponent.Color = Color(0.2, 0.17, 0.15, 1)
-		self.HpFill = H:SpawnUI("model://uisprite", "RtsMonInfoHpFill", panel, Vector2(0, 1), Vector2(0, 1), Vector2(x0, -42), Vector2(self.BarW, 26))
-		self.HpFill.SpriteGUIRendererComponent.Color = Color(0.85, 0.2, 0.2, 1)
-		self.HpText = H:SpawnLabel("RtsMonInfoHpText", panel, Vector2(0, 1), Vector2(0, 1), Vector2(x0, -42), Vector2(self.BarW, 26),
-			"", Color(1, 1, 1, 1), 15, TextAlignmentType.MiddleCenter, true)
-		self.HpPctText = H:SpawnLabel("RtsMonInfoHpPct", panel, Vector2(0, 1), Vector2(0, 1), Vector2(x0 + self.BarW + 4, -42), Vector2(self.PctW, 26),
-			"", H:ColInk(), 16, TextAlignmentType.MiddleRight, true)
-		self.InfoText = H:SpawnLabel("RtsMonInfoText", panel, Vector2(0, 1), Vector2(0, 1), Vector2(x0, -76), Vector2(self.BarW + 4 + self.PctW, 28),
-			"", H:ColMuted(), 15, TextAlignmentType.MiddleLeft, false)
+		local boss = target.RtsMonsterComponent.IsBoss
+		local kind = "몬스터"
+		if boss then kind = "보스" end
+		local badge = H:SpawnRoundedPanel("RtsMonInfoKind", panel, Vector2(1, 1), Vector2(1, 1), Vector2(-16, -16), Vector2(76, 28), Color(0.92, 0.91, 0.97, 1), H:ColBorderSoft(), 1)
+		H:SpawnLabel("RtsMonInfoKindText", badge, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2.zero, Vector2(70, 24), kind, Color(0.43, 0.42, 0.62, 1), 14, TextAlignmentType.MiddleCenter, false)
+		self.NameText = H:SpawnLabel("RtsMonInfoName", panel, Vector2(0, 1), Vector2(0, 1), Vector2(x0, -14), Vector2(self.BarW - 8, 30), "", H:ColInk(), 22, TextAlignmentType.MiddleLeft, true)
+		self.HpText = H:SpawnLabel("RtsMonInfoHpText", panel, Vector2(0, 1), Vector2(0, 1), Vector2(x0, -49), Vector2(self.BarW, 26), "", H:ColInk(), 16, TextAlignmentType.MiddleLeft, false)
+		self.HpPctText = H:SpawnLabel("RtsMonInfoHpPct", panel, Vector2(0, 1), Vector2(0, 1), Vector2(x0 + self.BarW + 4, -49), Vector2(self.PctW, 26), "", Color(0.43, 0.42, 0.62, 1), 18, TextAlignmentType.MiddleRight, false)
+		local back = H:SpawnUI("model://uisprite", "RtsMonInfoHpBack", panel, Vector2(0, 1), Vector2(0, 1), Vector2(x0, -82), Vector2(self.BarW + 4 + self.PctW, 10))
+		back.SpriteGUIRendererComponent.Color = Color(0.88, 0.89, 0.94, 1)
+		self.HpFill = H:SpawnUI("model://uisprite", "RtsMonInfoHpFill", panel, Vector2(0, 1), Vector2(0, 1), Vector2(x0, -82), Vector2(self.BarW + 4 + self.PctW, 10))
+		self.HpFill.SpriteGUIRendererComponent.Color = Color(0.65, 0.64, 0.81, 1)
+		if boss then self.HpFill.SpriteGUIRendererComponent.Color = Color(0.80, 0.48, 0.56, 1) end
+		self.InfoText = H:SpawnLabel("RtsMonInfoText", panel, Vector2(0, 1), Vector2(0, 1), Vector2(x0, -102), Vector2(self.BarW + 4 + self.PctW, 46), "", H:ColMuted(), 15, TextAlignmentType.UpperLeft, false)
+
 		self:Refresh()
 		self.TickId = _TimerService:SetTimerRepeat(function() self:Refresh() end, 0.2, 0.2)
 	end
@@ -170,13 +168,13 @@ script RtsMonsterInfoLogic extends Logic
 		local mon = _RtsStageTableLogic:GetMonster(m.MonsterId)
 		local name = m.MonsterId
 		if mon ~= nil then name = mon.name end
-		if m.IsBoss then name = name .. "  <color=#e0b95a>보스</color>" end
+		-- 보스 표시는 제목과 겹치지 않게 별도 배지에 둔다.
 		if self.NameText.TextComponent.Text ~= name then self.NameText.TextComponent.Text = name end
 		local r = 0
 		if m.MaxHp > 0 then r = m.Hp / m.MaxHp end
 		if r < 0 then r = 0 elseif r > 1 then r = 1 end
-		self.HpFill.UITransformComponent.RectSize = Vector2(math.max(1, self.BarW * r), 26)
-		self.HpText.TextComponent.Text = H:FormatNumber(math.max(0, m.Hp)) .. " / " .. H:FormatNumber(m.MaxHp)
+		self.HpFill.UITransformComponent.RectSize = Vector2(math.max(0, (self.BarW + 4 + self.PctW) * r), 10)
+		self.HpText.TextComponent.Text = "체력  " .. H:FormatNumber(math.max(0, m.Hp)) .. " / " .. H:FormatNumber(m.MaxHp)
 		if self.HpPctText ~= nil and isvalid(self.HpPctText) then self.HpPctText.TextComponent.Text = string.format("%.1f%%", r * 100) end
 		-- 방어율은 보스만(2026-09-24 사용자 "일반 몬스터 방어율 0 — 방무는 보스 옵션")
 		local info = ""
@@ -184,7 +182,7 @@ script RtsMonsterInfoLogic extends Logic
 		local s = nil
 		if m.StageNo > 0 then s = _RtsStageTableLogic:GetStage(m.StageNo) end
 		if s ~= nil then
-			if info ~= "" then info = info .. "   ·   " end
+			if info ~= "" then info = info .. "\n" end
 			info = info .. H:Int(m.StageNo) .. "라운드 · " .. _RtsStageTableLogic:FullName(s)
 		end
 		if self.InfoText.TextComponent.Text ~= info then self.InfoText.TextComponent.Text = info end
@@ -320,8 +318,8 @@ script RtsMonsterInfoLogic extends Logic
 				local w = math.floor(ws[i] * k)
 				local lead = 14
 				if d.ruid ~= "" then lead = 34 end
-				local chip = H:SpawnPanel("RtsMonInfoDebuff" .. d.id, row, Vector2(0, 0.5), Vector2(0, 0.5), Vector2(x, 0), Vector2(w, 32),
-					Color(0.16, 0.135, 0.11, 1), H:ColBorderSoft(), 1)
+				local chip = H:SpawnRoundedPanel("RtsMonInfoDebuff" .. d.id, row, Vector2(0, 0.5), Vector2(0, 0.5), Vector2(x, 0), Vector2(w, 32),
+					Color(0.95, 0.95, 0.99, 1), H:ColBorderSoft(), 1)
 				x = x + w + math.floor(6 * k)
 				local outer = chip.Parent
 				chip.SpriteGUIRendererComponent.RaycastTarget = false
@@ -364,7 +362,7 @@ script RtsMonsterInfoLogic extends Logic
 	method string TipBody(table d)
 		local left = "조건이 유지되는 동안"
 		if d.left >= 0 then left = "남은 시간 " .. string.format("%.1f", d.left) .. "초" end
-		return "<b>" .. d.name .. "</b>\n" .. d.desc .. "\n<color=#e0b95a>" .. left .. "</color>"
+		return "<b>" .. d.name .. "</b>\n" .. d.desc .. "\n<color=#6E6B9E>" .. left .. "</color>"
 	end
 
 	-- 긴 설명 창: 정보 창 바로 오른쪽(아래 맞춤, 폭 DebuffBoxW), 높이 = 설명 길이에 맞춤. 마우스를 받지 않는다
@@ -384,7 +382,7 @@ script RtsMonsterInfoLogic extends Logic
 		local chars = math.ceil(string.len(d.desc) / 2.6)
 		local lines = math.max(1, math.ceil(chars / 18))
 		local h = math.max(self.PanelH, 16 + 26 + lines * 23 + 26)
-		local tip = H:SpawnPanel("RtsMonInfoTip", self.Panel, Vector2(1, 0), Vector2(0, 0), Vector2(8, 0), Vector2(W, h), Color(0.11, 0.094, 0.075, 0.97), H:ColGold(), 1.5)
+		local tip = H:SpawnRoundedPanel("RtsMonInfoTip", self.Panel, Vector2(1, 0), Vector2(0, 0), Vector2(8, 0), Vector2(W, h), Color(0.98, 0.985, 1, 0.98), H:ColBorder(), 1.5)
 		self.Tip = tip.Parent
 		self.Tip.SpriteGUIRendererComponent.RaycastTarget = false
 		tip.SpriteGUIRendererComponent.RaycastTarget = false

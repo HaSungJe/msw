@@ -150,7 +150,7 @@
 - Priority: takes precedence over defaults
 
 ## 캐릭터 원화·모션 제작 규칙
-- Rule: 원화 → 프레임 제작, 대기 1장·스킬별 약 3장, 비율·색감·의상 일관성, 폴더/파일명과 결과물 정리는 docs/unit-art.md가 단일 기준이다(결정 배경은 [character-art](_archived/character-art.md)).
+- Rule: 원화 → 프레임 제작, 작은 호흡의 복수 대기 프레임·스킬별 연결 프레임(현재 대기 3장, 마법사 스킬 5장, 히어로 8/7장), 비율·색감·의상 일관성, 폴더/파일명과 결과물 정리는 docs/unit-art.md가 단일 기준이다(결정 배경은 [character-art](_archived/character-art.md)).
 - Scope: project
 - Rationale: User decision 2026-09-25.
 - Priority: takes precedence over earlier character-art conventions.

@@ -1,4 +1,4 @@
--- Phase 5 #19·#20 (부분, 2026-09-16): 유닛 간 파티 버프 — 캐릭터 밑 아이콘 + 유닛 정보 팝업의 "적용 중인 버프".
+-- 유닛 간 파티 버프 — 타일 오른쪽 위 +개수 + 상세정보의 적용 중인 버프.
 --   버프는 동기화된 RtsUnitComponent 값(직업·레벨·칸·BondNo)만으로 클라가 계산한다(서버 상태 없음).
 --   정의 = .info/character.md의 "모든 유닛 / 주변 n타일 / 유닛 1개 지정" 스킬. 시전자 자신도 포함(홀리 유니티 제외) —
 --   그래서 RtsJobTableLogic.GetStatRaw에는 파티 버프를 넣지 않는다(이중 적용 방지).
@@ -6,21 +6,13 @@
 @Logic
 script RtsUnitBuffLogic extends Logic
 
-	-- 캐릭터 밑 아이콘: 유닛 엔티티의 자식(유닛이 움직이거나 사라지면 같이). 유닛 스케일 2라 로컬 값은 절반.
-	--   32px 아이콘 × 2.2 = 0.7유닛 ≈ 칸(1.78)의 40% — 카메라가 멀어서 이보다 작으면 안 보인다(2026-09-16 실측)
-	property number IconScale = 2.2
-
-	property number IconGap = 0.75
-
-	property number IconDy = -0.52
+	-- 타일 안쪽 오른쪽 위에 고정하는 버프 개수. 캐릭터 프레임/방향과 무관하다.
+	property number BadgeInset = 0.08
 
 	-- 구역별 갱신 예약(동기화가 프로퍼티마다 오므로 0.2초 모아서 한 번에)
 	property table Dirty = {}
 
 	property number FlushId = 0
-
-	-- 유닛별 아이콘 세대(이름 충돌 방지 — 클라 스폰/파괴는 프레임에 걸쳐 처리된다)
-	property table IconGen = {}
 
 	-- ===== 정의 =====
 
@@ -65,7 +57,7 @@ script RtsUnitBuffLogic extends Logic
 	end
 
 	-- 구역 zone의 유닛 no에 걸린 버프 목록: { def, srcNo, srcJob, srcLevel }. 출처 유닛 번호 순, id 중복 제거(출처는 화면에 안 씀)
-	--   서버(RtsCombatLogic.DoAttack — 실제 크리·최종 데미지)와 클라(팝업·발 아래 아이콘) 둘 다 부른다
+	--   서버(RtsCombatLogic.DoAttack — 실제 크리·최종 데미지)와 클라(팝업·타일 버프 개수) 둘 다 부른다
 	method table GetBuffsFor(number zone, number no)
 		local out = {}
 		local seen = {}
@@ -129,7 +121,7 @@ script RtsUnitBuffLogic extends Logic
 		return _RtsAugmentLogic:ListForUnit(u.Owner, no)
 	end
 
-	-- ===== 캐릭터 밑 아이콘 =====
+	-- ===== 타일 오른쪽 위 버프 개수 =====
 
 	-- RtsUnitComponent 동기화마다 호출 — 구역 단위로 모아서 곧 다시 그린다
 	@ExecSpace("ClientOnly")
@@ -157,48 +149,52 @@ script RtsUnitBuffLogic extends Logic
 		local nos = _RtsUnitLogic:ListZoneUnits(zone)
 		for i = 1, #nos do
 			local u = _RtsUnitLogic:GetZoneUnit(zone, nos[i])
-			if u ~= nil then self:RefreshUnitIcons(u) end
+			if u ~= nil then self:RefreshUnitBadge(u) end
 		end
 	end
 
-	-- 유닛 1기의 아이콘을 전부 지우고 다시 만든다 (발 아래 가로로 나열, 가운데 정렬)
 	@ExecSpace("ClientOnly")
-	method void RefreshUnitIcons(any u)
+	method void RefreshUnitBadge(any u)
+		-- 중복 제거된 실제 버프 개수를 제자리 갱신한다. 0개일 때는 표시하지 않는다.
 		local e = u.Entity
-		if e == nil then return end
-		local key = _RtsHudLogic:Int(u.Zone) .. "_" .. _RtsHudLogic:Int(u.No)
-		local kids = e.Children:ToTable()
-		for i = 1, #kids do
-			local k = kids[i]
-			if k ~= nil and string.sub(k.Name, 1, 11) == "RtsBuffIcon" then k:Destroy() end
-		end
-		-- 아이콘 없는 버프는 발밑 줄에서 뺀다
-		local all = self:GetBuffsFor(u.Zone, u.No)
-		local buffs = {}
-		for i = 1, #all do
-			if all[i].def.icon ~= nil and all[i].def.icon ~= "" then buffs[#buffs + 1] = all[i] end
-		end
-		if #buffs == 0 then return end
-		local gen = (self.IconGen[key] or 0) + 1
-		self.IconGen[key] = gen
+		if not isvalid(e) then return end
+		local buffs = self:GetBuffsFor(u.Zone, u.No)
 		local n = #buffs
-		for i = 1, n do
-			local dx = (i - (n + 1) / 2) * self.IconGap
-			local name = "RtsBuffIcon" .. _RtsHudLogic:Int(gen) .. "_" .. _RtsHudLogic:Int(i)
-			local m = _SpawnService:SpawnByModelId("model://MapObject", name, Vector3.zero, e)
-			if m ~= nil then
-				local sr = m.SpriteRendererComponent
-				if sr == nil then sr = m:AddComponent("SpriteRendererComponent") end
-				if sr ~= nil then
-					sr.SpriteRUID = buffs[i].def.icon
-					sr.SortingLayer = "MapLayer0"
-					sr.OrderInLayer = 210
-				end
-				-- 부모(유닛) 스케일 2 → 로컬은 절반
-				m.TransformComponent.Position = Vector3(dx / 2, self.IconDy / 2, 0)
-				m.TransformComponent.Scale = Vector3(self.IconScale / 2, self.IconScale / 2, 1)
-			end
+		local badge = e:GetChildByName("RtsBuffCount")
+		if n == 0 then
+			if isvalid(badge) then badge:SetEnable(false) end
+			return
 		end
+		if not isvalid(badge) then
+			badge = _SpawnService:SpawnByModelId("model://MapObject", "RtsBuffCount", Vector3.zero, e)
+			if not isvalid(badge) then return end
+			if badge.SpriteRendererComponent ~= nil then badge.SpriteRendererComponent.Enable = false end
+			local text = badge:AddComponent("TextRendererComponent")
+			text.IsRichText = false
+			text.FontSize = 2.8
+			text.FontStyle = FontStyleType.Bold
+			text.FontColor = Color(0.85, 1, 0.68, 1)
+			text.OutlineColor = Color(0.12, 0.22, 0.12, 1)
+			text.OutlineWidth = 0.2
+			text.HorizontalAlignment = TextHorizontalAlignmentOption.Right
+			text.VerticalAlignment = TextVerticalAlignmentOption.Top
+			text.RectSize = Vector2(1.2, 0.4)
+			text.RectOffset = Vector2.zero
+			text.Wrapping = false
+			text.SortingLayer = "Default"
+			text.OrderInLayer = 210
+		end
+		badge:SetEnable(true)
+		local label = "+" .. _RtsHudLogic:Int(n)
+		if badge.TextRendererComponent.Text ~= label then badge.TextRendererComponent.Text = label end
+		local cell = _RtsConfigLogic:GetGridCell()
+		local center = _RtsZoneLogic:GetCellCenter(u.Zone, u.Col, u.Row)
+		local pos = e.TransformComponent.WorldPosition
+		local scale = e.TransformComponent.Scale
+		local dx = center.x + cell / 2 - self.BadgeInset - 0.6 - pos.x
+		local dy = center.y + cell / 2 - self.BadgeInset - 0.2 - pos.y
+		badge.TransformComponent.Position = Vector3(dx / scale.x, dy / scale.y, 0)
+		badge.TransformComponent.Scale = Vector3(1 / scale.x, 1 / scale.y, 1)
 	end
 
 end

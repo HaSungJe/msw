@@ -1,0 +1,740 @@
+{
+  "status": "업로드·게임 연결 완료, 4종 13액션 재생 확인 / 사용자 인게임 확인 중",
+  "jobs": [
+    {
+      "job": "il",
+      "id": "ice-lightning-mage",
+      "name": "아크메이지(썬·콜)",
+      "actions": {
+        "wait": {
+          "key": "stand1",
+          "order": [
+            1,
+            2,
+            1,
+            3
+          ],
+          "durations": [
+            0.65,
+            0.45,
+            0.65,
+            0.45
+          ],
+          "files": [
+            "assets/design/characters/ice-lightning-mage/frames/wait/motion01.png",
+            "assets/design/characters/ice-lightning-mage/frames/wait/motion02.png",
+            "assets/design/characters/ice-lightning-mage/frames/wait/motion03.png"
+          ]
+        },
+        "chain-lightning": {
+          "key": "swingO1",
+          "durations": [
+            0.18,
+            0.12,
+            0.08,
+            0.07,
+            0.35
+          ],
+          "files": [
+            "assets/design/characters/ice-lightning-mage/frames/chain-lightning/motion01.png",
+            "assets/design/characters/ice-lightning-mage/frames/chain-lightning/motion02.png",
+            "assets/design/characters/ice-lightning-mage/frames/chain-lightning/motion03.png",
+            "assets/design/characters/ice-lightning-mage/frames/chain-lightning/motion04.png",
+            "assets/design/characters/ice-lightning-mage/frames/chain-lightning/motion05.png"
+          ]
+        },
+        "blizzard": {
+          "key": "swingO3",
+          "durations": [
+            0.21,
+            0.09,
+            0.93,
+            0.09,
+            0.48
+          ],
+          "files": [
+            "assets/design/characters/ice-lightning-mage/frames/blizzard/motion01.png",
+            "assets/design/characters/ice-lightning-mage/frames/blizzard/motion02.png",
+            "assets/design/characters/ice-lightning-mage/frames/blizzard/motion03.png",
+            "assets/design/characters/ice-lightning-mage/frames/blizzard/motion04.png",
+            "assets/design/characters/ice-lightning-mage/frames/blizzard/motion05.png"
+          ]
+        }
+      }
+    },
+    {
+      "job": "fp",
+      "id": "fire-poison-mage",
+      "name": "아크메이지(불·독)",
+      "actions": {
+        "wait": {
+          "key": "stand1",
+          "order": [
+            1,
+            2,
+            1,
+            3
+          ],
+          "durations": [
+            0.65,
+            0.45,
+            0.65,
+            0.45
+          ],
+          "files": [
+            "assets/design/characters/fire-poison-mage/frames/wait/motion01.png",
+            "assets/design/characters/fire-poison-mage/frames/wait/motion02.png",
+            "assets/design/characters/fire-poison-mage/frames/wait/motion03.png"
+          ]
+        },
+        "poison-region": {
+          "key": "poisonRegion",
+          "durations": [
+            0.25,
+            0.15,
+            0.3,
+            0.15,
+            0.35
+          ],
+          "files": [
+            "assets/design/characters/fire-poison-mage/frames/poison-region/motion01.png",
+            "assets/design/characters/fire-poison-mage/frames/poison-region/motion02.png",
+            "assets/design/characters/fire-poison-mage/frames/poison-region/motion03.png",
+            "assets/design/characters/fire-poison-mage/frames/poison-region/motion04.png",
+            "assets/design/characters/fire-poison-mage/frames/poison-region/motion05.png"
+          ]
+        },
+        "dot-punisher": {
+          "key": "dotPunisher",
+          "durations": [
+            0.2,
+            0.15,
+            0.25,
+            0.15,
+            0.45
+          ],
+          "files": [
+            "assets/design/characters/fire-poison-mage/frames/dot-punisher/motion01.png",
+            "assets/design/characters/fire-poison-mage/frames/dot-punisher/motion02.png",
+            "assets/design/characters/fire-poison-mage/frames/dot-punisher/motion03.png",
+            "assets/design/characters/fire-poison-mage/frames/dot-punisher/motion04.png",
+            "assets/design/characters/fire-poison-mage/frames/dot-punisher/motion05.png"
+          ]
+        }
+      }
+    },
+    {
+      "job": "bishop",
+      "id": "bishop",
+      "name": "비숍",
+      "actions": {
+        "wait": {
+          "key": "stand1",
+          "order": [
+            1,
+            2,
+            1,
+            3
+          ],
+          "durations": [
+            0.65,
+            0.45,
+            0.65,
+            0.45
+          ],
+          "files": [
+            "assets/design/characters/bishop/frames/wait/motion01.png",
+            "assets/design/characters/bishop/frames/wait/motion02.png",
+            "assets/design/characters/bishop/frames/wait/motion03.png"
+          ]
+        },
+        "angel-ray": {
+          "key": "swingO1",
+          "durations": [
+            0.09,
+            0.06,
+            0.18,
+            0.12,
+            0.35
+          ],
+          "files": [
+            "assets/design/characters/bishop/frames/angel-ray/motion01.png",
+            "assets/design/characters/bishop/frames/angel-ray/motion02.png",
+            "assets/design/characters/bishop/frames/angel-ray/motion03.png",
+            "assets/design/characters/bishop/frames/angel-ray/motion04.png",
+            "assets/design/characters/bishop/frames/angel-ray/motion05.png"
+          ]
+        },
+        "genesis": {
+          "key": "swingO3",
+          "durations": [
+            0.35,
+            0.15,
+            0.3,
+            0.15,
+            0.55
+          ],
+          "files": [
+            "assets/design/characters/bishop/frames/genesis/motion01.png",
+            "assets/design/characters/bishop/frames/genesis/motion02.png",
+            "assets/design/characters/bishop/frames/genesis/motion03.png",
+            "assets/design/characters/bishop/frames/genesis/motion04.png",
+            "assets/design/characters/bishop/frames/genesis/motion05.png"
+          ]
+        },
+        "divine-punishment": {
+          "key": "divinePunishment",
+          "durations": [
+            0.15,
+            0.1,
+            0.15,
+            0.1,
+            0.3
+          ],
+          "files": [
+            "assets/design/characters/bishop/frames/divine-punishment/motion01.png",
+            "assets/design/characters/bishop/frames/divine-punishment/motion02.png",
+            "assets/design/characters/bishop/frames/divine-punishment/motion03.png",
+            "assets/design/characters/bishop/frames/divine-punishment/motion04.png",
+            "assets/design/characters/bishop/frames/divine-punishment/motion05.png"
+          ]
+        }
+      }
+    },
+    {
+      "job": "hero",
+      "id": "hero",
+      "name": "히어로",
+      "actions": {
+        "wait": {
+          "key": "stand1",
+          "order": [
+            1,
+            2,
+            1,
+            3
+          ],
+          "durations": [
+            0.65,
+            0.45,
+            0.65,
+            0.45
+          ],
+          "files": [
+            "assets/design/characters/hero/frames/wait/motion01.png",
+            "assets/design/characters/hero/frames/wait/motion02.png",
+            "assets/design/characters/hero/frames/wait/motion03.png"
+          ]
+        },
+        "raging-blow": {
+          "key": "swingO3",
+          "durations": [
+            0.06,
+            0.18,
+            0.06,
+            0.12,
+            0.06,
+            0.12,
+            0.18,
+            0.12
+          ],
+          "files": [
+            "assets/design/characters/hero/frames/raging-blow/motion01.png",
+            "assets/design/characters/hero/frames/raging-blow/motion02.png",
+            "assets/design/characters/hero/frames/raging-blow/motion03.png",
+            "assets/design/characters/hero/frames/raging-blow/motion04.png",
+            "assets/design/characters/hero/frames/raging-blow/motion05.png",
+            "assets/design/characters/hero/frames/raging-blow/motion06.png",
+            "assets/design/characters/hero/frames/raging-blow/motion07.png",
+            "assets/design/characters/hero/frames/raging-blow/motion08.png"
+          ]
+        },
+        "enraged-raging-blow": {
+          "key": "enragedRagingBlow",
+          "durations": [
+            0.18,
+            0.12,
+            0.12,
+            0.08,
+            0.12,
+            0.08,
+            0.2
+          ],
+          "files": [
+            "assets/design/characters/hero/frames/enraged-raging-blow/motion01.png",
+            "assets/design/characters/hero/frames/enraged-raging-blow/motion02.png",
+            "assets/design/characters/hero/frames/enraged-raging-blow/motion03.png",
+            "assets/design/characters/hero/frames/enraged-raging-blow/motion04.png",
+            "assets/design/characters/hero/frames/enraged-raging-blow/motion05.png",
+            "assets/design/characters/hero/frames/enraged-raging-blow/motion06.png",
+            "assets/design/characters/hero/frames/enraged-raging-blow/motion07.png"
+          ]
+        }
+      }
+    }
+  ],
+  "assets": [
+    {
+      "file": "assets/design/characters/ice-lightning-mage/frames/wait/motion01.png",
+      "ruid": "fe0c6be3795d49e29a311b3edb8e89ab",
+      "name": "RtsIlWaitMotion01",
+      "size": 268449,
+      "sha256": "e5f60543ba12e370333be01289308d3a3a0e6efad8d2dc3d9d1488e5d2079136"
+    },
+    {
+      "file": "assets/design/characters/ice-lightning-mage/frames/wait/motion02.png",
+      "ruid": "6b91e70ed2a64198a41f368191d834c8",
+      "name": "RtsIlWaitMotion02",
+      "size": 274407,
+      "sha256": "7f7073ba44acf19a83f0d27e5bcebea355bf368b606c13ea7033d2be063f8a9c"
+    },
+    {
+      "file": "assets/design/characters/ice-lightning-mage/frames/wait/motion03.png",
+      "ruid": "0f16c5bda207468aa1fe9dcb05cb4ed6",
+      "name": "RtsIlWaitMotion03",
+      "size": 272390,
+      "sha256": "590adbdb8aa90a8de1aec40b0f1dade5aa85b57bd0b4268b09772d10ca004914"
+    },
+    {
+      "file": "assets/design/characters/ice-lightning-mage/frames/chain-lightning/motion01.png",
+      "ruid": "66b1f0af75c745bdaf10c9710486b867",
+      "name": "RtsIlChainLightningMotion01",
+      "size": 304421,
+      "sha256": "e28d8ca6c99c070fbd5d793b1fbea8eac3587358e49edf781b6741ca6f3937a2"
+    },
+    {
+      "file": "assets/design/characters/ice-lightning-mage/frames/chain-lightning/motion02.png",
+      "ruid": "b2bd84ff10da4d40a6e1f0e80a90c8f6",
+      "name": "RtsIlChainLightningMotion02",
+      "size": 302304,
+      "sha256": "888f1f4ab575a39b584b4e5e4c469c8101fb3e0744efd32cefafd7d8c658bab1"
+    },
+    {
+      "file": "assets/design/characters/ice-lightning-mage/frames/chain-lightning/motion03.png",
+      "ruid": "0c4635067dcc4aae9ed3987fc3820dcd",
+      "name": "RtsIlChainLightningMotion03",
+      "size": 303733,
+      "sha256": "8b4e953ec42bece41a59443dc78fa75d79e1551bc880f850a476135909f226d8"
+    },
+    {
+      "file": "assets/design/characters/ice-lightning-mage/frames/chain-lightning/motion04.png",
+      "ruid": "263444c070344cceb0196534f9997395",
+      "name": "RtsIlChainLightningMotion04",
+      "size": 318161,
+      "sha256": "8f4cdc87f6fcb1148cf4d0dff2d599bb31e140be1343dfb938b84ce7959b45bb"
+    },
+    {
+      "file": "assets/design/characters/ice-lightning-mage/frames/chain-lightning/motion05.png",
+      "ruid": "307d3b6aa3d7485d932c9fcde44642ed",
+      "name": "RtsIlChainLightningMotion05",
+      "size": 327835,
+      "sha256": "c8d62b3d0aff6a0ed7ba9b4a4503de9aab4545ebb0bc255dc470b35729df1685"
+    },
+    {
+      "file": "assets/design/characters/ice-lightning-mage/frames/blizzard/motion01.png",
+      "ruid": "cfb678afe3fe423ca87a610f41f5c989",
+      "name": "RtsIlBlizzardMotion01",
+      "size": 357082,
+      "sha256": "da5adf0525b59be5e51bae9f24e455d611f60f458ed1fa928d123c6d667ae451"
+    },
+    {
+      "file": "assets/design/characters/ice-lightning-mage/frames/blizzard/motion02.png",
+      "ruid": "d0415a8c09d746868c66b9d776babdf1",
+      "name": "RtsIlBlizzardMotion02",
+      "size": 334183,
+      "sha256": "d9caf71c250adc1127c89a753249870073db589c51c0347211d1c5664eb0e932"
+    },
+    {
+      "file": "assets/design/characters/ice-lightning-mage/frames/blizzard/motion03.png",
+      "ruid": "08f5c40cb8fa4af28fab2f6b996fdd41",
+      "name": "RtsIlBlizzardMotion03",
+      "size": 338049,
+      "sha256": "bd8d5f0a35604bbaf60da490928eb6afc1fcc0e3874aefeb0568c1e1d5d975d8"
+    },
+    {
+      "file": "assets/design/characters/ice-lightning-mage/frames/blizzard/motion04.png",
+      "ruid": "7b877eaff02f4cc6b408f82d4a3f9e19",
+      "name": "RtsIlBlizzardMotion04",
+      "size": 339236,
+      "sha256": "30e9f230847524ae730ccc9e88c1556b11eef457554deaf4dba9ef7bb22f6885"
+    },
+    {
+      "file": "assets/design/characters/ice-lightning-mage/frames/blizzard/motion05.png",
+      "ruid": "3821ebdc6c2346c2b2561fec50b9900c",
+      "name": "RtsIlBlizzardMotion05",
+      "size": 314271,
+      "sha256": "8648a17bcc5419ef70f0125f424f033965db9780968994145af8fc27aa8b9e54"
+    },
+    {
+      "file": "assets/design/characters/ice-lightning-mage/portrait.png",
+      "ruid": "f93cfcc7a46d428cb6ed2bb3d71fc986",
+      "name": "RtsIlPortrait",
+      "size": 447506,
+      "sha256": "ef647c7fe060cd95816dd9a4dd056925107b78a353eeb59c1f4dd46c6eea6708"
+    },
+    {
+      "file": "assets/design/characters/fire-poison-mage/frames/wait/motion01.png",
+      "ruid": "762ba8485e584f60a94bc71631ee7881",
+      "name": "RtsFpWaitMotion01",
+      "size": 231919,
+      "sha256": "cc7886565ffcabadaf8865dcd585725c39255403a7416077115602add7724090"
+    },
+    {
+      "file": "assets/design/characters/fire-poison-mage/frames/wait/motion02.png",
+      "ruid": "43f43917582b4fe6848b525f32d69652",
+      "name": "RtsFpWaitMotion02",
+      "size": 231373,
+      "sha256": "ed9b315558e86cd848faf2a7a73faa738793146aaa2d16f96d78faefc79849bf"
+    },
+    {
+      "file": "assets/design/characters/fire-poison-mage/frames/wait/motion03.png",
+      "ruid": "49312816d1bb4c2d87f0452e8af0f89b",
+      "name": "RtsFpWaitMotion03",
+      "size": 233993,
+      "sha256": "e8f6a92ce01a2011ebed2ab1745c172fe488152cf80763efc0c04a810f5ab09d"
+    },
+    {
+      "file": "assets/design/characters/fire-poison-mage/frames/poison-region/motion01.png",
+      "ruid": "3d29ef1ad55541d2a91af4400a0a22ed",
+      "name": "RtsFpPoisonRegionMotion01",
+      "size": 252244,
+      "sha256": "1be0751d31120b33dd893bdca1871cc7347aa88ae93dad9800cc67ffb2754051"
+    },
+    {
+      "file": "assets/design/characters/fire-poison-mage/frames/poison-region/motion02.png",
+      "ruid": "4669d925ba604b28852c02b0baa4a567",
+      "name": "RtsFpPoisonRegionMotion02",
+      "size": 266689,
+      "sha256": "2316c80702eca508c216b4a21ae3d1af7d7fe3aaff043363c1dc0dea6c4ef28e"
+    },
+    {
+      "file": "assets/design/characters/fire-poison-mage/frames/poison-region/motion03.png",
+      "ruid": "413bb52e0b4f47cabe7600bab0a89919",
+      "name": "RtsFpPoisonRegionMotion03",
+      "size": 265895,
+      "sha256": "bbac9f156fbae4dedfce418d1698fd7ceed5053ec1e13f4cce386ed26988c1f9"
+    },
+    {
+      "file": "assets/design/characters/fire-poison-mage/frames/poison-region/motion04.png",
+      "ruid": "d3360cf51ebf48e1ba9d5b9f1d58425e",
+      "name": "RtsFpPoisonRegionMotion04",
+      "size": 288453,
+      "sha256": "20497c964a8609c203043c354b164da39bd15ea5e9da1b16a0920d6f8882a5fe"
+    },
+    {
+      "file": "assets/design/characters/fire-poison-mage/frames/poison-region/motion05.png",
+      "ruid": "b987d27c6aba4867abfd690cf7960cd8",
+      "name": "RtsFpPoisonRegionMotion05",
+      "size": 265182,
+      "sha256": "c557ef968bbfbea886d1d4733ba345eff288452d07a49d314c86d1ca4c0f41e2"
+    },
+    {
+      "file": "assets/design/characters/fire-poison-mage/frames/dot-punisher/motion01.png",
+      "ruid": "61f1428a7d9d4bd7aa94d7f57ceb3ab2",
+      "name": "RtsFpDotPunisherMotion01",
+      "size": 264691,
+      "sha256": "dde4610c56f0393eb4000c3a19d0a395eeed565fb11d9fd9182201e8486fc9c0"
+    },
+    {
+      "file": "assets/design/characters/fire-poison-mage/frames/dot-punisher/motion02.png",
+      "ruid": "dfd12d4d6d1e4ab28d76cbb4e7779264",
+      "name": "RtsFpDotPunisherMotion02",
+      "size": 312583,
+      "sha256": "e4d295bf6a8e806f4d6409fdf95eb0db77bc482eb8a70277a4860b7d270ea28a"
+    },
+    {
+      "file": "assets/design/characters/fire-poison-mage/frames/dot-punisher/motion03.png",
+      "ruid": "1f61ca3ebc5e46a381af77bdadf5e3d3",
+      "name": "RtsFpDotPunisherMotion03",
+      "size": 276500,
+      "sha256": "a1578f5868e38b70a7b7fb0644d680258937f3887bdca1af7918a36696952b64"
+    },
+    {
+      "file": "assets/design/characters/fire-poison-mage/frames/dot-punisher/motion04.png",
+      "ruid": "16de092651e1436cb7bffb5ec142d6c0",
+      "name": "RtsFpDotPunisherMotion04",
+      "size": 291412,
+      "sha256": "afc6f8df542702da5f73fe12c4f8a1b7166f34c26cb103e20b0c9e067649c4f4"
+    },
+    {
+      "file": "assets/design/characters/fire-poison-mage/frames/dot-punisher/motion05.png",
+      "ruid": "2581e6d505a2401aab26d85c57cca9df",
+      "name": "RtsFpDotPunisherMotion05",
+      "size": 240762,
+      "sha256": "7eef9357495510feb08e451e0e8ab39a4fec109513f257982213e5e884eee292"
+    },
+    {
+      "file": "assets/design/characters/fire-poison-mage/portrait.png",
+      "ruid": "81c1c00cd1aa4ff3b08f9894b42c819b",
+      "name": "RtsFpPortrait",
+      "size": 429822,
+      "sha256": "750165d554cd8b48c50dd3dcbba6e6524ddd92900a838c2744759bd2321d66e7"
+    },
+    {
+      "file": "assets/design/characters/bishop/frames/wait/motion01.png",
+      "ruid": "99dcc70fd0c04167aa3c7bebdd72bb5b",
+      "name": "RtsBishopWaitMotion01",
+      "size": 234793,
+      "sha256": "7949a8bdfd86a72d5ef45c67856df447f4c2e319eb5e9a6978d8800648e45849"
+    },
+    {
+      "file": "assets/design/characters/bishop/frames/wait/motion02.png",
+      "ruid": "049e7e1c48364faca8efbed9ddca1afc",
+      "name": "RtsBishopWaitMotion02",
+      "size": 241397,
+      "sha256": "6c80d82d24df5acf97dde4dcd93dee43b982e13063027a7445e39e20f3ef9fa4"
+    },
+    {
+      "file": "assets/design/characters/bishop/frames/wait/motion03.png",
+      "ruid": "7b64b5c05ae444f8baab5737fdcff112",
+      "name": "RtsBishopWaitMotion03",
+      "size": 240584,
+      "sha256": "09e03a1c40705b11e214e906029ab3d49d8bf6184c5b0b82995123e8febaec24"
+    },
+    {
+      "file": "assets/design/characters/bishop/frames/angel-ray/motion01.png",
+      "ruid": "074de3777cbb42839c997bd1f1f958ae",
+      "name": "RtsBishopAngelRayMotion01",
+      "size": 273011,
+      "sha256": "273b3d55222167bf80d7b3ff614b52ccfad117014a70990f6133f6f83de534b9"
+    },
+    {
+      "file": "assets/design/characters/bishop/frames/angel-ray/motion02.png",
+      "ruid": "72e53ccff7c74860b1cf984fa020720d",
+      "name": "RtsBishopAngelRayMotion02",
+      "size": 278466,
+      "sha256": "64c907c244955a9878091f5077f1b3d3d1defd807688059d82f35aaa593ccfad"
+    },
+    {
+      "file": "assets/design/characters/bishop/frames/angel-ray/motion03.png",
+      "ruid": "a68dc71362dd47119b9477d261175de5",
+      "name": "RtsBishopAngelRayMotion03",
+      "size": 236402,
+      "sha256": "ce5ccc4af941fcd2fd22ce979a0f53698734217b8ec1517f8bf8c4dc53ca5d51"
+    },
+    {
+      "file": "assets/design/characters/bishop/frames/angel-ray/motion04.png",
+      "ruid": "9781d9083bac4ea786fd95228d147f92",
+      "name": "RtsBishopAngelRayMotion04",
+      "size": 260021,
+      "sha256": "db7202ee986b774d8f6543a5b0d1fb6811137f356add53b26eed2975a4e11306"
+    },
+    {
+      "file": "assets/design/characters/bishop/frames/angel-ray/motion05.png",
+      "ruid": "2246d2a21d1948c1b1b57d56f7776d63",
+      "name": "RtsBishopAngelRayMotion05",
+      "size": 243249,
+      "sha256": "1473048e9347b98d97ddfe508abe261e5655228c0f9b2180553bb05dfc3ae0f0"
+    },
+    {
+      "file": "assets/design/characters/bishop/frames/genesis/motion01.png",
+      "ruid": "55f8fb5d2d4f45ab9bae87a6a79837af",
+      "name": "RtsBishopGenesisMotion01",
+      "size": 244687,
+      "sha256": "8849aa18a46b812f0006898386c7b34520e76a85094db5c855f5da31c2e13d86"
+    },
+    {
+      "file": "assets/design/characters/bishop/frames/genesis/motion02.png",
+      "ruid": "8814b38104ea4eb1bd7e4ee22e88fa0b",
+      "name": "RtsBishopGenesisMotion02",
+      "size": 268932,
+      "sha256": "3e389ce4c355b9d3e7b23d3a360ad0cc1da6999f0e5afc7970d995995f18412f"
+    },
+    {
+      "file": "assets/design/characters/bishop/frames/genesis/motion03.png",
+      "ruid": "97aab06bc9c64d6faa2caee8105443cd",
+      "name": "RtsBishopGenesisMotion03",
+      "size": 252368,
+      "sha256": "7a94eb45e6e286fcb77f189f70994e661ad1a3bb2b893f4a7070d6723a692084"
+    },
+    {
+      "file": "assets/design/characters/bishop/frames/genesis/motion04.png",
+      "ruid": "485d02497a384434a91be5a7396cac8c",
+      "name": "RtsBishopGenesisMotion04",
+      "size": 269868,
+      "sha256": "6db94c5fb2cb649158e876ec4263d63ca30536a1b13808c506bfab785feec65f"
+    },
+    {
+      "file": "assets/design/characters/bishop/frames/genesis/motion05.png",
+      "ruid": "23f7adea4a5246f2995c3c1593b382ae",
+      "name": "RtsBishopGenesisMotion05",
+      "size": 251708,
+      "sha256": "ecdc9cb7e67c3d43cd04bee1b93c998ff6a5a11fed1d2828c5dca0981baf2557"
+    },
+    {
+      "file": "assets/design/characters/bishop/frames/divine-punishment/motion01.png",
+      "ruid": "fa8ad8e0822a45368697bc884853d364",
+      "name": "RtsBishopDivinePunishmentMotion01",
+      "size": 255748,
+      "sha256": "a9b1f119042ee5ed665fca00cdb9ce5422b64220eff9f73ab47894574c815625"
+    },
+    {
+      "file": "assets/design/characters/bishop/frames/divine-punishment/motion02.png",
+      "ruid": "a235e087ff374bec8f71c2453dc31bdc",
+      "name": "RtsBishopDivinePunishmentMotion02",
+      "size": 279585,
+      "sha256": "87089af05915dfe14036be3a7bed11987b80a072b6e54ec69eebaa6ea3bab1d3"
+    },
+    {
+      "file": "assets/design/characters/bishop/frames/divine-punishment/motion03.png",
+      "ruid": "bdd116091aa447d9927b5f7ed0375fab",
+      "name": "RtsBishopDivinePunishmentMotion03",
+      "size": 250410,
+      "sha256": "ecfb5c83d0441500b5347da843d200ad0c6377a702fe56f93b8925203ea3201a"
+    },
+    {
+      "file": "assets/design/characters/bishop/frames/divine-punishment/motion04.png",
+      "ruid": "e5df8c553e8b4870a0db442531e0057b",
+      "name": "RtsBishopDivinePunishmentMotion04",
+      "size": 275093,
+      "sha256": "a39e33507137b9bdff194e470fa8e3485a105529b43df00a3967052f1b4a1150"
+    },
+    {
+      "file": "assets/design/characters/bishop/frames/divine-punishment/motion05.png",
+      "ruid": "9345eeebfda54f2690c9849661bcd988",
+      "name": "RtsBishopDivinePunishmentMotion05",
+      "size": 258042,
+      "sha256": "20a51b406be42bd7a7d61fb7c5f4743bd0ba8102736679f72a049e3b16bd9ecf"
+    },
+    {
+      "file": "assets/design/characters/bishop/portrait.png",
+      "ruid": "778abb348ac2432eb2ca8916a0ce24b9",
+      "name": "RtsBishopPortrait",
+      "size": 415341,
+      "sha256": "8455d94bc3e25b2527918b8c5a29c3fef07d5c9375051c918abdb8ba8977407b"
+    },
+    {
+      "file": "assets/design/characters/hero/frames/wait/motion01.png",
+      "ruid": "fb4c72bd02e24790b948edfd2e78696d",
+      "name": "RtsHeroWaitMotion01",
+      "size": 236590,
+      "sha256": "11f60392141496b33648d61df7235df9c9329b180eb2a53557ee6c336a25689e"
+    },
+    {
+      "file": "assets/design/characters/hero/frames/wait/motion02.png",
+      "ruid": "5c32a751b5864e4f802b1cbfe2f6980d",
+      "name": "RtsHeroWaitMotion02",
+      "size": 239239,
+      "sha256": "f208a0e87b0a16f47a18357d256b5fedbb4973a2e4a25d15309855fc0446dac1"
+    },
+    {
+      "file": "assets/design/characters/hero/frames/wait/motion03.png",
+      "ruid": "bf6a1a79ae3e47419571fb82b46a26fa",
+      "name": "RtsHeroWaitMotion03",
+      "size": 238559,
+      "sha256": "dbff47bd3d2da86854865290a988282f400ea97ab93f0858098e0d13eebe636b"
+    },
+    {
+      "file": "assets/design/characters/hero/frames/raging-blow/motion01.png",
+      "ruid": "a4b2f29361fd49dda2104ce70a4b4f82",
+      "name": "RtsHeroRagingBlowMotion01",
+      "size": 196022,
+      "sha256": "da9add3d88ac744f7505106690c708fd7f0e7f547ad1b417a652b4b0faf15ea1"
+    },
+    {
+      "file": "assets/design/characters/hero/frames/raging-blow/motion02.png",
+      "ruid": "e81fe579b29846c4a93f4a5e3decd341",
+      "name": "RtsHeroRagingBlowMotion02",
+      "size": 197681,
+      "sha256": "91b1f6baedf12285c26c8ab7cfdfb9bf9bf2ed663074749fa37e4b529e04d7ef"
+    },
+    {
+      "file": "assets/design/characters/hero/frames/raging-blow/motion03.png",
+      "ruid": "2ab55adc7e964164a2675fe41720dd35",
+      "name": "RtsHeroRagingBlowMotion03",
+      "size": 211053,
+      "sha256": "edf40010d01587aeb69c590605a8da8f17085661caded1151f2fb0d7ca599038"
+    },
+    {
+      "file": "assets/design/characters/hero/frames/raging-blow/motion04.png",
+      "ruid": "f952fd92a3b140f1a896e60ea777278f",
+      "name": "RtsHeroRagingBlowMotion04",
+      "size": 213879,
+      "sha256": "c44abc679779eead97f16390888fdb5303c2a998fda0e06ff33f22f07a350631"
+    },
+    {
+      "file": "assets/design/characters/hero/frames/raging-blow/motion05.png",
+      "ruid": "a94516dd5ddb4c12b55d7877ce927eca",
+      "name": "RtsHeroRagingBlowMotion05",
+      "size": 209715,
+      "sha256": "e6726f068059bbea135b714d00801f41f4771b7f9b24aa15e11d030241dc1184"
+    },
+    {
+      "file": "assets/design/characters/hero/frames/raging-blow/motion06.png",
+      "ruid": "a63a0e835c3e46dfb862a1727e898d56",
+      "name": "RtsHeroRagingBlowMotion06",
+      "size": 214537,
+      "sha256": "28e809353cb4302f8c77ce2f47a9fa1034a75c1fb51cda901bc856d065e6f75f"
+    },
+    {
+      "file": "assets/design/characters/hero/frames/raging-blow/motion07.png",
+      "ruid": "b8f0b7d9b63d4738ba1c40bf7f7d6ed3",
+      "name": "RtsHeroRagingBlowMotion07",
+      "size": 209024,
+      "sha256": "45299b6ef9468d5d913e4ceded6203b7bb46bfdc9788872f4377a7002b48dde2"
+    },
+    {
+      "file": "assets/design/characters/hero/frames/raging-blow/motion08.png",
+      "ruid": "4ff13f32715d4446b32cc3cd81ac01ad",
+      "name": "RtsHeroRagingBlowMotion08",
+      "size": 224053,
+      "sha256": "ad0dc6d54801864548e41778c8f58c380231a33697e2717a57fafe89f9099fb1"
+    },
+    {
+      "file": "assets/design/characters/hero/frames/enraged-raging-blow/motion01.png",
+      "ruid": "921342b83ead49499ebcb1305c051f79",
+      "name": "RtsHeroEnragedRagingBlowMotion01",
+      "size": 181171,
+      "sha256": "7b6088100d8f0aee31b6ce1224fd856f30cdef59c043a1d6bb118b62e3c1014e"
+    },
+    {
+      "file": "assets/design/characters/hero/frames/enraged-raging-blow/motion02.png",
+      "ruid": "2252822c3c544150b2b11d2c689df015",
+      "name": "RtsHeroEnragedRagingBlowMotion02",
+      "size": 202396,
+      "sha256": "3924487b89b605ca5d417d24879024279e331902e1bcf8a62b08e98e89a182b7"
+    },
+    {
+      "file": "assets/design/characters/hero/frames/enraged-raging-blow/motion03.png",
+      "ruid": "0e8533552bca4a7dbdeca19be5b65e23",
+      "name": "RtsHeroEnragedRagingBlowMotion03",
+      "size": 206259,
+      "sha256": "0acd01336b5b92af22440aba45b086c26b7aee6709ed2e93eb099c8a8d1b2349"
+    },
+    {
+      "file": "assets/design/characters/hero/frames/enraged-raging-blow/motion04.png",
+      "ruid": "bd5b06cb3c6e4dcf8708ceae77c33ff5",
+      "name": "RtsHeroEnragedRagingBlowMotion04",
+      "size": 212363,
+      "sha256": "05fab7a4b1b252d7baeaa239a24f4407eca8cb707cb876616f2c7731834b6b90"
+    },
+    {
+      "file": "assets/design/characters/hero/frames/enraged-raging-blow/motion05.png",
+      "ruid": "fd0f61326882439783495af1c34284b6",
+      "name": "RtsHeroEnragedRagingBlowMotion05",
+      "size": 224418,
+      "sha256": "6e972a066a148b58b0d34192d3ff3431e2f170ad0e0b87212a48ffbe6d77a65f"
+    },
+    {
+      "file": "assets/design/characters/hero/frames/enraged-raging-blow/motion06.png",
+      "ruid": "b60553dd8f9f48fc8a449df949625cbe",
+      "name": "RtsHeroEnragedRagingBlowMotion06",
+      "size": 216828,
+      "sha256": "012580d7f74480538cb925ebc2fc56bccbeb85e7e2e5bebca7a0ba6b737be828"
+    },
+    {
+      "file": "assets/design/characters/hero/frames/enraged-raging-blow/motion07.png",
+      "ruid": "6fd0859ce3d44c37a80d2c3c8c21dc1c",
+      "name": "RtsHeroEnragedRagingBlowMotion07",
+      "size": 173075,
+      "sha256": "e630c7fcb077f5de352645f3cbf735eb8e4565ba27c8ff3473ab43d6c311a42b"
+    },
+    {
+      "file": "assets/design/characters/hero/portrait.png",
+      "ruid": "01d1da2e721b4dd893e314ef3d64e2e1",
+      "name": "RtsHeroPortrait",
+      "size": 392714,
+      "sha256": "a215a28e85b32126a994f38dbb551ad207be4bea2756d1a5042e2ed0fc8f00dc"
+    }
+  ]
+}

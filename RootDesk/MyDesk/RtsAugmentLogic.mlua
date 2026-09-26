@@ -4,7 +4,7 @@
 --   고른 증강은 '대상 미지정'으로 보유(OwnedByUser) → 증강 창에서 유닛 1명에 1회 지정(RequestAssign). 지정 후 변경 불가.
 --     브~골·특수 코어 → 그 유닛 Augs(능력치 오버레이) / 직업 프리즘 → 그 직업 유닛에만, RtsUnitLogic.ApplyPrism / 팬텀 → 받는 즉시 영입 해금(지정 없음).
 --   방출된 유닛에 지정된 증강은 소멸, 탈락·새 판이면 보유 초기화.
---   동기화 문자열: OwnedByUser[userId] = "id:유닛번호,…"(0 = 미지정, -1 = 지정 필요 없음) / OfferByUser[userId] = "등급|id,id,id" (없으면 "")
+--   동기화 문자열: OwnedByUser[userId] = "id:유닛번호,…"(0 = 미지정, -1 = 지정 필요 없음) / OfferByUser[userId] = "등급|id,id,id|개별식별자" (없으면 "")
 @Logic
 script RtsAugmentLogic extends Logic
 
@@ -14,8 +14,15 @@ script RtsAugmentLogic extends Logic
 	@Sync
 	property SyncTable<string, string> OfferByUser
 
-	-- 서버: userId → { 등급, … } 아직 못 띄운 지급 줄
+	-- 서버: userId → { token, grade, packed } 수령하지 않은 선택지 전체. 발급 순서를 유지한다.
 	property table Queue = {}
+
+	@Sync
+	property SyncTable<string, string> PendingItemsByUser
+
+	property table NextPendingToken = {}
+
+	property number AwaitingPendingToken = 0
 
 	-- 고르지 않은 선택지 수(지금 선택지 1 + 줄) — 클라 '펼치기 (n)' 표시용. 최대 MaxPending(10), 넘치면 먼저 받은 것부터 삭제(2026-09-23 사용자)
 	@Sync
@@ -89,14 +96,20 @@ script RtsAugmentLogic extends Logic
 		return table.concat(parts, ",")
 	end
 
-	-- "grade|a,b,c" → grade, { a, b, c }
+	-- "grade|a,b,c|token" → grade, { a, b, c }, token
 	method table ParseOffer(string packed)
-		local out = { grade = "", ids = {} }
+		local out = { grade = "", ids = {}, token = 0 }
 		if packed == nil or packed == "" then return out end
 		local bar = string.find(packed, "|", 1, true)
 		if bar == nil then return out end
 		out.grade = string.sub(packed, 1, bar - 1)
-		for id in string.gmatch(string.sub(packed, bar + 1), "[^,]+") do out.ids[#out.ids + 1] = id end
+		local tail = string.sub(packed, bar + 1)
+		local tokenAt = string.find(tail, "|", 1, true)
+		if tokenAt ~= nil then
+			out.token = tonumber(string.sub(tail, tokenAt + 1)) or 0
+			tail = string.sub(tail, 1, tokenAt - 1)
+		end
+		for id in string.gmatch(tail, "[^,]+") do out.ids[#out.ids + 1] = id end
 		return out
 	end
 
@@ -167,78 +180,106 @@ script RtsAugmentLogic extends Logic
 	method void Offer(string userId, string grade)
 		if self.Queue[userId] == nil then self.Queue[userId] = {} end
 		local q = self.Queue[userId]
-		q[#q + 1] = grade
-		-- 쌓인 선택지(지금 선택지 + 줄)가 MaxPending을 넘으면 먼저 받은 것부터 버린다 — 지금 선택지가 가장 오래된 것
-		local cur = (self.OfferByUser[userId] or "") ~= ""
-		local total = #q
-		if cur then total = total + 1 end
-		while total > self.MaxPending do
-			if cur then
-				_RtsConfigLogic:Log("RtsAugment: drop oldest offer " .. (self.OfferByUser[userId] or "") .. " -> " .. userId)
-				self.OfferByUser[userId] = ""
-				cur = false
-			else
-				table.remove(q, 1)
-			end
-			total = total - 1
+		local token = (self.NextPendingToken[userId] or 0) + 1
+		self.NextPendingToken[userId] = token
+		q[#q + 1] = { token = token, grade = grade, packed = "" }
+		local active = self:ParseOffer(self.OfferByUser[userId] or "").token
+		while #q > self.MaxPending do
+			local dropped = table.remove(q, 1)
+			if dropped.token == active then self.OfferByUser[userId] = "" end
 		end
 		if (self.OfferByUser[userId] or "") == "" then self:PopNext(userId) end
 		self:SyncPending(userId)
 	end
 
-	-- 고르지 않은 선택지 수 동기화(지금 선택지 + 줄)
 	@ExecSpace("ServerOnly")
 	method void SyncPending(string userId)
-		local n = 0
-		if (self.OfferByUser[userId] or "") ~= "" then n = 1 end
-		local q = self.Queue[userId]
-		if q ~= nil then n = n + #q end
-		self.PendingByUser[userId] = n
+		local q = self.Queue[userId] or {}
+		local rows = {}
+		for _, item in ipairs(q) do rows[#rows + 1] = string.format("%d", item.token) .. ":" .. item.grade end
+		self.PendingByUser[userId] = #q
+		self.PendingItemsByUser[userId] = table.concat(rows, ",")
 	end
 
-	-- 줄의 다음 등급으로 후보 3개. 프리즘은 이미 가진 직업 프리즘·팬텀 제외(특수 코어는 중복 등장 가능)
 	@ExecSpace("ServerOnly")
-	method void PopNext(string userId)
-		local q = self.Queue[userId]
-		if q == nil or #q == 0 then
-			self.OfferByUser[userId] = ""
-			return
-		end
-		local grade = table.remove(q, 1)
+	method void ActivatePending(string userId, table item)
 		local exclude = {}
-		local share = nil
-		if grade == "prism" then
-			local owned = self:GetOwned(userId)
-			for i = 1, #owned do
-				local d = _RtsAugmentTableLogic:GetDef(owned[i].id)
+		if item.grade == "prism" then
+			for _, owned in ipairs(self:GetOwned(userId)) do
+				local d = _RtsAugmentTableLogic:GetDef(owned.id)
 				if d ~= nil and not d.core then exclude[d.id] = true end
 			end
 		end
-		local ids = _RtsAugmentTableLogic:RollShared(grade, exclude, share)
-		if #ids == 0 then
-			self:PopNext(userId)
-			return
+		local ids = {}
+		for _, id in ipairs(self:ParseOffer(item.packed).ids) do
+			if not exclude[id] then ids[#ids + 1] = id exclude[id] = true end
 		end
-		self.OfferByUser[userId] = grade .. "|" .. table.concat(ids, ",")
-		_RtsConfigLogic:Log("RtsAugment: offer " .. grade .. " -> " .. userId .. " [" .. table.concat(ids, ",") .. "]")
+		if #ids < 3 then
+			for _, id in ipairs(_RtsAugmentTableLogic:RollShared(item.grade, exclude, nil)) do
+				if #ids < 3 then ids[#ids + 1] = id end
+			end
+		end
+		item.packed = item.grade .. "|" .. table.concat(ids, ",") .. "|" .. string.format("%d", item.token)
+		self.OfferByUser[userId] = item.packed
+	end
+
+	@ExecSpace("ServerOnly")
+	method void PopNext(string userId)
+		local q = self.Queue[userId] or {}
+		if #q == 0 then self.OfferByUser[userId] = "" return end
+		self:ActivatePending(userId, q[1])
+	end
+
+	@ExecSpace("Server")
+	method void RequestBrowsePending(number token)
+		local uid = senderUserId
+		if uid == nil or uid == "" or not _RtsRunResultLogic:IsAlive(uid) then return end
+		if token ~= math.floor(token) or token < 1 then return end
+		for _, item in ipairs(self.Queue[uid] or {}) do
+			if item.token == token then self:ActivatePending(uid, item) return end
+		end
+	end
+
+	@ExecSpace("ClientOnly")
+	method table MyPendingItems()
+		local list = {}
+		local packed = self.PendingItemsByUser[_RtsUnitLogic:MyUserId()] or ""
+		for part in string.gmatch(packed, "[^,]+") do
+			local split = string.find(part, ":", 1, true)
+			if split ~= nil then list[#list + 1] = { token = tonumber(string.sub(part, 1, split - 1)), grade = string.sub(part, split + 1) } end
+		end
+		return list
+	end
+
+	@ExecSpace("ClientOnly")
+	method void BrowsePending(number token)
+		self.AwaitingPendingToken = token
+		self.PickFolded = true
+		self:RequestBrowsePending(token)
 	end
 
 	-- 클라: '받기' 누름 — 지금 보이는 제안을 '방금 고름'으로 적고 서버에 수령 요청
 	@ExecSpace("ClientOnly")
 	method void ChooseFromPopup(number idx)
+		if _RtsStageLogic.Paused then
+			_RtsHudLogic:ShowHintFor("일시정지를 해제한 뒤 증강을 받을 수 있어요", 3)
+			return
+		end
 		self.ChosenOffer = self.ShownOffer
 		self.ChosenAt = _UtilLogic.ElapsedSeconds
-		self:RequestChoose(idx)
+		self:RequestChoose(idx, self.ShownOffer)
 	end
 
 	-- 3택1 수령(idx = 1~3). 팬텀은 바로 해금(-1), 나머지는 미지정(0)
 	@ExecSpace("Server")
-	method void RequestChoose(number idx)
+	method void RequestChoose(number idx, string expectedOffer)
 		if _RtsStageLogic.Paused then return end  -- 일시정지 중 게임 조작 막기(2026-09-25 사용자 "전부 막기")
 		local userId = senderUserId
 		if userId == nil or userId == "" or not _RtsRunResultLogic:IsAlive(userId) then return end
+		if expectedOffer ~= (self.OfferByUser[userId] or "") then return end
 		local offer = self:ParseOffer(self.OfferByUser[userId] or "")
-		local i = math.floor(idx + 0.5)
+		if idx ~= math.floor(idx) or idx < 1 or idx > 3 then return end
+		local i = idx
 		local id = offer.ids[i]
 		if id == nil then return end
 		local d = _RtsAugmentTableLogic:GetDef(id)
@@ -249,6 +290,10 @@ script RtsAugmentLogic extends Logic
 		list[#list + 1] = { id = id, no = no }
 		self.OwnedByUser[userId] = self:PackOwned(list)
 		_RtsConfigLogic:Log("RtsAugment: " .. userId .. " took " .. id)
+		local q = self.Queue[userId] or {}
+		for qi, item in ipairs(q) do
+			if item.token == offer.token then table.remove(q, qi) break end
+		end
 		self:PopNext(userId)
 		self:SyncPending(userId)
 	end
@@ -297,6 +342,8 @@ script RtsAugmentLogic extends Logic
 		self.OwnedByUser[userId] = ""
 		self.OfferByUser[userId] = ""
 		self.Queue[userId] = {}
+		self.PendingItemsByUser[userId] = ""
+		self.NextPendingToken[userId] = 0
 		self.PendingByUser[userId] = 0
 		self.BuyCountByUser[userId] = 0
 		self.BuyPrismByUser[userId] = 0
@@ -386,7 +433,8 @@ script RtsAugmentLogic extends Logic
 			_RtsHudLogic:ShowHintFor("메소가 부족해요 — 증강 뽑기 " .. _RtsHudLogic:FormatNumber(price) .. " 메소", 3)
 			return
 		end
-		self.PickFolded = false
+		-- 뽑기 페이지는 구매 화면으로 유지한다. 선택은 보유 탭에서 한다.
+		self.PickFolded = _RtsPopupLogic.Kind == "draw"
 		self:RequestBuy()
 	end
 
@@ -436,6 +484,19 @@ script RtsAugmentLogic extends Logic
 	method void ClientTick()
 		if not _RtsHudLogic.Built or not _RtsPopupLogic.Built then return end
 		local packed = self.OfferByUser[_RtsUnitLogic:MyUserId()] or ""
+		if self.AwaitingPendingToken > 0 then
+			if self:ParseOffer(packed).token == self.AwaitingPendingToken then
+				self.AwaitingPendingToken = 0
+				self.PickFolded = false
+				self.ChosenOffer = ""
+				self.ShownOffer = packed
+				_RtsPopupLogic:Open("pick")
+			else
+				local found = false
+				for _, item in ipairs(self:MyPendingItems()) do if item.token == self.AwaitingPendingToken then found = true end end
+				if not found then self.AwaitingPendingToken = 0 end
+			end
+		end
 		-- 제안이 겹칠 때(보스 처치 프리즘 + 라운드 시작 증강, 2026-09-23 사용자 "일반 증강 선택지에 프리즘 설명만 보였다"):
 		--   전엔 '받기' 직후 서버 갱신 전의 옛 제안(프리즘)으로 팝업이 다시 열리고, 서버가 다음 제안으로 바꿔도 열린 팝업은 그대로라
 		--   카드는 프리즘인데 실제 선택은 일반 증강이었다 → 방금 고른 제안은 잠깐(3초) 다시 열지 않고, 제안이 바뀌면 열려 있어도 새로 그린다
@@ -444,7 +505,7 @@ script RtsAugmentLogic extends Logic
 		if packed == "" then self.PickFolded = false end
 		if justChosen then
 			if _RtsPopupLogic.Kind == "pick" then _RtsPopupLogic:Close() end
-		elseif packed ~= "" and self.PickFolded then
+		elseif packed ~= "" and (self.PickFolded or _RtsPopupLogic.Kind == "draw") then
 			-- 접어 둠: 자동으로 열지 않는다(HUD '펼치기')
 		elseif packed ~= "" and (packed ~= self.ShownOffer or _RtsPopupLogic.Kind ~= "pick") then
 			self.ShownOffer = packed
@@ -468,6 +529,8 @@ script RtsAugmentLogic extends Logic
 		if name == "OwnedByUser" then
 			if _RtsPopupLogic.Kind == "augment" then _RtsPopupLogic:RefreshAugment() end
 			_RtsUnitPopupLogic:OnUnitSynced(0)
+		elseif name == "PendingByUser" or name == "PendingItemsByUser" or name == "OfferByUser" then
+			if _RtsPopupLogic.Kind == "augment" then _RtsPopupLogic:RefreshAugment() end
 		end
 	end
 

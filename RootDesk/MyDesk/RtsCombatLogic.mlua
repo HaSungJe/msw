@@ -632,8 +632,18 @@ script RtsCombatLogic extends Logic
 				local op = nil
 				if orbPoint ~= nil then op = orbPoint[h] end
 				local zone = u.Zone
+				-- 최초 구체 생성부터 5초. 재조준·일시정지로 수명이 다시 시작되지 않는다.
+				local expiresAt = 0
+				if op ~= nil and fx.projMaxLife ~= nil then
+					expiresAt = _UtilLogic.ElapsedSeconds + math.min(fx.projDelay or 0, fx.projHover or 0) + (fx.projStagger or 0) * (h - 1) + fx.projMaxLife
+				end
+				local function expired()
+					local gone = expiresAt > 0 and _UtilLogic.ElapsedSeconds >= expiresAt
+					if gone then _RtsConfigLogic:Log("dot orb expired before hit: " .. tostring(hh)) end
+					return gone
+				end
 				local function redirect(t0, px, py, left)
-					if not isvalid(e) then return end
+					if not isvalid(e) or expired() then return end
 					local sx = px
 					local sy = py
 					if t0 ~= nil and isvalid(t0) then
@@ -645,9 +655,9 @@ script RtsCombatLogic extends Logic
 					if t2 == nil then return end
 					local a2 = self:AimPoint(t2)
 					local dist = math.sqrt((a2.x - sx) * (a2.x - sx) + (a2.y - sy) * (a2.y - sy))
-					self:RedirectOrbFx(zone, no, idx, sx, sy, t2.Name)
+					self:RedirectOrbFx(zone, no, idx, sx, sy, t2.Name, math.max(0, expiresAt - _UtilLogic.ElapsedSeconds))
 					_RtsStageLogic:After(function()
-						if not isvalid(e) then return end
+						if not isvalid(e) or expired() then return end
 						if self:IsTargetable(t2) then
 							strike(t2, hitBase, hh)
 						elseif left > 0 then
@@ -656,7 +666,7 @@ script RtsCombatLogic extends Logic
 					end, _RtsJobTableLogic:OrbTravelSec(fx, dist))
 				end
 				_RtsStageLogic:After(function()
-					if not isvalid(e) then return end
+					if not isvalid(e) or expired() then return end
 					for j = 1, #tlist do
 						local t = tlist[j]
 						if op ~= nil and not self:IsTargetable(t) then
@@ -778,7 +788,7 @@ script RtsCombatLogic extends Logic
 
 	-- 전 클라: 도트 퍼니셔 구체 재조준 — (x, y)(대상이 죽은 자리)에서 새 대상 targetName으로 이어 날아가는 구체(서버 구체 재조준 redirect와 짝)
 	@ExecSpace("Client")
-	method void RedirectOrbFx(number zone, number no, number idx, number x, number y, string targetName)
+	method void RedirectOrbFx(number zone, number no, number idx, number x, number y, string targetName, number lifeLeft)
 		local t = _EntityService:GetEntityByPath("/maps/RtsMap/" .. targetName)
 		if t == nil or not isvalid(t) then return end
 		local u = _RtsUnitLogic:GetZoneUnit(zone, no)
@@ -786,7 +796,10 @@ script RtsCombatLogic extends Logic
 		local skills = _RtsJobTableLogic:GetSkillsFor(u)
 		local k = skills[math.floor(idx)]
 		if k == nil or k.fx == nil then return end
-		_RtsSkillFxLogic:PlayOrbRedirect(k.fx, Vector2(x, y), t)
+		-- 남은 수명은 기존 이펙트 표에 전달해 새 구체의 5초 타이머를 다시 시작하지 않는다.
+		local redirectFx = _RtsJobTableLogic:CopyTable(k.fx)
+		if redirectFx.projMaxLife ~= nil then redirectFx.projMaxLife = lifeLeft end
+		_RtsSkillFxLogic:PlayOrbRedirect(redirectFx, Vector2(x, y), t)
 	end
 
 end
