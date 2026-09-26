@@ -93,10 +93,16 @@ script RtsProfileLogic extends Logic
 
 	property string PendingTomb = ""
 
-	-- 획득 팝업 대기열(보스 3택1 등 다른 창이 먼저 떠 있으면 닫힌 뒤에)
+	-- 획득 팝업 대기열(다른 창이 떠 있으면 모두 닫힌 뒤에 — 2026-09-26)
 	property table GotQueue = {}
 
 	property string GotIcon = ""
+
+	-- 클라: 이번 접속에서 이미 알린(대기열에 넣은) 획득 아이콘 — 같은 아이콘 알림이 겹쳐 와도 팝업은 한 번(2026-09-26 사용자 "같은 아이콘 동시에 두 개 따닥 획득했다 뜨더라")
+	property table GotSeen = {}
+
+	-- 서버: 유저별로 이번 접속에서 획득을 알린 아이콘 { userId → { id → true } } — 저장 완료 뒤 알림을 한 번만 보낸다
+	property table AnnouncedByUser = {}
 
 	-- 아이콘 순서(M001…M229, B01…B18) — 처음 부를 때 만든다
 	property table IconIdCache = {}
@@ -274,6 +280,7 @@ script RtsProfileLogic extends Logic
 		self.OwnedByUser[userId] = nil
 		self.ThemesByUser[userId] = nil
 		self.TombsByUser[userId] = nil
+		self.AnnouncedByUser[userId] = nil
 	end
 
 	method number CountOwned(table owned)
@@ -418,6 +425,17 @@ script RtsProfileLogic extends Logic
 			end
 			_RtsConfigLogic:Log("RtsProfile: icon " .. monsterId .. " → " .. userId)
 			self:PushProfile(userId)
+			-- 획득 알림은 유저·아이콘마다 한 번만(저장 콜백이 겹쳐도 팝업이 두 번 뜨지 않게)
+			local ann = self.AnnouncedByUser[userId]
+			if ann == nil then
+				ann = {}
+				self.AnnouncedByUser[userId] = ann
+			end
+			if ann[monsterId] then
+				_RtsConfigLogic:Log("RtsProfile: icon " .. monsterId .. " already announced → skip")
+				return
+			end
+			ann[monsterId] = true
 			self:ShowIconGot(monsterId, userId)
 		end)
 	end
@@ -446,22 +464,35 @@ script RtsProfileLogic extends Logic
 		end
 	end
 
-	-- 서버 → 그 유저: 아이콘 획득 팝업(다른 창이 있으면 대기 — FlushGot)
+	-- 서버 → 그 유저: 아이콘 획득 팝업(다른 창이 있으면 대기 — FlushGot). 이미 알린 아이콘이면 무시(같은 알림 두 번 → 팝업 한 번)
 	@ExecSpace("Client")
 	method void ShowIconGot(string monsterId, string userId)
+		if monsterId == nil or monsterId == "" or self.GotSeen[monsterId] then
+			_RtsConfigLogic:Log("RtsProfile: icon popup dup skip " .. tostring(monsterId))
+			return
+		end
+		self.GotSeen[monsterId] = true
 		self.GotQueue[#self.GotQueue + 1] = monsterId
 		self:FlushGot()
 	end
 
-	-- 대기 중인 획득 팝업을 연다. 보스 3택1·다른 획득 팝업이 떠 있으면 그 창이 닫힐 때(RtsPopupLogic.Close) 다시 부른다
+	-- 대기 중인 획득 팝업을 연다. 어떤 창이든 떠 있으면 열지 않고 기다린다(2026-09-26 사용자 "아이콘 획득 시 다른 팝업 닫는 문제" — 전엔 보스 3택1·획득 팝업만 기다리고
+	--   유닛 상세·증강 창 등은 닫고 열었다). 창이 닫힐 때(RtsPopupLogic.Close → 0.15초 뒤) 다시 불린다
 	@ExecSpace("ClientOnly")
 	method void FlushGot()
 		if #self.GotQueue == 0 then return end
-		local k = _RtsPopupLogic.Kind
-		if k == "pick" or k == "iconget" then return end
+		if _RtsPopupLogic.Kind ~= "" then return end
 		self.GotIcon = self.GotQueue[1]
 		table.remove(self.GotQueue, 1)
 		_RtsPopupLogic:Open("iconget")
+	end
+
+	-- 획득 팝업이 다른 창(보스 3택1 자동 열림 등)에 밀려 닫히면 그 아이콘을 대기열 맨 앞에 되돌린다 — 그 창이 닫히면 다시 뜬다(RtsPopupLogic.Close)
+	@ExecSpace("ClientOnly")
+	method void RequeueGot()
+		if self.GotIcon == nil or self.GotIcon == "" then return end
+		table.insert(self.GotQueue, 1, self.GotIcon)
+		self.GotIcon = ""
 	end
 
 	method boolean IsOwned(string id)

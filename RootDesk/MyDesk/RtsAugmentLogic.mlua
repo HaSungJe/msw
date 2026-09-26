@@ -24,6 +24,11 @@ script RtsAugmentLogic extends Logic
 
 	property number AwaitingPendingToken = 0
 
+	-- 클라: 뽑기 버튼을 누른 뒤 기다리는 뽑기 횟수(BuyCountByUser가 이 값이 되면 획득음 + 보유 증강 탭 반짝임) · 누른 시각(3초 지나면 포기 — 서버 거절)
+	property number AwaitBuy = 0
+
+	property number AwaitBuyAt = 0
+
 	-- 고르지 않은 선택지 수(지금 선택지 1 + 줄) — 클라 '펼치기 (n)' 표시용. 최대 MaxPending(10), 넘치면 먼저 받은 것부터 삭제(2026-09-23 사용자)
 	@Sync
 	property SyncTable<string, number> PendingByUser
@@ -435,6 +440,9 @@ script RtsAugmentLogic extends Logic
 		end
 		-- 뽑기 페이지는 구매 화면으로 유지한다. 선택은 보유 탭에서 한다.
 		self.PickFolded = _RtsPopupLogic.Kind == "draw"
+		-- 뽑기가 서버에서 처리되면(뽑기 횟수 증가) 획득음 + 보유 증강 탭 반짝임(2026-09-26 사용자 "뽑았다는 사운드, 보유 증강 탭에 이펙트 살짝") — ClientTick(AwaitBuy)
+		self.AwaitBuy = (self.BuyCountByUser[me] or 0) + 1
+		self.AwaitBuyAt = _UtilLogic.ElapsedSeconds
 		self:RequestBuy()
 	end
 
@@ -484,6 +492,17 @@ script RtsAugmentLogic extends Logic
 	method void ClientTick()
 		if not _RtsHudLogic.Built or not _RtsPopupLogic.Built then return end
 		local packed = self.OfferByUser[_RtsUnitLogic:MyUserId()] or ""
+		-- 뽑기 직후: 뽑기 횟수가 올라가면(서버가 받아 처리함) 획득음 + 보유 증강 탭 반짝임. 3초 안에 안 오르면(서버 거절) 기다림을 푼다
+		if self.AwaitBuy > 0 then
+			if (self.BuyCountByUser[_RtsUnitLogic:MyUserId()] or 0) >= self.AwaitBuy then
+				self.AwaitBuy = 0
+				_SoundService:PlaySound(_RtsPopupLogic.PickSound, 1)
+				_RtsPopupLogic:FlashHubTab("augment")
+				_RtsConfigLogic:Log("RtsAugment: bought -> sound + flash")
+			elseif _UtilLogic.ElapsedSeconds - self.AwaitBuyAt > 3 then
+				self.AwaitBuy = 0
+			end
+		end
 		if self.AwaitingPendingToken > 0 then
 			if self:ParseOffer(packed).token == self.AwaitingPendingToken then
 				self.AwaitingPendingToken = 0

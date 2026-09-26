@@ -428,6 +428,8 @@ script RtsPopupLogic extends Logic
 		end
 		if not self.Reopening and self.Kind ~= "pick" then _RtsHudLogic:PlayUi(_RtsHudLogic.CloseSound) end
 		if self.Kind == "pick" then _RtsAugmentLogic.PickFolded = true end
+		-- 아이콘 획득 팝업이 다른 창(보스 3택1 자동 열림·HUD 버튼)에 밀려 닫히면 그 아이콘을 대기열로 되돌린다 — 그 창이 닫히면 다시 뜬다(2026-09-26). [확인]으로 닫을 때는 되돌리지 않는다
+		if self.Kind == "iconget" and self.Reopening then _RtsProfileLogic:RequeueGot() end
 		self.HubBar = nil
 		self.HubPage = nil
 		self.DrawRefs = nil
@@ -654,6 +656,33 @@ script RtsPopupLogic extends Logic
 		if bar == nil then return end
 		bar.cur = key
 		for k, t in pairs(bar.tabs) do self:SetTabOn(t, k == key) end
+	end
+
+	-- 증강 창 탭 하나를 금색으로 두 번 살짝 반짝인 뒤 원래 모양으로(2026-09-26 사용자 "뽑았다는 사운드, 보유 증강 탭에 이펙트 살짝") — 증강 뽑기 성공(RtsAugmentLogic.ClientTick AwaitBuy).
+	--   탭 바탕색만 바꿔 둥근 모양은 그대로, 0.05초 × 16번(0.8초) 삼각파, 끝나면 SetTabOn으로 켜짐/꺼짐 색 복구. 증강 창이 안 열려 있으면 아무것도 안 한다
+	@ExecSpace("ClientOnly")
+	method void FlashHubTab(string key)
+		local bar = self.HubBar
+		if bar == nil then return end
+		local t = bar.tabs[key]
+		if t == nil or not isvalid(t) or t.SpriteGUIRendererComponent == nil then return end
+		local H = _RtsHudLogic
+		local steps = 16
+		local i = 0
+		local timer = 0
+		timer = _TimerService:SetTimerRepeat(function()
+			i = i + 1
+			if i > steps or not isvalid(t) or self.HubBar ~= bar then
+				_TimerService:ClearTimer(timer)
+				if isvalid(t) and self.HubBar == bar then self:SetTabOn(t, bar.cur == key) end
+				return
+			end
+			local ph = ((i - 1) % 8) / 7
+			local k = 1 - math.abs(ph * 2 - 1)
+			local base = 0
+			if bar.cur == key then base = 0.18 end
+			t.SpriteGUIRendererComponent.Color = self:Mix(H:ColGold(), base + (0.75 - base) * k)
+		end, 0.05)
 	end
 
 	-- 막대의 다음 키(Tab 키 순환)

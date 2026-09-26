@@ -127,7 +127,13 @@ MOB_HP_UP_FROM, MOB_HP_UP = 11, 1.2
 # 일반 몬스터 방어율 %(2026-09-23 사용자 "일반 몬스터에도 방어율 — 자쿰 이후 10%, 핑크빈 이후 ~ 시그너스 이전 20%, 아케인리버 30%"):
 #   27~46 = 10, 48~64 = 20(시그너스 뒤 블랙헤븐·세계수도 20 — 사용자 확정), 65~ = 30. 체력 모델엔 넣지 않음(방어율만큼 더 단단해짐)
 #   → 2026-09-24 사용자 "일반 몬스터에서 방어율 다 빼자. 방무는 이제 보스 옵션이야": 전부 0(체력 모델엔 원래 안 넣었으니 체력은 그대로)
-def mob_def(no): return 0
+#   → 2026-09-26 사용자 "아케인리버 지역의 모든 몬스터 체력 3배 / 방어율 50%"(일반 몬스터 기준): 아케인리버(ARCANE~, 소멸의 여로~리멘) 일반 몬스터만 ARCANE_MOB_DEF
+#     (보스는 BOSS_DEF_AT 120~145 그대로 — 50으로 내리지 않는다). 체력은 같은 날 "3배 보류 — 지역별로" → 아래 ARCANE_THEME_HP
+ARCANE_MOB_DEF = 50
+def mob_def(no): return ARCANE_MOB_DEF if no >= ARCANE else 0
+# 아케인리버 일반 몬스터 지역별 체력 배율(2026-09-26 사용자 — 두 번째 '아르카나 2.7'은 에스페라로 정정)
+ARCANE_THEME_HP = {"소멸의 여로": 2.2, "츄츄 아일랜드": 2.2, "레헬른": 2.5, "아르카나": 2.5, "모라스": 2.7, "에스페라": 2.7,
+                   "문브릿지": 3.0, "고통의 미궁": 3.5, "리멘": 4.0}
 # 2026-09-23 사용자 "피아누스 이후 일반 몬스터 체력 20% 너프 — 너무 안 죽네": 순번 MOB_HP_DOWN_FROM(30)부터 ×0.8
 #   → 같은 날 "피아누스 이후의 몬스터 체력 10% 감소": ×0.8 × 0.9 = ×0.72
 MOB_HP_DOWN_FROM, MOB_HP_DOWN = 30, 0.72
@@ -223,9 +229,11 @@ def num(x):
     try: return float(x)
     except Exception: return None
 
-# 직업 DPS 앵커(balance-detail.md 직업별 상세 표)
+# 직업 DPS 앵커(balance-detail.md 직업별 상세 표) — 고정 스냅숏(아래 ANCH_FILE)이 있으면 읽지 않는다
+#   (2026-09-26: 문서 표 형식이 바뀌어도 — 썬콜 표 7칸 — 스냅숏으로 도는 생성기가 멈추지 않게)
 ANCH = {}
-for sec in re.split(r"\n## ", read("balance-detail.md")):
+ANCH_FILE = os.path.join(ROOT, "tools", "hp-model-anchors.json")
+for sec in ([] if os.path.exists(ANCH_FILE) else re.split(r"\n## ", read("balance-detail.md"))):
     title = sec.split("\n")[0]
     job = next((j for j in JOBS if title.startswith(j + " ")), None)
     if job is None: continue
@@ -241,10 +249,10 @@ for sec in re.split(r"\n## ", read("balance-detail.md")):
             boss = num(c[5]); hunt = num(c[7])
         rows[lv] = (atk, boss, hunt)
     ANCH[job] = rows
-assert len(ANCH) == 10, "balance-detail 직업 표 10개를 못 읽음: %s" % list(ANCH)
+if not os.path.exists(ANCH_FILE):
+    assert len(ANCH) == 10, "balance-detail 직업 표 10개를 못 읽음: %s" % list(ANCH)
 # 몬스터 체력 모델은 고정 스냅숏(tools/hp-model-anchors.json)의 직업 DPS를 쓴다 — 2026-09-23 사용자 "몬스터 체력은 유지, 다크나이트 공격력만 초반에 내린 것, 몬스터 건들지 마".
 #   직업 밸런스(balance-detail 표)를 바꿔도 몬스터 체력·메소는 그대로. 몬스터를 직업 변경에 맞춰 다시 맞출 땐 그 파일을 지우거나 새로 찍는다
-ANCH_FILE = os.path.join(ROOT, "tools", "hp-model-anchors.json")
 if os.path.exists(ANCH_FILE):
     _snap = json.load(io.open(ANCH_FILE, encoding="utf-8"))["anchors"]
     ANCH = {j: {int(lv): tuple(v) for lv, v in rows.items()} for j, rows in _snap.items()}
@@ -463,6 +471,31 @@ for s in ST:
     if s["kind"] == "mob" and s["no"] > RISE_FROM and s["hp"] > RISE_BASE:
         s["hp"] = int(round(RISE_BASE + (s["hp"] - RISE_BASE) * RISE_MUL))
 
+# 2026-09-26 사용자(여러 번 조정 끝 — "주니어 발록 이후 ~ 시그너스 25%" → "스우·데미안 포함" → "데미안은 빼자" → "일반 몬스터만 25% 폐기하고 2.5배,
+#   자쿰 이후 ~ 시그너스 이전 + 스우·데미안 쪽 일반 몬스터도 2.5배, 보스는 25% 유지, 스우 체력은 데미안의 −5%"), 모든 난이도:
+#   일반 몬스터 = 순번 MID_MOB_FROM~MID_MOB_TO(자쿰 다음 ~ 데미안 전 — 블랙헤븐·세계수 포함) × MID_MOB_MUL,
+#   보스 = MID_BOSS_FROM~MID_BOSS_TO(자쿰~시그너스) × MID_BOSS_MUL, 스우는 아래 규칙, 데미안은 그대로, 주니어 발록~자쿰 전 일반 몬스터는 그대로.
+#   위 RISE까지 끝난 최종 체력에 곱한다 — 메소 분배(모델 체력)·보스 고점 모델은 그대로. 난이도 배율·극악 곡선(RtsDifficultyLogic.HpMul)은 이 표 체력에 곱하므로 모든 난이도에 같이 적용된다
+MID_MOB_FROM, MID_MOB_TO, MID_MOB_MUL = 27, 63, 2.5
+MID_BOSS_FROM, MID_BOSS_TO, MID_BOSS_MUL = 26, 56, 1.25
+def mid_hp_mul(no, kind="mob"):
+    if kind == "mob": return MID_MOB_MUL if MID_MOB_FROM <= no <= MID_MOB_TO else 1.0
+    return MID_BOSS_MUL if MID_BOSS_FROM <= no <= MID_BOSS_TO else 1.0
+# 구간 보너스 전체 = 위 구간 × 아케인리버 일반 몬스터 지역별 ARCANE_THEME_HP(2026-09-26 — mob_def 옆 주석)
+STAGE_THEME = {s["no"]: s["theme"] for s in ST}
+def bonus_hp_mul(no, kind="mob"):
+    arc = ARCANE_THEME_HP.get(STAGE_THEME.get(no, ""), 1.0) if kind == "mob" and no >= ARCANE else 1.0
+    return mid_hp_mul(no, kind) * arc
+for s in ST:
+    if s["kind"] in ("mob", "boss"):
+        s["hp"] = int(round(s["hp"] * bonus_hp_mul(s["no"], s["kind"])))
+# 스우(60) = 데미안(64) 게임 안 체력의 SWOO_VS_DAMIEN. 게임 안 체력 = 표 체력 × 극악 곡선(RtsDifficultyLogic.GetCurve — 보스 라운드 값) × 난이도 배율(둘에 같음)이라
+#   곡선 비율까지 넣어 표 체력을 정한다. 방어율은 둘 다 100(BOSS_DEF_AT). CURVE_AT는 GetCurve와 같아야 한다(아래 검산)
+SWOO_NO, DAMIEN_NO, SWOO_VS_DAMIEN = 60, 64, 0.95
+CURVE_AT = {60: 0.56, 64: 0.72}
+_swoo = next(x for x in ST if x["no"] == SWOO_NO); _damien = next(x for x in ST if x["no"] == DAMIEN_NO)
+_swoo["hp"] = int(round(_damien["hp"] * CURVE_AT[DAMIEN_NO] / CURVE_AT[SWOO_NO] * SWOO_VS_DAMIEN))
+
 # ======================================================================== 몬스터 크기(CDN 클립 파일)
 CDN = "https://mod-resource.dn.nexoncdn.co.kr/"
 CACHE = os.path.join(tempfile.gettempdir(), "msw-gen-stage-cache"); os.makedirs(CACHE, exist_ok=True)
@@ -616,15 +649,24 @@ basep = [s["meso"] / (SPECIAL_MUL_AT.get(s["no"], SPECIAL_MUL) if s["special"] e
 check(all(b2 >= b1 for b1, b2 in zip(basep, basep[1:])), "기본 메소 곡선이 줄어드는 곳 있음")
 pre = [s for s in mobst if s["no"] < ARCANE and not s["special"]][-1]
 check(ST[ARCANE - 1]["meso"] >= 1.8 * pre["meso"] - 400, "아케인 첫 라운드 메소 점프 < 1.8배")
+# 곡선 검산(줄지 않음·아케인 2배·한계)은 2026-09-26 구간 보너스(bonus_hp_mul, 사용자 요청 — 구간 끝에서 한 번 내려가는 게 의도)를 뺀 값으로 본다
+def base_hp(s): return s["hp"] / bonus_hp_mul(s["no"], s["kind"])
 for a, b in zip(mobst, mobst[1:]):
     # 피아누스 뒤 일반 몬스터 ×0.8(MOB_HP_DOWN_FROM, 사용자 요청)은 그 경계에서 한 번 내려가는 게 의도 — 그 한 쌍만 비율을 빼고 본다
     if a["no"] < MOB_HP_DOWN_FROM <= b["no"]:
-        check(b["hp"] / MOB_HP_DOWN >= a["hp"] - 1, f"몬스터 라운드 체력 감소 {a['no']}→{b['no']}(×{MOB_HP_DOWN} 경계 제외)")
+        check(base_hp(b) / MOB_HP_DOWN >= base_hp(a) - 1, f"몬스터 라운드 체력 감소 {a['no']}→{b['no']}(×{MOB_HP_DOWN} 경계 제외)")
         continue
-    check(b["hp"] >= a["hp"], f"몬스터 라운드 체력 감소 {a['no']}→{b['no']}")
-prev = max(unrise(s["no"], s["hp"]) for s in mobst if s["no"] < ARCANE)
-check(unrise(ARCANE, ST[ARCANE - 1]["hp"]) >= ARCANE_MIN_JUMP * prev - 2, "아케인 첫 라운드 체력 < 직전 2배(상승폭 절반 전 값)")
-check(all(s["hp"] <= CAP_LIMIT * s["cap"] * mob_hp_mul(s["no"]) + 1 for s in mobst), "라인 클리어 한계(×일반 체력 배율) 95% 초과 라운드")
+    check(base_hp(b) >= base_hp(a) - 1, f"몬스터 라운드 체력 감소 {a['no']}→{b['no']}")
+prev = max(unrise(s["no"], base_hp(s)) for s in mobst if s["no"] < ARCANE)
+check(unrise(ARCANE, base_hp(ST[ARCANE - 1])) >= ARCANE_MIN_JUMP * prev - 2, "아케인 첫 라운드 체력 < 직전 2배(상승폭 절반 전 값)")
+check(all(base_hp(s) <= CAP_LIMIT * s["cap"] * mob_hp_mul(s["no"]) + 1 for s in mobst), "라인 클리어 한계(×일반 체력 배율) 95% 초과 라운드")
+# 아케인리버 일반 몬스터 라운드는 모두 지역별 체력 배율(ARCANE_THEME_HP)에 이름이 있어야 한다(테마 이름 오타로 조용히 빠지지 않게)
+_miss = sorted({s["theme"] for s in mobst if s["no"] >= ARCANE and s["theme"] not in ARCANE_THEME_HP})
+check(not _miss, "ARCANE_THEME_HP에 없는 아케인리버 테마: %s" % _miss)
+# 스우 규칙의 곡선 값(CURVE_AT)이 게임 난이도 곡선(RtsDifficultyLogic.GetCurve)과 같은가
+_dl = io.open(os.path.join(ROOT, "RootDesk", "MyDesk", "RtsDifficultyLogic.mlua"), encoding="utf-8").read()
+for _no, _c in CURVE_AT.items():
+    check(re.search(r"\{ %d, %s \}" % (_no, re.escape(("%g" % _c))), _dl) is not None, f"CURVE_AT[{_no}] = {_c}가 RtsDifficultyLogic.GetCurve와 다름")
 for s in ST:
     if s["kind"] != "boss": continue
     if s["no"] in LATE_HP:
@@ -690,7 +732,7 @@ KIND = {"mob": "몬스터", "boss": "보스", "rest": "쉬는"}
 for s in ST:
     kind = "**스페셜**" if s["special"] else KIND[s["kind"]]
     if s["kind"] == "boss" and len(s["mobs"]) > 1: kind = f'보스 ×{len(s["mobs"])}'
-    basis = f'한계 {s["hp"] / s["cap"] / mob_hp_mul(s["no"]):.0%} ×{mob_hp_mul(s["no"]):g}' if s["kind"] == "mob" else ((f'몬테카를로 보정(방어 {BOSS_DEF_AT.get(s["no"], BOSS_DEF)})' if s.get("late") else f'고점 {s["peak"]:,.0f}의 {s["ratio"]:.0%}') if s["kind"] == "boss" else "-")
+    basis = f'한계 {s["hp"] / s["cap"] / (mob_hp_mul(s["no"]) * bonus_hp_mul(s["no"])):.0%} ×{mob_hp_mul(s["no"]) * bonus_hp_mul(s["no"]):g}' if s["kind"] == "mob" else ((f'몬테카를로 보정(방어 {BOSS_DEF_AT.get(s["no"], BOSS_DEF)})' if s.get("late") else f'고점 {s["peak"]:,.0f}의 {s["ratio"]:.0%}') if s["kind"] == "boss" else "-")
     T.append(f'| {s["no"]} | {s["tag"]} | {s["name"]} | {DISPLAY_THEME.get(s["no"], s["theme"])} | {kind} | {s["units"]} | {"-" if s["kind"] == "rest" else format(s["hp"], ",")} | {basis} | '
              f'{format(s["meso"] // SPAWN, ",") if s["kind"] == "mob" else "-"} | {s["meso"]:,} | {s["cum"]:,} | {"·".join(str(v) for v in sorted(s["lv"], reverse=True))} |')
 io.open(path, "w", encoding="utf-8", newline="\n").write(head + "\n".join(T) + "\n")

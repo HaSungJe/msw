@@ -130,9 +130,6 @@ script RtsSkillFxLogic extends Logic
 		end
 	end
 
-	-- 효과음 1회. pitch(0~3, 1 = 원속)가 있으면 SoundComponent 풀로 재생(피치 = 음높이 + 재생 속도 — 애로우 레인 타격음 400030002/loop 0.97초를 빨리 감기, 2026-09-22 사용자), 없으면 SoundService
-	@ExecSpace("ClientOnly")
-	--   pitch가 nil이면 SoundService(동시 재생 수 제한이 있어 0.02초 간격 117타에선 앞 몇십 개만 나고 뒤가 잘린다 — 2026-09-22 실측 "타격음이 1초도 안 이어짐"), 1이라도 값이 있으면 풀(SfxPoolSize개를 돌려 쓰며 restart → 끊기지 않고 파바박)
 	-- 같은 효과음을 gap초 안에 또 부르면 건너뛴다(한꺼번에 여러 몹이 맞는 틱 피해 — 포이즌 리전)
 	@ExecSpace("ClientOnly")
 	method void PlaySfxGap(string ruid, number volume, number gap)
@@ -144,6 +141,9 @@ script RtsSkillFxLogic extends Logic
 		self:PlaySfx(ruid, volume, nil)
 	end
 
+	-- 효과음 1회. pitch(0~3, 1 = 원속)가 있으면 SoundComponent 풀로 재생(피치 = 음높이 + 재생 속도 — 애로우 레인 타격음 400030002/loop 0.97초를 빨리 감기, 2026-09-22 사용자), 없으면 SoundService
+	--   pitch가 nil이면 SoundService(동시 재생 수 제한이 있어 0.02초 간격 117타에선 앞 몇십 개만 나고 뒤가 잘린다 — 2026-09-22 실측 "타격음이 1초도 안 이어짐"), 1이라도 값이 있으면 풀(SfxPoolSize개를 돌려 쓰며 restart → 끊기지 않고 파바박)
+	@ExecSpace("ClientOnly")
 	method void PlaySfx(string ruid, number volume, any pitch)
 		if ruid == nil or ruid == "" then return end
 		local vol = (volume or 1) * self.SfxMaster
@@ -464,6 +464,7 @@ script RtsSkillFxLogic extends Logic
 		if flip then dir = -1 end
 		-- 유닛 엔티티의 자식으로 붙인다(2026-09-20 사용자 "조커 애니메이션이 캐릭터 위치 이동해도 안 따라간다") — 부모 스케일 2라 로컬 값은 절반. 보는 방향이 바뀌면 반전만 갱신(RefreshLoopFacing — FaceDir 동기화 때도 불린다)
 		--   loopAt "target"(디바인 퍼니시먼트 keydown — 2026-09-22 사용자 "몬스터 위에 나와야"): 대상 몬스터의 자식으로. 부모 스케일은 몬스터 것(보스 2·일반 1)으로 나누고, 위치 = 피격 박스 중앙 + loopDy. 대상이 바뀌면 루프를 새로 만든다
+		local prevFx = self.LoopFx[no]
 		self.LoopFx[no] = fx
 		local anchor = unitEntity
 		local pscale = 2
@@ -482,9 +483,16 @@ script RtsSkillFxLogic extends Logic
 		end
 		local old = self.ActiveLoop[no]
 		if old ~= nil and isvalid(old) then
-			if self.LoopAnchor[no] == anchor then
+			-- 공격이 끊기지 않은 채 루프 클립이 바뀌면(폭풍의 시 쏘는 중에 애로우 레인 프리즘 — 2026-09-26 사용자 "1레벨에 증강 줬더니 애로우 레인 이펙트가 안 나온다") 옛 루프를 지우고 새로 만든다.
+			--   전엔 같은 유닛에 붙어 있으면 방향만 갱신하고 끝나 옛 keydown 루프가 공격이 멈출 때(LoopTimeout)까지 남았다
+			local sameClip = prevFx ~= nil and prevFx.loopClip == fx.loopClip and prevFx.loopFrameA == fx.loopFrameA
+			if self.LoopAnchor[no] == anchor and sameClip then
 				self:RefreshLoopFacing(no)
 				return
+			end
+			if not sameClip then
+				_RtsConfigLogic:Log("RtsSkillFx: loop clip changed -> rebuild " .. tostring(fx.loopClip))
+				if prevFx ~= nil and prevFx.loopSound ~= nil and prevFx.loopSound ~= "" then _SoundService:StopSound(prevFx.loopSound) end
 			end
 			old:Destroy()
 			self.ActiveLoop[no] = nil

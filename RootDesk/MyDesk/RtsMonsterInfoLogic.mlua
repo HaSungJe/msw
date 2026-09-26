@@ -176,9 +176,9 @@ script RtsMonsterInfoLogic extends Logic
 		self.HpFill.UITransformComponent.RectSize = Vector2(math.max(0, (self.BarW + 4 + self.PctW) * r), 10)
 		self.HpText.TextComponent.Text = "체력  " .. H:FormatNumber(math.max(0, m.Hp)) .. " / " .. H:FormatNumber(m.MaxHp)
 		if self.HpPctText ~= nil and isvalid(self.HpPctText) then self.HpPctText.TextComponent.Text = string.format("%.1f%%", r * 100) end
-		-- 방어율은 보스만(2026-09-24 사용자 "일반 몬스터 방어율 0 — 방무는 보스 옵션")
+		-- 방어율: 보스는 항상, 일반 몬스터는 방어율이 있을 때만(2026-09-26 아케인리버 일반 몬스터 50% — 그 전엔 일반 몬스터 방어율 0이라 보스만)
 		local info = ""
-		if m.IsBoss then info = "방어율 " .. H:Int(m.Defense) .. "%" end
+		if m.IsBoss or m.Defense > 0 then info = "방어율 " .. H:Int(m.Defense) .. "%" end
 		local s = nil
 		if m.StageNo > 0 then s = _RtsStageTableLogic:GetStage(m.StageNo) end
 		if s ~= nil then

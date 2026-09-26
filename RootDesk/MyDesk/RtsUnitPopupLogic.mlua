@@ -674,7 +674,7 @@ script RtsUnitPopupLogic extends Logic
 			text, _RtsPopupLogic:Muted(), 15, TextAlignmentType.MiddleCenter, false)
 	end
 
-	-- 증강 탭(2026-09-24): 맨 위에 증강 합계(공격력·공격력%·보스·크리 확률·크리 데미지·최종) + 방어구 부수기(켜졌을 때만), 그 아래 지정된 증강 목록
+	-- 증강 탭(2026-09-24): 맨 위에 증강 합계(공격력·공격력%·보스·크리 확률·크리 데미지·최종), 그 아래 지정된 증강 목록. 방어구 부수기는 버프 탭(2026-09-26)
 	@ExecSpace("ClientOnly")
 	method void BuildAugTabFor(Entity content, any u, number rx, number rw, number top, table augs)
 		local H = _RtsHudLogic
@@ -693,23 +693,11 @@ script RtsUnitPopupLogic extends Logic
 		local line1 = "증강 " .. H:Int(t.n) .. "개 합계"
 		local line2 = "아직 없어요"
 		if #parts > 0 then line2 = table.concat(parts, "  ·  ") end
-		-- 셋째 줄 = 방어구 부수기가 켜졌을 때만 그 수치(자기 직업 프리즘이 있는 1티어 — RtsJobTableLogic.ArmorBreakFor).
-		--   티어·서포터 같은 분류는 화면에 쓰지 않는다(2026-09-24 사용자 "1티어/2티어는 개발 관점에서 나눈 거지 유저는 몰라야 해") — 셋째 줄이 없으면 상자를 줄인다
-		local JT = _RtsJobTableLogic
-		local line3 = ""
-		if JT:ArmorBreakFor(u) > 0 then
-			local n = JT:AugCountOf(u)
-			if n > JT.ArmorBreakCap then n = JT.ArmorBreakCap end
-			line3 = "방어구 부수기: 보스 방어율 −" .. H:Int(JT:ArmorBreakFor(u)) .. "%p (증강 " .. H:Int(n) .. "/" .. H:Int(JT.ArmorBreakCap) .. "개)"
-		end
-		local boxH = 88
-		if line3 == "" then boxH = 62 end
+		-- 방어구 부수기는 2026-09-26 버프 탭으로 옮겼다(사용자 "버프 쪽에 방어구 부수기가 나와야") — 합계 상자는 두 줄
+		local boxH = 62
 		box.Parent.UITransformComponent.RectSize = Vector2(rw - 12, boxH)
 		H:SpawnLabel("RtsUnitAugSumT", box, Vector2(0, 1), Vector2(0, 1), Vector2(14, -6), Vector2(rw - 40, 22), line1, P:AccentInk(), 16, TextAlignmentType.MiddleLeft, true)
 		H:SpawnLabel("RtsUnitAugSumV", box, Vector2(0, 1), Vector2(0, 1), Vector2(14, -30), Vector2(rw - 40, 24), line2, _RtsPopupLogic:Ink(), 15, TextAlignmentType.MiddleLeft, true)
-		if line3 ~= "" then
-			H:SpawnLabel("RtsUnitAugSumE", box, Vector2(0, 1), Vector2(0, 1), Vector2(14, -58), Vector2(rw - 40, 22), line3, _RtsPopupLogic:Muted(), 13, TextAlignmentType.MiddleLeft, false)
-		end
 		self:BuildAugTab(content, rx, rw, top - boxH - 8, augs)
 	end
 
@@ -754,16 +742,17 @@ script RtsUnitPopupLogic extends Logic
 		end
 	end
 
-	-- 탭 글자 '적용 중인 버프 n' = 파티 버프 수 + 프리즘 증강 효율 버프(있으면 1)
+	-- 탭 글자 '적용 중인 버프 n' = 파티 버프 수 + 프리즘 증강 효율 버프(있으면 1) + 방어구 부수기(있으면 1)
 	@ExecSpace("ClientOnly")
 	method number BuffCount(any u, table buffs)
 		local n = #buffs
 		if _RtsJobTableLogic:PrismAugBuff(u) ~= nil then n = n + 1 end
+		if _RtsJobTableLogic:ArmorBreakFor(u) > 0 then n = n + 1 end
 		return n
 	end
 
 	-- 적용 중인 버프 탭: 맨 위 = 프리즘 증강 효율(있으면 — 2026-09-25 사용자 "프리즘 버프가 버프 칸에, 증강이 얼마나 오르고 증강으로 오른 수치 +얼마"),
-	--   그 아래 파티 버프(아이콘 · 이름 + 범위 · 효과, 출처 유닛은 안 씀)
+	--   그다음 방어구 부수기(있으면 — 2026-09-26), 그 아래 파티 버프(아이콘 · 이름 + 범위 · 효과, 출처 유닛은 안 씀)
 	@ExecSpace("ClientOnly")
 	method void BuildBuffTabFor(Entity content, any u, number rx, number rw, number top, table buffs)
 		local H = _RtsHudLogic
@@ -776,8 +765,12 @@ script RtsUnitPopupLogic extends Logic
 			local gl = math.max(1, math.ceil(#pb.gains / 2))
 			pbH = 34 + 24 + 22 + gl * 20 + 10
 		end
+		-- 방어구 부수기(2026-09-26 사용자 "프리즘 설명에 방어구 부수기 효과를 얻는다, 버프 쪽에 방어구 부수기가 나와야") — 전엔 증강 탭 합계 상자 셋째 줄에만 있었다
+		local JT = _RtsJobTableLogic
+		local ab = JT:ArmorBreakFor(u)
 		local rows = #buffs
 		if pb ~= nil then rows = rows + math.ceil(pbH / 64) + 1 end
+		if ab > 0 then rows = rows + 1 end
 		local list = self:SpawnScrollList(content, "RtsUnitBuffList", rx, rw, top, rows)
 		if list == nil then return end
 		if pb ~= nil then
@@ -809,7 +802,27 @@ script RtsUnitPopupLogic extends Logic
 				g.TextComponent.Overflow = OverflowType.Truncate
 			end
 		end
-		if #buffs == 0 and pb == nil then
+		-- 방어구 부수기 줄: 프리즘 줄 바로 아래, 파티 버프와 같은 모양(아이콘 = 몬스터 정보 창 디버프와 같은 1f4eea78…).
+		--   이 유닛이 가진 증강 개수만큼 그 구역 보스 방어율 감소(1개당 ArmorBreakPer%p, 최대 ArmorBreakCap개) — 구역에 여럿이면 가장 큰 1기만 적용(RtsCombatLogic.ArmorBreak)
+		if ab > 0 then
+			local n = JT:AugCountOf(u)
+			if n > JT.ArmorBreakCap then n = JT.ArmorBreakCap end
+			local row = H:SpawnRoundedPanel("RtsUnitBuffArmor", list, Vector2(0, 1), Vector2(0, 1), Vector2(0, 0), Vector2(rw - 12, 64),
+				P:Card(), P:Edge(), 1.5)
+			local ic = H:SpawnUI("model://uisprite", "RtsUnitBuffArmorIcon", row, Vector2(0, 0.5), Vector2(0, 0.5), Vector2(14, 0), Vector2(40, 40))
+			if ic ~= nil and ic.SpriteGUIRendererComponent ~= nil then
+				ic.SpriteGUIRendererComponent.ImageRUID = DataRef("1f4eea783bbe4785b3ba82334f211aaa")
+				ic.SpriteGUIRendererComponent.Color = Color.white
+			end
+			local an = H:SpawnLabel("RtsUnitBuffArmorName", row, Vector2(0, 1), Vector2(0, 1), Vector2(70, -8), Vector2(rw - 100, 24),
+				"방어구 부수기  <size=11><color=#78624d>보스 약화 · 이 유닛</color></size>", _RtsPopupLogic:Ink(), 17, TextAlignmentType.MiddleLeft, true)
+			an.TextComponent.IsRichText = true
+			local ae = H:SpawnLabel("RtsUnitBuffArmorEff", row, Vector2(0, 1), Vector2(0, 1), Vector2(70, -34), Vector2(rw - 100, 22),
+				"보스 방어율 −" .. H:Int(ab) .. "%p (증강 " .. H:Int(n) .. "/" .. H:Int(JT.ArmorBreakCap) .. "개, 1개마다 −" .. H:Int(JT.ArmorBreakPer) .. "%p)",
+				Color(0.23, 0.43, 0.21, 1), 16, TextAlignmentType.MiddleLeft, false)
+			ae.TextComponent.Overflow = OverflowType.Truncate
+		end
+		if #buffs == 0 and pb == nil and ab <= 0 then
 			self:SpawnEmptyRow(list, rw, "적용 중인 버프가 없어요.")
 			return
 		end
