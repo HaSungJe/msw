@@ -2620,17 +2620,16 @@ script RtsPopupLogic extends Logic
 				-- 본문이 흔들리지 않도록 지속 반짝임을 사용하지 않는다.
 				local band = H:SpawnStretch("model://uisprite", "RtsPickBand", card, Vector2(0, 1), Vector2(1, 1), Vector2(0, -6), Vector2(0, 0))
 				band.SpriteGUIRendererComponent.Color = self:GradeColor(d.grade)
-				-- 아이콘·제목·설명을 하나의 묶음으로 카드 중앙에 배치한다.
+				-- 설명 길이와 관계없이 아이콘·제목의 시작 높이를 같은 위치에 고정한다.
 				local effectText = AT:EffectText(d.id)
-				local descH = math.min(230, math.max(52, math.ceil(#effectText / 48) * 26))
-				local contentH = 104 + 20 + 64 + 12 + descH
-				local contentTop = (660 - contentH) / 2 - 12
+				local descH = 230
+				local contentTop = 150
 				self:SpawnAugIcon(card, d, Vector2((cardW - 104) / 2, -contentTop), 104)
 				H:SpawnLabel("RtsPickGrade", card, Vector2(0, 1), Vector2(0, 1), Vector2(19, -12), Vector2(cardW - 38, 24), self:GradeName(d.grade), self:Muted(), 15, TextAlignmentType.MiddleCenter, true)
 				H:SpawnLabel("RtsPickT", card, Vector2(0, 1), Vector2(0, 1), Vector2(19, -(contentTop + 124)), Vector2(cardW - 38, 64),
 					d.name, self:Ink(), 21, TextAlignmentType.MiddleCenter, true)
 				H:SpawnLabel("RtsPickD", card, Vector2(0, 1), Vector2(0, 1), Vector2(19, -(contentTop + 200)), Vector2(cardW - 38, descH),
-					effectText, self:Ink(), 18, TextAlignmentType.MiddleCenter, false)
+					effectText, self:Ink(), 18, TextAlignmentType.UpperCenter, false)
 				local btn = H:SpawnRoundedPanel("RtsPickTake", card, Vector2(0.5, 0), Vector2(0.5, 0), Vector2(0, 19), Vector2(cardW - 38, 44),
 					self:Mix(H:ColGold(), 0.9), H:ColGold(), 1.5)
 				H:SpawnLabel("RtsPickTakeText", btn, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2(0, 0), Vector2(cardW - 50, 40),
