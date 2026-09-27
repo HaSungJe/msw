@@ -22,8 +22,9 @@ script RtsUnitBuffLogic extends Logic
 		return {
 			-- 홀리 유니티 = 프리즘 스킬(2026-09-20: 40레벨 패시브 +20% 삭제, 지정 유닛 최종 +100% → 2026-09-22 +40%). prism = 이 프리즘을 가진 유닛만 출처(RtsUnitComponent.Prisms)
 			{ id = "bond", name = "홀리 유니티", job = "paladin", lv = 1, prism = "holyunity", scope = "target", icon = "53a38855164a4b64accf68785761c283", fin = 40 },
-			{ id = "sharpeyes", name = "샤프아이즈", job = "bow", lv = 40, scope = "all", icon = "4cd1961bc55b47cb80e1a7f8843e225e", crit = 20, critDmg = 20 },
-			{ id = "sharpeyes", name = "샤프아이즈", job = "marks", lv = 20, scope = "all", icon = "4cd1961bc55b47cb80e1a7f8843e225e", crit = 20, critDmg = 20 },
+			-- 샤프아이즈 크확·크뎀 20 → 50(2026-09-27 사용자 "샤프아이즈 효과를 크확 50% 크뎀 50%로 상향" — 크리 증강이 쓸모 있게, 기본 크뎀 20%는 그대로)
+			{ id = "sharpeyes", name = "샤프아이즈", job = "bow", lv = 40, scope = "all", icon = "4cd1961bc55b47cb80e1a7f8843e225e", crit = 50, critDmg = 50 },
+			{ id = "sharpeyes", name = "샤프아이즈", job = "marks", lv = 20, scope = "all", icon = "4cd1961bc55b47cb80e1a7f8843e225e", crit = 50, critDmg = 50 },
 			{ id = "pray", name = "프레이", job = "bishop", lv = 30, scope = "all", icon = "39b3159efcc74334b875c94c64a74243", fin = 10 }, -- 2026-09-19: 주변 1타일·자신 미적용 → 구역 전체(자신 포함)·+10%
 			{ id = "joker", name = "조커: 날카로운 검", job = "phantom", lv = 10, scope = "all", icon = "f1575f7842c740a49f9e19c2514de64e", fin = 5 }, -- 2026-09-24 사용자 "조커 최종 5% — 커트라인 낮추게"(2026-09-19 3차 5 → 3에서 되돌림)
 		}

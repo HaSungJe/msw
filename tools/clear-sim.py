@@ -131,7 +131,7 @@ def capacity(run, s, G):
     tot = 0.0
     for u in pres:
         st, sk = eff_stats(u, lvs[id(u)])
-        if sharp: st = dict(st, crit=st["crit"] + 20, cd=st["cd"] + 20)
+        if sharp: st = dict(st, crit=st["crit"] + 50, cd=st["cd"] + 50)   # 샤프아이즈 50/50(2026-09-27, 전 20/20)
         d = bc.rotation_dps(st, sk, True, T=60) * bc.defmul(defv, st["ign"] + st["ignBoss"], guard, armor)
         if u is t1: d *= holy
         tot += d

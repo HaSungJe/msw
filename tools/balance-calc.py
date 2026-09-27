@@ -223,14 +223,15 @@ def defmul(defv, ign, guard=0, shred=0):
     return max(0.0, 1 - max(0.0, defv - guard - shred - ign) / 100)
 
 # ---------------------------------------------------------------- 증강(augmentation.md)
+# 2026-09-27 효율 조정(사용자): 공격력% ×2.5 · 크확 ×2 · 크뎀 ×3(골드 I 크뎀 21) · 샤프아이즈 50/50
 # 2026-09-27 개편(augmentation.md — 게임 RtsAugmentTableLogic와 같은 값): 등급마다 단계 I/II/III(LEVEL_W 50/35/15%)만 무작위, 그 단계의 종류는 전부 보고 고른다.
 #   실버 '보스 사냥꾼' 삭제, 골드 '거인 학살자' 20/25/30. 뽑기 등급 = 브 50 · 실 35 · 골 10 · 프리즘 5(BUY_GRADE)
 AUG = {   # 등급: [(이름, 능력치, 값, 단계)]
-    "bronze": [(n, s, v, lv) for lv, vals in ((1, (3, 3, 20, 3)), (2, (3.5, 3.5, 22, 3.5)), (3, (4, 4, 25, 4)))
+    "bronze": [(n, s, v, lv) for lv, vals in ((1, (6, 9, 20, 7.5)), (2, (7, 10.5, 22, 9)), (3, (8, 12, 25, 10)))
                for (n, s), v in zip((("약점 찾기", "crit"), ("급소 찌르기", "cd"), ("무기 연마", "flat"), ("전투 감각", "pct")), vals)],
-    "silver": [(n, s, v, lv) for lv, vals in ((1, (5, 5, 40, 5)), (2, (5.5, 5.5, 45, 5.5)), (3, (6, 6, 50, 6)))
+    "silver": [(n, s, v, lv) for lv, vals in ((1, (10, 15, 40, 12.5)), (2, (11, 16.5, 45, 14)), (3, (12, 18, 50, 15)))
                for (n, s), v in zip((("약점 찾기", "crit"), ("급소 찌르기", "cd"), ("무기 연마", "flat"), ("전투 감각", "pct")), vals)],
-    "gold": [(n, s, v, lv) for lv, vals in ((1, (7, 8, 70, 7, 20)), (2, (7.5, 7.5, 75, 7.5, 25)), (3, (8, 8, 80, 8, 30)))
+    "gold": [(n, s, v, lv) for lv, vals in ((1, (14, 21, 70, 17.5, 20)), (2, (15, 22.5, 75, 19, 25)), (3, (16, 24, 80, 20, 30)))
              for (n, s), v in zip((("약점 찾기", "crit"), ("급소 찌르기", "cd"), ("무기 연마", "flat"), ("전투 감각", "pct"), ("거인 학살자", "boss")), vals)],
 }
 LEVEL_W = {1: 50, 2: 35, 3: 15}
@@ -416,7 +417,7 @@ def eval_team(order, dealers, main, lvmap, got, stats, no, G):
     for j in order:
         st, sk = stats[j]
         st2 = dict(st)
-        if sharp: st2["crit"] += 20; st2["cd"] += 20
+        if sharp: st2["crit"] += 50; st2["cd"] += 50   # 샤프아이즈 50/50(2026-09-27, 전 20/20)
         d = rotation_dps(st2, sk, True) * defmul(defv, st["ign"] + st["ignBoss"], guard, shred)
         if holy and j == main: d *= 1.4
         tot += d

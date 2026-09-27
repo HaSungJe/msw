@@ -577,7 +577,7 @@ script RtsJobTableLogic extends Logic
 				{ lv = 10, kind = "패시브", name = "크리티컬 마스터리", desc = "크리티컬 확률이 30% 증가한다.", target = false },
 				{ lv = 20, kind = "패시브", name = "보우 마스터리", desc = "공격력이 25% 증가한다.", target = false },
 				{ lv = 30, kind = "패시브", name = "보우 액스퍼트", desc = "공격력이 25% 증가한다.", target = false },
-				{ lv = 40, kind = "패시브", name = "샤프아이즈", desc = "모든 아군 유닛의 크리티컬 확률과 크리티컬 데미지가 20% 증가한다.", target = false },
+				{ lv = 40, kind = "패시브", name = "샤프아이즈", desc = "모든 아군 유닛의 크리티컬 확률과 크리티컬 데미지가 50% 증가한다.", target = false },
 				{ lv = 50, kind = "패시브", name = "폭풍의 시 강화", desc = "폭풍의 시의 데미지가 23% 증가하고, 보스 공격 시 폭풍의 시의 데미지가 143% 증가한다. 몬스터의 방어율을 70% 무시한다.", target = false },
 			}
 		end
@@ -589,7 +589,7 @@ script RtsJobTableLogic extends Logic
 						proj = "1923e5406af44149a7575b25593e9336", projSec = 0.2, projDy = 0.9, projScale = 1.6,
 						hitDelay = 0.35, hitGap = 0.12, hitClip = "4a8db8d2f9614af3a3c902e4ef56d06b", hitScale = 1.6, hitDy = 0.6, hitSound = "1888d984619e45598028a2f830e78bdb" } },
 				{ lv = 10, kind = "패시브", name = "크리티컬 마스터리", desc = "크리티컬 확률이 30% 증가한다.", target = false },
-				{ lv = 20, kind = "패시브", name = "샤프아이즈", desc = "모든 아군 유닛의 크리티컬 확률과 크리티컬 데미지가 20% 증가한다.", target = false },
+				{ lv = 20, kind = "패시브", name = "샤프아이즈", desc = "모든 아군 유닛의 크리티컬 확률과 크리티컬 데미지가 50% 증가한다.", target = false },
 				-- 스나이핑 연출(사용자 2026-09-18 "화살이 아니라 대상에게 표식이 뜨면서 데미지"): 시전 순간 대상 위에 조준 표식 3221007/mob(markClip) + 시전음, 화살 투사체 없음.
 				--   0.4초 뒤 50%×10회(0.08초 간격) 타격 hit/0 + 타격음. 시전 이펙트(석궁 폭발)는 유지. 1마리, 쿨 10초
 				{ lv = 30, kind = "액티브", name = "스나이핑", desc = "사거리 6 안의 적 1마리를 216.7%의 데미지로 10회 공격한다. 재사용 대기시간 10초", target = false, cd = 10, ratio = 216.7, hits = 10, targets = 1, range = 6,
@@ -1219,20 +1219,20 @@ script RtsJobTableLogic extends Logic
 
 	-- 오각형 5축 단계(5 매우 높음 … 1 매우 낮음, 50레벨 · 증강 없음 · 전체 직업 중 비교 — 2026-09-25 사용자):
 	--   speed = 기본 공격 속도 이름 / range = 기본 공격 사거리 ÷ 전체 최댓값 → 80·60·40·20% / aug = 증강 효율(1티어 5 · 팬텀 4 · 2티어 3 · 서포터 1, '낮음'은 비움 — 화면엔 티어 말 금지)
-	--   boss·hunt = tools/balance-calc.py --radar(2026-09-27 증강 개편 반영: 보스 = 50레벨 + 자기 프리즘 + 마지막 보스 전 카드 43장을 한 장씩 단계별 최선 종류로 몰아준 보스 DPS, 사냥 = 50레벨·증강 없음 40마리 사냥 DPS) — 직업 수치가 바뀌면 다시 돌려 옮긴다
+	--   boss·hunt = tools/balance-calc.py --radar(2026-09-27 증강 개편 반영: 보스 = 50레벨 + 자기 프리즘 + 마지막 보스 전 카드 43장을 한 장씩 단계별 최선 종류로 몰아준 보스 DPS, 사냥 = 50레벨·증강 없음 40마리 사냥 DPS, 샤프아이즈 없음 — 2026-09-27 크확·크뎀·공% 증강 상향으로 기본 크리가 있는 보우·나로가 앞선다) — 직업 수치가 바뀌면 다시 돌려 옮긴다
 	method table GetRadar(string jobId)
 		local fixed = {
-			hero = { boss = 5, hunt = 5 },
+			hero = { boss = 4, hunt = 5 },
 			paladin = { boss = 1, hunt = 2 },
 			dk = { boss = 1, hunt = 3 },
 			bow = { boss = 5, hunt = 1 },
-			marks = { boss = 2, hunt = 4 },
-			il = { boss = 5, hunt = 3 },
-			fp = { boss = 2, hunt = 2 },
+			marks = { boss = 1, hunt = 4 },
+			il = { boss = 3, hunt = 3 },
+			fp = { boss = 1, hunt = 2 },
 			bishop = { boss = 1, hunt = 1 },
 			nl = { boss = 5, hunt = 1 },
-			shad = { boss = 2, hunt = 1 },
-			phantom = { boss = 3, hunt = 2 },
+			shad = { boss = 1, hunt = 1 },
+			phantom = { boss = 2, hunt = 2 },
 		}
 		local f = fixed[jobId] or { boss = 1, hunt = 1 }
 		local sp = self:GetStat(jobId, 50).speed or "보통"
