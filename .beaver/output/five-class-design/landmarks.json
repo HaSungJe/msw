@@ -1,0 +1,47 @@
+[
+  {
+    "id": "paladin",
+    "crown": 176.34375,
+    "chin": 597.609375,
+    "sole": 1146.234375,
+    "foot_center_x": 636.796875,
+    "heads": 2.3,
+    "approximate": true
+  },
+  {
+    "id": "dark-knight",
+    "crown": 235.125,
+    "chin": 631.8984375,
+    "sole": 1146.234375,
+    "foot_center_x": 573.1171875,
+    "heads": 2.3,
+    "approximate": true
+  },
+  {
+    "id": "night-lord",
+    "crown": 225.328125,
+    "chin": 631.8984375,
+    "sole": 1146.234375,
+    "foot_center_x": 553.5234375,
+    "heads": 2.27,
+    "approximate": true
+  },
+  {
+    "id": "shadower",
+    "crown": 171.4453125,
+    "chin": 587.8125,
+    "sole": 1092.3515625,
+    "foot_center_x": 582.9140625,
+    "heads": 2.21,
+    "approximate": true
+  },
+  {
+    "id": "phantom",
+    "crown": 342.890625,
+    "chin": 690.6796875,
+    "sole": 1165.828125,
+    "foot_center_x": 622.1015625,
+    "heads": 2.37,
+    "approximate": true
+  }
+]

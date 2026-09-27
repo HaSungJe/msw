@@ -1,0 +1,57 @@
+[
+  {
+    "id": "paladin",
+    "source": "C:\\workspace\\msw\\assets\\design\\characters\\paladin\\concept.png",
+    "sha256": "07e8d4f9a0a05711198900791bdc8c909707e12b642b6991362b58bc42b7c26b",
+    "base": "C:\\workspace\\msw\\.beaver\\output\\five-class-motion\\base\\paladin.png",
+    "scale": 0.34186046511627904,
+    "crown": 180,
+    "chin": 610,
+    "sole": 1180,
+    "cx": 650
+  },
+  {
+    "id": "dark-knight",
+    "source": "C:\\workspace\\msw\\assets\\design\\characters\\dark-knight\\concept.png",
+    "sha256": "90281a7fedecaa723568395234ea58303feadfde5b5bfbf70ba71b62e860f492",
+    "base": "C:\\workspace\\msw\\.beaver\\output\\five-class-motion\\base\\dark-knight.png",
+    "scale": 0.362962962962963,
+    "crown": 240,
+    "chin": 645,
+    "sole": 1178,
+    "cx": 585
+  },
+  {
+    "id": "night-lord",
+    "source": "C:\\workspace\\msw\\assets\\design\\characters\\night-lord\\concept.png",
+    "sha256": "cb882dcc352abc52448a2ac35eb38e9545635ffbafc8373f3f1f246654701585",
+    "base": "C:\\workspace\\msw\\.beaver\\output\\five-class-motion\\base\\night-lord.png",
+    "scale": 0.3542168674698795,
+    "crown": 230,
+    "chin": 645,
+    "sole": 1170,
+    "cx": 565
+  },
+  {
+    "id": "shadower",
+    "source": "C:\\workspace\\msw\\assets\\design\\characters\\shadower\\concept.png",
+    "sha256": "2eae51e760e880a37c73394c774e1d15e18a0e7c2d4898661a233844196349c6",
+    "base": "C:\\workspace\\msw\\.beaver\\output\\five-class-motion\\base\\shadower.png",
+    "scale": 0.3458823529411765,
+    "crown": 175,
+    "chin": 600,
+    "sole": 1122,
+    "cx": 595
+  },
+  {
+    "id": "phantom",
+    "source": "C:\\workspace\\msw\\assets\\design\\characters\\phantom\\concept.png",
+    "sha256": "3107933cdb8fd621de8a5dd036ec3d4b391e05be1d18a778de84a01735006e84",
+    "base": "C:\\workspace\\msw\\.beaver\\output\\five-class-motion\\base\\phantom.png",
+    "scale": 0.4140845070422535,
+    "crown": 350,
+    "chin": 705,
+    "sole": 1200,
+    "cx": 635
+  }
+]

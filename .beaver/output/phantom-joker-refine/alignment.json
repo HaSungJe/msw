@@ -1,0 +1,210 @@
+[
+  {
+    "name": "motion01",
+    "refs": [
+      "C:/workspace/msw/assets/design/characters/phantom/frames/joker/motion01.png"
+    ],
+    "prompt": "Use case: precise-object-edit. Edit target Image 1 is an already approved transparent game animation frame. Make a LIMITED pose refinement, NOT a redesign. Bring both boots toward each other so their center-to-center separation is 18% smaller than the original, keeping the midpoint and ground level fixed. Maintain a stable planted combat stance, never crossed legs. Add a little more energetic knee compression and upper torso reaction appropriate to this phase: Preparation pose: knees compress slightly more, shoulders gather energy. Preserve EXACT character identity, face, eye size, head/body ratio, enormous ornate feathered hat, costume, palette, linework, hand trajectory and card presence/absence. Keep same front/three-quarter LEFT facing orientation, absolutely no body spin or back view. Preserve the cane in the other hand, closed fingers gripping its thin neck BELOW the red jewel handle; cane tip suspended off floor, never leaning on it. Keep the same canvas, full body size, hat scale, centered position and transparent margins. Flying cards and circular VFX are separate sprites: DO NOT add any floating cards, trails, glow, circles, background, ground shadow, text or watermark. Held card fan only where it already appears. True transparent background.",
+    "source": "C:/Users/timec/.codex/generated_images/01a0dbf3-5094-7520-bfc7-f24b6496f5e5/exec-e1d3757f-bac1-4647-99a3-d792069402cd.png",
+    "n": 1,
+    "scale": 0.556390977443609,
+    "footX": 572,
+    "footY": 1144,
+    "before": {
+      "eye": 74,
+      "footX": 311,
+      "footY": 640,
+      "footSpan": 253
+    },
+    "after": {
+      "eye": 133,
+      "footX": 572,
+      "footY": 1144,
+      "footSpan": 343
+    },
+    "normalizedFootSpan": 190.8421052631579,
+    "normalized": "C:\\workspace\\msw\\.beaver\\output\\phantom-joker-refine\\normalized\\motion01.png"
+  },
+  {
+    "name": "motion02",
+    "refs": [
+      "C:/workspace/msw/assets/design/characters/phantom/frames/joker/motion02.png"
+    ],
+    "prompt": "Use case: precise-object-edit. Edit target Image 1 is an already approved transparent game animation frame. Make a LIMITED pose refinement, NOT a redesign. Bring both boots toward each other so their center-to-center separation is 18% smaller than the original, keeping the midpoint and ground level fixed. Maintain a stable planted combat stance, never crossed legs. Add a little more energetic knee compression and upper torso reaction appropriate to this phase: High windup: keep card hand raised beside head; compact knees, chest loaded for cross-body throw. Preserve EXACT character identity, face, eye size, head/body ratio, enormous ornate feathered hat, costume, palette, linework, hand trajectory and card presence/absence. Keep same front/three-quarter LEFT facing orientation, absolutely no body spin or back view. Preserve the cane in the other hand, closed fingers gripping its thin neck BELOW the red jewel handle; cane tip suspended off floor, never leaning on it. Keep the same canvas, full body size, hat scale, centered position and transparent margins. Flying cards and circular VFX are separate sprites: DO NOT add any floating cards, trails, glow, circles, background, ground shadow, text or watermark. Held card fan only where it already appears. True transparent background.",
+    "source": "C:/Users/timec/.codex/generated_images/01a0dbf3-5094-7520-bfc7-f24b6496f5e5/exec-ae42d5fe-bce3-489d-bf2e-193024f43234.png",
+    "n": 2,
+    "scale": 0.553030303030303,
+    "footX": 636.5,
+    "footY": 1136,
+    "before": {
+      "eye": 73,
+      "footX": 352,
+      "footY": 640,
+      "footSpan": 269
+    },
+    "after": {
+      "eye": 132,
+      "footX": 636.5,
+      "footY": 1136,
+      "footSpan": 396
+    },
+    "normalizedFootSpan": 218.99999999999997,
+    "normalized": "C:\\workspace\\msw\\.beaver\\output\\phantom-joker-refine\\normalized\\motion02.png"
+  },
+  {
+    "name": "motion03",
+    "refs": [
+      "C:/workspace/msw/assets/design/characters/phantom/frames/joker/motion03.png"
+    ],
+    "prompt": "Use case: precise-object-edit. Edit target Image 1 is an already approved transparent game animation frame. Make a LIMITED pose refinement, NOT a redesign. Bring both boots toward each other so their center-to-center separation is 18% smaller than the original, keeping the midpoint and ground level fixed. Maintain a stable planted combat stance, never crossed legs. Add a little more energetic knee compression and upper torso reaction appropriate to this phase: Fast cross-body sweep: keep exact extended throwing arm/cards and direct it LEFT; small strong forward torso lean. Preserve EXACT character identity, face, eye size, head/body ratio, enormous ornate feathered hat, costume, palette, linework, hand trajectory and card presence/absence. Keep same front/three-quarter LEFT facing orientation, absolutely no body spin or back view. Preserve the cane in the other hand, closed fingers gripping its thin neck BELOW the red jewel handle; cane tip suspended off floor, never leaning on it. Keep the same canvas, full body size, hat scale, centered position and transparent margins. Flying cards and circular VFX are separate sprites: DO NOT add any floating cards, trails, glow, circles, background, ground shadow, text or watermark. Held card fan only where it already appears. True transparent background.",
+    "source": "C:/Users/timec/.codex/generated_images/01a0dbf3-5094-7520-bfc7-f24b6496f5e5/exec-e63d565d-06db-4795-96ff-1572a669ca85.png",
+    "n": 3,
+    "scale": 0.556390977443609,
+    "footX": 627,
+    "footY": 1141,
+    "before": {
+      "eye": 74,
+      "footX": 352,
+      "footY": 640,
+      "footSpan": 235
+    },
+    "after": {
+      "eye": 133,
+      "footX": 627,
+      "footY": 1141,
+      "footSpan": 337
+    },
+    "normalizedFootSpan": 187.50375939849624,
+    "normalized": "C:\\workspace\\msw\\.beaver\\output\\phantom-joker-refine\\normalized\\motion03.png"
+  },
+  {
+    "name": "motion04",
+    "refs": [
+      "C:/workspace/msw/assets/design/characters/phantom/frames/joker/motion04.png"
+    ],
+    "prompt": "Use case: precise-object-edit. Edit target Image 1 is an already approved transparent game animation frame. Make a LIMITED pose refinement, NOT a redesign. Bring both boots toward each other so their center-to-center separation is 18% smaller than the original, keeping the midpoint and ground level fixed. Maintain a stable planted combat stance, never crossed legs. Add a little more energetic knee compression and upper torso reaction appropriate to this phase: Low release: preserve empty splayed throwing fingers extended LEFT; slightly deeper knees and forward chest recoil. Preserve EXACT character identity, face, eye size, head/body ratio, enormous ornate feathered hat, costume, palette, linework, hand trajectory and card presence/absence. Keep same front/three-quarter LEFT facing orientation, absolutely no body spin or back view. Preserve the cane in the other hand, closed fingers gripping its thin neck BELOW the red jewel handle; cane tip suspended off floor, never leaning on it. Keep the same canvas, full body size, hat scale, centered position and transparent margins. Flying cards and circular VFX are separate sprites: DO NOT add any floating cards, trails, glow, circles, background, ground shadow, text or watermark. Held card fan only where it already appears. True transparent background.",
+    "source": "C:/Users/timec/.codex/generated_images/01a0dbf3-5094-7520-bfc7-f24b6496f5e5/exec-f237460a-6e1c-4d50-85ca-196dbfa55d81.png",
+    "n": 4,
+    "scale": 0.5441176470588235,
+    "footX": 644.5,
+    "footY": 1139,
+    "before": {
+      "eye": 74,
+      "footX": 351.5,
+      "footY": 640,
+      "footSpan": 246
+    },
+    "after": {
+      "eye": 136,
+      "footX": 644.5,
+      "footY": 1139,
+      "footSpan": 376
+    },
+    "normalizedFootSpan": 204.58823529411762,
+    "normalized": "C:\\workspace\\msw\\.beaver\\output\\phantom-joker-refine\\normalized\\motion04.png"
+  },
+  {
+    "name": "motion05",
+    "refs": [
+      "C:/workspace/msw/assets/design/characters/phantom/frames/joker/motion05.png"
+    ],
+    "prompt": "Use case: precise-object-edit. Edit target Image 1 is an already approved transparent game animation frame. Make a LIMITED pose refinement, NOT a redesign. Bring both boots toward each other so their center-to-center separation is 18% smaller than the original, keeping the midpoint and ground level fixed. Maintain a stable planted combat stance, never crossed legs. Add a little more energetic knee compression and upper torso reaction appropriate to this phase: Follow through: preserve empty lowered throwing hand; weight absorbs the throw with bent knees. Preserve EXACT character identity, face, eye size, head/body ratio, enormous ornate feathered hat, costume, palette, linework, hand trajectory and card presence/absence. Keep same front/three-quarter LEFT facing orientation, absolutely no body spin or back view. Preserve the cane in the other hand, closed fingers gripping its thin neck BELOW the red jewel handle; cane tip suspended off floor, never leaning on it. Keep the same canvas, full body size, hat scale, centered position and transparent margins. Flying cards and circular VFX are separate sprites: DO NOT add any floating cards, trails, glow, circles, background, ground shadow, text or watermark. Held card fan only where it already appears. True transparent background.",
+    "source": "C:/Users/timec/.codex/generated_images/01a0dbf3-5094-7520-bfc7-f24b6496f5e5/exec-dece1630-9fa7-4730-8bac-a118486e219a.png",
+    "n": 5,
+    "scale": 0.5648854961832062,
+    "footX": 614,
+    "footY": 1138,
+    "before": {
+      "eye": 74,
+      "footX": 352,
+      "footY": 641,
+      "footSpan": 259
+    },
+    "after": {
+      "eye": 131,
+      "footX": 614,
+      "footY": 1138,
+      "footSpan": 407
+    },
+    "normalizedFootSpan": 229.90839694656492,
+    "normalized": "C:\\workspace\\msw\\.beaver\\output\\phantom-joker-refine\\normalized\\motion05.png"
+  },
+  {
+    "name": "motion06",
+    "refs": [
+      "C:/workspace/msw/assets/design/characters/phantom/frames/joker/motion06.png"
+    ],
+    "prompt": "Use case: precise-object-edit. Edit target Image 1 is an already approved transparent game animation frame. Make a LIMITED pose refinement, NOT a redesign. Bring both boots toward each other so their center-to-center separation is 18% smaller than the original, keeping the midpoint and ground level fixed. Maintain a stable planted combat stance, never crossed legs. Add a little more energetic knee compression and upper torso reaction appropriate to this phase: Quick reload: preserve the gathered cards; compact legs and energetic shoulder recoil. Preserve EXACT character identity, face, eye size, head/body ratio, enormous ornate feathered hat, costume, palette, linework, hand trajectory and card presence/absence. Keep same front/three-quarter LEFT facing orientation, absolutely no body spin or back view. Preserve the cane in the other hand, closed fingers gripping its thin neck BELOW the red jewel handle; cane tip suspended off floor, never leaning on it. Keep the same canvas, full body size, hat scale, centered position and transparent margins. Flying cards and circular VFX are separate sprites: DO NOT add any floating cards, trails, glow, circles, background, ground shadow, text or watermark. Held card fan only where it already appears. True transparent background.",
+    "source": "C:/Users/timec/.codex/generated_images/01a0dbf3-5094-7520-bfc7-f24b6496f5e5/exec-d82e026d-16dc-4528-bc47-e89c12e0c0da.png",
+    "n": 6,
+    "scale": 0.5692307692307692,
+    "footX": 622.5,
+    "footY": 1141,
+    "before": {
+      "eye": 74,
+      "footX": 329,
+      "footY": 640,
+      "footSpan": 255
+    },
+    "after": {
+      "eye": 130,
+      "footX": 622.5,
+      "footY": 1141,
+      "footSpan": 294
+    },
+    "normalizedFootSpan": 167.35384615384615,
+    "normalized": "C:\\workspace\\msw\\.beaver\\output\\phantom-joker-refine\\normalized\\motion06.png"
+  },
+  {
+    "name": "motion07",
+    "refs": [
+      "C:/workspace/msw/assets/design/characters/phantom/frames/joker/motion07.png"
+    ],
+    "prompt": "Use case: precise-object-edit. Edit target Image 1 is an already approved transparent game animation frame. Make a LIMITED pose refinement, NOT a redesign. Bring both boots toward each other so their center-to-center separation is 18% smaller than the original, keeping the midpoint and ground level fixed. Maintain a stable planted combat stance, never crossed legs. Add a little more energetic knee compression and upper torso reaction appropriate to this phase: Second high release: preserve extended empty fingers aimed LEFT; strong but small forward torso impulse. Preserve EXACT character identity, face, eye size, head/body ratio, enormous ornate feathered hat, costume, palette, linework, hand trajectory and card presence/absence. Keep same front/three-quarter LEFT facing orientation, absolutely no body spin or back view. Preserve the cane in the other hand, closed fingers gripping its thin neck BELOW the red jewel handle; cane tip suspended off floor, never leaning on it. Keep the same canvas, full body size, hat scale, centered position and transparent margins. Flying cards and circular VFX are separate sprites: DO NOT add any floating cards, trails, glow, circles, background, ground shadow, text or watermark. Held card fan only where it already appears. True transparent background.",
+    "source": "C:/Users/timec/.codex/generated_images/01a0dbf3-5094-7520-bfc7-f24b6496f5e5/exec-c8765d17-3ea4-43fb-aee7-73bb294198aa.png",
+    "n": 7,
+    "scale": 0.5067567567567568,
+    "footX": 662.5,
+    "footY": 1132,
+    "before": {
+      "eye": 75,
+      "footX": 363.5,
+      "footY": 640,
+      "footSpan": 248
+    },
+    "after": {
+      "eye": 148,
+      "footX": 662.5,
+      "footY": 1132,
+      "footSpan": 364
+    },
+    "normalizedFootSpan": 184.45945945945948,
+    "normalized": "C:\\workspace\\msw\\.beaver\\output\\phantom-joker-refine\\normalized\\motion07.png"
+  },
+  {
+    "name": "motion08",
+    "refs": [
+      "C:/workspace/msw/assets/design/characters/phantom/frames/joker/motion08.png"
+    ],
+    "prompt": "Use case: precise-object-edit. Edit target Image 1 is an already approved transparent game animation frame. Make a LIMITED pose refinement, NOT a redesign. Bring both boots toward each other so their center-to-center separation is 18% smaller than the original, keeping the midpoint and ground level fixed. Maintain a stable planted combat stance, never crossed legs. Add a little more energetic knee compression and upper torso reaction appropriate to this phase: Recoil/link: preserve cards gathered near upper chest; knees rebound slightly, shoulders ready next throw. Preserve EXACT character identity, face, eye size, head/body ratio, enormous ornate feathered hat, costume, palette, linework, hand trajectory and card presence/absence. Keep same front/three-quarter LEFT facing orientation, absolutely no body spin or back view. Preserve the cane in the other hand, closed fingers gripping its thin neck BELOW the red jewel handle; cane tip suspended off floor, never leaning on it. Keep the same canvas, full body size, hat scale, centered position and transparent margins. Flying cards and circular VFX are separate sprites: DO NOT add any floating cards, trails, glow, circles, background, ground shadow, text or watermark. Held card fan only where it already appears. True transparent background.",
+    "source": "C:/Users/timec/.codex/generated_images/01a0dbf3-5094-7520-bfc7-f24b6496f5e5/exec-5012b459-779a-4fb0-8116-5f1ac0cc181d.png",
+    "n": 8,
+    "scale": 0.5285714285714286,
+    "footX": 594.5,
+    "footY": 1144,
+    "before": {
+      "eye": 74,
+      "footX": 326,
+      "footY": 640,
+      "footSpan": 247
+    },
+    "after": {
+      "eye": 140,
+      "footX": 594.5,
+      "footY": 1144,
+      "footSpan": 330
+    },
+    "normalizedFootSpan": 174.42857142857144,
+    "normalized": "C:\\workspace\\msw\\.beaver\\output\\phantom-joker-refine\\normalized\\motion08.png"
+  }
+]

@@ -1,0 +1,7 @@
+{
+  "source": "C:/Users/timec/.codex/generated_images/01a0dbf3-5094-7520-bfc7-f24b6496f5e5/exec-1c956095-3acb-4dc0-88c6-855fb1cdcf27.png",
+  "prompt": "Use case: background-extraction. Edit this exact card image. Keep the single rectangular wine-red and gold card artwork and outline unchanged. REMOVE ALL the brown/black gradient and glow surrounding the card. Output only the card on genuinely TRANSPARENT background, alpha zero beyond its rounded rectangular edge. No new glow or drop shadow. Preserve card opaque center and fine gold design. Tight but safe transparent margin. This is an isolated projectile sprite; absolutely no brown box behind it.",
+  "refs": [
+    "C:/Users/timec/.codex/generated_images/01a0dbf3-5094-7520-bfc7-f24b6496f5e5/exec-ff73de81-0482-4aa2-9bbf-f48f22427a72.png"
+  ]
+}

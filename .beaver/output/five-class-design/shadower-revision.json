@@ -1,0 +1,10 @@
+{
+  "id": "shadower",
+  "prompt": "Use case: style-transfer. Correct ONLY anatomical proportions in image1 (edit target), matching Bishop in images2 and3. Preserve target's exact identity, expression, all colors, costume pieces, accessories and weapons. One complete isolated character on transparent background, no effects or labels.\nThe anatomical head is currently too oversized, about half of entire standing body height. Reduce head including silver bob about12% relative to body, retain round short face and EXACT teal eye expression and black mask. Target crown-to-chin43.5% of crown-to-soles, not50%. Keep compact torso and short legs; do NOT elongate legs to compensate. Preserve orange top, black tactical gear, single ornate curved dagger green jewels and trailing black scarf.\nMatch Bishop polished thin clean linework and soft restrained cel shading. Recompose whole figure centered in square with at least6% transparent margins around all weapon/hat/cape/hair tips. Do not crop anything.",
+  "refs": [
+    "C:/Users/timec/.codex/generated_images/01a0dbf3-5094-7520-bfc7-f24b6496f5e5/exec-9c7a1321-32c8-4b68-a385-fc29e145cd79.png",
+    "C:/workspace/msw/assets/design/characters/bishop/concept.png",
+    "C:/workspace/msw/assets/design/characters/bishop/frames/wait/motion01.png"
+  ],
+  "source": "C:\\Users\\timec\\.codex\\generated_images\\01a0dbf3-5094-7520-bfc7-f24b6496f5e5\\exec-050fef45-6adf-4187-b489-aeec0123cf7c.png"
+}

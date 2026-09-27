@@ -1,0 +1,1766 @@
+[
+  {
+    "key": "dark-knight--dragon-roar--01",
+    "hair": {
+      "bbox": [
+        114,
+        120,
+        201,
+        192
+      ],
+      "span": 340.93125,
+      "componentPixels": 3742
+    },
+    "reference": {
+      "bbox": [
+        109,
+        87,
+        199,
+        161
+      ],
+      "span": 162.0,
+      "componentPixels": 3761
+    },
+    "head": 309.36354166666666,
+    "feet": [
+      629.5,
+      1171.0
+    ]
+  },
+  {
+    "key": "dark-knight--dragon-roar--02",
+    "hair": {
+      "bbox": [
+        123,
+        122,
+        206,
+        189
+      ],
+      "span": 325.25625,
+      "componentPixels": 3115
+    },
+    "reference": {
+      "bbox": [
+        109,
+        87,
+        199,
+        161
+      ],
+      "span": 162.0,
+      "componentPixels": 3761
+    },
+    "head": 295.13993055555557,
+    "feet": [
+      624.5,
+      1151.0
+    ]
+  },
+  {
+    "key": "dark-knight--dragon-roar--03",
+    "hair": {
+      "bbox": [
+        123,
+        114,
+        207,
+        183
+      ],
+      "span": 329.175,
+      "componentPixels": 3246
+    },
+    "reference": {
+      "bbox": [
+        109,
+        87,
+        199,
+        161
+      ],
+      "span": 162.0,
+      "componentPixels": 3761
+    },
+    "head": 298.6958333333333,
+    "feet": [
+      674.5,
+      1159.0
+    ]
+  },
+  {
+    "key": "dark-knight--dragon-roar--04",
+    "hair": {
+      "bbox": [
+        145,
+        136,
+        216,
+        199
+      ],
+      "span": 278.23125,
+      "componentPixels": 2068
+    },
+    "reference": {
+      "bbox": [
+        109,
+        87,
+        199,
+        161
+      ],
+      "span": 162.0,
+      "componentPixels": 3761
+    },
+    "head": 252.46909722222222,
+    "feet": [
+      681.0,
+      1149.0
+    ]
+  },
+  {
+    "key": "dark-knight--dragon-roar--05",
+    "hair": {
+      "bbox": [
+        114,
+        139,
+        188,
+        202
+      ],
+      "span": 289.9875,
+      "componentPixels": 2830
+    },
+    "reference": {
+      "bbox": [
+        109,
+        87,
+        199,
+        161
+      ],
+      "span": 162.0,
+      "componentPixels": 3761
+    },
+    "head": 263.13680555555555,
+    "feet": [
+      634.0,
+      1162.0
+    ]
+  },
+  {
+    "key": "dark-knight--dragon-roar--06",
+    "hair": {
+      "bbox": [
+        118,
+        112,
+        196,
+        178
+      ],
+      "span": 305.6625,
+      "componentPixels": 3209
+    },
+    "reference": {
+      "bbox": [
+        109,
+        87,
+        199,
+        161
+      ],
+      "span": 162.0,
+      "componentPixels": 3761
+    },
+    "head": 277.3604166666667,
+    "feet": [
+      670.5,
+      1126.0
+    ]
+  },
+  {
+    "key": "dark-knight--spear-buster--01",
+    "hair": {
+      "bbox": [
+        118,
+        115,
+        202,
+        187
+      ],
+      "span": 329.175,
+      "componentPixels": 3471
+    },
+    "reference": {
+      "bbox": [
+        109,
+        87,
+        199,
+        161
+      ],
+      "span": 162.0,
+      "componentPixels": 3761
+    },
+    "head": 298.6958333333333,
+    "feet": [
+      663.0,
+      1124.0
+    ]
+  },
+  {
+    "key": "dark-knight--spear-buster--02",
+    "hair": {
+      "bbox": [
+        118,
+        113,
+        207,
+        183
+      ],
+      "span": 348.76875,
+      "componentPixels": 3786
+    },
+    "reference": {
+      "bbox": [
+        109,
+        87,
+        199,
+        161
+      ],
+      "span": 162.0,
+      "componentPixels": 3761
+    },
+    "head": 316.47534722222224,
+    "feet": [
+      702.5,
+      1105.0
+    ]
+  },
+  {
+    "key": "dark-knight--spear-buster--03",
+    "hair": {
+      "bbox": [
+        130,
+        112,
+        222,
+        186
+      ],
+      "span": 360.525,
+      "componentPixels": 4212
+    },
+    "reference": {
+      "bbox": [
+        109,
+        87,
+        199,
+        161
+      ],
+      "span": 162.0,
+      "componentPixels": 3761
+    },
+    "head": 327.1430555555555,
+    "feet": [
+      723.5,
+      1122.0
+    ]
+  },
+  {
+    "key": "dark-knight--spear-buster--04",
+    "hair": {
+      "bbox": [
+        127,
+        130,
+        201,
+        187
+      ],
+      "span": 289.9875,
+      "componentPixels": 2643
+    },
+    "reference": {
+      "bbox": [
+        109,
+        87,
+        199,
+        161
+      ],
+      "span": 162.0,
+      "componentPixels": 3761
+    },
+    "head": 263.13680555555555,
+    "feet": [
+      700.0,
+      1134.0
+    ]
+  },
+  {
+    "key": "dark-knight--spear-buster--05",
+    "hair": {
+      "bbox": [
+        128,
+        123,
+        211,
+        190
+      ],
+      "span": 325.25625,
+      "componentPixels": 3327
+    },
+    "reference": {
+      "bbox": [
+        109,
+        87,
+        199,
+        161
+      ],
+      "span": 162.0,
+      "componentPixels": 3761
+    },
+    "head": 295.13993055555557,
+    "feet": [
+      739.0,
+      1100.0
+    ]
+  },
+  {
+    "key": "dark-knight--spear-buster--06",
+    "hair": {
+      "bbox": [
+        115,
+        108,
+        208,
+        187
+      ],
+      "span": 364.44375,
+      "componentPixels": 4242
+    },
+    "reference": {
+      "bbox": [
+        109,
+        87,
+        199,
+        161
+      ],
+      "span": 162.0,
+      "componentPixels": 3761
+    },
+    "head": 330.69895833333334,
+    "feet": [
+      659.0,
+      1163.0
+    ]
+  },
+  {
+    "key": "dark-knight--spear-buster--07",
+    "hair": {
+      "bbox": [
+        135,
+        130,
+        216,
+        196
+      ],
+      "span": 317.41875,
+      "componentPixels": 3172
+    },
+    "reference": {
+      "bbox": [
+        109,
+        87,
+        199,
+        161
+      ],
+      "span": 162.0,
+      "componentPixels": 3761
+    },
+    "head": 288.028125,
+    "feet": [
+      713.5,
+      1136.0
+    ]
+  },
+  {
+    "key": "dark-knight--spear-buster--08",
+    "hair": {
+      "bbox": [
+        115,
+        110,
+        205,
+        181
+      ],
+      "span": 352.6875,
+      "componentPixels": 3877
+    },
+    "reference": {
+      "bbox": [
+        109,
+        87,
+        199,
+        161
+      ],
+      "span": 162.0,
+      "componentPixels": 3761
+    },
+    "head": 320.03125,
+    "feet": [
+      647.0,
+      1181.0
+    ]
+  },
+  {
+    "key": "dark-knight--wait--02",
+    "hair": {
+      "bbox": [
+        105,
+        87,
+        198,
+        166
+      ],
+      "span": 364.44375,
+      "componentPixels": 4226
+    },
+    "reference": {
+      "bbox": [
+        109,
+        87,
+        199,
+        161
+      ],
+      "span": 162.0,
+      "componentPixels": 3761
+    },
+    "head": 330.69895833333334,
+    "feet": [
+      674.0,
+      1124.0
+    ]
+  },
+  {
+    "key": "dark-knight--wait--03",
+    "hair": {
+      "bbox": [
+        107,
+        96,
+        198,
+        173
+      ],
+      "span": 356.60625,
+      "componentPixels": 4137
+    },
+    "reference": {
+      "bbox": [
+        109,
+        87,
+        199,
+        161
+      ],
+      "span": 162.0,
+      "componentPixels": 3761
+    },
+    "head": 323.58715277777776,
+    "feet": [
+      663.0,
+      1147.0
+    ]
+  },
+  {
+    "key": "night-lord--quadruple-throw--01",
+    "hair": {
+      "bbox": [
+        106,
+        124,
+        205,
+        200
+      ],
+      "span": 387.95625,
+      "componentPixels": 4030
+    },
+    "reference": {
+      "bbox": [
+        105,
+        81,
+        215,
+        171
+      ],
+      "span": 198.0,
+      "componentPixels": 4864
+    },
+    "head": 288.028125,
+    "feet": [
+      609.0,
+      1179.0
+    ]
+  },
+  {
+    "key": "night-lord--quadruple-throw--02",
+    "hair": {
+      "bbox": [
+        116,
+        111,
+        210,
+        184
+      ],
+      "span": 368.3625,
+      "componentPixels": 3619
+    },
+    "reference": {
+      "bbox": [
+        105,
+        81,
+        215,
+        171
+      ],
+      "span": 198.0,
+      "componentPixels": 4864
+    },
+    "head": 273.48125,
+    "feet": [
+      631.0,
+      1106.0
+    ]
+  },
+  {
+    "key": "night-lord--quadruple-throw--03",
+    "hair": {
+      "bbox": [
+        100,
+        109,
+        206,
+        194
+      ],
+      "span": 415.3875,
+      "componentPixels": 4558
+    },
+    "reference": {
+      "bbox": [
+        105,
+        81,
+        215,
+        171
+      ],
+      "span": 198.0,
+      "componentPixels": 4864
+    },
+    "head": 308.39375,
+    "feet": [
+      625.5,
+      1153.0
+    ]
+  },
+  {
+    "key": "night-lord--quadruple-throw--04",
+    "hair": {
+      "bbox": [
+        111,
+        111,
+        215,
+        193
+      ],
+      "span": 407.55,
+      "componentPixels": 4384
+    },
+    "reference": {
+      "bbox": [
+        105,
+        81,
+        215,
+        171
+      ],
+      "span": 198.0,
+      "componentPixels": 4864
+    },
+    "head": 302.575,
+    "feet": [
+      652.0,
+      1137.0
+    ]
+  },
+  {
+    "key": "night-lord--quadruple-throw--05",
+    "hair": {
+      "bbox": [
+        111,
+        116,
+        205,
+        192
+      ],
+      "span": 368.3625,
+      "componentPixels": 3631
+    },
+    "reference": {
+      "bbox": [
+        105,
+        81,
+        215,
+        171
+      ],
+      "span": 198.0,
+      "componentPixels": 4864
+    },
+    "head": 273.48125,
+    "feet": [
+      631.0,
+      1167.0
+    ]
+  },
+  {
+    "key": "night-lord--quadruple-throw--06",
+    "hair": {
+      "bbox": [
+        112,
+        110,
+        209,
+        186
+      ],
+      "span": 380.11875,
+      "componentPixels": 3702
+    },
+    "reference": {
+      "bbox": [
+        105,
+        81,
+        215,
+        171
+      ],
+      "span": 198.0,
+      "componentPixels": 4864
+    },
+    "head": 282.20937499999997,
+    "feet": [
+      653.5,
+      1107.0
+    ]
+  },
+  {
+    "key": "night-lord--quadruple-throw--07",
+    "hair": {
+      "bbox": [
+        103,
+        122,
+        195,
+        198
+      ],
+      "span": 360.525,
+      "componentPixels": 3520
+    },
+    "reference": {
+      "bbox": [
+        105,
+        81,
+        215,
+        171
+      ],
+      "span": 198.0,
+      "componentPixels": 4864
+    },
+    "head": 267.66249999999997,
+    "feet": [
+      639.0,
+      1114.0
+    ]
+  },
+  {
+    "key": "night-lord--quadruple-throw--08",
+    "hair": {
+      "bbox": [
+        110,
+        118,
+        208,
+        198
+      ],
+      "span": 384.0375,
+      "componentPixels": 3926
+    },
+    "reference": {
+      "bbox": [
+        105,
+        81,
+        215,
+        171
+      ],
+      "span": 198.0,
+      "componentPixels": 4864
+    },
+    "head": 285.11875000000003,
+    "feet": [
+      656.5,
+      1171.0
+    ]
+  },
+  {
+    "key": "night-lord--wait--02",
+    "hair": {
+      "bbox": [
+        99,
+        84,
+        215,
+        178
+      ],
+      "span": 454.575,
+      "componentPixels": 5304
+    },
+    "reference": {
+      "bbox": [
+        105,
+        81,
+        215,
+        171
+      ],
+      "span": 198.0,
+      "componentPixels": 4864
+    },
+    "head": 337.48749999999995,
+    "feet": [
+      654.0,
+      1140.0
+    ]
+  },
+  {
+    "key": "night-lord--wait--03",
+    "hair": {
+      "bbox": [
+        72,
+        34,
+        216,
+        152
+      ],
+      "span": 564.3,
+      "componentPixels": 8296
+    },
+    "reference": {
+      "bbox": [
+        105,
+        81,
+        215,
+        171
+      ],
+      "span": 198.0,
+      "componentPixels": 4864
+    },
+    "head": 418.94999999999993,
+    "feet": [
+      606.0,
+      1171.0
+    ]
+  },
+  {
+    "key": "paladin--divine-charge--01",
+    "hair": {
+      "bbox": [
+        111,
+        124,
+        197,
+        205
+      ],
+      "span": 337.0125,
+      "componentPixels": 3891
+    },
+    "reference": {
+      "bbox": [
+        108,
+        85,
+        213,
+        205
+      ],
+      "span": 189.0,
+      "componentPixels": 6508
+    },
+    "head": 262.12083333333334,
+    "feet": [
+      659.0,
+      1119.0
+    ]
+  },
+  {
+    "key": "paladin--divine-charge--02",
+    "hair": {
+      "bbox": [
+        103,
+        117,
+        203,
+        205
+      ],
+      "span": 391.875,
+      "componentPixels": 5138
+    },
+    "reference": {
+      "bbox": [
+        108,
+        85,
+        213,
+        205
+      ],
+      "span": 189.0,
+      "componentPixels": 6508
+    },
+    "head": 304.7916666666667,
+    "feet": [
+      665.5,
+      1156.0
+    ]
+  },
+  {
+    "key": "paladin--divine-charge--03",
+    "hair": {
+      "bbox": [
+        126,
+        111,
+        232,
+        205
+      ],
+      "span": 415.3875,
+      "componentPixels": 5623
+    },
+    "reference": {
+      "bbox": [
+        108,
+        85,
+        213,
+        205
+      ],
+      "span": 189.0,
+      "componentPixels": 6508
+    },
+    "head": 323.07916666666665,
+    "feet": [
+      689.5,
+      1151.0
+    ]
+  },
+  {
+    "key": "paladin--divine-charge--04",
+    "hair": {
+      "bbox": [
+        128,
+        116,
+        224,
+        205
+      ],
+      "span": 376.2,
+      "componentPixels": 4605
+    },
+    "reference": {
+      "bbox": [
+        108,
+        85,
+        213,
+        205
+      ],
+      "span": 189.0,
+      "componentPixels": 6508
+    },
+    "head": 292.6,
+    "feet": [
+      642.5,
+      1170.0
+    ]
+  },
+  {
+    "key": "paladin--divine-charge--05",
+    "hair": {
+      "bbox": [
+        90,
+        124,
+        204,
+        205
+      ],
+      "span": 446.7375,
+      "componentPixels": 4443
+    },
+    "reference": {
+      "bbox": [
+        108,
+        85,
+        213,
+        205
+      ],
+      "span": 189.0,
+      "componentPixels": 6508
+    },
+    "head": 347.46250000000003,
+    "feet": [
+      628.0,
+      1149.0
+    ]
+  },
+  {
+    "key": "paladin--divine-charge--06",
+    "hair": {
+      "bbox": [
+        117,
+        120,
+        206,
+        193
+      ],
+      "span": 348.76875,
+      "componentPixels": 3865
+    },
+    "reference": {
+      "bbox": [
+        108,
+        85,
+        213,
+        205
+      ],
+      "span": 189.0,
+      "componentPixels": 6508
+    },
+    "head": 271.26458333333335,
+    "feet": [
+      572.5,
+      1138.0
+    ]
+  },
+  {
+    "key": "paladin--sanctuary--01",
+    "hair": {
+      "bbox": [
+        118,
+        139,
+        223,
+        205
+      ],
+      "span": 411.46875,
+      "componentPixels": 3854
+    },
+    "reference": {
+      "bbox": [
+        108,
+        85,
+        213,
+        205
+      ],
+      "span": 189.0,
+      "componentPixels": 6508
+    },
+    "head": 320.03125,
+    "feet": [
+      657.5,
+      1172.0
+    ]
+  },
+  {
+    "key": "paladin--sanctuary--02",
+    "hair": {
+      "bbox": [
+        115,
+        156,
+        202,
+        205
+      ],
+      "span": 340.93125,
+      "componentPixels": 2267
+    },
+    "reference": {
+      "bbox": [
+        108,
+        85,
+        213,
+        205
+      ],
+      "span": 189.0,
+      "componentPixels": 6508
+    },
+    "head": 265.16875,
+    "feet": [
+      624.0,
+      1169.0
+    ]
+  },
+  {
+    "key": "paladin--sanctuary--03",
+    "hair": {
+      "bbox": [
+        94,
+        123,
+        192,
+        205
+      ],
+      "span": 384.0375,
+      "componentPixels": 4179
+    },
+    "reference": {
+      "bbox": [
+        108,
+        85,
+        213,
+        205
+      ],
+      "span": 189.0,
+      "componentPixels": 6508
+    },
+    "head": 298.6958333333334,
+    "feet": [
+      654.5,
+      1172.0
+    ]
+  },
+  {
+    "key": "paladin--sanctuary--04",
+    "hair": {
+      "bbox": [
+        101,
+        120,
+        200,
+        205
+      ],
+      "span": 387.95625,
+      "componentPixels": 5213
+    },
+    "reference": {
+      "bbox": [
+        108,
+        85,
+        213,
+        205
+      ],
+      "span": 189.0,
+      "componentPixels": 6508
+    },
+    "head": 301.74375,
+    "feet": [
+      448.5,
+      1220.0
+    ]
+  },
+  {
+    "key": "paladin--sanctuary--05",
+    "hair": {
+      "bbox": [
+        111,
+        113,
+        206,
+        205
+      ],
+      "span": 372.28125,
+      "componentPixels": 4739
+    },
+    "reference": {
+      "bbox": [
+        108,
+        85,
+        213,
+        205
+      ],
+      "span": 189.0,
+      "componentPixels": 6508
+    },
+    "head": 289.5520833333333,
+    "feet": [
+      591.0,
+      1131.0
+    ]
+  },
+  {
+    "key": "paladin--sanctuary--06",
+    "hair": {
+      "bbox": [
+        115,
+        110,
+        213,
+        205
+      ],
+      "span": 384.0375,
+      "componentPixels": 4985
+    },
+    "reference": {
+      "bbox": [
+        108,
+        85,
+        213,
+        205
+      ],
+      "span": 189.0,
+      "componentPixels": 6508
+    },
+    "head": 298.6958333333334,
+    "feet": [
+      587.0,
+      1168.0
+    ]
+  },
+  {
+    "key": "paladin--wait--02",
+    "hair": {
+      "bbox": [
+        109,
+        86,
+        215,
+        204
+      ],
+      "span": 415.3875,
+      "componentPixels": 6036
+    },
+    "reference": {
+      "bbox": [
+        108,
+        85,
+        213,
+        205
+      ],
+      "span": 189.0,
+      "componentPixels": 6508
+    },
+    "head": 323.07916666666665,
+    "feet": [
+      587.5,
+      1119.0
+    ]
+  },
+  {
+    "key": "paladin--wait--03",
+    "hair": {
+      "bbox": [
+        111,
+        103,
+        212,
+        205
+      ],
+      "span": 395.79375,
+      "componentPixels": 5353
+    },
+    "reference": {
+      "bbox": [
+        108,
+        85,
+        213,
+        205
+      ],
+      "span": 189.0,
+      "componentPixels": 6508
+    },
+    "head": 307.83958333333334,
+    "feet": [
+      580.0,
+      1143.0
+    ]
+  },
+  {
+    "key": "shadower--blade-tornado-karma-fury--01",
+    "hair": {
+      "bbox": [
+        104,
+        131,
+        204,
+        205
+      ],
+      "span": 391.875,
+      "componentPixels": 4733
+    },
+    "reference": {
+      "bbox": [
+        114,
+        102,
+        207,
+        183
+      ],
+      "span": 167.4,
+      "componentPixels": 4487
+    },
+    "head": 344.119623655914,
+    "feet": [
+      633.0,
+      1190.0
+    ]
+  },
+  {
+    "key": "shadower--blade-tornado-karma-fury--02",
+    "hair": {
+      "bbox": [
+        115,
+        118,
+        202,
+        192
+      ],
+      "span": 340.93125,
+      "componentPixels": 3788
+    },
+    "reference": {
+      "bbox": [
+        114,
+        102,
+        207,
+        183
+      ],
+      "span": 167.4,
+      "componentPixels": 4487
+    },
+    "head": 299.3840725806451,
+    "feet": [
+      638.5,
+      1142.0
+    ]
+  },
+  {
+    "key": "shadower--blade-tornado-karma-fury--03",
+    "hair": {
+      "bbox": [
+        109,
+        130,
+        202,
+        205
+      ],
+      "span": 364.44375,
+      "componentPixels": 4024
+    },
+    "reference": {
+      "bbox": [
+        114,
+        102,
+        207,
+        183
+      ],
+      "span": 167.4,
+      "componentPixels": 4487
+    },
+    "head": 320.03125,
+    "feet": [
+      652.5,
+      1155.0
+    ]
+  },
+  {
+    "key": "shadower--blade-tornado-karma-fury--04",
+    "hair": {
+      "bbox": [
+        104,
+        120,
+        204,
+        202
+      ],
+      "span": 391.875,
+      "componentPixels": 4833
+    },
+    "reference": {
+      "bbox": [
+        114,
+        102,
+        207,
+        183
+      ],
+      "span": 167.4,
+      "componentPixels": 4487
+    },
+    "head": 344.119623655914,
+    "feet": [
+      632.5,
+      1161.0
+    ]
+  },
+  {
+    "key": "shadower--blade-tornado-karma-fury--05",
+    "hair": {
+      "bbox": [
+        106,
+        127,
+        194,
+        199
+      ],
+      "span": 344.85,
+      "componentPixels": 3826
+    },
+    "reference": {
+      "bbox": [
+        114,
+        102,
+        207,
+        183
+      ],
+      "span": 167.4,
+      "componentPixels": 4487
+    },
+    "head": 302.8252688172043,
+    "feet": [
+      641.5,
+      1129.0
+    ]
+  },
+  {
+    "key": "shadower--blade-tornado-karma-fury--06",
+    "hair": {
+      "bbox": [
+        114,
+        137,
+        202,
+        205
+      ],
+      "span": 344.85,
+      "componentPixels": 3812
+    },
+    "reference": {
+      "bbox": [
+        114,
+        102,
+        207,
+        183
+      ],
+      "span": 167.4,
+      "componentPixels": 4487
+    },
+    "head": 302.8252688172043,
+    "feet": [
+      643.0,
+      1149.0
+    ]
+  },
+  {
+    "key": "shadower--blade-tornado-karma-fury--07",
+    "hair": {
+      "bbox": [
+        115,
+        119,
+        202,
+        192
+      ],
+      "span": 340.93125,
+      "componentPixels": 3895
+    },
+    "reference": {
+      "bbox": [
+        114,
+        102,
+        207,
+        183
+      ],
+      "span": 167.4,
+      "componentPixels": 4487
+    },
+    "head": 299.3840725806451,
+    "feet": [
+      625.5,
+      1168.0
+    ]
+  },
+  {
+    "key": "shadower--blade-tornado-karma-fury--08",
+    "hair": {
+      "bbox": [
+        121,
+        125,
+        197,
+        192
+      ],
+      "span": 297.825,
+      "componentPixels": 3103
+    },
+    "reference": {
+      "bbox": [
+        114,
+        102,
+        207,
+        183
+      ],
+      "span": 167.4,
+      "componentPixels": 4487
+    },
+    "head": 261.5309139784946,
+    "feet": [
+      694.0,
+      1098.0
+    ]
+  },
+  {
+    "key": "shadower--meso-explosion--01",
+    "hair": {
+      "bbox": [
+        118,
+        129,
+        199,
+        199
+      ],
+      "span": 317.41875,
+      "componentPixels": 3390
+    },
+    "reference": {
+      "bbox": [
+        114,
+        102,
+        207,
+        183
+      ],
+      "span": 167.4,
+      "componentPixels": 4487
+    },
+    "head": 278.7368951612903,
+    "feet": [
+      600.0,
+      1152.0
+    ]
+  },
+  {
+    "key": "shadower--meso-explosion--02",
+    "hair": {
+      "bbox": [
+        118,
+        130,
+        200,
+        199
+      ],
+      "span": 321.3375,
+      "componentPixels": 3454
+    },
+    "reference": {
+      "bbox": [
+        114,
+        102,
+        207,
+        183
+      ],
+      "span": 167.4,
+      "componentPixels": 4487
+    },
+    "head": 282.1780913978494,
+    "feet": [
+      628.5,
+      1177.0
+    ]
+  },
+  {
+    "key": "shadower--meso-explosion--03",
+    "hair": {
+      "bbox": [
+        115,
+        123,
+        201,
+        199
+      ],
+      "span": 337.0125,
+      "componentPixels": 3711
+    },
+    "reference": {
+      "bbox": [
+        114,
+        102,
+        207,
+        183
+      ],
+      "span": 167.4,
+      "componentPixels": 4487
+    },
+    "head": 295.942876344086,
+    "feet": [
+      671.5,
+      1140.0
+    ]
+  },
+  {
+    "key": "shadower--meso-explosion--04",
+    "hair": {
+      "bbox": [
+        118,
+        135,
+        203,
+        203
+      ],
+      "span": 333.09375,
+      "componentPixels": 3372
+    },
+    "reference": {
+      "bbox": [
+        114,
+        102,
+        207,
+        183
+      ],
+      "span": 167.4,
+      "componentPixels": 4487
+    },
+    "head": 292.50168010752685,
+    "feet": [
+      620.0,
+      1146.0
+    ]
+  },
+  {
+    "key": "shadower--meso-explosion--05",
+    "hair": {
+      "bbox": [
+        122,
+        135,
+        199,
+        202
+      ],
+      "span": 301.74375,
+      "componentPixels": 3108
+    },
+    "reference": {
+      "bbox": [
+        114,
+        102,
+        207,
+        183
+      ],
+      "span": 167.4,
+      "componentPixels": 4487
+    },
+    "head": 264.9721102150537,
+    "feet": [
+      699.5,
+      1136.0
+    ]
+  },
+  {
+    "key": "shadower--savage-blow--01",
+    "hair": {
+      "bbox": [
+        108,
+        135,
+        198,
+        205
+      ],
+      "span": 352.6875,
+      "componentPixels": 3472
+    },
+    "reference": {
+      "bbox": [
+        114,
+        102,
+        207,
+        183
+      ],
+      "span": 167.4,
+      "componentPixels": 4487
+    },
+    "head": 309.70766129032256,
+    "feet": [
+      653.0,
+      1153.0
+    ]
+  },
+  {
+    "key": "shadower--savage-blow--02",
+    "hair": {
+      "bbox": [
+        104,
+        118,
+        201,
+        198
+      ],
+      "span": 380.11875,
+      "componentPixels": 4499
+    },
+    "reference": {
+      "bbox": [
+        114,
+        102,
+        207,
+        183
+      ],
+      "span": 167.4,
+      "componentPixels": 4487
+    },
+    "head": 333.79603494623655,
+    "feet": [
+      639.5,
+      1163.0
+    ]
+  },
+  {
+    "key": "shadower--savage-blow--03",
+    "hair": {
+      "bbox": [
+        114,
+        120,
+        201,
+        192
+      ],
+      "span": 340.93125,
+      "componentPixels": 3512
+    },
+    "reference": {
+      "bbox": [
+        114,
+        102,
+        207,
+        183
+      ],
+      "span": 167.4,
+      "componentPixels": 4487
+    },
+    "head": 299.3840725806451,
+    "feet": [
+      646.0,
+      1130.0
+    ]
+  },
+  {
+    "key": "shadower--savage-blow--04",
+    "hair": {
+      "bbox": [
+        107,
+        130,
+        199,
+        204
+      ],
+      "span": 360.525,
+      "componentPixels": 3946
+    },
+    "reference": {
+      "bbox": [
+        114,
+        102,
+        207,
+        183
+      ],
+      "span": 167.4,
+      "componentPixels": 4487
+    },
+    "head": 316.59005376344084,
+    "feet": [
+      699.5,
+      1161.0
+    ]
+  },
+  {
+    "key": "shadower--savage-blow--05",
+    "hair": {
+      "bbox": [
+        97,
+        135,
+        202,
+        205
+      ],
+      "span": 411.46875,
+      "componentPixels": 4799
+    },
+    "reference": {
+      "bbox": [
+        114,
+        102,
+        207,
+        183
+      ],
+      "span": 167.4,
+      "componentPixels": 4487
+    },
+    "head": 361.32560483870964,
+    "feet": [
+      646.0,
+      1173.0
+    ]
+  },
+  {
+    "key": "shadower--savage-blow--06",
+    "hair": {
+      "bbox": [
+        115,
+        132,
+        197,
+        205
+      ],
+      "span": 321.3375,
+      "componentPixels": 3545
+    },
+    "reference": {
+      "bbox": [
+        114,
+        102,
+        207,
+        183
+      ],
+      "span": 167.4,
+      "componentPixels": 4487
+    },
+    "head": 282.1780913978494,
+    "feet": [
+      685.0,
+      1161.0
+    ]
+  },
+  {
+    "key": "shadower--savage-blow--07",
+    "hair": {
+      "bbox": [
+        104,
+        122,
+        199,
+        202
+      ],
+      "span": 372.28125,
+      "componentPixels": 4608
+    },
+    "reference": {
+      "bbox": [
+        114,
+        102,
+        207,
+        183
+      ],
+      "span": 167.4,
+      "componentPixels": 4487
+    },
+    "head": 326.9136424731183,
+    "feet": [
+      631.0,
+      1139.0
+    ]
+  },
+  {
+    "key": "shadower--savage-blow--08",
+    "hair": {
+      "bbox": [
+        121,
+        132,
+        194,
+        195
+      ],
+      "span": 286.06875,
+      "componentPixels": 2863
+    },
+    "reference": {
+      "bbox": [
+        114,
+        102,
+        207,
+        183
+      ],
+      "span": 167.4,
+      "componentPixels": 4487
+    },
+    "head": 251.20732526881721,
+    "feet": [
+      686.5,
+      1114.0
+    ]
+  },
+  {
+    "key": "shadower--wait--02",
+    "hair": {
+      "bbox": [
+        111,
+        103,
+        208,
+        194
+      ],
+      "span": 380.11875,
+      "componentPixels": 4601
+    },
+    "reference": {
+      "bbox": [
+        114,
+        102,
+        207,
+        183
+      ],
+      "span": 167.4,
+      "componentPixels": 4487
+    },
+    "head": 333.79603494623655,
+    "feet": [
+      634.0,
+      1118.0
+    ]
+  },
+  {
+    "key": "shadower--wait--03",
+    "hair": {
+      "bbox": [
+        115,
+        115,
+        207,
+        194
+      ],
+      "span": 360.525,
+      "componentPixels": 4415
+    },
+    "reference": {
+      "bbox": [
+        114,
+        102,
+        207,
+        183
+      ],
+      "span": 167.4,
+      "componentPixels": 4487
+    },
+    "head": 316.59005376344084,
+    "feet": [
+      635.5,
+      1153.0
+    ]
+  }
+]

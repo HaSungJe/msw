@@ -1,0 +1,62 @@
+[
+  {
+    "id": "paladin",
+    "prompt": "Use case: stylized-concept. Asset type: transparent game character bust portrait for recruitment and details UI. Image 1 is the approved paladin identity, costume, colors, expression reference. Image 2 Bishop portrait is the mandatory drawing style, face-to-shoulder proportions, rendering and composition reference. Make ONE dedicated upper-chest bust of the exact character from image 1, in the same polished smooth 2D SD anime illustration style as image 2: crisp outer lines, fine clean internal lines, soft controlled cel shading, luminous clear eyes, short round face, short neck, small shoulders. Paladin: blonde voluminous curls, turquoise eyes, calm slight smile, silver plate armor with gold trim, gold star at chest and royal blue cape. Preserve approved identity and all visible costume details. Face is visual focus, big head and compact upper chest; show head, shoulders and upper chest only, not full body. Similar face prominence to Bishop. Three-quarter portrait facing slightly toward viewer's left. Clean portrait silhouette with hair and key hat ornaments fully visible, narrow safe margins. No weapon or hands, no floating card, no extra effects, no orb, no text, no frame, no logo, no shadow, no backdrop. True transparent alpha background. Square image, production-quality clean edges suitable for final downsample to 512x512. Do not copy Bishop's hair, eyes, priest clothes or smile onto this character.",
+    "refs": [
+      "C:/workspace/msw/assets/design/characters/paladin/concept.png",
+      "C:/workspace/msw/assets/design/characters/bishop/portrait.png"
+    ],
+    "referenceHashes": {
+      "C:/workspace/msw/assets/design/characters/paladin/concept.png": "07e8d4f9a0a05711198900791bdc8c909707e12b642b6991362b58bc42b7c26b",
+      "C:/workspace/msw/assets/design/characters/bishop/portrait.png": "8455d94bc3e25b2527918b8c5a29c3fef07d5c9375051c918abdb8ba8977407b"
+    }
+  },
+  {
+    "id": "dark-knight",
+    "prompt": "Use case: stylized-concept. Asset type: transparent game character bust portrait for recruitment and details UI. Image 1 is the approved dark-knight identity, costume, colors, expression reference. Image 2 Bishop portrait is the mandatory drawing style, face-to-shoulder proportions, rendering and composition reference. Make ONE dedicated upper-chest bust of the exact character from image 1, in the same polished smooth 2D SD anime illustration style as image 2: crisp outer lines, fine clean internal lines, soft controlled cel shading, luminous clear eyes, short round face, short neck, small shoulders. Dark Knight: charcoal black short spiky hair, thick dark brows, green eyes, serious small closed mouth, gold hoop earrings, charcoal plate armor with gold trim and two gold chest chains, crimson cape. Absolutely no Beholder orb. Preserve approved identity and all visible costume details. Face is visual focus, big head and compact upper chest; show head, shoulders and upper chest only, not full body. Similar face prominence to Bishop. Three-quarter portrait facing slightly toward viewer's left. Clean portrait silhouette with hair and key hat ornaments fully visible, narrow safe margins. No weapon or hands, no floating card, no extra effects, no orb, no text, no frame, no logo, no shadow, no backdrop. True transparent alpha background. Square image, production-quality clean edges suitable for final downsample to 512x512. Do not copy Bishop's hair, eyes, priest clothes or smile onto this character.",
+    "refs": [
+      "C:/workspace/msw/assets/design/characters/dark-knight/concept.png",
+      "C:/workspace/msw/assets/design/characters/bishop/portrait.png"
+    ],
+    "referenceHashes": {
+      "C:/workspace/msw/assets/design/characters/dark-knight/concept.png": "90281a7fedecaa723568395234ea58303feadfde5b5bfbf70ba71b62e860f492",
+      "C:/workspace/msw/assets/design/characters/bishop/portrait.png": "8455d94bc3e25b2527918b8c5a29c3fef07d5c9375051c918abdb8ba8977407b"
+    }
+  },
+  {
+    "id": "night-lord",
+    "prompt": "Use case: stylized-concept. Asset type: transparent game character bust portrait for recruitment and details UI. Image 1 is the approved night-lord identity, costume, colors, expression reference. Image 2 Bishop portrait is the mandatory drawing style, face-to-shoulder proportions, rendering and composition reference. Make ONE dedicated upper-chest bust of the exact character from image 1, in the same polished smooth 2D SD anime illustration style as image 2: crisp outer lines, fine clean internal lines, soft controlled cel shading, luminous clear eyes, short round face, short neck, small shoulders. Night Lord: purple spiky hair, lavender gray eyes, serious composed expression, black headband with small silver ring, silver earrings, high black collar with silver piping, engraved silver shoulder armor, dark teal black clothing, dark red scarf tails. Preserve approved identity and all visible costume details. Face is visual focus, big head and compact upper chest; show head, shoulders and upper chest only, not full body. Similar face prominence to Bishop. Three-quarter portrait facing slightly toward viewer's left. Clean portrait silhouette with hair and key hat ornaments fully visible, narrow safe margins. No weapon or hands, no floating card, no extra effects, no orb, no text, no frame, no logo, no shadow, no backdrop. True transparent alpha background. Square image, production-quality clean edges suitable for final downsample to 512x512. Do not copy Bishop's hair, eyes, priest clothes or smile onto this character.",
+    "refs": [
+      "C:/workspace/msw/assets/design/characters/night-lord/concept.png",
+      "C:/workspace/msw/assets/design/characters/bishop/portrait.png"
+    ],
+    "referenceHashes": {
+      "C:/workspace/msw/assets/design/characters/night-lord/concept.png": "cb882dcc352abc52448a2ac35eb38e9545635ffbafc8373f3f1f246654701585",
+      "C:/workspace/msw/assets/design/characters/bishop/portrait.png": "8455d94bc3e25b2527918b8c5a29c3fef07d5c9375051c918abdb8ba8977407b"
+    }
+  },
+  {
+    "id": "shadower",
+    "prompt": "Use case: stylized-concept. Asset type: transparent game character bust portrait for recruitment and details UI. Image 1 is the approved shadower identity, costume, colors, expression reference. Image 2 Bishop portrait is the mandatory drawing style, face-to-shoulder proportions, rendering and composition reference. Make ONE dedicated upper-chest bust of the exact character from image 1, in the same polished smooth 2D SD anime illustration style as image 2: crisp outer lines, fine clean internal lines, soft controlled cel shading, luminous clear eyes, short round face, short neck, small shoulders. Shadower: silver white straight bob with blunt bangs, turquoise eyes, cool serious gaze, black cloth face mask fully covering nose and mouth, silver ear cuff and little gold studs, orange sleeves, black shoulder pads and black scarf. Preserve approved identity and all visible costume details. Face is visual focus, big head and compact upper chest; show head, shoulders and upper chest only, not full body. Similar face prominence to Bishop. Three-quarter portrait facing slightly toward viewer's left. Clean portrait silhouette with hair and key hat ornaments fully visible, narrow safe margins. No weapon or hands, no floating card, no extra effects, no orb, no text, no frame, no logo, no shadow, no backdrop. True transparent alpha background. Square image, production-quality clean edges suitable for final downsample to 512x512. Do not copy Bishop's hair, eyes, priest clothes or smile onto this character.",
+    "refs": [
+      "C:/workspace/msw/assets/design/characters/shadower/concept.png",
+      "C:/workspace/msw/assets/design/characters/bishop/portrait.png"
+    ],
+    "referenceHashes": {
+      "C:/workspace/msw/assets/design/characters/shadower/concept.png": "2eae51e760e880a37c73394c774e1d15e18a0e7c2d4898661a233844196349c6",
+      "C:/workspace/msw/assets/design/characters/bishop/portrait.png": "8455d94bc3e25b2527918b8c5a29c3fef07d5c9375051c918abdb8ba8977407b"
+    }
+  },
+  {
+    "id": "phantom",
+    "prompt": "Use case: stylized-concept. Asset type: transparent game character bust portrait for recruitment and details UI. Image 1 is the approved phantom identity, costume, colors, expression reference. Image 2 Bishop portrait is the mandatory drawing style, face-to-shoulder proportions, rendering and composition reference. Make ONE dedicated upper-chest bust of the exact character from image 1, in the same polished smooth 2D SD anime illustration style as image 2: crisp outer lines, fine clean internal lines, soft controlled cel shading, luminous clear eyes, short round face, short neck, small shoulders. Phantom: blonde tousled short hair, violet eyes, confident subtle smirk, ornate large white royal-blue black gold hat with blue feather and turquoise jewel, white blue gold coat, red gemstone brooch and gold epaulettes. Keep hat recognizable while framing face clearly. Preserve approved identity and all visible costume details. Face is visual focus, big head and compact upper chest; show head, shoulders and upper chest only, not full body. Similar face prominence to Bishop. Three-quarter portrait facing slightly toward viewer's left. Clean portrait silhouette with hair and key hat ornaments fully visible, narrow safe margins. No weapon or hands, no floating card, no extra effects, no orb, no text, no frame, no logo, no shadow, no backdrop. True transparent alpha background. Square image, production-quality clean edges suitable for final downsample to 512x512. Do not copy Bishop's hair, eyes, priest clothes or smile onto this character.",
+    "refs": [
+      "C:/workspace/msw/assets/design/characters/phantom/concept.png",
+      "C:/workspace/msw/assets/design/characters/bishop/portrait.png"
+    ],
+    "referenceHashes": {
+      "C:/workspace/msw/assets/design/characters/phantom/concept.png": "3107933cdb8fd621de8a5dd036ec3d4b391e05be1d18a778de84a01735006e84",
+      "C:/workspace/msw/assets/design/characters/bishop/portrait.png": "8455d94bc3e25b2527918b8c5a29c3fef07d5c9375051c918abdb8ba8977407b"
+    }
+  }
+]

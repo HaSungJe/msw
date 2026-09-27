@@ -1,0 +1,118 @@
+--- before
++++ after
+@@ -8,12 +8,27 @@
+ 
+ 	method boolean HasMageSkin(string jobId)
+ 		-- 원화 적용 직업: 서버 스폰과 클라이언트 표시가 같은 분기를 사용한다.
+-		return jobId == "il" or jobId == "fp" or jobId == "bishop" or jobId == "hero" or jobId == "marks" or jobId == "bow"
++		return jobId == "il" or jobId == "fp" or jobId == "bishop" or jobId == "hero" or jobId == "marks" or jobId == "bow" or jobId == "paladin" or jobId == "dk"
+ 	end
+ 
+ 	-- 대기는 3장의 호흡 동작, 공격은 스킬마다 그린 연결 프레임을 재생한다.
+ 	@ExecSpace("ClientOnly")
+ 	method table GetMageSkinFrames(string jobId)
++		if jobId == "paladin" then
++			return {
++				stand1 = { "17e0e0811cd742bea27591ffbc9b723b", "019b667361c1459c819353dcc5a0ed8b", "17e0e0811cd742bea27591ffbc9b723b", "2838ebd8b5d044a693a4c43b0bf77879" },
++				paladinCharge = { "a5be5b20b9d8440ab5af38cc595ba2f8", "1db1a18d2bde472c88e72ab3d70d14bf", "6c9a71053f3a4f259dd41e270e4c94bd", "a17d41771324411b9d1b0b78ddb1bb74", "cc366fbe0bdb40a38b6efd846aaccb48", "af6ec8fb94ae40f4abb3002779fc8994" },
++				paladinSanctuary = { "cdcbfe6d6e9146a6a1920baa69b90751", "86cd9fda03684baabc4bfdfe050fac74", "ba408ac01fcd4974a5b9d15fb910cdf0", "16619a38e9104bd99c5bc0a0b59a3096", "0a9d251c2a494888a0f1ebc47927bb15", "371429c6ddab4a1cb26d06fa3149bea6" },
++			}
++		end
++		if jobId == "dk" then
++			return {
++				stand1 = { "8e918f5a58d84f0880f30802e53ec1cb", "a97d69b1da2244c3bbe72930a3215557", "8e918f5a58d84f0880f30802e53ec1cb", "469c0c8e7bab4319a830615eb520aa25" },
++				dkBuster = { "db441b80de084e379a78abef334b222d", "44b618f978a64d6ab413e65c53eb5bb3", "147f40da0e0f489ca2b21ec4d0ff100a", "9782ca7375084fbbbd53f61f98282761", "75434da8b1d941c7bcf2d8761010db5b", "7f5f9ec7b7584a70b5d01e374cee5c68", "196ec18d224d4b868a2dce4a4c4a729c", "70cf79c13cf34ea8a754b74b47bb56fa" },
++				dkRoar = { "ed125f0a1730494d95c759927e035556", "310c4f9feeb3407597dcce8138e66cd5", "7005c13026024b839785ebf274ca4ea9", "b95f492ef7bf43a2ab0243d81ea9bc20", "9c54e19b80b54384a2950c3f9905f560", "1374b63a6fe14ee2ab0d200b61bf0e97" },
++				dkGiantBuster = { "db441b80de084e379a78abef334b222d", "44b618f978a64d6ab413e65c53eb5bb3", "147f40da0e0f489ca2b21ec4d0ff100a", "9782ca7375084fbbbd53f61f98282761", "75434da8b1d941c7bcf2d8761010db5b", "7f5f9ec7b7584a70b5d01e374cee5c68", "196ec18d224d4b868a2dce4a4c4a729c", "7f5f9ec7b7584a70b5d01e374cee5c68", "75434da8b1d941c7bcf2d8761010db5b", "7f5f9ec7b7584a70b5d01e374cee5c68", "196ec18d224d4b868a2dce4a4c4a729c", "7f5f9ec7b7584a70b5d01e374cee5c68", "196ec18d224d4b868a2dce4a4c4a729c", "70cf79c13cf34ea8a754b74b47bb56fa" },
++			}
++		end
+ 		-- 보우마스터: 비숍 기준 비율, 수평 연사 / 한쪽 무릎 수직 발사.
+ 		if jobId == "bow" then
+ 			return {
+@@ -66,6 +81,9 @@
+ 	-- 선택창·상세정보 공용 흉상.
+ 	@ExecSpace("ClientOnly")
+ 	method string GetMagePortraitRUID(string jobId)
++		-- 전용 흉상 제작 전에는 승인된 대기 첫 컷을 임시 사용한다.
++		if jobId == "paladin" then return "17e0e0811cd742bea27591ffbc9b723b" end
++		if jobId == "dk" then return "8e918f5a58d84f0880f30802e53ec1cb" end
+ 		if jobId == "bow" then return "0d124c8828044ba4b8d71180f2e2fca6" end
+ 		if jobId == "marks" then return "bb8c6be33ae64a9f96d8a3f74ea7f459" end
+ 		if jobId == "il" then return "f93cfcc7a46d428cb6ed2bb3d71fc986" end
+@@ -78,6 +96,21 @@
+ 	-- 기존 효과 시작·타격 시점과 시전 전체 길이를 유지하며 중간 자세만 추가한다.
+ 	@ExecSpace("ClientOnly")
+ 	method table GetMageSkinFrameDurations(string jobId)
++		if jobId == "paladin" then
++			return {
++				stand1 = { 0.65, 0.45, 0.65, 0.45 },
++				paladinCharge = { 0.15, 0.15, 0.08, 0.1, 0.1, 0.17 },
++				paladinSanctuary = { 0.2, 0.2, 0.1, 0.12, 0.13, 0.15 },
++			}
++		end
++		if jobId == "dk" then
++			return {
++				stand1 = { 0.65, 0.45, 0.65, 0.45 },
++				dkBuster = { 0.6, 0.05, 0.08, 0.07, 0.08, 0.07, 0.1, 0.15 },
++				dkRoar = { 0.2, 0.2, 0.2, 0.2, 0.25, 0.35 },
++				dkGiantBuster = { 0.6, 0.05, 0.04, 0.035, 0.04, 0.035, 0.04, 0.035, 0.04, 0.035, 0.04, 0.035, 0.04, 0.135 },
++			}
++		end
+ 		if jobId == "bow" then return { stand1 = { 0.65, 0.45, 0.65, 0.45 }, bowHurricane = { 0.04, 0.04, 0.04, 0.04, 0.04 }, bowArrowRain = { 0.04, 0.04, 0.04, 0.04, 0.04 } } end
+ 		-- 저격은 첫 타격까지 조준하고, 타격 간격에 맞춰 반동·조준을 반복한다.
+ 		if jobId == "marks" then
+@@ -451,15 +484,15 @@
+ 		end
+ 		if jobId == "paladin" then
+ 			return {
+-				-- 디바인 차지 연출(2026-09-18 사용자 "지금 것 그대로, 원작 재탐색 ㄴㄴ" = character.md 값): swingTF + 시전 클립 1221004/effect/1(cb9cff6c…, 0.65초) + 시전음 1221004/use(e2989dca…)
++				-- 디바인 차지 연출(2026-09-18 사용자 "지금 것 그대로, 원작 재탐색 ㄴㄴ" = character.md 값): paladinCharge PNG + 시전 클립 1221004/effect/1(cb9cff6c…, 0.65초) + 시전음 1221004/use(e2989dca…)
+ 				--   타격 0.3초 뒤 1회(200%). 타격 클립·타격음 미지정 → 몬스터 번쩍임만. 클립은 왼쪽 보기 자산(무기 빛 → 앞쪽에 문양 폭발)이라 assetFacesLeft, 스케일 1.4(2.0은 문양이 두 칸 크기)
+ 				{ lv = 1, kind = "액티브", name = "디바인 차지", desc = "사거리 1 안의 적을 최대 4마리까지 120%의 데미지로 공격한다.", target = false, range = 1,
+-					fx = { motion = "swingTF", clip = "cb9cff6c57fd4cb18a05db3d47277031", scale = 1.4, feetDx = 0, feetDy = 0, assetFacesLeft = true, sound = "e2989dcac9054d689e379b9feff55f54",
++					fx = { motion = "paladinCharge", clip = "cb9cff6c57fd4cb18a05db3d47277031", scale = 1.4, feetDx = 0, feetDy = 0, assetFacesLeft = true, sound = "e2989dcac9054d689e379b9feff55f54",
+ 						hitDelay = 0.3 } },
+ 				{ lv = 10, kind = "패시브", name = "가드 크러쉬", desc = "같은 구역의 모든 적의 방어율을 10% 감소시킨다.", target = false },
+-				-- 생츄어리 연출(character.md 값): swingT1 + 시전 클립 1221011/effect(d577178a…, 0.9초, 첫 재생 로딩 → Preload) + 시전음 1221011/use / 타격 0.5초 뒤 1회, 맞는 몬스터 위 1221011/hit/0 + 타격음 1221011/hit. cd = 쿨타임 초(전투 루프가 준비되면 기본 공격 대신 쓴다)
++				-- 생츄어리 연출(character.md 값): paladinSanctuary PNG + 시전 클립 1221011/effect(d577178a…, 0.9초, 첫 재생 로딩 → Preload) + 시전음 1221011/use / 타격 0.5초 뒤 1회, 맞는 몬스터 위 1221011/hit/0 + 타격음 1221011/hit. cd = 쿨타임 초(전투 루프가 준비되면 기본 공격 대신 쓴다)
+ 				{ lv = 20, kind = "액티브", name = "생츄어리", desc = "사거리 4 안의 적을 최대 15마리까지 200%의 데미지로 공격한다. 일반 몬스터에게는 데미지가 100% 증가한다. 재사용 대기시간 15초", target = false, area = true, mobMul = 2, cd = 15, ratio = 200, hits = 1, targets = 15, range = 4, after = 1.5,
+-					fx = { motion = "swingT1", clip = "d577178a8212489e8319a4c5b16e897b", scale = 1.2, feetDx = 0, feetDy = 0, assetFacesLeft = true, sound = "aa96c1117c634a23b56440be8de39037",
++					fx = { motion = "paladinSanctuary", clip = "d577178a8212489e8319a4c5b16e897b", scale = 1.2, feetDx = 0, feetDy = 0, assetFacesLeft = true, sound = "aa96c1117c634a23b56440be8de39037",
+ 						hitDelay = 0.5, hitClip = "5df303c326dd488cbeb17028892b5238", hitScale = 1.6, hitDy = 0.6, hitSound = "2cc05078af454fa3a7856b9fb65ed61f" } },
+ 				{ lv = 30, kind = "패시브", name = "디바인 블레싱", desc = "최종 데미지가 50% 증가한다.", target = false },
+ 				{ lv = 40, kind = "패시브", name = "가드 크러쉬 강화", desc = "가드 크러쉬의 방어율 감소가 20%로 증가한다.", target = false },
+@@ -471,12 +504,12 @@
+ 			return {
+ 				-- 스피어 버스터 연출(2026-09-19 사용자 지정 skill/80003291 세트 — 원작 데이터에 스피어 버스터로 검색됨): 클립들이 각자 빈 프레임으로 시작 시각을 갖고 있어 전부 시전 순간에 함께 띄운다(clips).
+ 				--   effect c7051cc2…(푸른 창날 윤곽 158×189px, 발 기준, 2fr 0.9초 — 캐릭터 위 오라) / effect0 176da561…(0.3초 뒤 마법진 113px → 0.5초 용머리 166×120) / effect1·2·3(0.6·0.75·0.9초에 찌르기 잔상 162×69 → 용머리 찌르기 164×78, 원점 오른쪽 끝 = 앞으로 뻗음, 발 높이 +0~60px)
+-				--   모션 stabT1은 0.5초 뒤(motionDelay — 찌르기 3개 0.6~0.95초를 덮음). 판정 0.65·0.8·0.95초(hitDelay 0.65 + hitGap 0.15 = 찌르기 시차와 같음). 몬스터 위 hit/0 84c06a06…(푸른 폭발 4fr 0.4초). 세트에 사운드가 없어 옛 스피어 크러셔 시전음 fcac442d…·타격음 6313ad64… 유지.
++				--   PNG dkBuster는 준비 0.5초를 첫 프레임 유지 시간에 포함한다(찌르기 3개 0.6~0.95초를 덮음; motionDelay는 기존 아바타 경로용). 판정 0.65·0.8·0.95초(hitDelay 0.65 + hitGap 0.15 = 찌르기 시차와 같음). 몬스터 위 hit/0 84c06a06…(푸른 폭발 4fr 0.4초). 세트에 사운드가 없어 옛 스피어 크러셔 시전음 fcac442d…·타격음 6313ad64… 유지.
+ 				--   **확정 2026-09-19 사용자 "다크나이트 스피어 버스터는 이거로 완전 종결"** — 이 상태 그대로 둔다(클립들은 EndFrame 정리라 용머리·찌르기 마지막 프레임이 0.03초만 보이는데, 사용자가 이 모습을 보고 확정. 더 길게 보이게 하려면 clips 항목에 life = 0.7/0.75/0.9/1.05, clipHold 옵션이 있음).
+ 				--   이전: 영상 추출 11프레임 플립북(assets/textures/crusher, frames = b309f1e7… 외 10, frameSec 0.09, scale 1.7, feetDx -0.11, feetDy 0.83) — 파일은 남겨 둠
+ 				{ lv = 1, kind = "액티브", name = "스피어 버스터", desc = "사거리 1 안의 적을 최대 3마리까지 80%의 데미지로 3회 공격한다.", target = false, range = 1,
+ 					-- 날개(effect c7051cc2 — 2프레임 0.9초)는 마지막 프레임 진입에서 지워져 0.45초면 사라졌다 → clipHold로 3단 찌르기가 끝나는 1.1초까지(2026-09-23 사용자 "날개를 유지"). 용머리(effect0)는 원래대로 잠깐
+-					fx = { motion = "stabT1", motionDelay = 0.5, clip = "c7051cc242c54208a7c22df2b4bcc28e", clipLife = 1.1, clipHold = true,
++					fx = { motion = "dkBuster", motionDelay = 0.5, clip = "c7051cc242c54208a7c22df2b4bcc28e", clipLife = 1.1, clipHold = true,
+ 						--   거대화는 6타라 찌르기를 더 넣는다(ApplyPrismSkills "giant")
+ 						clips = { "176da561b7f946bcbb45bbfbabbaf605", "852883a5b27442e88ac5a23f5a218a58", "3c2ee6e636924e179cca843f819f9b30", "521bf9f60cb94a7fb9890ba2e0ede109" },
+ 						scale = 2.0, feetDx = 0, feetDy = 0, assetFacesLeft = true, sound = "fcac442d953049d980da4b8d7bd766d8",
+@@ -486,9 +519,9 @@
+ 				{ lv = 20, kind = "패시브", name = "스피어 버스터 숙련", desc = "스피어 버스터의 데미지가 50% 증가한다.", target = false },
+ 				{ lv = 30, kind = "패시브", name = "버서크", desc = "공격력이 50% 증가한다.", target = false },
+ 				{ lv = 40, kind = "패시브", name = "스피어 버스터 강화", desc = "스피어 버스터의 데미지가 50% 증가하고, 보스 공격 시 데미지가 25% 증가한다.", target = false },
+-				-- 드래곤 로어 연출(character.md 값): swingT3 + 시전 클립 9001006/effect(5468cadd…, 18프레임 1.2초, 등장 시 Preload) + 시전음 eec2f5d3… / 타격 0.6초 뒤 1회(300%), 맞는 몬스터 위 9001006/hit/0. 쿨 15초, 기본 보스전 잠금
++				-- 드래곤 로어 연출(character.md 값): dkRoar PNG + 시전 클립 9001006/effect(5468cadd…, 18프레임 1.2초, 등장 시 Preload) + 시전음 eec2f5d3… / 타격 0.6초 뒤 1회(300%), 맞는 몬스터 위 9001006/hit/0. 쿨 15초, 기본 보스전 잠금
+ 				{ lv = 50, kind = "액티브", name = "드래곤 로어", desc = "사거리 5 안의 적을 최대 15마리까지 300%의 데미지로 공격한다. 일반 몬스터에게는 데미지가 100% 증가한다. 재사용 대기시간 15초. 패시브: 최종 데미지가 20% 증가한다. 몬스터의 방어율을 50% 무시한다.", target = false, lock = 1, area = true, mobMul = 2, cd = 15, ratio = 300, hits = 1, targets = 15, range = 5, after = 1.5,
+-					fx = { motion = "swingT3", clip = "5468cadd2f60428e925bc368968e1a1e", scale = 1.5, feetDx = 0, feetDy = 0, assetFacesLeft = true, sound = "eec2f5d35c6f4f6ebe8f19bb52dbf1d1", clipLife = 1.4,
++					fx = { motion = "dkRoar", clip = "5468cadd2f60428e925bc368968e1a1e", scale = 1.5, feetDx = 0, feetDy = 0, assetFacesLeft = true, sound = "eec2f5d35c6f4f6ebe8f19bb52dbf1d1", clipLife = 1.4,
+ 						hitDelay = 0.6, hitClip = "01c803531e2c4e5aa3c3ef66f14711b8", hitScale = 1.6, hitDy = 0.6 } },
+ 			}
+ 		end
+@@ -1421,6 +1454,7 @@
+ 				-- 거대화 6타 연출(2026-09-23 사용자 "찌르기 이펙트도 6번 따르르륵"): 타격 0.075초 간격, 찌르기 클립 3개를 0.075초 늦춰 한 번씩 더(0.6~0.975초), 용 날개 1.2초까지
+ 				-- 거대화 = 창이 3배(사용자 2026-09-22): 시전 클립·추가 클립 스케일 ×3(타격 클립은 그대로). 원점이 발이라 발판 위치는 같다
+ 				local fx = self:CopyTable(k.fx)
++				fx.motion = "dkGiantBuster" -- 같은 창 프레임으로 6회 찌르기
+ 				fx.scale = (fx.scale or 1) * 3
+ 				if fx.clips ~= nil then
+ 					local cl = {}

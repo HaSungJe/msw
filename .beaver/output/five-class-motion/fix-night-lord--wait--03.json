@@ -1,0 +1,17 @@
+{
+  "id": "night-lord",
+  "skill": "wait",
+  "n": 3,
+  "pose": "Small exhalation: preserve exact idle pose and planted feet, relax shoulders subtly lower, cape/scarf/hair tips settle slightly inward. Same eyes and expression, no stance change.",
+  "key": "night-lord--wait--03",
+  "prompt": "Use case: identity-preserve animation pose edit. Generate ONE transparent PNG animation frame, not a sheet.\nImage1 EDIT TARGET and exact framing/scale master: night-lord character on 576x576 square canvas. Image2 approved identity/costume master, do not copy its larger framing. Image3 Bishop style/anatomy master, do not copy its clothes/hair/staff.\nKeep character SAME small on-canvas size as image1, with generous empty transparent space above. Do not zoom in or fill canvas. In 576-unit canvas coordinates, anatomical head crown-to-chin147units, feet ground y512, centerx288. Underlying standing body height338units and2.3heads, ignoring hats/feathers/tall hair/weapon. Pose may bend knees, never lengthen limbs/boots. Preserve exact face, hair, eye color, all clothing panels, jewelry, weapon design, clean line weight and soft cel shading.\nFrame 3 for wait: Small exhalation: preserve exact idle pose and planted feet, relax shoulders subtly lower, cape/scarf/hair tips settle slightly inward. Same eyes and expression, no stance change.\n\n\nOnly body pose and subtle expression changes allowed. Entire hair/hat/weapon/cape/boots visible with transparent margins. No extra limbs or weapons, no blur or motion trails, no aura/projectiles/glows/environment, no text/numbers/grid/border/shadow. Feet grounded. Actual transparent background. Same fine polished 2D SD game illustration as Bishop, no pixel art. Output ONE frame.",
+  "refs": [
+    "C:/workspace/msw/.beaver/output/five-class-motion/base/night-lord.png",
+    "C:/workspace/msw/assets/design/characters/night-lord/concept.png",
+    "C:/workspace/msw/assets/design/characters/bishop/frames/wait/motion01.png"
+  ],
+  "source": "C:/Users/timec/.codex/generated_images/01a0dbf3-5094-7520-bfc7-f24b6496f5e5/exec-e686e2bb-17f3-4455-8b45-a27989f33973.png",
+  "state": "generated-awaiting-QA",
+  "previousSource": "C:/Users/timec/.codex/generated_images/01a0dbf3-5094-7520-bfc7-f24b6496f5e5/exec-28a0ad96-4497-4598-b1a9-d5cfd810183a.png",
+  "correctionPrompt": "Use case: precise-object-edit. Image1 target animation frame. Image2 approved identity/weapon reference. Remove ONLY the small white exhalation cloud/puff next to the mouth and left side of cheek. That area must be transparent. No breath vapor, effects, stars or symbols. Keep the character, weapon, pose and every other pixel appearance unchanged. Same original canvas framing, true transparent background, full body/weapon visible, no text/shadow. Output ONE corrected frame."
+}

@@ -1,0 +1,56 @@
+[
+  {
+    "n": 2,
+    "key": "dark-knight/frames/spear-buster/motion02.png",
+    "file": "C:\\workspace\\msw\\.beaver\\output\\dark-knight-buster\\normalized\\motion02.png",
+    "name": "RtsArt_dk_buster_up_down_front_02",
+    "size": 213276,
+    "sha256": "871d964fb1ee08be2bdc14edd7f0acc4915b7f52cfd19f2ea0b77299531c0e43",
+    "ruid": "0e1c9aecd84f4c10984932aa52441481"
+  },
+  {
+    "n": 3,
+    "key": "dark-knight/frames/spear-buster/motion03.png",
+    "file": "C:\\workspace\\msw\\.beaver\\output\\dark-knight-buster\\normalized\\motion03.png",
+    "name": "RtsArt_dk_buster_up_down_front_03",
+    "size": 225788,
+    "sha256": "8b52fe5b8e512a31219fa935236cf3524d97c478dbdccb07f0495a11916162f2",
+    "ruid": "a1c730f53f0249449329a6c5751e3df3"
+  },
+  {
+    "n": 4,
+    "key": "dark-knight/frames/spear-buster/motion04.png",
+    "file": "C:\\workspace\\msw\\.beaver\\output\\dark-knight-buster\\normalized\\motion04.png",
+    "name": "RtsArt_dk_buster_up_down_front_04",
+    "size": 208531,
+    "sha256": "68b183af8c7afd3a6ece00e31714dc22ac617d640fa31e050efdb1f73ac2bcb8",
+    "ruid": "6fbf840e8da146fd8951de0e68f631c4"
+  },
+  {
+    "n": 5,
+    "key": "dark-knight/frames/spear-buster/motion05.png",
+    "file": "C:\\workspace\\msw\\.beaver\\output\\dark-knight-buster\\normalized\\motion05.png",
+    "name": "RtsArt_dk_buster_up_down_front_05",
+    "size": 192540,
+    "sha256": "0b3b68ce7bb31122e8307350cbb25336049c9c53e46a3ed1f866fd8cbe3b57f2",
+    "ruid": "5a4ae361c00240128dab626b00cd7ca7"
+  },
+  {
+    "n": 6,
+    "key": "dark-knight/frames/spear-buster/motion06.png",
+    "file": "C:\\workspace\\msw\\.beaver\\output\\dark-knight-buster\\normalized\\motion06.png",
+    "name": "RtsArt_dk_buster_up_down_front_06",
+    "size": 214141,
+    "sha256": "e005e981aec80d80a22b3cc945ef1243ecd51e2382d902df12d9ebfb2e04b677",
+    "ruid": "d05450084ea54dc7a22c4a61f1b3d42f"
+  },
+  {
+    "n": 7,
+    "key": "dark-knight/frames/spear-buster/motion07.png",
+    "file": "C:\\workspace\\msw\\.beaver\\output\\dark-knight-buster\\normalized\\motion07.png",
+    "name": "RtsArt_dk_buster_up_down_front_07",
+    "size": 222432,
+    "sha256": "c83c7bcc950d0edf990d6cdb86c129f6eb39888177ad71149e16b0b48f921bc4",
+    "ruid": "2aac0b1ea953485085c7c0b53fc4dbf4"
+  }
+]

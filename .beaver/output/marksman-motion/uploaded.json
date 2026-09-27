@@ -1,0 +1,62 @@
+[
+  {
+    "path": "C:/workspace/msw/assets/design/characters/marksman/frames/wait/motion01.png",
+    "ruid": "f3d13c1096a4466fa0154d8c0a032ca5"
+  },
+  {
+    "path": "C:/workspace/msw/assets/design/characters/marksman/frames/wait/motion02.png",
+    "ruid": "73152d7bbf474ed08b8441ddf46d92e4"
+  },
+  {
+    "path": "C:/workspace/msw/assets/design/characters/marksman/frames/wait/motion03.png",
+    "ruid": "c25f3c31ebe04277bbad8010778e38b2"
+  },
+  {
+    "path": "C:/workspace/msw/assets/design/characters/marksman/frames/piercing/motion01.png",
+    "ruid": "34222457fabf49608e90f1680d79af32"
+  },
+  {
+    "path": "C:/workspace/msw/assets/design/characters/marksman/frames/piercing/motion02.png",
+    "ruid": "3f730e1b307447b2bf80927eb79844e5"
+  },
+  {
+    "path": "C:/workspace/msw/assets/design/characters/marksman/frames/piercing/motion03.png",
+    "ruid": "2bbbc8fe20664dbfaa6576011cf5c39c"
+  },
+  {
+    "path": "C:/workspace/msw/assets/design/characters/marksman/frames/piercing/motion04.png",
+    "ruid": "1a7cbdc7d002482d9f2144afb1347cd3"
+  },
+  {
+    "path": "C:/workspace/msw/assets/design/characters/marksman/frames/piercing/motion05.png",
+    "ruid": "7b0535e0a23e43d0a43a254ce0801f85"
+  },
+  {
+    "path": "C:/workspace/msw/assets/design/characters/marksman/frames/piercing/motion06.png",
+    "ruid": "610392408b3b42f4966e8b90b2fe4f8b"
+  },
+  {
+    "path": "C:/workspace/msw/assets/design/characters/marksman/frames/sniping/motion01.png",
+    "ruid": "2772f8130f1a46daa41ccb0c3cf5646c"
+  },
+  {
+    "path": "C:/workspace/msw/assets/design/characters/marksman/frames/sniping/motion02.png",
+    "ruid": "c844fb0acc594a37b6ac4ea5f49b7eaa"
+  },
+  {
+    "path": "C:/workspace/msw/assets/design/characters/marksman/frames/sniping/motion03.png",
+    "ruid": "a53258bcb9d445e79bd1a32c888ee2ea"
+  },
+  {
+    "path": "C:/workspace/msw/assets/design/characters/marksman/frames/sniping/motion04.png",
+    "ruid": "79efce895d6245978f315c4d7561e6aa"
+  },
+  {
+    "path": "C:/workspace/msw/assets/design/characters/marksman/frames/sniping/motion05.png",
+    "ruid": "49e0863243a44656ac715f8442e02fba"
+  },
+  {
+    "path": "C:/workspace/msw/assets/design/characters/marksman/portrait.png",
+    "ruid": "bb8c6be33ae64a9f96d8a3f74ea7f459"
+  }
+]

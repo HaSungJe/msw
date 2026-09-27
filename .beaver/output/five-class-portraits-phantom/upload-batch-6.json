@@ -1,0 +1,26 @@
+[
+  {
+    "key": "phantom/joker/04",
+    "file": "C:\\workspace\\msw\\assets\\design\\characters\\phantom\\frames\\joker\\motion04.png",
+    "name": "RtsPhantom_joker04",
+    "size": 374124,
+    "sha256": "3eabeabfa04f07338e28bed42178a6a1d10acf377b94f0e8269a4df9f4fc5b61",
+    "ruid": "243362d8c268465ea112983c96074d66"
+  },
+  {
+    "key": "phantom/joker/05",
+    "file": "C:\\workspace\\msw\\assets\\design\\characters\\phantom\\frames\\joker\\motion05.png",
+    "name": "RtsPhantom_joker05",
+    "size": 426514,
+    "sha256": "38cfd70c410144ac637aafaa5ebaf2e632ec04728d76c9bb45b9f38a4918b95f",
+    "ruid": "1095f84d2bc0495cb23aff6b99ad8028"
+  },
+  {
+    "key": "phantom/joker/06",
+    "file": "C:\\workspace\\msw\\assets\\design\\characters\\phantom\\frames\\joker\\motion06.png",
+    "name": "RtsPhantom_joker06",
+    "size": 441756,
+    "sha256": "914c6ca9edf5dd75e2c8d593b8e9c0a46963dbb6b30eef84f1426c4e59d85bdc",
+    "ruid": "e671da47876b4393abc19798852b594d"
+  }
+]

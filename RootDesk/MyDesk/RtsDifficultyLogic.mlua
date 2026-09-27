@@ -138,11 +138,11 @@ script RtsDifficultyLogic extends Logic
 		for i = 1, #self.Btns do
 			local b = self.Btns[i]
 			if i == my then
-				b.SpriteGUIRendererComponent.Color = Color(0.86, 0.85, 0.96, 0.95)
-				b.Parent.SpriteGUIRendererComponent.Color = H:ColGold()
+				_RtsHudLogic:SetUiColor(b, Color(0.86, 0.85, 0.96, 0.95), "surface")
+				_RtsHudLogic:SetUiColor(b.Parent, H:ColGold(), "border")
 			else
-				b.SpriteGUIRendererComponent.Color = H:ColPanel()
-				b.Parent.SpriteGUIRendererComponent.Color = H:ColBorder()
+				_RtsHudLogic:SetUiColor(b, H:ColPanel(), "surface")
+				_RtsHudLogic:SetUiColor(b.Parent, H:ColBorder(), "border")
 			end
 		end
 	end

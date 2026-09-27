@@ -1,0 +1,11 @@
+{
+  "key": "ice-lightning-mage/frames/chain-lightning/motion01.png",
+  "id": "ice-lightning-mage",
+  "rel": "frames/chain-lightning/motion01.png",
+  "original": "C:/workspace/msw/.beaver/output/bishop-standard/originals/ice-lightning-mage/frames/chain-lightning/motion01.png",
+  "width": 704,
+  "height": 704,
+  "originalSha256": "e28d8ca6c99c070fbd5d793b1fbea8eac3587358e49edf781b6741ca6f3937a2",
+  "generated": "C:/Users/timec/.codex/generated_images/01a0dbf3-5094-7520-bfc7-f24b6496f5e5/exec-c545a1a7-39df-4557-a151-70d17f5e6f02.png",
+  "prompt": "Edit IMAGE1, existing ice mage animation frame frames/chain-lightning/motion01.png. Image2 supplies corrected head/body proportions ONLY, about2.30 heads standing. Preserve IMAGE1 exact pose, all original face/eyes/hair/highlights/colors/rendering, clothing/staff/book details, hands, foot stance and expression. Match its modestly longer compact torso and short articulated legs to Image2, considering bent knees. Do not redesign or restyle. Keep staff direction and both arms in exact original pose, same facing. Single full-body frame with complete accessories on transparent square background, no effects or text, no ground. Same generous margins and feet near91% canvas height."
+}

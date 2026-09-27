@@ -1,0 +1,18 @@
+{
+  "errors": [],
+  "actions": [
+    "stand1",
+    "marksTrueSniping",
+    "marksPiercing",
+    "marksSniping"
+  ],
+  "ready": true,
+  "sampleCount": 135,
+  "completed": true,
+  "buildErrors": 0,
+  "buildWarnings": 10,
+  "userApproved": true,
+  "screenshot": "C:/Users/timec/AppData/LocalLow/nexon/MapleStory Worlds/McpScreenshots/maker_play_20260927_103400_650.png",
+  "scope": "Actual right-facing combat loop and return to idle. Left-facing and portrait not rechecked.",
+  "testScene": "Temporary Play session: top piercing, middle sniping, bottom true-sniping."
+}

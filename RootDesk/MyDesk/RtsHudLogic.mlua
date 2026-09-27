@@ -8,6 +8,9 @@ script RtsHudLogic extends Logic
 
 	property boolean Built = false
 
+	-- 모바일 가로 HUD는 실제 보이는 화면 좌표 안에서 배치한다.
+	property number MobileLayoutElapsed = 0
+
 	-- 스프라이트 RUID
 	property string WhiteRUID = "47b5e516b27d4625abffe8db398cd8c2"
 
@@ -123,7 +126,7 @@ script RtsHudLogic extends Logic
 
 	property string RestartShown = ""
 
-	-- 일시정지(2026-09-25 사용자 "솔로 플레이 한정 일시정지"): 오른쪽 아래 버튼 · 가운데 안내(어두운 막 + 상자) · 지금 보이는 상태 키
+	-- 일시정지: 상단 다시하기 오른쪽 버튼 · 가운데 안내 · 지금 보이는 상태 키
 	property Entity PauseBtn = nil
 
 	property Entity PauseText = nil
@@ -133,7 +136,7 @@ script RtsHudLogic extends Logic
 	property string PauseShown = ""
 
 	-- 배속 스위치(2026-09-27 사용자 "좌/우 스위치 — 왼쪽 1배속(초록) · 오른쪽 2배속(빨강), 여럿이면 스위치 위에 배속마다 고른 사람 수, 솔로는 표시 없이"):
-	--   오른쪽 아래 일시정지 왼쪽(일시정지가 없으면 그 자리). SpeedBox = 스위치 + 인원 묶음, SpeedTrack = 트랙(안쪽), SpeedKnob = 손잡이, SpeedSide[1·2] = { label, count }
+	--   오른쪽 아래 화면 모드 스위치 위에 고정. SpeedBox = 스위치 + 인원 묶음, SpeedTrack = 트랙(안쪽), SpeedKnob = 손잡이, SpeedSide[1·2] = { label, count }
 	property Entity SpeedBox = nil
 
 	property Entity SpeedTrack = nil
@@ -166,6 +169,111 @@ script RtsHudLogic extends Logic
 	property string VoteShown = ""
 
 	-- ===== UI 헬퍼 (RtsPopupLogic도 사용) =====
+	@ExecSpace("ClientOnly")
+	method Color UiModeColor(Color light, string role)
+		-- 원본 라이트 색은 보존하고 UI 면·글자·테두리만 역할별로 바꾼다.
+		if _RtsProfileLogic.MyUiMode ~= "dark" or light.a <= 0 then return light end
+		local hi = math.max(light.r, math.max(light.g, light.b))
+		local lo = math.min(light.r, math.min(light.g, light.b))
+		if role == "wave" then return Color(0.45, 0.53, 0.72, 0.10) end
+		if role == "text" then
+			if math.abs(light.r - 0.20) < 0.005 and math.abs(light.g - 0.22) < 0.005 then return Color(0.92, 0.94, 0.98, light.a) end
+			if math.abs(light.r - 0.42) < 0.005 and math.abs(light.g - 0.44) < 0.005 then return Color(0.68, 0.73, 0.82, light.a) end
+			if math.abs(light.r - 0.43) < 0.005 and math.abs(light.g - 0.42) < 0.005 then return Color(0.79, 0.78, 1, light.a) end
+			if lo >= 0.68 then return light end
+			return Color(0.60 + light.r * 0.40, 0.60 + light.g * 0.40, 0.63 + light.b * 0.37, light.a)
+		end
+		if role == "border" then
+			if hi - lo < 0.13 then return Color(0.31, 0.36, 0.47, light.a) end
+			-- 등급·위험·성공 테두리는 기존의 의미 색을 그대로 유지한다.
+			return light
+		end
+		if role == "surface" then
+			if hi < 0.55 then return light end
+			local alpha = light.a
+			if alpha >= 0.35 then alpha = math.max(alpha, 0.94) end
+			return Color(0.10 + (light.r - lo) * 0.38, 0.125 + (light.g - lo) * 0.38, 0.18 + (light.b - lo) * 0.38, alpha)
+		end
+		return light
+	end
+
+	@ExecSpace("ClientOnly")
+	method void SetUiColor(Entity e, Color light, string role)
+		-- 엔티티별 원본 색을 기록해 모드 전환 때 재생성하지 않고 갱신한다.
+		if not isvalid(e) then return end
+		if self._T.UiColors == nil then self._T.UiColors = {} end
+		local channel = "sprite"
+		if role == "text" then channel = "text" end
+		local key = e.Id .. ":" .. channel
+		local old = self._T.UiColors[key]
+		if old ~= nil and old.role == role and old.light.r == light.r and old.light.g == light.g and old.light.b == light.b and old.light.a == light.a then return end
+		if old == nil then
+			self._T.UiColorAdds = (self._T.UiColorAdds or 0) + 1
+			if self._T.UiColorAdds >= 128 then
+				self._T.UiColorAdds = 0
+				self:PruneUiColors()
+			end
+		end
+		self._T.UiColors[key] = { entity = e, light = light, role = role }
+		self:PaintUiColor(e, light, role)
+	end
+
+	@ExecSpace("ClientOnly")
+	method void PaintUiColor(Entity e, Color light, string role)
+		-- 캐릭터·스킬·능력치 그림은 이 경로에 등록하지 않는다.
+		local color = self:UiModeColor(light, role)
+		if role == "text" then
+			if e.TextComponent ~= nil then
+				e.TextComponent.FontColor = color
+				if e.TextComponent.IsRichText then e.TextComponent.Text = self:UiModeRichText(e.TextComponent.Text) end
+			end
+		elseif e.SpriteGUIRendererComponent ~= nil then
+			e.SpriteGUIRendererComponent.Color = color
+		end
+	end
+
+	@ExecSpace("ClientOnly")
+	method string UiModeRichText(string text)
+		-- 본문 안의 보조·증가량 태그도 읽기 쉬운 짝 색상으로 전환한다.
+		local pairs = {{"a3957a", "adbacc"}, {"356c32", "91cf91"}, {"784aa1", "c3a0ee"}, {"78624d", "b9b1ca"}, {"8a8072", "a7a9b8"}, {"6E6B9E", "b2aedf"}}
+		for _, pair in ipairs(pairs) do
+			local a = "<color=#" .. pair[1] .. ">"
+			local b = "<color=#" .. pair[2] .. ">"
+			if _RtsProfileLogic.MyUiMode == "dark" then text = string.gsub(text, a, b)
+			else text = string.gsub(text, b, a) end
+		end
+		return text
+	end
+
+	@ExecSpace("ClientOnly")
+	method void SetUiText(Entity e, string text)
+		-- 실시간 능력치 갱신도 현재 화면 모드의 태그 색상을 유지한다.
+		if isvalid(e) and e.TextComponent ~= nil then
+			local value = self:UiModeRichText(text)
+			if e.TextComponent.Text ~= value then e.TextComponent.Text = value end
+		end
+	end
+
+	@ExecSpace("ClientOnly")
+	method void PruneUiColors()
+		-- 닫힌 창의 엔티티 참조가 누적되지 않도록 생성 배치마다 정리한다.
+		for key, item in pairs(self._T.UiColors or {}) do
+			if not isvalid(item.entity) then self._T.UiColors[key] = nil end
+		end
+	end
+
+	@ExecSpace("ClientOnly")
+	method void ApplyUiMode()
+		-- 기존 창·탭·스크롤·선택은 유지하고 등록한 렌더러의 색만 갱신한다.
+		self:PruneUiColors()
+		local count = 0
+		for _, item in pairs(self._T.UiColors or {}) do
+			self:PaintUiColor(item.entity, item.light, item.role)
+			count = count + 1
+		end
+		_RtsConfigLogic:Log("RtsUiMode: painted " .. tostring(count) .. " " .. _RtsProfileLogic.MyUiMode)
+	end
+
 	property string RoundedPanelRUID = "01cb064203ee4e10b7ff492e72941857"
 	@ExecSpace("ClientOnly")
 	method void RoundPanel(Entity inner)
@@ -238,7 +346,7 @@ script RtsHudLogic extends Logic
 	method void Tint(Entity e, number r, number g, number b, number a)
 		if e == nil then return end
 		local sr = e.SpriteGUIRendererComponent
-		if sr ~= nil then sr.Color = Color(r, g, b, a) end
+		if sr ~= nil then self:SetUiColor(e, Color(r, g, b, a), "fixed") end
 	end
 
 	@ExecSpace("ClientOnly")
@@ -247,9 +355,11 @@ script RtsHudLogic extends Logic
 		if e == nil then return nil end
 		self:Tint(e, 1, 1, 1, 0)
 		if e.TextComponent ~= nil then
-			e.TextComponent.Text = text
-			e.TextComponent.FontColor = color
+			self:SetUiText(e, text)
+			self:SetUiColor(e, color, "text")
 		end
+		-- 라벨의 투명 배경이 그 뒤 버튼의 터치를 가로채지 않게 한다.
+		if e.SpriteGUIRendererComponent ~= nil then e.SpriteGUIRendererComponent.RaycastTarget = false end
 		return e
 	end
 
@@ -290,10 +400,10 @@ script RtsHudLogic extends Logic
 	method Entity SpawnPanel(string name, Entity parent, Vector2 anchor, Vector2 pivot, Vector2 pos, Vector2 size, Color bg, Color border, number thick)
 		local outer = self:SpawnUI("model://uisprite", name, parent, anchor, pivot, pos, size)
 		if outer == nil then return nil end
-		outer.SpriteGUIRendererComponent.Color = border
+		self:SetUiColor(outer, border, "border")
 		local inner = self:SpawnStretch("model://uisprite", name .. "In", outer,
 			Vector2(0, 0), Vector2(1, 1), Vector2(thick, thick), Vector2(0 - thick, 0 - thick))
-		inner.SpriteGUIRendererComponent.Color = bg
+		self:SetUiColor(inner, bg, "surface")
 		return inner
 	end
 
@@ -303,6 +413,7 @@ script RtsHudLogic extends Logic
 		local b = self:SpawnStretch("model://uibutton", name, parent, Vector2(0, 0), Vector2(1, 1), Vector2(0, 0), Vector2(0, 0))
 		if b ~= nil then
 			self:Tint(b, 1, 1, 1, 0.01)
+			b.SpriteGUIRendererComponent.RaycastTarget = true
 			-- 모든 UI 버튼 클릭음(2026-09-24 사용자)
 			b:ConnectEvent(ButtonClickEvent, function(event)
 				self:PlayUi(self.ClickSound)
@@ -412,7 +523,7 @@ script RtsHudLogic extends Logic
 		self.StageSubText.TextComponent.UseNBSP = true
 		local line = self:SpawnUI("model://uisprite", "RtsInfoLine", card, Vector2(0, 1), Vector2(0, 1), Vector2(12, -78), Vector2(376, 1.5))
 		line.SpriteGUIRendererComponent.ImageRUID = DataRef(self.WhiteRUID)
-		line.SpriteGUIRendererComponent.Color = self:ColBorderSoft()
+		self:SetUiColor(line, self:ColBorderSoft(), "border")
 		local coin = self:SpawnUI("model://uisprite", "RtsMesoCoin", card, Vector2(0, 0), Vector2(0, 0.5), Vector2(14, 22), Vector2(24, 24))
 		coin.SpriteGUIRendererComponent.ImageRUID = DataRef(self.CoinRUID)
 		coin.SpriteGUIRendererComponent.Color = Color(1, 1, 1, 1)
@@ -453,9 +564,9 @@ script RtsHudLogic extends Logic
 		end)
 		self.RestartBtn = restart
 		-- 멈춤 안내: 화면 전체 어두운 막(클릭은 통과 — 창 보기는 된다) + 위쪽 가운데 상자 "일시정지" · 안내 · [계속하기](창이 가운데 떠도 보이게 위로).
-		--   막을 버튼보다 먼저 만들어 오른쪽 아래 [계속하기] 버튼은 막 위에 밝게 보인다
+		--   막을 버튼보다 먼저 만들어 상단 [계속하기] 버튼은 막 위에 밝게 보인다
 		local dim = self:SpawnStretch("model://uisprite", "RtsPauseDim", grp, Vector2(0, 0), Vector2(1, 1), Vector2(0, 0), Vector2(0, 0))
-		dim.SpriteGUIRendererComponent.Color = Color(0, 0, 0, 0.35)
+		self:SetUiColor(dim, Color(0, 0, 0, 0.35), "surface")
 		dim.SpriteGUIRendererComponent.RaycastTarget = false
 		local pbox = self:SpawnRoundedPanel("RtsPauseBox", dim, Vector2(0.5, 1), Vector2(0.5, 1), Vector2(0, -190), Vector2(480, 200),
 			self:ColPanel(), self:ColGold(), 2)
@@ -473,11 +584,11 @@ script RtsHudLogic extends Logic
 		end)
 		self.PausePanel = dim
 		dim:SetEnable(false)
-		-- 오른쪽 아래 '다시하기' 왼쪽: 일시정지 / 계속하기(솔로·진행 중에만 보인다 — RefreshPauseUi). P 키도 같다(RtsUnitSelectLogic.HandleKeyDownEvent)
-		local pause = self:SpawnRoundedPanel("RtsPauseBtn", grp, Vector2(1, 0), Vector2(1, 0), Vector2(-16, 16), Vector2(150, 64),
+		-- 다시하기 오른쪽 12px 간격, 동일한 200×48 크기. 표시 조건과 P 단축키는 유지한다.
+		local pause = self:SpawnRoundedPanel("RtsPauseBtn", grp, Vector2(0.5, 1), Vector2(0.5, 1), Vector2(212, -12), Vector2(200, 48),
 			self:ColPanel(), self:ColBorder(), 2)
 		-- 글자는 왼쪽으로 조금(−16), 오른쪽 안에 단축키 [P](2026-09-27 사용자 "일시정지 버튼 옆에 단축키 P 보이도록" — 레벨업 [Space]와 같은 키캡 모양)
-		self.PauseText = self:SpawnLabel("RtsPauseLabel", pause, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2(-16, 0), Vector2(104, 56),
+		self.PauseText = self:SpawnLabel("RtsPauseLabel", pause, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2(-18, 0), Vector2(142, 40),
 			"일시정지", self:ColInk(), 19, TextAlignmentType.MiddleCenter, true)
 		local pcap = self:SpawnRoundedPanel("RtsPauseKey", pause, Vector2(1, 0.5), Vector2(1, 0.5), Vector2(-8, 0), Vector2(30, 26),
 			Color(0.92, 0.93, 0.98, 0.9), Color(0.72, 0.74, 0.84, 0.9), 1.2)
@@ -491,10 +602,11 @@ script RtsHudLogic extends Logic
 		end)
 		self.PauseBtn = pause
 		pause.Parent:SetEnable(false)
-		-- 배속 스위치: 묶음 212×92(일시정지 왼쪽 −176, 일시정지가 숨으면 오른쪽 끝 −16 — RefreshSpeedUi). 아래 = 트랙 212×64(안쪽 208×60, 반쪽 104),
+		self:BuildUiModeSwitch(grp)
+		-- 배속 스위치: 화면 모드 위 12px 간격, 오른쪽 16px·아래 92px. 묶음 212×92, 트랙 212×64.
 		--   손잡이 100×52(1배속 왼쪽 초록 · 2배속 오른쪽 빨강), 반쪽마다 글자 1배속·2배속과 누르는 칸(RtsStageLogic.RequestSpeedChoice). 위 = 여럿일 때 배속마다 고른 사람 수
-		local sbox = self:SpawnUI("model://uisprite", "RtsSpeedBox", grp, Vector2(1, 0), Vector2(1, 0), Vector2(-176, 16), Vector2(212, 92))
-		sbox.SpriteGUIRendererComponent.Color = Color(1, 1, 1, 0)
+		local sbox = self:SpawnUI("model://uisprite", "RtsSpeedBox", grp, Vector2(1, 0), Vector2(1, 0), Vector2(-16, 92), Vector2(212, 92))
+		self:SetUiColor(sbox, Color(1, 1, 1, 0), "surface")
 		sbox.SpriteGUIRendererComponent.RaycastTarget = false
 		local track = self:SpawnRoundedPanel("RtsSpeedTrack", sbox, Vector2(0, 0), Vector2(0, 0), Vector2(0, 0), Vector2(212, 64), self:ColPanel(), self:ColBorder(), 2)
 		local knob = self:SpawnRoundedPanel("RtsSpeedKnob", track, Vector2(0, 0.5), Vector2(0, 0.5), Vector2(4, 0), Vector2(100, 52),
@@ -507,7 +619,7 @@ script RtsHudLogic extends Logic
 		self.SpeedSide = {}
 		for side = 1, 2 do
 			local half = self:SpawnUI("model://uisprite", "RtsSpeedHalf" .. tostring(side), track, Vector2(0, 0), Vector2(0, 0), Vector2((side - 1) * 104, 0), Vector2(104, 60))
-			half.SpriteGUIRendererComponent.Color = Color(1, 1, 1, 0)
+			self:SetUiColor(half, Color(1, 1, 1, 0), "surface")
 			local text = "1배속"
 			if side == 2 then text = "2배속" end
 			local label = self:SpawnLabel("RtsSpeedSideText", half, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2(0, 0), Vector2(100, 48),
@@ -612,6 +724,7 @@ script RtsHudLogic extends Logic
 		end
 		self:RefreshMyUnits()
 		self:SetMeso(_RtsUnitLogic:GetMyMeso())
+		self:RefreshMobileLayout(true)
 	end
 
 	@ExecSpace("ClientOnly")
@@ -659,9 +772,9 @@ script RtsHudLogic extends Logic
 		if self.FieldText == nil or self.FieldText.TextComponent == nil then return end
 		self.FieldText.TextComponent.Text = self:Int(n) .. " / " .. self:Int(limit)
 		if n >= limit - 20 then
-			self.FieldText.TextComponent.FontColor = Color(0.92, 0.32, 0.28, 1)
+			self:SetUiColor(self.FieldText, Color(0.92, 0.32, 0.28, 1), "text")
 		else
-			self.FieldText.TextComponent.FontColor = self:ColInk()
+			self:SetUiColor(self.FieldText, self:ColInk(), "text")
 		end
 	end
 
@@ -702,6 +815,7 @@ script RtsHudLogic extends Logic
 	@ExecSpace("ClientOnly")
 	method void OnRestartButton()
 		local st = _RtsStageLogic.RunState
+		_RtsConfigLogic:Log("RtsHud: restart clicked state=" .. st)
 		if st ~= "running" and st ~= "ended" then return end
 		-- 이미 찬성했으면 다시 누르기 = 찬성 취소(확인 없이 바로)
 		if _RtsStageLogic:IsMyVote() then
@@ -747,25 +861,25 @@ script RtsHudLogic extends Logic
 		self.RestartText.TextComponent.Text = text
 		local outer = self.RestartBtn.Parent
 		if mode == "mine" then
-			self.RestartBtn.SpriteGUIRendererComponent.Color = Color(0.45, 0.37, 0.18, 0.96)
-			outer.SpriteGUIRendererComponent.Color = Color(1, 0.9, 0.55, 1)
-			self.RestartText.TextComponent.FontColor = Color(1, 0.97, 0.85, 1)
+			self:SetUiColor(self.RestartBtn, Color(0.45, 0.37, 0.18, 0.96), "surface")
+			self:SetUiColor(outer, Color(1, 0.9, 0.55, 1), "border")
+			self:SetUiColor(self.RestartText, Color(1, 0.97, 0.85, 1), "text")
 		elseif mode == "confirm" then
-			self.RestartBtn.SpriteGUIRendererComponent.Color = Color(0.3, 0.13, 0.11, 0.94)
-			outer.SpriteGUIRendererComponent.Color = Color(0.8, 0.35, 0.3, 1)
-			self.RestartText.TextComponent.FontColor = Color(0.98, 0.72, 0.66, 1)
+			self:SetUiColor(self.RestartBtn, Color(0.3, 0.13, 0.11, 0.94), "surface")
+			self:SetUiColor(outer, Color(0.8, 0.35, 0.3, 1), "border")
+			self:SetUiColor(self.RestartText, Color(0.98, 0.72, 0.66, 1), "text")
 		elseif mode == "on" then
-			self.RestartBtn.SpriteGUIRendererComponent.Color = Color(0.87, 0.86, 0.96, 0.92)
-			outer.SpriteGUIRendererComponent.Color = self:ColGold()
-			self.RestartText.TextComponent.FontColor = Color(0.26, 0.25, 0.39, 1)
+			self:SetUiColor(self.RestartBtn, Color(0.87, 0.86, 0.96, 0.92), "surface")
+			self:SetUiColor(outer, self:ColGold(), "border")
+			self:SetUiColor(self.RestartText, Color(0.26, 0.25, 0.39, 1), "text")
 		elseif mode == "off" then
-			self.RestartBtn.SpriteGUIRendererComponent.Color = self:ColPanel()
-			outer.SpriteGUIRendererComponent.Color = self:ColBorder()
-			self.RestartText.TextComponent.FontColor = self:ColInk()
+			self:SetUiColor(self.RestartBtn, self:ColPanel(), "surface")
+			self:SetUiColor(outer, self:ColBorder(), "border")
+			self:SetUiColor(self.RestartText, self:ColInk(), "text")
 		else
-			self.RestartBtn.SpriteGUIRendererComponent.Color = self:ColPanel()
-			outer.SpriteGUIRendererComponent.Color = self:ColBorderSoft()
-			self.RestartText.TextComponent.FontColor = self:ColMuted()
+			self:SetUiColor(self.RestartBtn, self:ColPanel(), "surface")
+			self:SetUiColor(outer, self:ColBorderSoft(), "border")
+			self:SetUiColor(self.RestartText, self:ColMuted(), "text")
 		end
 	end
 
@@ -783,14 +897,14 @@ script RtsHudLogic extends Logic
 		self.PausePanel:SetEnable(paused)
 		if paused then
 			self.PauseText.TextComponent.Text = "계속하기"
-			self.PauseBtn.SpriteGUIRendererComponent.Color = Color(0.45, 0.37, 0.18, 0.96)
-			self.PauseBtn.Parent.SpriteGUIRendererComponent.Color = Color(1, 0.9, 0.55, 1)
-			self.PauseText.TextComponent.FontColor = Color(1, 0.97, 0.85, 1)
+			self:SetUiColor(self.PauseBtn, Color(0.45, 0.37, 0.18, 0.96), "surface")
+			self:SetUiColor(self.PauseBtn.Parent, Color(1, 0.9, 0.55, 1), "border")
+			self:SetUiColor(self.PauseText, Color(1, 0.97, 0.85, 1), "text")
 		else
 			self.PauseText.TextComponent.Text = "일시정지"
-			self.PauseBtn.SpriteGUIRendererComponent.Color = self:ColPanel()
-			self.PauseBtn.Parent.SpriteGUIRendererComponent.Color = self:ColBorder()
-			self.PauseText.TextComponent.FontColor = self:ColInk()
+			self:SetUiColor(self.PauseBtn, self:ColPanel(), "surface")
+			self:SetUiColor(self.PauseBtn.Parent, self:ColBorder(), "border")
+			self:SetUiColor(self.PauseText, self:ColInk(), "text")
 		end
 	end
 
@@ -801,42 +915,203 @@ script RtsHudLogic extends Logic
 		if self.SpeedBox == nil or not isvalid(self.SpeedBox) then return end
 		local S = _RtsStageLogic
 		local show = S.RunState == "countdown" or S.RunState == "running"
-		local pauseShown = self.PauseBtn ~= nil and isvalid(self.PauseBtn) and self.PauseBtn.Parent.Enable
 		local mine = S.SpeedVotes[_RtsUnitLogic:MyUserId()] ~= nil
 		local solo = S:IsSolo()
 		local fastN = S.SpeedVoteCount
 		local slowN = math.max(0, S.RoomCount - fastN)
-		local key = tostring(show) .. "|" .. tostring(pauseShown) .. "|" .. tostring(mine) .. "|" .. tostring(solo) .. "|" .. self:Int(fastN) .. "|" .. self:Int(slowN)
+		local key = tostring(show) .. "|" .. tostring(mine) .. "|" .. tostring(solo) .. "|" .. self:Int(fastN) .. "|" .. self:Int(slowN)
 		if key == self.SpeedShown then return end
 		self.SpeedShown = key
 		self.SpeedBox:SetEnable(show)
 		if not show then return end
-		-- 일시정지가 보이면 그 왼쪽(−176), 아니면 오른쪽 끝(−16)
-		local x = -16
-		if pauseShown then x = -176 end
-		self.SpeedBox.UITransformComponent.anchoredPosition = Vector2(x, 16)
+		-- 일시정지 표시 여부와 관계없이 화면 모드 위에 고정한다.
+		if not Environment:IsMobilePlatform() then self.SpeedBox.UITransformComponent.anchoredPosition = Vector2(-16, 92) end
 		-- 손잡이: 1배속 왼쪽(4) 초록 / 2배속 오른쪽(104) 빨강
 		local knob = self.SpeedKnob
 		if mine then
 			knob.Parent.UITransformComponent.anchoredPosition = Vector2(104, 0)
-			knob.SpriteGUIRendererComponent.Color = Color(0.86, 0.32, 0.3, 1)
-			knob.Parent.SpriteGUIRendererComponent.Color = Color(0.66, 0.2, 0.18, 1)
+			self:SetUiColor(knob, Color(0.86, 0.32, 0.3, 1), "fixed")
+			self:SetUiColor(knob.Parent, Color(0.66, 0.2, 0.18, 1), "fixed")
 		else
 			knob.Parent.UITransformComponent.anchoredPosition = Vector2(4, 0)
-			knob.SpriteGUIRendererComponent.Color = Color(0.3, 0.66, 0.36, 1)
-			knob.Parent.SpriteGUIRendererComponent.Color = Color(0.2, 0.5, 0.26, 1)
+			self:SetUiColor(knob, Color(0.3, 0.66, 0.36, 1), "fixed")
+			self:SetUiColor(knob.Parent, Color(0.2, 0.5, 0.26, 1), "fixed")
 		end
 		for side = 1, 2 do
 			local sd = self.SpeedSide[side]
 			if sd ~= nil and isvalid(sd.label) then
 				local on = (side == 2) == mine
-				if on then sd.label.TextComponent.FontColor = Color(1, 1, 1, 1) else sd.label.TextComponent.FontColor = self:ColMuted() end
+				if on then self:SetUiColor(sd.label, Color(1, 1, 1, 1), "text") else self:SetUiColor(sd.label, self:ColMuted(), "text") end
 				local n = slowN
 				if side == 2 then n = fastN end
 				local txt = ""
 				if not solo then txt = self:Int(n) .. "명" end
 				sd.count.TextComponent.Text = txt
 			end
+		end
+	end
+
+	@ExecSpace("ClientOnly")
+	method void BuildUiModeSwitch(Entity grp)
+		-- 화면 오른쪽 아래의 라이트·다크 선택기. 배속과 같은 크기의 좌우 스위치다.
+		local track = self:SpawnRoundedPanel("RtsUiModeSwitch", grp, Vector2(1, 0), Vector2(1, 0), Vector2(-16, 16), Vector2(212, 64), self:ColPanel(), self:ColBorder(), 2)
+		local knob = self:SpawnRoundedPanel("RtsUiModeKnob", track, Vector2(0, 0.5), Vector2(0, 0.5), Vector2(4, 0), Vector2(100, 52), self:ColGold(), self:ColGold(), 1.5)
+		knob.SpriteGUIRendererComponent.RaycastTarget = false
+		knob.Parent.SpriteGUIRendererComponent.RaycastTarget = false
+		local labels = {}
+		for side, mode in ipairs({"light", "dark"}) do
+			local half = self:SpawnUI("model://uisprite", "RtsUiModeHalf" .. tostring(side), track, Vector2(0, 0), Vector2(0, 0), Vector2((side - 1) * 104, 0), Vector2(104, 60))
+			self:SetUiColor(half, Color(1, 1, 1, 0), "fixed")
+			labels[side] = self:SpawnLabel("RtsUiModeLabel" .. tostring(side), half, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2.zero, Vector2(100, 48), "", self:ColMuted(), 18, TextAlignmentType.MiddleCenter, true)
+			local selectedMode = mode
+			self:SpawnClick("RtsUiModeClick" .. tostring(side), half):ConnectEvent(ButtonClickEvent, function()
+				_RtsProfileLogic:ChooseUiMode(selectedMode)
+			end)
+		end
+		self._T.UiModeSwitch = { knob = knob, labels = labels }
+		self:RefreshUiModeSwitch()
+	end
+
+	@ExecSpace("ClientOnly")
+	method table MobileViewport()
+		-- UI 캔버스의 고정 1920×1080과 기기의 실제 표시 범위를 구분한다.
+		local w = _UILogic.ScreenWidth
+		local h = _UILogic.ScreenHeight
+		if w <= 0 or h <= 0 then return nil end
+		local lo = _UILogic:ScreenToUIPosition(Vector2.zero)
+		local hi = _UILogic:ScreenToUIPosition(Vector2(w, h))
+		local x0 = math.min(lo.x, hi.x)
+		local x1 = math.max(lo.x, hi.x)
+		local y0 = math.min(lo.y, hi.y)
+		local y1 = math.max(lo.y, hi.y)
+		local unit = (y1 - y0) / 1080
+		if unit <= 0 then return nil end
+		-- 공개 SafeArea API가 없어 노치·내비게이션 영역에 보수적인 여백을 둔다.
+		return { x0 = x0 + 96 * unit, x1 = x1 - 96 * unit,
+			y0 = y0 + 64 * unit, y1 = y1 - 48 * unit, unit = unit,
+			key = tostring(w) .. ":" .. tostring(h) .. ":" .. tostring(x1 - x0) .. ":" .. tostring(y1 - y0) }
+	end
+
+	@ExecSpace("ClientOnly")
+	method void PlaceMobile(Entity e, table v, number ax, number ay, number x, number y, number w, number h, number scale)
+		-- 화면 가장자리 앵커 대신 실측한 화면 안쪽 좌표를 사용한다.
+		if not isvalid(e) then return end
+		local t = e.UITransformComponent
+		local u = v.unit
+		t.AnchorsMin = Vector2(0.5, 0.5)
+		t.AnchorsMax = Vector2(0.5, 0.5)
+		t.Pivot = Vector2(ax, ay)
+		t.anchoredPosition = Vector2(v.x0 + (v.x1 - v.x0) * ax + x * u, v.y0 + (v.y1 - v.y0) * ay + y * u)
+		t.RectSize = Vector2(w, h)
+		t.UIScale = Vector3(scale * u, scale * u, 1)
+	end
+
+	@ExecSpace("ClientOnly")
+	method void OnUpdate(number delta)
+		-- 해상도가 달라진 때만 기존 엔티티를 이동한다. 창을 다시 열지 않는다.
+		if not self.Built or not Environment:IsMobilePlatform() then return end
+		self.MobileLayoutElapsed = self.MobileLayoutElapsed + delta
+		if self.MobileLayoutElapsed < 0.25 then return end
+		self.MobileLayoutElapsed = 0
+		self:RefreshMobileLayout(false)
+	end
+
+	@ExecSpace("ClientOnly")
+	method void RefreshMobileLayout(boolean force)
+		-- PC 레이아웃과 서버 게임 상태는 건드리지 않는 모바일 전용 배치다.
+		if not self.Built or not Environment:IsMobilePlatform() then return end
+		local v = self:MobileViewport()
+		if v == nil then return end
+		local diff = _RtsDifficultyLogic.Bar
+		local diffKey = ""
+		if isvalid(diff) then diffKey = diff.Id end
+		local key = v.key .. ":" .. diffKey
+		if not force and self._T.MobileLayoutKey == key then return end
+		local top = self.HudGroup:GetChildByName("RtsTopBox")
+		self:PlaceMobile(top, v, 0, 1, 0, 0, 400, 208, 1.15)
+		self:PlaceMobile(self.PlayersBox, v, 0, 1, 0, -252, self.CardW, 24 + 4 * (self.CardH + self.CardGap), 1.15)
+		self.PlayersBox.SpriteGUIRendererComponent.RaycastTarget = false
+		self:PlaceMobile(self.RestartBtn.Parent, v, 0.5, 1, -118, 0, 220, 88, 1)
+		self:PlaceMobile(self.PauseBtn.Parent, v, 0.5, 1, 118, 0, 220, 88, 1)
+		self:SetLabelSize(self.RestartText, 26)
+		self:SetLabelSize(self.PauseText, 26)
+		self.PauseText.UITransformComponent.anchoredPosition = Vector2.zero
+		self.PauseText.UITransformComponent.RectSize = Vector2(204, 60)
+		local pkey = self.PauseBtn:GetChildByName("RtsPauseKey")
+		if isvalid(pkey) then pkey:SetEnable(false) end
+		self:PlaceMobile(self.VotePanel.Parent, v, 0.5, 1, 0, -100, 420, 160, 1)
+		self.VoteText.UITransformComponent.RectSize = Vector2(396, 48)
+		self:SetLabelSize(self.VoteText, 20)
+		for i, button in ipairs({self.VoteYesBtn, self.VoteNoBtn}) do
+			button.Parent.UITransformComponent.RectSize = Vector2(190, 88)
+			button.Parent.UITransformComponent.anchoredPosition = Vector2(12 + (i - 1) * 204, 12)
+		end
+		for i = 1, 6 do
+			local slot = self.UnitSlots[i]
+			if slot ~= nil then
+				self:PlaceMobile(slot.box.Parent, v, 1, 1, 0, -96 - (i - 1) * 100, 260, 88, 1)
+				self:LayoutMobileSlot(i)
+			end
+		end
+		self:PlaceMobile(self.AugBtn.Parent, v, 0, 0, 0, 0, 250, 78, 1.4)
+		self:PlaceMobile(self.RecruitBtn.Parent, v, 0, 0, 370, 0, 240, 96, 1)
+		self.RecruitText.UITransformComponent.RectSize = Vector2(224, 72)
+		self:SetLabelSize(self.RecruitText, 26)
+		self:PlaceMobile(self.SpeedBox, v, 1, 0, 0, 112, 212, 92, 1.5)
+		self:PlaceMobile(self.HudGroup:GetChildByName("RtsUiModeSwitch"), v, 1, 0, 0, 0, 212, 64, 1.5)
+		self:PlaceMobile(self.Hint, v, 0.5, 1, 0, -290, 720, 60, 1)
+		self:SetLabelSize(self.HintText, 24)
+		self.HintText.UITransformComponent.RectSize = Vector2(696, 52)
+		local dev = self.HudGroup:GetChildByName("RtsDevBtn")
+		self:PlaceMobile(dev, v, 1, 0, -340, 0, 160, 80, 1)
+		if isvalid(diff) then
+			self:PlaceMobile(diff.Parent, v, 0.5, 1, 0, 0, 690, 132, 1.15)
+			for _, button in ipairs(_RtsDifficultyLogic.Btns) do
+				local size = button.Parent.UITransformComponent.RectSize
+				button.Parent.UITransformComponent.RectSize = Vector2(size.x, 78)
+			end
+			if isvalid(_RtsDifficultyLogic.StartBtn) then
+				_RtsDifficultyLogic.StartBtn.Parent.UITransformComponent.RectSize = Vector2(220, 78)
+			end
+		end
+		_RtsPopupLogic:RefreshMobilePopup()
+		self._T.MobileLayoutKey = key
+		_RtsConfigLogic:Log("RtsHud mobile viewport " .. v.key)
+	end
+
+	@ExecSpace("ClientOnly")
+	method void LayoutMobileSlot(number i)
+		-- 유닛 갱신이 기존 PC용 글자 폭을 덮어쓴 뒤 모바일 폭을 다시 맞춘다.
+		if not Environment:IsMobilePlatform() then return end
+		local s = self.UnitSlots[i]
+		if s == nil then return end
+		local width = 238
+		if s.filled then width = 168 end
+		s.name.UITransformComponent.RectSize = Vector2(width, 60)
+		self:SetLabelSize(s.name, 24)
+		s.lv.UITransformComponent.RectSize = Vector2(64, 60)
+		self:SetLabelSize(s.lv, 22)
+	end
+
+	@ExecSpace("ClientOnly")
+	method void RefreshUiModeSwitch()
+		-- 서버 저장 응답에 맞춰 손잡이와 라벨만 갱신한다. 새 창을 만들지 않는다.
+		local ui = self._T.UiModeSwitch
+		if ui == nil or not isvalid(ui.knob) then return end
+		local P = _RtsProfileLogic
+		local selected = 1
+		if P.MyUiMode == "dark" then selected = 2 end
+		ui.knob.Parent.UITransformComponent.anchoredPosition = Vector2(4 + (selected - 1) * 100, 0)
+		local names = {"라이트", "다크"}
+		for side, label in ipairs(ui.labels) do
+			local text = names[side]
+			local ink = self:ColMuted()
+			if side == selected then
+				ink = self:ColInk()
+				if P.MyUiModeSaving then text = "저장 중…" end
+			end
+			self:SetUiText(label, text)
+			self:SetUiColor(label, ink, "text")
 		end
 	end
 
@@ -886,11 +1161,11 @@ script RtsHudLogic extends Logic
 			local b = btns[i]
 			if b ~= nil then
 				if mine == i then
-					b.SpriteGUIRendererComponent.Color = Color(0.45, 0.37, 0.18, 0.96)
-					b.Parent.SpriteGUIRendererComponent.Color = Color(1, 0.9, 0.55, 1)
+					self:SetUiColor(b, Color(0.45, 0.37, 0.18, 0.96), "surface")
+					self:SetUiColor(b.Parent, Color(1, 0.9, 0.55, 1), "border")
 				else
-					b.SpriteGUIRendererComponent.Color = self:ColPanel()
-					b.Parent.SpriteGUIRendererComponent.Color = self:ColBorder()
+					self:SetUiColor(b, self:ColPanel(), "surface")
+					self:SetUiColor(b.Parent, self:ColBorder(), "border")
 				end
 			end
 		end
@@ -940,14 +1215,14 @@ script RtsHudLogic extends Logic
 			self.RecruitShown = key
 			if solo then
 				self.RecruitText.TextComponent.Text = "다시하기"
-				self.RecruitBtn.SpriteGUIRendererComponent.Color = Color(0.87, 0.86, 0.96, 0.92)
-				self.RecruitBtn.Parent.SpriteGUIRendererComponent.Color = self:ColGold()
-				self.RecruitText.TextComponent.FontColor = Color(1, 0.95, 0.8, 1)
+				self:SetUiColor(self.RecruitBtn, Color(0.87, 0.86, 0.96, 0.92), "surface")
+				self:SetUiColor(self.RecruitBtn.Parent, self:ColGold(), "border")
+				self:SetUiColor(self.RecruitText, Color(1, 0.95, 0.8, 1), "text")
 			else
 				self.RecruitText.TextComponent.Text = "나가기"
-				self.RecruitBtn.SpriteGUIRendererComponent.Color = Color(0.3, 0.13, 0.11, 0.94)
-				self.RecruitBtn.Parent.SpriteGUIRendererComponent.Color = Color(0.8, 0.35, 0.3, 1)
-				self.RecruitText.TextComponent.FontColor = Color(0.98, 0.72, 0.66, 1)
+				self:SetUiColor(self.RecruitBtn, Color(0.3, 0.13, 0.11, 0.94), "surface")
+				self:SetUiColor(self.RecruitBtn.Parent, Color(0.8, 0.35, 0.3, 1), "border")
+				self:SetUiColor(self.RecruitText, Color(0.98, 0.72, 0.66, 1), "text")
 			end
 			return
 		end
@@ -985,17 +1260,17 @@ script RtsHudLogic extends Logic
 		self.RecruitText.TextComponent.Text = text
 		local outer = self.RecruitBtn.Parent
 		if flash then
-			self.RecruitBtn.SpriteGUIRendererComponent.Color = Color(0.45, 0.37, 0.18, 0.96)
-			outer.SpriteGUIRendererComponent.Color = Color(1, 0.9, 0.55, 1)
-			self.RecruitText.TextComponent.FontColor = Color(1, 0.97, 0.85, 1)
+			self:SetUiColor(self.RecruitBtn, Color(0.45, 0.37, 0.18, 0.96), "surface")
+			self:SetUiColor(outer, Color(1, 0.9, 0.55, 1), "border")
+			self:SetUiColor(self.RecruitText, Color(1, 0.97, 0.85, 1), "text")
 		elseif on then
-			self.RecruitBtn.SpriteGUIRendererComponent.Color = Color(0.87, 0.86, 0.96, 0.92)
-			outer.SpriteGUIRendererComponent.Color = self:ColGold()
-			self.RecruitText.TextComponent.FontColor = Color(0.26, 0.25, 0.39, 1)
+			self:SetUiColor(self.RecruitBtn, Color(0.87, 0.86, 0.96, 0.92), "surface")
+			self:SetUiColor(outer, self:ColGold(), "border")
+			self:SetUiColor(self.RecruitText, Color(0.26, 0.25, 0.39, 1), "text")
 		else
-			self.RecruitBtn.SpriteGUIRendererComponent.Color = Color(0.094, 0.082, 0.071, 0.6)
-			outer.SpriteGUIRendererComponent.Color = self:ColBorderSoft()
-			self.RecruitText.TextComponent.FontColor = self:ColMuted()
+			self:SetUiColor(self.RecruitBtn, Color(0.094, 0.082, 0.071, 0.6), "surface")
+			self:SetUiColor(outer, self:ColBorderSoft(), "border")
+			self:SetUiColor(self.RecruitText, self:ColMuted(), "text")
 		end
 	end
 
@@ -1091,9 +1366,10 @@ script RtsHudLogic extends Logic
 		local preset = _RtsThemeLogic:GetPreset(theme)
 		local row = self:SpawnRoundedPanel("RtsPlayerRow" .. self:Int(index), self.PlayersBox, Vector2(0, 1), Vector2(0, 1), Vector2(0, y), Vector2(W, H),
 			preset.color, self:ColBorderSoft(), thick)
+		self:SetUiColor(row, preset.color, "fixed")
 		if preset.thumb ~= nil and preset.thumb ~= "" then
 			local clip = self:SpawnStretch("model://uisprite", "RtsPlayerBackdropClip", row, Vector2(0, 0), Vector2(1, 1), Vector2(2, 2), Vector2(-2, -2))
-			clip.SpriteGUIRendererComponent.Color = Color(1, 1, 1, 0)
+			self:SetUiColor(clip, Color(1, 1, 1, 0), "surface")
 			clip.SpriteGUIRendererComponent.RaycastTarget = false
 			clip:AddComponent("MaskComponent")
 			local photo = self:SpawnUI("model://uisprite", "RtsPlayerBackdrop", clip, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2(0, 0), Vector2(W, W * 0.6))
@@ -1107,7 +1383,7 @@ script RtsHudLogic extends Logic
 		shade.SpriteGUIRendererComponent.ImageRUID = DataRef(self.RoundedPanelRUID)
 		shade.SpriteGUIRendererComponent.Type = ImageType.Sliced
 		local slot = self:SpawnUI("model://uisprite", "RtsPlayerIconSlot", row, Vector2(0, 0.5), Vector2(0, 0.5), Vector2(14, 0), Vector2(68, 68))
-		slot.SpriteGUIRendererComponent.Color = Color(1, 1, 1, 0)
+		self:SetUiColor(slot, Color(1, 1, 1, 0), "surface")
 		slot.SpriteGUIRendererComponent.RaycastTarget = false
 		local face = nil
 		if icon ~= _RtsProfileLogic.IconNone then
@@ -1168,15 +1444,15 @@ script RtsHudLogic extends Logic
 		elseif watching then
 			border = self:ColGold()
 		end
-		p.row.Parent.SpriteGUIRendererComponent.Color = border
+		self:SetUiColor(p.row.Parent, border, "border")
 		if p.alive then
 			p.shade.SpriteGUIRendererComponent.Color = Color(0.06, 0.08, 0.12, 0.30)
-			p.name.TextComponent.FontColor = Color.white
+			self:SetUiColor(p.name, Color.white, "text")
 			p.tomb:SetEnable(false)
 			if p.face ~= nil and isvalid(p.face) then p.face.SpriteGUIRendererComponent.Color = Color(1, 1, 1, 1) end
 		else
 			p.shade.SpriteGUIRendererComponent.Color = Color(0.06, 0.08, 0.12, 0.64)
-			p.name.TextComponent.FontColor = Color(0.8, 0.82, 0.86, 1)
+			self:SetUiColor(p.name, Color(0.8, 0.82, 0.86, 1), "text")
 			p.tomb:SetEnable(true)
 			if p.face ~= nil and isvalid(p.face) then p.face.SpriteGUIRendererComponent.Color = Color(0.45, 0.45, 0.45, 1) end
 		end
@@ -1191,13 +1467,13 @@ script RtsHudLogic extends Logic
 	method Entity BuildTopBox(Entity grp)
 		local box = self:SpawnRoundedPanel("RtsTopBox", grp, Vector2(0, 1), Vector2(0, 1), Vector2(16, -16), Vector2(400, 208),
 			self:ColPanel(), self:ColBorder(), 1.5)
-		box.SpriteGUIRendererComponent.Color = Color(0.98, 0.985, 1, 1)
+		self:SetUiColor(box, Color(0.98, 0.985, 1, 1), "surface")
 		self:SpawnWater(box)
 		local row = self:SpawnStretch("model://uisprite", "RtsProfileRow", box, Vector2(0, 1), Vector2(1, 1), Vector2(0, -64), Vector2(0, 0))
-		row.SpriteGUIRendererComponent.Color = Color(1, 1, 1, 0)
+		self:SetUiColor(row, Color(1, 1, 1, 0), "surface")
 		local slot = self:SpawnUI("model://uisprite", "RtsProfileIconSlot", row, Vector2(0, 0.5), Vector2(0, 0.5), Vector2(10, 0), Vector2(48, 48))
 		if self.CircleMaskRUID ~= "" then slot.SpriteGUIRendererComponent.ImageRUID = DataRef(self.CircleMaskRUID) end
-		slot.SpriteGUIRendererComponent.Color = Color(1, 1, 1, 0)  -- 아이콘 배경 원 = 투명(2026-09-25 사용자). 아이콘 없음일 때만 옅은 원(RefreshProfileBox)
+		self:SetUiColor(slot, Color(1, 1, 1, 0), "surface")  -- 아이콘 배경 원 = 투명(2026-09-25 사용자). 아이콘 없음일 때만 옅은 원(RefreshProfileBox)
 		slot.SpriteGUIRendererComponent.RaycastTarget = false
 		self.ProfileIconSlot = slot
 		self.ProfileIconFace = nil
@@ -1214,10 +1490,10 @@ script RtsHudLogic extends Logic
 		end)
 		local line = self:SpawnUI("model://uisprite", "RtsTopLine", box, Vector2(0, 1), Vector2(0, 1), Vector2(12, -67), Vector2(376, 1.5))
 		line.SpriteGUIRendererComponent.ImageRUID = DataRef(self.WhiteRUID)
-		line.SpriteGUIRendererComponent.Color = self:ColBorderSoft()
+		self:SetUiColor(line, self:ColBorderSoft(), "border")
 		line.SpriteGUIRendererComponent.RaycastTarget = false
 		local info = self:SpawnStretch("model://uisprite", "RtsInfoCard", box, Vector2(0, 0), Vector2(1, 1), Vector2(0, 0), Vector2(0, -72))
-		info.SpriteGUIRendererComponent.Color = Color(1, 1, 1, 0)
+		self:SetUiColor(info, Color(1, 1, 1, 0), "surface")
 		info.SpriteGUIRendererComponent.RaycastTarget = false
 		self:RefreshProfileBox()
 		return info
@@ -1233,8 +1509,8 @@ script RtsHudLogic extends Logic
 		if self.ProfileIconSlot ~= nil and isvalid(self.ProfileIconSlot) and self.ProfileIconId ~= P.MyIcon then
 			if self.ProfileIconFace ~= nil and isvalid(self.ProfileIconFace) then self.ProfileIconFace:Destroy() end
 			self.ProfileIconFace = self:SpawnMonsterPortrait(self.ProfileIconSlot, P.MyIcon, 48, false)
-			if self.ProfileIconFace == nil then self.ProfileIconSlot.SpriteGUIRendererComponent.Color = Color(1, 1, 1, 0.15)
-			else self.ProfileIconSlot.SpriteGUIRendererComponent.Color = Color(1, 1, 1, 0) end
+			if self.ProfileIconFace == nil then self:SetUiColor(self.ProfileIconSlot, Color(1, 1, 1, 0.15), "fixed")
+			else self:SetUiColor(self.ProfileIconSlot, Color(1, 1, 1, 0), "fixed") end
 			self.ProfileIconId = P.MyIcon
 		end
 		if self.ProfileSummary ~= nil and self.ProfileSummary.TextComponent ~= nil then
@@ -1417,21 +1693,22 @@ script RtsHudLogic extends Logic
 	method void ApplySlotLook(number i)
 		local s = self.UnitSlots[i]
 		if s == nil then return end
+		self:LayoutMobileSlot(i)
 		local outer = s.box.Parent
 		if not s.filled then
-			s.box.SpriteGUIRendererComponent.Color = Color(0.094, 0.082, 0.071, 0.35)
-			outer.SpriteGUIRendererComponent.Color = Color(0.788, 0.635, 0.290, 0.2)
-			s.name.TextComponent.FontColor = Color(0.788, 0.710, 0.541, 0.5)
+			self:SetUiColor(s.box, Color(0.094, 0.082, 0.071, 0.35), "surface")
+			self:SetUiColor(outer, Color(0.788, 0.635, 0.290, 0.2), "border")
+			self:SetUiColor(s.name, Color(0.788, 0.710, 0.541, 0.5), "text")
 			s.bar.SpriteGUIRendererComponent.Color = Color(0.541, 0.498, 0.439, 0.35)
 			return
 		end
-		s.name.TextComponent.FontColor = self:ColInk()
+		self:SetUiColor(s.name, self:ColInk(), "text")
 		if self.SelectedSlot == i then
-			s.box.SpriteGUIRendererComponent.Color = Color(0.87, 0.86, 0.96, 0.92)
-			outer.SpriteGUIRendererComponent.Color = self:ColGold()
+			self:SetUiColor(s.box, Color(0.87, 0.86, 0.96, 0.92), "surface")
+			self:SetUiColor(outer, self:ColGold(), "border")
 		else
-			s.box.SpriteGUIRendererComponent.Color = self:ColPanel()
-			outer.SpriteGUIRendererComponent.Color = self:ColBorderSoft()
+			self:SetUiColor(s.box, self:ColPanel(), "surface")
+			self:SetUiColor(outer, self:ColBorderSoft(), "border")
 		end
 	end
 
@@ -1455,7 +1732,7 @@ script RtsHudLogic extends Logic
 		-- 정적인 얇은 물결을 면 아래에 넣어 글자나 입력을 방해하지 않는다.
 		local wave = self:SpawnStretch("model://uisprite", "RtsWaterFlow", parent, Vector2(0, 0), Vector2(1, 1), Vector2(10, 10), Vector2(-10, -10))
 		wave.SpriteGUIRendererComponent.ImageRUID = DataRef(self.WaterRUID)
-		wave.SpriteGUIRendererComponent.Color = Color(1, 1, 1, 0.75)
+		self:SetUiColor(wave, Color(1, 1, 1, 0.75), "wave")
 		wave.SpriteGUIRendererComponent.RaycastTarget = false
 	end
 

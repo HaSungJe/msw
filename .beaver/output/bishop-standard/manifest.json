@@ -1,0 +1,522 @@
+{
+  "standard": "Original concept appearance and style; current Bishop motion anatomical proportions",
+  "tasks": [
+    {
+      "key": "ice-lightning-mage/frames/blizzard/motion01.png",
+      "id": "ice-lightning-mage",
+      "rel": "frames/blizzard/motion01.png",
+      "original": "C:/workspace/msw/.beaver/output/bishop-standard/originals/ice-lightning-mage/frames/blizzard/motion01.png",
+      "width": 704,
+      "height": 704,
+      "originalSha256": "da5adf0525b59be5e51bae9f24e455d611f60f458ed1fa928d123c6d667ae451"
+    },
+    {
+      "key": "ice-lightning-mage/frames/blizzard/motion02.png",
+      "id": "ice-lightning-mage",
+      "rel": "frames/blizzard/motion02.png",
+      "original": "C:/workspace/msw/.beaver/output/bishop-standard/originals/ice-lightning-mage/frames/blizzard/motion02.png",
+      "width": 704,
+      "height": 704,
+      "originalSha256": "d9caf71c250adc1127c89a753249870073db589c51c0347211d1c5664eb0e932"
+    },
+    {
+      "key": "ice-lightning-mage/frames/blizzard/motion03.png",
+      "id": "ice-lightning-mage",
+      "rel": "frames/blizzard/motion03.png",
+      "original": "C:/workspace/msw/.beaver/output/bishop-standard/originals/ice-lightning-mage/frames/blizzard/motion03.png",
+      "width": 704,
+      "height": 704,
+      "originalSha256": "bd8d5f0a35604bbaf60da490928eb6afc1fcc0e3874aefeb0568c1e1d5d975d8"
+    },
+    {
+      "key": "ice-lightning-mage/frames/blizzard/motion04.png",
+      "id": "ice-lightning-mage",
+      "rel": "frames/blizzard/motion04.png",
+      "original": "C:/workspace/msw/.beaver/output/bishop-standard/originals/ice-lightning-mage/frames/blizzard/motion04.png",
+      "width": 704,
+      "height": 704,
+      "originalSha256": "30e9f230847524ae730ccc9e88c1556b11eef457554deaf4dba9ef7bb22f6885"
+    },
+    {
+      "key": "ice-lightning-mage/frames/blizzard/motion05.png",
+      "id": "ice-lightning-mage",
+      "rel": "frames/blizzard/motion05.png",
+      "original": "C:/workspace/msw/.beaver/output/bishop-standard/originals/ice-lightning-mage/frames/blizzard/motion05.png",
+      "width": 704,
+      "height": 704,
+      "originalSha256": "8648a17bcc5419ef70f0125f424f033965db9780968994145af8fc27aa8b9e54"
+    },
+    {
+      "key": "ice-lightning-mage/frames/chain-lightning/motion01.png",
+      "id": "ice-lightning-mage",
+      "rel": "frames/chain-lightning/motion01.png",
+      "original": "C:/workspace/msw/.beaver/output/bishop-standard/originals/ice-lightning-mage/frames/chain-lightning/motion01.png",
+      "width": 704,
+      "height": 704,
+      "originalSha256": "e28d8ca6c99c070fbd5d793b1fbea8eac3587358e49edf781b6741ca6f3937a2"
+    },
+    {
+      "key": "ice-lightning-mage/frames/chain-lightning/motion02.png",
+      "id": "ice-lightning-mage",
+      "rel": "frames/chain-lightning/motion02.png",
+      "original": "C:/workspace/msw/.beaver/output/bishop-standard/originals/ice-lightning-mage/frames/chain-lightning/motion02.png",
+      "width": 704,
+      "height": 704,
+      "originalSha256": "888f1f4ab575a39b584b4e5e4c469c8101fb3e0744efd32cefafd7d8c658bab1"
+    },
+    {
+      "key": "ice-lightning-mage/frames/chain-lightning/motion03.png",
+      "id": "ice-lightning-mage",
+      "rel": "frames/chain-lightning/motion03.png",
+      "original": "C:/workspace/msw/.beaver/output/bishop-standard/originals/ice-lightning-mage/frames/chain-lightning/motion03.png",
+      "width": 704,
+      "height": 704,
+      "originalSha256": "8b4e953ec42bece41a59443dc78fa75d79e1551bc880f850a476135909f226d8"
+    },
+    {
+      "key": "ice-lightning-mage/frames/chain-lightning/motion04.png",
+      "id": "ice-lightning-mage",
+      "rel": "frames/chain-lightning/motion04.png",
+      "original": "C:/workspace/msw/.beaver/output/bishop-standard/originals/ice-lightning-mage/frames/chain-lightning/motion04.png",
+      "width": 704,
+      "height": 704,
+      "originalSha256": "8f4cdc87f6fcb1148cf4d0dff2d599bb31e140be1343dfb938b84ce7959b45bb"
+    },
+    {
+      "key": "ice-lightning-mage/frames/chain-lightning/motion05.png",
+      "id": "ice-lightning-mage",
+      "rel": "frames/chain-lightning/motion05.png",
+      "original": "C:/workspace/msw/.beaver/output/bishop-standard/originals/ice-lightning-mage/frames/chain-lightning/motion05.png",
+      "width": 704,
+      "height": 704,
+      "originalSha256": "c8d62b3d0aff6a0ed7ba9b4a4503de9aab4545ebb0bc255dc470b35729df1685"
+    },
+    {
+      "key": "ice-lightning-mage/frames/wait/motion01.png",
+      "id": "ice-lightning-mage",
+      "rel": "frames/wait/motion01.png",
+      "original": "C:/workspace/msw/.beaver/output/bishop-standard/originals/ice-lightning-mage/frames/wait/motion01.png",
+      "width": 576,
+      "height": 576,
+      "originalSha256": "e5f60543ba12e370333be01289308d3a3a0e6efad8d2dc3d9d1488e5d2079136"
+    },
+    {
+      "key": "ice-lightning-mage/frames/wait/motion02.png",
+      "id": "ice-lightning-mage",
+      "rel": "frames/wait/motion02.png",
+      "original": "C:/workspace/msw/.beaver/output/bishop-standard/originals/ice-lightning-mage/frames/wait/motion02.png",
+      "width": 576,
+      "height": 576,
+      "originalSha256": "7f7073ba44acf19a83f0d27e5bcebea355bf368b606c13ea7033d2be063f8a9c"
+    },
+    {
+      "key": "ice-lightning-mage/frames/wait/motion03.png",
+      "id": "ice-lightning-mage",
+      "rel": "frames/wait/motion03.png",
+      "original": "C:/workspace/msw/.beaver/output/bishop-standard/originals/ice-lightning-mage/frames/wait/motion03.png",
+      "width": 576,
+      "height": 576,
+      "originalSha256": "590adbdb8aa90a8de1aec40b0f1dade5aa85b57bd0b4268b09772d10ca004914"
+    },
+    {
+      "key": "ice-lightning-mage/portrait.png",
+      "id": "ice-lightning-mage",
+      "rel": "portrait.png",
+      "original": "C:/workspace/msw/.beaver/output/bishop-standard/originals/ice-lightning-mage/portrait.png",
+      "width": 512,
+      "height": 512,
+      "originalSha256": "ef647c7fe060cd95816dd9a4dd056925107b78a353eeb59c1f4dd46c6eea6708"
+    },
+    {
+      "key": "fire-poison-mage/frames/dot-punisher/motion01.png",
+      "id": "fire-poison-mage",
+      "rel": "frames/dot-punisher/motion01.png",
+      "original": "C:/workspace/msw/.beaver/output/bishop-standard/originals/fire-poison-mage/frames/dot-punisher/motion01.png",
+      "width": 704,
+      "height": 704,
+      "originalSha256": "dde4610c56f0393eb4000c3a19d0a395eeed565fb11d9fd9182201e8486fc9c0"
+    },
+    {
+      "key": "fire-poison-mage/frames/dot-punisher/motion02.png",
+      "id": "fire-poison-mage",
+      "rel": "frames/dot-punisher/motion02.png",
+      "original": "C:/workspace/msw/.beaver/output/bishop-standard/originals/fire-poison-mage/frames/dot-punisher/motion02.png",
+      "width": 704,
+      "height": 704,
+      "originalSha256": "e4d295bf6a8e806f4d6409fdf95eb0db77bc482eb8a70277a4860b7d270ea28a"
+    },
+    {
+      "key": "fire-poison-mage/frames/dot-punisher/motion03.png",
+      "id": "fire-poison-mage",
+      "rel": "frames/dot-punisher/motion03.png",
+      "original": "C:/workspace/msw/.beaver/output/bishop-standard/originals/fire-poison-mage/frames/dot-punisher/motion03.png",
+      "width": 704,
+      "height": 704,
+      "originalSha256": "a1578f5868e38b70a7b7fb0644d680258937f3887bdca1af7918a36696952b64"
+    },
+    {
+      "key": "fire-poison-mage/frames/dot-punisher/motion04.png",
+      "id": "fire-poison-mage",
+      "rel": "frames/dot-punisher/motion04.png",
+      "original": "C:/workspace/msw/.beaver/output/bishop-standard/originals/fire-poison-mage/frames/dot-punisher/motion04.png",
+      "width": 704,
+      "height": 704,
+      "originalSha256": "afc6f8df542702da5f73fe12c4f8a1b7166f34c26cb103e20b0c9e067649c4f4"
+    },
+    {
+      "key": "fire-poison-mage/frames/dot-punisher/motion05.png",
+      "id": "fire-poison-mage",
+      "rel": "frames/dot-punisher/motion05.png",
+      "original": "C:/workspace/msw/.beaver/output/bishop-standard/originals/fire-poison-mage/frames/dot-punisher/motion05.png",
+      "width": 704,
+      "height": 704,
+      "originalSha256": "7eef9357495510feb08e451e0e8ab39a4fec109513f257982213e5e884eee292"
+    },
+    {
+      "key": "fire-poison-mage/frames/poison-region/motion01.png",
+      "id": "fire-poison-mage",
+      "rel": "frames/poison-region/motion01.png",
+      "original": "C:/workspace/msw/.beaver/output/bishop-standard/originals/fire-poison-mage/frames/poison-region/motion01.png",
+      "width": 704,
+      "height": 704,
+      "originalSha256": "1be0751d31120b33dd893bdca1871cc7347aa88ae93dad9800cc67ffb2754051"
+    },
+    {
+      "key": "fire-poison-mage/frames/poison-region/motion02.png",
+      "id": "fire-poison-mage",
+      "rel": "frames/poison-region/motion02.png",
+      "original": "C:/workspace/msw/.beaver/output/bishop-standard/originals/fire-poison-mage/frames/poison-region/motion02.png",
+      "width": 704,
+      "height": 704,
+      "originalSha256": "2316c80702eca508c216b4a21ae3d1af7d7fe3aaff043363c1dc0dea6c4ef28e"
+    },
+    {
+      "key": "fire-poison-mage/frames/poison-region/motion03.png",
+      "id": "fire-poison-mage",
+      "rel": "frames/poison-region/motion03.png",
+      "original": "C:/workspace/msw/.beaver/output/bishop-standard/originals/fire-poison-mage/frames/poison-region/motion03.png",
+      "width": 704,
+      "height": 704,
+      "originalSha256": "bbac9f156fbae4dedfce418d1698fd7ceed5053ec1e13f4cce386ed26988c1f9"
+    },
+    {
+      "key": "fire-poison-mage/frames/poison-region/motion04.png",
+      "id": "fire-poison-mage",
+      "rel": "frames/poison-region/motion04.png",
+      "original": "C:/workspace/msw/.beaver/output/bishop-standard/originals/fire-poison-mage/frames/poison-region/motion04.png",
+      "width": 704,
+      "height": 704,
+      "originalSha256": "20497c964a8609c203043c354b164da39bd15ea5e9da1b16a0920d6f8882a5fe"
+    },
+    {
+      "key": "fire-poison-mage/frames/poison-region/motion05.png",
+      "id": "fire-poison-mage",
+      "rel": "frames/poison-region/motion05.png",
+      "original": "C:/workspace/msw/.beaver/output/bishop-standard/originals/fire-poison-mage/frames/poison-region/motion05.png",
+      "width": 704,
+      "height": 704,
+      "originalSha256": "c557ef968bbfbea886d1d4733ba345eff288452d07a49d314c86d1ca4c0f41e2"
+    },
+    {
+      "key": "fire-poison-mage/frames/wait/motion01.png",
+      "id": "fire-poison-mage",
+      "rel": "frames/wait/motion01.png",
+      "original": "C:/workspace/msw/.beaver/output/bishop-standard/originals/fire-poison-mage/frames/wait/motion01.png",
+      "width": 576,
+      "height": 576,
+      "originalSha256": "cc7886565ffcabadaf8865dcd585725c39255403a7416077115602add7724090"
+    },
+    {
+      "key": "fire-poison-mage/frames/wait/motion02.png",
+      "id": "fire-poison-mage",
+      "rel": "frames/wait/motion02.png",
+      "original": "C:/workspace/msw/.beaver/output/bishop-standard/originals/fire-poison-mage/frames/wait/motion02.png",
+      "width": 576,
+      "height": 576,
+      "originalSha256": "ed9b315558e86cd848faf2a7a73faa738793146aaa2d16f96d78faefc79849bf"
+    },
+    {
+      "key": "fire-poison-mage/frames/wait/motion03.png",
+      "id": "fire-poison-mage",
+      "rel": "frames/wait/motion03.png",
+      "original": "C:/workspace/msw/.beaver/output/bishop-standard/originals/fire-poison-mage/frames/wait/motion03.png",
+      "width": 576,
+      "height": 576,
+      "originalSha256": "e8f6a92ce01a2011ebed2ab1745c172fe488152cf80763efc0c04a810f5ab09d"
+    },
+    {
+      "key": "fire-poison-mage/portrait.png",
+      "id": "fire-poison-mage",
+      "rel": "portrait.png",
+      "original": "C:/workspace/msw/.beaver/output/bishop-standard/originals/fire-poison-mage/portrait.png",
+      "width": 512,
+      "height": 512,
+      "originalSha256": "750165d554cd8b48c50dd3dcbba6e6524ddd92900a838c2744759bd2321d66e7"
+    },
+    {
+      "key": "hero/frames/enraged-raging-blow/motion01.png",
+      "id": "hero",
+      "rel": "frames/enraged-raging-blow/motion01.png",
+      "original": "C:/workspace/msw/.beaver/output/bishop-standard/originals/hero/frames/enraged-raging-blow/motion01.png",
+      "width": 704,
+      "height": 704,
+      "originalSha256": "7b6088100d8f0aee31b6ce1224fd856f30cdef59c043a1d6bb118b62e3c1014e"
+    },
+    {
+      "key": "hero/frames/enraged-raging-blow/motion02.png",
+      "id": "hero",
+      "rel": "frames/enraged-raging-blow/motion02.png",
+      "original": "C:/workspace/msw/.beaver/output/bishop-standard/originals/hero/frames/enraged-raging-blow/motion02.png",
+      "width": 704,
+      "height": 704,
+      "originalSha256": "3924487b89b605ca5d417d24879024279e331902e1bcf8a62b08e98e89a182b7"
+    },
+    {
+      "key": "hero/frames/enraged-raging-blow/motion03.png",
+      "id": "hero",
+      "rel": "frames/enraged-raging-blow/motion03.png",
+      "original": "C:/workspace/msw/.beaver/output/bishop-standard/originals/hero/frames/enraged-raging-blow/motion03.png",
+      "width": 704,
+      "height": 704,
+      "originalSha256": "0acd01336b5b92af22440aba45b086c26b7aee6709ed2e93eb099c8a8d1b2349"
+    },
+    {
+      "key": "hero/frames/enraged-raging-blow/motion04.png",
+      "id": "hero",
+      "rel": "frames/enraged-raging-blow/motion04.png",
+      "original": "C:/workspace/msw/.beaver/output/bishop-standard/originals/hero/frames/enraged-raging-blow/motion04.png",
+      "width": 704,
+      "height": 704,
+      "originalSha256": "05fab7a4b1b252d7baeaa239a24f4407eca8cb707cb876616f2c7731834b6b90"
+    },
+    {
+      "key": "hero/frames/enraged-raging-blow/motion05.png",
+      "id": "hero",
+      "rel": "frames/enraged-raging-blow/motion05.png",
+      "original": "C:/workspace/msw/.beaver/output/bishop-standard/originals/hero/frames/enraged-raging-blow/motion05.png",
+      "width": 704,
+      "height": 704,
+      "originalSha256": "6e972a066a148b58b0d34192d3ff3431e2f170ad0e0b87212a48ffbe6d77a65f"
+    },
+    {
+      "key": "hero/frames/enraged-raging-blow/motion06.png",
+      "id": "hero",
+      "rel": "frames/enraged-raging-blow/motion06.png",
+      "original": "C:/workspace/msw/.beaver/output/bishop-standard/originals/hero/frames/enraged-raging-blow/motion06.png",
+      "width": 704,
+      "height": 704,
+      "originalSha256": "012580d7f74480538cb925ebc2fc56bccbeb85e7e2e5bebca7a0ba6b737be828"
+    },
+    {
+      "key": "hero/frames/enraged-raging-blow/motion07.png",
+      "id": "hero",
+      "rel": "frames/enraged-raging-blow/motion07.png",
+      "original": "C:/workspace/msw/.beaver/output/bishop-standard/originals/hero/frames/enraged-raging-blow/motion07.png",
+      "width": 704,
+      "height": 704,
+      "originalSha256": "e630c7fcb077f5de352645f3cbf735eb8e4565ba27c8ff3473ab43d6c311a42b"
+    },
+    {
+      "key": "hero/frames/raging-blow/motion01.png",
+      "id": "hero",
+      "rel": "frames/raging-blow/motion01.png",
+      "original": "C:/workspace/msw/.beaver/output/bishop-standard/originals/hero/frames/raging-blow/motion01.png",
+      "width": 704,
+      "height": 704,
+      "originalSha256": "da9add3d88ac744f7505106690c708fd7f0e7f547ad1b417a652b4b0faf15ea1"
+    },
+    {
+      "key": "hero/frames/raging-blow/motion02.png",
+      "id": "hero",
+      "rel": "frames/raging-blow/motion02.png",
+      "original": "C:/workspace/msw/.beaver/output/bishop-standard/originals/hero/frames/raging-blow/motion02.png",
+      "width": 704,
+      "height": 704,
+      "originalSha256": "91b1f6baedf12285c26c8ab7cfdfb9bf9bf2ed663074749fa37e4b529e04d7ef"
+    },
+    {
+      "key": "hero/frames/raging-blow/motion03.png",
+      "id": "hero",
+      "rel": "frames/raging-blow/motion03.png",
+      "original": "C:/workspace/msw/.beaver/output/bishop-standard/originals/hero/frames/raging-blow/motion03.png",
+      "width": 704,
+      "height": 704,
+      "originalSha256": "edf40010d01587aeb69c590605a8da8f17085661caded1151f2fb0d7ca599038"
+    },
+    {
+      "key": "hero/frames/raging-blow/motion04.png",
+      "id": "hero",
+      "rel": "frames/raging-blow/motion04.png",
+      "original": "C:/workspace/msw/.beaver/output/bishop-standard/originals/hero/frames/raging-blow/motion04.png",
+      "width": 704,
+      "height": 704,
+      "originalSha256": "c44abc679779eead97f16390888fdb5303c2a998fda0e06ff33f22f07a350631"
+    },
+    {
+      "key": "hero/frames/raging-blow/motion05.png",
+      "id": "hero",
+      "rel": "frames/raging-blow/motion05.png",
+      "original": "C:/workspace/msw/.beaver/output/bishop-standard/originals/hero/frames/raging-blow/motion05.png",
+      "width": 704,
+      "height": 704,
+      "originalSha256": "e6726f068059bbea135b714d00801f41f4771b7f9b24aa15e11d030241dc1184"
+    },
+    {
+      "key": "hero/frames/raging-blow/motion06.png",
+      "id": "hero",
+      "rel": "frames/raging-blow/motion06.png",
+      "original": "C:/workspace/msw/.beaver/output/bishop-standard/originals/hero/frames/raging-blow/motion06.png",
+      "width": 704,
+      "height": 704,
+      "originalSha256": "28e809353cb4302f8c77ce2f47a9fa1034a75c1fb51cda901bc856d065e6f75f"
+    },
+    {
+      "key": "hero/frames/raging-blow/motion07.png",
+      "id": "hero",
+      "rel": "frames/raging-blow/motion07.png",
+      "original": "C:/workspace/msw/.beaver/output/bishop-standard/originals/hero/frames/raging-blow/motion07.png",
+      "width": 704,
+      "height": 704,
+      "originalSha256": "45299b6ef9468d5d913e4ceded6203b7bb46bfdc9788872f4377a7002b48dde2"
+    },
+    {
+      "key": "hero/frames/raging-blow/motion08.png",
+      "id": "hero",
+      "rel": "frames/raging-blow/motion08.png",
+      "original": "C:/workspace/msw/.beaver/output/bishop-standard/originals/hero/frames/raging-blow/motion08.png",
+      "width": 704,
+      "height": 704,
+      "originalSha256": "ad0dc6d54801864548e41778c8f58c380231a33697e2717a57fafe89f9099fb1"
+    },
+    {
+      "key": "hero/frames/wait/motion01.png",
+      "id": "hero",
+      "rel": "frames/wait/motion01.png",
+      "original": "C:/workspace/msw/.beaver/output/bishop-standard/originals/hero/frames/wait/motion01.png",
+      "width": 576,
+      "height": 576,
+      "originalSha256": "11f60392141496b33648d61df7235df9c9329b180eb2a53557ee6c336a25689e"
+    },
+    {
+      "key": "hero/frames/wait/motion02.png",
+      "id": "hero",
+      "rel": "frames/wait/motion02.png",
+      "original": "C:/workspace/msw/.beaver/output/bishop-standard/originals/hero/frames/wait/motion02.png",
+      "width": 576,
+      "height": 576,
+      "originalSha256": "f208a0e87b0a16f47a18357d256b5fedbb4973a2e4a25d15309855fc0446dac1"
+    },
+    {
+      "key": "hero/frames/wait/motion03.png",
+      "id": "hero",
+      "rel": "frames/wait/motion03.png",
+      "original": "C:/workspace/msw/.beaver/output/bishop-standard/originals/hero/frames/wait/motion03.png",
+      "width": 576,
+      "height": 576,
+      "originalSha256": "dbff47bd3d2da86854865290a988282f400ea97ab93f0858098e0d13eebe636b"
+    },
+    {
+      "key": "hero/portrait.png",
+      "id": "hero",
+      "rel": "portrait.png",
+      "original": "C:/workspace/msw/.beaver/output/bishop-standard/originals/hero/portrait.png",
+      "width": 512,
+      "height": 512,
+      "originalSha256": "a215a28e85b32126a994f38dbb551ad207be4bea2756d1a5042e2ed0fc8f00dc"
+    }
+  ],
+  "bishopHashes": [
+    {
+      "file": "C:\\workspace\\msw\\assets\\design\\characters\\bishop\\frames\\angel-ray\\motion01.png",
+      "sha256": "273b3d55222167bf80d7b3ff614b52ccfad117014a70990f6133f6f83de534b9"
+    },
+    {
+      "file": "C:\\workspace\\msw\\assets\\design\\characters\\bishop\\frames\\angel-ray\\motion02.png",
+      "sha256": "64c907c244955a9878091f5077f1b3d3d1defd807688059d82f35aaa593ccfad"
+    },
+    {
+      "file": "C:\\workspace\\msw\\assets\\design\\characters\\bishop\\frames\\angel-ray\\motion03.png",
+      "sha256": "ce5ccc4af941fcd2fd22ce979a0f53698734217b8ec1517f8bf8c4dc53ca5d51"
+    },
+    {
+      "file": "C:\\workspace\\msw\\assets\\design\\characters\\bishop\\frames\\angel-ray\\motion04.png",
+      "sha256": "db7202ee986b774d8f6543a5b0d1fb6811137f356add53b26eed2975a4e11306"
+    },
+    {
+      "file": "C:\\workspace\\msw\\assets\\design\\characters\\bishop\\frames\\angel-ray\\motion05.png",
+      "sha256": "1473048e9347b98d97ddfe508abe261e5655228c0f9b2180553bb05dfc3ae0f0"
+    },
+    {
+      "file": "C:\\workspace\\msw\\assets\\design\\characters\\bishop\\frames\\divine-punishment\\motion01.png",
+      "sha256": "a9b1f119042ee5ed665fca00cdb9ce5422b64220eff9f73ab47894574c815625"
+    },
+    {
+      "file": "C:\\workspace\\msw\\assets\\design\\characters\\bishop\\frames\\divine-punishment\\motion02.png",
+      "sha256": "87089af05915dfe14036be3a7bed11987b80a072b6e54ec69eebaa6ea3bab1d3"
+    },
+    {
+      "file": "C:\\workspace\\msw\\assets\\design\\characters\\bishop\\frames\\divine-punishment\\motion03.png",
+      "sha256": "ecfb5c83d0441500b5347da843d200ad0c6377a702fe56f93b8925203ea3201a"
+    },
+    {
+      "file": "C:\\workspace\\msw\\assets\\design\\characters\\bishop\\frames\\divine-punishment\\motion04.png",
+      "sha256": "a39e33507137b9bdff194e470fa8e3485a105529b43df00a3967052f1b4a1150"
+    },
+    {
+      "file": "C:\\workspace\\msw\\assets\\design\\characters\\bishop\\frames\\divine-punishment\\motion05.png",
+      "sha256": "20a51b406be42bd7a7d61fb7c5f4743bd0ba8102736679f72a049e3b16bd9ecf"
+    },
+    {
+      "file": "C:\\workspace\\msw\\assets\\design\\characters\\bishop\\frames\\genesis\\motion01.png",
+      "sha256": "8849aa18a46b812f0006898386c7b34520e76a85094db5c855f5da31c2e13d86"
+    },
+    {
+      "file": "C:\\workspace\\msw\\assets\\design\\characters\\bishop\\frames\\genesis\\motion02.png",
+      "sha256": "3e389ce4c355b9d3e7b23d3a360ad0cc1da6999f0e5afc7970d995995f18412f"
+    },
+    {
+      "file": "C:\\workspace\\msw\\assets\\design\\characters\\bishop\\frames\\genesis\\motion03.png",
+      "sha256": "7a94eb45e6e286fcb77f189f70994e661ad1a3bb2b893f4a7070d6723a692084"
+    },
+    {
+      "file": "C:\\workspace\\msw\\assets\\design\\characters\\bishop\\frames\\genesis\\motion04.png",
+      "sha256": "6db94c5fb2cb649158e876ec4263d63ca30536a1b13808c506bfab785feec65f"
+    },
+    {
+      "file": "C:\\workspace\\msw\\assets\\design\\characters\\bishop\\frames\\genesis\\motion05.png",
+      "sha256": "ecdc9cb7e67c3d43cd04bee1b93c998ff6a5a11fed1d2828c5dca0981baf2557"
+    },
+    {
+      "file": "C:\\workspace\\msw\\assets\\design\\characters\\bishop\\frames\\wait\\motion01.png",
+      "sha256": "7949a8bdfd86a72d5ef45c67856df447f4c2e319eb5e9a6978d8800648e45849"
+    },
+    {
+      "file": "C:\\workspace\\msw\\assets\\design\\characters\\bishop\\frames\\wait\\motion02.png",
+      "sha256": "6c80d82d24df5acf97dde4dcd93dee43b982e13063027a7445e39e20f3ef9fa4"
+    },
+    {
+      "file": "C:\\workspace\\msw\\assets\\design\\characters\\bishop\\frames\\wait\\motion03.png",
+      "sha256": "09e03a1c40705b11e214e906029ab3d49d8bf6184c5b0b82995123e8febaec24"
+    }
+  ],
+  "rejectedConcepts": {
+    "ice-lightning-mage": {
+      "path": "C:/Users/timec/.codex/generated_images/01a0dbf3-5094-7520-bfc7-f24b6496f5e5/exec-8cb85669-ca1f-45b2-885d-1e97808a3d7c.png",
+      "prompt": "Restyle the ice/lightning mage in IMAGE1 to look drawn by EXACTLY the same artist as the ORIGINAL BISHOP in IMAGE2. This is a significant STYLE TRANSFER, not merely changing body proportions. Image2 is the sole style/anatomy master. Image1's existing saturated shiny illustration style must be replaced.\nUse Bishop's soft rounded hair locks, delicate warm charcoal/brown contour lines, restrained pastel shading and SMALL understated highlights. No hard white zigzag reflections through hair, no electric cyan rim lights, no oversaturated royal blue shadows, no noisy sparkle textures. Hair stays recognizable light icy blue but becomes soft powder blue/periwinkle, with calm muted blue-violet shadows. Face should have Bishop's softly rounded cheeks, gentle eye contours/eyelashes and simple clear layered irises, NOT sharp high-contrast angular anime eyes. Eyes remain silver-gray. Warm light skin, tiny relaxed smile.\nRetain ice mage identity: long flowing light blue hair, big navy/black ribbon with blue diamond, navy/white mage dress, ice-blue geometric panels, dark short boots, ornate silver staff with blue crystals and a floating navy spellbook. Treat crystals with elegant low-intensity cel highlights like Bishop's turquoise staff gem, no neon glow or over-rendered ice textures. The same outfit/silhouette and accessories, not Bishop's robes or hat.\nMatch Bishop's APPROVED 2.30-head anatomy: crown-to-chin43.5% of crown-to-soles, body56.5%, face width like Bishop, short but visibly articulated legs, compact torso. Keep staff held calmly low in both hands and existing three-quarter standing pose. Not an exaggerated2-head large-head remake. Whole body plus ribbon, book and staff visible. Transparent square background with generous margins as in Bishop; character anatomical crown-to-soles about59% of canvas height and feet near89% height, centered. ONE single full-body character, no text, no UI, no ground/shadow. True alpha transparency."
+    },
+    "fire-poison-mage": {
+      "path": "C:/Users/timec/.codex/generated_images/01a0dbf3-5094-7520-bfc7-f24b6496f5e5/exec-a4412d46-3501-4bc6-aa9a-411813086a35.png",
+      "prompt": "Use case: precise identity-preserving character style/proportion edit. IMAGE 1 is the EDIT TARGET, the character whose identity, colors, costume, equipment and standing pose must be preserved. IMAGES 2-4 are our CURRENT APPROVED BISHOP ANIMATION SPRITES and the ONLY canonical ART STYLE, ANATOMICAL PROPORTION and character-scale references. Image2 is neutral idle; image3 and4 are action examples only to clarify anatomy. Do NOT copy their action poses or Bishop's costume, hair color, eyes, hat, staff or book onto target.\nThe user chose the ORIGINAL CURRENT BISHOP, not an exaggerated big-head remake, as the master. Match this bishop's balanced elegant SD anatomy: approximately 2.30 heads tall excluding ornaments, anatomical crown-to-chin about43.5% of crown-to-sole height; chin-to-sole about56.5%. Clearly defined compact torso with recognizable thighs, calves and small shoes like bishop. Do not make a two-head stubby baby, gigantic head, tiny torso, elongated mature warrior, or tall oversize boots. Face shape and eye spacing should harmonize with bishop while keeping target's expression/identity.\nBishop measured visual landmarks on576 square: anatomical crown y174, chin y321, soles y512 => height338, head147; face skin width around104; costume lower hem about440 (costume landmark, NOT anatomical hip); hem-to-soles72; hands around394. Foot midpoint x288. Use these as approximate normalized proportions, scale with resolution. Keep generous transparent upper and side margins like the original sprites: character crown-to-sole about59% of square height. Keep complete hairstyle ornaments, weapon, books, hands, feet and cape in frame. DO NOT zoom the character to fill the canvas.\nPaint with exactly the CURRENT BISHOP'S finely outlined smooth2D anime game illustration, fine clean outer contour, soft controlled cel shading, delicate glossy grouped hair locks, clear large eyes with soft upper lashes. Not3D, not painterly, not flat icon or pixels. Retain target's rich fine costume details. A polished SINGLE full-body character on actual TRANSPARENT background. No captions, text, labels, UI, panels, reference sheets, ground, cast shadow or VFX. Preserve the target's existing standing pose, every distinguishing accessory and colors. Create a corrected original concept, not animation frames. TARGET Fire/Poison Mage: female with platinum center-parted wavy twin ponytails and black bows, amber-gold eyes and confident quiet closed-mouth smile. Black/gold embroidered cape and dress, white ruffled collar and lace hem, brown/gold boots, amber-orb staff held across front in two hands and a burgundy/gold floating spellbook to right. Original target is already quite close to Bishop's2.3 heads, so make only subtle head/torso/leg and facial line/shading adjustments required to match Bishop. Do NOT exaggerate the head or shrink her torso and legs to2-head proportions. Preserve exact appearance and details."
+    },
+    "hero": {
+      "path": "C:/Users/timec/.codex/generated_images/01a0dbf3-5094-7520-bfc7-f24b6496f5e5/exec-71899ba0-53be-407c-95e1-50cab692d125.png",
+      "prompt": "Use case: precise identity-preserving character style/proportion edit. IMAGE 1 is the EDIT TARGET, the character whose identity, colors, costume, equipment and standing pose must be preserved. IMAGES 2-4 are our CURRENT APPROVED BISHOP ANIMATION SPRITES and the ONLY canonical ART STYLE, ANATOMICAL PROPORTION and character-scale references. Image2 is neutral idle; image3 and4 are action examples only to clarify anatomy. Do NOT copy their action poses or Bishop's costume, hair color, eyes, hat, staff or book onto target.\nThe user chose the ORIGINAL CURRENT BISHOP, not an exaggerated big-head remake, as the master. Match this bishop's balanced elegant SD anatomy: approximately 2.30 heads tall excluding ornaments, anatomical crown-to-chin about43.5% of crown-to-sole height; chin-to-sole about56.5%. Clearly defined compact torso with recognizable thighs, calves and small shoes like bishop. Do not make a two-head stubby baby, gigantic head, tiny torso, elongated mature warrior, or tall oversize boots. Face shape and eye spacing should harmonize with bishop while keeping target's expression/identity.\nBishop measured visual landmarks on576 square: anatomical crown y174, chin y321, soles y512 => height338, head147; face skin width around104; costume lower hem about440 (costume landmark, NOT anatomical hip); hem-to-soles72; hands around394. Foot midpoint x288. Use these as approximate normalized proportions, scale with resolution. Keep generous transparent upper and side margins like the original sprites: character crown-to-sole about59% of square height. Keep complete hairstyle ornaments, weapon, books, hands, feet and cape in frame. DO NOT zoom the character to fill the canvas.\nPaint with exactly the CURRENT BISHOP'S finely outlined smooth2D anime game illustration, fine clean outer contour, soft controlled cel shading, delicate glossy grouped hair locks, clear large eyes with soft upper lashes. Not3D, not painterly, not flat icon or pixels. Retain target's rich fine costume details. A polished SINGLE full-body character on actual TRANSPARENT background. No captions, text, labels, UI, panels, reference sheets, ground, cast shadow or VFX. Preserve the target's existing standing pose, every distinguishing accessory and colors. Create a corrected original concept, not animation frames. TARGET Hero: male with short voluminous swept brown hair, vivid blue eyes, silver earrings, quiet confident closed-mouth smile. Black/silver plate armor with gold emblems and red chest jewel, crimson and gold cape. Full silver greatsword with gold/red jeweled guard resting on his shoulder, one raised hand on hilt, other resting low. Match Bishop's overall anatomical height and face size: current warrior is much too tall on same canvas; aim crown y174 instead of118, chin321, feet512. Keep2.3-head anatomy rather than2-head stubby remake; compact his long torso and shin guards proportionally, natural short armored legs. Preserve masculine eyes/face, no feminization or long feminine eyelashes. Preserve full sword, cape motifs, metallic palette and standing pose."
+    }
+  },
+  "conceptFiles": [
+    "C:/workspace/msw/assets/design/characters/bishop/concept.png",
+    "C:/workspace/msw/assets/design/characters/ice-lightning-mage/concept.png",
+    "C:/workspace/msw/assets/design/characters/fire-poison-mage/concept.png",
+    "C:/workspace/msw/assets/design/characters/hero/concept.png"
+  ]
+}

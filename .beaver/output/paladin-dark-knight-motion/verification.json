@@ -1,0 +1,688 @@
+{
+  "buildErrors": [],
+  "buildWarnings": [
+    {
+      "logType": "Warning",
+      "dateTime": "2026-09-27T17:58:34",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": false,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": "",
+      "message": "<MODIssueFormat>LWA&Default&1111&0</MODIssueFormat><MODIssueArg>2</MODIssueArg><MODIssueArg>1</MODIssueArg>",
+      "stackTrace": [
+        {
+          "methodName": "MyPendingItems",
+          "methodLineNum": 4,
+          "codeBlockFileId": "codeblock://f0bca8b6-82f4-4dd0-b6e6-55891ffa1bc8"
+        }
+      ]
+    },
+    {
+      "logType": "Warning",
+      "dateTime": "2026-09-27T17:58:34",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": false,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": "",
+      "message": "<MODIssueFormat>LWA&Default&1111&0</MODIssueFormat><MODIssueArg>2</MODIssueArg><MODIssueArg>1</MODIssueArg>",
+      "stackTrace": [
+        {
+          "methodName": "ParseOwned",
+          "methodLineNum": 4,
+          "codeBlockFileId": "codeblock://f0bca8b6-82f4-4dd0-b6e6-55891ffa1bc8"
+        }
+      ]
+    },
+    {
+      "logType": "Warning",
+      "dateTime": "2026-09-27T17:58:34",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": false,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": "",
+      "message": "<MODIssueFormat>LWA&Default&1111&0</MODIssueFormat><MODIssueArg>2</MODIssueArg><MODIssueArg>1</MODIssueArg>",
+      "stackTrace": [
+        {
+          "methodName": "ParseOffer",
+          "methodLineNum": 3,
+          "codeBlockFileId": "codeblock://f0bca8b6-82f4-4dd0-b6e6-55891ffa1bc8"
+        }
+      ]
+    },
+    {
+      "logType": "Warning",
+      "dateTime": "2026-09-27T17:58:34",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": false,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": "",
+      "message": "<MODIssueFormat>LWA&Default&1111&0</MODIssueFormat><MODIssueArg>2</MODIssueArg><MODIssueArg>1</MODIssueArg>",
+      "stackTrace": [
+        {
+          "methodName": "ParseOffer",
+          "methodLineNum": 7,
+          "codeBlockFileId": "codeblock://f0bca8b6-82f4-4dd0-b6e6-55891ffa1bc8"
+        }
+      ]
+    },
+    {
+      "logType": "Warning",
+      "dateTime": "2026-09-27T17:58:34",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": false,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": "",
+      "message": "<MODIssueFormat>LWA&Default&1111&0</MODIssueFormat><MODIssueArg>1</MODIssueArg><MODIssueArg>2</MODIssueArg>",
+      "stackTrace": [
+        {
+          "methodName": "BuildRank",
+          "methodLineNum": 43,
+          "codeBlockFileId": "codeblock://6c469ff5-548b-450f-928b-f92ba2bf7621"
+        }
+      ]
+    },
+    {
+      "logType": "Warning",
+      "dateTime": "2026-09-27T17:58:34",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": false,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": "",
+      "message": "<MODIssueFormat>LWA&Default&1111&0</MODIssueFormat><MODIssueArg>2</MODIssueArg><MODIssueArg>1</MODIssueArg>",
+      "stackTrace": [
+        {
+          "methodName": "StripTags",
+          "methodLineNum": 3,
+          "codeBlockFileId": "codeblock://6c469ff5-548b-450f-928b-f92ba2bf7621"
+        }
+      ]
+    },
+    {
+      "logType": "Warning",
+      "dateTime": "2026-09-27T17:58:34",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": false,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": "",
+      "message": "<MODIssueFormat>LWA&Default&1111&0</MODIssueFormat><MODIssueArg>1</MODIssueArg><MODIssueArg>2</MODIssueArg>",
+      "stackTrace": [
+        {
+          "methodName": "ParseOwned",
+          "methodLineNum": 5,
+          "codeBlockFileId": "codeblock://be912d7e-d385-48b7-a737-ba241b00d281"
+        }
+      ]
+    },
+    {
+      "logType": "Warning",
+      "dateTime": "2026-09-27T17:58:34",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": false,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": "",
+      "message": "<MODIssueFormat>LWA&Default&1111&0</MODIssueFormat><MODIssueArg>2</MODIssueArg><MODIssueArg>1</MODIssueArg>",
+      "stackTrace": [
+        {
+          "methodName": "RequestRanking",
+          "methodLineNum": 58,
+          "codeBlockFileId": "codeblock://7ae09b6f-97c9-4d3b-bebd-573e8ed2b3a2"
+        }
+      ]
+    },
+    {
+      "logType": "Warning",
+      "dateTime": "2026-09-27T17:58:34",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": false,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": "",
+      "message": "<MODIssueFormat>LWA&Default&1111&0</MODIssueFormat><MODIssueArg>2</MODIssueArg><MODIssueArg>1</MODIssueArg>",
+      "stackTrace": [
+        {
+          "methodName": "ComboText",
+          "methodLineNum": 11,
+          "codeBlockFileId": "codeblock://7ae09b6f-97c9-4d3b-bebd-573e8ed2b3a2"
+        }
+      ]
+    },
+    {
+      "logType": "Warning",
+      "dateTime": "2026-09-27T17:58:34",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": false,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": "",
+      "message": "<MODIssueFormat>LWA&Default&1111&0</MODIssueFormat><MODIssueArg>2</MODIssueArg><MODIssueArg>1</MODIssueArg>",
+      "stackTrace": [
+        {
+          "methodName": "ComboText",
+          "methodLineNum": 12,
+          "codeBlockFileId": "codeblock://7ae09b6f-97c9-4d3b-bebd-573e8ed2b3a2"
+        }
+      ]
+    }
+  ],
+  "runtimeErrors": [],
+  "evidence": [
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-27T17:59:56",
+      "isGeneratedFromServer": true,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "[WARRIOR_QA] spawn=paladin no=99871 avatar=false",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 11,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-27T17:59:56",
+      "isGeneratedFromServer": true,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "[WARRIOR_QA] spawn=dk no=99872 avatar=false",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 11,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-27T17:59:57",
+      "isGeneratedFromServer": true,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "[WARRIOR_QA] spawn=dk no=99873 avatar=false",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 11,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-27T17:59:57",
+      "isGeneratedFromServer": true,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "[WARRIOR_QA] spawnOK=true nil",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 14,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-27T18:00:01",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "[WARRIOR_QA] resources=32/32 errors=0",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 15,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-27T18:00:01",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "[WARRIOR_QA] user=20372100000235013 zone=1.0",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 16,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-27T18:00:47",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "[WARRIOR_QA] missing=99871",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 4,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-27T18:00:47",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "[WARRIOR_QA] missing=99872",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 4,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-27T18:00:47",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "[WARRIOR_QA] missing=99873",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 4,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-27T18:01:34",
+      "isGeneratedFromServer": true,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "[WARRIOR_QA] respawn=paladin name=Unit1_99871",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 6,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-27T18:01:34",
+      "isGeneratedFromServer": true,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "[WARRIOR_QA] respawn=dk name=Unit1_99872",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 6,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-27T18:01:34",
+      "isGeneratedFromServer": true,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "[WARRIOR_QA] respawn=dk name=Unit1_99873",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 6,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-27T18:01:37",
+      "isGeneratedFromServer": true,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "[WARRIOR_QA] server cleanup=3",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 21,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-27T18:02:03",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "[WARRIOR_QA] paladinCharge:L frames=6/6",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 47,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-27T18:02:03",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "[WARRIOR_QA] paladinCharge:R frames=6/6",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 47,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-27T18:02:03",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "[WARRIOR_QA] paladinSanctuary:L frames=6/6",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 47,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-27T18:02:03",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "[WARRIOR_QA] paladinSanctuary:R frames=6/6",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 47,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-27T18:02:03",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "[WARRIOR_QA] no=99871 returns=8/8 idle=3/3 effects=true errors=0",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 53,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-27T18:02:03",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "[WARRIOR_QA] dkBuster:L frames=8/8",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 47,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-27T18:02:03",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "[WARRIOR_QA] dkBuster:R frames=8/8",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 47,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-27T18:02:03",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "[WARRIOR_QA] dkRoar:L frames=6/6",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 47,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-27T18:02:03",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "[WARRIOR_QA] dkRoar:R frames=6/6",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 47,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-27T18:02:03",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "[WARRIOR_QA] no=99872 returns=8/8 idle=3/3 effects=true errors=0",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 53,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-27T18:02:03",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "[WARRIOR_QA] dkGiantBuster:L frames=8/8",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 47,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-27T18:02:03",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "[WARRIOR_QA] dkGiantBuster:R frames=8/8",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 47,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-27T18:02:03",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "[WARRIOR_QA] no=99873 returns=8/8 idle=3/3 effects=true errors=0",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 53,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-27T18:02:32",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "[WARRIOR_QA] visible=paladin done=true action=stand1",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 3,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-27T18:02:32",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "[WARRIOR_QA] visible=dk done=true action=stand1",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 3,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-27T18:02:32",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "[WARRIOR_QA] visible=dk done=true action=stand1",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 3,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-27T18:05:28",
+      "isGeneratedFromServer": true,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "[WARRIOR_QA] final cleanup=3",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 9,
+          "codeBlockFileId": null
+        }
+      ]
+    }
+  ]
+}

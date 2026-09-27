@@ -77,7 +77,7 @@ script RtsUnitComponent extends Component
 	property table MageFrameDurations = {}
 	property Entity HeroSwordEntity = nil
 	property table HeroSwordSprites = {}
-	property table HeroSwordHands = { {400,495}, {426,479}, {369,468}, {376,499}, {334,504}, {225,486}, {228,486} }
+	property table HeroSwordHands = { {391,520}, {423,506}, {372,496}, {365,538}, {338,539}, {244,515}, {243,520} }
 	property table HeroSwordGrips = { {0,0}, {25,48}, {25,45}, {25,41}, {200,151}, {184,211}, {108,212}, {29,192}, {207,158}, {210,74}, {211,56}, {206,34}, {210,40}, {207,35} }
 
 	method void OnBeginPlay()
@@ -290,6 +290,7 @@ script RtsUnitComponent extends Component
 		local parentScale = math.abs(self.Entity.TransformComponent.Scale.x)
 		if parentScale <= 0 or sprite.PixelPerUnit <= 0 then return end
 		local pixelScale = 2.0 / (parentScale * sprite.PixelPerUnit)
+		-- 재작화한 704px 프레임에서 측정한 손 좌표를 사용한다. 불꽃의 월드 크기는 유지한다.
 		local x = (hand[1] - 352) * 0.002 + (sprite.PivotPixel.x - grip[1]) * pixelScale
 		local y = (640 - hand[2]) * 0.002 + (sprite.PivotPixel.y - (sprite.Height - grip[2])) * pixelScale
 		local flip = self:FaceNow() > 0

@@ -1,0 +1,10 @@
+{
+  "id": "phantom",
+  "prompt": "Use case: style-transfer. Correct ONLY anatomical proportions in image1 (edit target), matching Bishop in images2 and3. Preserve target's exact identity, expression, all colors, costume pieces, accessories and weapons. One complete isolated character on transparent background, no effects or labels.\nThe hat is NOT part of the head measurement. Current body below chin is too long compared with his actual face/skull. Enlarge the actual face/skull relative to torso, and REDRAW the chin-to-soles region about25% shorter with compact torso and very short legs/boots. The actual underlying anatomical skull crown to chin, hidden under hat, must be43.5% of skull-crown-to-soles height. Keep the elegant white/blue/gold hat and feathers, blond hair, violet eyes and confident faint smile, three red-brown/gold filigree cards, cane, short striped breeches. Keep all correct hand contacts. Do not merely shrink the whole character and do not count tall hat as head.\nMatch Bishop polished thin clean linework and soft restrained cel shading. Recompose whole figure centered in square with at least6% transparent margins around all weapon/hat/cape/hair tips. Do not crop anything.",
+  "refs": [
+    "C:/Users/timec/.codex/generated_images/01a0dbf3-5094-7520-bfc7-f24b6496f5e5/exec-ecc66f06-a7b1-474c-8cdf-b1b924df89d5.png",
+    "C:/workspace/msw/assets/design/characters/bishop/concept.png",
+    "C:/workspace/msw/assets/design/characters/bishop/frames/wait/motion01.png"
+  ],
+  "source": "C:\\Users\\timec\\.codex\\generated_images\\01a0dbf3-5094-7520-bfc7-f24b6496f5e5\\exec-18037e5c-2632-4076-9046-6e89e4100183.png"
+}

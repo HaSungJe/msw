@@ -8,17 +8,69 @@ script RtsJobTableLogic extends Logic
 
 	method boolean HasMageSkin(string jobId)
 		-- 원화 적용 직업: 서버 스폰과 클라이언트 표시가 같은 분기를 사용한다.
-		return jobId == "il" or jobId == "fp" or jobId == "bishop" or jobId == "hero"
+		return jobId == "il" or jobId == "fp" or jobId == "bishop" or jobId == "hero" or jobId == "marks" or jobId == "bow" or jobId == "paladin" or jobId == "dk" or jobId == "nl" or jobId == "shad" or jobId == "phantom"
 	end
 
 	-- 대기는 3장의 호흡 동작, 공격은 스킬마다 그린 연결 프레임을 재생한다.
 	@ExecSpace("ClientOnly")
 	method table GetMageSkinFrames(string jobId)
+		if jobId == "phantom" then
+			return {
+				stand1 = { "283726be0d0e4cf7baf54840aae336f6", "0bfd511879954157ba0dbd9bfb8003d9", "283726be0d0e4cf7baf54840aae336f6", "862241619fc444eba0449187c43732a6" },
+				phantomJoker = { "744518d46677462a9676c54bac715c39", "34c76f3cdddb430291dc1a8bf6592cf7", "06752f5a312949e9932d573333d650b0", "243362d8c268465ea112983c96074d66", "1095f84d2bc0495cb23aff6b99ad8028", "e671da47876b4393abc19798852b594d", "4d67e5ce5ae84a7c8d561ac4859e12fe", "a4720376ddb54f6c9f41a83af69174b7" },
+			}
+		end
+		if jobId == "nl" then
+			return {
+				stand1 = { "0eb5a0560215452fba5d11fa5b0dbd16", "53e0a2cf0bb940bbb7ed86cd65562037", "0eb5a0560215452fba5d11fa5b0dbd16", "e7f8edd9c9ee4898baaacc1f38ff33db" },
+				nlThrow = { "866e55971d3b4ebf96a3dab124e32e00", "5370617f4c2e403691279d424471f2b5", "697245aeab1a4ce9abfa1f1a9234d463", "6599b1f88ea84d7baf53b840da59667d", "03eb6091d1bb419e9d0cbd00a7db2e45", "6d729205cc984689b50da0c5fccc7fe8", "03eb6091d1bb419e9d0cbd00a7db2e45", "6d729205cc984689b50da0c5fccc7fe8", "67da87ba78dc4e95a0d8787a84935080", "aec7d0e3b7ad427b8bc1fd1ab906cdcb" },
+			}
+		end
+		if jobId == "shad" then
+			return {
+				stand1 = { "2753c58c1aaf413681834dc5d70ecac2", "96ed758328834446b5d9f9e7adebf101", "2753c58c1aaf413681834dc5d70ecac2", "fb4ae0f6c16e49459d28f99139523bf7" },
+				shadSavage = { "e0f64485b5db4a95aa412399d5790b00", "fb2887c0d0b443bda8d7f6d7dc3aaf21", "10a908c265d64f5aabbff97de72821ae", "476197fafcaa47938c2c0d9bf011bd45", "6292265f10a2488bac1ad7258df7034d", "238fb780543747a085ac1107d7aa765c", "476197fafcaa47938c2c0d9bf011bd45", "6292265f10a2488bac1ad7258df7034d", "f74189314f454aa683a7febdd268f0ae", "bc760d3a8ba7430f899b11057c4ace73" },
+				shadMeso = { "fbef7d6900ee489eb870bb29f04f962f", "c5379c189d674cff98b310cca14cad50", "4dc51fe6f8554aa3ae727777235460d4", "cbdb8dd7ecdd4bc796e6bb2b96a24e01", "24ee1e2b9952414d936e483b8ece07ae" },
+				shadDualblade = { "7200f4b75d9d43a0af2a735e6cd0ba8f", "70f2e87473434a68bd3ceb1f56bb41b2", "6c6fb1dbd7584b1d8eee7d4bda13ee29", "a4b7ae6b436f483b912330a657ad88d4", "ef741c7fc3cc4fdeb1d06a71d74ccc14", "0a36ccef0202492788c4283d6c52f545", "fc0570f63b4945f390bf4e03508a3416", "91f0a6cfb7c04e729e1a788a40d283ba" },
+			}
+		end
+		if jobId == "paladin" then
+			return {
+				stand1 = { "17e0e0811cd742bea27591ffbc9b723b", "019b667361c1459c819353dcc5a0ed8b", "17e0e0811cd742bea27591ffbc9b723b", "2838ebd8b5d044a693a4c43b0bf77879" },
+				paladinCharge = { "a5be5b20b9d8440ab5af38cc595ba2f8", "1db1a18d2bde472c88e72ab3d70d14bf", "6c9a71053f3a4f259dd41e270e4c94bd", "a17d41771324411b9d1b0b78ddb1bb74", "cc366fbe0bdb40a38b6efd846aaccb48", "af6ec8fb94ae40f4abb3002779fc8994" },
+				paladinSanctuary = { "cdcbfe6d6e9146a6a1920baa69b90751", "86cd9fda03684baabc4bfdfe050fac74", "ba408ac01fcd4974a5b9d15fb910cdf0", "16619a38e9104bd99c5bc0a0b59a3096", "0a9d251c2a494888a0f1ebc47927bb15", "371429c6ddab4a1cb26d06fa3149bea6" },
+			}
+		end
+		if jobId == "dk" then
+			return {
+				stand1 = { "8e918f5a58d84f0880f30802e53ec1cb", "a97d69b1da2244c3bbe72930a3215557", "8e918f5a58d84f0880f30802e53ec1cb", "469c0c8e7bab4319a830615eb520aa25" },
+				dkBuster = { "0e1c9aecd84f4c10984932aa52441481", "0e1c9aecd84f4c10984932aa52441481", "a1c730f53f0249449329a6c5751e3df3", "6fbf840e8da146fd8951de0e68f631c4", "5a4ae361c00240128dab626b00cd7ca7", "d05450084ea54dc7a22c4a61f1b3d42f", "2aac0b1ea953485085c7c0b53fc4dbf4", "d05450084ea54dc7a22c4a61f1b3d42f" },
+				dkRoar = { "ed125f0a1730494d95c759927e035556", "310c4f9feeb3407597dcce8138e66cd5", "7005c13026024b839785ebf274ca4ea9", "b95f492ef7bf43a2ab0243d81ea9bc20", "9c54e19b80b54384a2950c3f9905f560", "1374b63a6fe14ee2ab0d200b61bf0e97" },
+				dkGiantBuster = { "0e1c9aecd84f4c10984932aa52441481", "0e1c9aecd84f4c10984932aa52441481", "a1c730f53f0249449329a6c5751e3df3", "6fbf840e8da146fd8951de0e68f631c4", "5a4ae361c00240128dab626b00cd7ca7", "d05450084ea54dc7a22c4a61f1b3d42f", "2aac0b1ea953485085c7c0b53fc4dbf4", "0e1c9aecd84f4c10984932aa52441481", "a1c730f53f0249449329a6c5751e3df3", "6fbf840e8da146fd8951de0e68f631c4", "5a4ae361c00240128dab626b00cd7ca7", "d05450084ea54dc7a22c4a61f1b3d42f", "2aac0b1ea953485085c7c0b53fc4dbf4", "d05450084ea54dc7a22c4a61f1b3d42f" },
+			}
+		end
+		-- 보우마스터: 비숍 기준 비율, 수평 연사 / 한쪽 무릎 수직 발사.
+		if jobId == "bow" then
+			return {
+				stand1 = { "20a3afc8702c4b478b70a5eb76bcd3a7", "013e5b1037874974935618356a372dee", "20a3afc8702c4b478b70a5eb76bcd3a7", "81223efd1c2847b19a2e8c92bcc93fce" },
+				bowHurricane = { "0b766b43e5f84d84abb7c9c031786b2a", "7bf344e5fbc5490088eafdac9b65aad1", "cd2aab758bb7458ca5003bfa49d6914e", "02b3c4cf488349e3b7f26a253b8a95e4", "1531464fb7ac46c1823c6f4359eb8bb5" },
+				bowArrowRain = { "cd51066174ca4ce7a6694df2a80c614c", "2a8ceb574fa6403c9a071969cbc08352", "f35b316092b542f28eea52ce90d989b9", "f00254a942224e439a7ac033c8df2a12", "2a8ceb574fa6403c9a071969cbc08352" },
+			}
+		end
+		-- 신궁: 비숍 엔젤레이 기준으로 승인된 짧은 비율. 대기·피어싱·저격을 같은 발 원점으로 재생한다.
+		if jobId == "marks" then
+			return {
+				stand1 = { "f3d13c1096a4466fa0154d8c0a032ca5", "73152d7bbf474ed08b8441ddf46d92e4", "f3d13c1096a4466fa0154d8c0a032ca5", "c25f3c31ebe04277bbad8010778e38b2" },
+				marksPiercing = { "34222457fabf49608e90f1680d79af32", "3f730e1b307447b2bf80927eb79844e5", "2bbbc8fe20664dbfaa6576011cf5c39c", "1a7cbdc7d002482d9f2144afb1347cd3", "7b0535e0a23e43d0a43a254ce0801f85", "610392408b3b42f4966e8b90b2fe4f8b" },
+				marksSniping = { "2772f8130f1a46daa41ccb0c3cf5646c", "c844fb0acc594a37b6ac4ea5f49b7eaa", "a53258bcb9d445e79bd1a32c888ee2ea", "c844fb0acc594a37b6ac4ea5f49b7eaa", "a53258bcb9d445e79bd1a32c888ee2ea", "c844fb0acc594a37b6ac4ea5f49b7eaa", "a53258bcb9d445e79bd1a32c888ee2ea", "c844fb0acc594a37b6ac4ea5f49b7eaa", "a53258bcb9d445e79bd1a32c888ee2ea", "c844fb0acc594a37b6ac4ea5f49b7eaa", "a53258bcb9d445e79bd1a32c888ee2ea", "c844fb0acc594a37b6ac4ea5f49b7eaa", "a53258bcb9d445e79bd1a32c888ee2ea", "c844fb0acc594a37b6ac4ea5f49b7eaa", "a53258bcb9d445e79bd1a32c888ee2ea", "c844fb0acc594a37b6ac4ea5f49b7eaa", "a53258bcb9d445e79bd1a32c888ee2ea", "c844fb0acc594a37b6ac4ea5f49b7eaa", "a53258bcb9d445e79bd1a32c888ee2ea", "c844fb0acc594a37b6ac4ea5f49b7eaa", "a53258bcb9d445e79bd1a32c888ee2ea", "c844fb0acc594a37b6ac4ea5f49b7eaa", "79efce895d6245978f315c4d7561e6aa", "49e0863243a44656ac715f8442e02fba" },
+				marksTrueSniping = { "2772f8130f1a46daa41ccb0c3cf5646c", "c844fb0acc594a37b6ac4ea5f49b7eaa", "a53258bcb9d445e79bd1a32c888ee2ea", "c844fb0acc594a37b6ac4ea5f49b7eaa", "a53258bcb9d445e79bd1a32c888ee2ea", "c844fb0acc594a37b6ac4ea5f49b7eaa", "a53258bcb9d445e79bd1a32c888ee2ea", "c844fb0acc594a37b6ac4ea5f49b7eaa", "a53258bcb9d445e79bd1a32c888ee2ea", "c844fb0acc594a37b6ac4ea5f49b7eaa", "a53258bcb9d445e79bd1a32c888ee2ea", "c844fb0acc594a37b6ac4ea5f49b7eaa", "a53258bcb9d445e79bd1a32c888ee2ea", "c844fb0acc594a37b6ac4ea5f49b7eaa", "a53258bcb9d445e79bd1a32c888ee2ea", "c844fb0acc594a37b6ac4ea5f49b7eaa", "a53258bcb9d445e79bd1a32c888ee2ea", "c844fb0acc594a37b6ac4ea5f49b7eaa", "a53258bcb9d445e79bd1a32c888ee2ea", "c844fb0acc594a37b6ac4ea5f49b7eaa", "a53258bcb9d445e79bd1a32c888ee2ea", "c844fb0acc594a37b6ac4ea5f49b7eaa", "79efce895d6245978f315c4d7561e6aa", "49e0863243a44656ac715f8442e02fba" },
+			}
+		end
 		if jobId == "il" then
 			return {
-				stand1 = { "fe0c6be3795d49e29a311b3edb8e89ab", "6b91e70ed2a64198a41f368191d834c8", "fe0c6be3795d49e29a311b3edb8e89ab", "0f16c5bda207468aa1fe9dcb05cb4ed6" },
-				swingO1 = { "66b1f0af75c745bdaf10c9710486b867", "b2bd84ff10da4d40a6e1f0e80a90c8f6", "0c4635067dcc4aae9ed3987fc3820dcd", "263444c070344cceb0196534f9997395", "307d3b6aa3d7485d932c9fcde44642ed" },
-				swingO3 = { "cfb678afe3fe423ca87a610f41f5c989", "d0415a8c09d746868c66b9d776babdf1", "08f5c40cb8fa4af28fab2f6b996fdd41", "7b877eaff02f4cc6b408f82d4a3f9e19", "3821ebdc6c2346c2b2561fec50b9900c" },
+				stand1 = { "31f7d3dc8bde42d6905eca8ca3d3d3aa", "7480c71e7fc7406a89e74930c407ad87", "31f7d3dc8bde42d6905eca8ca3d3d3aa", "440ab4519beb44f39a820aab4d2ef864" },
+				swingO1 = { "f986bf2671c04e11b2f6aaf708f0c2bb", "63a019d7ca084d78b084c29536c14999", "02cde524cf654ae8b6000e402cbd0a4f", "ebdb54d66e9042ffa2a2d35dd4732c89", "de4d62586d274d28a336adf401e8ecde" },
+				swingO3 = { "3166883e4dbb4fe68eade2f2605468f1", "7b663ea7d9da42bf8a497213cca04848", "24bee0fe7428442196ecb31813b6ba59", "f1f16a077dee4a718e7f52d73545d2ae", "0ca54631539d40e7b708b9f9609daa7e" },
 			}
 		end
 		if jobId == "fp" then
@@ -38,9 +90,9 @@ script RtsJobTableLogic extends Logic
 		end
 		if jobId == "hero" then
 			return {
-				stand1 = { "fb4c72bd02e24790b948edfd2e78696d", "5c32a751b5864e4f802b1cbfe2f6980d", "fb4c72bd02e24790b948edfd2e78696d", "bf6a1a79ae3e47419571fb82b46a26fa" },
-				swingO3 = { "a4b2f29361fd49dda2104ce70a4b4f82", "e81fe579b29846c4a93f4a5e3decd341", "2ab55adc7e964164a2675fe41720dd35", "f952fd92a3b140f1a896e60ea777278f", "a94516dd5ddb4c12b55d7877ce927eca", "a63a0e835c3e46dfb862a1727e898d56", "b8f0b7d9b63d4738ba1c40bf7f7d6ed3", "4ff13f32715d4446b32cc3cd81ac01ad" },
-				enragedRagingBlow = { "921342b83ead49499ebcb1305c051f79", "2252822c3c544150b2b11d2c689df015", "0e8533552bca4a7dbdeca19be5b65e23", "bd5b06cb3c6e4dcf8708ceae77c33ff5", "fd0f61326882439783495af1c34284b6", "b60553dd8f9f48fc8a449df949625cbe", "6fd0859ce3d44c37a80d2c3c8c21dc1c" },
+				stand1 = { "6142e6907e054a4c86bda1719698af21", "66beab16ed794e27b49a33ee52a82b18", "6142e6907e054a4c86bda1719698af21", "f5ce5824f3a24e069ec0a523028c7f79" },
+				swingO3 = { "aac52a1acd1f414d9aa9f68167aeb2d0", "a302b38cd51543059e46a3162b209b02", "1b789ed0b21f404297592ca1bd0666af", "29beedf569f7412483c02c99e0e5fe2e", "cdd8a42144c949979ef9a7d1b0fa9e51", "be37495f3da24fa1ba32404daeb1c998", "bfe48ef4838c4d16a3f86ee914cf9440", "b9daa2a09e874aeea2a82b15cfb328ca" },
+				enragedRagingBlow = { "b64a6805781448eb875ea1d4629f3bc5", "77faeca61b3e4bec80ec0a66faee52e6", "29bc48d64e1f4f78bb56cc0948dda058", "f8199840321d4eed9bfd3395afcc8a77", "591f6cf9adb34a099a3f435b2e40dbc4", "8ce4f50c18a04c93b060320e30f68858", "a992dea232544bdd972d0978a94b25fd" },
 			}
 		end
 		return {}
@@ -49,6 +101,14 @@ script RtsJobTableLogic extends Logic
 	-- 선택창·상세정보 공용 흉상.
 	@ExecSpace("ClientOnly")
 	method string GetMagePortraitRUID(string jobId)
+		if jobId == "phantom" then return "844dc3e58c214cfc9aafaee9d12c33dd" end
+		if jobId == "nl" then return "ccb44d85f142402da6de7b5c7ed67d94" end
+		if jobId == "shad" then return "69652c3bf48b457d86e649a540eefc1e" end
+		-- 비숍 흉상과 승인 원화를 참조한 직업별 전용 흉상.
+		if jobId == "paladin" then return "0e14a7ba1554474fb46cb13ab22bdbfb" end
+		if jobId == "dk" then return "bc09a2f673ba42b6b5989e4ac39a0fc5" end
+		if jobId == "bow" then return "0d124c8828044ba4b8d71180f2e2fca6" end
+		if jobId == "marks" then return "bb8c6be33ae64a9f96d8a3f74ea7f459" end
 		if jobId == "il" then return "f93cfcc7a46d428cb6ed2bb3d71fc986" end
 		if jobId == "fp" then return "81c1c00cd1aa4ff3b08f9894b42c819b" end
 		if jobId == "bishop" then return "778abb348ac2432eb2ca8916a0ce24b9" end
@@ -59,6 +119,48 @@ script RtsJobTableLogic extends Logic
 	-- 기존 효과 시작·타격 시점과 시전 전체 길이를 유지하며 중간 자세만 추가한다.
 	@ExecSpace("ClientOnly")
 	method table GetMageSkinFrameDurations(string jobId)
+		if jobId == "phantom" then
+			return { stand1 = { 0.65, 0.45, 0.65, 0.45 }, phantomJoker = { 0.06, 0.05, 0.04, 0.06, 0.04, 0.05, 0.05, 0.05 } }
+		end
+		if jobId == "nl" then
+			return {
+				stand1 = { 0.65, 0.45, 0.65, 0.45 },
+				nlThrow = { 0.1, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.1, 0.15 },
+			}
+		end
+		if jobId == "shad" then
+			return {
+				stand1 = { 0.65, 0.45, 0.65, 0.45 },
+				shadSavage = { 0.1, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.03, 0.02 },
+				shadMeso = { 0.12, 0.18, 0.07, 0.08, 0.05 },
+				shadDualblade = { 0.15, 0.15, 0.1, 0.15, 0.2, 2.1, 0.2, 0.15 },
+			}
+		end
+		if jobId == "paladin" then
+			return {
+				stand1 = { 0.65, 0.45, 0.65, 0.45 },
+				paladinCharge = { 0.15, 0.15, 0.08, 0.1, 0.1, 0.17 },
+				paladinSanctuary = { 0.2, 0.2, 0.1, 0.12, 0.13, 0.15 },
+			}
+		end
+		if jobId == "dk" then
+			return {
+				stand1 = { 0.65, 0.45, 0.65, 0.45 },
+				dkBuster = { 0.6, 0.05, 0.08, 0.07, 0.08, 0.07, 0.1, 0.15 },
+				dkRoar = { 0.2, 0.2, 0.2, 0.2, 0.25, 0.35 },
+				dkGiantBuster = { 0.6, 0.05, 0.04, 0.035, 0.04, 0.035, 0.04, 0.035, 0.04, 0.035, 0.04, 0.035, 0.04, 0.135 },
+			}
+		end
+		if jobId == "bow" then return { stand1 = { 0.65, 0.45, 0.65, 0.45 }, bowHurricane = { 0.04, 0.04, 0.04, 0.04, 0.04 }, bowArrowRain = { 0.04, 0.04, 0.04, 0.04, 0.04 } } end
+		-- 저격은 첫 타격까지 조준하고, 타격 간격에 맞춰 반동·조준을 반복한다.
+		if jobId == "marks" then
+			return {
+				stand1 = { 0.65, 0.45, 0.65, 0.45 },
+				marksPiercing = { 0.08, 0.09, 0.18, 0.09, 0.1, 0.16 },
+				marksSniping = { 0.1, 0.3, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.1, 0.1 },
+				marksTrueSniping = { 0.08, 0.28, 0.025, 0.025, 0.025, 0.025, 0.025, 0.025, 0.025, 0.025, 0.025, 0.025, 0.025, 0.025, 0.025, 0.025, 0.025, 0.025, 0.025, 0.025, 0.025, 0.025, 0.08, 0.1 },
+			}
+		end
 		if jobId == "il" then return { stand1 = { 0.65, 0.45, 0.65, 0.45 }, swingO1 = { 0.18, 0.12, 0.08, 0.07, 0.35 }, swingO3 = { 0.21, 0.09, 0.93, 0.09, 0.48 } } end
 		if jobId == "fp" then return { stand1 = { 0.65, 0.45, 0.65, 0.45 }, poisonRegion = { 0.25, 0.15, 0.30, 0.15, 0.35 }, dotPunisher = { 0.20, 0.15, 0.25, 0.15, 0.45 } } end
 		if jobId == "bishop" then return { stand1 = { 0.65, 0.45, 0.65, 0.45 }, swingO1 = { 0.09, 0.06, 0.18, 0.12, 0.35 }, swingO3 = { 0.35, 0.15, 0.30, 0.15, 0.55 }, divinePunishment = { 0.15, 0.10, 0.15, 0.10, 0.30 } } end
@@ -422,15 +524,15 @@ script RtsJobTableLogic extends Logic
 		end
 		if jobId == "paladin" then
 			return {
-				-- 디바인 차지 연출(2026-09-18 사용자 "지금 것 그대로, 원작 재탐색 ㄴㄴ" = character.md 값): swingTF + 시전 클립 1221004/effect/1(cb9cff6c…, 0.65초) + 시전음 1221004/use(e2989dca…)
+				-- 디바인 차지 연출(2026-09-18 사용자 "지금 것 그대로, 원작 재탐색 ㄴㄴ" = character.md 값): paladinCharge PNG + 시전 클립 1221004/effect/1(cb9cff6c…, 0.65초) + 시전음 1221004/use(e2989dca…)
 				--   타격 0.3초 뒤 1회(200%). 타격 클립·타격음 미지정 → 몬스터 번쩍임만. 클립은 왼쪽 보기 자산(무기 빛 → 앞쪽에 문양 폭발)이라 assetFacesLeft, 스케일 1.4(2.0은 문양이 두 칸 크기)
 				{ lv = 1, kind = "액티브", name = "디바인 차지", desc = "사거리 1 안의 적을 최대 4마리까지 120%의 데미지로 공격한다.", target = false, range = 1,
-					fx = { motion = "swingTF", clip = "cb9cff6c57fd4cb18a05db3d47277031", scale = 1.4, feetDx = 0, feetDy = 0, assetFacesLeft = true, sound = "e2989dcac9054d689e379b9feff55f54",
+					fx = { motion = "paladinCharge", clip = "cb9cff6c57fd4cb18a05db3d47277031", scale = 1.4, feetDx = 0, feetDy = 0, assetFacesLeft = true, sound = "e2989dcac9054d689e379b9feff55f54",
 						hitDelay = 0.3 } },
 				{ lv = 10, kind = "패시브", name = "가드 크러쉬", desc = "같은 구역의 모든 적의 방어율을 10% 감소시킨다.", target = false },
-				-- 생츄어리 연출(character.md 값): swingT1 + 시전 클립 1221011/effect(d577178a…, 0.9초, 첫 재생 로딩 → Preload) + 시전음 1221011/use / 타격 0.5초 뒤 1회, 맞는 몬스터 위 1221011/hit/0 + 타격음 1221011/hit. cd = 쿨타임 초(전투 루프가 준비되면 기본 공격 대신 쓴다)
+				-- 생츄어리 연출(character.md 값): paladinSanctuary PNG + 시전 클립 1221011/effect(d577178a…, 0.9초, 첫 재생 로딩 → Preload) + 시전음 1221011/use / 타격 0.5초 뒤 1회, 맞는 몬스터 위 1221011/hit/0 + 타격음 1221011/hit. cd = 쿨타임 초(전투 루프가 준비되면 기본 공격 대신 쓴다)
 				{ lv = 20, kind = "액티브", name = "생츄어리", desc = "사거리 4 안의 적을 최대 15마리까지 200%의 데미지로 공격한다. 일반 몬스터에게는 데미지가 100% 증가한다. 재사용 대기시간 15초", target = false, area = true, mobMul = 2, cd = 15, ratio = 200, hits = 1, targets = 15, range = 4, after = 1.5,
-					fx = { motion = "swingT1", clip = "d577178a8212489e8319a4c5b16e897b", scale = 1.2, feetDx = 0, feetDy = 0, assetFacesLeft = true, sound = "aa96c1117c634a23b56440be8de39037",
+					fx = { motion = "paladinSanctuary", clip = "d577178a8212489e8319a4c5b16e897b", scale = 1.2, feetDx = 0, feetDy = 0, assetFacesLeft = true, sound = "aa96c1117c634a23b56440be8de39037",
 						hitDelay = 0.5, hitClip = "5df303c326dd488cbeb17028892b5238", hitScale = 1.6, hitDy = 0.6, hitSound = "2cc05078af454fa3a7856b9fb65ed61f" } },
 				{ lv = 30, kind = "패시브", name = "디바인 블레싱", desc = "최종 데미지가 50% 증가한다.", target = false },
 				{ lv = 40, kind = "패시브", name = "가드 크러쉬 강화", desc = "가드 크러쉬의 방어율 감소가 20%로 증가한다.", target = false },
@@ -442,12 +544,12 @@ script RtsJobTableLogic extends Logic
 			return {
 				-- 스피어 버스터 연출(2026-09-19 사용자 지정 skill/80003291 세트 — 원작 데이터에 스피어 버스터로 검색됨): 클립들이 각자 빈 프레임으로 시작 시각을 갖고 있어 전부 시전 순간에 함께 띄운다(clips).
 				--   effect c7051cc2…(푸른 창날 윤곽 158×189px, 발 기준, 2fr 0.9초 — 캐릭터 위 오라) / effect0 176da561…(0.3초 뒤 마법진 113px → 0.5초 용머리 166×120) / effect1·2·3(0.6·0.75·0.9초에 찌르기 잔상 162×69 → 용머리 찌르기 164×78, 원점 오른쪽 끝 = 앞으로 뻗음, 발 높이 +0~60px)
-				--   모션 stabT1은 0.5초 뒤(motionDelay — 찌르기 3개 0.6~0.95초를 덮음). 판정 0.65·0.8·0.95초(hitDelay 0.65 + hitGap 0.15 = 찌르기 시차와 같음). 몬스터 위 hit/0 84c06a06…(푸른 폭발 4fr 0.4초). 세트에 사운드가 없어 옛 스피어 크러셔 시전음 fcac442d…·타격음 6313ad64… 유지.
+				--   PNG dkBuster는 준비 0.5초를 첫 프레임 유지 시간에 포함한다(찌르기 3개 0.6~0.95초를 덮음; motionDelay는 기존 아바타 경로용). 판정 0.65·0.8·0.95초(hitDelay 0.65 + hitGap 0.15 = 찌르기 시차와 같음). 몬스터 위 hit/0 84c06a06…(푸른 폭발 4fr 0.4초). 세트에 사운드가 없어 옛 스피어 크러셔 시전음 fcac442d…·타격음 6313ad64… 유지.
 				--   **확정 2026-09-19 사용자 "다크나이트 스피어 버스터는 이거로 완전 종결"** — 이 상태 그대로 둔다(클립들은 EndFrame 정리라 용머리·찌르기 마지막 프레임이 0.03초만 보이는데, 사용자가 이 모습을 보고 확정. 더 길게 보이게 하려면 clips 항목에 life = 0.7/0.75/0.9/1.05, clipHold 옵션이 있음).
 				--   이전: 영상 추출 11프레임 플립북(assets/textures/crusher, frames = b309f1e7… 외 10, frameSec 0.09, scale 1.7, feetDx -0.11, feetDy 0.83) — 파일은 남겨 둠
 				{ lv = 1, kind = "액티브", name = "스피어 버스터", desc = "사거리 1 안의 적을 최대 3마리까지 80%의 데미지로 3회 공격한다.", target = false, range = 1,
 					-- 날개(effect c7051cc2 — 2프레임 0.9초)는 마지막 프레임 진입에서 지워져 0.45초면 사라졌다 → clipHold로 3단 찌르기가 끝나는 1.1초까지(2026-09-23 사용자 "날개를 유지"). 용머리(effect0)는 원래대로 잠깐
-					fx = { motion = "stabT1", motionDelay = 0.5, clip = "c7051cc242c54208a7c22df2b4bcc28e", clipLife = 1.1, clipHold = true,
+					fx = { motion = "dkBuster", motionDelay = 0.5, clip = "c7051cc242c54208a7c22df2b4bcc28e", clipLife = 1.1, clipHold = true,
 						--   거대화는 6타라 찌르기를 더 넣는다(ApplyPrismSkills "giant")
 						clips = { "176da561b7f946bcbb45bbfbabbaf605", "852883a5b27442e88ac5a23f5a218a58", "3c2ee6e636924e179cca843f819f9b30", "521bf9f60cb94a7fb9890ba2e0ede109" },
 						scale = 2.0, feetDx = 0, feetDy = 0, assetFacesLeft = true, sound = "fcac442d953049d980da4b8d7bd766d8",
@@ -457,9 +559,9 @@ script RtsJobTableLogic extends Logic
 				{ lv = 20, kind = "패시브", name = "스피어 버스터 숙련", desc = "스피어 버스터의 데미지가 50% 증가한다.", target = false },
 				{ lv = 30, kind = "패시브", name = "버서크", desc = "공격력이 50% 증가한다.", target = false },
 				{ lv = 40, kind = "패시브", name = "스피어 버스터 강화", desc = "스피어 버스터의 데미지가 50% 증가하고, 보스 공격 시 데미지가 25% 증가한다.", target = false },
-				-- 드래곤 로어 연출(character.md 값): swingT3 + 시전 클립 9001006/effect(5468cadd…, 18프레임 1.2초, 등장 시 Preload) + 시전음 eec2f5d3… / 타격 0.6초 뒤 1회(300%), 맞는 몬스터 위 9001006/hit/0. 쿨 15초, 기본 보스전 잠금
+				-- 드래곤 로어 연출(character.md 값): dkRoar PNG + 시전 클립 9001006/effect(5468cadd…, 18프레임 1.2초, 등장 시 Preload) + 시전음 eec2f5d3… / 타격 0.6초 뒤 1회(300%), 맞는 몬스터 위 9001006/hit/0. 쿨 15초, 기본 보스전 잠금
 				{ lv = 50, kind = "액티브", name = "드래곤 로어", desc = "사거리 5 안의 적을 최대 15마리까지 300%의 데미지로 공격한다. 일반 몬스터에게는 데미지가 100% 증가한다. 재사용 대기시간 15초. 패시브: 최종 데미지가 20% 증가한다. 몬스터의 방어율을 50% 무시한다.", target = false, lock = 1, area = true, mobMul = 2, cd = 15, ratio = 300, hits = 1, targets = 15, range = 5, after = 1.5,
-					fx = { motion = "swingT3", clip = "5468cadd2f60428e925bc368968e1a1e", scale = 1.5, feetDx = 0, feetDy = 0, assetFacesLeft = true, sound = "eec2f5d35c6f4f6ebe8f19bb52dbf1d1", clipLife = 1.4,
+					fx = { motion = "dkRoar", clip = "5468cadd2f60428e925bc368968e1a1e", scale = 1.5, feetDx = 0, feetDy = 0, assetFacesLeft = true, sound = "eec2f5d35c6f4f6ebe8f19bb52dbf1d1", clipLife = 1.4,
 						hitDelay = 0.6, hitClip = "01c803531e2c4e5aa3c3ef66f14711b8", hitScale = 1.6, hitDy = 0.6 } },
 			}
 		end
@@ -468,7 +570,7 @@ script RtsJobTableLogic extends Logic
 				-- 폭풍의 시 연출(2026-09-18): 원작 폭풍의 시(3121020 계열) — 공격 중 캐릭터 위에 keydown 이펙트 루프(loopClip, 공격이 끊기면 자동 정리) + 화살 투사체 ball + 타격 hit/0, 시전음·타격음은 3121004 use/hit. 0.2초마다 1발 — shoot1 모션을 루프로 유지(motionLoop), 화살은 유닛 손(+0.9)에서 대상까지 0.15초 비행(proj)
 				--   keydown 클립(keydown/0~2 원본 PNG 실측 2026-09-20)은 마법진이 왼쪽(앞), 날개가 오른쪽(뒤)으로 뻗은 왼쪽 보기 → loopFacesLeft = true. 09-18에 false로 둔 건 루프를 첫 시전 때 한 번만 반전하던 시절 FaceDir 동기화가 늦어 반대로 보인 걸 잘못 고친 것(사용자 2026-09-20 "바라보는 방향 안 따라간다")
 				{ lv = 1, kind = "액티브", name = "폭풍의 시", desc = "사거리 3 안의 적 1마리를 70%의 데미지로 공격한다. 공격속도와 관계없이 0.2초마다 화살을 발사한다.", target = false, range = 3,
-					fx = { motion = "shoot1", motionLoop = true, sound = "3782f12e174947db8517c13e48217f15",
+					fx = { motion = "bowHurricane", motionLoop = true, sound = "3782f12e174947db8517c13e48217f15",
 						loopClip = "5b382e3dd14b430480b729cc3cb56c82", loopScale = 1.2, loopDx = 0, loopDy = 0, loopAlpha = 0.75, loopFacesLeft = true,
 						proj = "a342d48c6f03440abdfe46fc5a39fa8a", projSec = 0.15, projDy = 0.9, projScale = 1.6, assetFacesLeft = true,
 						hitDelay = 0.15, hitClip = "0361094bf35f40aa844685a50f1a1d7e", hitScale = 1.6, hitDy = 0.6, hitSound = "0d2f3305bff945e88a7c7dae9e366348" } },
@@ -481,9 +583,9 @@ script RtsJobTableLogic extends Logic
 		end
 		if jobId == "marks" then
 			return {
-				-- 피어싱 연출(2026-09-18): 원작 피어싱(3221017) 시전 이펙트(화살촉 모양 폭발 — 촉이 앞, 날개가 등 뒤로 트레일: 프레임 썸네일로 왼쪽 보기 확인) + 화살 투사체 ball + 타격 hit/3, 사운드는 3221001 use/hit. shoot2(석궁) 모션, 타격 3회 0.12초 간격. 시전 이펙트는 캐릭터와 겹치지 않게 앞으로 0.6×스케일(feetDx −0.6 = 자산 기준 앞쪽, 방향에 따라 반전) — 사용자 2026-09-18 "너무 겹친다"
+				-- 피어싱 연출(2026-09-18): 원작 피어싱(3221017) 시전 이펙트(화살촉 모양 폭발 — 촉이 앞, 날개가 등 뒤로 트레일: 프레임 썸네일로 왼쪽 보기 확인) + 화살 투사체 ball + 타격 hit/3, 사운드는 3221001 use/hit. marksPiercing(선 자세에서 조준·사격) 모션, 판정 간격 0.12초. 시전 이펙트는 캐릭터와 겹치지 않게 앞으로 0.6×스케일(feetDx −0.6 = 자산 기준 앞쪽, 방향에 따라 반전) — 사용자 2026-09-18 "너무 겹친다"
 				{ lv = 1, kind = "액티브", name = "피어싱", desc = "사거리 3 안의 적을 최대 6마리까지 183.3%의 데미지로 2회 공격한다.", target = false, range = 3,
-					fx = { motion = "shoot2", projEach = true, clip = "abe88a701a094181b44c8aa9746a1cd7", scale = 1.2, feetDx = -0.6, feetDy = 0, assetFacesLeft = true, sound = "f06e9bb7399640e088a081032036cebf",
+					fx = { motion = "marksPiercing", projEach = true, clip = "abe88a701a094181b44c8aa9746a1cd7", scale = 1.2, feetDx = -0.6, feetDy = 0, assetFacesLeft = true, sound = "f06e9bb7399640e088a081032036cebf",
 						proj = "1923e5406af44149a7575b25593e9336", projSec = 0.2, projDy = 0.9, projScale = 1.6,
 						hitDelay = 0.35, hitGap = 0.12, hitClip = "4a8db8d2f9614af3a3c902e4ef56d06b", hitScale = 1.6, hitDy = 0.6, hitSound = "1888d984619e45598028a2f830e78bdb" } },
 				{ lv = 10, kind = "패시브", name = "크리티컬 마스터리", desc = "크리티컬 확률이 30% 증가한다.", target = false },
@@ -491,7 +593,7 @@ script RtsJobTableLogic extends Logic
 				-- 스나이핑 연출(사용자 2026-09-18 "화살이 아니라 대상에게 표식이 뜨면서 데미지"): 시전 순간 대상 위에 조준 표식 3221007/mob(markClip) + 시전음, 화살 투사체 없음.
 				--   0.4초 뒤 50%×10회(0.08초 간격) 타격 hit/0 + 타격음. 시전 이펙트(석궁 폭발)는 유지. 1마리, 쿨 10초
 				{ lv = 30, kind = "액티브", name = "스나이핑", desc = "사거리 6 안의 적 1마리를 216.7%의 데미지로 10회 공격한다. 재사용 대기시간 10초", target = false, cd = 10, ratio = 216.7, hits = 10, targets = 1, range = 6,
-					fx = { motion = "shoot2", clip = "6c7b4f7910af41dfbe1348eaf2f8c9e6", scale = 1.2, feetDx = -0.6, feetDy = 0, assetFacesLeft = true, sound = "384e71cfc38a4ab1b8a10963cae6365f",
+					fx = { motion = "marksSniping", clip = "6c7b4f7910af41dfbe1348eaf2f8c9e6", scale = 1.2, feetDx = -0.6, feetDy = 0, assetFacesLeft = true, sound = "384e71cfc38a4ab1b8a10963cae6365f",
 						markClip = "0c76a3bdd54548988c48bdbdbbd2a5ca", markFit = 1.5, markPivotDy = 0.36, markLife = 1.4,
 						hitDelay = 0.4, hitGap = 0.08, hitClip = "72fa136a368d4f7eba60ce0d16606be5", hitScale = 1.6, hitDy = 0.6, hitSound = "81a8c21eaf31429aa21ccaa63afc1b35" } },
 				{ lv = 40, kind = "패시브", name = "크로스보우 액스퍼트", desc = "공격력이 70% 증가한다.", target = false },
@@ -564,10 +666,10 @@ script RtsJobTableLogic extends Logic
 			return {
 				-- 쿼드러플 스로우 연출(2026-09-20): 원작 4121013 — 시전 클립 effect(던지는 손 궤적 흰·붉은 호, 9프레임, 왼쪽 보기 그림) + 표창 투사체(뇌전수리검 02070011 bullet — 주황 별 + 번개, 사용자 지정) 4발 0.1초 간격. 사거리 2(사용자 2026-09-20, 3에서)
 				--   + 타격 hit/0(흰 빛 터짐 + 파편) ×4(0.1초 간격), 시전음 use, 타격음 hit. 쉐도우 파트너(30)는 등 뒤(projShadowDx)에서 같은 표창 4발을 0.5초 늦게(본체 4발이 다 나간 뒤 이어서 — 2026-09-22 사용자, 그림자 동작도 0.5초 늦게 RtsSkillFxLogic.ShadowActionDelay) 어둡게 던지고 타격 4회 ½(st.halfHits)
-				--   모션 = swingO1 + 무기 가림(2026-09-20 사용자 확정 — shootF는 활 쏘는 자세라 표창과 안 맞음. 표창 던지기 전용 액션은 없음). 표창 출발 = 배 앞(projDx 0.35·projDy 0.55 — "머리 뒤에서 나온다")
+				--   모션 = nlThrow PNG (이전 swingO1) + 아바타 경로 무기 가림(2026-09-20 사용자 확정 — shootF는 활 쏘는 자세라 표창과 안 맞음. 표창 던지기 전용 액션은 없음). 표창 출발 = 배 앞(projDx 0.35·projDy 0.55 — "머리 뒤에서 나온다")
 				--   쉐도우 파트너 그림자 = 유닛 자식 "Shadow" 스프라이트(원작 4111002/special 검은 실루엣, RtsUnitLogic.EnsureShadow, 30레벨~) — 등 뒤 0.44, 본체 액션과 같은 이름의 클립을 따라 재생
 				{ lv = 1, kind = "액티브", name = "쿼드러플 스로우", desc = "사거리 2 안의 적 1마리를 110%의 데미지로 4회 공격한다.", target = false, range = 2,
-					fx = { motion = "swingO1", hideWeapon = true, hideWeaponSec = 0.6, clip = "ff9ced53e871474c9a2ae167e0c75ef1", scale = 1.4, feetDx = 0, feetDy = 0, assetFacesLeft = true, sound = "747c5e5435b942a494f94032dabbffb2",
+					fx = { motion = "nlThrow", hideWeapon = true, hideWeaponSec = 0.6, clip = "ff9ced53e871474c9a2ae167e0c75ef1", scale = 1.4, feetDx = 0, feetDy = 0, assetFacesLeft = true, sound = "747c5e5435b942a494f94032dabbffb2",
 						proj = "99a112c1dcbb4cf69fccfca53fbb6620", projCount = 4, projStagger = 0.1, projSec = 0.2, projDx = 0.35, projDy = 0.55, projScale = 1.2,
 						projShadowLv = 30, projShadowDx = 0.5, projShadowDelay = 0.5,
 						hitDelay = 0.3, hitGap = 0.1, hitClip = "6d26a151289342db913d50bf9f84a96b", hitScale = 1.4, hitDy = 0.6, hitSound = "4709f06b2fb543f7a980fdbbb23441b1" } },
@@ -580,15 +682,15 @@ script RtsJobTableLogic extends Logic
 		end
 		if jobId == "shad" then
 			return {
-				-- 새비지 블로우 연출(2026-09-20): 시전 클립 = 신형 4201012/effect(사용자 지정 — 붉은 참격 선, 4201005 폴더엔 타격음뿐) + 빠른 한손 베기 모션(swingO2) + 타격마다 4221007(부메랑 스텝)/hit/0 분홍 참격 폭발 ×8(0.05초 간격) + 타격마다 새비지 타격음(사용자 2026-09-20 "8번 파파박")
+				-- 새비지 블로우 연출(2026-09-20): 시전 클립 = 신형 4201012/effect(사용자 지정 — 붉은 참격 선, 4201005 폴더엔 타격음뿐) + 빠른 단검 베기 PNG(shadSavage) + 타격마다 4221007(부메랑 스텝)/hit/0 분홍 참격 폭발 ×8(0.05초 간격) + 타격마다 새비지 타격음(사용자 2026-09-20 "8번 파파박")
 				{ lv = 1, kind = "액티브", name = "새비지 블로우", desc = "사거리 1 안의 적 1마리를 29.2%의 데미지로 8회 공격한다.", target = false, range = 1,
-					fx = { motion = "swingO2", clip = "895ac1e384ea42ca8dd084f54ff3346b", scale = 1.6, feetDx = 0, feetDy = 0, assetFacesLeft = true,
+					fx = { motion = "shadSavage", clip = "895ac1e384ea42ca8dd084f54ff3346b", scale = 1.6, feetDx = 0, feetDy = 0, assetFacesLeft = true,
 						hitDelay = 0.1, hitGap = 0.05, hitClip = "6614245a414645089d41ec1f60df1fab", hitScale = 1.3, hitDy = 0.6, hitSound = "23250468023a4767b32611f2fd8ec49b" } },
 				{ lv = 10, kind = "패시브", name = "대거 마스터리", desc = "공격력이 30% 증가한다.", target = false },
 				{ lv = 20, kind = "패시브", name = "크리티컬 마스터리", desc = "크리티컬 확률이 30%, 크리티컬 데미지가 20% 증가한다.", target = false },
 				-- 메소 익스플로전 연출 1차: 원작 4211006 — 시전 클립 effect(발 아래 보라 소용돌이) + 타격 hit/0(흰 폭발 + 연두 불꽃) + 타격음 hit. 사거리 1·10마리(메인 대상 곁 1칸 규칙)
 				{ lv = 30, kind = "액티브", name = "메소 익스플로전", desc = "사거리 1 안의 적을 최대 10마리까지 83.3%의 데미지로 공격한다. 재사용 대기시간 8초", target = false, cd = 8, ratio = 83.3, hits = 1, targets = 10, range = 1,
-					fx = { motion = "swingO1", clip = "61840689ea7b44f09f91960734232e34", scale = 1.6, feetDx = 0, feetDy = 0, assetFacesLeft = true, sound = "acb0f70275b7422dbcc8a395cbbd9d28",
+					fx = { motion = "shadMeso", clip = "61840689ea7b44f09f91960734232e34", scale = 1.6, feetDx = 0, feetDy = 0, assetFacesLeft = true, sound = "acb0f70275b7422dbcc8a395cbbd9d28",
 						hitDelay = 0.3, hitClip = "644458b8c91949b4b4b84ff949eba8ca", hitScale = 1.4, hitDy = 0.6 } },
 				{ lv = 40, kind = "패시브", name = "대거 익스퍼트", desc = "공격력이 20%, 최종 데미지가 5% 증가한다.", target = false },
 				{ lv = 50, kind = "패시브", name = "레디 투 다이", desc = "최종 데미지가 20%, 보스 공격 시 데미지가 30% 증가한다. 보스 공격 시 새비지 블로우의 데미지가 88% 증가하고, 몬스터의 방어율을 50% 무시한다.", target = false },
@@ -596,12 +698,11 @@ script RtsJobTableLogic extends Logic
 		end
 		if jobId == "phantom" then
 			return {
-				-- 조커 연출 3차(2026-09-20, 사용자 영상 + "스킬명 400041009, 캐릭터 애니메이션은 keydown 01eff730…"): 원작 조커 = 400041009(prepare·keydown·keydownend·screen + pre/loop/end 사운드) + 400041010(타격 3색·타격음).
-				--   캐릭터: alert 자세 유지 + keydown 클립(붉은·금빛 리본이 몸을 감싸며 도는 지팡이 회전 잔상)을 loopClip으로 공격 중 계속. 카드: 사용자 지정 5종(2026-09-20 "빨강·초록·파랑·검정·노랑 5개") = 400041011/screen/6 빨강 십자(e57428fc…) · 400041012/screen/5 초록 나무(3642df1a…) · 400041014/screen/4 파랑 검(4e7909ae…) · 400041015/screen/4 검정·금 달별(6856aa12…) · 400041013/screen/5 노랑 모래시계(68eead1e…), 발마다 차례로(라운드 로빈). 포물선 높이는 대상까지 칸 거리로 1칸 1.0 / 2칸 1.1 / 3칸 1.2 / 4칸 이상 1.3(projArcByDist, 무작위 없음 — 2026-09-20 사용자; 그 전엔 1.0 → 1.4 고정). 비행 시간은 0.65·0.55초를 거쳐 다시 0.4초(사용자 "원래대로, 너무 답답하네"), 판정 0.35초 뒤. 원본이 180~204×300~328px지만 보이는 카드는 그 절반(나머지는 투명한 잔상 테두리)이라 0.55배가 이전 덱(104×176, 0.52배)과 같은 화면 크기(0.3배는 너무 작았음). 회전 없이 그대로(projSpin 제거·projNoRotate), 공격마다 2장(0.05초 간격 — 0.1초 공격이라 초당 20장), **머리 위(+1.35)에서 적에게 항상 위로 볼록한 포물선**(projArc 1.0, 높이 0.5~1.0) 0.4초 비행. 타격은 400041010 hit/0·1·2 무작위 + 타격음
+				-- 조커: 전용 PNG 8장 연사 루프 + 독립 카드/고리. 대상 방향 1.55유닛 앞에서 출발해 고리 가장자리가 몸 앞부분에 살짝 겹친다.
 				{ lv = 1, kind = "액티브", name = "조커", desc = "사거리 5 안의 적 1마리를 192.5%의 데미지로 공격한다. 공격속도와 관계없이 0.1초마다 카드를 던진다.", target = false, range = 5,
-					fx = { motions = { "swingOF", "swingO1", "swingO1", "stabO1" }, motionCycle = true, motionGap = 0.45,
-						loopClip = "01eff730ea0a4c3aa797fdb50a1e4492", loopScale = 0.9, loopDx = 0, loopDy = 0.55, loopAlpha = 0.9, loopOrder = 190, loopFacesLeft = true,
-						projs = { "e57428fc63e34e239b0ed3c5befdaae3", "3642df1a01b043e282621a3d97ee0beb", "4e7909aecedf4dde84d841bf7a0f7fb4", "6856aa123ca94eb3ad9315fc7e3bf027", "68eead1e49fa4e21b7ab064d47833a2b" }, projCount = 2, projStagger = 0.05, projSec = 0.4, projDx = 0, projDy = 1.35, projScale = 0.55, projNoRotate = true, projArc = 1.0, projArcByDist = { 1.0, 1.1, 1.2, 1.3 }, assetFacesLeft = true,
+					fx = { motion = "phantomJoker", motionLoop = true,
+						proj = "019edd955d0e4e3eac59989654278fac", projRing = "dadc8093850a445394ea6b883e89f4a8", projWidth = 1.152, projRingSize = 2.528, projSpin = 458.37, projRingSpin = 286.48,
+						projCount = 2, projStagger = 0.05, projSec = 0.4, projDx = 1.55, projDy = 0.84, projNoRotate = true, projArc = 1.0, projArcByDist = { 1.0, 1.1, 1.2, 1.3 }, assetFacesLeft = true,
 						hitDelay = 0.35, hitClips = { "6c691c6d80724c7f966326006e210fcc", "f0f23e845b144475b9b8a7059e4821cc", "8b23673c5c2d4443b384b080eaa1dac2" }, hitScale = 1.4, hitDy = 0.6, hitSound = "e37b311a831546b99b6e512f7ba6983c" } },
 				{ lv = 10, kind = "패시브", name = "조커: 날카로운 검", desc = "모든 아군 유닛의 최종 데미지가 5% 증가한다.", target = false },
 				{ lv = 20, kind = "패시브", name = "문라이트", desc = "공격력이 150, 공격력이 10% 증가한다.", target = false },
@@ -1392,6 +1493,7 @@ script RtsJobTableLogic extends Logic
 				-- 거대화 6타 연출(2026-09-23 사용자 "찌르기 이펙트도 6번 따르르륵"): 타격 0.075초 간격, 찌르기 클립 3개를 0.075초 늦춰 한 번씩 더(0.6~0.975초), 용 날개 1.2초까지
 				-- 거대화 = 창이 3배(사용자 2026-09-22): 시전 클립·추가 클립 스케일 ×3(타격 클립은 그대로). 원점이 발이라 발판 위치는 같다
 				local fx = self:CopyTable(k.fx)
+				fx.motion = "dkGiantBuster" -- 같은 창 프레임으로 6회 찌르기
 				fx.scale = (fx.scale or 1) * 3
 				if fx.clips ~= nil then
 					local cl = {}
@@ -1426,14 +1528,18 @@ script RtsJobTableLogic extends Logic
 			local fx = nil
 			if i > 0 and list[i].fx ~= nil then
 				fx = self:CopyTable(list[i].fx)
+				fx.motion = "bowArrowRain"
 				-- 루프 = effect 클립(활 소환)의 큰 활 구간 4~12프레임을 반복(2026-09-22 사용자 "첫 애니메이션만 크고 이후는 작아진다 — 처음의 큰 애니메이션이 계속 유지되어야"). 전엔 repeat 클립(188px)이라 작아 보였다
 				--   인트로는 같은 클립 0~12프레임(등장 → 큰 활, 0.72초)까지만 보이고 루프로 이어진다(13~14 소멸 프레임은 안 보임)
 				fx.loopClip = "586154fb11a4489a88e78f3d2a028884"
 				fx.loopFrameA = 4
 				fx.loopFrameB = 12
 				fx.loopScale = 1.1
+				-- 개인 활 사출구(약307,222px)에 황금 활 사출구를 맞춘다. 원본 pivot 기준 (2,92px), 회전12도 반영.
 				fx.loopDx = 0
-				fx.loopDy = 1.1
+				fx.loopDy = 0.68
+				fx.loopOrder = -2 -- 소환(-1)·루프(-2)를 캐릭터(0) 뒤에 그려 얼굴과 무릎 자세를 보존한다.
+				fx.loopRotation = 12 -- 원화 활 양끝의 기울기. 오른쪽을 보면 반대 각도로 표시한다.
 				fx.loopAlpha = 1
 				fx.loopFacesLeft = nil
 				fx.loopIntro = "586154fb11a4489a88e78f3d2a028884"
@@ -1453,11 +1559,12 @@ script RtsJobTableLogic extends Logic
 			list[#list + 1] = { lv = 1, kind = "액티브", prism = true, name = "애로우 레인", desc = "폭풍의 시 대신 애로우 레인을 사용한다. 하늘에서 화살비를 내려 사거리 6 안의 적 1마리를 395%의 데미지로 2회 공격하며, 공격속도와 관계없이 0.2초마다 발사한다. 증강의 효율을 높인다.", target = false, range = 6, fx = fx }
 		elseif id == "truesnipe" then
 			-- 트루 스나이핑 연출(2026-09-22 사용자 skillname#400031006): 원작 400031006에는 special(조준 십자선 7프레임 0.84초 — 잠금 3 → 발사 섬광 → 원 확산)과 use 소리만 있다.
-			--   스나이핑 fx를 복사해 표식만 십자선(markClip, 박스 긴 쪽 × 0.45, 0.85초)으로, 시전음은 400031006/use(1.44초), 타격은 섬광 프레임(0.36초)에 맞춰 0.05초 간격 10회·타격 클립 스케일 2.0. 모션·시전 이펙트·타격 클립·타격음은 스나이핑 것
+			--   스나이핑 fx를 복사해 표식만 십자선(markClip, 박스 긴 쪽 × 0.45, 0.85초)으로, 시전음은 400031006/use(1.44초), 타격은 섬광 프레임(0.36초)에 맞춰 0.05초 간격 10회·타격 클립 스케일 2.0. 모션은 marksTrueSniping(1.04초), 시전 이펙트·타격 클립·타격음은 스나이핑 것
 			local i = self:FindSkill(list, "스나이핑")
 			local fx = nil
 			if i > 0 and list[i].fx ~= nil then
 				fx = self:CopyTable(list[i].fx)
+				fx.motion = "marksTrueSniping"
 				fx.markClip = "64224b19c0aa4359963ab551d5862cfd"
 				fx.markFit = 0.45
 				fx.markPivotDy = 0
@@ -1583,9 +1690,9 @@ script RtsJobTableLogic extends Logic
 			--   토네이도 = 투사체(400041043 shootobj/layerlist/b1 380×488px 12프레임 0.72초 루프, 피벗 중앙, 2.0배): 캐릭터 위치(손 높이 1.0)에서 생성 → 0.3초 머문 뒤(projHover) 25유닛/초로 대상 박스 중앙에 돌진(사거리 3이면 ≤0.3초) → 도착 뒤 판정. 1.9초까지 대상 위에 남는다(projLife)
 			--   판정 0.6초(토네이도 도착)부터 0.0215초 간격 117타 = 3.1초까지(토네이도 72·카르마 45를 섞어서 동시에, hitKinds) — 토네이도가 보스 위에 머무는 2.5초 내내 타격·타격음(사용자). 카르마 퓨리 = 캐릭터 등 뒤 클립(400041021 effect 殺 참격 + 폭발 + 연기 996×568px 25프레임 1.59초, 피벗 바닥 중앙, 1.5배 = 0.5의 3배 — 사용자 "3배·캐릭터 뒤로") 0.3초에(backDelay — 토네이도와 동시)
 			--   소리: 토네이도 loop 950234be…(5.78초, 시전음 1회) + 카르마 use b634a62d…(3.32초, 0.3초 뒤 sound2). 타격음 = 둔탁한 피격음 1개를 두 스킬 공통(사용자) — 토네이도 타 400041042/hit 341c155e…(사용자 지정), 카르마 타 스피어 버스터 타격음 23250468…, 섞여서 3타마다(hitSoundEvery — 0.065초 간격 39번, 소리 1.3초라 ~20개 겹침) SoundService로 겹쳐 재생. 풀(SoundComponent 재시작)은 소리가 하나씩 끊기며 이어져 "같이 안 들린다"(사용자), 타격마다 SoundService는 동시 재생 제한에 걸려 뒤가 잘렸다 → 그 사이값, 대안 레이징 블로우 6313ad64…·카르마 hit fc142213…·토네이도 hit c1f44f0c…
-			--   타격 클립(사용자 지정): 토네이도 타 = hit/1 f5a6d5aa…, 카르마 타 = hit/1 6eab154e…·hit/0 089ce476… 무작위(hitPhases[hitKinds[h]], 0.8배). 모션 swingD1 → 0.3초 뒤 swingD2
+			--   타격 클립(사용자 지정): 토네이도 타 = hit/1 f5a6d5aa…, 카르마 타 = hit/1 6eab154e…·hit/0 089ce476… 무작위(hitPhases[hitKinds[h]], 0.8배). 모션 shadDualblade PNG 3.2초(0.3초 방출 자세)
 			--   동시 발동(2026-09-22 사용자 "블레이드 토네이도/카르마 퓨리 동시에 사용되어야 함"): 카르마 퓨리 등 뒤 클립·소리·2번째 모션을 토네이도가 출발하는 0.3초에 함께(전엔 1.8초 뒤 순차)
-			local fx = { motions = { "swingD1", "swingD2" }, motionGap = 0.3, noFlip = true,
+			local fx = { motion = "shadDualblade", noFlip = true,
 				sound = "950234be7d9f44bd9091ab6000832f89", sound2 = "b634a62d21c04da18adc0c036e987dc5", sound2Delay = 0.3,
 				proj = "d91e675288f9450b888c3daed98fb63e", projScale = 2.0, projNoRotate = true, projDx = 0, projDy = 1.0, projHover = 0.3, projSpeed = 25, projLife = 2.9,
 				backClip = "643c9e8d1b7043a29045e3fed2f1021c", backScale = 1.5, backDx = 0, backDy = 0, backDelay = 0.3, backLife = 2.9,

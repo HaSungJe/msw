@@ -1,6 +1,6 @@
 # 캐릭터 원화 7종 제작 기록
 
-상태: 원화 검토용. 프레임·흉상 제작 및 게임 연결은 하지 않았다.
+상태: 2026-09-27 사용자 요청으로 7종 원화 보관 확정. 후속 디자인 기준은 `assets/design/characters/<character-id>/concept.png`이며, 인계는 `docs/design/character-concepts.md`를 따른다. 아래 상대 경로 이미지는 생성 당시 출력 기록이다. 다크나이트는 비홀더를 제거한 마지막 결과를 선택했다. 프레임·흉상 제작 및 게임 연결은 하지 않았다.
 
 내장 image_gen으로 생성했다. 다크나이트는 사용자 요청에 따라 비홀더를 제거한 결과만 보관한다. 기존 썬콜·히어로·불독·비숍의 wait/motion01.png를 그림체·비율 참고로 사용했다. 게임 적용 상태와 .info의 현재 외형 정보는 변경하지 않았다.
 
@@ -53,5 +53,4 @@ SUBJECT: Shadower (섀도어), the pale silver-haired masked rogue in image 1. P
 결과: [phantom.png](phantom.png)
 
 SUBJECT: Phantom (팬텀), male gentleman thief from image 1. Ash-blond swept hair, striking violet eyes, sly charming asymmetrical closed-mouth smirk. His iconic dramatic broad-brim black-and-white top hat, rich cobalt blue band, dangling delicate gold chains with red jewels, long blue/white feather and oval turquoise brooch. Ornate white and royal-blue tailcoat/cape with intricate restrained gold embroidery and shoulder epaulets, white gloves, dark brown/black pinstriped short trousers and compact elegant black/gold boots. One hand holds a single ornate burgundy-backed gold-trimmed playing card near shoulder, the other grips his elegant dark cane with gold and red-gem handle, entire cane visible. Body grounded, standing elegant relaxed 3/4 pose, NOT leaping or crouched. Keep actual body about TWO HEADS tall underneath the tall hat; tall hat doesn't count as head height. All hat, feathers, cape, boots and cane within canvas with clear margins. No orbiting cards, cyan flames, streaks or background effects.
-
 

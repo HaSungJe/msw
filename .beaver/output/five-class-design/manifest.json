@@ -1,0 +1,87 @@
+[
+  {
+    "id": "paladin",
+    "path": "C:\\workspace\\msw\\.beaver\\output\\five-class-design\\concepts\\paladin.png",
+    "size": [
+      1254,
+      1254
+    ],
+    "alpha_bbox": [
+      89,
+      128,
+      1208,
+      1184
+    ],
+    "sha256": "07e8d4f9a0a05711198900791bdc8c909707e12b642b6991362b58bc42b7c26b",
+    "status": "user-selected concept saved; motion and game connection pending",
+    "installed_path": "C:\\workspace\\msw\\assets\\design\\characters\\paladin\\concept.png"
+  },
+  {
+    "id": "dark-knight",
+    "path": "C:\\workspace\\msw\\.beaver\\output\\five-class-design\\concepts\\dark-knight.png",
+    "size": [
+      1254,
+      1254
+    ],
+    "alpha_bbox": [
+      95,
+      189,
+      1242,
+      1178
+    ],
+    "sha256": "90281a7fedecaa723568395234ea58303feadfde5b5bfbf70ba71b62e860f492",
+    "status": "user-selected concept saved; motion and game connection pending",
+    "installed_path": "C:\\workspace\\msw\\assets\\design\\characters\\dark-knight\\concept.png"
+  },
+  {
+    "id": "night-lord",
+    "path": "C:\\workspace\\msw\\.beaver\\output\\five-class-design\\concepts\\night-lord.png",
+    "size": [
+      1254,
+      1254
+    ],
+    "alpha_bbox": [
+      259,
+      121,
+      1188,
+      1170
+    ],
+    "sha256": "cb882dcc352abc52448a2ac35eb38e9545635ffbafc8373f3f1f246654701585",
+    "status": "user-selected concept saved; motion and game connection pending",
+    "installed_path": "C:\\workspace\\msw\\assets\\design\\characters\\night-lord\\concept.png"
+  },
+  {
+    "id": "shadower",
+    "path": "C:\\workspace\\msw\\.beaver\\output\\five-class-design\\concepts\\shadower.png",
+    "size": [
+      1254,
+      1254
+    ],
+    "alpha_bbox": [
+      291,
+      166,
+      1147,
+      1122
+    ],
+    "sha256": "2eae51e760e880a37c73394c774e1d15e18a0e7c2d4898661a233844196349c6",
+    "status": "user-selected concept saved; motion and game connection pending",
+    "installed_path": "C:\\workspace\\msw\\assets\\design\\characters\\shadower\\concept.png"
+  },
+  {
+    "id": "phantom",
+    "path": "C:\\workspace\\msw\\.beaver\\output\\five-class-design\\concepts\\phantom.png",
+    "size": [
+      1254,
+      1254
+    ],
+    "alpha_bbox": [
+      192,
+      72,
+      1146,
+      1200
+    ],
+    "sha256": "3107933cdb8fd621de8a5dd036ec3d4b391e05be1d18a778de84a01735006e84",
+    "status": "user-selected concept saved; motion and game connection pending",
+    "installed_path": "C:\\workspace\\msw\\assets\\design\\characters\\phantom\\concept.png"
+  }
+]

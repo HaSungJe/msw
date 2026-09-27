@@ -1,0 +1,1029 @@
+[
+  {
+    "id": "paladin",
+    "status": "local-frames-revised-game-integration-pending",
+    "concept": "concept.png",
+    "idleCanvas": 576,
+    "attackCanvas": 704,
+    "idleFeet": [
+      288,
+      512
+    ],
+    "attackFeet": [
+      352,
+      640
+    ],
+    "referenceHead": 147,
+    "revision": "natural-game-idle; phantom-fixed-facing-card-throw-neck-grip",
+    "frames": [
+      {
+        "file": "frames/divine-charge/motion01.png",
+        "sha256": "f449d848f7e6555fc03fa49341b70892d0a766eb68fc6eaf768546e137f0bd53",
+        "width": 704,
+        "height": 704
+      },
+      {
+        "file": "frames/divine-charge/motion02.png",
+        "sha256": "ddf092cedc896f3850e16966de7baf27e52a17bfeee9d59c88a7ef6273a4f7af",
+        "width": 704,
+        "height": 704
+      },
+      {
+        "file": "frames/divine-charge/motion03.png",
+        "sha256": "eceaed7cb8d91ed434acd4dd9bfbe607bccb8323f67dcf7776c7f90aca4d9d7e",
+        "width": 704,
+        "height": 704
+      },
+      {
+        "file": "frames/divine-charge/motion04.png",
+        "sha256": "28eea2e2c3e2bf7d9d45942b6503a407442619163f5db9f631d41039953e81ee",
+        "width": 704,
+        "height": 704
+      },
+      {
+        "file": "frames/divine-charge/motion05.png",
+        "sha256": "6e8ded1c90ba132bf39637115103312d0126368419732582cf6e4e9a39968b98",
+        "width": 704,
+        "height": 704
+      },
+      {
+        "file": "frames/divine-charge/motion06.png",
+        "sha256": "d61639424c90ee8585ef8177809caa3786cd2fdfe9a6fab9e3043336a838a257",
+        "width": 704,
+        "height": 704
+      },
+      {
+        "file": "frames/sanctuary/motion01.png",
+        "sha256": "e4486b8d8f2d9d73f6f87e1e4b1390a92c5025d8a1f6fbbf97f97fbe45849773",
+        "width": 704,
+        "height": 704
+      },
+      {
+        "file": "frames/sanctuary/motion02.png",
+        "sha256": "81d37c92c6dab96fc1ca6d07e224b13c964193e0308a903ee6d74575c9e47a7c",
+        "width": 704,
+        "height": 704
+      },
+      {
+        "file": "frames/sanctuary/motion03.png",
+        "sha256": "22babba5e67fbcc0b3ad3404116678f497fe6e88b076de45c836654e17d7ea5b",
+        "width": 704,
+        "height": 704
+      },
+      {
+        "file": "frames/sanctuary/motion04.png",
+        "sha256": "997a77001bcf7d7f9a45f9ab409401670f58e0fc220dc67cec38c4ecaece2cf0",
+        "width": 704,
+        "height": 704
+      },
+      {
+        "file": "frames/sanctuary/motion05.png",
+        "sha256": "dead476ff2e674ba5b7ff6ed9b07edba0454826d114ea5da0423cd42f5315db5",
+        "width": 704,
+        "height": 704
+      },
+      {
+        "file": "frames/sanctuary/motion06.png",
+        "sha256": "f7fe48a1dac5f6fca5b2f63d84b1fe410ed0ea0b84dbc888a1e0cff12e36839f",
+        "width": 704,
+        "height": 704
+      },
+      {
+        "file": "frames/wait/motion01.png",
+        "sha256": "083dbcaf4e276b41265681df8b4c51b6641aff1445f78ee0284ccee483f16012",
+        "width": 576,
+        "height": 576
+      },
+      {
+        "file": "frames/wait/motion02.png",
+        "sha256": "6425f75326d96904c1527e71b7b07085f11d34b4541a0edcfe570119f2ff41e0",
+        "width": 576,
+        "height": 576
+      },
+      {
+        "file": "frames/wait/motion03.png",
+        "sha256": "9b0027fd792a29204a36862b6b2592cd923d0ed9d780ae97545009f4e760ad0d",
+        "width": 576,
+        "height": 576
+      }
+    ],
+    "playback": [
+      {
+        "id": "paladin",
+        "skill": "wait",
+        "ko": "대기",
+        "order": [
+          1,
+          2,
+          1,
+          3
+        ],
+        "times": [
+          0.65,
+          0.45,
+          0.65,
+          0.45
+        ]
+      },
+      {
+        "id": "paladin",
+        "skill": "divine-charge",
+        "ko": "디바인 차지",
+        "order": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "times": [
+          0.15,
+          0.15,
+          0.08,
+          0.1,
+          0.1,
+          0.17
+        ],
+        "hit": [
+          0.3
+        ],
+        "delay": 0
+      },
+      {
+        "id": "paladin",
+        "skill": "sanctuary",
+        "ko": "생츄어리",
+        "order": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "times": [
+          0.2,
+          0.2,
+          0.1,
+          0.12,
+          0.13,
+          0.15
+        ],
+        "hit": [
+          0.5
+        ],
+        "delay": 0
+      }
+    ]
+  },
+  {
+    "id": "dark-knight",
+    "status": "local-frames-revised-game-integration-pending",
+    "concept": "concept.png",
+    "idleCanvas": 576,
+    "attackCanvas": 704,
+    "idleFeet": [
+      288,
+      512
+    ],
+    "attackFeet": [
+      352,
+      640
+    ],
+    "referenceHead": 147,
+    "revision": "natural-game-idle; phantom-fixed-facing-card-throw-neck-grip",
+    "frames": [
+      {
+        "file": "frames/dragon-roar/motion01.png",
+        "sha256": "72a969fef826e0cad6b948e4ae05c985ba1c934a7cfe5c75950e47a3ac5aa8f9",
+        "width": 704,
+        "height": 704
+      },
+      {
+        "file": "frames/dragon-roar/motion02.png",
+        "sha256": "3ee92f3a21c2d00412e0a04c75fdd796565efc0c64d6a75785ecd38eceed4136",
+        "width": 704,
+        "height": 704
+      },
+      {
+        "file": "frames/dragon-roar/motion03.png",
+        "sha256": "ab49397d807e1e1d07e70e031fc7201cc6efa8823823990d9dc612ba38e37a41",
+        "width": 704,
+        "height": 704
+      },
+      {
+        "file": "frames/dragon-roar/motion04.png",
+        "sha256": "28bb67d1d504bf0517084726d381100769aee4eb241381e1d9616d0b2d15549f",
+        "width": 704,
+        "height": 704
+      },
+      {
+        "file": "frames/dragon-roar/motion05.png",
+        "sha256": "4c98a9e5955b08b2c5515e9f8a58bc5914912edee5391e99b0e3caf589e9d143",
+        "width": 704,
+        "height": 704
+      },
+      {
+        "file": "frames/dragon-roar/motion06.png",
+        "sha256": "3c01c61d6c072a28c05e5e2d854450cba33df460623b5f3032ff948cec48e589",
+        "width": 704,
+        "height": 704
+      },
+      {
+        "file": "frames/spear-buster/motion01.png",
+        "sha256": "be9b7abda8ae68550fd663a376ffd33a1732199f6c3ad471f87c77c7fe1ff749",
+        "width": 704,
+        "height": 704
+      },
+      {
+        "file": "frames/spear-buster/motion02.png",
+        "sha256": "9d4c22b172d90ec09730706f1aca60cb8def75a66f96a7a22fa3d4a1988381a2",
+        "width": 704,
+        "height": 704
+      },
+      {
+        "file": "frames/spear-buster/motion03.png",
+        "sha256": "d23f7b9735fcdf40a169d7ecea860b5180917a843a13b6f40b89629f524978b2",
+        "width": 704,
+        "height": 704
+      },
+      {
+        "file": "frames/spear-buster/motion04.png",
+        "sha256": "f5377a0a89c2ac7b392f097a34824c4c231a0a3a42b289a906226dfdfe66fc53",
+        "width": 704,
+        "height": 704
+      },
+      {
+        "file": "frames/spear-buster/motion05.png",
+        "sha256": "8febad1367b22b26e72038dd9e95332c743ddc301572afc59556de1c38212039",
+        "width": 704,
+        "height": 704
+      },
+      {
+        "file": "frames/spear-buster/motion06.png",
+        "sha256": "d8f9a4f9ca1a1ce31c8bca9f9bb0b2a59534f27547a29c63eab813748271683c",
+        "width": 704,
+        "height": 704
+      },
+      {
+        "file": "frames/spear-buster/motion07.png",
+        "sha256": "24681311c86112d768b9ad1c4ffa5e564c7e39ca67da736112d2d1337b95aeca",
+        "width": 704,
+        "height": 704
+      },
+      {
+        "file": "frames/spear-buster/motion08.png",
+        "sha256": "6925b46067cb55b39ad1dbdd119501283f008383f706ea92c410571872552034",
+        "width": 704,
+        "height": 704
+      },
+      {
+        "file": "frames/wait/motion01.png",
+        "sha256": "01fe9e81618b5b860e3da8de7c54e78d0d77d9a9c6f7a34a017652a36efebb15",
+        "width": 576,
+        "height": 576
+      },
+      {
+        "file": "frames/wait/motion02.png",
+        "sha256": "8c8e1364bbdc249695baedc365a77dff38d376f50019aa3622c5e69197a3468a",
+        "width": 576,
+        "height": 576
+      },
+      {
+        "file": "frames/wait/motion03.png",
+        "sha256": "196b8447b320834593f05d8ec04a501820822dc44bdacbcd8614ac8ce62b5cd5",
+        "width": 576,
+        "height": 576
+      }
+    ],
+    "playback": [
+      {
+        "id": "dark-knight",
+        "skill": "wait",
+        "ko": "대기",
+        "order": [
+          1,
+          2,
+          1,
+          3
+        ],
+        "times": [
+          0.65,
+          0.45,
+          0.65,
+          0.45
+        ]
+      },
+      {
+        "id": "dark-knight",
+        "skill": "spear-buster",
+        "ko": "스피어 버스터",
+        "order": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8
+        ],
+        "times": [
+          0.1,
+          0.05,
+          0.08,
+          0.07,
+          0.08,
+          0.07,
+          0.1,
+          0.15
+        ],
+        "hit": [
+          0.65,
+          0.8,
+          0.95
+        ],
+        "delay": 0.5
+      },
+      {
+        "id": "dark-knight",
+        "skill": "dragon-roar",
+        "ko": "드래곤 로어",
+        "order": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "times": [
+          0.2,
+          0.2,
+          0.2,
+          0.2,
+          0.25,
+          0.35
+        ],
+        "hit": [
+          0.6
+        ],
+        "delay": 0
+      }
+    ]
+  },
+  {
+    "id": "night-lord",
+    "status": "local-frames-revised-game-integration-pending",
+    "concept": "concept.png",
+    "idleCanvas": 576,
+    "attackCanvas": 704,
+    "idleFeet": [
+      288,
+      512
+    ],
+    "attackFeet": [
+      352,
+      640
+    ],
+    "referenceHead": 147,
+    "revision": "natural-game-idle; phantom-fixed-facing-card-throw-neck-grip",
+    "frames": [
+      {
+        "file": "frames/quadruple-throw/motion01.png",
+        "sha256": "8c562f1b3d1d661d6896b834d2880d277a184acece79faacdb7180ad31db4ee9",
+        "width": 704,
+        "height": 704
+      },
+      {
+        "file": "frames/quadruple-throw/motion02.png",
+        "sha256": "ecabe5e1086c03706191e711818e4b5f347fe3fdbb4c22ef209028eff34f5ffc",
+        "width": 704,
+        "height": 704
+      },
+      {
+        "file": "frames/quadruple-throw/motion03.png",
+        "sha256": "f3d1858d05a1c9f0af7e3741cd76d7d24ac2c08c89a10bf31b18cb50e8bf24ff",
+        "width": 704,
+        "height": 704
+      },
+      {
+        "file": "frames/quadruple-throw/motion04.png",
+        "sha256": "b56d0b0411afefcffdd0f11e9d657e165a55b109d6236b4e9ddb345c5c7a41d7",
+        "width": 704,
+        "height": 704
+      },
+      {
+        "file": "frames/quadruple-throw/motion05.png",
+        "sha256": "ab41b5dda2c505370a559203b6fcd4bc7ffc31f3064ffaeb09b3cdb85961cbbf",
+        "width": 704,
+        "height": 704
+      },
+      {
+        "file": "frames/quadruple-throw/motion06.png",
+        "sha256": "030d77c3b06d423c1ea4eb61f55ddebd327bfe936f516345be656b190b403259",
+        "width": 704,
+        "height": 704
+      },
+      {
+        "file": "frames/quadruple-throw/motion07.png",
+        "sha256": "039c94719ce779f5f67e96302bec339b160e954c4c93b5228d7a76b7e1fdfe84",
+        "width": 704,
+        "height": 704
+      },
+      {
+        "file": "frames/quadruple-throw/motion08.png",
+        "sha256": "54ec7f0a38e1536e002bcb51c73433a9a9edf12451b8fed5d83c8057f6b4ea12",
+        "width": 704,
+        "height": 704
+      },
+      {
+        "file": "frames/wait/motion01.png",
+        "sha256": "4564c4c3d2d89be7cd3128e9a7f27b14231301b57166ac8ddb566aa8dc24649e",
+        "width": 576,
+        "height": 576
+      },
+      {
+        "file": "frames/wait/motion02.png",
+        "sha256": "8fb779cde4736c68820df9985ce982c3d504716f7479db2ddf0440c8b6234ca0",
+        "width": 576,
+        "height": 576
+      },
+      {
+        "file": "frames/wait/motion03.png",
+        "sha256": "524a907da0051fcede8d3ea25c85ba69e5f70811c5a2a7869f491b2b0016c1c0",
+        "width": 576,
+        "height": 576
+      }
+    ],
+    "playback": [
+      {
+        "id": "night-lord",
+        "skill": "wait",
+        "ko": "대기",
+        "order": [
+          1,
+          2,
+          1,
+          3
+        ],
+        "times": [
+          0.65,
+          0.45,
+          0.65,
+          0.45
+        ]
+      },
+      {
+        "id": "night-lord",
+        "skill": "quadruple-throw",
+        "ko": "쿼드러플 스로우·풍마수리검 공용",
+        "order": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          5,
+          6,
+          7,
+          8
+        ],
+        "times": [
+          0.1,
+          0.05,
+          0.05,
+          0.05,
+          0.05,
+          0.05,
+          0.05,
+          0.05,
+          0.1,
+          0.15
+        ],
+        "hit": [
+          0.3,
+          0.4,
+          0.5,
+          0.6
+        ],
+        "delay": 0
+      }
+    ]
+  },
+  {
+    "id": "shadower",
+    "status": "local-frames-revised-game-integration-pending",
+    "concept": "concept.png",
+    "idleCanvas": 576,
+    "attackCanvas": 704,
+    "idleFeet": [
+      288,
+      512
+    ],
+    "attackFeet": [
+      352,
+      640
+    ],
+    "referenceHead": 147,
+    "revision": "natural-game-idle; phantom-fixed-facing-card-throw-neck-grip",
+    "frames": [
+      {
+        "file": "frames/blade-tornado-karma-fury/motion01.png",
+        "sha256": "f380d1fb1fe53e7bbdb3b20886162db5432af86b8c8af793d9d9cbbd690a3e43",
+        "width": 704,
+        "height": 704
+      },
+      {
+        "file": "frames/blade-tornado-karma-fury/motion02.png",
+        "sha256": "fdba0b181641281498d8a405116892e9a0c0c547573ed2bfbeddcb4425b1c4d3",
+        "width": 704,
+        "height": 704
+      },
+      {
+        "file": "frames/blade-tornado-karma-fury/motion03.png",
+        "sha256": "f56a447881b2bd891760978314d269e1afe8fdd76202e0d24621fec283df5bbb",
+        "width": 704,
+        "height": 704
+      },
+      {
+        "file": "frames/blade-tornado-karma-fury/motion04.png",
+        "sha256": "bca387e7d240b681ca8892c6c900bde36f3da695b126a92f08b9b2f04e0abd3b",
+        "width": 704,
+        "height": 704
+      },
+      {
+        "file": "frames/blade-tornado-karma-fury/motion05.png",
+        "sha256": "2272e486de02a677ee245799349b6e9ebec9edf43c57d405d908936e284cda07",
+        "width": 704,
+        "height": 704
+      },
+      {
+        "file": "frames/blade-tornado-karma-fury/motion06.png",
+        "sha256": "77abf3bfc96f012414bc9406d162c3b2c3a6ed77bc3404a1733d884ceeb9b205",
+        "width": 704,
+        "height": 704
+      },
+      {
+        "file": "frames/blade-tornado-karma-fury/motion07.png",
+        "sha256": "9a7a0d56fdab49011f80522598cf3611fb471c1e05226c232e811c366c9a21f6",
+        "width": 704,
+        "height": 704
+      },
+      {
+        "file": "frames/blade-tornado-karma-fury/motion08.png",
+        "sha256": "4778ece10822c435fe69f1d2b66b4a8578db937f5c6b824e0f7c3c31935451e8",
+        "width": 704,
+        "height": 704
+      },
+      {
+        "file": "frames/meso-explosion/motion01.png",
+        "sha256": "808dc2211b7ea606d39c3a5331b80ebcd6453569dde38308c2f7a4a7cb91976b",
+        "width": 704,
+        "height": 704
+      },
+      {
+        "file": "frames/meso-explosion/motion02.png",
+        "sha256": "9164c75381cddde0bc86023cbe2a3a9f95e6e9bc8a100e39d0fa9946cddf5618",
+        "width": 704,
+        "height": 704
+      },
+      {
+        "file": "frames/meso-explosion/motion03.png",
+        "sha256": "35c8bf1e87eacb9ddb0802c6078a0e00f16281385f8eeb2bc33bcf25fe8c7383",
+        "width": 704,
+        "height": 704
+      },
+      {
+        "file": "frames/meso-explosion/motion04.png",
+        "sha256": "7fac42860abb815b6b8123f951ecdb965faf0245cfe2dd81cb9bccdbd357fde1",
+        "width": 704,
+        "height": 704
+      },
+      {
+        "file": "frames/meso-explosion/motion05.png",
+        "sha256": "0916c2c69952515bb5b59e5d9a2ce9302cb079b3bbede76babab63b35a7d4dde",
+        "width": 704,
+        "height": 704
+      },
+      {
+        "file": "frames/savage-blow/motion01.png",
+        "sha256": "2b3db25cf712f68493240c21d289cab68c607941831b8dba1816a8bd293fc6b7",
+        "width": 704,
+        "height": 704
+      },
+      {
+        "file": "frames/savage-blow/motion02.png",
+        "sha256": "726b81406652ba904ead97a3bc69a56be5a76afc1bb71cf81d0c0cf8473e4708",
+        "width": 704,
+        "height": 704
+      },
+      {
+        "file": "frames/savage-blow/motion03.png",
+        "sha256": "85891b7c89874c729b8550cc9486fb2a1ac3442b3f92ba16f961fe599d5eab79",
+        "width": 704,
+        "height": 704
+      },
+      {
+        "file": "frames/savage-blow/motion04.png",
+        "sha256": "afaf0aeb55317ac73e360bbbc4eb758340bb4c0b6add9885d03691ef3245160e",
+        "width": 704,
+        "height": 704
+      },
+      {
+        "file": "frames/savage-blow/motion05.png",
+        "sha256": "3da0d094077bc3f23ae56a961c700fdfe92923219e4a84c1ab238919ad5c0883",
+        "width": 704,
+        "height": 704
+      },
+      {
+        "file": "frames/savage-blow/motion06.png",
+        "sha256": "46b09d21164da920fffe9990d2228e565ce7e390e3b29b288bbfdedbfd8d0a32",
+        "width": 704,
+        "height": 704
+      },
+      {
+        "file": "frames/savage-blow/motion07.png",
+        "sha256": "0920cd8f09d867919d9aba57cc428f3c43117919173d935dd2e19ff684e933ca",
+        "width": 704,
+        "height": 704
+      },
+      {
+        "file": "frames/savage-blow/motion08.png",
+        "sha256": "f7f4e1a1ef9a66f4a0d67a00c7561b0202b19d86ac41b5e485820b4d762b1e63",
+        "width": 704,
+        "height": 704
+      },
+      {
+        "file": "frames/wait/motion01.png",
+        "sha256": "79f123667adfd47b1e2367120453e2596cc829848d5502472f25859f5cac3f60",
+        "width": 576,
+        "height": 576
+      },
+      {
+        "file": "frames/wait/motion02.png",
+        "sha256": "921d49bae01383f3647fa253149f6a1a1b9edc4eb218b42df9f2a4cb233ac6a1",
+        "width": 576,
+        "height": 576
+      },
+      {
+        "file": "frames/wait/motion03.png",
+        "sha256": "3a260a3a5fa0e9bd60f1f9217c3afe743f00f484bb531c97ba45908431a53bbe",
+        "width": 576,
+        "height": 576
+      }
+    ],
+    "playback": [
+      {
+        "id": "shadower",
+        "skill": "wait",
+        "ko": "대기",
+        "order": [
+          1,
+          2,
+          1,
+          3
+        ],
+        "times": [
+          0.65,
+          0.45,
+          0.65,
+          0.45
+        ]
+      },
+      {
+        "id": "shadower",
+        "skill": "savage-blow",
+        "ko": "새비지 블로우",
+        "order": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          4,
+          5,
+          7,
+          8
+        ],
+        "times": [
+          0.1,
+          0.05,
+          0.05,
+          0.05,
+          0.05,
+          0.05,
+          0.05,
+          0.05,
+          0.03,
+          0.02
+        ],
+        "hit": [
+          0.1,
+          0.15,
+          0.2,
+          0.25,
+          0.3,
+          0.35,
+          0.4,
+          0.45
+        ],
+        "delay": 0
+      },
+      {
+        "id": "shadower",
+        "skill": "meso-explosion",
+        "ko": "메소 익스플로전",
+        "order": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "times": [
+          0.12,
+          0.18,
+          0.07,
+          0.08,
+          0.05
+        ],
+        "hit": [
+          0.3
+        ],
+        "delay": 0
+      },
+      {
+        "id": "shadower",
+        "skill": "blade-tornado-karma-fury",
+        "ko": "블레이드 토네이도·카르마 퓨리",
+        "order": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8
+        ],
+        "times": [
+          0.15,
+          0.15,
+          0.1,
+          0.15,
+          0.2,
+          2.1,
+          0.2,
+          0.15
+        ],
+        "hit": [
+          0.6,
+          3.1
+        ],
+        "delay": 0
+      }
+    ]
+  },
+  {
+    "id": "phantom",
+    "status": "local-frames-revised-game-integration-pending",
+    "concept": "concept.png",
+    "idleCanvas": 576,
+    "attackCanvas": 704,
+    "idleFeet": [
+      288,
+      512
+    ],
+    "attackFeet": [
+      352,
+      640
+    ],
+    "referenceHead": 147,
+    "revision": "video-referenced-cross-body-barrage-no-spin",
+    "frames": [
+      {
+        "file": "frames/joker/motion01.png",
+        "sha256": "7f847c70b9b0d79e58186e7a819ecc333570450aa46cef6a53f0a8457409ef20",
+        "width": 704,
+        "height": 704
+      },
+      {
+        "file": "frames/joker/motion02.png",
+        "sha256": "d1b3cdafddb741ac65703503556fec3159a0260866f3fbc91c2e710a52b50ec9",
+        "width": 704,
+        "height": 704
+      },
+      {
+        "file": "frames/joker/motion03.png",
+        "sha256": "afbecc383faed55ef6f018e61f1171cf08246aa0aa5f3d307190238b73853624",
+        "width": 704,
+        "height": 704
+      },
+      {
+        "file": "frames/joker/motion04.png",
+        "sha256": "85ac00e3ab53ec08b2afd6e9f28aca603f31378f2b25d5e57ab308251fd77214",
+        "width": 704,
+        "height": 704
+      },
+      {
+        "file": "frames/joker/motion05.png",
+        "sha256": "255c00b0e733da5e357f150954e017768b9a9bfe31b375d8d70a50f915fe0204",
+        "width": 704,
+        "height": 704
+      },
+      {
+        "file": "frames/joker/motion06.png",
+        "sha256": "a2e270b591440aa3d0daf9860e4f1a6201fecd7ded72b81c67c00e54a656657b",
+        "width": 704,
+        "height": 704
+      },
+      {
+        "file": "frames/joker/motion07.png",
+        "sha256": "a43214a63a4fba0e3424ee6eb01c741c05102ffd17896424aa3a468d3eacb380",
+        "width": 704,
+        "height": 704
+      },
+      {
+        "file": "frames/joker/motion08.png",
+        "sha256": "9b0ae6a8d1d906c90c36979ce59c129f58881c1b22203fb1d0815b0b7f69e3d6",
+        "width": 704,
+        "height": 704
+      },
+      {
+        "file": "frames/wait/motion01.png",
+        "sha256": "7cdfe3c6c1d1da25d417841c9905628b7197c4e38d380edbef1b5e6f0e4605b8",
+        "width": 576,
+        "height": 576
+      },
+      {
+        "file": "frames/wait/motion02.png",
+        "sha256": "319413c63c4bda4187c3c67138bb390e0a2b5be86ca0756556503916b1b0b6f3",
+        "width": 576,
+        "height": 576
+      },
+      {
+        "file": "frames/wait/motion03.png",
+        "sha256": "3869d5f5cba57299dc0f8626467d695130c1bd1df6dc57642f787527c1c7c1fd",
+        "width": 576,
+        "height": 576
+      }
+    ],
+    "playback": [
+      {
+        "id": "phantom",
+        "skill": "wait",
+        "ko": "대기",
+        "order": [
+          1,
+          2,
+          1,
+          3
+        ],
+        "times": [
+          0.65,
+          0.45,
+          0.65,
+          0.45
+        ]
+      },
+      {
+        "id": "phantom",
+        "skill": "joker",
+        "ko": "조커",
+        "order": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8
+        ],
+        "times": [
+          0.06,
+          0.05,
+          0.04,
+          0.06,
+          0.04,
+          0.05,
+          0.05,
+          0.05,
+          0.06,
+          0.05,
+          0.04,
+          0.06,
+          0.04,
+          0.05,
+          0.05,
+          0.05,
+          0.06,
+          0.05,
+          0.04,
+          0.06,
+          0.04,
+          0.05,
+          0.05,
+          0.05,
+          0.06,
+          0.05,
+          0.04,
+          0.06,
+          0.04,
+          0.05,
+          0.05,
+          0.05,
+          0.06,
+          0.05,
+          0.04,
+          0.06,
+          0.04,
+          0.05,
+          0.05,
+          0.05,
+          0.06,
+          0.05,
+          0.04,
+          0.06,
+          0.04,
+          0.05,
+          0.05,
+          0.05
+        ],
+        "hit": [
+          0.35
+        ],
+        "delay": 0,
+        "loopOrder": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8
+        ],
+        "loopTimes": [
+          0.06,
+          0.05,
+          0.04,
+          0.06,
+          0.04,
+          0.05,
+          0.05,
+          0.05
+        ],
+        "bodyRotation": false,
+        "projectileDirection": "left",
+        "caneGrip": "neck-below-handle-suspended"
+      }
+    ],
+    "projectileSprite": "assets/design/effects/phantom-joker/card.png",
+    "preview": ".beaver/output/phantom-joker-video/preview.html"
+  }
+]

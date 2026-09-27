@@ -1,0 +1,318 @@
+{
+  "id": "phantom",
+  "status": "game-connected-maker-verified-user-review-pending",
+  "concept": "concept.png",
+  "idleCanvas": 576,
+  "attackCanvas": 704,
+  "idleFeet": [
+    288,
+    512
+  ],
+  "attackFeet": [
+    352,
+    640
+  ],
+  "referenceHead": 147,
+  "revision": "compact-stance-dynamic-barrage-ring-projectiles",
+  "frames": [
+    {
+      "file": "frames/joker/motion01.png",
+      "sha256": "b7abbd44c2b790c5086df548ebfd15f29ddf38f343b06d981c1d81fb2270dfb0",
+      "width": 704,
+      "height": 704,
+      "ruid": "744518d46677462a9676c54bac715c39"
+    },
+    {
+      "file": "frames/joker/motion02.png",
+      "sha256": "2009c34b655c7d9d700dd0498f9361e7ea9ba77ce1fc2fab8267c987b4872ec2",
+      "width": 704,
+      "height": 704,
+      "ruid": "34c76f3cdddb430291dc1a8bf6592cf7"
+    },
+    {
+      "file": "frames/joker/motion03.png",
+      "sha256": "3f1adf6888a441993f0b03efc08edd5744baabcc842b6426ebe08a9a2ace6307",
+      "width": 704,
+      "height": 704,
+      "ruid": "06752f5a312949e9932d573333d650b0"
+    },
+    {
+      "file": "frames/joker/motion04.png",
+      "sha256": "3eabeabfa04f07338e28bed42178a6a1d10acf377b94f0e8269a4df9f4fc5b61",
+      "width": 704,
+      "height": 704,
+      "ruid": "243362d8c268465ea112983c96074d66"
+    },
+    {
+      "file": "frames/joker/motion05.png",
+      "sha256": "38cfd70c410144ac637aafaa5ebaf2e632ec04728d76c9bb45b9f38a4918b95f",
+      "width": 704,
+      "height": 704,
+      "ruid": "1095f84d2bc0495cb23aff6b99ad8028"
+    },
+    {
+      "file": "frames/joker/motion06.png",
+      "sha256": "914c6ca9edf5dd75e2c8d593b8e9c0a46963dbb6b30eef84f1426c4e59d85bdc",
+      "width": 704,
+      "height": 704,
+      "ruid": "e671da47876b4393abc19798852b594d"
+    },
+    {
+      "file": "frames/joker/motion07.png",
+      "sha256": "581a917f20ccd013e5edf02f856f517847ce6ea1840dfa1e4438f6663b7b7966",
+      "width": 704,
+      "height": 704,
+      "ruid": "4d67e5ce5ae84a7c8d561ac4859e12fe"
+    },
+    {
+      "file": "frames/joker/motion08.png",
+      "sha256": "3372edfaadad5e590d71a70b7d34fbf3655d3453ecf608aa455ff900876db211",
+      "width": 704,
+      "height": 704,
+      "ruid": "a4720376ddb54f6c9f41a83af69174b7"
+    },
+    {
+      "file": "frames/wait/motion01.png",
+      "sha256": "7cdfe3c6c1d1da25d417841c9905628b7197c4e38d380edbef1b5e6f0e4605b8",
+      "width": 576,
+      "height": 576,
+      "ruid": "283726be0d0e4cf7baf54840aae336f6"
+    },
+    {
+      "file": "frames/wait/motion02.png",
+      "sha256": "319413c63c4bda4187c3c67138bb390e0a2b5be86ca0756556503916b1b0b6f3",
+      "width": 576,
+      "height": 576,
+      "ruid": "0bfd511879954157ba0dbd9bfb8003d9"
+    },
+    {
+      "file": "frames/wait/motion03.png",
+      "sha256": "3869d5f5cba57299dc0f8626467d695130c1bd1df6dc57642f787527c1c7c1fd",
+      "width": 576,
+      "height": 576,
+      "ruid": "862241619fc444eba0449187c43732a6"
+    }
+  ],
+  "playback": [
+    {
+      "id": "phantom",
+      "skill": "wait",
+      "ko": "대기",
+      "order": [
+        1,
+        2,
+        1,
+        3
+      ],
+      "times": [
+        0.65,
+        0.45,
+        0.65,
+        0.45
+      ]
+    },
+    {
+      "id": "phantom",
+      "skill": "joker",
+      "ko": "조커",
+      "order": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "times": [
+        0.06,
+        0.05,
+        0.04,
+        0.06,
+        0.04,
+        0.05,
+        0.05,
+        0.05,
+        0.06,
+        0.05,
+        0.04,
+        0.06,
+        0.04,
+        0.05,
+        0.05,
+        0.05,
+        0.06,
+        0.05,
+        0.04,
+        0.06,
+        0.04,
+        0.05,
+        0.05,
+        0.05,
+        0.06,
+        0.05,
+        0.04,
+        0.06,
+        0.04,
+        0.05,
+        0.05,
+        0.05,
+        0.06,
+        0.05,
+        0.04,
+        0.06,
+        0.04,
+        0.05,
+        0.05,
+        0.05,
+        0.06,
+        0.05,
+        0.04,
+        0.06,
+        0.04,
+        0.05,
+        0.05,
+        0.05
+      ],
+      "hit": [
+        0.35
+      ],
+      "delay": 0,
+      "loopOrder": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "loopTimes": [
+        0.06,
+        0.05,
+        0.04,
+        0.06,
+        0.04,
+        0.05,
+        0.05,
+        0.05
+      ],
+      "bodyRotation": false,
+      "projectileDirection": "left",
+      "caneGrip": "neck-below-handle-suspended"
+    }
+  ],
+  "projectileSprite": "assets/design/effects/phantom-joker/card.png",
+  "preview": ".beaver/output/phantom-joker-video/preview.html",
+  "ringSprite": "assets/design/effects/phantom-joker/ring.png",
+  "projectileDisplaySize": [
+    288,
+    432
+  ],
+  "ringDisplaySize": [
+    632,
+    632
+  ],
+  "portrait": {
+    "file": "portrait.png",
+    "ruid": "844dc3e58c214cfc9aafaee9d12c33dd",
+    "width": 512,
+    "height": 512
+  },
+  "runtimeActions": {
+    "stand1": {
+      "order": [
+        1,
+        2,
+        1,
+        3
+      ],
+      "times": [
+        0.65,
+        0.45,
+        0.65,
+        0.45
+      ]
+    },
+    "phantomJoker": {
+      "order": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "times": [
+        0.06,
+        0.05,
+        0.04,
+        0.06,
+        0.04,
+        0.05,
+        0.05,
+        0.05
+      ],
+      "loop": true
+    }
+  },
+  "projectileRUID": "019edd955d0e4e3eac59989654278fac",
+  "ringRUID": "dadc8093850a445394ea6b883e89f4a8",
+  "projectileWorldSize": [
+    1.152,
+    1.728
+  ],
+  "ringWorldSize": [
+    2.528,
+    2.528
+  ],
+  "projectileOrigin": {
+    "forwardWorldUnits": 1.55,
+    "heightWorldUnits": 0.84,
+    "frameHandTracking": false
+  }
+}

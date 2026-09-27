@@ -1,0 +1,151 @@
+[
+  {
+    "key": "phantom/wait/01",
+    "file": "C:\\workspace\\msw\\assets\\design\\characters\\phantom\\frames\\wait\\motion01.png",
+    "name": "RtsPhantom_wait01",
+    "size": 293720,
+    "sha256": "7cdfe3c6c1d1da25d417841c9905628b7197c4e38d380edbef1b5e6f0e4605b8",
+    "ruid": "283726be0d0e4cf7baf54840aae336f6"
+  },
+  {
+    "key": "phantom/wait/02",
+    "file": "C:\\workspace\\msw\\assets\\design\\characters\\phantom\\frames\\wait\\motion02.png",
+    "name": "RtsPhantom_wait02",
+    "size": 300966,
+    "sha256": "319413c63c4bda4187c3c67138bb390e0a2b5be86ca0756556503916b1b0b6f3",
+    "ruid": "0bfd511879954157ba0dbd9bfb8003d9"
+  },
+  {
+    "key": "phantom/wait/03",
+    "file": "C:\\workspace\\msw\\assets\\design\\characters\\phantom\\frames\\wait\\motion03.png",
+    "name": "RtsPhantom_wait03",
+    "size": 295786,
+    "sha256": "3869d5f5cba57299dc0f8626467d695130c1bd1df6dc57642f787527c1c7c1fd",
+    "ruid": "862241619fc444eba0449187c43732a6"
+  },
+  {
+    "key": "phantom/joker/01",
+    "file": "C:\\workspace\\msw\\assets\\design\\characters\\phantom\\frames\\joker\\motion01.png",
+    "name": "RtsPhantom_joker01",
+    "size": 394497,
+    "sha256": "b7abbd44c2b790c5086df548ebfd15f29ddf38f343b06d981c1d81fb2270dfb0",
+    "ruid": "744518d46677462a9676c54bac715c39"
+  },
+  {
+    "key": "phantom/joker/02",
+    "file": "C:\\workspace\\msw\\assets\\design\\characters\\phantom\\frames\\joker\\motion02.png",
+    "name": "RtsPhantom_joker02",
+    "size": 423315,
+    "sha256": "2009c34b655c7d9d700dd0498f9361e7ea9ba77ce1fc2fab8267c987b4872ec2",
+    "ruid": "34c76f3cdddb430291dc1a8bf6592cf7"
+  },
+  {
+    "key": "phantom/joker/03",
+    "file": "C:\\workspace\\msw\\assets\\design\\characters\\phantom\\frames\\joker\\motion03.png",
+    "name": "RtsPhantom_joker03",
+    "size": 382493,
+    "sha256": "3f1adf6888a441993f0b03efc08edd5744baabcc842b6426ebe08a9a2ace6307",
+    "ruid": "06752f5a312949e9932d573333d650b0"
+  },
+  {
+    "key": "phantom/joker/04",
+    "file": "C:\\workspace\\msw\\assets\\design\\characters\\phantom\\frames\\joker\\motion04.png",
+    "name": "RtsPhantom_joker04",
+    "size": 374124,
+    "sha256": "3eabeabfa04f07338e28bed42178a6a1d10acf377b94f0e8269a4df9f4fc5b61",
+    "ruid": "243362d8c268465ea112983c96074d66"
+  },
+  {
+    "key": "phantom/joker/05",
+    "file": "C:\\workspace\\msw\\assets\\design\\characters\\phantom\\frames\\joker\\motion05.png",
+    "name": "RtsPhantom_joker05",
+    "size": 426514,
+    "sha256": "38cfd70c410144ac637aafaa5ebaf2e632ec04728d76c9bb45b9f38a4918b95f",
+    "ruid": "1095f84d2bc0495cb23aff6b99ad8028"
+  },
+  {
+    "key": "phantom/joker/06",
+    "file": "C:\\workspace\\msw\\assets\\design\\characters\\phantom\\frames\\joker\\motion06.png",
+    "name": "RtsPhantom_joker06",
+    "size": 441756,
+    "sha256": "914c6ca9edf5dd75e2c8d593b8e9c0a46963dbb6b30eef84f1426c4e59d85bdc",
+    "ruid": "e671da47876b4393abc19798852b594d"
+  },
+  {
+    "key": "phantom/joker/07",
+    "file": "C:\\workspace\\msw\\assets\\design\\characters\\phantom\\frames\\joker\\motion07.png",
+    "name": "RtsPhantom_joker07",
+    "size": 356304,
+    "sha256": "581a917f20ccd013e5edf02f856f517847ce6ea1840dfa1e4438f6663b7b7966",
+    "ruid": "4d67e5ce5ae84a7c8d561ac4859e12fe"
+  },
+  {
+    "key": "phantom/joker/08",
+    "file": "C:\\workspace\\msw\\assets\\design\\characters\\phantom\\frames\\joker\\motion08.png",
+    "name": "RtsPhantom_joker08",
+    "size": 375145,
+    "sha256": "3372edfaadad5e590d71a70b7d34fbf3655d3453ecf608aa455ff900876db211",
+    "ruid": "a4720376ddb54f6c9f41a83af69174b7"
+  },
+  {
+    "key": "phantom/card",
+    "file": "C:\\workspace\\msw\\assets\\design\\effects\\phantom-joker\\card.png",
+    "name": "RtsPhantom_card",
+    "size": 216280,
+    "sha256": "8c68ffaeeb169b4ec8bb396d23f54425ca1779a71bd59e07c45d2119541c3d05",
+    "ruid": "019edd955d0e4e3eac59989654278fac"
+  },
+  {
+    "key": "phantom/ring",
+    "file": "C:\\workspace\\msw\\assets\\design\\effects\\phantom-joker\\ring.png",
+    "name": "RtsPhantom_ring",
+    "size": 383760,
+    "sha256": "1dc08111b89ada24a318aadd116fdbcfdd12a51b2e82f97acb0256ef8d4eb185",
+    "ruid": "dadc8093850a445394ea6b883e89f4a8"
+  },
+  {
+    "key": "paladin/portrait",
+    "file": "C:/workspace/msw/assets/design/characters/paladin/portrait.png",
+    "name": "RtsPortrait_paladin",
+    "size": 387731,
+    "sha256": "7eea9d859ad88c9895e7aedc6f8d20556331bfc1a67631ec709c5a2a5b6b765a",
+    "source": "C:\\Users\\timec\\.codex\\generated_images\\01a0dbf3-5094-7520-bfc7-f24b6496f5e5\\exec-bfe9b021-0115-40f2-bf2e-3f6adfb331d4.png",
+    "ruid": "0e14a7ba1554474fb46cb13ab22bdbfb"
+  },
+  {
+    "key": "dark-knight/portrait",
+    "file": "C:/workspace/msw/assets/design/characters/dark-knight/portrait.png",
+    "name": "RtsPortrait_dark-knight",
+    "size": 347805,
+    "sha256": "ed89f4e24634e8aaab005cd6d1d39d0065bf3ce403fccb86cad195ecc3542bed",
+    "source": "C:\\Users\\timec\\.codex\\generated_images\\01a0dbf3-5094-7520-bfc7-f24b6496f5e5\\exec-fe5d3d13-91fc-4700-92b1-b76e68efe58f.png",
+    "ruid": "bc09a2f673ba42b6b5989e4ac39a0fc5"
+  },
+  {
+    "key": "night-lord/portrait",
+    "file": "C:/workspace/msw/assets/design/characters/night-lord/portrait.png",
+    "name": "RtsPortrait_night-lord",
+    "size": 367041,
+    "sha256": "2da93750a14de2358cb5ffdadaa0ab9f2fcc4d14b57f845293741d76a5f225c4",
+    "source": "C:\\Users\\timec\\.codex\\generated_images\\01a0dbf3-5094-7520-bfc7-f24b6496f5e5\\exec-f69dc838-f774-4252-a683-31390cef23a0.png",
+    "ruid": "ccb44d85f142402da6de7b5c7ed67d94"
+  },
+  {
+    "key": "shadower/portrait",
+    "file": "C:/workspace/msw/assets/design/characters/shadower/portrait.png",
+    "name": "RtsPortrait_shadower",
+    "size": 344973,
+    "sha256": "44661ad78b28e549be29f60ddca007e9675409333bc11338262046c83bbaf8f7",
+    "source": "C:\\Users\\timec\\.codex\\generated_images\\01a0dbf3-5094-7520-bfc7-f24b6496f5e5\\exec-d58231de-627d-4c59-8a17-06a7e58f2306.png",
+    "ruid": "69652c3bf48b457d86e649a540eefc1e"
+  },
+  {
+    "key": "phantom/portrait",
+    "file": "C:/workspace/msw/assets/design/characters/phantom/portrait.png",
+    "name": "RtsPortrait_phantom",
+    "size": 440445,
+    "sha256": "a9962ce03dcbef8780121903ff8ec2e668c84546b52adb71dd59d7e465327b40",
+    "source": "C:\\Users\\timec\\.codex\\generated_images\\01a0dbf3-5094-7520-bfc7-f24b6496f5e5\\exec-58addc77-134e-44b3-a019-fdf9a037a3bd.png",
+    "ruid": "844dc3e58c214cfc9aafaee9d12c33dd"
+  }
+]

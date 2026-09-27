@@ -1,0 +1,15 @@
+{
+  "id": "paladin",
+  "skill": "sanctuary",
+  "n": 4,
+  "pose": "Impact at0.50s: bring hammer forcefully down toward viewer LEFT, hammer head near ground in front of left foot, body crouched but head same size, both hands grip handle.",
+  "key": "paladin--sanctuary--04",
+  "prompt": "Use case: identity-preserve animation pose edit. Generate ONE transparent PNG animation frame, not a sheet.\nImage1 EDIT TARGET and exact framing/scale master: paladin character on 704x704 square canvas. Image2 approved identity/costume master, do not copy its larger framing. Image3 Bishop style/anatomy master, do not copy its clothes/hair/staff.\nKeep character SAME small on-canvas size as image1, with generous empty transparent space above. Do not zoom in or fill canvas. In 704-unit canvas coordinates, anatomical head crown-to-chin147units, feet ground y640, centerx352. Underlying standing body height338units and2.3heads, ignoring hats/feathers/tall hair/weapon. Pose may bend knees, never lengthen limbs/boots. Preserve exact face, hair, eye color, all clothing panels, jewelry, weapon design, clean line weight and soft cel shading.\nFrame 4 for sanctuary: Impact at0.50s: bring hammer forcefully down toward viewer LEFT, hammer head near ground in front of left foot, body crouched but head same size, both hands grip handle.\n\n\nOnly body pose and subtle expression changes allowed. Entire hair/hat/weapon/cape/boots visible with transparent margins. No extra limbs or weapons, no blur or motion trails, no aura/projectiles/glows/environment, no text/numbers/grid/border/shadow. Feet grounded. Actual transparent background. Same fine polished 2D SD game illustration as Bishop, no pixel art. Output ONE frame.",
+  "refs": [
+    "C:/workspace/msw/.beaver/output/five-class-motion/base/paladin-attack.png",
+    "C:/workspace/msw/assets/design/characters/paladin/concept.png",
+    "C:/workspace/msw/assets/design/characters/bishop/frames/angel-ray/motion03.png"
+  ],
+  "source": "C:/Users/timec/.codex/generated_images/01a0dbf3-5094-7520-bfc7-f24b6496f5e5/exec-2908a48b-444c-414d-a4a3-932f9744e914.png",
+  "state": "generated-awaiting-QA"
+}

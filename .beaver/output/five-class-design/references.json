@@ -1,0 +1,30 @@
+[
+  {
+    "path": "assets\\design\\characters\\bishop\\concept.png",
+    "sha256": "06c5a96b1c8dd24d94385e7e29ef56aea9bf22439460e1f02e25d068c49b454c"
+  },
+  {
+    "path": "assets\\design\\characters\\paladin\\concept.png",
+    "sha256": "01141719a3513dcfdc922024cfd6f90c4226e3ec9a7a0c43e6af04793792ea44"
+  },
+  {
+    "path": "assets\\design\\characters\\dark-knight\\concept.png",
+    "sha256": "26104d10cf5f8238f7e503b918ce5fff372d8badedcc84d516e26a83737fc34a"
+  },
+  {
+    "path": "assets\\design\\characters\\night-lord\\concept.png",
+    "sha256": "f3f1228887064ca390a4c1473a689f26ee3e4436164bae6d01b59230bffeb84c"
+  },
+  {
+    "path": "assets\\design\\characters\\shadower\\concept.png",
+    "sha256": "88ce34740111a9bb58875ed77755bf267c8d9470a2f29c61a1f112645fb23b44"
+  },
+  {
+    "path": "assets\\design\\characters\\phantom\\concept.png",
+    "sha256": "891759abf4dede8660fb0b97c03e193a5a254416c0bfdf1ef50a37e7d7dd2655"
+  },
+  {
+    "path": "assets\\design\\characters\\bishop\\frames\\wait\\motion01.png",
+    "sha256": "7949a8bdfd86a72d5ef45c67856df447f4c2e319eb5e9a6978d8800648e45849"
+  }
+]

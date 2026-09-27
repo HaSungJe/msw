@@ -1,0 +1,238 @@
+{
+  "id": "night-lord",
+  "status": "game-connected-maker-verified-user-approved",
+  "concept": "concept.png",
+  "idleCanvas": 576,
+  "attackCanvas": 704,
+  "idleFeet": [
+    288,
+    512
+  ],
+  "attackFeet": [
+    352,
+    640
+  ],
+  "referenceHead": 147,
+  "revision": "natural-game-idle; phantom-fixed-facing-card-throw-neck-grip",
+  "frames": [
+    {
+      "file": "frames/quadruple-throw/motion01.png",
+      "sha256": "8c562f1b3d1d661d6896b834d2880d277a184acece79faacdb7180ad31db4ee9",
+      "width": 704,
+      "height": 704,
+      "ruid": "866e55971d3b4ebf96a3dab124e32e00"
+    },
+    {
+      "file": "frames/quadruple-throw/motion02.png",
+      "sha256": "ecabe5e1086c03706191e711818e4b5f347fe3fdbb4c22ef209028eff34f5ffc",
+      "width": 704,
+      "height": 704,
+      "ruid": "5370617f4c2e403691279d424471f2b5"
+    },
+    {
+      "file": "frames/quadruple-throw/motion03.png",
+      "sha256": "f3d1858d05a1c9f0af7e3741cd76d7d24ac2c08c89a10bf31b18cb50e8bf24ff",
+      "width": 704,
+      "height": 704,
+      "ruid": "697245aeab1a4ce9abfa1f1a9234d463"
+    },
+    {
+      "file": "frames/quadruple-throw/motion04.png",
+      "sha256": "b56d0b0411afefcffdd0f11e9d657e165a55b109d6236b4e9ddb345c5c7a41d7",
+      "width": 704,
+      "height": 704,
+      "ruid": "6599b1f88ea84d7baf53b840da59667d"
+    },
+    {
+      "file": "frames/quadruple-throw/motion05.png",
+      "sha256": "ab41b5dda2c505370a559203b6fcd4bc7ffc31f3064ffaeb09b3cdb85961cbbf",
+      "width": 704,
+      "height": 704,
+      "ruid": "03eb6091d1bb419e9d0cbd00a7db2e45"
+    },
+    {
+      "file": "frames/quadruple-throw/motion06.png",
+      "sha256": "030d77c3b06d423c1ea4eb61f55ddebd327bfe936f516345be656b190b403259",
+      "width": 704,
+      "height": 704,
+      "ruid": "6d729205cc984689b50da0c5fccc7fe8"
+    },
+    {
+      "file": "frames/quadruple-throw/motion07.png",
+      "sha256": "039c94719ce779f5f67e96302bec339b160e954c4c93b5228d7a76b7e1fdfe84",
+      "width": 704,
+      "height": 704,
+      "ruid": "67da87ba78dc4e95a0d8787a84935080"
+    },
+    {
+      "file": "frames/quadruple-throw/motion08.png",
+      "sha256": "54ec7f0a38e1536e002bcb51c73433a9a9edf12451b8fed5d83c8057f6b4ea12",
+      "width": 704,
+      "height": 704,
+      "ruid": "aec7d0e3b7ad427b8bc1fd1ab906cdcb"
+    },
+    {
+      "file": "frames/wait/motion01.png",
+      "sha256": "4564c4c3d2d89be7cd3128e9a7f27b14231301b57166ac8ddb566aa8dc24649e",
+      "width": 576,
+      "height": 576,
+      "ruid": "0eb5a0560215452fba5d11fa5b0dbd16"
+    },
+    {
+      "file": "frames/wait/motion02.png",
+      "sha256": "8fb779cde4736c68820df9985ce982c3d504716f7479db2ddf0440c8b6234ca0",
+      "width": 576,
+      "height": 576,
+      "ruid": "53e0a2cf0bb940bbb7ed86cd65562037"
+    },
+    {
+      "file": "frames/wait/motion03.png",
+      "sha256": "524a907da0051fcede8d3ea25c85ba69e5f70811c5a2a7869f491b2b0016c1c0",
+      "width": 576,
+      "height": 576,
+      "ruid": "e7f8edd9c9ee4898baaacc1f38ff33db"
+    }
+  ],
+  "playback": [
+    {
+      "id": "night-lord",
+      "skill": "wait",
+      "ko": "대기",
+      "order": [
+        1,
+        2,
+        1,
+        3
+      ],
+      "times": [
+        0.65,
+        0.45,
+        0.65,
+        0.45
+      ]
+    },
+    {
+      "id": "night-lord",
+      "skill": "quadruple-throw",
+      "ko": "쿼드러플 스로우·풍마수리검 공용",
+      "order": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        5,
+        6,
+        7,
+        8
+      ],
+      "times": [
+        0.1,
+        0.05,
+        0.05,
+        0.05,
+        0.05,
+        0.05,
+        0.05,
+        0.05,
+        0.1,
+        0.15
+      ],
+      "hit": [
+        0.3,
+        0.4,
+        0.5,
+        0.6
+      ],
+      "delay": 0
+    }
+  ],
+  "runtimeActions": [
+    {
+      "id": "night-lord",
+      "skill": "wait",
+      "ko": "대기",
+      "order": [
+        1,
+        2,
+        1,
+        3
+      ],
+      "times": [
+        0.65,
+        0.45,
+        0.65,
+        0.45
+      ],
+      "jobId": "nl",
+      "action": "stand1",
+      "files": [
+        "assets/design/characters/night-lord/frames/wait/motion01.png",
+        "assets/design/characters/night-lord/frames/wait/motion02.png",
+        "assets/design/characters/night-lord/frames/wait/motion01.png",
+        "assets/design/characters/night-lord/frames/wait/motion03.png"
+      ],
+      "duration": 2.2
+    },
+    {
+      "id": "night-lord",
+      "skill": "quadruple-throw",
+      "ko": "쿼드러플 스로우·풍마수리검 공용",
+      "order": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        5,
+        6,
+        7,
+        8
+      ],
+      "times": [
+        0.1,
+        0.05,
+        0.05,
+        0.05,
+        0.05,
+        0.05,
+        0.05,
+        0.05,
+        0.1,
+        0.15
+      ],
+      "hit": [
+        0.3,
+        0.4,
+        0.5,
+        0.6
+      ],
+      "delay": 0,
+      "jobId": "nl",
+      "action": "nlThrow",
+      "files": [
+        "assets/design/characters/night-lord/frames/quadruple-throw/motion01.png",
+        "assets/design/characters/night-lord/frames/quadruple-throw/motion02.png",
+        "assets/design/characters/night-lord/frames/quadruple-throw/motion03.png",
+        "assets/design/characters/night-lord/frames/quadruple-throw/motion04.png",
+        "assets/design/characters/night-lord/frames/quadruple-throw/motion05.png",
+        "assets/design/characters/night-lord/frames/quadruple-throw/motion06.png",
+        "assets/design/characters/night-lord/frames/quadruple-throw/motion05.png",
+        "assets/design/characters/night-lord/frames/quadruple-throw/motion06.png",
+        "assets/design/characters/night-lord/frames/quadruple-throw/motion07.png",
+        "assets/design/characters/night-lord/frames/quadruple-throw/motion08.png"
+      ],
+      "duration": 0.7
+    }
+  ],
+  "portraitStatus": "wait-motion01-temporary; dedicated-portrait-pending",
+  "verification": ".beaver/output/night-lord-shadower-motion/verification.json",
+  "portrait": {
+    "file": "portrait.png",
+    "ruid": "ccb44d85f142402da6de7b5c7ed67d94",
+    "width": 512,
+    "height": 512
+  }
+}

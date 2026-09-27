@@ -1,6 +1,6 @@
 -- Phase 4 합류(2026-09-23, revision-1 §2): 증강 표 — 정의·지급 라운드·굴림·능력치 오버레이. 서버·클라 공용 읽기 전용.
 --   원본 = .info/augmentation.md(사용자 확정 — 이름·효과·단계 확률). 브론즈~골드 = 능력치만(크리 확률·크리 데미지·공격력 +n·공격력 %·보스 공격시 데미지(골드만), 전부 합연산 — 방어율 무시 증강은 2026-09-24 삭제).
---   2026-09-27 개편: 단계(I 50 · II 35 · III 15%)만 무작위, 그 단계의 종류는 전부 보여 주고 선택(StatChoices). 프리즘은 가중치 무작위 3장 중 선택(Roll — 같은 날 전체 선택을 되돌림).
+--   2026-09-27 개편: 단계(I 50 · II 35 · III 15%)만 무작위, 그 단계의 종류는 전부 보여 주고 선택(StatChoices). 프리즘은 가중치 무작위 3장(Roll) — 자쿰 처치 보상만 아직 없는 프리즘 전체(PrismChoices).
 --   프리즘 = 특수 코어 2(일격필살·보스 슬레이어 — 모든 직업, 중복 등장 가능·같은 유닛 중복 적용 불가) + 팬텀 잠금 해제 + 직업 전용 10(RtsJobTableLogic.GetPrisms의 id와 같다).
 --   지급: 브~골 = 몬스터 스테이지 태그 표(라운드 시작 때), 프리즘 = 보스 순번(처치 직후). 한 판 30개(브 10·실 10·골 7·프리즘 3 — 자쿰·시그너스·루시드).
 @Logic
@@ -149,6 +149,12 @@ script RtsAugmentTableLogic extends Logic
 		return false
 	end
 
+	-- 이 순번 보스가 준 프리즘은 전체에서 고르는가 — 첫 프리즘 보스(자쿰)만(2026-09-27 사용자 "자쿰 한정으로 자쿰이 준 프리즘만 선택 가능")
+	method boolean IsPrismPickStage(number no)
+		self:Ensure()
+		return #self.PrismStages > 0 and self.PrismStages[1] == math.floor(no + 0.5)
+	end
+
 	-- 효과 한 줄: "크리티컬 확률 +3.5%" / 프리즘은 설명 — 소수 한 자리까지(RtsHudLogic.Num, 2026-09-27 3.5·5.5·7.5 단계)
 	method string EffectText(string id)
 		local d = self:GetDef(id)
@@ -193,6 +199,38 @@ script RtsAugmentTableLogic extends Logic
 		if lv < 1 or lv > 3 then lv = self:RollLevel() end
 		local out = {}
 		for _, id in ipairs(byGrade[lv] or {}) do out[#out + 1] = id end
+		return out
+	end
+
+	-- 프리즘 전체 선택지(자쿰 처치 보상 — 2026-09-27 사용자 "자쿰 한정으로 자쿰이 준 프리즘만 선택 가능"): 아직 없는 프리즘 전부를
+	--   내 유닛 직업의 프리즘 → 다른 직업 프리즘 → 특수 코어 → 팬텀 잠금 해제 순서로(같은 묶음 안은 GetPrisms 순서). exclude[id] = true는 뺀다
+	--   (보유한 직업 프리즘·팬텀 — 특수 코어는 여러 개 가질 수 있어 늘 남는다). preferJobs[jobId] = true = 내가 가진 유닛 직업
+	method table PrismChoices(table exclude, table preferJobs)
+		self:Ensure()
+		local mine = {}
+		local other = {}
+		local core = {}
+		local unlock = {}
+		local ids = self.ByGrade.prism or {}
+		for i = 1, #ids do
+			local id = ids[i]
+			if exclude == nil or not exclude[id] then
+				local d = self.Defs[id]
+				if d.core then
+					core[#core + 1] = id
+				elseif d.unlock ~= nil then
+					unlock[#unlock + 1] = id
+				elseif preferJobs ~= nil and d.job ~= nil and preferJobs[d.job] then
+					mine[#mine + 1] = id
+				else
+					other[#other + 1] = id
+				end
+			end
+		end
+		local out = {}
+		for _, group in ipairs({ mine, other, core, unlock }) do
+			for _, id in ipairs(group) do out[#out + 1] = id end
+		end
 		return out
 	end
 

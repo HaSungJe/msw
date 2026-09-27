@@ -1,0 +1,11 @@
+{
+  "id": "dark-knight",
+  "n": 1,
+  "source": "C:/Users/timec/.codex/generated_images/01a0dbf3-5094-7520-bfc7-f24b6496f5e5/exec-ee71bc25-8ba7-4806-9e31-990e74a6a732.png",
+  "prompt": "Use case: identity-preserve. ONE natural GAME IDLE animation base frame, actual transparent background.\nImage1 EDIT TARGET, exact character physical scale / framing. Image2 approved character identity, not pose. Image3 Bishop relaxed neutral idle / short SD anatomy reference.\nChange ONLY body and weapon POSE to a comfortable unposed game idle between attacks. NOT a promotional illustration, no dramatic hero pose. Feet shoulder-width or narrower, knees almost straight, short compact limbs, relaxed level shoulders, arms loose close to body. Head remains front three-quarter facing screen LEFT, original face expression unchanged.\nCharacter dark-knight. Required pose: Shoulders relaxed, feet close, back upright, weight centered. ONE hand comfortably holds spear shaft at lower-chest height off to screen LEFT, SPEAR NEAR VERTICAL alongside the body; blade above and away from head, butt near but not supporting body on the floor. Other hand rests naturally beside waist, NOT gripping shaft across chest. No two-hand diagonal attack guard. Original spear blade/length/colors unchanged. Absolutely no Beholder/eye orb.\nOriginal face/head/hair/eye color/costume/accessories/weapon and fine 2D SD lines/shading EXACTLY preserved. Anatomical head scale147units, short neutral body338units, 2.3heads. Do not elongate legs or boots.\nCanvas576units, stable foot midpoint(288,512), generous transparent top margin; match Image1 actual body scale. Entire hair, cape, weapon visible. Do not enlarge to fill canvas, do not shrink body to fit a long weapon. No text, grid, floor shadow, effects, blur, magic trails, extra arms or duplicated weapons. Single neutral IDLE pose; only pose change.",
+  "refs": [
+    "C:/workspace/msw/.beaver/output/five-class-motion/base/dark-knight.png",
+    "C:/workspace/msw/assets/design/characters/dark-knight/concept.png",
+    "C:/workspace/msw/assets/design/characters/bishop/frames/wait/motion01.png"
+  ]
+}

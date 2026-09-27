@@ -6,7 +6,7 @@
 
 연한 파란 긴 머리, 검은 리본과 푸른 보석, 흰색·남색 의상, 푸른 결정 지팡이와 떠 있는 마법책. 표정은 은은한 미소. 지팡이를 두 손으로 받쳐 든 조심스러운 전투 준비 자세를 유지한다.
 
-현재 wait/motion01.png를 외모·비율 기준으로 삼는다. 매끈한 2D SD 그림체와 같은 의상·색·소품을 유지한다. 대기는 3장의 작은 호흡을 반복하며 발을 고정한다. 몸 전체의 회전·확대·이동이나 크로스페이드로 움직이지 않는다.
+사용자가 승인한 concept.png의 외형·비율로 대기와 공격 13장 PNG를 보정했다. 수정 PNG 업로드·새 RUID 연결 완료. Maker 재시작 검증 결과는 character-proportions.md 참고. 매끈한 2D SD 그림체와 같은 의상·색·소품을 유지한다. 대기는 3장의 작은 호흡을 반복하며 발을 고정한다. 몸 전체의 회전·확대·이동이나 크로스페이드로 움직이지 않는다.
 
 ## 파일·시간
 
@@ -26,19 +26,19 @@
 
 | 결과물 | RUID |
 |---|---|
-| frames/wait/motion01.png | `fe0c6be3795d49e29a311b3edb8e89ab` |
-| frames/wait/motion02.png | `6b91e70ed2a64198a41f368191d834c8` |
-| frames/wait/motion03.png | `0f16c5bda207468aa1fe9dcb05cb4ed6` |
-| frames/chain-lightning/motion01.png | `66b1f0af75c745bdaf10c9710486b867` |
-| frames/chain-lightning/motion02.png | `b2bd84ff10da4d40a6e1f0e80a90c8f6` |
-| frames/chain-lightning/motion03.png | `0c4635067dcc4aae9ed3987fc3820dcd` |
-| frames/chain-lightning/motion04.png | `263444c070344cceb0196534f9997395` |
-| frames/chain-lightning/motion05.png | `307d3b6aa3d7485d932c9fcde44642ed` |
-| frames/blizzard/motion01.png | `cfb678afe3fe423ca87a610f41f5c989` |
-| frames/blizzard/motion02.png | `d0415a8c09d746868c66b9d776babdf1` |
-| frames/blizzard/motion03.png | `08f5c40cb8fa4af28fab2f6b996fdd41` |
-| frames/blizzard/motion04.png | `7b877eaff02f4cc6b408f82d4a3f9e19` |
-| frames/blizzard/motion05.png | `3821ebdc6c2346c2b2561fec50b9900c` |
+| frames/wait/motion01.png | `31f7d3dc8bde42d6905eca8ca3d3d3aa` |
+| frames/wait/motion02.png | `7480c71e7fc7406a89e74930c407ad87` |
+| frames/wait/motion03.png | `440ab4519beb44f39a820aab4d2ef864` |
+| frames/chain-lightning/motion01.png | `f986bf2671c04e11b2f6aaf708f0c2bb` |
+| frames/chain-lightning/motion02.png | `63a019d7ca084d78b084c29536c14999` |
+| frames/chain-lightning/motion03.png | `02cde524cf654ae8b6000e402cbd0a4f` |
+| frames/chain-lightning/motion04.png | `ebdb54d66e9042ffa2a2d35dd4732c89` |
+| frames/chain-lightning/motion05.png | `de4d62586d274d28a336adf401e8ecde` |
+| frames/blizzard/motion01.png | `3166883e4dbb4fe68eade2f2605468f1` |
+| frames/blizzard/motion02.png | `7b663ea7d9da42bf8a497213cca04848` |
+| frames/blizzard/motion03.png | `24bee0fe7428442196ecb31813b6ba59` |
+| frames/blizzard/motion04.png | `f1f16a077dee4a718e7f52d73545d2ae` |
+| frames/blizzard/motion05.png | `0ca54631539d40e7b708b9f9609daa7e` |
 | portrait.png | `f93cfcc7a46d428cb6ed2bb3d71fc986` |
 
 `RtsJobTableLogic.HasMageSkin/GetMageSkinFrames/GetMageSkinFrameDurations/GetMagePortraitRUID`가 연결 기준이다. `RtsUnitComponent`는 대기 반복과 공격 시간표를 재생하고 좌우 방향을 맞춘다. `RtsSkillFxLogic.PlayCast/ReturnStand/CheckLoops`가 단발·반복 공격과 복귀를 제어한다.

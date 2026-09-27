@@ -1,0 +1,29 @@
+[
+  {
+    "key": "night-lord/portrait",
+    "file": "C:/workspace/msw/assets/design/characters/night-lord/portrait.png",
+    "name": "RtsPortrait_night-lord",
+    "size": 367041,
+    "sha256": "2da93750a14de2358cb5ffdadaa0ab9f2fcc4d14b57f845293741d76a5f225c4",
+    "source": "C:\\Users\\timec\\.codex\\generated_images\\01a0dbf3-5094-7520-bfc7-f24b6496f5e5\\exec-f69dc838-f774-4252-a683-31390cef23a0.png",
+    "ruid": "ccb44d85f142402da6de7b5c7ed67d94"
+  },
+  {
+    "key": "shadower/portrait",
+    "file": "C:/workspace/msw/assets/design/characters/shadower/portrait.png",
+    "name": "RtsPortrait_shadower",
+    "size": 344973,
+    "sha256": "44661ad78b28e549be29f60ddca007e9675409333bc11338262046c83bbaf8f7",
+    "source": "C:\\Users\\timec\\.codex\\generated_images\\01a0dbf3-5094-7520-bfc7-f24b6496f5e5\\exec-d58231de-627d-4c59-8a17-06a7e58f2306.png",
+    "ruid": "69652c3bf48b457d86e649a540eefc1e"
+  },
+  {
+    "key": "phantom/portrait",
+    "file": "C:/workspace/msw/assets/design/characters/phantom/portrait.png",
+    "name": "RtsPortrait_phantom",
+    "size": 440445,
+    "sha256": "a9962ce03dcbef8780121903ff8ec2e668c84546b52adb71dd59d7e465327b40",
+    "source": "C:\\Users\\timec\\.codex\\generated_images\\01a0dbf3-5094-7520-bfc7-f24b6496f5e5\\exec-58addc77-134e-44b3-a019-fdf9a037a3bd.png",
+    "ruid": "844dc3e58c214cfc9aafaee9d12c33dd"
+  }
+]

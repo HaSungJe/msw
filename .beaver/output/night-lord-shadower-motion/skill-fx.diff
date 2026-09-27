@@ -1,0 +1,28 @@
+--- 
+
++++ 
+
+@@ -1201,6 +1201,8 @@
+
+ 	--   그 경우만 stand → 0.15초 뒤 액션(0.05초는 무시됨). 평소엔 모션이 끝나는 즉시 ReturnStand가 stand를 보내 두므로 다음 공격은 지연 0으로 바로 재생된다
+ 	-- 쉐도우 파트너 그림자 클립(원작 skill/4111002/special/<액션> — 검은 실루엣, 왼쪽 보기). 액션 이름은 소문자로 찾는다
+ 	method string ShadowClip(string action)
++		-- 원화 투척의 분신은 기존 검은 실루엣 투척 액션을 유지한다.
++		if action == "nlThrow" then action = "swingO1" end
+ 		local t = {
+ 			stand1 = "92689403831f4cb39bd828065a61fab6", stand2 = "eef0a195d421437fa0911409c93cfb32", alert = "6568f7b69d144963aa2541eba958cab7",
+ 			walk1 = "dfc414a245bc4b1aacca01d05595794e", walk2 = "a85d9bf79d524af79bcc06d87600c3cb",
+@@ -1224,10 +1226,8 @@
+
+ 		if body == nil or not isvalid(body) then return end
+ 		if body.RtsUnitComponent ~= nil and _RtsJobTableLogic:HasMageSkin(body.RtsUnitComponent.JobId) then
+ 			body.RtsUnitComponent:PlayMageAction(name)
+-			return
+-		end
+-		-- frameA·frameB(있으면) = 재생 프레임 범위. 같은 값이면 그 프레임에 멈춘 자세(조커 — 지팡이를 앞으로 뻗은 stabO1 마지막 프레임 유지)
+-		if frameA ~= nil then
++		-- PNG 본체도 아래 쉐도우 파트너 지연 재생을 거친다.
++		elseif frameA ~= nil then
+ 			body:SendEvent(ActionStateChangedEvent(name, name, rate, playType, frameA, frameB or frameA))
+ 		else
+ 			body:SendEvent(ActionStateChangedEvent(name, name, rate, playType))

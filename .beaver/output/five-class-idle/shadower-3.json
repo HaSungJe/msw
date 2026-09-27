@@ -1,0 +1,9 @@
+{
+  "id": "shadower",
+  "n": 3,
+  "source": "C:/Users/timec/.codex/generated_images/01a0dbf3-5094-7520-bfc7-f24b6496f5e5/exec-2f3ff11f-682e-4d16-b79e-869dab369baf.png",
+  "prompt": "Use case: identity-preserve. Edit target Image1 ONLY. This is idle breathing frame 3 for shadower. Preserve every face/hair/costume/weapon detail and SAME natural idle stance and physical size. Change ONLY: Tiny relaxed BREATH OUT: chest/shoulders settle by only about 1% of head height, outer cloth hems settle slightly inward. Mouth stays exactly the same; NO visible breath vapor/cloud.\nABSOLUTELY keep identical head size, face expression, hat/hair shape, canvas framing, two boot sole coordinates, knee angles and feet distance. No whole-body translation/scaling or pose change. No big arm motion; fingers grip weapon at the SAME exact spot. Original weapon length/angle. For Phantom cane: closed fist around neck below red jewel, diagonally held above floor exactly as Image1; never palm on top, no walking-stick stance. Original low card hand unchanged.\nSubtle cloth breathing must look like the same animation character on next frame, not another illustration. All props low/relaxed, no attack guard. Single transparent PNG, no text/effects/shadow/clouds/glow, full original extent.",
+  "refs": [
+    "C:/Users/timec/.codex/generated_images/01a0dbf3-5094-7520-bfc7-f24b6496f5e5/exec-cd39009f-3c77-4183-bbf4-17946465800e.png"
+  ]
+}

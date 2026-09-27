@@ -1,0 +1,114 @@
+[
+  {
+    "name": "marksman-final-wait-motion01",
+    "path": "C:/workspace/msw/assets/design/characters/marksman/frames/wait/motion01.png",
+    "contentLength": 292251,
+    "projectPath": "assets/design/characters/marksman/frames/wait/motion01.png",
+    "previousRuid": "9a7092cec2954b91be0c8957934a36b2",
+    "ruid": "f3d13c1096a4466fa0154d8c0a032ca5"
+  },
+  {
+    "name": "marksman-final-wait-motion02",
+    "path": "C:/workspace/msw/assets/design/characters/marksman/frames/wait/motion02.png",
+    "contentLength": 292719,
+    "projectPath": "assets/design/characters/marksman/frames/wait/motion02.png",
+    "previousRuid": "23db2879df4e46bdb98783417c9fb985",
+    "ruid": "73152d7bbf474ed08b8441ddf46d92e4"
+  },
+  {
+    "name": "marksman-final-wait-motion03",
+    "path": "C:/workspace/msw/assets/design/characters/marksman/frames/wait/motion03.png",
+    "contentLength": 286942,
+    "projectPath": "assets/design/characters/marksman/frames/wait/motion03.png",
+    "previousRuid": "b483f5e8629e40868170b1030e487f18",
+    "ruid": "c25f3c31ebe04277bbad8010778e38b2"
+  },
+  {
+    "name": "marksman-final-piercing-motion01",
+    "path": "C:/workspace/msw/assets/design/characters/marksman/frames/piercing/motion01.png",
+    "contentLength": 280338,
+    "projectPath": "assets/design/characters/marksman/frames/piercing/motion01.png",
+    "previousRuid": "e7b164aea8804453977c53a05244aa66",
+    "ruid": "34222457fabf49608e90f1680d79af32"
+  },
+  {
+    "name": "marksman-final-piercing-motion02",
+    "path": "C:/workspace/msw/assets/design/characters/marksman/frames/piercing/motion02.png",
+    "contentLength": 275258,
+    "projectPath": "assets/design/characters/marksman/frames/piercing/motion02.png",
+    "previousRuid": "929d63605272432aaa36eafd698dbd38",
+    "ruid": "3f730e1b307447b2bf80927eb79844e5"
+  },
+  {
+    "name": "marksman-final-piercing-motion03",
+    "path": "C:/workspace/msw/assets/design/characters/marksman/frames/piercing/motion03.png",
+    "contentLength": 269506,
+    "projectPath": "assets/design/characters/marksman/frames/piercing/motion03.png",
+    "previousRuid": "5473483f812b40998251ba4b6d74c5de",
+    "ruid": "2bbbc8fe20664dbfaa6576011cf5c39c"
+  },
+  {
+    "name": "marksman-final-piercing-motion04",
+    "path": "C:/workspace/msw/assets/design/characters/marksman/frames/piercing/motion04.png",
+    "contentLength": 281146,
+    "projectPath": "assets/design/characters/marksman/frames/piercing/motion04.png",
+    "previousRuid": "cbc9d95248b44e11922416ad28b1961b",
+    "ruid": "1a7cbdc7d002482d9f2144afb1347cd3"
+  },
+  {
+    "name": "marksman-final-piercing-motion05",
+    "path": "C:/workspace/msw/assets/design/characters/marksman/frames/piercing/motion05.png",
+    "contentLength": 281382,
+    "projectPath": "assets/design/characters/marksman/frames/piercing/motion05.png",
+    "previousRuid": "e770768e850c41bc9308d6651a01b180",
+    "ruid": "7b0535e0a23e43d0a43a254ce0801f85"
+  },
+  {
+    "name": "marksman-final-piercing-motion06",
+    "path": "C:/workspace/msw/assets/design/characters/marksman/frames/piercing/motion06.png",
+    "contentLength": 289233,
+    "projectPath": "assets/design/characters/marksman/frames/piercing/motion06.png",
+    "previousRuid": "55cdf41865ad4dd7a42a6d2a25353886",
+    "ruid": "610392408b3b42f4966e8b90b2fe4f8b"
+  },
+  {
+    "name": "marksman-final-sniping-motion01",
+    "path": "C:/workspace/msw/assets/design/characters/marksman/frames/sniping/motion01.png",
+    "contentLength": 254339,
+    "projectPath": "assets/design/characters/marksman/frames/sniping/motion01.png",
+    "previousRuid": "f6751aec717845cca3bfad8d982d7842",
+    "ruid": "2772f8130f1a46daa41ccb0c3cf5646c"
+  },
+  {
+    "name": "marksman-final-sniping-motion02",
+    "path": "C:/workspace/msw/assets/design/characters/marksman/frames/sniping/motion02.png",
+    "contentLength": 263965,
+    "projectPath": "assets/design/characters/marksman/frames/sniping/motion02.png",
+    "previousRuid": "7a260ab5ca1344d9bfd22094447845b1",
+    "ruid": "c844fb0acc594a37b6ac4ea5f49b7eaa"
+  },
+  {
+    "name": "marksman-final-sniping-motion03",
+    "path": "C:/workspace/msw/assets/design/characters/marksman/frames/sniping/motion03.png",
+    "contentLength": 265266,
+    "projectPath": "assets/design/characters/marksman/frames/sniping/motion03.png",
+    "previousRuid": "88220102942e4094a38fd888f32bffe8",
+    "ruid": "a53258bcb9d445e79bd1a32c888ee2ea"
+  },
+  {
+    "name": "marksman-final-sniping-motion04",
+    "path": "C:/workspace/msw/assets/design/characters/marksman/frames/sniping/motion04.png",
+    "contentLength": 256635,
+    "projectPath": "assets/design/characters/marksman/frames/sniping/motion04.png",
+    "previousRuid": "931f5dd4db5b4e3f8e1094e7634868fe",
+    "ruid": "79efce895d6245978f315c4d7561e6aa"
+  },
+  {
+    "name": "marksman-final-sniping-motion05",
+    "path": "C:/workspace/msw/assets/design/characters/marksman/frames/sniping/motion05.png",
+    "contentLength": 269714,
+    "projectPath": "assets/design/characters/marksman/frames/sniping/motion05.png",
+    "previousRuid": "c4ed39a2cdcc4bc895666d09ca53ecda",
+    "ruid": "49e0863243a44656ac715f8442e02fba"
+  }
+]

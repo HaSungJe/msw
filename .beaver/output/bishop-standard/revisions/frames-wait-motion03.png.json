@@ -1,0 +1,11 @@
+{
+  "key": "ice-lightning-mage/frames/wait/motion03.png",
+  "id": "ice-lightning-mage",
+  "rel": "frames/wait/motion03.png",
+  "original": "C:/workspace/msw/.beaver/output/bishop-standard/originals/ice-lightning-mage/frames/wait/motion03.png",
+  "width": 576,
+  "height": 576,
+  "originalSha256": "590adbdb8aa90a8de1aec40b0f1dade5aa85b57bd0b4268b09772d10ca004914",
+  "generated": "C:/Users/timec/.codex/generated_images/01a0dbf3-5094-7520-bfc7-f24b6496f5e5/exec-9afa4966-3308-4e78-b17b-745588bfdc84.png",
+  "prompt": "Edit IMAGE1 existing ice mage frames/wait/motion03.png. IMAGE2 is same character corrected concept: match ONLY its2.30-head anatomy and character identity. Preserve original image1 pose, precise face eyes blue hair and rendering/color palette, staff/book/costume details and gesture. No style transfer or redesign. Produce a very subtle exhaling idle breathing pose, feet planted, staff held low across front by both hands. Face and body dimensions identical to IMAGE2. Slight cloth and hair movement only. Single complete full-body frame, no VFX, no text, transparent square. Generous margins and no clipping."
+}

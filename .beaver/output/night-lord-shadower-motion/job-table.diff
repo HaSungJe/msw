@@ -1,0 +1,112 @@
+--- 
+
++++ 
+
+@@ -8,12 +8,26 @@
+
+ 
+ 	method boolean HasMageSkin(string jobId)
+ 		-- 원화 적용 직업: 서버 스폰과 클라이언트 표시가 같은 분기를 사용한다.
+-		return jobId == "il" or jobId == "fp" or jobId == "bishop" or jobId == "hero" or jobId == "marks" or jobId == "bow" or jobId == "paladin" or jobId == "dk"
++		return jobId == "il" or jobId == "fp" or jobId == "bishop" or jobId == "hero" or jobId == "marks" or jobId == "bow" or jobId == "paladin" or jobId == "dk" or jobId == "nl" or jobId == "shad"
+ 	end
+ 
+ 	-- 대기는 3장의 호흡 동작, 공격은 스킬마다 그린 연결 프레임을 재생한다.
+ 	@ExecSpace("ClientOnly")
+ 	method table GetMageSkinFrames(string jobId)
++		if jobId == "nl" then
++			return {
++				stand1 = { "0eb5a0560215452fba5d11fa5b0dbd16", "53e0a2cf0bb940bbb7ed86cd65562037", "0eb5a0560215452fba5d11fa5b0dbd16", "e7f8edd9c9ee4898baaacc1f38ff33db" },
++				nlThrow = { "866e55971d3b4ebf96a3dab124e32e00", "5370617f4c2e403691279d424471f2b5", "697245aeab1a4ce9abfa1f1a9234d463", "6599b1f88ea84d7baf53b840da59667d", "03eb6091d1bb419e9d0cbd00a7db2e45", "6d729205cc984689b50da0c5fccc7fe8", "03eb6091d1bb419e9d0cbd00a7db2e45", "6d729205cc984689b50da0c5fccc7fe8", "67da87ba78dc4e95a0d8787a84935080", "aec7d0e3b7ad427b8bc1fd1ab906cdcb" },
++			}
++		end
++		if jobId == "shad" then
++			return {
++				stand1 = { "2753c58c1aaf413681834dc5d70ecac2", "96ed758328834446b5d9f9e7adebf101", "2753c58c1aaf413681834dc5d70ecac2", "fb4ae0f6c16e49459d28f99139523bf7" },
++				shadSavage = { "e0f64485b5db4a95aa412399d5790b00", "fb2887c0d0b443bda8d7f6d7dc3aaf21", "10a908c265d64f5aabbff97de72821ae", "476197fafcaa47938c2c0d9bf011bd45", "6292265f10a2488bac1ad7258df7034d", "238fb780543747a085ac1107d7aa765c", "476197fafcaa47938c2c0d9bf011bd45", "6292265f10a2488bac1ad7258df7034d", "f74189314f454aa683a7febdd268f0ae", "bc760d3a8ba7430f899b11057c4ace73" },
++				shadMeso = { "fbef7d6900ee489eb870bb29f04f962f", "c5379c189d674cff98b310cca14cad50", "4dc51fe6f8554aa3ae727777235460d4", "cbdb8dd7ecdd4bc796e6bb2b96a24e01", "24ee1e2b9952414d936e483b8ece07ae" },
++				shadDualblade = { "7200f4b75d9d43a0af2a735e6cd0ba8f", "70f2e87473434a68bd3ceb1f56bb41b2", "6c6fb1dbd7584b1d8eee7d4bda13ee29", "a4b7ae6b436f483b912330a657ad88d4", "ef741c7fc3cc4fdeb1d06a71d74ccc14", "0a36ccef0202492788c4283d6c52f545", "fc0570f63b4945f390bf4e03508a3416", "91f0a6cfb7c04e729e1a788a40d283ba" },
++			}
++		end
+ 		if jobId == "paladin" then
+ 			return {
+ 				stand1 = { "17e0e0811cd742bea27591ffbc9b723b", "019b667361c1459c819353dcc5a0ed8b", "17e0e0811cd742bea27591ffbc9b723b", "2838ebd8b5d044a693a4c43b0bf77879" },
+@@ -81,6 +95,8 @@
+
+ 	-- 선택창·상세정보 공용 흉상.
+ 	@ExecSpace("ClientOnly")
+ 	method string GetMagePortraitRUID(string jobId)
++		if jobId == "nl" then return "0eb5a0560215452fba5d11fa5b0dbd16" end
++		if jobId == "shad" then return "2753c58c1aaf413681834dc5d70ecac2" end
+ 		-- 전용 흉상 제작 전에는 승인된 대기 첫 컷을 임시 사용한다.
+ 		if jobId == "paladin" then return "17e0e0811cd742bea27591ffbc9b723b" end
+ 		if jobId == "dk" then return "8e918f5a58d84f0880f30802e53ec1cb" end
+@@ -96,6 +112,20 @@
+
+ 	-- 기존 효과 시작·타격 시점과 시전 전체 길이를 유지하며 중간 자세만 추가한다.
+ 	@ExecSpace("ClientOnly")
+ 	method table GetMageSkinFrameDurations(string jobId)
++		if jobId == "nl" then
++			return {
++				stand1 = { 0.65, 0.45, 0.65, 0.45 },
++				nlThrow = { 0.1, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.1, 0.15 },
++			}
++		end
++		if jobId == "shad" then
++			return {
++				stand1 = { 0.65, 0.45, 0.65, 0.45 },
++				shadSavage = { 0.1, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.03, 0.02 },
++				shadMeso = { 0.12, 0.18, 0.07, 0.08, 0.05 },
++				shadDualblade = { 0.15, 0.15, 0.1, 0.15, 0.2, 2.1, 0.2, 0.15 },
++			}
++		end
+ 		if jobId == "paladin" then
+ 			return {
+ 				stand1 = { 0.65, 0.45, 0.65, 0.45 },
+@@ -626,10 +656,10 @@
+
+ 			return {
+ 				-- 쿼드러플 스로우 연출(2026-09-20): 원작 4121013 — 시전 클립 effect(던지는 손 궤적 흰·붉은 호, 9프레임, 왼쪽 보기 그림) + 표창 투사체(뇌전수리검 02070011 bullet — 주황 별 + 번개, 사용자 지정) 4발 0.1초 간격. 사거리 2(사용자 2026-09-20, 3에서)
+ 				--   + 타격 hit/0(흰 빛 터짐 + 파편) ×4(0.1초 간격), 시전음 use, 타격음 hit. 쉐도우 파트너(30)는 등 뒤(projShadowDx)에서 같은 표창 4발을 0.5초 늦게(본체 4발이 다 나간 뒤 이어서 — 2026-09-22 사용자, 그림자 동작도 0.5초 늦게 RtsSkillFxLogic.ShadowActionDelay) 어둡게 던지고 타격 4회 ½(st.halfHits)
+-				--   모션 = swingO1 + 무기 가림(2026-09-20 사용자 확정 — shootF는 활 쏘는 자세라 표창과 안 맞음. 표창 던지기 전용 액션은 없음). 표창 출발 = 배 앞(projDx 0.35·projDy 0.55 — "머리 뒤에서 나온다")
++				--   모션 = nlThrow PNG (이전 swingO1) + 아바타 경로 무기 가림(2026-09-20 사용자 확정 — shootF는 활 쏘는 자세라 표창과 안 맞음. 표창 던지기 전용 액션은 없음). 표창 출발 = 배 앞(projDx 0.35·projDy 0.55 — "머리 뒤에서 나온다")
+ 				--   쉐도우 파트너 그림자 = 유닛 자식 "Shadow" 스프라이트(원작 4111002/special 검은 실루엣, RtsUnitLogic.EnsureShadow, 30레벨~) — 등 뒤 0.44, 본체 액션과 같은 이름의 클립을 따라 재생
+ 				{ lv = 1, kind = "액티브", name = "쿼드러플 스로우", desc = "사거리 2 안의 적 1마리를 110%의 데미지로 4회 공격한다.", target = false, range = 2,
+-					fx = { motion = "swingO1", hideWeapon = true, hideWeaponSec = 0.6, clip = "ff9ced53e871474c9a2ae167e0c75ef1", scale = 1.4, feetDx = 0, feetDy = 0, assetFacesLeft = true, sound = "747c5e5435b942a494f94032dabbffb2",
++					fx = { motion = "nlThrow", hideWeapon = true, hideWeaponSec = 0.6, clip = "ff9ced53e871474c9a2ae167e0c75ef1", scale = 1.4, feetDx = 0, feetDy = 0, assetFacesLeft = true, sound = "747c5e5435b942a494f94032dabbffb2",
+ 						proj = "99a112c1dcbb4cf69fccfca53fbb6620", projCount = 4, projStagger = 0.1, projSec = 0.2, projDx = 0.35, projDy = 0.55, projScale = 1.2,
+ 						projShadowLv = 30, projShadowDx = 0.5, projShadowDelay = 0.5,
+ 						hitDelay = 0.3, hitGap = 0.1, hitClip = "6d26a151289342db913d50bf9f84a96b", hitScale = 1.4, hitDy = 0.6, hitSound = "4709f06b2fb543f7a980fdbbb23441b1" } },
+@@ -642,15 +672,15 @@
+
+ 		end
+ 		if jobId == "shad" then
+ 			return {
+-				-- 새비지 블로우 연출(2026-09-20): 시전 클립 = 신형 4201012/effect(사용자 지정 — 붉은 참격 선, 4201005 폴더엔 타격음뿐) + 빠른 한손 베기 모션(swingO2) + 타격마다 4221007(부메랑 스텝)/hit/0 분홍 참격 폭발 ×8(0.05초 간격) + 타격마다 새비지 타격음(사용자 2026-09-20 "8번 파파박")
++				-- 새비지 블로우 연출(2026-09-20): 시전 클립 = 신형 4201012/effect(사용자 지정 — 붉은 참격 선, 4201005 폴더엔 타격음뿐) + 빠른 단검 베기 PNG(shadSavage) + 타격마다 4221007(부메랑 스텝)/hit/0 분홍 참격 폭발 ×8(0.05초 간격) + 타격마다 새비지 타격음(사용자 2026-09-20 "8번 파파박")
+ 				{ lv = 1, kind = "액티브", name = "새비지 블로우", desc = "사거리 1 안의 적 1마리를 29.2%의 데미지로 8회 공격한다.", target = false, range = 1,
+-					fx = { motion = "swingO2", clip = "895ac1e384ea42ca8dd084f54ff3346b", scale = 1.6, feetDx = 0, feetDy = 0, assetFacesLeft = true,
++					fx = { motion = "shadSavage", clip = "895ac1e384ea42ca8dd084f54ff3346b", scale = 1.6, feetDx = 0, feetDy = 0, assetFacesLeft = true,
+ 						hitDelay = 0.1, hitGap = 0.05, hitClip = "6614245a414645089d41ec1f60df1fab", hitScale = 1.3, hitDy = 0.6, hitSound = "23250468023a4767b32611f2fd8ec49b" } },
+ 				{ lv = 10, kind = "패시브", name = "대거 마스터리", desc = "공격력이 30% 증가한다.", target = false },
+ 				{ lv = 20, kind = "패시브", name = "크리티컬 마스터리", desc = "크리티컬 확률이 30%, 크리티컬 데미지가 20% 증가한다.", target = false },
+ 				-- 메소 익스플로전 연출 1차: 원작 4211006 — 시전 클립 effect(발 아래 보라 소용돌이) + 타격 hit/0(흰 폭발 + 연두 불꽃) + 타격음 hit. 사거리 1·10마리(메인 대상 곁 1칸 규칙)
+ 				{ lv = 30, kind = "액티브", name = "메소 익스플로전", desc = "사거리 1 안의 적을 최대 10마리까지 83.3%의 데미지로 공격한다. 재사용 대기시간 8초", target = false, cd = 8, ratio = 83.3, hits = 1, targets = 10, range = 1,
+-					fx = { motion = "swingO1", clip = "61840689ea7b44f09f91960734232e34", scale = 1.6, feetDx = 0, feetDy = 0, assetFacesLeft = true, sound = "acb0f70275b7422dbcc8a395cbbd9d28",
++					fx = { motion = "shadMeso", clip = "61840689ea7b44f09f91960734232e34", scale = 1.6, feetDx = 0, feetDy = 0, assetFacesLeft = true, sound = "acb0f70275b7422dbcc8a395cbbd9d28",
+ 						hitDelay = 0.3, hitClip = "644458b8c91949b4b4b84ff949eba8ca", hitScale = 1.4, hitDy = 0.6 } },
+ 				{ lv = 40, kind = "패시브", name = "대거 익스퍼트", desc = "공격력이 20%, 최종 데미지가 5% 증가한다.", target = false },
+ 				{ lv = 50, kind = "패시브", name = "레디 투 다이", desc = "최종 데미지가 20%, 보스 공격 시 데미지가 30% 증가한다. 보스 공격 시 새비지 블로우의 데미지가 88% 증가하고, 몬스터의 방어율을 50% 무시한다.", target = false },
+@@ -1651,9 +1681,9 @@
+
+ 			--   토네이도 = 투사체(400041043 shootobj/layerlist/b1 380×488px 12프레임 0.72초 루프, 피벗 중앙, 2.0배): 캐릭터 위치(손 높이 1.0)에서 생성 → 0.3초 머문 뒤(projHover) 25유닛/초로 대상 박스 중앙에 돌진(사거리 3이면 ≤0.3초) → 도착 뒤 판정. 1.9초까지 대상 위에 남는다(projLife)
+ 			--   판정 0.6초(토네이도 도착)부터 0.0215초 간격 117타 = 3.1초까지(토네이도 72·카르마 45를 섞어서 동시에, hitKinds) — 토네이도가 보스 위에 머무는 2.5초 내내 타격·타격음(사용자). 카르마 퓨리 = 캐릭터 등 뒤 클립(400041021 effect 殺 참격 + 폭발 + 연기 996×568px 25프레임 1.59초, 피벗 바닥 중앙, 1.5배 = 0.5의 3배 — 사용자 "3배·캐릭터 뒤로") 0.3초에(backDelay — 토네이도와 동시)
+ 			--   소리: 토네이도 loop 950234be…(5.78초, 시전음 1회) + 카르마 use b634a62d…(3.32초, 0.3초 뒤 sound2). 타격음 = 둔탁한 피격음 1개를 두 스킬 공통(사용자) — 토네이도 타 400041042/hit 341c155e…(사용자 지정), 카르마 타 스피어 버스터 타격음 23250468…, 섞여서 3타마다(hitSoundEvery — 0.065초 간격 39번, 소리 1.3초라 ~20개 겹침) SoundService로 겹쳐 재생. 풀(SoundComponent 재시작)은 소리가 하나씩 끊기며 이어져 "같이 안 들린다"(사용자), 타격마다 SoundService는 동시 재생 제한에 걸려 뒤가 잘렸다 → 그 사이값, 대안 레이징 블로우 6313ad64…·카르마 hit fc142213…·토네이도 hit c1f44f0c…
+-			--   타격 클립(사용자 지정): 토네이도 타 = hit/1 f5a6d5aa…, 카르마 타 = hit/1 6eab154e…·hit/0 089ce476… 무작위(hitPhases[hitKinds[h]], 0.8배). 모션 swingD1 → 0.3초 뒤 swingD2
++			--   타격 클립(사용자 지정): 토네이도 타 = hit/1 f5a6d5aa…, 카르마 타 = hit/1 6eab154e…·hit/0 089ce476… 무작위(hitPhases[hitKinds[h]], 0.8배). 모션 shadDualblade PNG 3.2초(0.3초 방출 자세)
+ 			--   동시 발동(2026-09-22 사용자 "블레이드 토네이도/카르마 퓨리 동시에 사용되어야 함"): 카르마 퓨리 등 뒤 클립·소리·2번째 모션을 토네이도가 출발하는 0.3초에 함께(전엔 1.8초 뒤 순차)
+-			local fx = { motions = { "swingD1", "swingD2" }, motionGap = 0.3, noFlip = true,
++			local fx = { motion = "shadDualblade", noFlip = true,
+ 				sound = "950234be7d9f44bd9091ab6000832f89", sound2 = "b634a62d21c04da18adc0c036e987dc5", sound2Delay = 0.3,
+ 				proj = "d91e675288f9450b888c3daed98fb63e", projScale = 2.0, projNoRotate = true, projDx = 0, projDy = 1.0, projHover = 0.3, projSpeed = 25, projLife = 2.9,
+ 				backClip = "643c9e8d1b7043a29045e3fed2f1021c", backScale = 1.5, backDx = 0, backDy = 0, backDelay = 0.3, backLife = 2.9,

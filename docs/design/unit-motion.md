@@ -1,3 +1,7 @@
+> 현재 히어로: 확정 원화+비숍 기준 재작화18장과 새 RUID18개로 교체. 아래31개 업로드 중 히어로18개는 이전 이력이다. 최신 연결·검증은 [히어로 모션](hero-motion.md)과 `.beaver/output/hero-bishop-motion/resource-manifest.json`을 따른다.
+
+> 최신 비율 보정(2026-09-27): 썬콜 13장·히어로 18장 PNG 및 리소스 연결은 [원화 비율 적용 기록](character-proportions.md)과 `.beaver/output/bishop-standard/resource-manifest.json`을 우선한다. 아래 이전 업로드 이력의 해당 RUID는 교체 전 기록이다. 프레임 순서와 재생 시간은 유지한다.
+
 # 유닛 대기·공격 프레임 확장
 
 ## 상태

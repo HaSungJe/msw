@@ -121,7 +121,7 @@ script RtsMonsterInfoLogic extends Logic
 		self.HpText = H:SpawnLabel("RtsMonInfoHpText", panel, Vector2(0, 1), Vector2(0, 1), Vector2(x0, -49), Vector2(self.BarW, 26), "", H:ColInk(), 16, TextAlignmentType.MiddleLeft, false)
 		self.HpPctText = H:SpawnLabel("RtsMonInfoHpPct", panel, Vector2(0, 1), Vector2(0, 1), Vector2(x0 + self.BarW + 4, -49), Vector2(self.PctW, 26), "", Color(0.43, 0.42, 0.62, 1), 18, TextAlignmentType.MiddleRight, false)
 		local back = H:SpawnUI("model://uisprite", "RtsMonInfoHpBack", panel, Vector2(0, 1), Vector2(0, 1), Vector2(x0, -82), Vector2(self.BarW + 4 + self.PctW, 10))
-		back.SpriteGUIRendererComponent.Color = Color(0.88, 0.89, 0.94, 1)
+		_RtsHudLogic:SetUiColor(back, Color(0.88, 0.89, 0.94, 1), "surface")
 		self.HpFill = H:SpawnUI("model://uisprite", "RtsMonInfoHpFill", panel, Vector2(0, 1), Vector2(0, 1), Vector2(x0, -82), Vector2(self.BarW + 4 + self.PctW, 10))
 		self.HpFill.SpriteGUIRendererComponent.Color = Color(0.65, 0.64, 0.81, 1)
 		if boss then self.HpFill.SpriteGUIRendererComponent.Color = Color(0.80, 0.48, 0.56, 1) end
@@ -287,12 +287,12 @@ script RtsMonsterInfoLogic extends Logic
 			-- 줄 = 창 폭 전체(초상 아래까지), 위에 가는 구분선
 			local avail = self.LeftX + self.BarW + 4 + self.PctW + 18 - 24
 			local row = H:SpawnUI("model://uisprite", "RtsMonInfoDebuffs", self.PanelIn, Vector2(0, 0), Vector2(0, 0), Vector2(12, 8), Vector2(avail, 34))
-			row.SpriteGUIRendererComponent.Color = Color(1, 1, 1, 0)
+			_RtsHudLogic:SetUiColor(row, Color(1, 1, 1, 0), "surface")
 			row.SpriteGUIRendererComponent.RaycastTarget = false
 			self.DebuffRow = row
 			local line = H:SpawnUI("model://uisprite", "RtsMonInfoDebuffLine", row, Vector2(0, 1), Vector2(0, 0), Vector2(0, 5), Vector2(avail, 1.5))
 			line.SpriteGUIRendererComponent.ImageRUID = DataRef(H.WhiteRUID)
-			line.SpriteGUIRendererComponent.Color = H:ColBorderSoft()
+			_RtsHudLogic:SetUiColor(line, H:ColBorderSoft(), "border")
 			line.SpriteGUIRendererComponent.RaycastTarget = false
 			local n = #list
 			if n == 0 then
@@ -354,7 +354,7 @@ script RtsMonsterInfoLogic extends Logic
 			local d = list[i]
 			if self.TipId == d.id and self.TipText ~= nil and isvalid(self.TipText) then
 				local txt = self:TipBody(d)
-				if self.TipText.TextComponent.Text ~= txt then self.TipText.TextComponent.Text = txt end
+				_RtsHudLogic:SetUiText(self.TipText, txt)
 			end
 		end
 		if self.TipId ~= "" and string.find(sig, self.TipId .. ";", 1, true) == nil then self:HideTip() end

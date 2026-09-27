@@ -1,0 +1,642 @@
+{
+  "status": "game-connected-maker-verified-user-approved",
+  "character": "marksman",
+  "frames": {
+    "wait": [
+      {
+        "path": "assets/design/characters/marksman/frames/wait/motion01.png",
+        "sourceFile": "C:/Users/timec/.codex/generated_images/01a0d75b-8f64-7f51-b22a-2b0e88941349/exec-290a53b7-2951-4208-8bf9-f8798d49f227.png",
+        "sourceCell": 1,
+        "sourceCrop": {
+          "left": 0,
+          "top": 0,
+          "width": 627,
+          "height": 627
+        },
+        "sourceFoot": [
+          301,
+          627
+        ],
+        "scale": 0.75,
+        "sha256": "f7b4f4041e9301f6ed3e621e570340bdbaaa9357918d61ddab2ce87459ef414f",
+        "previousRuid": "9a7092cec2954b91be0c8957934a36b2",
+        "ruid": "f3d13c1096a4466fa0154d8c0a032ca5"
+      },
+      {
+        "path": "assets/design/characters/marksman/frames/wait/motion02.png",
+        "sourceFile": "C:/Users/timec/.codex/generated_images/01a0d75b-8f64-7f51-b22a-2b0e88941349/exec-290a53b7-2951-4208-8bf9-f8798d49f227.png",
+        "sourceCell": 2,
+        "sourceCrop": {
+          "left": 627,
+          "top": 0,
+          "width": 627,
+          "height": 627
+        },
+        "sourceFoot": [
+          298.5,
+          627
+        ],
+        "scale": 0.75,
+        "sha256": "a4e67c5bd652288542724eadb2a4e57093b7dd27c4072df586e24cacf8f12c8c",
+        "previousRuid": "23db2879df4e46bdb98783417c9fb985",
+        "ruid": "73152d7bbf474ed08b8441ddf46d92e4"
+      },
+      {
+        "path": "assets/design/characters/marksman/frames/wait/motion03.png",
+        "sourceFile": "C:/Users/timec/.codex/generated_images/01a0d75b-8f64-7f51-b22a-2b0e88941349/exec-290a53b7-2951-4208-8bf9-f8798d49f227.png",
+        "sourceCell": 3,
+        "sourceCrop": {
+          "left": 0,
+          "top": 627,
+          "width": 627,
+          "height": 627
+        },
+        "sourceFoot": [
+          303,
+          591
+        ],
+        "scale": 0.75,
+        "sha256": "e0fe8354e87fb4959548fba345af8d8314fb1665141fedd28fe282778555c343",
+        "previousRuid": "b483f5e8629e40868170b1030e487f18",
+        "ruid": "c25f3c31ebe04277bbad8010778e38b2"
+      }
+    ],
+    "piercing": [
+      {
+        "path": "assets/design/characters/marksman/frames/piercing/motion01.png",
+        "sourceFile": "C:/Users/timec/.codex/generated_images/01a0d75b-8f64-7f51-b22a-2b0e88941349/exec-5f8215e0-e977-4ea6-a168-975461711e54.png",
+        "sourceCell": 1,
+        "sourceCrop": {
+          "left": 0,
+          "top": 0,
+          "width": 512,
+          "height": 512
+        },
+        "sourceFoot": [
+          254.5,
+          479
+        ],
+        "scale": 0.9,
+        "sha256": "b972cc9d4f521e0a4f978032968b1c45afeb3accdb606d078e9c1d3fcf685610",
+        "previousRuid": "e7b164aea8804453977c53a05244aa66",
+        "ruid": "34222457fabf49608e90f1680d79af32"
+      },
+      {
+        "path": "assets/design/characters/marksman/frames/piercing/motion02.png",
+        "sourceFile": "C:/Users/timec/.codex/generated_images/01a0d75b-8f64-7f51-b22a-2b0e88941349/exec-5f8215e0-e977-4ea6-a168-975461711e54.png",
+        "sourceCell": 2,
+        "sourceCrop": {
+          "left": 512,
+          "top": 0,
+          "width": 488,
+          "height": 512
+        },
+        "sourceFoot": [
+          239,
+          478
+        ],
+        "scale": 0.9,
+        "sha256": "3da3140a1f22d0981c807c5abf4addae2bd1392a5e9c0d793cf1ce0bbfa5d14a",
+        "previousRuid": "929d63605272432aaa36eafd698dbd38",
+        "ruid": "3f730e1b307447b2bf80927eb79844e5"
+      },
+      {
+        "path": "assets/design/characters/marksman/frames/piercing/motion03.png",
+        "sourceFile": "C:/Users/timec/.codex/generated_images/01a0d75b-8f64-7f51-b22a-2b0e88941349/exec-5f8215e0-e977-4ea6-a168-975461711e54.png",
+        "sourceCell": 3,
+        "sourceCrop": {
+          "left": 1000,
+          "top": 0,
+          "width": 536,
+          "height": 512
+        },
+        "sourceFoot": [
+          256,
+          479
+        ],
+        "scale": 0.9,
+        "sha256": "624cdc982fbcbac9c7b6b8784b4c921c879aa8d60c9aa221e93458dd25789e72",
+        "previousRuid": "5473483f812b40998251ba4b6d74c5de",
+        "ruid": "2bbbc8fe20664dbfaa6576011cf5c39c"
+      },
+      {
+        "path": "assets/design/characters/marksman/frames/piercing/motion04.png",
+        "sourceFile": "C:/Users/timec/.codex/generated_images/01a0d75b-8f64-7f51-b22a-2b0e88941349/exec-5f8215e0-e977-4ea6-a168-975461711e54.png",
+        "sourceCell": 4,
+        "sourceCrop": {
+          "left": 0,
+          "top": 512,
+          "width": 560,
+          "height": 512
+        },
+        "sourceFoot": [
+          250.5,
+          451
+        ],
+        "scale": 0.9,
+        "sha256": "133b8558c5c9a76c548126a5276276f4d0e53aa95f161883f6ac150d8bb715ef",
+        "previousRuid": "cbc9d95248b44e11922416ad28b1961b",
+        "ruid": "1a7cbdc7d002482d9f2144afb1347cd3"
+      },
+      {
+        "path": "assets/design/characters/marksman/frames/piercing/motion05.png",
+        "sourceFile": "C:/Users/timec/.codex/generated_images/01a0d75b-8f64-7f51-b22a-2b0e88941349/exec-5f8215e0-e977-4ea6-a168-975461711e54.png",
+        "sourceCell": 5,
+        "sourceCrop": {
+          "left": 560,
+          "top": 512,
+          "width": 464,
+          "height": 512
+        },
+        "sourceFoot": [
+          189.5,
+          456
+        ],
+        "scale": 0.9,
+        "sha256": "ae987ed051091ca247bb19f4d529e49c5313de8701f55f71de4dc97880fadc97",
+        "previousRuid": "e770768e850c41bc9308d6651a01b180",
+        "ruid": "7b0535e0a23e43d0a43a254ce0801f85"
+      },
+      {
+        "path": "assets/design/characters/marksman/frames/piercing/motion06.png",
+        "sourceFile": "C:/Users/timec/.codex/generated_images/01a0d75b-8f64-7f51-b22a-2b0e88941349/exec-5f8215e0-e977-4ea6-a168-975461711e54.png",
+        "sourceCell": 6,
+        "sourceCrop": {
+          "left": 1024,
+          "top": 512,
+          "width": 512,
+          "height": 512
+        },
+        "sourceFoot": [
+          241.5,
+          458
+        ],
+        "scale": 0.9,
+        "sha256": "da15158de9e01e1986f29c2fd62a88c19a2f42a0e35a1bbc6b2b5a56560e858a",
+        "previousRuid": "55cdf41865ad4dd7a42a6d2a25353886",
+        "ruid": "610392408b3b42f4966e8b90b2fe4f8b"
+      }
+    ],
+    "sniping": [
+      {
+        "path": "assets/design/characters/marksman/frames/sniping/motion01.png",
+        "sourceFile": "C:/Users/timec/.codex/generated_images/01a0d75b-8f64-7f51-b22a-2b0e88941349/exec-4bba54aa-21cf-435a-a0c7-7af6c7787b59.png",
+        "sourceCell": 1,
+        "sourceCrop": {
+          "left": 0,
+          "top": 0,
+          "width": 512,
+          "height": 512
+        },
+        "sourceFoot": [
+          278,
+          469
+        ],
+        "scale": 0.97,
+        "sha256": "f0e8ce66d21aebc8899a20f81e87f58545c9453628114322253d6757bedadb4b",
+        "previousRuid": "f6751aec717845cca3bfad8d982d7842",
+        "ruid": "2772f8130f1a46daa41ccb0c3cf5646c"
+      },
+      {
+        "path": "assets/design/characters/marksman/frames/sniping/motion02.png",
+        "sourceFile": "C:/Users/timec/.codex/generated_images/01a0d75b-8f64-7f51-b22a-2b0e88941349/exec-4bba54aa-21cf-435a-a0c7-7af6c7787b59.png",
+        "sourceCell": 2,
+        "sourceCrop": {
+          "left": 512,
+          "top": 0,
+          "width": 512,
+          "height": 512
+        },
+        "sourceFoot": [
+          261,
+          468
+        ],
+        "scale": 0.97,
+        "sha256": "3c1b6e6399b0fd1758c1c1c6b10e6f1b81550aaac0a2a7852ad8cae343f2b9f7",
+        "previousRuid": "7a260ab5ca1344d9bfd22094447845b1",
+        "ruid": "c844fb0acc594a37b6ac4ea5f49b7eaa"
+      },
+      {
+        "path": "assets/design/characters/marksman/frames/sniping/motion03.png",
+        "sourceFile": "C:/Users/timec/.codex/generated_images/01a0d75b-8f64-7f51-b22a-2b0e88941349/exec-4bba54aa-21cf-435a-a0c7-7af6c7787b59.png",
+        "sourceCell": 3,
+        "sourceCrop": {
+          "left": 1024,
+          "top": 0,
+          "width": 512,
+          "height": 512
+        },
+        "sourceFoot": [
+          248,
+          469
+        ],
+        "scale": 0.97,
+        "sha256": "5fc57ccef3a1c6cea71c5beae742afaa51b082f32665f3a7a9c1f7f50e8fa7e5",
+        "previousRuid": "88220102942e4094a38fd888f32bffe8",
+        "ruid": "a53258bcb9d445e79bd1a32c888ee2ea"
+      },
+      {
+        "path": "assets/design/characters/marksman/frames/sniping/motion04.png",
+        "sourceFile": "C:/Users/timec/.codex/generated_images/01a0d75b-8f64-7f51-b22a-2b0e88941349/exec-4bba54aa-21cf-435a-a0c7-7af6c7787b59.png",
+        "sourceCell": 4,
+        "sourceCrop": {
+          "left": 0,
+          "top": 512,
+          "width": 512,
+          "height": 512
+        },
+        "sourceFoot": [
+          290,
+          416
+        ],
+        "scale": 0.97,
+        "sha256": "f13affd4b77cbd38c54f67cea55546046111311347f7014f1aa8d3544743f5ad",
+        "previousRuid": "931f5dd4db5b4e3f8e1094e7634868fe",
+        "ruid": "79efce895d6245978f315c4d7561e6aa"
+      },
+      {
+        "path": "assets/design/characters/marksman/frames/sniping/motion05.png",
+        "sourceFile": "C:/Users/timec/.codex/generated_images/01a0d75b-8f64-7f51-b22a-2b0e88941349/exec-4bba54aa-21cf-435a-a0c7-7af6c7787b59.png",
+        "sourceCell": 5,
+        "sourceCrop": {
+          "left": 512,
+          "top": 512,
+          "width": 512,
+          "height": 512
+        },
+        "sourceFoot": [
+          249,
+          430
+        ],
+        "scale": 0.97,
+        "sha256": "7e9b27f784a99b3486373a95c247d060cf1305dedb242ee24f3af1de88009c18",
+        "previousRuid": "c4ed39a2cdcc4bc895666d09ca53ecda",
+        "ruid": "49e0863243a44656ac715f8442e02fba"
+      }
+    ],
+    "true-sniping": [
+      {
+        "path": "assets/design/characters/marksman/frames/true-sniping/motion01.png",
+        "sourceFile": "C:/Users/timec/.codex/generated_images/01a0d75b-8f64-7f51-b22a-2b0e88941349/exec-4bba54aa-21cf-435a-a0c7-7af6c7787b59.png",
+        "sourceCell": 1,
+        "sourceCrop": {
+          "left": 0,
+          "top": 0,
+          "width": 512,
+          "height": 512
+        },
+        "sourceFoot": [
+          278,
+          469
+        ],
+        "scale": 0.97,
+        "sha256": "f0e8ce66d21aebc8899a20f81e87f58545c9453628114322253d6757bedadb4b",
+        "previousRuid": "f6751aec717845cca3bfad8d982d7842",
+        "ruid": "2772f8130f1a46daa41ccb0c3cf5646c"
+      },
+      {
+        "path": "assets/design/characters/marksman/frames/true-sniping/motion02.png",
+        "sourceFile": "C:/Users/timec/.codex/generated_images/01a0d75b-8f64-7f51-b22a-2b0e88941349/exec-4bba54aa-21cf-435a-a0c7-7af6c7787b59.png",
+        "sourceCell": 2,
+        "sourceCrop": {
+          "left": 512,
+          "top": 0,
+          "width": 512,
+          "height": 512
+        },
+        "sourceFoot": [
+          261,
+          468
+        ],
+        "scale": 0.97,
+        "sha256": "3c1b6e6399b0fd1758c1c1c6b10e6f1b81550aaac0a2a7852ad8cae343f2b9f7",
+        "previousRuid": "7a260ab5ca1344d9bfd22094447845b1",
+        "ruid": "c844fb0acc594a37b6ac4ea5f49b7eaa"
+      },
+      {
+        "path": "assets/design/characters/marksman/frames/true-sniping/motion03.png",
+        "sourceFile": "C:/Users/timec/.codex/generated_images/01a0d75b-8f64-7f51-b22a-2b0e88941349/exec-4bba54aa-21cf-435a-a0c7-7af6c7787b59.png",
+        "sourceCell": 3,
+        "sourceCrop": {
+          "left": 1024,
+          "top": 0,
+          "width": 512,
+          "height": 512
+        },
+        "sourceFoot": [
+          248,
+          469
+        ],
+        "scale": 0.97,
+        "sha256": "5fc57ccef3a1c6cea71c5beae742afaa51b082f32665f3a7a9c1f7f50e8fa7e5",
+        "previousRuid": "88220102942e4094a38fd888f32bffe8",
+        "ruid": "a53258bcb9d445e79bd1a32c888ee2ea"
+      },
+      {
+        "path": "assets/design/characters/marksman/frames/true-sniping/motion04.png",
+        "sourceFile": "C:/Users/timec/.codex/generated_images/01a0d75b-8f64-7f51-b22a-2b0e88941349/exec-4bba54aa-21cf-435a-a0c7-7af6c7787b59.png",
+        "sourceCell": 4,
+        "sourceCrop": {
+          "left": 0,
+          "top": 512,
+          "width": 512,
+          "height": 512
+        },
+        "sourceFoot": [
+          290,
+          416
+        ],
+        "scale": 0.97,
+        "sha256": "f13affd4b77cbd38c54f67cea55546046111311347f7014f1aa8d3544743f5ad",
+        "previousRuid": "931f5dd4db5b4e3f8e1094e7634868fe",
+        "ruid": "79efce895d6245978f315c4d7561e6aa"
+      },
+      {
+        "path": "assets/design/characters/marksman/frames/true-sniping/motion05.png",
+        "sourceFile": "C:/Users/timec/.codex/generated_images/01a0d75b-8f64-7f51-b22a-2b0e88941349/exec-4bba54aa-21cf-435a-a0c7-7af6c7787b59.png",
+        "sourceCell": 5,
+        "sourceCrop": {
+          "left": 512,
+          "top": 512,
+          "width": 512,
+          "height": 512
+        },
+        "sourceFoot": [
+          249,
+          430
+        ],
+        "scale": 0.97,
+        "sha256": "7e9b27f784a99b3486373a95c247d060cf1305dedb242ee24f3af1de88009c18",
+        "previousRuid": "c4ed39a2cdcc4bc895666d09ca53ecda",
+        "ruid": "49e0863243a44656ac715f8442e02fba"
+      }
+    ]
+  },
+  "sequences": {
+    "wait": [
+      [
+        1,
+        0.65
+      ],
+      [
+        2,
+        0.45
+      ],
+      [
+        1,
+        0.65
+      ],
+      [
+        3,
+        0.45
+      ]
+    ],
+    "piercing": [
+      [
+        1,
+        0.08
+      ],
+      [
+        2,
+        0.09
+      ],
+      [
+        3,
+        0.18
+      ],
+      [
+        4,
+        0.09
+      ],
+      [
+        5,
+        0.1
+      ],
+      [
+        6,
+        0.16
+      ]
+    ],
+    "sniping": [
+      [
+        1,
+        0.1
+      ],
+      [
+        2,
+        0.3
+      ],
+      [
+        3,
+        0.04
+      ],
+      [
+        2,
+        0.04
+      ],
+      [
+        3,
+        0.04
+      ],
+      [
+        2,
+        0.04
+      ],
+      [
+        3,
+        0.04
+      ],
+      [
+        2,
+        0.04
+      ],
+      [
+        3,
+        0.04
+      ],
+      [
+        2,
+        0.04
+      ],
+      [
+        3,
+        0.04
+      ],
+      [
+        2,
+        0.04
+      ],
+      [
+        3,
+        0.04
+      ],
+      [
+        2,
+        0.04
+      ],
+      [
+        3,
+        0.04
+      ],
+      [
+        2,
+        0.04
+      ],
+      [
+        3,
+        0.04
+      ],
+      [
+        2,
+        0.04
+      ],
+      [
+        3,
+        0.04
+      ],
+      [
+        2,
+        0.04
+      ],
+      [
+        3,
+        0.04
+      ],
+      [
+        2,
+        0.04
+      ],
+      [
+        4,
+        0.1
+      ],
+      [
+        5,
+        0.1
+      ]
+    ],
+    "true-sniping": [
+      [
+        1,
+        0.08
+      ],
+      [
+        2,
+        0.28
+      ],
+      [
+        3,
+        0.025
+      ],
+      [
+        2,
+        0.025
+      ],
+      [
+        3,
+        0.025
+      ],
+      [
+        2,
+        0.025
+      ],
+      [
+        3,
+        0.025
+      ],
+      [
+        2,
+        0.025
+      ],
+      [
+        3,
+        0.025
+      ],
+      [
+        2,
+        0.025
+      ],
+      [
+        3,
+        0.025
+      ],
+      [
+        2,
+        0.025
+      ],
+      [
+        3,
+        0.025
+      ],
+      [
+        2,
+        0.025
+      ],
+      [
+        3,
+        0.025
+      ],
+      [
+        2,
+        0.025
+      ],
+      [
+        3,
+        0.025
+      ],
+      [
+        2,
+        0.025
+      ],
+      [
+        3,
+        0.025
+      ],
+      [
+        2,
+        0.025
+      ],
+      [
+        3,
+        0.025
+      ],
+      [
+        2,
+        0.025
+      ],
+      [
+        4,
+        0.08
+      ],
+      [
+        5,
+        0.1
+      ]
+    ]
+  },
+  "portrait": "assets/design/characters/marksman/portrait.png",
+  "notes": [
+    "피어싱: 선 채 무릎만 살짝 굽혀 조준 후 사격",
+    "스나이핑: 즉시 낮은 자세, 10회 반동 반복 후 대기 복귀",
+    "스나이핑/트루 스나이핑은 같은 자세·다른 재생 시간",
+    "준비 모션과 석궁 연사는 PNG 교체로 재생, 전체 이미지 흔들기·크로스페이드 없음",
+    "대기: 편안한 자세·내린 석궁·차분한 눈매·작은 닫힌 입 미소. 비숍 엔젤레이 기준으로 승인된 짧은 다리·부츠 비율.",
+    "최신 로컬 프레임 14개 고유 PNG 새 RUID 업로드·코드 연결 완료. 스나이핑/트루 스나이핑은 RUID 공유. Maker 검증 진행."
+  ],
+  "portraitRuid": "bb8c6be33ae64a9f96d8a3f74ea7f459",
+  "actions": {
+    "wait": "stand1",
+    "piercing": "marksPiercing",
+    "sniping": "marksSniping",
+    "true-sniping": "marksTrueSniping"
+  },
+  "approvedReference": {
+    "path": "assets/design/characters/bishop/frames/angel-ray/",
+    "scope": "인체비율·표정·그림체",
+    "candidate": ".beaver/output/marksman-motion/bishop-reference-candidate.png",
+    "comparison": ".beaver/output/marksman-motion/bishop-reference-comparison.png",
+    "approval": "사용자: 이 비율로 진행"
+  },
+  "approval": "모션괜찮은데? 이대로 해도될듯",
+  "verification": ".beaver/output/marksman-motion/verification.json"
+}

@@ -1,0 +1,466 @@
+{
+  "id": "shadower",
+  "status": "game-connected-maker-verified-user-approved",
+  "concept": "concept.png",
+  "idleCanvas": 576,
+  "attackCanvas": 704,
+  "idleFeet": [
+    288,
+    512
+  ],
+  "attackFeet": [
+    352,
+    640
+  ],
+  "referenceHead": 147,
+  "revision": "natural-game-idle; phantom-fixed-facing-card-throw-neck-grip",
+  "frames": [
+    {
+      "file": "frames/blade-tornado-karma-fury/motion01.png",
+      "sha256": "f380d1fb1fe53e7bbdb3b20886162db5432af86b8c8af793d9d9cbbd690a3e43",
+      "width": 704,
+      "height": 704,
+      "ruid": "7200f4b75d9d43a0af2a735e6cd0ba8f"
+    },
+    {
+      "file": "frames/blade-tornado-karma-fury/motion02.png",
+      "sha256": "fdba0b181641281498d8a405116892e9a0c0c547573ed2bfbeddcb4425b1c4d3",
+      "width": 704,
+      "height": 704,
+      "ruid": "70f2e87473434a68bd3ceb1f56bb41b2"
+    },
+    {
+      "file": "frames/blade-tornado-karma-fury/motion03.png",
+      "sha256": "f56a447881b2bd891760978314d269e1afe8fdd76202e0d24621fec283df5bbb",
+      "width": 704,
+      "height": 704,
+      "ruid": "6c6fb1dbd7584b1d8eee7d4bda13ee29"
+    },
+    {
+      "file": "frames/blade-tornado-karma-fury/motion04.png",
+      "sha256": "bca387e7d240b681ca8892c6c900bde36f3da695b126a92f08b9b2f04e0abd3b",
+      "width": 704,
+      "height": 704,
+      "ruid": "a4b7ae6b436f483b912330a657ad88d4"
+    },
+    {
+      "file": "frames/blade-tornado-karma-fury/motion05.png",
+      "sha256": "2272e486de02a677ee245799349b6e9ebec9edf43c57d405d908936e284cda07",
+      "width": 704,
+      "height": 704,
+      "ruid": "ef741c7fc3cc4fdeb1d06a71d74ccc14"
+    },
+    {
+      "file": "frames/blade-tornado-karma-fury/motion06.png",
+      "sha256": "77abf3bfc96f012414bc9406d162c3b2c3a6ed77bc3404a1733d884ceeb9b205",
+      "width": 704,
+      "height": 704,
+      "ruid": "0a36ccef0202492788c4283d6c52f545"
+    },
+    {
+      "file": "frames/blade-tornado-karma-fury/motion07.png",
+      "sha256": "9a7a0d56fdab49011f80522598cf3611fb471c1e05226c232e811c366c9a21f6",
+      "width": 704,
+      "height": 704,
+      "ruid": "fc0570f63b4945f390bf4e03508a3416"
+    },
+    {
+      "file": "frames/blade-tornado-karma-fury/motion08.png",
+      "sha256": "4778ece10822c435fe69f1d2b66b4a8578db937f5c6b824e0f7c3c31935451e8",
+      "width": 704,
+      "height": 704,
+      "ruid": "91f0a6cfb7c04e729e1a788a40d283ba"
+    },
+    {
+      "file": "frames/meso-explosion/motion01.png",
+      "sha256": "808dc2211b7ea606d39c3a5331b80ebcd6453569dde38308c2f7a4a7cb91976b",
+      "width": 704,
+      "height": 704,
+      "ruid": "fbef7d6900ee489eb870bb29f04f962f"
+    },
+    {
+      "file": "frames/meso-explosion/motion02.png",
+      "sha256": "9164c75381cddde0bc86023cbe2a3a9f95e6e9bc8a100e39d0fa9946cddf5618",
+      "width": 704,
+      "height": 704,
+      "ruid": "c5379c189d674cff98b310cca14cad50"
+    },
+    {
+      "file": "frames/meso-explosion/motion03.png",
+      "sha256": "35c8bf1e87eacb9ddb0802c6078a0e00f16281385f8eeb2bc33bcf25fe8c7383",
+      "width": 704,
+      "height": 704,
+      "ruid": "4dc51fe6f8554aa3ae727777235460d4"
+    },
+    {
+      "file": "frames/meso-explosion/motion04.png",
+      "sha256": "7fac42860abb815b6b8123f951ecdb965faf0245cfe2dd81cb9bccdbd357fde1",
+      "width": 704,
+      "height": 704,
+      "ruid": "cbdb8dd7ecdd4bc796e6bb2b96a24e01"
+    },
+    {
+      "file": "frames/meso-explosion/motion05.png",
+      "sha256": "0916c2c69952515bb5b59e5d9a2ce9302cb079b3bbede76babab63b35a7d4dde",
+      "width": 704,
+      "height": 704,
+      "ruid": "24ee1e2b9952414d936e483b8ece07ae"
+    },
+    {
+      "file": "frames/savage-blow/motion01.png",
+      "sha256": "2b3db25cf712f68493240c21d289cab68c607941831b8dba1816a8bd293fc6b7",
+      "width": 704,
+      "height": 704,
+      "ruid": "e0f64485b5db4a95aa412399d5790b00"
+    },
+    {
+      "file": "frames/savage-blow/motion02.png",
+      "sha256": "726b81406652ba904ead97a3bc69a56be5a76afc1bb71cf81d0c0cf8473e4708",
+      "width": 704,
+      "height": 704,
+      "ruid": "fb2887c0d0b443bda8d7f6d7dc3aaf21"
+    },
+    {
+      "file": "frames/savage-blow/motion03.png",
+      "sha256": "85891b7c89874c729b8550cc9486fb2a1ac3442b3f92ba16f961fe599d5eab79",
+      "width": 704,
+      "height": 704,
+      "ruid": "10a908c265d64f5aabbff97de72821ae"
+    },
+    {
+      "file": "frames/savage-blow/motion04.png",
+      "sha256": "afaf0aeb55317ac73e360bbbc4eb758340bb4c0b6add9885d03691ef3245160e",
+      "width": 704,
+      "height": 704,
+      "ruid": "476197fafcaa47938c2c0d9bf011bd45"
+    },
+    {
+      "file": "frames/savage-blow/motion05.png",
+      "sha256": "3da0d094077bc3f23ae56a961c700fdfe92923219e4a84c1ab238919ad5c0883",
+      "width": 704,
+      "height": 704,
+      "ruid": "6292265f10a2488bac1ad7258df7034d"
+    },
+    {
+      "file": "frames/savage-blow/motion06.png",
+      "sha256": "46b09d21164da920fffe9990d2228e565ce7e390e3b29b288bbfdedbfd8d0a32",
+      "width": 704,
+      "height": 704,
+      "ruid": "238fb780543747a085ac1107d7aa765c"
+    },
+    {
+      "file": "frames/savage-blow/motion07.png",
+      "sha256": "0920cd8f09d867919d9aba57cc428f3c43117919173d935dd2e19ff684e933ca",
+      "width": 704,
+      "height": 704,
+      "ruid": "f74189314f454aa683a7febdd268f0ae"
+    },
+    {
+      "file": "frames/savage-blow/motion08.png",
+      "sha256": "f7f4e1a1ef9a66f4a0d67a00c7561b0202b19d86ac41b5e485820b4d762b1e63",
+      "width": 704,
+      "height": 704,
+      "ruid": "bc760d3a8ba7430f899b11057c4ace73"
+    },
+    {
+      "file": "frames/wait/motion01.png",
+      "sha256": "79f123667adfd47b1e2367120453e2596cc829848d5502472f25859f5cac3f60",
+      "width": 576,
+      "height": 576,
+      "ruid": "2753c58c1aaf413681834dc5d70ecac2"
+    },
+    {
+      "file": "frames/wait/motion02.png",
+      "sha256": "921d49bae01383f3647fa253149f6a1a1b9edc4eb218b42df9f2a4cb233ac6a1",
+      "width": 576,
+      "height": 576,
+      "ruid": "96ed758328834446b5d9f9e7adebf101"
+    },
+    {
+      "file": "frames/wait/motion03.png",
+      "sha256": "3a260a3a5fa0e9bd60f1f9217c3afe743f00f484bb531c97ba45908431a53bbe",
+      "width": 576,
+      "height": 576,
+      "ruid": "fb4ae0f6c16e49459d28f99139523bf7"
+    }
+  ],
+  "playback": [
+    {
+      "id": "shadower",
+      "skill": "wait",
+      "ko": "대기",
+      "order": [
+        1,
+        2,
+        1,
+        3
+      ],
+      "times": [
+        0.65,
+        0.45,
+        0.65,
+        0.45
+      ]
+    },
+    {
+      "id": "shadower",
+      "skill": "savage-blow",
+      "ko": "새비지 블로우",
+      "order": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        4,
+        5,
+        7,
+        8
+      ],
+      "times": [
+        0.1,
+        0.05,
+        0.05,
+        0.05,
+        0.05,
+        0.05,
+        0.05,
+        0.05,
+        0.03,
+        0.02
+      ],
+      "hit": [
+        0.1,
+        0.15,
+        0.2,
+        0.25,
+        0.3,
+        0.35,
+        0.4,
+        0.45
+      ],
+      "delay": 0
+    },
+    {
+      "id": "shadower",
+      "skill": "meso-explosion",
+      "ko": "메소 익스플로전",
+      "order": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "times": [
+        0.12,
+        0.18,
+        0.07,
+        0.08,
+        0.05
+      ],
+      "hit": [
+        0.3
+      ],
+      "delay": 0
+    },
+    {
+      "id": "shadower",
+      "skill": "blade-tornado-karma-fury",
+      "ko": "블레이드 토네이도·카르마 퓨리",
+      "order": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "times": [
+        0.15,
+        0.15,
+        0.1,
+        0.15,
+        0.2,
+        2.1,
+        0.2,
+        0.15
+      ],
+      "hit": [
+        0.6,
+        3.1
+      ],
+      "delay": 0
+    }
+  ],
+  "runtimeActions": [
+    {
+      "id": "shadower",
+      "skill": "wait",
+      "ko": "대기",
+      "order": [
+        1,
+        2,
+        1,
+        3
+      ],
+      "times": [
+        0.65,
+        0.45,
+        0.65,
+        0.45
+      ],
+      "jobId": "shad",
+      "action": "stand1",
+      "files": [
+        "assets/design/characters/shadower/frames/wait/motion01.png",
+        "assets/design/characters/shadower/frames/wait/motion02.png",
+        "assets/design/characters/shadower/frames/wait/motion01.png",
+        "assets/design/characters/shadower/frames/wait/motion03.png"
+      ],
+      "duration": 2.2
+    },
+    {
+      "id": "shadower",
+      "skill": "savage-blow",
+      "ko": "새비지 블로우",
+      "order": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        4,
+        5,
+        7,
+        8
+      ],
+      "times": [
+        0.1,
+        0.05,
+        0.05,
+        0.05,
+        0.05,
+        0.05,
+        0.05,
+        0.05,
+        0.03,
+        0.02
+      ],
+      "hit": [
+        0.1,
+        0.15,
+        0.2,
+        0.25,
+        0.3,
+        0.35,
+        0.4,
+        0.45
+      ],
+      "delay": 0,
+      "jobId": "shad",
+      "action": "shadSavage",
+      "files": [
+        "assets/design/characters/shadower/frames/savage-blow/motion01.png",
+        "assets/design/characters/shadower/frames/savage-blow/motion02.png",
+        "assets/design/characters/shadower/frames/savage-blow/motion03.png",
+        "assets/design/characters/shadower/frames/savage-blow/motion04.png",
+        "assets/design/characters/shadower/frames/savage-blow/motion05.png",
+        "assets/design/characters/shadower/frames/savage-blow/motion06.png",
+        "assets/design/characters/shadower/frames/savage-blow/motion04.png",
+        "assets/design/characters/shadower/frames/savage-blow/motion05.png",
+        "assets/design/characters/shadower/frames/savage-blow/motion07.png",
+        "assets/design/characters/shadower/frames/savage-blow/motion08.png"
+      ],
+      "duration": 0.5
+    },
+    {
+      "id": "shadower",
+      "skill": "meso-explosion",
+      "ko": "메소 익스플로전",
+      "order": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "times": [
+        0.12,
+        0.18,
+        0.07,
+        0.08,
+        0.05
+      ],
+      "hit": [
+        0.3
+      ],
+      "delay": 0,
+      "jobId": "shad",
+      "action": "shadMeso",
+      "files": [
+        "assets/design/characters/shadower/frames/meso-explosion/motion01.png",
+        "assets/design/characters/shadower/frames/meso-explosion/motion02.png",
+        "assets/design/characters/shadower/frames/meso-explosion/motion03.png",
+        "assets/design/characters/shadower/frames/meso-explosion/motion04.png",
+        "assets/design/characters/shadower/frames/meso-explosion/motion05.png"
+      ],
+      "duration": 0.5
+    },
+    {
+      "id": "shadower",
+      "skill": "blade-tornado-karma-fury",
+      "ko": "블레이드 토네이도·카르마 퓨리",
+      "order": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "times": [
+        0.15,
+        0.15,
+        0.1,
+        0.15,
+        0.2,
+        2.1,
+        0.2,
+        0.15
+      ],
+      "hit": [
+        0.6,
+        3.1
+      ],
+      "delay": 0,
+      "jobId": "shad",
+      "action": "shadDualblade",
+      "files": [
+        "assets/design/characters/shadower/frames/blade-tornado-karma-fury/motion01.png",
+        "assets/design/characters/shadower/frames/blade-tornado-karma-fury/motion02.png",
+        "assets/design/characters/shadower/frames/blade-tornado-karma-fury/motion03.png",
+        "assets/design/characters/shadower/frames/blade-tornado-karma-fury/motion04.png",
+        "assets/design/characters/shadower/frames/blade-tornado-karma-fury/motion05.png",
+        "assets/design/characters/shadower/frames/blade-tornado-karma-fury/motion06.png",
+        "assets/design/characters/shadower/frames/blade-tornado-karma-fury/motion07.png",
+        "assets/design/characters/shadower/frames/blade-tornado-karma-fury/motion08.png"
+      ],
+      "duration": 3.2
+    }
+  ],
+  "portraitStatus": "wait-motion01-temporary; dedicated-portrait-pending",
+  "verification": ".beaver/output/night-lord-shadower-motion/verification.json",
+  "portrait": {
+    "file": "portrait.png",
+    "ruid": "69652c3bf48b457d86e649a540eefc1e",
+    "width": 512,
+    "height": 512
+  }
+}

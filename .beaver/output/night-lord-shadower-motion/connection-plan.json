@@ -1,0 +1,241 @@
+{
+  "status": "game-connected-maker-verified-user-approved",
+  "files": 35,
+  "connections": [
+    {
+      "id": "night-lord",
+      "skill": "wait",
+      "ko": "대기",
+      "order": [
+        1,
+        2,
+        1,
+        3
+      ],
+      "times": [
+        0.65,
+        0.45,
+        0.65,
+        0.45
+      ],
+      "jobId": "nl",
+      "action": "stand1",
+      "files": [
+        "assets/design/characters/night-lord/frames/wait/motion01.png",
+        "assets/design/characters/night-lord/frames/wait/motion02.png",
+        "assets/design/characters/night-lord/frames/wait/motion01.png",
+        "assets/design/characters/night-lord/frames/wait/motion03.png"
+      ],
+      "duration": 2.2
+    },
+    {
+      "id": "night-lord",
+      "skill": "quadruple-throw",
+      "ko": "쿼드러플 스로우·풍마수리검 공용",
+      "order": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        5,
+        6,
+        7,
+        8
+      ],
+      "times": [
+        0.1,
+        0.05,
+        0.05,
+        0.05,
+        0.05,
+        0.05,
+        0.05,
+        0.05,
+        0.1,
+        0.15
+      ],
+      "hit": [
+        0.3,
+        0.4,
+        0.5,
+        0.6
+      ],
+      "delay": 0,
+      "jobId": "nl",
+      "action": "nlThrow",
+      "files": [
+        "assets/design/characters/night-lord/frames/quadruple-throw/motion01.png",
+        "assets/design/characters/night-lord/frames/quadruple-throw/motion02.png",
+        "assets/design/characters/night-lord/frames/quadruple-throw/motion03.png",
+        "assets/design/characters/night-lord/frames/quadruple-throw/motion04.png",
+        "assets/design/characters/night-lord/frames/quadruple-throw/motion05.png",
+        "assets/design/characters/night-lord/frames/quadruple-throw/motion06.png",
+        "assets/design/characters/night-lord/frames/quadruple-throw/motion05.png",
+        "assets/design/characters/night-lord/frames/quadruple-throw/motion06.png",
+        "assets/design/characters/night-lord/frames/quadruple-throw/motion07.png",
+        "assets/design/characters/night-lord/frames/quadruple-throw/motion08.png"
+      ],
+      "duration": 0.7
+    },
+    {
+      "id": "shadower",
+      "skill": "wait",
+      "ko": "대기",
+      "order": [
+        1,
+        2,
+        1,
+        3
+      ],
+      "times": [
+        0.65,
+        0.45,
+        0.65,
+        0.45
+      ],
+      "jobId": "shad",
+      "action": "stand1",
+      "files": [
+        "assets/design/characters/shadower/frames/wait/motion01.png",
+        "assets/design/characters/shadower/frames/wait/motion02.png",
+        "assets/design/characters/shadower/frames/wait/motion01.png",
+        "assets/design/characters/shadower/frames/wait/motion03.png"
+      ],
+      "duration": 2.2
+    },
+    {
+      "id": "shadower",
+      "skill": "savage-blow",
+      "ko": "새비지 블로우",
+      "order": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        4,
+        5,
+        7,
+        8
+      ],
+      "times": [
+        0.1,
+        0.05,
+        0.05,
+        0.05,
+        0.05,
+        0.05,
+        0.05,
+        0.05,
+        0.03,
+        0.02
+      ],
+      "hit": [
+        0.1,
+        0.15,
+        0.2,
+        0.25,
+        0.3,
+        0.35,
+        0.4,
+        0.45
+      ],
+      "delay": 0,
+      "jobId": "shad",
+      "action": "shadSavage",
+      "files": [
+        "assets/design/characters/shadower/frames/savage-blow/motion01.png",
+        "assets/design/characters/shadower/frames/savage-blow/motion02.png",
+        "assets/design/characters/shadower/frames/savage-blow/motion03.png",
+        "assets/design/characters/shadower/frames/savage-blow/motion04.png",
+        "assets/design/characters/shadower/frames/savage-blow/motion05.png",
+        "assets/design/characters/shadower/frames/savage-blow/motion06.png",
+        "assets/design/characters/shadower/frames/savage-blow/motion04.png",
+        "assets/design/characters/shadower/frames/savage-blow/motion05.png",
+        "assets/design/characters/shadower/frames/savage-blow/motion07.png",
+        "assets/design/characters/shadower/frames/savage-blow/motion08.png"
+      ],
+      "duration": 0.5
+    },
+    {
+      "id": "shadower",
+      "skill": "meso-explosion",
+      "ko": "메소 익스플로전",
+      "order": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "times": [
+        0.12,
+        0.18,
+        0.07,
+        0.08,
+        0.05
+      ],
+      "hit": [
+        0.3
+      ],
+      "delay": 0,
+      "jobId": "shad",
+      "action": "shadMeso",
+      "files": [
+        "assets/design/characters/shadower/frames/meso-explosion/motion01.png",
+        "assets/design/characters/shadower/frames/meso-explosion/motion02.png",
+        "assets/design/characters/shadower/frames/meso-explosion/motion03.png",
+        "assets/design/characters/shadower/frames/meso-explosion/motion04.png",
+        "assets/design/characters/shadower/frames/meso-explosion/motion05.png"
+      ],
+      "duration": 0.5
+    },
+    {
+      "id": "shadower",
+      "skill": "blade-tornado-karma-fury",
+      "ko": "블레이드 토네이도·카르마 퓨리",
+      "order": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "times": [
+        0.15,
+        0.15,
+        0.1,
+        0.15,
+        0.2,
+        2.1,
+        0.2,
+        0.15
+      ],
+      "hit": [
+        0.6,
+        3.1
+      ],
+      "delay": 0,
+      "jobId": "shad",
+      "action": "shadDualblade",
+      "files": [
+        "assets/design/characters/shadower/frames/blade-tornado-karma-fury/motion01.png",
+        "assets/design/characters/shadower/frames/blade-tornado-karma-fury/motion02.png",
+        "assets/design/characters/shadower/frames/blade-tornado-karma-fury/motion03.png",
+        "assets/design/characters/shadower/frames/blade-tornado-karma-fury/motion04.png",
+        "assets/design/characters/shadower/frames/blade-tornado-karma-fury/motion05.png",
+        "assets/design/characters/shadower/frames/blade-tornado-karma-fury/motion06.png",
+        "assets/design/characters/shadower/frames/blade-tornado-karma-fury/motion07.png",
+        "assets/design/characters/shadower/frames/blade-tornado-karma-fury/motion08.png"
+      ],
+      "duration": 3.2
+    }
+  ],
+  "uploaded": 35
+}

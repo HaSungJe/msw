@@ -1,0 +1,58 @@
+[
+  {
+    "path": "assets/design/characters/bowmaster/frames/wait/motion01.png",
+    "ruid": "20a3afc8702c4b478b70a5eb76bcd3a7"
+  },
+  {
+    "path": "assets/design/characters/bowmaster/frames/wait/motion02.png",
+    "ruid": "013e5b1037874974935618356a372dee"
+  },
+  {
+    "path": "assets/design/characters/bowmaster/frames/wait/motion03.png",
+    "ruid": "81223efd1c2847b19a2e8c92bcc93fce"
+  },
+  {
+    "path": "assets/design/characters/bowmaster/frames/hurricane/motion01.png",
+    "ruid": "0b766b43e5f84d84abb7c9c031786b2a"
+  },
+  {
+    "path": "assets/design/characters/bowmaster/frames/hurricane/motion02.png",
+    "ruid": "7bf344e5fbc5490088eafdac9b65aad1"
+  },
+  {
+    "path": "assets/design/characters/bowmaster/frames/hurricane/motion03.png",
+    "ruid": "cd2aab758bb7458ca5003bfa49d6914e"
+  },
+  {
+    "path": "assets/design/characters/bowmaster/frames/hurricane/motion04.png",
+    "ruid": "02b3c4cf488349e3b7f26a253b8a95e4"
+  },
+  {
+    "path": "assets/design/characters/bowmaster/frames/hurricane/motion05.png",
+    "ruid": "1531464fb7ac46c1823c6f4359eb8bb5"
+  },
+  {
+    "path": "assets/design/characters/bowmaster/portrait.png",
+    "ruid": "0d124c8828044ba4b8d71180f2e2fca6"
+  },
+  {
+    "path": "assets/design/characters/bowmaster/frames/arrow-rain/motion01.png",
+    "ruid": "cd51066174ca4ce7a6694df2a80c614c"
+  },
+  {
+    "path": "assets/design/characters/bowmaster/frames/arrow-rain/motion02.png",
+    "ruid": "2a8ceb574fa6403c9a071969cbc08352"
+  },
+  {
+    "path": "assets/design/characters/bowmaster/frames/arrow-rain/motion03.png",
+    "ruid": "f35b316092b542f28eea52ce90d989b9"
+  },
+  {
+    "path": "assets/design/characters/bowmaster/frames/arrow-rain/motion04.png",
+    "ruid": "f00254a942224e439a7ac033c8df2a12"
+  },
+  {
+    "path": "assets/design/characters/bowmaster/frames/arrow-rain/motion05.png",
+    "ruid": "2a8ceb574fa6403c9a071969cbc08352"
+  }
+]

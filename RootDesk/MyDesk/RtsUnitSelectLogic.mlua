@@ -171,7 +171,7 @@ script RtsUnitSelectLogic extends Logic
 		self.MenuHead = H:SpawnLabel("RtsUnitMenuHead", menu, Vector2(0, 1), Vector2(0, 1), Vector2(12, -6), Vector2(W - 24, rowH - 4),
 			"", H:ColGold(), 17, TextAlignmentType.MiddleLeft, true)
 		local line = H:SpawnUI("model://uisprite", "RtsUnitMenuHeadLine", menu, Vector2(0, 1), Vector2(0, 1), Vector2(8, -6 - rowH + 3), Vector2(W - 16, 1.5))
-		line.SpriteGUIRendererComponent.Color = H:ColBorderSoft()
+		_RtsHudLogic:SetUiColor(line, H:ColBorderSoft(), "border")
 
 		-- 1) 위치 이동 (쿨타임 중이면 남은 시간, 비활성)
 		local left = u:MoveCoolLeft()
@@ -266,8 +266,8 @@ script RtsUnitSelectLogic extends Logic
 		local text = "최대 레벨 도달"
 		if not maxed then text = "레벨업 (" .. H:FormatNumber(T:GetLevelCost(u.Level + 1)) end
 		if r.text.TextComponent.Text ~= text then r.text.TextComponent.Text = text end
-		r.text.TextComponent.FontColor = ink
-		r.close.TextComponent.FontColor = ink
+		_RtsHudLogic:SetUiColor(r.text, ink, "text")
+		_RtsHudLogic:SetUiColor(r.close, ink, "text")
 		if r.close.Enable == maxed then r.close:SetEnable(not maxed) end
 		if r.coin ~= nil and r.coin.Enable == maxed then r.coin:SetEnable(not maxed) end
 	end
@@ -317,12 +317,12 @@ script RtsUnitSelectLogic extends Logic
 		end
 		local can = _RtsUnitPopupLogic:CanLevelUp(u)
 		if can then
-			self.MenuLvBtn.SpriteGUIRendererComponent.Color = H:MixPanel(H:ColGold(), 0.9)
-			self.MenuLvBtn.Parent.SpriteGUIRendererComponent.Color = H:ColGold()
+			_RtsHudLogic:SetUiColor(self.MenuLvBtn, H:MixPanel(H:ColGold(), 0.9), "surface")
+			_RtsHudLogic:SetUiColor(self.MenuLvBtn.Parent, H:ColGold(), "border")
 			self:ApplyLvRow(self.MenuLvRow, u, Color(0.133, 0.114, 0.09, 1))
 		else
-			self.MenuLvBtn.SpriteGUIRendererComponent.Color = H:MixPanel(H:ColGold(), 0.25)
-			self.MenuLvBtn.Parent.SpriteGUIRendererComponent.Color = H:MixPanel(H:ColGold(), 0.4)
+			_RtsHudLogic:SetUiColor(self.MenuLvBtn, H:MixPanel(H:ColGold(), 0.25), "surface")
+			_RtsHudLogic:SetUiColor(self.MenuLvBtn.Parent, H:MixPanel(H:ColGold(), 0.4), "border")
 			self:ApplyLvRow(self.MenuLvRow, u, Color(0.6, 0.55, 0.45, 1))
 		end
 	end
@@ -461,7 +461,10 @@ script RtsUnitSelectLogic extends Logic
 	@ExecSpace("ClientOnly")
 	@EventSender("Service", "InputService")
 	handler HandleScreenTouchEvent(ScreenTouchEvent event)
-		if _InputService:IsPointerOverUI() then return end
+		-- 모바일은 마우스 포인터가 아니라 이 손가락의 UI 터치 여부를 검사한다.
+		if Environment:IsMobilePlatform() then
+			if _InputService:IsPointerOverUI(event.TouchId) then return end
+		elseif _InputService:IsPointerOverUI() then return end
 		if self.PlaceJob ~= "" then
 			local pc = self:CellAtScreen(event.TouchPoint)
 			if not _RtsZoneLogic:IsPadCell(pc.x, pc.y) then return end

@@ -190,6 +190,32 @@ script RtsPopupLogic extends Logic
 	end
 
 	@ExecSpace("ClientOnly")
+	method void FitMobilePanel(Entity panel)
+		if not Environment:IsMobilePlatform() or not isvalid(panel) then return end
+		local v = _RtsHudLogic:MobileViewport()
+		if v == nil then return end
+		local t = panel.UITransformComponent
+		local size = t.RectSize
+		if size.x <= 0 or size.y <= 0 then return end
+		-- 원래 콘텐츠 크기는 유지하며 실제 화면 안에 맞춘다. 작은 확인창은 확대한다.
+		local scale = math.min(1.5 * v.unit, (v.x1 - v.x0) / size.x, (v.y1 - v.y0) / size.y)
+		t.AnchorsMin = Vector2(0.5, 0.5)
+		t.AnchorsMax = Vector2(0.5, 0.5)
+		t.Pivot = Vector2(0.5, 0.5)
+		t.anchoredPosition = Vector2((v.x0 + v.x1) / 2, (v.y0 + v.y1) / 2)
+		t.UIScale = Vector3(scale, scale, 1)
+	end
+
+	@ExecSpace("ClientOnly")
+	method void RefreshMobilePopup()
+		if not Environment:IsMobilePlatform() or not self:IsOpen() then return end
+		self:FitMobilePanel(self.PanelOuter)
+		if isvalid(self._T.ProfileDialog) then
+			self:FitMobilePanel(self._T.ProfileDialog:GetChildByName("RtsProfileDialogPanel"))
+		end
+	end
+
+	@ExecSpace("ClientOnly")
 	method void Open(string kind)
 		if not self.Built then return end
 		if self.Kind == "profile" then
@@ -302,13 +328,13 @@ script RtsPopupLogic extends Logic
 		if self:IsHubKind(kind) then width = self.PanelW; height = 950; title = "증강" end
 		self.PanelOuter.UITransformComponent.RectSize = Vector2(width, height)
 		H:RoundPanel(self.Panel)
-		self.Panel.SpriteGUIRendererComponent.Color = self:Base()
+		_RtsHudLogic:SetUiColor(self.Panel, self:Base(), "surface")
 		-- 프로필과 연결된 설정/확인 화면은 맵이 비치지 않는 불투명 바탕이다.
 		if kind == "profile" or kind == "themeconfirm" or kind == "tombconfirm" or kind == "iconinfo" or kind == "iconconfirm" or kind == "iconget" then
-			self.Panel.SpriteGUIRendererComponent.Color = Color(0.98, 0.985, 1, 1)
+			_RtsHudLogic:SetUiColor(self.Panel, Color(0.98, 0.985, 1, 1), "surface")
 		end
-		self.PanelOuter.SpriteGUIRendererComponent.Color = Color(1, 1, 1, 0.9)
-		self.Title.TextComponent.FontColor = self:Ink()
+		_RtsHudLogic:SetUiColor(self.PanelOuter, Color(1, 1, 1, 0.9), "border")
+		_RtsHudLogic:SetUiColor(self.Title, self:Ink(), "text")
 		self.Title.TextComponent.IsRichText = false
 		self.Title.TextComponent.Text = title
 		-- 제목 자리: 직업 상세만 가운데(2026-09-25 사용자 "직업명은 가운데로"), 나머지는 왼쪽
@@ -333,7 +359,7 @@ script RtsPopupLogic extends Logic
 		H:Tint(body, 0, 0, 0, 0)
 		body.SpriteGUIRendererComponent.ImageRUID = DataRef(H.RoundedPanelRUID)
 		body.SpriteGUIRendererComponent.Type = ImageType.Sliced
-		body.SpriteGUIRendererComponent.Color = Color(1, 1, 1, 0)
+		_RtsHudLogic:SetUiColor(body, Color(1, 1, 1, 0), "surface")
 		H:SpawnWater(body)
 		self.Body = body
 
@@ -374,6 +400,11 @@ script RtsPopupLogic extends Logic
 		else
 			self:BuildPick(body)
 		end
+		if Environment:IsMobilePlatform() then
+			self.CloseBtn.UITransformComponent.RectSize = Vector2(60, 60)
+			self.CloseBtn.UITransformComponent.anchoredPosition = Vector2(-12, -5)
+		end
+		self:RefreshMobilePopup()
 		self.Group:SetEnable(true)
 		-- 옛 body(같은 창 다시 그리기)는 새 body가 여러 프레임에 걸쳐 그려진 뒤 지운다 — 새 body가 위에 그려진다
 		if self.OldBody ~= nil then
@@ -508,7 +539,7 @@ script RtsPopupLogic extends Logic
 		if key == "pick" then key = "augment" end
 		self:BarSelect(self.HubBar, key)
 		local page = H:SpawnStretch("model://uisprite", "RtsHubPage", self.Body, Vector2(0, 0), Vector2(1, 1), Vector2(0, 0), Vector2(0, -70))
-		page.SpriteGUIRendererComponent.Color = Color(1, 1, 1, 0)
+		_RtsHudLogic:SetUiColor(page, Color(1, 1, 1, 0), "surface")
 		self.HubPage = page
 		if kind == "augment" then self:BuildAugment(page)
 		elseif kind == "codex" then self:BuildCodex(page, self.PanelW)
@@ -570,16 +601,15 @@ script RtsPopupLogic extends Logic
 		local gsum = gr.bronze + gr.silver + gr.gold
 		local rates = {(100 - rate) * gr.bronze / gsum, (100 - rate) * gr.silver / gsum, (100 - rate) * gr.gold / gsum, rate}
 		for i = 1, 4 do r.rates[i].TextComponent.Text = string.format("%.1f%%", rates[i]) end
-		r.info.TextComponent.Text = "뽑기로 획득 가능한 프리즘  " .. H:Int(left) .. " / " .. H:Int(A.BuyPrismMax) .. "\n프리즘을 얻지 못하면 다음 뽑기의 프리즘 확률이 " .. H:Int(A.BuyPrismPityStep) .. "%p 올라요.\n선택 대기  " .. H:Int(pending) .. " / " .. H:Int(A.MaxPending)
+		r.info.TextComponent.Text = "뽑기로 획득 가능한 프리즘  " .. H:Int(left) .. " / " .. H:Int(A.BuyPrismMax) .. "\n프리즘을 얻지 못하면 다음 뽑기의 프리즘 확률이 " .. H:Int(A.BuyPrismPityStep) .. "%p 올라요.\n선택 대기  " .. H:Int(pending) .. "개"
 		r.label.TextComponent.Text = "증강 뽑기  ·  " .. H:FormatNumber(price) .. " 메소"
 		local reason = "등급·단계는 무작위 · 종류는 원하는 것을 선택"
 		if paused then reason = "일시정지를 해제한 뒤 뽑을 수 있어요"
 		elseif not _RtsRunResultLogic:IsMeAlive() then reason = "이번 판에서는 더 뽑을 수 없어요"
-		elseif pending >= A.MaxPending then reason = "대기 중인 선택지를 먼저 골라 주세요"
 		elseif money < price then reason = "메소가 " .. H:FormatNumber(price - money) .. " 더 필요해요"
 		elseif not can then reason = "게임 진행 중에 뽑을 수 있어요" end
 		r.reason.TextComponent.Text = reason
-		if can and not paused then r.buy.SpriteGUIRendererComponent.Color = H:ColGold() else r.buy.SpriteGUIRendererComponent.Color = self:Mix(self:Edge(), 0.5) end
+		if can and not paused then _RtsHudLogic:SetUiColor(r.buy, H:ColGold(), "surface") else _RtsHudLogic:SetUiColor(r.buy, self:Mix(self:Edge(), 0.5), "surface") end
 	end
 
 
@@ -616,12 +646,12 @@ script RtsPopupLogic extends Logic
 			border = H:ColGold()
 			ink = self:Ink()
 		end
-		t.SpriteGUIRendererComponent.Color = bg
+		_RtsHudLogic:SetUiColor(t, bg, "surface")
 		local outer = t.Parent
-		if outer ~= nil and outer.SpriteGUIRendererComponent ~= nil then outer.SpriteGUIRendererComponent.Color = border end
+		if outer ~= nil and outer.SpriteGUIRendererComponent ~= nil then _RtsHudLogic:SetUiColor(outer, border, "border") end
 		if outer ~= nil then
 			local lb = t:GetChildByName(outer.Name .. "Text")
-			if lb ~= nil and lb.TextComponent ~= nil then lb.TextComponent.FontColor = ink end
+			if lb ~= nil and lb.TextComponent ~= nil then _RtsHudLogic:SetUiColor(lb, ink, "text") end
 		end
 	end
 
@@ -688,7 +718,7 @@ script RtsPopupLogic extends Logic
 			local k = 1 - math.abs(ph * 2 - 1)
 			local base = 0
 			if bar.cur == key then base = 0.18 end
-			t.SpriteGUIRendererComponent.Color = self:Mix(H:ColGold(), base + (0.75 - base) * k)
+			_RtsHudLogic:SetUiColor(t, self:Mix(H:ColGold(), base + (0.75 - base) * k), "surface")
 		end, 0.05)
 	end
 
@@ -714,7 +744,7 @@ script RtsPopupLogic extends Logic
 	@ExecSpace("ClientOnly")
 	method Entity SpawnBox(Entity parent, string name)
 		local box = _RtsHudLogic:SpawnStretch("model://uisprite", name, parent, Vector2(0, 0), Vector2(1, 1), Vector2(0, 0), Vector2(0, 0))
-		box.SpriteGUIRendererComponent.Color = Color(1, 1, 1, 0)
+		_RtsHudLogic:SetUiColor(box, Color(1, 1, 1, 0), "surface")
 		box.SpriteGUIRendererComponent.RaycastTarget = false
 		return box
 	end
@@ -789,6 +819,29 @@ script RtsPopupLogic extends Logic
 	-- ===== 영입: 소속 탭 + 모든 소속 공통 계열 5열 + 보유 0/6 =====
 
 	@ExecSpace("ClientOnly")
+	method void SpawnRecruitLock(Entity card, number previewY)
+		local H = _RtsHudLogic
+		local icon = H:SpawnUI("model://uisprite", "RtsRcLock", card, Vector2(0.5, 1), Vector2(0.5, 0.5), Vector2(0, previewY), Vector2(36, 44))
+		icon.SpriteGUIRendererComponent.Color = Color(1, 1, 1, 0)
+		icon.SpriteGUIRendererComponent.RaycastTarget = false
+		local group = icon:AddComponent("CanvasGroupComponent")
+		group.GroupAlpha = 0.58
+		group.BlocksRaycasts = false
+		local ink = Color(0.12, 0.15, 0.21, 1)
+		local shackle = icon:AddComponent("LineGUIRendererComponent")
+		shackle.IsSmooth = false
+		shackle.Points = { LinePoint(Vector2(-10, 0), ink, 5), LinePoint(Vector2(-10, 11), ink, 5), LinePoint(Vector2(-7, 17), ink, 5), LinePoint(Vector2(0, 20), ink, 5), LinePoint(Vector2(7, 17), ink, 5), LinePoint(Vector2(10, 11), ink, 5), LinePoint(Vector2(10, 0), ink, 5) }
+		local plate = H:SpawnUI("model://uisprite", "Body", icon, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2(0, -6), Vector2(32, 25))
+		plate.SpriteGUIRendererComponent.ImageRUID = DataRef(H.RoundedPanelRUID)
+		plate.SpriteGUIRendererComponent.Type = ImageType.Sliced
+		plate.SpriteGUIRendererComponent.Color = ink
+		plate.SpriteGUIRendererComponent.RaycastTarget = false
+		local keyhole = H:SpawnUI("model://uisprite", "Keyhole", plate, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2.zero, Vector2(4, 10))
+		keyhole.SpriteGUIRendererComponent.Color = Color(1, 1, 1, 1)
+		keyhole.SpriteGUIRendererComponent.RaycastTarget = false
+	end
+
+	@ExecSpace("ClientOnly")
 	method void BuildRecruit(Entity body)
 		-- 직업군 탭: 모험가 / 영웅(2026-09-23 사용자 "팬텀은 영웅 탭에, 개발 아님") — 탭은 제자리, 카드·안내만 다시(RefreshRecruit)
 		self.RecruitBody = body
@@ -835,7 +888,7 @@ script RtsPopupLogic extends Logic
 			H:SpawnLabel("RtsRcGroup" .. tostring(gi), body, Vector2(0, 1), Vector2(0, 1), Vector2(gx, top), Vector2(colW, 26),
 				g[1], self:AccentInk(), 18, TextAlignmentType.MiddleCenter, true)
 			local line = H:SpawnUI("model://uisprite", "RtsRcGroupLine" .. tostring(gi), body, Vector2(0, 1), Vector2(0, 1), Vector2(gx, top - 30), Vector2(colW, 1.5))
-			line.SpriteGUIRendererComponent.Color = H:ColBorderSoft()
+			_RtsHudLogic:SetUiColor(line, H:ColBorderSoft(), "border")
 			local jobs = g[2]
 			if #jobs == 0 then
 				local empty = H:SpawnRoundedPanel("RtsRcEmpty" .. tostring(gi), body, Vector2(0, 1), Vector2(0, 1), Vector2(gx, top - 42), Vector2(colW, cardH),
@@ -858,10 +911,10 @@ script RtsPopupLogic extends Logic
 				local ink = self:Ink()
 				if ownedJob or not canRecruit or not unlocked then
 					ink = self:Muted()
-					card.SpriteGUIRendererComponent.Color = self:Card()
+					_RtsHudLogic:SetUiColor(card, self:Card(), "surface")
 				end
 				local status = ""
-				if ownedJob then status = "보유 중" elseif not unlocked then status = "잠김" end
+				if ownedJob then status = "보유 중" end
 				local previewY = -55
 				local nameY = -106
 				if status ~= "" then previewY = -47; nameY = -98 end
@@ -870,6 +923,7 @@ script RtsPopupLogic extends Logic
 				else
 					_RtsUnitPopupLogic:SpawnPreviewAt(card, { JobId = jid }, Vector2(colW / 2, previewY), Vector2(68, 78))
 				end
+				if not unlocked then self:SpawnRecruitLock(card, previewY) end
 				H:SpawnLabel("RtsRcJobName", card, Vector2(0.5, 1), Vector2(0.5, 0.5), Vector2(0, nameY), Vector2(colW - 16, 22),
 					_RtsJobTableLogic:GetJobName(jid), ink, 17, TextAlignmentType.MiddleCenter, false)
 				if status ~= "" then
@@ -960,6 +1014,7 @@ script RtsPopupLogic extends Logic
 		-- 맨 아래: [선택](가능할 때 — 2026-09-25 사용자 "영입 → 선택") / 이유 · [취소]
 		local bw = 180
 		local bh = 44
+		if Environment:IsMobilePlatform() then bh = 64 end
 		local reason = self:RecruitBlockReason(jid)
 		if reason == "" then
 			local yes = H:SpawnRoundedPanel("RtsRiRecruit", body, Vector2(0.5, 0), Vector2(1, 0), Vector2(-10, 22), Vector2(bw, bh),
@@ -1000,7 +1055,7 @@ script RtsPopupLogic extends Logic
 		self.RiSkillBox = box
 		self:DropLater(old)
 		local list = H:SpawnStretch("model://uisprite", "RtsRiSkillList", box, Vector2(0, 0), Vector2(1, 1), Vector2(27, 78), Vector2(-27, -260))
-		list.SpriteGUIRendererComponent.Color = self:Mix(Color.white, 0.02)
+		_RtsHudLogic:SetUiColor(list, self:Mix(Color.white, 0.02), "surface")
 		local sg = list:AddComponent("ScrollLayoutGroupComponent")
 		if sg ~= nil then
 			sg.Type = LayoutGroupType.Vertical
@@ -1132,7 +1187,7 @@ script RtsPopupLogic extends Logic
 		web.UITransformComponent.Pivot = Vector2(0.5, 0.5)
 		web.UITransformComponent.anchoredPosition = Vector2(cx, cy)
 		web.SpriteGUIRendererComponent.ImageRUID = DataRef(self.RadarWebRUID)
-		web.SpriteGUIRendererComponent.Color = Color(1, 1, 1, 0.9)
+		_RtsHudLogic:SetUiColor(web, Color(1, 1, 1, 0.9), "border")
 		web.SpriteGUIRendererComponent.RaycastTarget = false
 		local n = #levels
 		local pts = {}
@@ -1375,7 +1430,7 @@ script RtsPopupLogic extends Logic
 	method Entity SpawnScrollGrid(Entity body, string name, number top, number bottom, Vector2 cell, number gap, number cols)
 		local H = _RtsHudLogic
 		local list = H:SpawnStretch("model://uisprite", name, body, Vector2(0, 0), Vector2(1, 1), Vector2(27, bottom), Vector2(-27, 0 - top))
-		list.SpriteGUIRendererComponent.Color = self:Mix(Color.white, 0.02)
+		_RtsHudLogic:SetUiColor(list, self:Mix(Color.white, 0.02), "surface")
 		local sg = list:AddComponent("ScrollLayoutGroupComponent")
 		if sg == nil then return list end
 		-- 격자 설정: 만든 직후 넣은 값이 기본값(칸 100×100·간격 0)으로 계산될 때가 있어(2026-09-25 실측 — 테마 카드가 100px 간격으로 겹침) 한 박자 뒤에 한 번 더 넣는다
@@ -1455,7 +1510,7 @@ script RtsPopupLogic extends Logic
 		local H = _RtsHudLogic
 		local old = self._T.ProfileDialog
 		local layer = H:SpawnStretch("model://uisprite", "RtsProfileDialogLayer", self.Group, Vector2(0, 0), Vector2(1, 1), Vector2(0, 0), Vector2(0, 0))
-		layer.SpriteGUIRendererComponent.Color = Color(1, 1, 1, 0)
+		_RtsHudLogic:SetUiColor(layer, Color(1, 1, 1, 0), "surface")
 		layer.SpriteGUIRendererComponent.RaycastTarget = false
 		self._T.ProfileDialog = layer
 		self._T.ProfileDialogKind = kind
@@ -1476,11 +1531,16 @@ script RtsPopupLogic extends Logic
 		local click = H:SpawnClick("RtsProfileDialogCloseClick", close)
 		click:ConnectEvent(ButtonClickEvent, function(event) self:CloseProfileDialog() end)
 		local body = H:SpawnStretch("model://uisprite", "RtsProfileDialogBody", panel, Vector2(0, 0), Vector2(1, 1), Vector2(0, 0), Vector2(0, -70))
-		body.SpriteGUIRendererComponent.Color = Color(1, 1, 1, 0)
+		_RtsHudLogic:SetUiColor(body, Color(1, 1, 1, 0), "surface")
 		if kind == "themeconfirm" then self:BuildThemeConfirm(body)
 		elseif kind == "tombconfirm" then self:BuildTombConfirm(body)
 		elseif kind == "iconinfo" then self:BuildIconInfo(body, 640)
 		else self:BuildIconConfirm(body) end
+		if Environment:IsMobilePlatform() then
+			close.Parent.UITransformComponent.RectSize = Vector2(60, 60)
+			close.Parent.UITransformComponent.anchoredPosition = Vector2(-12, -5)
+		end
+		self:FitMobilePanel(panel.Parent)
 		self:SwapContent(old, layer)
 	end
 
@@ -1509,9 +1569,9 @@ script RtsPopupLogic extends Logic
 				local on = self:PresetIsCurrent(c.key)
 				local border = self:Mix(Color.white, 0.12)
 				if on then border = H:ColGold() end
-				if c.card.Parent ~= nil then c.card.Parent.SpriteGUIRendererComponent.Color = border end
+				if c.card.Parent ~= nil then _RtsHudLogic:SetUiColor(c.card.Parent, border, "border") end
 				if c.box ~= nil and isvalid(c.box) then
-					if on then c.box.SpriteGUIRendererComponent.Color = H:ColGold() else c.box.SpriteGUIRendererComponent.Color = Color(0.92, 0.93, 0.98, 0.9) end
+					if on then _RtsHudLogic:SetUiColor(c.box, H:ColGold(), "surface") else _RtsHudLogic:SetUiColor(c.box, Color(0.92, 0.93, 0.98, 0.9), "surface") end
 				end
 				for m = 1, #c.marks do
 					if c.marks[m] ~= nil and isvalid(c.marks[m]) then c.marks[m]:SetEnable(on) end
@@ -1554,7 +1614,7 @@ script RtsPopupLogic extends Logic
 	method Entity SpawnPresetList(Entity body, string name)
 		local H = _RtsHudLogic
 		local listE = H:SpawnStretch("model://uisprite", name, body, Vector2(0, 0), Vector2(1, 1), Vector2(27, 20), Vector2(-27, -86))
-		listE.SpriteGUIRendererComponent.Color = self:Mix(Color.white, 0.02)
+		_RtsHudLogic:SetUiColor(listE, self:Mix(Color.white, 0.02), "surface")
 		local sg = listE:AddComponent("ScrollLayoutGroupComponent")
 		if sg ~= nil then
 			sg.Type = LayoutGroupType.Vertical
@@ -1575,7 +1635,7 @@ script RtsPopupLogic extends Logic
 		if (k - 1) % 3 ~= 0 and row ~= nil then return row end
 		local H = _RtsHudLogic
 		local r = H:SpawnUI("model://uisprite", prefix .. H:Int(math.floor((k - 1) / 3) + 1), listE, Vector2(0, 1), Vector2(0, 1), Vector2(0, 0), Vector2(830, 270))
-		r.SpriteGUIRendererComponent.Color = Color(1, 1, 1, 0)
+		_RtsHudLogic:SetUiColor(r, Color(1, 1, 1, 0), "surface")
 		r.SpriteGUIRendererComponent.RaycastTarget = false
 		return r
 	end
@@ -1754,7 +1814,7 @@ script RtsPopupLogic extends Logic
 	method Entity SpawnIconGridRow(Entity list, number index)
 		-- 카드 높이 140에 행 사이 여백 10을 더해 이름과 다음 행 썸네일을 분리한다.
 		local row = _RtsHudLogic:SpawnUI("model://uisprite", "RtsIconGridRow" .. tostring(index), list, Vector2(0, 1), Vector2(0, 1), Vector2(0, 0), Vector2(818, 150))
-		row.SpriteGUIRendererComponent.Color = Color(1, 1, 1, 0)
+		_RtsHudLogic:SetUiColor(row, Color(1, 1, 1, 0), "surface")
 		row.SpriteGUIRendererComponent.RaycastTarget = false
 		return row
 	end
@@ -1766,7 +1826,7 @@ script RtsPopupLogic extends Logic
 		local cell = H:SpawnRoundedPanel("RtsIconCell" .. H:Int(index), grid, Vector2(0, 1), Vector2(0, 1), Vector2((index % 6) * 138, 0), Vector2(128, 140),
 			Color.white, self:Edge(), 1.5)
 		local slot = H:SpawnUI("model://uisprite", "RtsIconPortraitSlot", cell, Vector2(0.5, 1), Vector2(0.5, 0.5), Vector2(0, -66), Vector2(76, 76))
-		slot.SpriteGUIRendererComponent.Color = Color(1, 1, 1, 0)
+		_RtsHudLogic:SetUiColor(slot, Color(1, 1, 1, 0), "surface")
 		slot.SpriteGUIRendererComponent.RaycastTarget = false
 		local face = nil
 		if id ~= _RtsProfileLogic.IconNone then
@@ -1795,15 +1855,15 @@ script RtsPopupLogic extends Logic
 		local edge = Color(0.87, 0.89, 0.94, 1)
 		if owned then bg = Color.white end
 		if selected then bg = Color(0.92, 0.91, 0.99, 1); edge = _RtsHudLogic:ColGold() end
-		c.cell.SpriteGUIRendererComponent.Color = bg
-		c.cell.Parent.SpriteGUIRendererComponent.Color = edge
-		c.label.TextComponent.FontColor = self:Muted()
-		if owned then c.label.TextComponent.FontColor = self:Ink() end
+		_RtsHudLogic:SetUiColor(c.cell, bg, "surface")
+		_RtsHudLogic:SetUiColor(c.cell.Parent, edge, "border")
+		_RtsHudLogic:SetUiColor(c.label, self:Muted(), "text")
+		if owned then _RtsHudLogic:SetUiColor(c.label, self:Ink(), "text") end
 		c.mark.TextComponent.Text = ""
 		if selected then c.mark.TextComponent.Text = "사용 중"
 		elseif not owned then c.mark.TextComponent.Text = "미획득" end
-		c.mark.TextComponent.FontColor = self:Muted()
-		if selected then c.mark.TextComponent.FontColor = self:AccentInk() end
+		_RtsHudLogic:SetUiColor(c.mark, self:Muted(), "text")
+		if selected then _RtsHudLogic:SetUiColor(c.mark, self:AccentInk(), "text") end
 		if isvalid(c.face) then
 			if owned then c.face.SpriteGUIRendererComponent.Color = Color.white
 			else c.face.SpriteGUIRendererComponent.Color = Color(0.22, 0.25, 0.30, 0.68) end
@@ -1858,7 +1918,7 @@ script RtsPopupLogic extends Logic
 		local mon = _RtsStageTableLogic:GetMonster(id)
 		if mon == nil then return end
 		local slot = H:SpawnUI("model://uisprite", "RtsIconInfoSlot", body, Vector2(0, 1), Vector2(0, 1), Vector2(27, -10), Vector2(140, 140))
-		slot.SpriteGUIRendererComponent.Color = Color(0.94, 0.94, 0.99, 1)
+		_RtsHudLogic:SetUiColor(slot, Color(0.94, 0.94, 0.99, 1), "surface")
 		slot.SpriteGUIRendererComponent.ImageRUID = DataRef(H.RoundedPanelRUID)
 		slot.SpriteGUIRendererComponent.Type = ImageType.Sliced
 		if slot.MaskComponent == nil then slot:AddComponent("MaskComponent") end
@@ -1943,7 +2003,7 @@ script RtsPopupLogic extends Logic
 		if mon == nil then return end
 		H:PlayUi(self.PickSound)
 		local slot = H:SpawnUI("model://uisprite", "RtsIconGotSlot", body, Vector2(0.5, 1), Vector2(0.5, 1), Vector2(0, -6), Vector2(140, 140))
-		slot.SpriteGUIRendererComponent.Color = self:Mix(H:ColGold(), 0.22)
+		_RtsHudLogic:SetUiColor(slot, self:Mix(H:ColGold(), 0.22), "surface")
 		if slot.MaskComponent == nil then slot:AddComponent("MaskComponent") end
 		H:SpawnMonsterPortrait(slot, id, 128, true)
 		H:SpawnLabel("RtsIconGotName", body, Vector2(0.5, 1), Vector2(0.5, 1), Vector2(0, -154), Vector2(W - 54, 34),
@@ -2008,7 +2068,7 @@ script RtsPopupLogic extends Logic
 		-- 목록
 		local listW = W - 54
 		local list = H:SpawnStretch("model://uisprite", "RtsRankList", body, Vector2(0, 0), Vector2(1, 1), Vector2(27, 80), Vector2(-27, -86))
-		list.SpriteGUIRendererComponent.Color = self:Mix(Color.white, 0.02)
+		_RtsHudLogic:SetUiColor(list, self:Mix(Color.white, 0.02), "surface")
 		local rows = {}
 		for line in string.gmatch(c.rows, "[^\n]+") do
 			local nick, cnt = string.match(line, "^(.-)\t(%d+)$")
@@ -2086,7 +2146,7 @@ script RtsPopupLogic extends Logic
 				local txt = "[" .. T:GetJobName(pz.job) .. "] " .. pz.name
 				if has then txt = txt .. "   ✓ 적용됨 (누르면 해제)" elseif not hasUnit then txt = txt .. "   (유닛 없음 — 영입에서)" end
 				local tab = self:SpawnTab("RtsDp" .. pz.id, body, Vector2(x, y), Vector2(colW, 40), txt, has, 15)
-				if not hasUnit then tab.SpriteGUIRendererComponent.Color = self:Mix(Color.white, 0.02) end
+				if not hasUnit then _RtsHudLogic:SetUiColor(tab, self:Mix(Color.white, 0.02), "surface") end
 				H:SpawnLabel("RtsDpD" .. pz.id, body, Vector2(0, 1), Vector2(0, 1), Vector2(x + 4, y - 44), Vector2(colW - 8, 52),
 					pz.desc, self:Ink(), 12, TextAlignmentType.UpperLeft, false)
 				if hasUnit then
@@ -2101,7 +2161,7 @@ script RtsPopupLogic extends Logic
 		end
 		-- 하단: 유닛 전부 삭제(직업 바꿔 다시 영입하려고)
 		local clr = self:SpawnTab("RtsDpClear", body, Vector2(27, -40 - math.ceil(n / 2) * 104), Vector2(220, 38), "내 유닛 전부 삭제", false, 15)
-		clr.Parent.SpriteGUIRendererComponent.Color = Color(0.8, 0.35, 0.3, 1)
+		_RtsHudLogic:SetUiColor(clr.Parent, Color(0.8, 0.35, 0.3, 1), "border")
 		local cclick = H:SpawnClick("RtsDpClearClick", clr)
 		cclick:ConnectEvent(ButtonClickEvent, function(event)
 			_RtsUnitLogic:RequestDevClear()
@@ -2213,7 +2273,7 @@ script RtsPopupLogic extends Logic
 			end
 		end
 		local list = H:SpawnStretch("model://uisprite", "RtsAugList", box, Vector2(0, 0), Vector2(0, 1), Vector2(27, 27), Vector2(27 + listW, top))
-		list.SpriteGUIRendererComponent.Color = Color(1, 1, 1, 0)
+		_RtsHudLogic:SetUiColor(list, Color(1, 1, 1, 0), "surface")
 		self._T.AugList = list
 		self._T.AugEmpty = H:SpawnLabel("RtsAugFilteredEmpty", box, Vector2(0, 1), Vector2(0, 1), Vector2(47, -230), Vector2(390, 110), "미지정 증강이 없어요\n숨기기를 해제하면 적용된 증강을 볼 수 있어요", self:Muted(), 17, TextAlignmentType.MiddleCenter, false)
 
@@ -2228,7 +2288,8 @@ script RtsPopupLogic extends Logic
 				sg.Type = LayoutGroupType.Vertical
 				sg.ChildAlignment = ChildAlignmentType.UpperLeft
 				sg.Spacing = 6
-				sg.UseScroll = #rows > 8
+				-- 미선택 건까지 세어 6행이 넘으면 스크롤(ApplyAugFilter와 같은 기준 — 2026-09-27 선택지 한도를 없애 미선택이 많이 쌓일 수 있다)
+				sg.UseScroll = (#rows + #pendingItems) > 6
 				sg.ScrollBarVisible = ScrollBarVisibility.AlwaysShow
 				sg.ScrollBarThickness = 8
 				sg.ScrollBarHandleColor = H:ColGold()
@@ -2296,11 +2357,11 @@ script RtsPopupLogic extends Logic
 
 		-- 우측 하단: [v] 적용된 증강 숨기기(기본 체크) — 누르면 켜고 끄기
 		local cb = H:SpawnUI("model://uisprite", "RtsAugHideBox", box, Vector2(1, 1), Vector2(1, 1), Vector2(-27, -20), Vector2(210, 28))
-		cb.SpriteGUIRendererComponent.Color = Color(1, 1, 1, 0)
+		_RtsHudLogic:SetUiColor(cb, Color(1, 1, 1, 0), "surface")
 		local sq = H:SpawnRoundedPanel("RtsAugHideSq", cb, Vector2(0, 0.5), Vector2(0, 0.5), Vector2(0, 0), Vector2(20, 20), Color(0.92, 0.93, 0.98, 0.9), H:ColGold(), 1.5)
 		do
 			local mark = H:SpawnUI("model://uisprite", "RtsAugHideMark", sq, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2(0, 0), Vector2(10, 10))
-			mark.SpriteGUIRendererComponent.Color = H:ColGold()
+			_RtsHudLogic:SetUiColor(mark, H:ColGold(), "surface")
 			self._T.AugHideMark = mark
 		end
 		H:SpawnLabel("RtsAugHideText", cb, Vector2(0, 0.5), Vector2(0, 0.5), Vector2(28, 0), Vector2(182, 28), "적용된 증강 숨기기", self:Ink(), 16, TextAlignmentType.MiddleLeft, false)
@@ -2435,8 +2496,8 @@ script RtsPopupLogic extends Logic
 					bg = self:Mix(H:ColGold(), 0.14)
 					border = H:ColGold()
 				end
-				r.row.SpriteGUIRendererComponent.Color = bg
-				if r.row.Parent ~= nil then r.row.Parent.SpriteGUIRendererComponent.Color = border end
+				_RtsHudLogic:SetUiColor(r.row, bg, "surface")
+				if r.row.Parent ~= nil then _RtsHudLogic:SetUiColor(r.row.Parent, border, "border") end
 			end
 		end
 	end
@@ -2536,8 +2597,8 @@ script RtsPopupLogic extends Logic
 		local info = "라운드 지급 10장 · 기본 뽑기 확률 50%"
 		if self.CodexGrade == "silver" then info = "라운드 지급 10장 · 기본 뽑기 확률 35%" end
 		if self.CodexGrade == "gold" then info = "라운드 지급 7장 · 기본 뽑기 확률 10%" end
-		-- 프리즘은 가중치 무작위 3장 중 선택(2026-09-27 전체 선택에서 되돌림) — 오른쪽 % = 프리즘 안에서 나올 확률
-		if self.CodexGrade == "prism" then return "자쿰 · 시그너스 · 루시드 처치 뒤 3택1 · 기본 뽑기 확률 5%(판마다 최대 2개)   ·   오른쪽 % = 프리즘 안에서 나올 확률" end
+		-- 프리즘은 가중치 무작위 3장(오른쪽 % = 3택1에서 나올 확률), 자쿰 처치 보상만 전체에서 선택(2026-09-27 사용자 "자쿰 한정으로 자쿰이 준 프리즘만 선택 가능")
+		if self.CodexGrade == "prism" then return "자쿰 처치 뒤 원하는 것 선택 · 시그너스 · 루시드 처치 뒤 · 뽑기 5%(판마다 최대 2개)는 3택1   ·   오른쪽 % = 3택1 확률" end
 		return info .. "   ·   단계 I 50% · II 35% · III 15%, 종류는 선택"
 	end
 
@@ -2553,7 +2614,7 @@ script RtsPopupLogic extends Logic
 		local isPrism = self.CodexGrade == "prism"
 		local listW = W - 54
 		local list = H:SpawnStretch("model://uisprite", "RtsCodexList", body, Vector2(0, 0), Vector2(1, 1), Vector2(27, 27), Vector2(-27, -104))
-		list.SpriteGUIRendererComponent.Color = self:Mix(Color.white, 0.02)
+		_RtsHudLogic:SetUiColor(list, self:Mix(Color.white, 0.02), "surface")
 		self.CodexList = list
 		local sg = list:AddComponent("ScrollLayoutGroupComponent")
 		if sg ~= nil then
@@ -2633,14 +2694,17 @@ script RtsPopupLogic extends Logic
 			self:Close()
 			return
 		end
+		-- 자쿰 프리즘은 아직 없는 프리즘 전체(3장보다 많으면) — 같은 카드를 가로 스크롤로 늘어놓는다. 나머지 프리즘은 무작위 3장(2026-09-27 사용자 "자쿰 한정으로 자쿰이 준 프리즘만 선택 가능")
+		local scroll = offer.grade == "prism" and #offer.ids > 3
 		local title = self:GradeName(offer.grade) .. " 증강 선택"
-		-- 브론즈~골드는 단계(I/II/III)까지 무작위, 그 단계의 종류는 전부 보여 주고 고른다(2026-09-27 사용자 개편) — 제목에 단계. 프리즘은 무작위 3장(같은 날 전체 선택·가로 스크롤을 되돌림)
+		-- 브론즈~골드는 단계(I/II/III)까지 무작위, 그 단계의 종류는 전부 보여 주고 고른다(2026-09-27 사용자 개편) — 제목에 단계
 		local first = AT:GetDef(offer.ids[1])
 		if first ~= nil and first.level ~= nil then title = self:GradeName(offer.grade) .. " 증강 " .. AT:LevelName(first.level) .. " 선택" end
 		if offer.grade == "prism" then title = "프리즘 증강 선택" end
 		local pending = _RtsAugmentLogic.PendingByUser[_RtsUnitLogic:MyUserId()] or 0
 		local sub = title .. " · 원하는 증강을 하나 골라 주세요. 받은 증강은 보유 증강 탭에서 지정할 수 있어요."
-		if pending > 1 then sub = sub .. "   ·   대기 중인 선택지 " .. H:Int(pending) .. "개 / " .. H:Int(_RtsAugmentLogic.MaxPending) .. "개" end
+		if scroll then sub = title .. " · 원하는 프리즘을 하나 골라 주세요(좌우로 넘겨 보기 · " .. H:Int(#offer.ids) .. "종). 받은 증강은 보유 증강 탭에서 지정할 수 있어요." end
+		if pending > 1 then sub = sub .. "   ·   대기 중인 선택지 " .. H:Int(pending) .. "개" end
 		H:SpawnLabel("RtsPickSub", body, Vector2(0, 1), Vector2(0, 1), Vector2(27, -4), Vector2(1060, 44),
 			sub, self:Muted(), 15, TextAlignmentType.MiddleCenter, false)
 		-- 접기(2026-09-23 사용자): 창을 닫고 나중에 HUD '펼치기'로 고른다. ESC도 같다(2026-09-27 사용자 "보유 증강으로 버튼 ESC 단축키" — 오른쪽 안에 [ESC] 키캡, HandleKeyDownEvent)
@@ -2655,19 +2719,48 @@ script RtsPopupLogic extends Logic
 		end)
 		local cardW = 340
 		local gap = 19
+		-- 카드 크기: 고정 배치는 660 높이, 프리즘 가로 스크롤은 아래 스크롤 막대 자리만큼 줄인다(600 — 아이콘·제목·설명 위치도 그만큼 위로)
 		local cardH = 660
 		local cardTop = -56
 		local contentTop = 150
 		local descH = 230
-		-- 선택지 수(브론즈·실버 4장, 골드 5장, 프리즘 3장)에 맞춰 카드 폭을 줄여 한 줄에 다 보인다(최대 340)
-		if #offer.ids > 3 then cardW = math.floor((1060 - gap * (#offer.ids - 1)) / #offer.ids) end
+		local parent = body
+		if scroll then
+			cardH = 600
+			contentTop = 120
+			descH = 200
+			local list = H:SpawnStretch("model://uisprite", "RtsPickScroll", body, Vector2(0, 0), Vector2(1, 1), Vector2(27, 70), Vector2(-27, -50))
+			list.SpriteGUIRendererComponent.Color = Color(1, 1, 1, 0)
+			local sg = list:AddComponent("ScrollLayoutGroupComponent")
+			if sg ~= nil then
+				sg.Type = LayoutGroupType.Horizontal
+				sg.ChildAlignment = ChildAlignmentType.UpperLeft
+				sg.Spacing = gap
+				sg.UseScroll = true
+				sg.ScrollBarVisible = ScrollBarVisibility.AlwaysShow
+				sg.ScrollBarThickness = 10
+				sg.ScrollBarHandleColor = H:ColGold()
+				sg.ScrollBarBackgroundColor = Color(1, 1, 1, 0.06)
+			end
+			parent = list
+		end
+		-- 스크롤이 아니면 선택지 수(브론즈·실버 4장, 골드 5장, 프리즘 3장)에 맞춰 카드 폭을 줄여 한 줄에 다 보인다(최대 340)
+		if not scroll and #offer.ids > 3 then cardW = math.floor((1060 - gap * (#offer.ids - 1)) / #offer.ids) end
 		_SoundService:PlaySound(self.PickSound, 1)
 		for ci = 1, #offer.ids do
 			local d = AT:GetDef(offer.ids[ci])
 			if d ~= nil then
-				local host = body
+				-- 고정 배치 = body 위 절대 위치 / 스크롤 = 칸(빛 테두리 포함 크기) 하나를 목록에 넣고 그 안에 빛·카드
+				local host = parent
 				local cx = 27 + (ci - 1) * (cardW + gap)
 				local cy = cardTop
+				if scroll then
+					host = H:SpawnUI("model://uisprite", "RtsPickSlot" .. tostring(ci), parent, Vector2(0, 1), Vector2(0, 1), Vector2(0, 0), Vector2(cardW + 6, cardH + 6))
+					host.SpriteGUIRendererComponent.Color = Color(1, 1, 1, 0)
+					host.SpriteGUIRendererComponent.RaycastTarget = false
+					cx = 3
+					cy = -3
+				end
 				-- 등급색으로 카드 가장자리를 은은하게 강조한다.
 				local glow = H:SpawnUI("model://uisprite", "RtsPickGlow" .. tostring(ci), host, Vector2(0, 1), Vector2(0, 1), Vector2(cx - 3, cy + 3), Vector2(cardW + 6, cardH + 6))
 				local gc = self:GradeColor(d.grade)

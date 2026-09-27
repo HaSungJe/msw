@@ -1,0 +1,713 @@
+{
+  "status": "generating",
+  "sequences": [
+    {
+      "id": "paladin",
+      "skill": "divine-charge",
+      "ko": "디바인 차지",
+      "durations": [
+        0.15,
+        0.15,
+        0.08,
+        0.1,
+        0.1,
+        0.17
+      ],
+      "hit": [
+        0.3
+      ],
+      "poses": [
+        "Preparation: feet planted, both hands close on hammer handle at waist, hammer head drawn back low toward viewer RIGHT. Face looks toward viewer LEFT.",
+        "Wind-up: turn torso slightly toward viewer RIGHT, both hands bring hammer back beside right hip, bend knees subtly. Hammer head low, face still LEFT.",
+        "Impact at0.30s: decisive upward-forward swing toward viewer LEFT. Both hands on handle, hammer head extended to left at chest height, torso leans left slightly, rear heel lifted.",
+        "Follow-through: hammer continues upward over left shoulder, elbows bent, torso straightening. Keep hammer fully visible above LEFT side of head.",
+        "Recovery: hammer head near left shoulder now being lowered, elbows relax, feet settle, cape follows motion gently.",
+        "Return: lower hammer beside viewer LEFT thigh toward original idle resting position; gentle expression restored, compact upright posture."
+      ]
+    },
+    {
+      "id": "paladin",
+      "skill": "sanctuary",
+      "ko": "생츄어리",
+      "durations": [
+        0.2,
+        0.2,
+        0.1,
+        0.12,
+        0.13,
+        0.15
+      ],
+      "hit": [
+        0.5
+      ],
+      "poses": [
+        "Preparation for heavy overhead hammer strike: slightly lower hips, both hands grip hammer handle before chest, hammer head beside right shoulder.",
+        "Lift: both arms raise hammer above crown, elbows bent; hammer head above and slightly to viewer RIGHT, cape begins to lift.",
+        "Peak anticipation: hammer held above and behind head, knees bent gently, weight on rear foot, gaze LEFT. No giant halo.",
+        "Impact at0.50s: bring hammer forcefully down toward viewer LEFT, hammer head near ground in front of left foot, body crouched but head same size, both hands grip handle.",
+        "Follow-through hold: head and shoulders slightly lowered, hammer head still near LEFT ground, cape settling, body stable.",
+        "Recovery: lift hammer back to lowered resting position on viewer LEFT, rise almost upright, knees straightening naturally."
+      ]
+    },
+    {
+      "id": "dark-knight",
+      "skill": "spear-buster",
+      "ko": "스피어 버스터",
+      "durations": [
+        0.1,
+        0.05,
+        0.08,
+        0.07,
+        0.08,
+        0.07,
+        0.1,
+        0.15
+      ],
+      "motionDelay": 0.5,
+      "hit": [
+        0.65,
+        0.8,
+        0.95
+      ],
+      "poses": [
+        "Ready after magic charge: rotate spear to horizontal at waist with blade toward viewer LEFT, two hands spaced on shaft, compact slight knee bend.",
+        "Draw back: pull spear grip toward right hip, blade still LEFT at waist height, torso coiled slightly right, rear elbow back.",
+        "Thrust one: extend both arms toward viewer LEFT, long spear perfectly horizontal at waist/chest height, a small forward lunge, both feet visible.",
+        "Retract one: bring spear back half-way toward waist, front elbow bending, leftward spear remains level, knees still gently bent.",
+        "Thrust two: second sharp leftward thrust, leading shoulder advances slightly, shaft horizontal, front knee bends a little more, rear leg SHORT.",
+        "Retract two: spear drawn back toward right waist, elbows bent, cape trails right, calm intense expression unchanged.",
+        "Thrust three maximum reach: push spear toward viewer LEFT with fully extended compact arms and small torso lean; spear complete within canvas, no foreshortened giant blade.",
+        "Recovery: spear pulled back then begins returning to original diagonal guard, hips rise, feet planted, no magic orb."
+      ]
+    },
+    {
+      "id": "dark-knight",
+      "skill": "dragon-roar",
+      "ko": "드래곤 로어",
+      "durations": [
+        0.2,
+        0.2,
+        0.2,
+        0.2,
+        0.25,
+        0.35
+      ],
+      "hit": [
+        0.6
+      ],
+      "poses": [
+        "Charge start: bend knees slightly, grip spear at chest with blade diagonally up toward viewer LEFT, chin lowered, serious brows.",
+        "Gather power: bring shaft closer to torso, shoulders lifted, spear tip higher toward upper LEFT, short legs remain planted.",
+        "Peak charge: straighten torso, draw spear back beside right shoulder with blade pointing upward, elbows tightly bent, mouth opens slightly in forceful shout.",
+        "Release at0.60s: thrust spear upward high diagonally to LEFT, chest opens, head tips upward subtly, strong shout, feet remain on ground. No dragon or aura painted in.",
+        "Hold release: spear stays high, arms soften a little, cape lifted outward, mouth closes into focused expression.",
+        "Recovery: lower spear into original diagonal guard, shoulders drop, knees straighten, original serious face."
+      ]
+    },
+    {
+      "id": "night-lord",
+      "skill": "quadruple-throw",
+      "ko": "쿼드러플 스로우·풍마수리검 공용",
+      "durations": [
+        0.1,
+        0.1,
+        0.05,
+        0.05,
+        0.05,
+        0.05,
+        0.1,
+        0.2
+      ],
+      "hit": [
+        0.3,
+        0.4,
+        0.5,
+        0.6
+      ],
+      "poses": [
+        "Prepare volley: knees slightly flexed, throwing forearm with original red/silver shuriken draws back to right shoulder, free hand guards low waist, look LEFT.",
+        "Throw one release: throwing arm snaps toward viewer LEFT at chest height, open fingerless-gloved hand, shuriken has LEFT THE HAND and is not painted in flight. Free hand holds remaining original shuriken low.",
+        "Quick reload: throwing elbow bent halfway back, wrist close to upper chest, ready small red/silver shuriken gripped between fingers, compact torso.",
+        "Throw two release: leading arm extends LEFT, wrist flick down, hand open with no projectile attached; free hand low, head size fixed.",
+        "Quick reload for next release: pull forearm inward toward chin, elbow points right, original red/silver shuriken visible in hand, knees gently flexed.",
+        "Throw three/four repeat release: arm sweeps LEFT on slightly higher angle, fingers open, no flying shuriken in PNG, headband tails and jacket flutter to right.",
+        "Follow-through: throwing forearm extends low LEFT after final release, torso pitched very slightly forward, free hand returns to guard.",
+        "Recovery: elbow comes back down, both hands resume original low shuriken guard, straighten posture, original focused expression."
+      ]
+    },
+    {
+      "id": "shadower",
+      "skill": "savage-blow",
+      "ko": "새비지 블로우",
+      "durations": [
+        0.1,
+        0.05,
+        0.05,
+        0.05,
+        0.05,
+        0.05,
+        0.1,
+        0.1
+      ],
+      "hit": [
+        0.1,
+        0.15,
+        0.2,
+        0.25,
+        0.3,
+        0.35,
+        0.4,
+        0.45
+      ],
+      "poses": [
+        "Wind-up: compact knees gently bent, original curved dagger drawn back across chest toward right shoulder, free hand guarding waist, face LEFT.",
+        "Fast slash one: extend dagger diagonally downward toward viewer LEFT in front of hips, torso turns left slightly, blade silhouette clear, no painted slash trails.",
+        "Reverse slash: dagger moves up-left to shoulder height, leading elbow bent, shoulders twist back, head still LEFT.",
+        "Cross-body slash: dagger sweeps horizontally left across lower chest, free hand lifted behind for balance, knees bent, silver bob stable.",
+        "Low slash: original single dagger extends low LEFT near knee level, torso crouches slightly without long legs, scarf trails right.",
+        "Rising slash: dagger lifts high LEFT beside head, compact elbow then extends, knees begin to rise, no dagger duplication.",
+        "Finishing slash hold: dagger ends horizontal LEFT near waist, leading shoulder forward, eyes intensely focused, original black mask.",
+        "Recover to guard: single dagger returns across chest as original, free hand lowers, feet stable, scarf settles."
+      ]
+    },
+    {
+      "id": "shadower",
+      "skill": "meso-explosion",
+      "ko": "메소 익스플로전",
+      "durations": [
+        0.12,
+        0.18,
+        0.07,
+        0.08,
+        0.05
+      ],
+      "hit": [
+        0.3
+      ],
+      "poses": [
+        "Prepare detonation: upright near idle, original dagger lowered safely beside right thigh, free gloved hand raised before chest with fingers curled.",
+        "Gather: free hand lifts near chin, thumb and middle finger touching ready to snap, eyes LEFT, dagger still lowered.",
+        "Trigger at0.30s: snap fingers of free hand extending toward viewer LEFT, arm half-extended, torso steady. No coins, explosion or purple vortex painted in.",
+        "Follow-through: free palm opens toward LEFT after snap, shoulders relax, short legs planted, dagger still in other hand.",
+        "Recovery: free arm lowers, dagger returns to familiar diagonal chest guard, original face and stance."
+      ]
+    },
+    {
+      "id": "shadower",
+      "skill": "blade-tornado-karma-fury",
+      "ko": "블레이드 토네이도·카르마 퓨리",
+      "durations": [
+        0.15,
+        0.15,
+        0.1,
+        0.15,
+        0.2,
+        2.1,
+        0.2,
+        0.15
+      ],
+      "hit": [
+        0.6,
+        3.1
+      ],
+      "poses": [
+        "Prepare special strike: compact low stance, original curved dagger held back at right hip, free hand extends slightly LEFT, shoulders coiled.",
+        "Wind-up rotation: torso turns slightly right, dagger arm lifts behind shoulder, free forearm crosses chest, feet pivot in place.",
+        "Tornado launch at0.30s: sweep original dagger in broad horizontal arc toward viewer LEFT, free palm pushes left, torso follows. Keep one real dagger; magical blades are separate effects.",
+        "Second cross slash: dagger arm crosses down-left in front of body, free arm draws back right, both knees bent, scarf thrown outward.",
+        "Release: open chest slightly, dagger at low LEFT completing slash, free hand raised to shoulder, look LEFT, no magical letters or tornado painted in.",
+        "Sustained casting hold: balanced low guard, dagger forward-left at waist, free palm extended left, intense eyes; keep same short limbs. This pose holds while separately rendered attacks continue.",
+        "Recovery start: withdraw free palm and dagger toward torso, knees straighten, scarf settles.",
+        "Return: upright original dagger guard across chest, relaxed shoulders, original focused expression."
+      ]
+    },
+    {
+      "id": "phantom",
+      "skill": "joker",
+      "ko": "조커",
+      "durations": [
+        0.18,
+        0.12,
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.2
+      ],
+      "loopRange": [
+        2,
+        9
+      ],
+      "hit": [
+        0.35
+      ],
+      "poses": [
+        "Preparation: original front three-quarter LEFT-facing identity, lift red-jewel cane off floor, left arm lightly out, right hand fans three wine-red gold cards near chest. Feet close and steady.",
+        "Rotation0deg LOOP START: front three-quarter view looking LEFT, begin elegant upright turn on balls of feet, cane angled horizontally across waist, free gloved palm poised with one wine-red gold card. Coat tails flare slightly.",
+        "Rotation45deg: LEFT-facing profile, visible near violet eye, nose points LEFT, both shoulders turning; cane angled diagonally before waist, short legs pivot in place, hat and blue feathers retain exact design.",
+        "Rotation90deg: rear-left three-quarter view, mostly back of blond hair and hat visible, only sliver of cheek, white cape with gold edge opens right, cane in same anatomical hand follows turn.",
+        "Rotation135deg: nearly BACK view, face mostly hidden, crown/back of hat and blue feather attachment coherent, cape shows white/gold exterior and royal blue lining; cane held at waist follows body.",
+        "Rotation180deg: full BACK view, NO face or front eyes visible, blond nape under white/blue/gold hat, white cape with gold scroll borders, short trouser legs and small boots pivot. Cane partly visible beside waist.",
+        "Rotation225deg: rear-RIGHT three-quarter view, back mostly visible, far profile begins to appear on RIGHT, cape flares opposite side, same hat/cane outfit not mirrored accessory positions.",
+        "Rotation270deg: RIGHT-facing profile, one violet eye visible looking RIGHT as he turns through, shoulders side-on, cane crosses waist, small feet pivot, blue feathers at correct hat attachment.",
+        "Rotation315deg LOOP END: front-right three-quarter view turning back toward original left-facing front pose, both violet eyes emerging, cane angled across waist, hand poised for cards, cape returning to initial flare.",
+        "Finish: original front three-quarter LEFT view, stop turn gently, lower cane back to floor and raise three cards near shoulder, coat tails settle, relaxed sly smile. No painted card projectiles or swirls."
+      ]
+    }
+  ],
+  "jobs": [
+    {
+      "id": "paladin",
+      "skill": "wait",
+      "n": 2,
+      "pose": "Small inhalation: preserve exact idle pose and planted feet, lift shoulders and upper chest subtly, shift cape/scarf/hair tips outward by tiny amount. Same eyes and expression, no stance change."
+    },
+    {
+      "id": "paladin",
+      "skill": "wait",
+      "n": 3,
+      "pose": "Small exhalation: preserve exact idle pose and planted feet, relax shoulders subtly lower, cape/scarf/hair tips settle slightly inward. Same eyes and expression, no stance change."
+    },
+    {
+      "id": "dark-knight",
+      "skill": "wait",
+      "n": 2,
+      "pose": "Small inhalation: preserve exact idle pose and planted feet, lift shoulders and upper chest subtly, shift cape/scarf/hair tips outward by tiny amount. Same eyes and expression, no stance change."
+    },
+    {
+      "id": "dark-knight",
+      "skill": "wait",
+      "n": 3,
+      "pose": "Small exhalation: preserve exact idle pose and planted feet, relax shoulders subtly lower, cape/scarf/hair tips settle slightly inward. Same eyes and expression, no stance change."
+    },
+    {
+      "id": "night-lord",
+      "skill": "wait",
+      "n": 2,
+      "pose": "Small inhalation: preserve exact idle pose and planted feet, lift shoulders and upper chest subtly, shift cape/scarf/hair tips outward by tiny amount. Same eyes and expression, no stance change."
+    },
+    {
+      "id": "night-lord",
+      "skill": "wait",
+      "n": 3,
+      "pose": "Small exhalation: preserve exact idle pose and planted feet, relax shoulders subtly lower, cape/scarf/hair tips settle slightly inward. Same eyes and expression, no stance change."
+    },
+    {
+      "id": "shadower",
+      "skill": "wait",
+      "n": 2,
+      "pose": "Small inhalation: preserve exact idle pose and planted feet, lift shoulders and upper chest subtly, shift cape/scarf/hair tips outward by tiny amount. Same eyes and expression, no stance change."
+    },
+    {
+      "id": "shadower",
+      "skill": "wait",
+      "n": 3,
+      "pose": "Small exhalation: preserve exact idle pose and planted feet, relax shoulders subtly lower, cape/scarf/hair tips settle slightly inward. Same eyes and expression, no stance change."
+    },
+    {
+      "id": "phantom",
+      "skill": "wait",
+      "n": 2,
+      "pose": "Small inhalation: preserve exact idle pose and planted feet, lift shoulders and upper chest subtly, shift cape/scarf/hair tips outward by tiny amount. Same eyes and expression, no stance change."
+    },
+    {
+      "id": "phantom",
+      "skill": "wait",
+      "n": 3,
+      "pose": "Small exhalation: preserve exact idle pose and planted feet, relax shoulders subtly lower, cape/scarf/hair tips settle slightly inward. Same eyes and expression, no stance change."
+    },
+    {
+      "id": "paladin",
+      "skill": "divine-charge",
+      "n": 1,
+      "pose": "Preparation: feet planted, both hands close on hammer handle at waist, hammer head drawn back low toward viewer RIGHT. Face looks toward viewer LEFT."
+    },
+    {
+      "id": "paladin",
+      "skill": "divine-charge",
+      "n": 2,
+      "pose": "Wind-up: turn torso slightly toward viewer RIGHT, both hands bring hammer back beside right hip, bend knees subtly. Hammer head low, face still LEFT."
+    },
+    {
+      "id": "paladin",
+      "skill": "divine-charge",
+      "n": 3,
+      "pose": "Impact at0.30s: decisive upward-forward swing toward viewer LEFT. Both hands on handle, hammer head extended to left at chest height, torso leans left slightly, rear heel lifted."
+    },
+    {
+      "id": "paladin",
+      "skill": "divine-charge",
+      "n": 4,
+      "pose": "Follow-through: hammer continues upward over left shoulder, elbows bent, torso straightening. Keep hammer fully visible above LEFT side of head."
+    },
+    {
+      "id": "paladin",
+      "skill": "divine-charge",
+      "n": 5,
+      "pose": "Recovery: hammer head near left shoulder now being lowered, elbows relax, feet settle, cape follows motion gently."
+    },
+    {
+      "id": "paladin",
+      "skill": "divine-charge",
+      "n": 6,
+      "pose": "Return: lower hammer beside viewer LEFT thigh toward original idle resting position; gentle expression restored, compact upright posture."
+    },
+    {
+      "id": "paladin",
+      "skill": "sanctuary",
+      "n": 1,
+      "pose": "Preparation for heavy overhead hammer strike: slightly lower hips, both hands grip hammer handle before chest, hammer head beside right shoulder."
+    },
+    {
+      "id": "paladin",
+      "skill": "sanctuary",
+      "n": 2,
+      "pose": "Lift: both arms raise hammer above crown, elbows bent; hammer head above and slightly to viewer RIGHT, cape begins to lift."
+    },
+    {
+      "id": "paladin",
+      "skill": "sanctuary",
+      "n": 3,
+      "pose": "Peak anticipation: hammer held above and behind head, knees bent gently, weight on rear foot, gaze LEFT. No giant halo."
+    },
+    {
+      "id": "paladin",
+      "skill": "sanctuary",
+      "n": 4,
+      "pose": "Impact at0.50s: bring hammer forcefully down toward viewer LEFT, hammer head near ground in front of left foot, body crouched but head same size, both hands grip handle."
+    },
+    {
+      "id": "paladin",
+      "skill": "sanctuary",
+      "n": 5,
+      "pose": "Follow-through hold: head and shoulders slightly lowered, hammer head still near LEFT ground, cape settling, body stable."
+    },
+    {
+      "id": "paladin",
+      "skill": "sanctuary",
+      "n": 6,
+      "pose": "Recovery: lift hammer back to lowered resting position on viewer LEFT, rise almost upright, knees straightening naturally."
+    },
+    {
+      "id": "dark-knight",
+      "skill": "spear-buster",
+      "n": 1,
+      "pose": "Ready after magic charge: rotate spear to horizontal at waist with blade toward viewer LEFT, two hands spaced on shaft, compact slight knee bend."
+    },
+    {
+      "id": "dark-knight",
+      "skill": "spear-buster",
+      "n": 2,
+      "pose": "Draw back: pull spear grip toward right hip, blade still LEFT at waist height, torso coiled slightly right, rear elbow back."
+    },
+    {
+      "id": "dark-knight",
+      "skill": "spear-buster",
+      "n": 3,
+      "pose": "Thrust one: extend both arms toward viewer LEFT, long spear perfectly horizontal at waist/chest height, a small forward lunge, both feet visible."
+    },
+    {
+      "id": "dark-knight",
+      "skill": "spear-buster",
+      "n": 4,
+      "pose": "Retract one: bring spear back half-way toward waist, front elbow bending, leftward spear remains level, knees still gently bent."
+    },
+    {
+      "id": "dark-knight",
+      "skill": "spear-buster",
+      "n": 5,
+      "pose": "Thrust two: second sharp leftward thrust, leading shoulder advances slightly, shaft horizontal, front knee bends a little more, rear leg SHORT."
+    },
+    {
+      "id": "dark-knight",
+      "skill": "spear-buster",
+      "n": 6,
+      "pose": "Retract two: spear drawn back toward right waist, elbows bent, cape trails right, calm intense expression unchanged."
+    },
+    {
+      "id": "dark-knight",
+      "skill": "spear-buster",
+      "n": 7,
+      "pose": "Thrust three maximum reach: push spear toward viewer LEFT with fully extended compact arms and small torso lean; spear complete within canvas, no foreshortened giant blade."
+    },
+    {
+      "id": "dark-knight",
+      "skill": "spear-buster",
+      "n": 8,
+      "pose": "Recovery: spear pulled back then begins returning to original diagonal guard, hips rise, feet planted, no magic orb."
+    },
+    {
+      "id": "dark-knight",
+      "skill": "dragon-roar",
+      "n": 1,
+      "pose": "Charge start: bend knees slightly, grip spear at chest with blade diagonally up toward viewer LEFT, chin lowered, serious brows."
+    },
+    {
+      "id": "dark-knight",
+      "skill": "dragon-roar",
+      "n": 2,
+      "pose": "Gather power: bring shaft closer to torso, shoulders lifted, spear tip higher toward upper LEFT, short legs remain planted."
+    },
+    {
+      "id": "dark-knight",
+      "skill": "dragon-roar",
+      "n": 3,
+      "pose": "Peak charge: straighten torso, draw spear back beside right shoulder with blade pointing upward, elbows tightly bent, mouth opens slightly in forceful shout."
+    },
+    {
+      "id": "dark-knight",
+      "skill": "dragon-roar",
+      "n": 4,
+      "pose": "Release at0.60s: thrust spear upward high diagonally to LEFT, chest opens, head tips upward subtly, strong shout, feet remain on ground. No dragon or aura painted in."
+    },
+    {
+      "id": "dark-knight",
+      "skill": "dragon-roar",
+      "n": 5,
+      "pose": "Hold release: spear stays high, arms soften a little, cape lifted outward, mouth closes into focused expression."
+    },
+    {
+      "id": "dark-knight",
+      "skill": "dragon-roar",
+      "n": 6,
+      "pose": "Recovery: lower spear into original diagonal guard, shoulders drop, knees straighten, original serious face."
+    },
+    {
+      "id": "night-lord",
+      "skill": "quadruple-throw",
+      "n": 1,
+      "pose": "Prepare volley: knees slightly flexed, throwing forearm with original red/silver shuriken draws back to right shoulder, free hand guards low waist, look LEFT."
+    },
+    {
+      "id": "night-lord",
+      "skill": "quadruple-throw",
+      "n": 2,
+      "pose": "Throw one release: throwing arm snaps toward viewer LEFT at chest height, open fingerless-gloved hand, shuriken has LEFT THE HAND and is not painted in flight. Free hand holds remaining original shuriken low."
+    },
+    {
+      "id": "night-lord",
+      "skill": "quadruple-throw",
+      "n": 3,
+      "pose": "Quick reload: throwing elbow bent halfway back, wrist close to upper chest, ready small red/silver shuriken gripped between fingers, compact torso."
+    },
+    {
+      "id": "night-lord",
+      "skill": "quadruple-throw",
+      "n": 4,
+      "pose": "Throw two release: leading arm extends LEFT, wrist flick down, hand open with no projectile attached; free hand low, head size fixed."
+    },
+    {
+      "id": "night-lord",
+      "skill": "quadruple-throw",
+      "n": 5,
+      "pose": "Quick reload for next release: pull forearm inward toward chin, elbow points right, original red/silver shuriken visible in hand, knees gently flexed."
+    },
+    {
+      "id": "night-lord",
+      "skill": "quadruple-throw",
+      "n": 6,
+      "pose": "Throw three/four repeat release: arm sweeps LEFT on slightly higher angle, fingers open, no flying shuriken in PNG, headband tails and jacket flutter to right."
+    },
+    {
+      "id": "night-lord",
+      "skill": "quadruple-throw",
+      "n": 7,
+      "pose": "Follow-through: throwing forearm extends low LEFT after final release, torso pitched very slightly forward, free hand returns to guard."
+    },
+    {
+      "id": "night-lord",
+      "skill": "quadruple-throw",
+      "n": 8,
+      "pose": "Recovery: elbow comes back down, both hands resume original low shuriken guard, straighten posture, original focused expression."
+    },
+    {
+      "id": "shadower",
+      "skill": "savage-blow",
+      "n": 1,
+      "pose": "Wind-up: compact knees gently bent, original curved dagger drawn back across chest toward right shoulder, free hand guarding waist, face LEFT."
+    },
+    {
+      "id": "shadower",
+      "skill": "savage-blow",
+      "n": 2,
+      "pose": "Fast slash one: extend dagger diagonally downward toward viewer LEFT in front of hips, torso turns left slightly, blade silhouette clear, no painted slash trails."
+    },
+    {
+      "id": "shadower",
+      "skill": "savage-blow",
+      "n": 3,
+      "pose": "Reverse slash: dagger moves up-left to shoulder height, leading elbow bent, shoulders twist back, head still LEFT."
+    },
+    {
+      "id": "shadower",
+      "skill": "savage-blow",
+      "n": 4,
+      "pose": "Cross-body slash: dagger sweeps horizontally left across lower chest, free hand lifted behind for balance, knees bent, silver bob stable."
+    },
+    {
+      "id": "shadower",
+      "skill": "savage-blow",
+      "n": 5,
+      "pose": "Low slash: original single dagger extends low LEFT near knee level, torso crouches slightly without long legs, scarf trails right."
+    },
+    {
+      "id": "shadower",
+      "skill": "savage-blow",
+      "n": 6,
+      "pose": "Rising slash: dagger lifts high LEFT beside head, compact elbow then extends, knees begin to rise, no dagger duplication."
+    },
+    {
+      "id": "shadower",
+      "skill": "savage-blow",
+      "n": 7,
+      "pose": "Finishing slash hold: dagger ends horizontal LEFT near waist, leading shoulder forward, eyes intensely focused, original black mask."
+    },
+    {
+      "id": "shadower",
+      "skill": "savage-blow",
+      "n": 8,
+      "pose": "Recover to guard: single dagger returns across chest as original, free hand lowers, feet stable, scarf settles."
+    },
+    {
+      "id": "shadower",
+      "skill": "meso-explosion",
+      "n": 1,
+      "pose": "Prepare detonation: upright near idle, original dagger lowered safely beside right thigh, free gloved hand raised before chest with fingers curled."
+    },
+    {
+      "id": "shadower",
+      "skill": "meso-explosion",
+      "n": 2,
+      "pose": "Gather: free hand lifts near chin, thumb and middle finger touching ready to snap, eyes LEFT, dagger still lowered."
+    },
+    {
+      "id": "shadower",
+      "skill": "meso-explosion",
+      "n": 3,
+      "pose": "Trigger at0.30s: snap fingers of free hand extending toward viewer LEFT, arm half-extended, torso steady. No coins, explosion or purple vortex painted in."
+    },
+    {
+      "id": "shadower",
+      "skill": "meso-explosion",
+      "n": 4,
+      "pose": "Follow-through: free palm opens toward LEFT after snap, shoulders relax, short legs planted, dagger still in other hand."
+    },
+    {
+      "id": "shadower",
+      "skill": "meso-explosion",
+      "n": 5,
+      "pose": "Recovery: free arm lowers, dagger returns to familiar diagonal chest guard, original face and stance."
+    },
+    {
+      "id": "shadower",
+      "skill": "blade-tornado-karma-fury",
+      "n": 1,
+      "pose": "Prepare special strike: compact low stance, original curved dagger held back at right hip, free hand extends slightly LEFT, shoulders coiled."
+    },
+    {
+      "id": "shadower",
+      "skill": "blade-tornado-karma-fury",
+      "n": 2,
+      "pose": "Wind-up rotation: torso turns slightly right, dagger arm lifts behind shoulder, free forearm crosses chest, feet pivot in place."
+    },
+    {
+      "id": "shadower",
+      "skill": "blade-tornado-karma-fury",
+      "n": 3,
+      "pose": "Tornado launch at0.30s: sweep original dagger in broad horizontal arc toward viewer LEFT, free palm pushes left, torso follows. Keep one real dagger; magical blades are separate effects."
+    },
+    {
+      "id": "shadower",
+      "skill": "blade-tornado-karma-fury",
+      "n": 4,
+      "pose": "Second cross slash: dagger arm crosses down-left in front of body, free arm draws back right, both knees bent, scarf thrown outward."
+    },
+    {
+      "id": "shadower",
+      "skill": "blade-tornado-karma-fury",
+      "n": 5,
+      "pose": "Release: open chest slightly, dagger at low LEFT completing slash, free hand raised to shoulder, look LEFT, no magical letters or tornado painted in."
+    },
+    {
+      "id": "shadower",
+      "skill": "blade-tornado-karma-fury",
+      "n": 6,
+      "pose": "Sustained casting hold: balanced low guard, dagger forward-left at waist, free palm extended left, intense eyes; keep same short limbs. This pose holds while separately rendered attacks continue."
+    },
+    {
+      "id": "shadower",
+      "skill": "blade-tornado-karma-fury",
+      "n": 7,
+      "pose": "Recovery start: withdraw free palm and dagger toward torso, knees straighten, scarf settles."
+    },
+    {
+      "id": "shadower",
+      "skill": "blade-tornado-karma-fury",
+      "n": 8,
+      "pose": "Return: upright original dagger guard across chest, relaxed shoulders, original focused expression."
+    },
+    {
+      "id": "phantom",
+      "skill": "joker",
+      "n": 1,
+      "pose": "Preparation: original front three-quarter LEFT-facing identity, lift red-jewel cane off floor, left arm lightly out, right hand fans three wine-red gold cards near chest. Feet close and steady."
+    },
+    {
+      "id": "phantom",
+      "skill": "joker",
+      "n": 2,
+      "pose": "Rotation0deg LOOP START: front three-quarter view looking LEFT, begin elegant upright turn on balls of feet, cane angled horizontally across waist, free gloved palm poised with one wine-red gold card. Coat tails flare slightly."
+    },
+    {
+      "id": "phantom",
+      "skill": "joker",
+      "n": 3,
+      "pose": "Rotation45deg: LEFT-facing profile, visible near violet eye, nose points LEFT, both shoulders turning; cane angled diagonally before waist, short legs pivot in place, hat and blue feathers retain exact design."
+    },
+    {
+      "id": "phantom",
+      "skill": "joker",
+      "n": 4,
+      "pose": "Rotation90deg: rear-left three-quarter view, mostly back of blond hair and hat visible, only sliver of cheek, white cape with gold edge opens right, cane in same anatomical hand follows turn."
+    },
+    {
+      "id": "phantom",
+      "skill": "joker",
+      "n": 5,
+      "pose": "Rotation135deg: nearly BACK view, face mostly hidden, crown/back of hat and blue feather attachment coherent, cape shows white/gold exterior and royal blue lining; cane held at waist follows body."
+    },
+    {
+      "id": "phantom",
+      "skill": "joker",
+      "n": 6,
+      "pose": "Rotation180deg: full BACK view, NO face or front eyes visible, blond nape under white/blue/gold hat, white cape with gold scroll borders, short trouser legs and small boots pivot. Cane partly visible beside waist."
+    },
+    {
+      "id": "phantom",
+      "skill": "joker",
+      "n": 7,
+      "pose": "Rotation225deg: rear-RIGHT three-quarter view, back mostly visible, far profile begins to appear on RIGHT, cape flares opposite side, same hat/cane outfit not mirrored accessory positions."
+    },
+    {
+      "id": "phantom",
+      "skill": "joker",
+      "n": 8,
+      "pose": "Rotation270deg: RIGHT-facing profile, one violet eye visible looking RIGHT as he turns through, shoulders side-on, cane crosses waist, small feet pivot, blue feathers at correct hat attachment."
+    },
+    {
+      "id": "phantom",
+      "skill": "joker",
+      "n": 9,
+      "pose": "Rotation315deg LOOP END: front-right three-quarter view turning back toward original left-facing front pose, both violet eyes emerging, cane angled across waist, hand poised for cards, cape returning to initial flare."
+    },
+    {
+      "id": "phantom",
+      "skill": "joker",
+      "n": 10,
+      "pose": "Finish: original front three-quarter LEFT view, stop turn gently, lower cane back to floor and raise three cards near shoulder, coat tails settle, relaxed sly smile. No painted card projectiles or swirls."
+    }
+  ]
+}

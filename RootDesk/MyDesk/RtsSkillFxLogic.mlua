@@ -101,6 +101,7 @@ script RtsSkillFxLogic extends Logic
 			end
 		end
 		if fx.proj ~= nil and fx.proj ~= "" then list[#list + 1] = fx.proj end
+		if fx.projRing ~= nil and fx.projRing ~= "" then list[#list + 1] = fx.projRing end
 		if fx.projs ~= nil then for i = 1, #fx.projs do list[#list + 1] = fx.projs[i] end end
 		if fx.projFlySprites ~= nil then for i = 1, #fx.projFlySprites do list[#list + 1] = fx.projFlySprites[i] end end
 		if fx.projHitSprites ~= nil then for i = 1, #fx.projHitSprites do list[#list + 1] = fx.projHitSprites[i] end end
@@ -514,6 +515,7 @@ script RtsSkillFxLogic extends Logic
 		end
 		if fx.loopAlpha ~= nil then sr.Color = Color(1, 1, 1, fx.loopAlpha) end
 		e.TransformComponent.Position = Vector3((fx.loopDx or 0) * s * dir / pscale, (baseY + (fx.loopDy or 0)) / pscale, 0)
+		e.TransformComponent.ZRotation = (fx.loopRotation or 0) * dir
 		e.TransformComponent.Scale = Vector3(s / pscale, s / pscale, 1)
 		self.ActiveLoop[no] = e
 		-- loopIntroSound: 루프가 처음 생길 때 1회 재생하는 소리(애로우 레인 활 소환 400031002/use 1.9초 — 발마다 나는 sound와 별개)
@@ -561,6 +563,7 @@ script RtsSkillFxLogic extends Logic
 		local dir = 1
 		if flip then dir = -1 end
 		e.TransformComponent.Position = Vector3((fx.loopDx or 0) * s * dir / 2, (fx.loopDy or 0) / 2, 0)
+		e.TransformComponent.ZRotation = (fx.loopRotation or 0) * dir
 	end
 
 	@ExecSpace("ClientOnly")
@@ -692,7 +695,7 @@ script RtsSkillFxLogic extends Logic
 					if fx.projFrom == "around" then homing = t end
 					if d > 0 then
 						_TimerService:SetTimerOnce(function()
-							if isvalid(t) then self:SpawnProjectileEx(fx, from, to, mapRoot, false, cells, homing) end
+							if isvalid(t) and isvalid(unitEntity) then self:SpawnProjectileEx(fx, from, to, mapRoot, false, cells, homing) end
 						end, d)
 					else
 						self:SpawnProjectileEx(fx, from, to, mapRoot, false, cells, homing)
@@ -740,6 +743,7 @@ script RtsSkillFxLogic extends Logic
 	--   대상이 사라지면 마지막으로 본 자리로. 도트 퍼니셔 구체(2026-09-23 사용자 "이동 중인 대상의 지금 위치를 따라가야")
 	@ExecSpace("ClientOnly")
 	method void SpawnProjectileEx(table fx, Vector3 from, Vector2 to, Entity mapRoot, boolean shadow, number cells, any homing)
+		-- 투사체와 부속 고리는 같은 수명·궤적을 쓰며 각각 회전한다. 피해 판정은 서버에 둔다.
 		local goingRight = to.x >= from.x
 		local flip = self:FlipFor(fx, goingRight, "proj")
 		local dx = to.x - from.x
@@ -759,6 +763,8 @@ script RtsSkillFxLogic extends Logic
 		local flyIdx = 1
 		local flyTimer = nil
 		local spinTimer = nil
+		local ring = nil
+		local ringAngle = math.random(0, 359)
 		local function stopFly()
 			if flyTimer ~= nil then
 				_TimerService:ClearTimer(flyTimer)
@@ -768,6 +774,7 @@ script RtsSkillFxLogic extends Logic
 				_TimerService:ClearTimer(spinTimer)
 				spinTimer = nil
 			end
+			if isvalid(ring) then ring:Destroy() end
 		end
 		-- projSpin(도/초)이 있으면 떠 있는 동안·날아가는 동안 계속 회전(불구슬). 회전 방향은 구체마다 엇갈리게(홀짝)
 		if fx.projSpin ~= nil and fx.projSpin ~= 0 then
@@ -779,6 +786,10 @@ script RtsSkillFxLogic extends Logic
 					return
 				end
 				e.TransformComponent.ZRotation = e.TransformComponent.ZRotation + fx.projSpin * dirSpin * 0.03
+				if isvalid(ring) then
+					ringAngle = ringAngle + (fx.projRingSpin or 286.48) * 0.03
+					ring.TransformComponent.ZRotation = ringAngle - e.TransformComponent.ZRotation
+				end
 			end, 0.03)
 		end
 		if fx.projFlySprites ~= nil and #fx.projFlySprites > 0 then
@@ -805,8 +816,39 @@ script RtsSkillFxLogic extends Logic
 			sr.SpriteRUID = pr
 		end
 		local s = fx.projScale or 1.5
+		-- PNG 캔버스의 승인 표시 폭을 월드 유닛으로 지정한다. PPU가 달라도 같은 크기를 유지한다.
+		if fx.projWidth ~= nil and fx.projWidth > 0 then
+			if self._T.ProjectileSpriteMetrics == nil then self._T.ProjectileSpriteMetrics = {} end
+			local sprite = self._T.ProjectileSpriteMetrics[sr.SpriteRUID]
+			if sprite == nil then
+				sprite = _ResourceService:LoadSpriteAndWait(sr.SpriteRUID)
+				if sprite ~= nil and sprite.IsLoadComplete then self._T.ProjectileSpriteMetrics[sr.SpriteRUID] = sprite end
+			end
+			if sprite ~= nil and sprite.IsLoadComplete and sprite.Width > 0 then s = fx.projWidth * sprite.PixelPerUnit / sprite.Width end
+		end
 		e.TransformComponent.Scale = Vector3(s, s, 1)
 		if not fx.projNoRotate then e.TransformComponent.ZRotation = rot end
+		if fx.projRing ~= nil and fx.projRing ~= "" then
+			if self._T.ProjectileSpriteMetrics == nil then self._T.ProjectileSpriteMetrics = {} end
+			local sprite = self._T.ProjectileSpriteMetrics[fx.projRing]
+			if sprite == nil then
+				sprite = _ResourceService:LoadSpriteAndWait(fx.projRing)
+				if sprite ~= nil and sprite.IsLoadComplete then self._T.ProjectileSpriteMetrics[fx.projRing] = sprite end
+			end
+			if isvalid(e) and sprite ~= nil and sprite.IsLoadComplete and sprite.Width > 0 then
+				ring = _SpawnService:SpawnByModelId("model://MapObject", "CardRing", Vector3.zero, e)
+				if ring ~= nil then
+					local rr = ring.SpriteRendererComponent
+					rr.SpriteRUID = fx.projRing
+					rr.SortingLayer = "Default"
+					rr.OrderInLayer = 309
+					local ringScale = (fx.projRingSize or 2.528) * sprite.PixelPerUnit / sprite.Width / s
+					ring.TransformComponent.Position = Vector3.zero
+					ring.TransformComponent.Scale = Vector3(ringScale, ringScale, 1)
+					ring.TransformComponent.ZRotation = ringAngle - e.TransformComponent.ZRotation
+				end
+			end
+		end
 		-- 그림자 투사체(쉐도우 파트너)는 어둡고 반투명하게
 		if shadow then sr.Color = Color(0.25, 0.2, 0.35, 0.85) end
 		local dist = math.sqrt(dx * dx + dy * dy)
@@ -1199,6 +1241,8 @@ script RtsSkillFxLogic extends Logic
 	--   그 경우만 stand → 0.15초 뒤 액션(0.05초는 무시됨). 평소엔 모션이 끝나는 즉시 ReturnStand가 stand를 보내 두므로 다음 공격은 지연 0으로 바로 재생된다
 	-- 쉐도우 파트너 그림자 클립(원작 skill/4111002/special/<액션> — 검은 실루엣, 왼쪽 보기). 액션 이름은 소문자로 찾는다
 	method string ShadowClip(string action)
+		-- 원화 투척의 분신은 기존 검은 실루엣 투척 액션을 유지한다.
+		if action == "nlThrow" then action = "swingO1" end
 		local t = {
 			stand1 = "92689403831f4cb39bd828065a61fab6", stand2 = "eef0a195d421437fa0911409c93cfb32", alert = "6568f7b69d144963aa2541eba958cab7",
 			walk1 = "dfc414a245bc4b1aacca01d05595794e", walk2 = "a85d9bf79d524af79bcc06d87600c3cb",
@@ -1222,10 +1266,8 @@ script RtsSkillFxLogic extends Logic
 		if body == nil or not isvalid(body) then return end
 		if body.RtsUnitComponent ~= nil and _RtsJobTableLogic:HasMageSkin(body.RtsUnitComponent.JobId) then
 			body.RtsUnitComponent:PlayMageAction(name)
-			return
-		end
-		-- frameA·frameB(있으면) = 재생 프레임 범위. 같은 값이면 그 프레임에 멈춘 자세(조커 — 지팡이를 앞으로 뻗은 stabO1 마지막 프레임 유지)
-		if frameA ~= nil then
+		-- PNG 본체도 아래 쉐도우 파트너 지연 재생을 거친다.
+		elseif frameA ~= nil then
 			body:SendEvent(ActionStateChangedEvent(name, name, rate, playType, frameA, frameB or frameA))
 		else
 			body:SendEvent(ActionStateChangedEvent(name, name, rate, playType))

@@ -1,0 +1,93 @@
+[
+  {
+    "key": "phantom/wait/01",
+    "file": "C:\\workspace\\msw\\assets\\design\\characters\\phantom\\frames\\wait\\motion01.png",
+    "name": "RtsPhantom_wait01",
+    "size": 293720,
+    "sha256": "7cdfe3c6c1d1da25d417841c9905628b7197c4e38d380edbef1b5e6f0e4605b8"
+  },
+  {
+    "key": "phantom/wait/02",
+    "file": "C:\\workspace\\msw\\assets\\design\\characters\\phantom\\frames\\wait\\motion02.png",
+    "name": "RtsPhantom_wait02",
+    "size": 300966,
+    "sha256": "319413c63c4bda4187c3c67138bb390e0a2b5be86ca0756556503916b1b0b6f3"
+  },
+  {
+    "key": "phantom/wait/03",
+    "file": "C:\\workspace\\msw\\assets\\design\\characters\\phantom\\frames\\wait\\motion03.png",
+    "name": "RtsPhantom_wait03",
+    "size": 295786,
+    "sha256": "3869d5f5cba57299dc0f8626467d695130c1bd1df6dc57642f787527c1c7c1fd"
+  },
+  {
+    "key": "phantom/joker/01",
+    "file": "C:\\workspace\\msw\\assets\\design\\characters\\phantom\\frames\\joker\\motion01.png",
+    "name": "RtsPhantom_joker01",
+    "size": 394497,
+    "sha256": "b7abbd44c2b790c5086df548ebfd15f29ddf38f343b06d981c1d81fb2270dfb0"
+  },
+  {
+    "key": "phantom/joker/02",
+    "file": "C:\\workspace\\msw\\assets\\design\\characters\\phantom\\frames\\joker\\motion02.png",
+    "name": "RtsPhantom_joker02",
+    "size": 423315,
+    "sha256": "2009c34b655c7d9d700dd0498f9361e7ea9ba77ce1fc2fab8267c987b4872ec2"
+  },
+  {
+    "key": "phantom/joker/03",
+    "file": "C:\\workspace\\msw\\assets\\design\\characters\\phantom\\frames\\joker\\motion03.png",
+    "name": "RtsPhantom_joker03",
+    "size": 382493,
+    "sha256": "3f1adf6888a441993f0b03efc08edd5744baabcc842b6426ebe08a9a2ace6307"
+  },
+  {
+    "key": "phantom/joker/04",
+    "file": "C:\\workspace\\msw\\assets\\design\\characters\\phantom\\frames\\joker\\motion04.png",
+    "name": "RtsPhantom_joker04",
+    "size": 374124,
+    "sha256": "3eabeabfa04f07338e28bed42178a6a1d10acf377b94f0e8269a4df9f4fc5b61"
+  },
+  {
+    "key": "phantom/joker/05",
+    "file": "C:\\workspace\\msw\\assets\\design\\characters\\phantom\\frames\\joker\\motion05.png",
+    "name": "RtsPhantom_joker05",
+    "size": 426514,
+    "sha256": "38cfd70c410144ac637aafaa5ebaf2e632ec04728d76c9bb45b9f38a4918b95f"
+  },
+  {
+    "key": "phantom/joker/06",
+    "file": "C:\\workspace\\msw\\assets\\design\\characters\\phantom\\frames\\joker\\motion06.png",
+    "name": "RtsPhantom_joker06",
+    "size": 441756,
+    "sha256": "914c6ca9edf5dd75e2c8d593b8e9c0a46963dbb6b30eef84f1426c4e59d85bdc"
+  },
+  {
+    "key": "phantom/joker/07",
+    "file": "C:\\workspace\\msw\\assets\\design\\characters\\phantom\\frames\\joker\\motion07.png",
+    "name": "RtsPhantom_joker07",
+    "size": 356304,
+    "sha256": "581a917f20ccd013e5edf02f856f517847ce6ea1840dfa1e4438f6663b7b7966"
+  },
+  {
+    "key": "phantom/joker/08",
+    "file": "C:\\workspace\\msw\\assets\\design\\characters\\phantom\\frames\\joker\\motion08.png",
+    "name": "RtsPhantom_joker08",
+    "size": 375145,
+    "sha256": "3372edfaadad5e590d71a70b7d34fbf3655d3453ecf608aa455ff900876db211"
+  },
+  {
+    "key": "phantom/card",
+    "file": "C:\\workspace\\msw\\assets\\design\\effects\\phantom-joker\\card.png",
+    "name": "RtsPhantom_card",
+    "size": 216280,
+    "sha256": "8c68ffaeeb169b4ec8bb396d23f54425ca1779a71bd59e07c45d2119541c3d05"
+  },
+  {
+    "key": "phantom/ring",
+    "file": "C:\\workspace\\msw\\assets\\design\\effects\\phantom-joker\\ring.png",
+    "name": "RtsPhantom_ring",
+    "size": 383760,
+    "sha256": "1dc08111b89ada24a318aadd116fdbcfdd12a51b2e82f97acb0256ef8d4eb185"
+  }
+]

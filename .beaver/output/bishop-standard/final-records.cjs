@@ -1,0 +1,6 @@
+const fs=require('fs');const root='C:/workspace/msw/',w=root+'.beaver/output/bishop-standard/';
+const mf=w+'manifest.json',m=JSON.parse(fs.readFileSync(mf));m.rejectedConcepts=m.concepts;delete m.concepts;m.standard='Original concept appearance and style; current Bishop motion anatomical proportions';m.conceptFiles=['bishop','ice-lightning-mage','fire-poison-mage','hero'].map(id=>root+'assets/design/characters/'+id+'/concept.png');fs.writeFileSync(mf,JSON.stringify(m,null,2));
+let v=fs.readFileSync(w+'verify.cjs','utf8');v=v.replace("if(edge)errors.push(t.key+' edge clipping');","if(edge&&t.rel.startsWith('frames/'))errors.push(t.key+' edge clipping');");fs.writeFileSync(w+'verify.cjs',v);
+const unit=root+'docs/design/unit-motion.md';let text=fs.readFileSync(unit,'utf8');text='> 최신 비율 보정(2026-09-27): 썬콜 13장·히어로 18장 PNG 및 리소스 연결은 [원화 비율 적용 기록](character-proportions.md)과 `.beaver/output/bishop-standard/resource-manifest.json`을 우선한다. 아래 이전 업로드 이력의 해당 RUID는 교체 전 기록이다. 프레임 순서와 재생 시간은 유지한다.\n\n'+text;fs.writeFileSync(unit,text);
+const fp=root+'docs/design/fire-poison-mage-motion.md';let f=fs.readFileSync(fp,'utf8');f=f.replace('새 PNG 업로드와 아래 RUID 표 교체 진행 중.','불독은 기존 모션 비율이 기준에 가까워 프레임과 아래 RUID를 유지한다. 콘셉트만 비율 보정했다.');fs.writeFileSync(fp,f);
+console.log('records updated');

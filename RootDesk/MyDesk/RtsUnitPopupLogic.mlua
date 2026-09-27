@@ -144,7 +144,7 @@ script RtsUnitPopupLogic extends Logic
 		local rows = self:StatRowTexts(u)
 		for i = 1, #rows do
 			local v = self.StatVals[i]
-			if v ~= nil and isvalid(v) and v.TextComponent.Text ~= rows[i][2] then v.TextComponent.Text = rows[i][2] end
+			if isvalid(v) then _RtsHudLogic:SetUiText(v, rows[i][2]) end
 		end
 		self:UpdateStatChart(u)
 		self:ApplyDps(u)
@@ -211,8 +211,8 @@ script RtsUnitPopupLogic extends Logic
 			lborder = P:Mix(lborder, 0.4)
 			lInk = Color(0.45, 0.4, 0.33, 1)
 		end
-		self.LvBtn.SpriteGUIRendererComponent.Color = lbg
-		self.LvBtn.Parent.SpriteGUIRendererComponent.Color = lborder
+		_RtsHudLogic:SetUiColor(self.LvBtn, lbg, "surface")
+		_RtsHudLogic:SetUiColor(self.LvBtn.Parent, lborder, "border")
 		_RtsUnitSelectLogic:ApplyLvRow(self.LvRow, u, lInk)
 	end
 
@@ -915,7 +915,7 @@ script RtsUnitPopupLogic extends Logic
 			local bg = P:Card()
 			if on then bg = P:Mix(H:ColGold(), 0.2) end
 			local item = H:SpawnUI("model://uisprite", "RtsUnitTgtItem" .. tostring(i), list, Vector2(0, 1), Vector2(0, 1), Vector2(2, -2 - (i - 1) * rowH), Vector2(246, rowH))
-			item.SpriteGUIRendererComponent.Color = bg
+			_RtsHudLogic:SetUiColor(item, bg, "surface")
 			H:SpawnLabel("RtsUnitTgtItemText", item, Vector2(0, 0.5), Vector2(0, 0.5), Vector2(10, 0), Vector2(230, 26),
 				o.text, _RtsPopupLogic:Ink(), 14, TextAlignmentType.MiddleLeft, false)
 			local pick = o.no
@@ -936,10 +936,10 @@ script RtsUnitPopupLogic extends Logic
 		local left = u:BondCoolLeft()
 		if left > 0 then
 			self.BondCoolText.TextComponent.Text = "재지정까지 " .. self:FmtSec(left)
-			self.BondCoolText.TextComponent.FontColor = Color(0.91, 0.635, 0.416, 1)
+			_RtsHudLogic:SetUiColor(self.BondCoolText, Color(0.91, 0.635, 0.416, 1), "text")
 		else
 			self.BondCoolText.TextComponent.Text = "변경 가능 · 쿨타임 3분"
-			self.BondCoolText.TextComponent.FontColor = Color(0.624, 0.827, 0.604, 1)
+			_RtsHudLogic:SetUiColor(self.BondCoolText, Color(0.624, 0.827, 0.604, 1), "text")
 		end
 	end
 
@@ -1070,7 +1070,7 @@ script RtsUnitPopupLogic extends Logic
 		local P = _RtsPopupLogic
 		local info = self:DpsInfo(u)
 		local text = "보스 DPS <size=13><color=#a3957a>(방어율 제외)</color></size>  <size=22>" .. H:FormatNumber(info.dps) .. "</size>"
-		if v.TextComponent.Text ~= text then v.TextComponent.Text = text end
+		H:SetUiText(v, text)
 		local slots = self._T.EffRows or {}
 		for i = 1, #slots do
 			local s = slots[i]
@@ -1085,7 +1085,7 @@ script RtsUnitPopupLogic extends Logic
 				if s.name.TextComponent.Text ~= d.text then s.name.TextComponent.Text = d.text end
 				if s.gain.TextComponent.Text ~= g then
 					s.gain.TextComponent.Text = g
-					s.gain.TextComponent.FontColor = col
+					_RtsHudLogic:SetUiColor(s.gain, col, "text")
 				end
 			end
 		end

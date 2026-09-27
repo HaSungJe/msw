@@ -1,0 +1,11 @@
+{
+  "id": "shadower",
+  "n": 1,
+  "source": "C:/Users/timec/.codex/generated_images/01a0dbf3-5094-7520-bfc7-f24b6496f5e5/exec-cd39009f-3c77-4183-bbf4-17946465800e.png",
+  "prompt": "Use case: identity-preserve. ONE natural GAME IDLE animation base frame, actual transparent background.\nImage1 EDIT TARGET, exact character physical scale / framing. Image2 approved character identity, not pose. Image3 Bishop relaxed neutral idle / short SD anatomy reference.\nChange ONLY body and weapon POSE to a comfortable unposed game idle between attacks. NOT a promotional illustration, no dramatic hero pose. Feet shoulder-width or narrower, knees almost straight, short compact limbs, relaxed level shoulders, arms loose close to body. Head remains front three-quarter facing screen LEFT, original face expression unchanged.\nCharacter shadower. Required pose: Upright relaxed posture, feet close and parallel, no crouching and no defensive cross-body pose. Dagger hand hangs LOW beside hip with blade angled diagonally downward AWAY from leg; no dagger up near face or across chest. Original curved dagger complete. Free hand hangs relaxed near other hip. Shoulders level, silver bob and mask and orange top exactly unchanged. Scarf rests down behind.\nOriginal face/head/hair/eye color/costume/accessories/weapon and fine 2D SD lines/shading EXACTLY preserved. Anatomical head scale147units, short neutral body338units, 2.3heads. Do not elongate legs or boots.\nCanvas576units, stable foot midpoint(288,512), generous transparent top margin; match Image1 actual body scale. Entire hair, cape, weapon visible. Do not enlarge to fill canvas, do not shrink body to fit a long weapon. No text, grid, floor shadow, effects, blur, magic trails, extra arms or duplicated weapons. Single neutral IDLE pose; only pose change.",
+  "refs": [
+    "C:/workspace/msw/.beaver/output/five-class-motion/base/shadower.png",
+    "C:/workspace/msw/assets/design/characters/shadower/concept.png",
+    "C:/workspace/msw/assets/design/characters/bishop/frames/wait/motion01.png"
+  ]
+}

@@ -1,0 +1,964 @@
+{
+  "actionScreenshot": "C:/Users/timec/AppData/LocalLow/nexon/MapleStory Worlds\\McpScreenshots\\maker_play_20260927_113757_648.png",
+  "portraitScreenshot": "C:/Users/timec/AppData/LocalLow/nexon/MapleStory Worlds\\McpScreenshots\\maker_play_20260927_113930_910.png",
+  "attackLogs": {
+    "status": "ok",
+    "kind": "normal",
+    "count": 36,
+    "logs": [
+      {
+        "logType": "Info",
+        "dateTime": "2026-09-27T11:36:29",
+        "isGeneratedFromServer": true,
+        "isLogByMaker": true,
+        "owner": null,
+        "subOwner": null,
+        "ownerId": null,
+        "message": "BOW_SETUP unit=1 hp=1000000000.0",
+        "stackTrace": [
+          {
+            "methodName": "RtsConfigLogic.Log",
+            "methodLineNum": 1,
+            "codeBlockFileId": "d37e9a35-70f8-4794-b601-8f32062cfc6c"
+          },
+          {
+            "methodName": "MakerScript",
+            "methodLineNum": 16,
+            "codeBlockFileId": null
+          }
+        ]
+      },
+      {
+        "logType": "Info",
+        "dateTime": "2026-09-27T11:36:29",
+        "isGeneratedFromServer": true,
+        "isLogByMaker": true,
+        "owner": null,
+        "subOwner": null,
+        "ownerId": null,
+        "message": "RtsUnit: prism arrowrain -> unit 2 (bow)",
+        "stackTrace": [
+          {
+            "methodName": "RtsConfigLogic.Log",
+            "methodLineNum": 1,
+            "codeBlockFileId": "d37e9a35-70f8-4794-b601-8f32062cfc6c"
+          },
+          {
+            "methodName": "RtsUnitLogic.ApplyPrism",
+            "methodLineNum": 13,
+            "codeBlockFileId": "21b92bac-1582-4245-8236-ac5d05d50fd0"
+          },
+          {
+            "methodName": "MakerScript",
+            "methodLineNum": 11,
+            "codeBlockFileId": null
+          }
+        ]
+      },
+      {
+        "logType": "Info",
+        "dateTime": "2026-09-27T11:36:30",
+        "isGeneratedFromServer": true,
+        "isLogByMaker": true,
+        "owner": null,
+        "subOwner": null,
+        "ownerId": null,
+        "message": "BOW_SETUP unit=2 hp=1000000000.0",
+        "stackTrace": [
+          {
+            "methodName": "RtsConfigLogic.Log",
+            "methodLineNum": 1,
+            "codeBlockFileId": "d37e9a35-70f8-4794-b601-8f32062cfc6c"
+          },
+          {
+            "methodName": "MakerScript",
+            "methodLineNum": 16,
+            "codeBlockFileId": null
+          }
+        ]
+      },
+      {
+        "logType": "Info",
+        "dateTime": "2026-09-27T11:36:34",
+        "isGeneratedFromServer": false,
+        "isLogByMaker": true,
+        "owner": null,
+        "subOwner": null,
+        "ownerId": null,
+        "message": "BOW_FRAME unit=1 action=bowHurricane ruid=1531464fb7ac46c1823c6f4359eb8bb5 ready=true face=1.0",
+        "stackTrace": [
+          {
+            "methodName": "RtsConfigLogic.Log",
+            "methodLineNum": 1,
+            "codeBlockFileId": "d37e9a35-70f8-4794-b601-8f32062cfc6c"
+          },
+          {
+            "methodName": "MakerScript",
+            "methodLineNum": 17,
+            "codeBlockFileId": null
+          }
+        ]
+      },
+      {
+        "logType": "Info",
+        "dateTime": "2026-09-27T11:36:34",
+        "isGeneratedFromServer": false,
+        "isLogByMaker": true,
+        "owner": null,
+        "subOwner": null,
+        "ownerId": null,
+        "message": "BOW_FRAME unit=2 action=bowArrowRain ruid=f00254a942224e439a7ac033c8df2a12 ready=true face=1.0",
+        "stackTrace": [
+          {
+            "methodName": "RtsConfigLogic.Log",
+            "methodLineNum": 1,
+            "codeBlockFileId": "d37e9a35-70f8-4794-b601-8f32062cfc6c"
+          },
+          {
+            "methodName": "MakerScript",
+            "methodLineNum": 17,
+            "codeBlockFileId": null
+          }
+        ]
+      },
+      {
+        "logType": "Info",
+        "dateTime": "2026-09-27T11:36:34",
+        "isGeneratedFromServer": false,
+        "isLogByMaker": true,
+        "owner": null,
+        "subOwner": null,
+        "ownerId": null,
+        "message": "BOW_FRAME unit=1 action=bowHurricane ruid=0b766b43e5f84d84abb7c9c031786b2a ready=true face=1.0",
+        "stackTrace": [
+          {
+            "methodName": "RtsConfigLogic.Log",
+            "methodLineNum": 1,
+            "codeBlockFileId": "d37e9a35-70f8-4794-b601-8f32062cfc6c"
+          },
+          {
+            "methodName": "MakerScript",
+            "methodLineNum": 17,
+            "codeBlockFileId": null
+          }
+        ]
+      },
+      {
+        "logType": "Info",
+        "dateTime": "2026-09-27T11:36:34",
+        "isGeneratedFromServer": false,
+        "isLogByMaker": true,
+        "owner": null,
+        "subOwner": null,
+        "ownerId": null,
+        "message": "BOW_FRAME unit=2 action=bowArrowRain ruid=2a8ceb574fa6403c9a071969cbc08352 ready=true face=1.0",
+        "stackTrace": [
+          {
+            "methodName": "RtsConfigLogic.Log",
+            "methodLineNum": 1,
+            "codeBlockFileId": "d37e9a35-70f8-4794-b601-8f32062cfc6c"
+          },
+          {
+            "methodName": "MakerScript",
+            "methodLineNum": 17,
+            "codeBlockFileId": null
+          }
+        ]
+      },
+      {
+        "logType": "Info",
+        "dateTime": "2026-09-27T11:36:34",
+        "isGeneratedFromServer": false,
+        "isLogByMaker": true,
+        "owner": null,
+        "subOwner": null,
+        "ownerId": null,
+        "message": "BOW_FRAME unit=2 action=bowArrowRain ruid=cd51066174ca4ce7a6694df2a80c614c ready=true face=1.0",
+        "stackTrace": [
+          {
+            "methodName": "RtsConfigLogic.Log",
+            "methodLineNum": 1,
+            "codeBlockFileId": "d37e9a35-70f8-4794-b601-8f32062cfc6c"
+          },
+          {
+            "methodName": "MakerScript",
+            "methodLineNum": 17,
+            "codeBlockFileId": null
+          }
+        ]
+      },
+      {
+        "logType": "Info",
+        "dateTime": "2026-09-27T11:36:34",
+        "isGeneratedFromServer": false,
+        "isLogByMaker": true,
+        "owner": null,
+        "subOwner": null,
+        "ownerId": null,
+        "message": "BOW_FRAME unit=1 action=bowHurricane ruid=7bf344e5fbc5490088eafdac9b65aad1 ready=true face=1.0",
+        "stackTrace": [
+          {
+            "methodName": "RtsConfigLogic.Log",
+            "methodLineNum": 1,
+            "codeBlockFileId": "d37e9a35-70f8-4794-b601-8f32062cfc6c"
+          },
+          {
+            "methodName": "MakerScript",
+            "methodLineNum": 17,
+            "codeBlockFileId": null
+          }
+        ]
+      },
+      {
+        "logType": "Info",
+        "dateTime": "2026-09-27T11:36:34",
+        "isGeneratedFromServer": false,
+        "isLogByMaker": true,
+        "owner": null,
+        "subOwner": null,
+        "ownerId": null,
+        "message": "BOW_FRAME unit=1 action=bowHurricane ruid=cd2aab758bb7458ca5003bfa49d6914e ready=true face=1.0",
+        "stackTrace": [
+          {
+            "methodName": "RtsConfigLogic.Log",
+            "methodLineNum": 1,
+            "codeBlockFileId": "d37e9a35-70f8-4794-b601-8f32062cfc6c"
+          },
+          {
+            "methodName": "MakerScript",
+            "methodLineNum": 17,
+            "codeBlockFileId": null
+          }
+        ]
+      },
+      {
+        "logType": "Info",
+        "dateTime": "2026-09-27T11:36:34",
+        "isGeneratedFromServer": false,
+        "isLogByMaker": true,
+        "owner": null,
+        "subOwner": null,
+        "ownerId": null,
+        "message": "BOW_FRAME unit=2 action=bowArrowRain ruid=f35b316092b542f28eea52ce90d989b9 ready=true face=1.0",
+        "stackTrace": [
+          {
+            "methodName": "RtsConfigLogic.Log",
+            "methodLineNum": 1,
+            "codeBlockFileId": "d37e9a35-70f8-4794-b601-8f32062cfc6c"
+          },
+          {
+            "methodName": "MakerScript",
+            "methodLineNum": 17,
+            "codeBlockFileId": null
+          }
+        ]
+      },
+      {
+        "logType": "Info",
+        "dateTime": "2026-09-27T11:36:34",
+        "isGeneratedFromServer": false,
+        "isLogByMaker": true,
+        "owner": null,
+        "subOwner": null,
+        "ownerId": null,
+        "message": "BOW_FRAME unit=1 action=bowHurricane ruid=02b3c4cf488349e3b7f26a253b8a95e4 ready=true face=1.0",
+        "stackTrace": [
+          {
+            "methodName": "RtsConfigLogic.Log",
+            "methodLineNum": 1,
+            "codeBlockFileId": "d37e9a35-70f8-4794-b601-8f32062cfc6c"
+          },
+          {
+            "methodName": "MakerScript",
+            "methodLineNum": 17,
+            "codeBlockFileId": null
+          }
+        ]
+      },
+      {
+        "logType": "Info",
+        "dateTime": "2026-09-27T11:36:41",
+        "isGeneratedFromServer": false,
+        "isLogByMaker": true,
+        "owner": null,
+        "subOwner": null,
+        "ownerId": null,
+        "message": "BOW_SAMPLE_COMPLETE",
+        "stackTrace": [
+          {
+            "methodName": "RtsConfigLogic.Log",
+            "methodLineNum": 1,
+            "codeBlockFileId": "d37e9a35-70f8-4794-b601-8f32062cfc6c"
+          },
+          {
+            "methodName": "MakerScript",
+            "methodLineNum": 23,
+            "codeBlockFileId": null
+          }
+        ]
+      },
+      {
+        "logType": "Info",
+        "dateTime": "2026-09-27T11:37:46",
+        "isGeneratedFromServer": true,
+        "isLogByMaker": true,
+        "owner": null,
+        "subOwner": null,
+        "ownerId": null,
+        "message": "BOW_DAMAGE unit=1 hp=999693070.0",
+        "stackTrace": [
+          {
+            "methodName": "RtsConfigLogic.Log",
+            "methodLineNum": 1,
+            "codeBlockFileId": "d37e9a35-70f8-4794-b601-8f32062cfc6c"
+          },
+          {
+            "methodName": "MakerScript",
+            "methodLineNum": 5,
+            "codeBlockFileId": null
+          }
+        ]
+      },
+      {
+        "logType": "Info",
+        "dateTime": "2026-09-27T11:37:46",
+        "isGeneratedFromServer": true,
+        "isLogByMaker": true,
+        "owner": null,
+        "subOwner": null,
+        "ownerId": null,
+        "message": "BOW_DAMAGE unit=2 hp=997342624.0",
+        "stackTrace": [
+          {
+            "methodName": "RtsConfigLogic.Log",
+            "methodLineNum": 1,
+            "codeBlockFileId": "d37e9a35-70f8-4794-b601-8f32062cfc6c"
+          },
+          {
+            "methodName": "MakerScript",
+            "methodLineNum": 5,
+            "codeBlockFileId": null
+          }
+        ]
+      },
+      {
+        "logType": "Info",
+        "dateTime": "2026-09-27T11:37:49",
+        "isGeneratedFromServer": false,
+        "isLogByMaker": true,
+        "owner": null,
+        "subOwner": null,
+        "ownerId": null,
+        "message": "BOW_FRAME unit=1 action=bowHurricane ruid=02b3c4cf488349e3b7f26a253b8a95e4 ready=true face=-1.0",
+        "stackTrace": [
+          {
+            "methodName": "RtsConfigLogic.Log",
+            "methodLineNum": 1,
+            "codeBlockFileId": "d37e9a35-70f8-4794-b601-8f32062cfc6c"
+          },
+          {
+            "methodName": "MakerScript",
+            "methodLineNum": 17,
+            "codeBlockFileId": null
+          }
+        ]
+      },
+      {
+        "logType": "Info",
+        "dateTime": "2026-09-27T11:37:49",
+        "isGeneratedFromServer": false,
+        "isLogByMaker": true,
+        "owner": null,
+        "subOwner": null,
+        "ownerId": null,
+        "message": "BOW_FRAME unit=2 action=bowArrowRain ruid=f35b316092b542f28eea52ce90d989b9 ready=true face=-1.0",
+        "stackTrace": [
+          {
+            "methodName": "RtsConfigLogic.Log",
+            "methodLineNum": 1,
+            "codeBlockFileId": "d37e9a35-70f8-4794-b601-8f32062cfc6c"
+          },
+          {
+            "methodName": "MakerScript",
+            "methodLineNum": 17,
+            "codeBlockFileId": null
+          }
+        ]
+      },
+      {
+        "logType": "Info",
+        "dateTime": "2026-09-27T11:37:49",
+        "isGeneratedFromServer": false,
+        "isLogByMaker": true,
+        "owner": null,
+        "subOwner": null,
+        "ownerId": null,
+        "message": "BOW_FRAME unit=1 action=bowHurricane ruid=1531464fb7ac46c1823c6f4359eb8bb5 ready=true face=-1.0",
+        "stackTrace": [
+          {
+            "methodName": "RtsConfigLogic.Log",
+            "methodLineNum": 1,
+            "codeBlockFileId": "d37e9a35-70f8-4794-b601-8f32062cfc6c"
+          },
+          {
+            "methodName": "MakerScript",
+            "methodLineNum": 17,
+            "codeBlockFileId": null
+          }
+        ]
+      },
+      {
+        "logType": "Info",
+        "dateTime": "2026-09-27T11:37:49",
+        "isGeneratedFromServer": false,
+        "isLogByMaker": true,
+        "owner": null,
+        "subOwner": null,
+        "ownerId": null,
+        "message": "BOW_FRAME unit=2 action=bowArrowRain ruid=f00254a942224e439a7ac033c8df2a12 ready=true face=-1.0",
+        "stackTrace": [
+          {
+            "methodName": "RtsConfigLogic.Log",
+            "methodLineNum": 1,
+            "codeBlockFileId": "d37e9a35-70f8-4794-b601-8f32062cfc6c"
+          },
+          {
+            "methodName": "MakerScript",
+            "methodLineNum": 17,
+            "codeBlockFileId": null
+          }
+        ]
+      },
+      {
+        "logType": "Info",
+        "dateTime": "2026-09-27T11:37:49",
+        "isGeneratedFromServer": false,
+        "isLogByMaker": true,
+        "owner": null,
+        "subOwner": null,
+        "ownerId": null,
+        "message": "BOW_FRAME unit=1 action=bowHurricane ruid=0b766b43e5f84d84abb7c9c031786b2a ready=true face=-1.0",
+        "stackTrace": [
+          {
+            "methodName": "RtsConfigLogic.Log",
+            "methodLineNum": 1,
+            "codeBlockFileId": "d37e9a35-70f8-4794-b601-8f32062cfc6c"
+          },
+          {
+            "methodName": "MakerScript",
+            "methodLineNum": 17,
+            "codeBlockFileId": null
+          }
+        ]
+      },
+      {
+        "logType": "Info",
+        "dateTime": "2026-09-27T11:37:49",
+        "isGeneratedFromServer": false,
+        "isLogByMaker": true,
+        "owner": null,
+        "subOwner": null,
+        "ownerId": null,
+        "message": "BOW_FRAME unit=2 action=bowArrowRain ruid=2a8ceb574fa6403c9a071969cbc08352 ready=true face=-1.0",
+        "stackTrace": [
+          {
+            "methodName": "RtsConfigLogic.Log",
+            "methodLineNum": 1,
+            "codeBlockFileId": "d37e9a35-70f8-4794-b601-8f32062cfc6c"
+          },
+          {
+            "methodName": "MakerScript",
+            "methodLineNum": 17,
+            "codeBlockFileId": null
+          }
+        ]
+      },
+      {
+        "logType": "Info",
+        "dateTime": "2026-09-27T11:37:49",
+        "isGeneratedFromServer": false,
+        "isLogByMaker": true,
+        "owner": null,
+        "subOwner": null,
+        "ownerId": null,
+        "message": "BOW_FRAME unit=1 action=bowHurricane ruid=7bf344e5fbc5490088eafdac9b65aad1 ready=true face=-1.0",
+        "stackTrace": [
+          {
+            "methodName": "RtsConfigLogic.Log",
+            "methodLineNum": 1,
+            "codeBlockFileId": "d37e9a35-70f8-4794-b601-8f32062cfc6c"
+          },
+          {
+            "methodName": "MakerScript",
+            "methodLineNum": 17,
+            "codeBlockFileId": null
+          }
+        ]
+      },
+      {
+        "logType": "Info",
+        "dateTime": "2026-09-27T11:37:49",
+        "isGeneratedFromServer": false,
+        "isLogByMaker": true,
+        "owner": null,
+        "subOwner": null,
+        "ownerId": null,
+        "message": "BOW_FRAME unit=2 action=bowArrowRain ruid=cd51066174ca4ce7a6694df2a80c614c ready=true face=-1.0",
+        "stackTrace": [
+          {
+            "methodName": "RtsConfigLogic.Log",
+            "methodLineNum": 1,
+            "codeBlockFileId": "d37e9a35-70f8-4794-b601-8f32062cfc6c"
+          },
+          {
+            "methodName": "MakerScript",
+            "methodLineNum": 17,
+            "codeBlockFileId": null
+          }
+        ]
+      },
+      {
+        "logType": "Info",
+        "dateTime": "2026-09-27T11:37:50",
+        "isGeneratedFromServer": false,
+        "isLogByMaker": true,
+        "owner": null,
+        "subOwner": null,
+        "ownerId": null,
+        "message": "BOW_FRAME unit=1 action=bowHurricane ruid=cd2aab758bb7458ca5003bfa49d6914e ready=true face=-1.0",
+        "stackTrace": [
+          {
+            "methodName": "RtsConfigLogic.Log",
+            "methodLineNum": 1,
+            "codeBlockFileId": "d37e9a35-70f8-4794-b601-8f32062cfc6c"
+          },
+          {
+            "methodName": "MakerScript",
+            "methodLineNum": 17,
+            "codeBlockFileId": null
+          }
+        ]
+      },
+      {
+        "logType": "Info",
+        "dateTime": "2026-09-27T11:37:56",
+        "isGeneratedFromServer": false,
+        "isLogByMaker": true,
+        "owner": null,
+        "subOwner": null,
+        "ownerId": null,
+        "message": "BOW_SAMPLE_COMPLETE",
+        "stackTrace": [
+          {
+            "methodName": "RtsConfigLogic.Log",
+            "methodLineNum": 1,
+            "codeBlockFileId": "d37e9a35-70f8-4794-b601-8f32062cfc6c"
+          },
+          {
+            "methodName": "MakerScript",
+            "methodLineNum": 23,
+            "codeBlockFileId": null
+          }
+        ]
+      },
+      {
+        "logType": "Error",
+        "dateTime": "2026-09-27T11:38:30",
+        "isGeneratedFromServer": true,
+        "isLogByMaker": false,
+        "owner": null,
+        "subOwner": null,
+        "ownerId": null,
+        "message": "[LEA-2007] AttemptToIndex : 'u'을 인덱싱할 수 없습니다. 'u'은 nil입니다.",
+        "stackTrace": [
+          {
+            "methodName": "MakerScript",
+            "methodLineNum": 3,
+            "codeBlockFileId": null
+          }
+        ]
+      },
+      {
+        "logType": "Info",
+        "dateTime": "2026-09-27T11:38:35",
+        "isGeneratedFromServer": false,
+        "isLogByMaker": true,
+        "owner": null,
+        "subOwner": null,
+        "ownerId": null,
+        "message": "BOW_FRAME unit=1 action=bowHurricane ruid=0b766b43e5f84d84abb7c9c031786b2a ready=true face=-1.0",
+        "stackTrace": [
+          {
+            "methodName": "RtsConfigLogic.Log",
+            "methodLineNum": 1,
+            "codeBlockFileId": "d37e9a35-70f8-4794-b601-8f32062cfc6c"
+          },
+          {
+            "methodName": "MakerScript",
+            "methodLineNum": 17,
+            "codeBlockFileId": null
+          }
+        ]
+      },
+      {
+        "logType": "Info",
+        "dateTime": "2026-09-27T11:38:35",
+        "isGeneratedFromServer": false,
+        "isLogByMaker": true,
+        "owner": null,
+        "subOwner": null,
+        "ownerId": null,
+        "message": "BOW_FRAME unit=2 action=bowArrowRain ruid=cd51066174ca4ce7a6694df2a80c614c ready=true face=-1.0",
+        "stackTrace": [
+          {
+            "methodName": "RtsConfigLogic.Log",
+            "methodLineNum": 1,
+            "codeBlockFileId": "d37e9a35-70f8-4794-b601-8f32062cfc6c"
+          },
+          {
+            "methodName": "MakerScript",
+            "methodLineNum": 17,
+            "codeBlockFileId": null
+          }
+        ]
+      },
+      {
+        "logType": "Info",
+        "dateTime": "2026-09-27T11:38:35",
+        "isGeneratedFromServer": false,
+        "isLogByMaker": true,
+        "owner": null,
+        "subOwner": null,
+        "ownerId": null,
+        "message": "BOW_FRAME unit=1 action=bowHurricane ruid=7bf344e5fbc5490088eafdac9b65aad1 ready=true face=-1.0",
+        "stackTrace": [
+          {
+            "methodName": "RtsConfigLogic.Log",
+            "methodLineNum": 1,
+            "codeBlockFileId": "d37e9a35-70f8-4794-b601-8f32062cfc6c"
+          },
+          {
+            "methodName": "MakerScript",
+            "methodLineNum": 17,
+            "codeBlockFileId": null
+          }
+        ]
+      },
+      {
+        "logType": "Info",
+        "dateTime": "2026-09-27T11:38:35",
+        "isGeneratedFromServer": false,
+        "isLogByMaker": true,
+        "owner": null,
+        "subOwner": null,
+        "ownerId": null,
+        "message": "BOW_FRAME unit=1 action=bowHurricane ruid=cd2aab758bb7458ca5003bfa49d6914e ready=true face=-1.0",
+        "stackTrace": [
+          {
+            "methodName": "RtsConfigLogic.Log",
+            "methodLineNum": 1,
+            "codeBlockFileId": "d37e9a35-70f8-4794-b601-8f32062cfc6c"
+          },
+          {
+            "methodName": "MakerScript",
+            "methodLineNum": 17,
+            "codeBlockFileId": null
+          }
+        ]
+      },
+      {
+        "logType": "Info",
+        "dateTime": "2026-09-27T11:38:35",
+        "isGeneratedFromServer": false,
+        "isLogByMaker": true,
+        "owner": null,
+        "subOwner": null,
+        "ownerId": null,
+        "message": "BOW_FRAME unit=2 action=bowArrowRain ruid=2a8ceb574fa6403c9a071969cbc08352 ready=true face=-1.0",
+        "stackTrace": [
+          {
+            "methodName": "RtsConfigLogic.Log",
+            "methodLineNum": 1,
+            "codeBlockFileId": "d37e9a35-70f8-4794-b601-8f32062cfc6c"
+          },
+          {
+            "methodName": "MakerScript",
+            "methodLineNum": 17,
+            "codeBlockFileId": null
+          }
+        ]
+      },
+      {
+        "logType": "Info",
+        "dateTime": "2026-09-27T11:38:35",
+        "isGeneratedFromServer": false,
+        "isLogByMaker": true,
+        "owner": null,
+        "subOwner": null,
+        "ownerId": null,
+        "message": "BOW_FRAME unit=1 action=bowHurricane ruid=02b3c4cf488349e3b7f26a253b8a95e4 ready=true face=-1.0",
+        "stackTrace": [
+          {
+            "methodName": "RtsConfigLogic.Log",
+            "methodLineNum": 1,
+            "codeBlockFileId": "d37e9a35-70f8-4794-b601-8f32062cfc6c"
+          },
+          {
+            "methodName": "MakerScript",
+            "methodLineNum": 17,
+            "codeBlockFileId": null
+          }
+        ]
+      },
+      {
+        "logType": "Info",
+        "dateTime": "2026-09-27T11:38:35",
+        "isGeneratedFromServer": false,
+        "isLogByMaker": true,
+        "owner": null,
+        "subOwner": null,
+        "ownerId": null,
+        "message": "BOW_FRAME unit=2 action=bowArrowRain ruid=f35b316092b542f28eea52ce90d989b9 ready=true face=-1.0",
+        "stackTrace": [
+          {
+            "methodName": "RtsConfigLogic.Log",
+            "methodLineNum": 1,
+            "codeBlockFileId": "d37e9a35-70f8-4794-b601-8f32062cfc6c"
+          },
+          {
+            "methodName": "MakerScript",
+            "methodLineNum": 17,
+            "codeBlockFileId": null
+          }
+        ]
+      },
+      {
+        "logType": "Info",
+        "dateTime": "2026-09-27T11:38:35",
+        "isGeneratedFromServer": false,
+        "isLogByMaker": true,
+        "owner": null,
+        "subOwner": null,
+        "ownerId": null,
+        "message": "BOW_FRAME unit=1 action=bowHurricane ruid=1531464fb7ac46c1823c6f4359eb8bb5 ready=true face=-1.0",
+        "stackTrace": [
+          {
+            "methodName": "RtsConfigLogic.Log",
+            "methodLineNum": 1,
+            "codeBlockFileId": "d37e9a35-70f8-4794-b601-8f32062cfc6c"
+          },
+          {
+            "methodName": "MakerScript",
+            "methodLineNum": 17,
+            "codeBlockFileId": null
+          }
+        ]
+      },
+      {
+        "logType": "Info",
+        "dateTime": "2026-09-27T11:38:35",
+        "isGeneratedFromServer": false,
+        "isLogByMaker": true,
+        "owner": null,
+        "subOwner": null,
+        "ownerId": null,
+        "message": "BOW_FRAME unit=2 action=bowArrowRain ruid=f00254a942224e439a7ac033c8df2a12 ready=true face=-1.0",
+        "stackTrace": [
+          {
+            "methodName": "RtsConfigLogic.Log",
+            "methodLineNum": 1,
+            "codeBlockFileId": "d37e9a35-70f8-4794-b601-8f32062cfc6c"
+          },
+          {
+            "methodName": "MakerScript",
+            "methodLineNum": 17,
+            "codeBlockFileId": null
+          }
+        ]
+      },
+      {
+        "logType": "Info",
+        "dateTime": "2026-09-27T11:38:42",
+        "isGeneratedFromServer": false,
+        "isLogByMaker": true,
+        "owner": null,
+        "subOwner": null,
+        "ownerId": null,
+        "message": "BOW_SAMPLE_COMPLETE",
+        "stackTrace": [
+          {
+            "methodName": "RtsConfigLogic.Log",
+            "methodLineNum": 1,
+            "codeBlockFileId": "d37e9a35-70f8-4794-b601-8f32062cfc6c"
+          },
+          {
+            "methodName": "MakerScript",
+            "methodLineNum": 23,
+            "codeBlockFileId": null
+          }
+        ]
+      }
+    ]
+  },
+  "idleLogs": {
+    "status": "ok",
+    "kind": "normal",
+    "count": 7,
+    "logs": [
+      {
+        "logType": "Info",
+        "dateTime": "2026-09-27T11:40:20",
+        "isGeneratedFromServer": false,
+        "isLogByMaker": true,
+        "owner": null,
+        "subOwner": null,
+        "ownerId": null,
+        "message": "BOW_FRAME unit=1 action=stand1 ruid=013e5b1037874974935618356a372dee ready=true face=-1.0",
+        "stackTrace": [
+          {
+            "methodName": "RtsConfigLogic.Log",
+            "methodLineNum": 1,
+            "codeBlockFileId": "d37e9a35-70f8-4794-b601-8f32062cfc6c"
+          },
+          {
+            "methodName": "MakerScript",
+            "methodLineNum": 17,
+            "codeBlockFileId": null
+          }
+        ]
+      },
+      {
+        "logType": "Info",
+        "dateTime": "2026-09-27T11:40:20",
+        "isGeneratedFromServer": false,
+        "isLogByMaker": true,
+        "owner": null,
+        "subOwner": null,
+        "ownerId": null,
+        "message": "BOW_FRAME unit=2 action=stand1 ruid=013e5b1037874974935618356a372dee ready=true face=-1.0",
+        "stackTrace": [
+          {
+            "methodName": "RtsConfigLogic.Log",
+            "methodLineNum": 1,
+            "codeBlockFileId": "d37e9a35-70f8-4794-b601-8f32062cfc6c"
+          },
+          {
+            "methodName": "MakerScript",
+            "methodLineNum": 17,
+            "codeBlockFileId": null
+          }
+        ]
+      },
+      {
+        "logType": "Info",
+        "dateTime": "2026-09-27T11:40:20",
+        "isGeneratedFromServer": false,
+        "isLogByMaker": true,
+        "owner": null,
+        "subOwner": null,
+        "ownerId": null,
+        "message": "BOW_FRAME unit=1 action=stand1 ruid=20a3afc8702c4b478b70a5eb76bcd3a7 ready=true face=-1.0",
+        "stackTrace": [
+          {
+            "methodName": "RtsConfigLogic.Log",
+            "methodLineNum": 1,
+            "codeBlockFileId": "d37e9a35-70f8-4794-b601-8f32062cfc6c"
+          },
+          {
+            "methodName": "MakerScript",
+            "methodLineNum": 17,
+            "codeBlockFileId": null
+          }
+        ]
+      },
+      {
+        "logType": "Info",
+        "dateTime": "2026-09-27T11:40:20",
+        "isGeneratedFromServer": false,
+        "isLogByMaker": true,
+        "owner": null,
+        "subOwner": null,
+        "ownerId": null,
+        "message": "BOW_FRAME unit=2 action=stand1 ruid=20a3afc8702c4b478b70a5eb76bcd3a7 ready=true face=-1.0",
+        "stackTrace": [
+          {
+            "methodName": "RtsConfigLogic.Log",
+            "methodLineNum": 1,
+            "codeBlockFileId": "d37e9a35-70f8-4794-b601-8f32062cfc6c"
+          },
+          {
+            "methodName": "MakerScript",
+            "methodLineNum": 17,
+            "codeBlockFileId": null
+          }
+        ]
+      },
+      {
+        "logType": "Info",
+        "dateTime": "2026-09-27T11:40:21",
+        "isGeneratedFromServer": false,
+        "isLogByMaker": true,
+        "owner": null,
+        "subOwner": null,
+        "ownerId": null,
+        "message": "BOW_FRAME unit=1 action=stand1 ruid=81223efd1c2847b19a2e8c92bcc93fce ready=true face=-1.0",
+        "stackTrace": [
+          {
+            "methodName": "RtsConfigLogic.Log",
+            "methodLineNum": 1,
+            "codeBlockFileId": "d37e9a35-70f8-4794-b601-8f32062cfc6c"
+          },
+          {
+            "methodName": "MakerScript",
+            "methodLineNum": 17,
+            "codeBlockFileId": null
+          }
+        ]
+      },
+      {
+        "logType": "Info",
+        "dateTime": "2026-09-27T11:40:21",
+        "isGeneratedFromServer": false,
+        "isLogByMaker": true,
+        "owner": null,
+        "subOwner": null,
+        "ownerId": null,
+        "message": "BOW_FRAME unit=2 action=stand1 ruid=81223efd1c2847b19a2e8c92bcc93fce ready=true face=-1.0",
+        "stackTrace": [
+          {
+            "methodName": "RtsConfigLogic.Log",
+            "methodLineNum": 1,
+            "codeBlockFileId": "d37e9a35-70f8-4794-b601-8f32062cfc6c"
+          },
+          {
+            "methodName": "MakerScript",
+            "methodLineNum": 17,
+            "codeBlockFileId": null
+          }
+        ]
+      },
+      {
+        "logType": "Info",
+        "dateTime": "2026-09-27T11:40:27",
+        "isGeneratedFromServer": false,
+        "isLogByMaker": true,
+        "owner": null,
+        "subOwner": null,
+        "ownerId": null,
+        "message": "BOW_SAMPLE_COMPLETE",
+        "stackTrace": [
+          {
+            "methodName": "RtsConfigLogic.Log",
+            "methodLineNum": 1,
+            "codeBlockFileId": "d37e9a35-70f8-4794-b601-8f32062cfc6c"
+          },
+          {
+            "methodName": "MakerScript",
+            "methodLineNum": 23,
+            "codeBlockFileId": null
+          }
+        ]
+      }
+    ]
+  }
+}

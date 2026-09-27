@@ -1,0 +1,11 @@
+{
+  "key": "ice-lightning-mage/frames/blizzard/motion01.png",
+  "id": "ice-lightning-mage",
+  "rel": "frames/blizzard/motion01.png",
+  "original": "C:/workspace/msw/.beaver/output/bishop-standard/originals/ice-lightning-mage/frames/blizzard/motion01.png",
+  "width": 704,
+  "height": 704,
+  "originalSha256": "da5adf0525b59be5e51bae9f24e455d611f60f458ed1fa928d123c6d667ae451",
+  "generated": "C:/Users/timec/.codex/generated_images/01a0dbf3-5094-7520-bfc7-f24b6496f5e5/exec-f2c13f08-7026-473e-8ed4-1ff6463033aa.png",
+  "prompt": "Use case: identity-preserve. Edit IMAGE1, a single animation frame (frames/blizzard/motion01.png). IMAGE2 is the SAME character's corrected neutral concept and anatomical reference. Preserve IMAGE1's exact action pose, gesture, facing, staff angle/location relative to hands, book, hair flow and expression. Match ONLY its anatomical head/body ratio to IMAGE2 (about2.30 heads tall standing; retain pose bending). Original face/eyes/skin/blue hair colors, highlights, thin line drawing style, elaborate staff, clothing patterns and book must remain like IMAGE1/IMAGE2. Do not reinterpret style, mute palette, change face or redesign anything. Preserve each hand/finger and foot stance. Single complete character, no extra poses, no text, no VFX, actual transparent background. Use the same full square composition and transparent margins as IMAGE1, feet anchored at91% of canvas height. Face size matches reference neutral when scaled to common pixel size. This is an anatomy correction to an existing animation frame, not a new pose."
+}

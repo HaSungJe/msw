@@ -1,0 +1,2033 @@
+[
+  {
+    "id": "dark-knight",
+    "skill": "dragon-roar",
+    "n": 1,
+    "pose": "Charge start: bend knees slightly, grip spear at chest with blade diagonally up toward viewer LEFT, chin lowered, serious brows.",
+    "key": "dark-knight--dragon-roar--01",
+    "prompt": "Use case: identity-preserve animation pose edit. Generate ONE transparent PNG animation frame, not a sheet.\nImage1 EDIT TARGET and exact framing/scale master: dark-knight character on 704x704 square canvas. Image2 approved identity/costume master, do not copy its larger framing. Image3 Bishop style/anatomy master, do not copy its clothes/hair/staff.\nKeep character SAME small on-canvas size as image1, with generous empty transparent space above. Do not zoom in or fill canvas. In 704-unit canvas coordinates, anatomical head crown-to-chin147units, feet ground y640, centerx352. Underlying standing body height338units and2.3heads, ignoring hats/feathers/tall hair/weapon. Pose may bend knees, never lengthen limbs/boots. Preserve exact face, hair, eye color, all clothing panels, jewelry, weapon design, clean line weight and soft cel shading.\nFrame 1 for dragon-roar: Charge start: bend knees slightly, grip spear at chest with blade diagonally up toward viewer LEFT, chin lowered, serious brows.\nABSOLUTELY NO Beholder/eye orb/companion. ONE complete spear only, maintain two hand grips and original weapon length.\n\nOnly body pose and subtle expression changes allowed. Entire hair/hat/weapon/cape/boots visible with transparent margins. No extra limbs or weapons, no blur or motion trails, no aura/projectiles/glows/environment, no text/numbers/grid/border/shadow. Feet grounded. Actual transparent background. Same fine polished 2D SD game illustration as Bishop, no pixel art. Output ONE frame.",
+    "refs": [
+      "C:/workspace/msw/.beaver/output/five-class-motion/base/dark-knight-attack.png",
+      "C:/workspace/msw/assets/design/characters/dark-knight/concept.png",
+      "C:/workspace/msw/assets/design/characters/bishop/frames/angel-ray/motion03.png"
+    ],
+    "source": "C:/Users/timec/.codex/generated_images/01a0dbf3-5094-7520-bfc7-f24b6496f5e5/exec-e19fe8a4-0cfe-4192-a474-f878d76d3230.png",
+    "state": "generated-awaiting-QA",
+    "normalized": "C:\\workspace\\msw\\.beaver\\output\\five-class-motion\\normalized\\dark-knight\\dragon-roar\\motion01.png",
+    "size": 704,
+    "bbox": [
+      89,
+      285,
+      588,
+      640
+    ],
+    "edgePixels": 0,
+    "alphaMin": 0,
+    "alphaMax": 255,
+    "sha256": "72a969fef826e0cad6b948e4ae05c985ba1c934a7cfe5c75950e47a3ac5aa8f9"
+  },
+  {
+    "id": "dark-knight",
+    "skill": "dragon-roar",
+    "n": 2,
+    "pose": "Gather power: bring shaft closer to torso, shoulders lifted, spear tip higher toward upper LEFT, short legs remain planted.",
+    "key": "dark-knight--dragon-roar--02",
+    "prompt": "Use case: identity-preserve animation pose edit. Generate ONE transparent PNG animation frame, not a sheet.\nImage1 EDIT TARGET and exact framing/scale master: dark-knight character on 704x704 square canvas. Image2 approved identity/costume master, do not copy its larger framing. Image3 Bishop style/anatomy master, do not copy its clothes/hair/staff.\nKeep character SAME small on-canvas size as image1, with generous empty transparent space above. Do not zoom in or fill canvas. In 704-unit canvas coordinates, anatomical head crown-to-chin147units, feet ground y640, centerx352. Underlying standing body height338units and2.3heads, ignoring hats/feathers/tall hair/weapon. Pose may bend knees, never lengthen limbs/boots. Preserve exact face, hair, eye color, all clothing panels, jewelry, weapon design, clean line weight and soft cel shading.\nFrame 2 for dragon-roar: Gather power: bring shaft closer to torso, shoulders lifted, spear tip higher toward upper LEFT, short legs remain planted.\nABSOLUTELY NO Beholder/eye orb/companion. ONE complete spear only, maintain two hand grips and original weapon length.\n\nOnly body pose and subtle expression changes allowed. Entire hair/hat/weapon/cape/boots visible with transparent margins. No extra limbs or weapons, no blur or motion trails, no aura/projectiles/glows/environment, no text/numbers/grid/border/shadow. Feet grounded. Actual transparent background. Same fine polished 2D SD game illustration as Bishop, no pixel art. Output ONE frame.",
+    "refs": [
+      "C:/workspace/msw/.beaver/output/five-class-motion/base/dark-knight-attack.png",
+      "C:/workspace/msw/assets/design/characters/dark-knight/concept.png",
+      "C:/workspace/msw/assets/design/characters/bishop/frames/angel-ray/motion03.png"
+    ],
+    "source": "C:/Users/timec/.codex/generated_images/01a0dbf3-5094-7520-bfc7-f24b6496f5e5/exec-574a2b21-f10f-4eca-803e-60f70f415a45.png",
+    "state": "generated-awaiting-QA",
+    "normalized": "C:\\workspace\\msw\\.beaver\\output\\five-class-motion\\normalized\\dark-knight\\dragon-roar\\motion02.png",
+    "size": 704,
+    "bbox": [
+      132,
+      213,
+      567,
+      640
+    ],
+    "edgePixels": 0,
+    "alphaMin": 0,
+    "alphaMax": 255,
+    "sha256": "3ee92f3a21c2d00412e0a04c75fdd796565efc0c64d6a75785ecd38eceed4136"
+  },
+  {
+    "id": "dark-knight",
+    "skill": "dragon-roar",
+    "n": 3,
+    "pose": "Peak charge: straighten torso, draw spear back beside right shoulder with blade pointing upward, elbows tightly bent, mouth opens slightly in forceful shout.",
+    "key": "dark-knight--dragon-roar--03",
+    "prompt": "Use case: identity-preserve animation pose edit. Generate ONE transparent PNG animation frame, not a sheet.\nImage1 EDIT TARGET and exact framing/scale master: dark-knight character on 704x704 square canvas. Image2 approved identity/costume master, do not copy its larger framing. Image3 Bishop style/anatomy master, do not copy its clothes/hair/staff.\nKeep character SAME small on-canvas size as image1, with generous empty transparent space above. Do not zoom in or fill canvas. In 704-unit canvas coordinates, anatomical head crown-to-chin147units, feet ground y640, centerx352. Underlying standing body height338units and2.3heads, ignoring hats/feathers/tall hair/weapon. Pose may bend knees, never lengthen limbs/boots. Preserve exact face, hair, eye color, all clothing panels, jewelry, weapon design, clean line weight and soft cel shading.\nFrame 3 for dragon-roar: Peak charge: straighten torso, draw spear back beside right shoulder with blade pointing upward, elbows tightly bent, mouth opens slightly in forceful shout.\nABSOLUTELY NO Beholder/eye orb/companion. ONE complete spear only, maintain two hand grips and original weapon length.\n\nOnly body pose and subtle expression changes allowed. Entire hair/hat/weapon/cape/boots visible with transparent margins. No extra limbs or weapons, no blur or motion trails, no aura/projectiles/glows/environment, no text/numbers/grid/border/shadow. Feet grounded. Actual transparent background. Same fine polished 2D SD game illustration as Bishop, no pixel art. Output ONE frame.",
+    "refs": [
+      "C:/workspace/msw/.beaver/output/five-class-motion/base/dark-knight-attack.png",
+      "C:/workspace/msw/assets/design/characters/dark-knight/concept.png",
+      "C:/workspace/msw/assets/design/characters/bishop/frames/angel-ray/motion03.png"
+    ],
+    "source": "C:/Users/timec/.codex/generated_images/01a0dbf3-5094-7520-bfc7-f24b6496f5e5/exec-ec786696-cae7-48c9-8d5f-b058b484d009.png",
+    "state": "generated-awaiting-QA",
+    "normalized": "C:\\workspace\\msw\\.beaver\\output\\five-class-motion\\normalized\\dark-knight\\dragon-roar\\motion03.png",
+    "size": 704,
+    "bbox": [
+      126,
+      195,
+      533,
+      640
+    ],
+    "edgePixels": 0,
+    "alphaMin": 0,
+    "alphaMax": 255,
+    "sha256": "ab49397d807e1e1d07e70e031fc7201cc6efa8823823990d9dc612ba38e37a41"
+  },
+  {
+    "id": "dark-knight",
+    "skill": "dragon-roar",
+    "n": 4,
+    "pose": "Release at0.60s: thrust spear upward high diagonally to LEFT, chest opens, head tips upward subtly, strong shout, feet remain on ground. No dragon or aura painted in.",
+    "key": "dark-knight--dragon-roar--04",
+    "prompt": "Use case: identity-preserve animation pose edit. Generate ONE transparent PNG animation frame, not a sheet.\nImage1 EDIT TARGET and exact framing/scale master: dark-knight character on 704x704 square canvas. Image2 approved identity/costume master, do not copy its larger framing. Image3 Bishop style/anatomy master, do not copy its clothes/hair/staff.\nKeep character SAME small on-canvas size as image1, with generous empty transparent space above. Do not zoom in or fill canvas. In 704-unit canvas coordinates, anatomical head crown-to-chin147units, feet ground y640, centerx352. Underlying standing body height338units and2.3heads, ignoring hats/feathers/tall hair/weapon. Pose may bend knees, never lengthen limbs/boots. Preserve exact face, hair, eye color, all clothing panels, jewelry, weapon design, clean line weight and soft cel shading.\nFrame 4 for dragon-roar: Release at0.60s: thrust spear upward high diagonally to LEFT, chest opens, head tips upward subtly, strong shout, feet remain on ground. No dragon or aura painted in.\nABSOLUTELY NO Beholder/eye orb/companion. ONE complete spear only, maintain two hand grips and original weapon length.\n\nOnly body pose and subtle expression changes allowed. Entire hair/hat/weapon/cape/boots visible with transparent margins. No extra limbs or weapons, no blur or motion trails, no aura/projectiles/glows/environment, no text/numbers/grid/border/shadow. Feet grounded. Actual transparent background. Same fine polished 2D SD game illustration as Bishop, no pixel art. Output ONE frame.",
+    "refs": [
+      "C:/workspace/msw/.beaver/output/five-class-motion/base/dark-knight-attack.png",
+      "C:/workspace/msw/assets/design/characters/dark-knight/concept.png",
+      "C:/workspace/msw/assets/design/characters/bishop/frames/angel-ray/motion03.png"
+    ],
+    "source": "C:/Users/timec/.codex/generated_images/01a0dbf3-5094-7520-bfc7-f24b6496f5e5/exec-d471e900-521b-4024-900a-b105a27ac2da.png",
+    "state": "generated-awaiting-QA",
+    "normalized": "C:\\workspace\\msw\\.beaver\\output\\five-class-motion\\normalized\\dark-knight\\dragon-roar\\motion04.png",
+    "size": 704,
+    "bbox": [
+      46,
+      132,
+      589,
+      640
+    ],
+    "edgePixels": 0,
+    "alphaMin": 0,
+    "alphaMax": 255,
+    "sha256": "28bb67d1d504bf0517084726d381100769aee4eb241381e1d9616d0b2d15549f"
+  },
+  {
+    "id": "dark-knight",
+    "skill": "dragon-roar",
+    "n": 5,
+    "pose": "Hold release: spear stays high, arms soften a little, cape lifted outward, mouth closes into focused expression.",
+    "key": "dark-knight--dragon-roar--05",
+    "prompt": "Use case: identity-preserve animation pose edit. Generate ONE transparent PNG animation frame, not a sheet.\nImage1 EDIT TARGET and exact framing/scale master: dark-knight character on 704x704 square canvas. Image2 approved identity/costume master, do not copy its larger framing. Image3 Bishop style/anatomy master, do not copy its clothes/hair/staff.\nKeep character SAME small on-canvas size as image1, with generous empty transparent space above. Do not zoom in or fill canvas. In 704-unit canvas coordinates, anatomical head crown-to-chin147units, feet ground y640, centerx352. Underlying standing body height338units and2.3heads, ignoring hats/feathers/tall hair/weapon. Pose may bend knees, never lengthen limbs/boots. Preserve exact face, hair, eye color, all clothing panels, jewelry, weapon design, clean line weight and soft cel shading.\nFrame 5 for dragon-roar: Hold release: spear stays high, arms soften a little, cape lifted outward, mouth closes into focused expression.\nABSOLUTELY NO Beholder/eye orb/companion. ONE complete spear only, maintain two hand grips and original weapon length.\n\nOnly body pose and subtle expression changes allowed. Entire hair/hat/weapon/cape/boots visible with transparent margins. No extra limbs or weapons, no blur or motion trails, no aura/projectiles/glows/environment, no text/numbers/grid/border/shadow. Feet grounded. Actual transparent background. Same fine polished 2D SD game illustration as Bishop, no pixel art. Output ONE frame.",
+    "refs": [
+      "C:/workspace/msw/.beaver/output/five-class-motion/base/dark-knight-attack.png",
+      "C:/workspace/msw/assets/design/characters/dark-knight/concept.png",
+      "C:/workspace/msw/assets/design/characters/bishop/frames/angel-ray/motion03.png"
+    ],
+    "source": "C:/Users/timec/.codex/generated_images/01a0dbf3-5094-7520-bfc7-f24b6496f5e5/exec-9c8f84de-ba7c-47df-8924-3a0afa71ebe5.png",
+    "state": "generated-awaiting-QA",
+    "normalized": "C:\\workspace\\msw\\.beaver\\output\\five-class-motion\\normalized\\dark-knight\\dragon-roar\\motion05.png",
+    "size": 704,
+    "bbox": [
+      159,
+      232,
+      613,
+      640
+    ],
+    "edgePixels": 0,
+    "alphaMin": 0,
+    "alphaMax": 255,
+    "sha256": "4c98a9e5955b08b2c5515e9f8a58bc5914912edee5391e99b0e3caf589e9d143"
+  },
+  {
+    "id": "dark-knight",
+    "skill": "dragon-roar",
+    "n": 6,
+    "pose": "Recovery: lower spear into original diagonal guard, shoulders drop, knees straighten, original serious face.",
+    "key": "dark-knight--dragon-roar--06",
+    "prompt": "Use case: identity-preserve animation pose edit. Generate ONE transparent PNG animation frame, not a sheet.\nImage1 EDIT TARGET and exact framing/scale master: dark-knight character on 704x704 square canvas. Image2 approved identity/costume master, do not copy its larger framing. Image3 Bishop style/anatomy master, do not copy its clothes/hair/staff.\nKeep character SAME small on-canvas size as image1, with generous empty transparent space above. Do not zoom in or fill canvas. In 704-unit canvas coordinates, anatomical head crown-to-chin147units, feet ground y640, centerx352. Underlying standing body height338units and2.3heads, ignoring hats/feathers/tall hair/weapon. Pose may bend knees, never lengthen limbs/boots. Preserve exact face, hair, eye color, all clothing panels, jewelry, weapon design, clean line weight and soft cel shading.\nFrame 6 for dragon-roar: Recovery: lower spear into original diagonal guard, shoulders drop, knees straighten, original serious face.\nABSOLUTELY NO Beholder/eye orb/companion. ONE complete spear only, maintain two hand grips and original weapon length.\n\nOnly body pose and subtle expression changes allowed. Entire hair/hat/weapon/cape/boots visible with transparent margins. No extra limbs or weapons, no blur or motion trails, no aura/projectiles/glows/environment, no text/numbers/grid/border/shadow. Feet grounded. Actual transparent background. Same fine polished 2D SD game illustration as Bishop, no pixel art. Output ONE frame.",
+    "refs": [
+      "C:/workspace/msw/.beaver/output/five-class-motion/base/dark-knight-attack.png",
+      "C:/workspace/msw/assets/design/characters/dark-knight/concept.png",
+      "C:/workspace/msw/assets/design/characters/bishop/frames/angel-ray/motion03.png"
+    ],
+    "source": "C:/Users/timec/.codex/generated_images/01a0dbf3-5094-7520-bfc7-f24b6496f5e5/exec-3d330558-36ab-4f96-86b9-3c5578d83c74.png",
+    "state": "generated-awaiting-QA",
+    "normalized": "C:\\workspace\\msw\\.beaver\\output\\five-class-motion\\normalized\\dark-knight\\dragon-roar\\motion06.png",
+    "size": 704,
+    "bbox": [
+      149,
+      271,
+      584,
+      640
+    ],
+    "edgePixels": 0,
+    "alphaMin": 0,
+    "alphaMax": 255,
+    "sha256": "3c01c61d6c072a28c05e5e2d854450cba33df460623b5f3032ff948cec48e589"
+  },
+  {
+    "id": "dark-knight",
+    "skill": "spear-buster",
+    "n": 1,
+    "pose": "Ready after magic charge: rotate spear to horizontal at waist with blade toward viewer LEFT, two hands spaced on shaft, compact slight knee bend.",
+    "key": "dark-knight--spear-buster--01",
+    "prompt": "Use case: identity-preserve animation pose edit. Generate ONE transparent PNG animation frame, not a sheet.\nImage1 EDIT TARGET and exact framing/scale master: dark-knight character on 704x704 square canvas. Image2 approved identity/costume master, do not copy its larger framing. Image3 Bishop style/anatomy master, do not copy its clothes/hair/staff.\nKeep character SAME small on-canvas size as image1, with generous empty transparent space above. Do not zoom in or fill canvas. In 704-unit canvas coordinates, anatomical head crown-to-chin147units, feet ground y640, centerx352. Underlying standing body height338units and2.3heads, ignoring hats/feathers/tall hair/weapon. Pose may bend knees, never lengthen limbs/boots. Preserve exact face, hair, eye color, all clothing panels, jewelry, weapon design, clean line weight and soft cel shading.\nFrame 1 for spear-buster: Ready after magic charge: rotate spear to horizontal at waist with blade toward viewer LEFT, two hands spaced on shaft, compact slight knee bend.\nABSOLUTELY NO Beholder/eye orb/companion. ONE complete spear only, maintain two hand grips and original weapon length.\n\nOnly body pose and subtle expression changes allowed. Entire hair/hat/weapon/cape/boots visible with transparent margins. No extra limbs or weapons, no blur or motion trails, no aura/projectiles/glows/environment, no text/numbers/grid/border/shadow. Feet grounded. Actual transparent background. Same fine polished 2D SD game illustration as Bishop, no pixel art. Output ONE frame.",
+    "refs": [
+      "C:/workspace/msw/.beaver/output/five-class-motion/base/dark-knight-attack.png",
+      "C:/workspace/msw/assets/design/characters/dark-knight/concept.png",
+      "C:/workspace/msw/assets/design/characters/bishop/frames/angel-ray/motion03.png"
+    ],
+    "source": "C:/Users/timec/.codex/generated_images/01a0dbf3-5094-7520-bfc7-f24b6496f5e5/exec-d293502d-3734-4855-8a97-c059977c4279.png",
+    "state": "generated-awaiting-QA",
+    "normalized": "C:\\workspace\\msw\\.beaver\\output\\five-class-motion\\normalized\\dark-knight\\spear-buster\\motion01.png",
+    "size": 704,
+    "bbox": [
+      48,
+      305,
+      575,
+      639
+    ],
+    "edgePixels": 0,
+    "alphaMin": 0,
+    "alphaMax": 255,
+    "sha256": "be9b7abda8ae68550fd663a376ffd33a1732199f6c3ad471f87c77c7fe1ff749"
+  },
+  {
+    "id": "dark-knight",
+    "skill": "spear-buster",
+    "n": 2,
+    "pose": "Draw back: pull spear grip toward right hip, blade still LEFT at waist height, torso coiled slightly right, rear elbow back.",
+    "key": "dark-knight--spear-buster--02",
+    "prompt": "Use case: identity-preserve animation pose edit. Generate ONE transparent PNG animation frame, not a sheet.\nImage1 EDIT TARGET and exact framing/scale master: dark-knight character on 704x704 square canvas. Image2 approved identity/costume master, do not copy its larger framing. Image3 Bishop style/anatomy master, do not copy its clothes/hair/staff.\nKeep character SAME small on-canvas size as image1, with generous empty transparent space above. Do not zoom in or fill canvas. In 704-unit canvas coordinates, anatomical head crown-to-chin147units, feet ground y640, centerx352. Underlying standing body height338units and2.3heads, ignoring hats/feathers/tall hair/weapon. Pose may bend knees, never lengthen limbs/boots. Preserve exact face, hair, eye color, all clothing panels, jewelry, weapon design, clean line weight and soft cel shading.\nFrame 2 for spear-buster: Draw back: pull spear grip toward right hip, blade still LEFT at waist height, torso coiled slightly right, rear elbow back.\nABSOLUTELY NO Beholder/eye orb/companion. ONE complete spear only, maintain two hand grips and original weapon length.\n\nOnly body pose and subtle expression changes allowed. Entire hair/hat/weapon/cape/boots visible with transparent margins. No extra limbs or weapons, no blur or motion trails, no aura/projectiles/glows/environment, no text/numbers/grid/border/shadow. Feet grounded. Actual transparent background. Same fine polished 2D SD game illustration as Bishop, no pixel art. Output ONE frame.",
+    "refs": [
+      "C:/workspace/msw/.beaver/output/five-class-motion/base/dark-knight-attack.png",
+      "C:/workspace/msw/assets/design/characters/dark-knight/concept.png",
+      "C:/workspace/msw/assets/design/characters/bishop/frames/angel-ray/motion03.png"
+    ],
+    "source": "C:/Users/timec/.codex/generated_images/01a0dbf3-5094-7520-bfc7-f24b6496f5e5/exec-8191f4f2-7320-47e9-be59-45a20a5c4bcc.png",
+    "state": "generated-awaiting-QA",
+    "normalized": "C:\\workspace\\msw\\.beaver\\output\\five-class-motion\\normalized\\dark-knight\\spear-buster\\motion02.png",
+    "size": 704,
+    "bbox": [
+      33,
+      327,
+      563,
+      639
+    ],
+    "edgePixels": 0,
+    "alphaMin": 0,
+    "alphaMax": 255,
+    "sha256": "9d4c22b172d90ec09730706f1aca60cb8def75a66f96a7a22fa3d4a1988381a2"
+  },
+  {
+    "id": "dark-knight",
+    "skill": "spear-buster",
+    "n": 3,
+    "pose": "Thrust one: extend both arms toward viewer LEFT, long spear perfectly horizontal at waist/chest height, a small forward lunge, both feet visible.",
+    "key": "dark-knight--spear-buster--03",
+    "prompt": "Use case: identity-preserve animation pose edit. Generate ONE transparent PNG animation frame, not a sheet.\nImage1 EDIT TARGET and exact framing/scale master: dark-knight character on 704x704 square canvas. Image2 approved identity/costume master, do not copy its larger framing. Image3 Bishop style/anatomy master, do not copy its clothes/hair/staff.\nKeep character SAME small on-canvas size as image1, with generous empty transparent space above. Do not zoom in or fill canvas. In 704-unit canvas coordinates, anatomical head crown-to-chin147units, feet ground y640, centerx352. Underlying standing body height338units and2.3heads, ignoring hats/feathers/tall hair/weapon. Pose may bend knees, never lengthen limbs/boots. Preserve exact face, hair, eye color, all clothing panels, jewelry, weapon design, clean line weight and soft cel shading.\nFrame 3 for spear-buster: Thrust one: extend both arms toward viewer LEFT, long spear perfectly horizontal at waist/chest height, a small forward lunge, both feet visible.\nABSOLUTELY NO Beholder/eye orb/companion. ONE complete spear only, maintain two hand grips and original weapon length.\n\nOnly body pose and subtle expression changes allowed. Entire hair/hat/weapon/cape/boots visible with transparent margins. No extra limbs or weapons, no blur or motion trails, no aura/projectiles/glows/environment, no text/numbers/grid/border/shadow. Feet grounded. Actual transparent background. Same fine polished 2D SD game illustration as Bishop, no pixel art. Output ONE frame.",
+    "refs": [
+      "C:/workspace/msw/.beaver/output/five-class-motion/base/dark-knight-attack.png",
+      "C:/workspace/msw/assets/design/characters/dark-knight/concept.png",
+      "C:/workspace/msw/assets/design/characters/bishop/frames/angel-ray/motion03.png"
+    ],
+    "source": "C:/Users/timec/.codex/generated_images/01a0dbf3-5094-7520-bfc7-f24b6496f5e5/exec-da42301a-a56f-4a7c-b621-56acd23fad97.png",
+    "state": "generated-awaiting-QA",
+    "normalized": "C:\\workspace\\msw\\.beaver\\output\\five-class-motion\\normalized\\dark-knight\\spear-buster\\motion03.png",
+    "size": 704,
+    "bbox": [
+      33,
+      328,
+      583,
+      640
+    ],
+    "edgePixels": 0,
+    "alphaMin": 0,
+    "alphaMax": 255,
+    "sha256": "d23f7b9735fcdf40a169d7ecea860b5180917a843a13b6f40b89629f524978b2"
+  },
+  {
+    "id": "dark-knight",
+    "skill": "spear-buster",
+    "n": 4,
+    "pose": "Retract one: bring spear back half-way toward waist, front elbow bending, leftward spear remains level, knees still gently bent.",
+    "key": "dark-knight--spear-buster--04",
+    "prompt": "Use case: identity-preserve animation pose edit. Generate ONE transparent PNG animation frame, not a sheet.\nImage1 EDIT TARGET and exact framing/scale master: dark-knight character on 704x704 square canvas. Image2 approved identity/costume master, do not copy its larger framing. Image3 Bishop style/anatomy master, do not copy its clothes/hair/staff.\nKeep character SAME small on-canvas size as image1, with generous empty transparent space above. Do not zoom in or fill canvas. In 704-unit canvas coordinates, anatomical head crown-to-chin147units, feet ground y640, centerx352. Underlying standing body height338units and2.3heads, ignoring hats/feathers/tall hair/weapon. Pose may bend knees, never lengthen limbs/boots. Preserve exact face, hair, eye color, all clothing panels, jewelry, weapon design, clean line weight and soft cel shading.\nFrame 4 for spear-buster: Retract one: bring spear back half-way toward waist, front elbow bending, leftward spear remains level, knees still gently bent.\nABSOLUTELY NO Beholder/eye orb/companion. ONE complete spear only, maintain two hand grips and original weapon length.\n\nOnly body pose and subtle expression changes allowed. Entire hair/hat/weapon/cape/boots visible with transparent margins. No extra limbs or weapons, no blur or motion trails, no aura/projectiles/glows/environment, no text/numbers/grid/border/shadow. Feet grounded. Actual transparent background. Same fine polished 2D SD game illustration as Bishop, no pixel art. Output ONE frame.",
+    "refs": [
+      "C:/workspace/msw/.beaver/output/five-class-motion/base/dark-knight-attack.png",
+      "C:/workspace/msw/assets/design/characters/dark-knight/concept.png",
+      "C:/workspace/msw/assets/design/characters/bishop/frames/angel-ray/motion03.png"
+    ],
+    "source": "C:/Users/timec/.codex/generated_images/01a0dbf3-5094-7520-bfc7-f24b6496f5e5/exec-aa3c7eec-32f5-4c6c-9b55-966ffb8af704.png",
+    "state": "generated-awaiting-QA",
+    "normalized": "C:\\workspace\\msw\\.beaver\\output\\five-class-motion\\normalized\\dark-knight\\spear-buster\\motion04.png",
+    "size": 704,
+    "bbox": [
+      24,
+      285,
+      558,
+      639
+    ],
+    "edgePixels": 0,
+    "alphaMin": 0,
+    "alphaMax": 255,
+    "sha256": "f5377a0a89c2ac7b392f097a34824c4c231a0a3a42b289a906226dfdfe66fc53"
+  },
+  {
+    "id": "dark-knight",
+    "skill": "spear-buster",
+    "n": 5,
+    "pose": "Thrust two: second sharp leftward thrust, leading shoulder advances slightly, shaft horizontal, front knee bends a little more, rear leg SHORT.",
+    "key": "dark-knight--spear-buster--05",
+    "prompt": "Use case: identity-preserve animation pose edit. Generate ONE transparent PNG animation frame, not a sheet.\nImage1 EDIT TARGET and exact framing/scale master: dark-knight character on 704x704 square canvas. Image2 approved identity/costume master, do not copy its larger framing. Image3 Bishop style/anatomy master, do not copy its clothes/hair/staff.\nKeep character SAME small on-canvas size as image1, with generous empty transparent space above. Do not zoom in or fill canvas. In 704-unit canvas coordinates, anatomical head crown-to-chin147units, feet ground y640, centerx352. Underlying standing body height338units and2.3heads, ignoring hats/feathers/tall hair/weapon. Pose may bend knees, never lengthen limbs/boots. Preserve exact face, hair, eye color, all clothing panels, jewelry, weapon design, clean line weight and soft cel shading.\nFrame 5 for spear-buster: Thrust two: second sharp leftward thrust, leading shoulder advances slightly, shaft horizontal, front knee bends a little more, rear leg SHORT.\nABSOLUTELY NO Beholder/eye orb/companion. ONE complete spear only, maintain two hand grips and original weapon length.\n\nOnly body pose and subtle expression changes allowed. Entire hair/hat/weapon/cape/boots visible with transparent margins. No extra limbs or weapons, no blur or motion trails, no aura/projectiles/glows/environment, no text/numbers/grid/border/shadow. Feet grounded. Actual transparent background. Same fine polished 2D SD game illustration as Bishop, no pixel art. Output ONE frame.",
+    "refs": [
+      "C:/workspace/msw/.beaver/output/five-class-motion/base/dark-knight-attack.png",
+      "C:/workspace/msw/assets/design/characters/dark-knight/concept.png",
+      "C:/workspace/msw/assets/design/characters/bishop/frames/angel-ray/motion03.png"
+    ],
+    "source": "C:/Users/timec/.codex/generated_images/01a0dbf3-5094-7520-bfc7-f24b6496f5e5/exec-43d7f7a3-1555-42dc-ab91-8be402a45c23.png",
+    "state": "generated-awaiting-QA",
+    "normalized": "C:\\workspace\\msw\\.beaver\\output\\five-class-motion\\normalized\\dark-knight\\spear-buster\\motion05.png",
+    "size": 704,
+    "bbox": [
+      9,
+      330,
+      612,
+      641
+    ],
+    "edgePixels": 0,
+    "alphaMin": 0,
+    "alphaMax": 255,
+    "sha256": "8febad1367b22b26e72038dd9e95332c743ddc301572afc59556de1c38212039"
+  },
+  {
+    "id": "dark-knight",
+    "skill": "spear-buster",
+    "n": 6,
+    "pose": "Retract two: spear drawn back toward right waist, elbows bent, cape trails right, calm intense expression unchanged.",
+    "key": "dark-knight--spear-buster--06",
+    "prompt": "Use case: identity-preserve animation pose edit. Generate ONE transparent PNG animation frame, not a sheet.\nImage1 EDIT TARGET and exact framing/scale master: dark-knight character on 704x704 square canvas. Image2 approved identity/costume master, do not copy its larger framing. Image3 Bishop style/anatomy master, do not copy its clothes/hair/staff.\nKeep character SAME small on-canvas size as image1, with generous empty transparent space above. Do not zoom in or fill canvas. In 704-unit canvas coordinates, anatomical head crown-to-chin147units, feet ground y640, centerx352. Underlying standing body height338units and2.3heads, ignoring hats/feathers/tall hair/weapon. Pose may bend knees, never lengthen limbs/boots. Preserve exact face, hair, eye color, all clothing panels, jewelry, weapon design, clean line weight and soft cel shading.\nFrame 6 for spear-buster: Retract two: spear drawn back toward right waist, elbows bent, cape trails right, calm intense expression unchanged.\nABSOLUTELY NO Beholder/eye orb/companion. ONE complete spear only, maintain two hand grips and original weapon length.\n\nOnly body pose and subtle expression changes allowed. Entire hair/hat/weapon/cape/boots visible with transparent margins. No extra limbs or weapons, no blur or motion trails, no aura/projectiles/glows/environment, no text/numbers/grid/border/shadow. Feet grounded. Actual transparent background. Same fine polished 2D SD game illustration as Bishop, no pixel art. Output ONE frame.",
+    "refs": [
+      "C:/workspace/msw/.beaver/output/five-class-motion/base/dark-knight-attack.png",
+      "C:/workspace/msw/assets/design/characters/dark-knight/concept.png",
+      "C:/workspace/msw/assets/design/characters/bishop/frames/angel-ray/motion03.png"
+    ],
+    "source": "C:/Users/timec/.codex/generated_images/01a0dbf3-5094-7520-bfc7-f24b6496f5e5/exec-193844f8-152f-4bb3-b2a7-2ed103b926ac.png",
+    "state": "generated-awaiting-QA",
+    "previousSource": "C:/Users/timec/.codex/generated_images/01a0dbf3-5094-7520-bfc7-f24b6496f5e5/exec-2f6810ae-43d1-4785-bfbc-c18cc28d81a8.png",
+    "correctionPrompt": "Use case: precise-object-edit. Image1 target animation frame. Image2 approved identity/weapon reference. Correct spear orientation ONLY: this is the retraction between two LEFTWARD thrusts. BOTH hands hold the spear HORIZONTALLY at waist, blade points LEFT, small counterweight points RIGHT. Pull shaft inward toward right hip with bent elbows. Absolutely no spear blade pointing right, no diagonal spear, no Beholder. Preserve same pose scale/head/feet and costume. Same original canvas framing, true transparent background, full body/weapon visible, no text/shadow. Output ONE corrected frame.",
+    "normalized": "C:\\workspace\\msw\\.beaver\\output\\five-class-motion\\normalized\\dark-knight\\spear-buster\\motion06.png",
+    "size": 704,
+    "bbox": [
+      71,
+      307,
+      609,
+      639
+    ],
+    "edgePixels": 0,
+    "alphaMin": 0,
+    "alphaMax": 255,
+    "sha256": "d8f9a4f9ca1a1ce31c8bca9f9bb0b2a59534f27547a29c63eab813748271683c"
+  },
+  {
+    "id": "dark-knight",
+    "skill": "spear-buster",
+    "n": 7,
+    "pose": "Thrust three maximum reach: push spear toward viewer LEFT with fully extended compact arms and small torso lean; spear complete within canvas, no foreshortened giant blade.",
+    "key": "dark-knight--spear-buster--07",
+    "prompt": "Use case: identity-preserve animation pose edit. Generate ONE transparent PNG animation frame, not a sheet.\nImage1 EDIT TARGET and exact framing/scale master: dark-knight character on 704x704 square canvas. Image2 approved identity/costume master, do not copy its larger framing. Image3 Bishop style/anatomy master, do not copy its clothes/hair/staff.\nKeep character SAME small on-canvas size as image1, with generous empty transparent space above. Do not zoom in or fill canvas. In 704-unit canvas coordinates, anatomical head crown-to-chin147units, feet ground y640, centerx352. Underlying standing body height338units and2.3heads, ignoring hats/feathers/tall hair/weapon. Pose may bend knees, never lengthen limbs/boots. Preserve exact face, hair, eye color, all clothing panels, jewelry, weapon design, clean line weight and soft cel shading.\nFrame 7 for spear-buster: Thrust three maximum reach: push spear toward viewer LEFT with fully extended compact arms and small torso lean; spear complete within canvas, no foreshortened giant blade.\nABSOLUTELY NO Beholder/eye orb/companion. ONE complete spear only, maintain two hand grips and original weapon length.\n\nOnly body pose and subtle expression changes allowed. Entire hair/hat/weapon/cape/boots visible with transparent margins. No extra limbs or weapons, no blur or motion trails, no aura/projectiles/glows/environment, no text/numbers/grid/border/shadow. Feet grounded. Actual transparent background. Same fine polished 2D SD game illustration as Bishop, no pixel art. Output ONE frame.",
+    "refs": [
+      "C:/workspace/msw/.beaver/output/five-class-motion/base/dark-knight-attack.png",
+      "C:/workspace/msw/assets/design/characters/dark-knight/concept.png",
+      "C:/workspace/msw/assets/design/characters/bishop/frames/angel-ray/motion03.png"
+    ],
+    "source": "C:/Users/timec/.codex/generated_images/01a0dbf3-5094-7520-bfc7-f24b6496f5e5/exec-eb2edba7-1f78-48e6-8153-c6cc995221e1.png",
+    "state": "generated-awaiting-QA",
+    "normalized": "C:\\workspace\\msw\\.beaver\\output\\five-class-motion\\normalized\\dark-knight\\spear-buster\\motion07.png",
+    "size": 704,
+    "bbox": [
+      6,
+      316,
+      594,
+      639
+    ],
+    "edgePixels": 0,
+    "alphaMin": 0,
+    "alphaMax": 255,
+    "sha256": "24681311c86112d768b9ad1c4ffa5e564c7e39ca67da736112d2d1337b95aeca"
+  },
+  {
+    "id": "dark-knight",
+    "skill": "spear-buster",
+    "n": 8,
+    "pose": "Recovery: spear pulled back then begins returning to original diagonal guard, hips rise, feet planted, no magic orb.",
+    "key": "dark-knight--spear-buster--08",
+    "prompt": "Use case: identity-preserve animation pose edit. Generate ONE transparent PNG animation frame, not a sheet.\nImage1 EDIT TARGET and exact framing/scale master: dark-knight character on 704x704 square canvas. Image2 approved identity/costume master, do not copy its larger framing. Image3 Bishop style/anatomy master, do not copy its clothes/hair/staff.\nKeep character SAME small on-canvas size as image1, with generous empty transparent space above. Do not zoom in or fill canvas. In 704-unit canvas coordinates, anatomical head crown-to-chin147units, feet ground y640, centerx352. Underlying standing body height338units and2.3heads, ignoring hats/feathers/tall hair/weapon. Pose may bend knees, never lengthen limbs/boots. Preserve exact face, hair, eye color, all clothing panels, jewelry, weapon design, clean line weight and soft cel shading.\nFrame 8 for spear-buster: Recovery: spear pulled back then begins returning to original diagonal guard, hips rise, feet planted, no magic orb.\nABSOLUTELY NO Beholder/eye orb/companion. ONE complete spear only, maintain two hand grips and original weapon length.\n\nOnly body pose and subtle expression changes allowed. Entire hair/hat/weapon/cape/boots visible with transparent margins. No extra limbs or weapons, no blur or motion trails, no aura/projectiles/glows/environment, no text/numbers/grid/border/shadow. Feet grounded. Actual transparent background. Same fine polished 2D SD game illustration as Bishop, no pixel art. Output ONE frame.",
+    "refs": [
+      "C:/workspace/msw/.beaver/output/five-class-motion/base/dark-knight-attack.png",
+      "C:/workspace/msw/assets/design/characters/dark-knight/concept.png",
+      "C:/workspace/msw/assets/design/characters/bishop/frames/angel-ray/motion03.png"
+    ],
+    "source": "C:/Users/timec/.codex/generated_images/01a0dbf3-5094-7520-bfc7-f24b6496f5e5/exec-5133f613-cfd7-49cb-b20c-3edd006ea765.png",
+    "state": "generated-awaiting-QA",
+    "normalized": "C:\\workspace\\msw\\.beaver\\output\\five-class-motion\\normalized\\dark-knight\\spear-buster\\motion08.png",
+    "size": 704,
+    "bbox": [
+      178,
+      292,
+      592,
+      640
+    ],
+    "edgePixels": 0,
+    "alphaMin": 0,
+    "alphaMax": 255,
+    "sha256": "6925b46067cb55b39ad1dbdd119501283f008383f706ea92c410571872552034"
+  },
+  {
+    "id": "dark-knight",
+    "skill": "wait",
+    "n": 2,
+    "pose": "Small inhalation: preserve exact idle pose and planted feet, lift shoulders and upper chest subtly, shift cape/scarf/hair tips outward by tiny amount. Same eyes and expression, no stance change.",
+    "key": "dark-knight--wait--02",
+    "prompt": "Use case: identity-preserve animation pose edit. Generate ONE transparent PNG animation frame, not a sheet.\nImage1 EDIT TARGET and exact framing/scale master: dark-knight character on 576x576 square canvas. Image2 approved identity/costume master, do not copy its larger framing. Image3 Bishop style/anatomy master, do not copy its clothes/hair/staff.\nKeep character SAME small on-canvas size as image1, with generous empty transparent space above. Do not zoom in or fill canvas. In 576-unit canvas coordinates, anatomical head crown-to-chin147units, feet ground y512, centerx288. Underlying standing body height338units and2.3heads, ignoring hats/feathers/tall hair/weapon. Pose may bend knees, never lengthen limbs/boots. Preserve exact face, hair, eye color, all clothing panels, jewelry, weapon design, clean line weight and soft cel shading.\nFrame 2 for wait: Small inhalation: preserve exact idle pose and planted feet, lift shoulders and upper chest subtly, shift cape/scarf/hair tips outward by tiny amount. Same eyes and expression, no stance change.\nABSOLUTELY NO Beholder/eye orb/companion. ONE complete spear only, maintain two hand grips and original weapon length.\n\nOnly body pose and subtle expression changes allowed. Entire hair/hat/weapon/cape/boots visible with transparent margins. No extra limbs or weapons, no blur or motion trails, no aura/projectiles/glows/environment, no text/numbers/grid/border/shadow. Feet grounded. Actual transparent background. Same fine polished 2D SD game illustration as Bishop, no pixel art. Output ONE frame.",
+    "refs": [
+      "C:/workspace/msw/.beaver/output/five-class-motion/base/dark-knight.png",
+      "C:/workspace/msw/assets/design/characters/dark-knight/concept.png",
+      "C:/workspace/msw/assets/design/characters/bishop/frames/wait/motion01.png"
+    ],
+    "source": "C:/Users/timec/.codex/generated_images/01a0dbf3-5094-7520-bfc7-f24b6496f5e5/exec-8240c70c-0241-4102-bb8d-99d571842321.png",
+    "state": "generated-awaiting-QA",
+    "normalized": "C:\\workspace\\msw\\.beaver\\output\\five-class-motion\\normalized\\dark-knight\\wait\\motion02.png",
+    "size": 576,
+    "bbox": [
+      77,
+      159,
+      504,
+      511
+    ],
+    "edgePixels": 0,
+    "alphaMin": 0,
+    "alphaMax": 255,
+    "sha256": "7d72e3f6e16cf1a45af616ff3a969f95807171ccb7ac444a9db4d1106e42fd22"
+  },
+  {
+    "id": "dark-knight",
+    "skill": "wait",
+    "n": 3,
+    "pose": "Small exhalation: preserve exact idle pose and planted feet, relax shoulders subtly lower, cape/scarf/hair tips settle slightly inward. Same eyes and expression, no stance change.",
+    "key": "dark-knight--wait--03",
+    "prompt": "Use case: identity-preserve animation pose edit. Generate ONE transparent PNG animation frame, not a sheet.\nImage1 EDIT TARGET and exact framing/scale master: dark-knight character on 576x576 square canvas. Image2 approved identity/costume master, do not copy its larger framing. Image3 Bishop style/anatomy master, do not copy its clothes/hair/staff.\nKeep character SAME small on-canvas size as image1, with generous empty transparent space above. Do not zoom in or fill canvas. In 576-unit canvas coordinates, anatomical head crown-to-chin147units, feet ground y512, centerx288. Underlying standing body height338units and2.3heads, ignoring hats/feathers/tall hair/weapon. Pose may bend knees, never lengthen limbs/boots. Preserve exact face, hair, eye color, all clothing panels, jewelry, weapon design, clean line weight and soft cel shading.\nFrame 3 for wait: Small exhalation: preserve exact idle pose and planted feet, relax shoulders subtly lower, cape/scarf/hair tips settle slightly inward. Same eyes and expression, no stance change.\nABSOLUTELY NO Beholder/eye orb/companion. ONE complete spear only, maintain two hand grips and original weapon length.\n\nOnly body pose and subtle expression changes allowed. Entire hair/hat/weapon/cape/boots visible with transparent margins. No extra limbs or weapons, no blur or motion trails, no aura/projectiles/glows/environment, no text/numbers/grid/border/shadow. Feet grounded. Actual transparent background. Same fine polished 2D SD game illustration as Bishop, no pixel art. Output ONE frame.",
+    "refs": [
+      "C:/workspace/msw/.beaver/output/five-class-motion/base/dark-knight.png",
+      "C:/workspace/msw/assets/design/characters/dark-knight/concept.png",
+      "C:/workspace/msw/assets/design/characters/bishop/frames/wait/motion01.png"
+    ],
+    "source": "C:/Users/timec/.codex/generated_images/01a0dbf3-5094-7520-bfc7-f24b6496f5e5/exec-967e3c82-742c-4622-8789-7c9aa62ea164.png",
+    "state": "generated-awaiting-QA",
+    "normalized": "C:\\workspace\\msw\\.beaver\\output\\five-class-motion\\normalized\\dark-knight\\wait\\motion03.png",
+    "size": 576,
+    "bbox": [
+      92,
+      158,
+      511,
+      512
+    ],
+    "edgePixels": 0,
+    "alphaMin": 0,
+    "alphaMax": 255,
+    "sha256": "d967e7c2e9e1ade249819b50ebe827d5d4abfd3a1b804f3b468aef84dde2b1ea"
+  },
+  {
+    "id": "night-lord",
+    "skill": "quadruple-throw",
+    "n": 1,
+    "pose": "Prepare volley: knees slightly flexed, throwing forearm with original red/silver shuriken draws back to right shoulder, free hand guards low waist, look LEFT.",
+    "key": "night-lord--quadruple-throw--01",
+    "prompt": "Use case: identity-preserve animation pose edit. Generate ONE transparent PNG animation frame, not a sheet.\nImage1 EDIT TARGET and exact framing/scale master: night-lord character on 704x704 square canvas. Image2 approved identity/costume master, do not copy its larger framing. Image3 Bishop style/anatomy master, do not copy its clothes/hair/staff.\nKeep character SAME small on-canvas size as image1, with generous empty transparent space above. Do not zoom in or fill canvas. In 704-unit canvas coordinates, anatomical head crown-to-chin147units, feet ground y640, centerx352. Underlying standing body height338units and2.3heads, ignoring hats/feathers/tall hair/weapon. Pose may bend knees, never lengthen limbs/boots. Preserve exact face, hair, eye color, all clothing panels, jewelry, weapon design, clean line weight and soft cel shading.\nFrame 1 for quadruple-throw: Prepare volley: knees slightly flexed, throwing forearm with original red/silver shuriken draws back to right shoulder, free hand guards low waist, look LEFT.\n\n\nOnly body pose and subtle expression changes allowed. Entire hair/hat/weapon/cape/boots visible with transparent margins. No extra limbs or weapons, no blur or motion trails, no aura/projectiles/glows/environment, no text/numbers/grid/border/shadow. Feet grounded. Actual transparent background. Same fine polished 2D SD game illustration as Bishop, no pixel art. Output ONE frame.",
+    "refs": [
+      "C:/workspace/msw/.beaver/output/five-class-motion/base/night-lord-attack.png",
+      "C:/workspace/msw/assets/design/characters/night-lord/concept.png",
+      "C:/workspace/msw/assets/design/characters/bishop/frames/angel-ray/motion03.png"
+    ],
+    "source": "C:/Users/timec/.codex/generated_images/01a0dbf3-5094-7520-bfc7-f24b6496f5e5/exec-3acd9f5c-ae84-48fc-a219-49a6c6b728a6.png",
+    "state": "generated-awaiting-QA",
+    "normalized": "C:\\workspace\\msw\\.beaver\\output\\five-class-motion\\normalized\\night-lord\\quadruple-throw\\motion01.png",
+    "size": 704,
+    "bbox": [
+      245,
+      284,
+      607,
+      639
+    ],
+    "edgePixels": 0,
+    "alphaMin": 0,
+    "alphaMax": 255,
+    "sha256": "8c562f1b3d1d661d6896b834d2880d277a184acece79faacdb7180ad31db4ee9"
+  },
+  {
+    "id": "night-lord",
+    "skill": "quadruple-throw",
+    "n": 2,
+    "pose": "Throw one release: throwing arm snaps toward viewer LEFT at chest height, open fingerless-gloved hand, shuriken has LEFT THE HAND and is not painted in flight. Free hand holds remaining original shuriken low.",
+    "key": "night-lord--quadruple-throw--02",
+    "prompt": "Use case: identity-preserve animation pose edit. Generate ONE transparent PNG animation frame, not a sheet.\nImage1 EDIT TARGET and exact framing/scale master: night-lord character on 704x704 square canvas. Image2 approved identity/costume master, do not copy its larger framing. Image3 Bishop style/anatomy master, do not copy its clothes/hair/staff.\nKeep character SAME small on-canvas size as image1, with generous empty transparent space above. Do not zoom in or fill canvas. In 704-unit canvas coordinates, anatomical head crown-to-chin147units, feet ground y640, centerx352. Underlying standing body height338units and2.3heads, ignoring hats/feathers/tall hair/weapon. Pose may bend knees, never lengthen limbs/boots. Preserve exact face, hair, eye color, all clothing panels, jewelry, weapon design, clean line weight and soft cel shading.\nFrame 2 for quadruple-throw: Throw one release: throwing arm snaps toward viewer LEFT at chest height, open fingerless-gloved hand, shuriken has LEFT THE HAND and is not painted in flight. Free hand holds remaining original shuriken low.\n\n\nOnly body pose and subtle expression changes allowed. Entire hair/hat/weapon/cape/boots visible with transparent margins. No extra limbs or weapons, no blur or motion trails, no aura/projectiles/glows/environment, no text/numbers/grid/border/shadow. Feet grounded. Actual transparent background. Same fine polished 2D SD game illustration as Bishop, no pixel art. Output ONE frame.",
+    "refs": [
+      "C:/workspace/msw/.beaver/output/five-class-motion/base/night-lord-attack.png",
+      "C:/workspace/msw/assets/design/characters/night-lord/concept.png",
+      "C:/workspace/msw/assets/design/characters/bishop/frames/angel-ray/motion03.png"
+    ],
+    "source": "C:/Users/timec/.codex/generated_images/01a0dbf3-5094-7520-bfc7-f24b6496f5e5/exec-455298a1-3356-47cf-9ef5-c24006f04fb3.png",
+    "state": "generated-awaiting-QA",
+    "normalized": "C:\\workspace\\msw\\.beaver\\output\\five-class-motion\\normalized\\night-lord\\quadruple-throw\\motion02.png",
+    "size": 704,
+    "bbox": [
+      209,
+      277,
+      586,
+      640
+    ],
+    "edgePixels": 0,
+    "alphaMin": 0,
+    "alphaMax": 255,
+    "sha256": "ecabe5e1086c03706191e711818e4b5f347fe3fdbb4c22ef209028eff34f5ffc"
+  },
+  {
+    "id": "night-lord",
+    "skill": "quadruple-throw",
+    "n": 3,
+    "pose": "Quick reload: throwing elbow bent halfway back, wrist close to upper chest, ready small red/silver shuriken gripped between fingers, compact torso.",
+    "key": "night-lord--quadruple-throw--03",
+    "prompt": "Use case: identity-preserve animation pose edit. Generate ONE transparent PNG animation frame, not a sheet.\nImage1 EDIT TARGET and exact framing/scale master: night-lord character on 704x704 square canvas. Image2 approved identity/costume master, do not copy its larger framing. Image3 Bishop style/anatomy master, do not copy its clothes/hair/staff.\nKeep character SAME small on-canvas size as image1, with generous empty transparent space above. Do not zoom in or fill canvas. In 704-unit canvas coordinates, anatomical head crown-to-chin147units, feet ground y640, centerx352. Underlying standing body height338units and2.3heads, ignoring hats/feathers/tall hair/weapon. Pose may bend knees, never lengthen limbs/boots. Preserve exact face, hair, eye color, all clothing panels, jewelry, weapon design, clean line weight and soft cel shading.\nFrame 3 for quadruple-throw: Quick reload: throwing elbow bent halfway back, wrist close to upper chest, ready small red/silver shuriken gripped between fingers, compact torso.\n\n\nOnly body pose and subtle expression changes allowed. Entire hair/hat/weapon/cape/boots visible with transparent margins. No extra limbs or weapons, no blur or motion trails, no aura/projectiles/glows/environment, no text/numbers/grid/border/shadow. Feet grounded. Actual transparent background. Same fine polished 2D SD game illustration as Bishop, no pixel art. Output ONE frame.",
+    "refs": [
+      "C:/workspace/msw/.beaver/output/five-class-motion/base/night-lord-attack.png",
+      "C:/workspace/msw/assets/design/characters/night-lord/concept.png",
+      "C:/workspace/msw/assets/design/characters/bishop/frames/angel-ray/motion03.png"
+    ],
+    "source": "C:/Users/timec/.codex/generated_images/01a0dbf3-5094-7520-bfc7-f24b6496f5e5/exec-a6bc1e34-bdfa-4ef7-ba5d-086cf0260b97.png",
+    "state": "generated-awaiting-QA",
+    "normalized": "C:\\workspace\\msw\\.beaver\\output\\five-class-motion\\normalized\\night-lord\\quadruple-throw\\motion03.png",
+    "size": 704,
+    "bbox": [
+      237,
+      290,
+      583,
+      639
+    ],
+    "edgePixels": 0,
+    "alphaMin": 0,
+    "alphaMax": 255,
+    "sha256": "f3d1858d05a1c9f0af7e3741cd76d7d24ac2c08c89a10bf31b18cb50e8bf24ff"
+  },
+  {
+    "id": "night-lord",
+    "skill": "quadruple-throw",
+    "n": 4,
+    "pose": "Throw two release: leading arm extends LEFT, wrist flick down, hand open with no projectile attached; free hand low, head size fixed.",
+    "key": "night-lord--quadruple-throw--04",
+    "prompt": "Use case: identity-preserve animation pose edit. Generate ONE transparent PNG animation frame, not a sheet.\nImage1 EDIT TARGET and exact framing/scale master: night-lord character on 704x704 square canvas. Image2 approved identity/costume master, do not copy its larger framing. Image3 Bishop style/anatomy master, do not copy its clothes/hair/staff.\nKeep character SAME small on-canvas size as image1, with generous empty transparent space above. Do not zoom in or fill canvas. In 704-unit canvas coordinates, anatomical head crown-to-chin147units, feet ground y640, centerx352. Underlying standing body height338units and2.3heads, ignoring hats/feathers/tall hair/weapon. Pose may bend knees, never lengthen limbs/boots. Preserve exact face, hair, eye color, all clothing panels, jewelry, weapon design, clean line weight and soft cel shading.\nFrame 4 for quadruple-throw: Throw two release: leading arm extends LEFT, wrist flick down, hand open with no projectile attached; free hand low, head size fixed.\n\n\nOnly body pose and subtle expression changes allowed. Entire hair/hat/weapon/cape/boots visible with transparent margins. No extra limbs or weapons, no blur or motion trails, no aura/projectiles/glows/environment, no text/numbers/grid/border/shadow. Feet grounded. Actual transparent background. Same fine polished 2D SD game illustration as Bishop, no pixel art. Output ONE frame.",
+    "refs": [
+      "C:/workspace/msw/.beaver/output/five-class-motion/base/night-lord-attack.png",
+      "C:/workspace/msw/assets/design/characters/night-lord/concept.png",
+      "C:/workspace/msw/assets/design/characters/bishop/frames/angel-ray/motion03.png"
+    ],
+    "source": "C:/Users/timec/.codex/generated_images/01a0dbf3-5094-7520-bfc7-f24b6496f5e5/exec-62cf5ada-63e1-4ec8-94f6-14c45e289983.png",
+    "state": "generated-awaiting-QA",
+    "normalized": "C:\\workspace\\msw\\.beaver\\output\\five-class-motion\\normalized\\night-lord\\quadruple-throw\\motion04.png",
+    "size": 704,
+    "bbox": [
+      162,
+      295,
+      566,
+      640
+    ],
+    "edgePixels": 0,
+    "alphaMin": 0,
+    "alphaMax": 255,
+    "sha256": "b56d0b0411afefcffdd0f11e9d657e165a55b109d6236b4e9ddb345c5c7a41d7"
+  },
+  {
+    "id": "night-lord",
+    "skill": "quadruple-throw",
+    "n": 5,
+    "pose": "Quick reload for next release: pull forearm inward toward chin, elbow points right, original red/silver shuriken visible in hand, knees gently flexed.",
+    "key": "night-lord--quadruple-throw--05",
+    "prompt": "Use case: identity-preserve animation pose edit. Generate ONE transparent PNG animation frame, not a sheet.\nImage1 EDIT TARGET and exact framing/scale master: night-lord character on 704x704 square canvas. Image2 approved identity/costume master, do not copy its larger framing. Image3 Bishop style/anatomy master, do not copy its clothes/hair/staff.\nKeep character SAME small on-canvas size as image1, with generous empty transparent space above. Do not zoom in or fill canvas. In 704-unit canvas coordinates, anatomical head crown-to-chin147units, feet ground y640, centerx352. Underlying standing body height338units and2.3heads, ignoring hats/feathers/tall hair/weapon. Pose may bend knees, never lengthen limbs/boots. Preserve exact face, hair, eye color, all clothing panels, jewelry, weapon design, clean line weight and soft cel shading.\nFrame 5 for quadruple-throw: Quick reload for next release: pull forearm inward toward chin, elbow points right, original red/silver shuriken visible in hand, knees gently flexed.\n\n\nOnly body pose and subtle expression changes allowed. Entire hair/hat/weapon/cape/boots visible with transparent margins. No extra limbs or weapons, no blur or motion trails, no aura/projectiles/glows/environment, no text/numbers/grid/border/shadow. Feet grounded. Actual transparent background. Same fine polished 2D SD game illustration as Bishop, no pixel art. Output ONE frame.",
+    "refs": [
+      "C:/workspace/msw/.beaver/output/five-class-motion/base/night-lord-attack.png",
+      "C:/workspace/msw/assets/design/characters/night-lord/concept.png",
+      "C:/workspace/msw/assets/design/characters/bishop/frames/angel-ray/motion03.png"
+    ],
+    "source": "C:/Users/timec/.codex/generated_images/01a0dbf3-5094-7520-bfc7-f24b6496f5e5/exec-c010f088-45f0-4d33-a451-b0e0e9297793.png",
+    "state": "generated-awaiting-QA",
+    "normalized": "C:\\workspace\\msw\\.beaver\\output\\five-class-motion\\normalized\\night-lord\\quadruple-throw\\motion05.png",
+    "size": 704,
+    "bbox": [
+      242,
+      254,
+      570,
+      640
+    ],
+    "edgePixels": 0,
+    "alphaMin": 0,
+    "alphaMax": 255,
+    "sha256": "ab41b5dda2c505370a559203b6fcd4bc7ffc31f3064ffaeb09b3cdb85961cbbf"
+  },
+  {
+    "id": "night-lord",
+    "skill": "quadruple-throw",
+    "n": 6,
+    "pose": "Throw three/four repeat release: arm sweeps LEFT on slightly higher angle, fingers open, no flying shuriken in PNG, headband tails and jacket flutter to right.",
+    "key": "night-lord--quadruple-throw--06",
+    "prompt": "Use case: identity-preserve animation pose edit. Generate ONE transparent PNG animation frame, not a sheet.\nImage1 EDIT TARGET and exact framing/scale master: night-lord character on 704x704 square canvas. Image2 approved identity/costume master, do not copy its larger framing. Image3 Bishop style/anatomy master, do not copy its clothes/hair/staff.\nKeep character SAME small on-canvas size as image1, with generous empty transparent space above. Do not zoom in or fill canvas. In 704-unit canvas coordinates, anatomical head crown-to-chin147units, feet ground y640, centerx352. Underlying standing body height338units and2.3heads, ignoring hats/feathers/tall hair/weapon. Pose may bend knees, never lengthen limbs/boots. Preserve exact face, hair, eye color, all clothing panels, jewelry, weapon design, clean line weight and soft cel shading.\nFrame 6 for quadruple-throw: Throw three/four repeat release: arm sweeps LEFT on slightly higher angle, fingers open, no flying shuriken in PNG, headband tails and jacket flutter to right.\n\n\nOnly body pose and subtle expression changes allowed. Entire hair/hat/weapon/cape/boots visible with transparent margins. No extra limbs or weapons, no blur or motion trails, no aura/projectiles/glows/environment, no text/numbers/grid/border/shadow. Feet grounded. Actual transparent background. Same fine polished 2D SD game illustration as Bishop, no pixel art. Output ONE frame.",
+    "refs": [
+      "C:/workspace/msw/.beaver/output/five-class-motion/base/night-lord-attack.png",
+      "C:/workspace/msw/assets/design/characters/night-lord/concept.png",
+      "C:/workspace/msw/assets/design/characters/bishop/frames/angel-ray/motion03.png"
+    ],
+    "source": "C:/Users/timec/.codex/generated_images/01a0dbf3-5094-7520-bfc7-f24b6496f5e5/exec-89c7b0b2-74a2-4177-8fe9-1d21ac0ac031.png",
+    "state": "generated-awaiting-QA",
+    "normalized": "C:\\workspace\\msw\\.beaver\\output\\five-class-motion\\normalized\\night-lord\\quadruple-throw\\motion06.png",
+    "size": 704,
+    "bbox": [
+      176,
+      284,
+      593,
+      639
+    ],
+    "edgePixels": 0,
+    "alphaMin": 0,
+    "alphaMax": 255,
+    "sha256": "030d77c3b06d423c1ea4eb61f55ddebd327bfe936f516345be656b190b403259"
+  },
+  {
+    "id": "night-lord",
+    "skill": "quadruple-throw",
+    "n": 7,
+    "pose": "Follow-through: throwing forearm extends low LEFT after final release, torso pitched very slightly forward, free hand returns to guard.",
+    "key": "night-lord--quadruple-throw--07",
+    "prompt": "Use case: identity-preserve animation pose edit. Generate ONE transparent PNG animation frame, not a sheet.\nImage1 EDIT TARGET and exact framing/scale master: night-lord character on 704x704 square canvas. Image2 approved identity/costume master, do not copy its larger framing. Image3 Bishop style/anatomy master, do not copy its clothes/hair/staff.\nKeep character SAME small on-canvas size as image1, with generous empty transparent space above. Do not zoom in or fill canvas. In 704-unit canvas coordinates, anatomical head crown-to-chin147units, feet ground y640, centerx352. Underlying standing body height338units and2.3heads, ignoring hats/feathers/tall hair/weapon. Pose may bend knees, never lengthen limbs/boots. Preserve exact face, hair, eye color, all clothing panels, jewelry, weapon design, clean line weight and soft cel shading.\nFrame 7 for quadruple-throw: Follow-through: throwing forearm extends low LEFT after final release, torso pitched very slightly forward, free hand returns to guard.\n\n\nOnly body pose and subtle expression changes allowed. Entire hair/hat/weapon/cape/boots visible with transparent margins. No extra limbs or weapons, no blur or motion trails, no aura/projectiles/glows/environment, no text/numbers/grid/border/shadow. Feet grounded. Actual transparent background. Same fine polished 2D SD game illustration as Bishop, no pixel art. Output ONE frame.",
+    "refs": [
+      "C:/workspace/msw/.beaver/output/five-class-motion/base/night-lord-attack.png",
+      "C:/workspace/msw/assets/design/characters/night-lord/concept.png",
+      "C:/workspace/msw/assets/design/characters/bishop/frames/angel-ray/motion03.png"
+    ],
+    "source": "C:/Users/timec/.codex/generated_images/01a0dbf3-5094-7520-bfc7-f24b6496f5e5/exec-0829c38d-80f7-42fa-a8d4-038979757992.png",
+    "state": "generated-awaiting-QA",
+    "normalized": "C:\\workspace\\msw\\.beaver\\output\\five-class-motion\\normalized\\night-lord\\quadruple-throw\\motion07.png",
+    "size": 704,
+    "bbox": [
+      159,
+      287,
+      576,
+      640
+    ],
+    "edgePixels": 0,
+    "alphaMin": 0,
+    "alphaMax": 255,
+    "sha256": "039c94719ce779f5f67e96302bec339b160e954c4c93b5228d7a76b7e1fdfe84"
+  },
+  {
+    "id": "night-lord",
+    "skill": "quadruple-throw",
+    "n": 8,
+    "pose": "Recovery: elbow comes back down, both hands resume original low shuriken guard, straighten posture, original focused expression.",
+    "key": "night-lord--quadruple-throw--08",
+    "prompt": "Use case: identity-preserve animation pose edit. Generate ONE transparent PNG animation frame, not a sheet.\nImage1 EDIT TARGET and exact framing/scale master: night-lord character on 704x704 square canvas. Image2 approved identity/costume master, do not copy its larger framing. Image3 Bishop style/anatomy master, do not copy its clothes/hair/staff.\nKeep character SAME small on-canvas size as image1, with generous empty transparent space above. Do not zoom in or fill canvas. In 704-unit canvas coordinates, anatomical head crown-to-chin147units, feet ground y640, centerx352. Underlying standing body height338units and2.3heads, ignoring hats/feathers/tall hair/weapon. Pose may bend knees, never lengthen limbs/boots. Preserve exact face, hair, eye color, all clothing panels, jewelry, weapon design, clean line weight and soft cel shading.\nFrame 8 for quadruple-throw: Recovery: elbow comes back down, both hands resume original low shuriken guard, straighten posture, original focused expression.\n\n\nOnly body pose and subtle expression changes allowed. Entire hair/hat/weapon/cape/boots visible with transparent margins. No extra limbs or weapons, no blur or motion trails, no aura/projectiles/glows/environment, no text/numbers/grid/border/shadow. Feet grounded. Actual transparent background. Same fine polished 2D SD game illustration as Bishop, no pixel art. Output ONE frame.",
+    "refs": [
+      "C:/workspace/msw/.beaver/output/five-class-motion/base/night-lord-attack.png",
+      "C:/workspace/msw/assets/design/characters/night-lord/concept.png",
+      "C:/workspace/msw/assets/design/characters/bishop/frames/angel-ray/motion03.png"
+    ],
+    "source": "C:/Users/timec/.codex/generated_images/01a0dbf3-5094-7520-bfc7-f24b6496f5e5/exec-95905814-f890-4961-98ce-2ba0fc891bf0.png",
+    "state": "generated-awaiting-QA",
+    "normalized": "C:\\workspace\\msw\\.beaver\\output\\five-class-motion\\normalized\\night-lord\\quadruple-throw\\motion08.png",
+    "size": 704,
+    "bbox": [
+      227,
+      271,
+      556,
+      639
+    ],
+    "edgePixels": 0,
+    "alphaMin": 0,
+    "alphaMax": 255,
+    "sha256": "54ec7f0a38e1536e002bcb51c73433a9a9edf12451b8fed5d83c8057f6b4ea12"
+  },
+  {
+    "id": "night-lord",
+    "skill": "wait",
+    "n": 2,
+    "pose": "Small inhalation: preserve exact idle pose and planted feet, lift shoulders and upper chest subtly, shift cape/scarf/hair tips outward by tiny amount. Same eyes and expression, no stance change.",
+    "key": "night-lord--wait--02",
+    "prompt": "Use case: identity-preserve animation pose edit. Generate ONE transparent PNG animation frame, not a sheet.\nImage1 EDIT TARGET and exact framing/scale master: night-lord character on 576x576 square canvas. Image2 approved identity/costume master, do not copy its larger framing. Image3 Bishop style/anatomy master, do not copy its clothes/hair/staff.\nKeep character SAME small on-canvas size as image1, with generous empty transparent space above. Do not zoom in or fill canvas. In 576-unit canvas coordinates, anatomical head crown-to-chin147units, feet ground y512, centerx288. Underlying standing body height338units and2.3heads, ignoring hats/feathers/tall hair/weapon. Pose may bend knees, never lengthen limbs/boots. Preserve exact face, hair, eye color, all clothing panels, jewelry, weapon design, clean line weight and soft cel shading.\nFrame 2 for wait: Small inhalation: preserve exact idle pose and planted feet, lift shoulders and upper chest subtly, shift cape/scarf/hair tips outward by tiny amount. Same eyes and expression, no stance change.\n\n\nOnly body pose and subtle expression changes allowed. Entire hair/hat/weapon/cape/boots visible with transparent margins. No extra limbs or weapons, no blur or motion trails, no aura/projectiles/glows/environment, no text/numbers/grid/border/shadow. Feet grounded. Actual transparent background. Same fine polished 2D SD game illustration as Bishop, no pixel art. Output ONE frame.",
+    "refs": [
+      "C:/workspace/msw/.beaver/output/five-class-motion/base/night-lord.png",
+      "C:/workspace/msw/assets/design/characters/night-lord/concept.png",
+      "C:/workspace/msw/assets/design/characters/bishop/frames/wait/motion01.png"
+    ],
+    "source": "C:/Users/timec/.codex/generated_images/01a0dbf3-5094-7520-bfc7-f24b6496f5e5/exec-e063f042-1b83-4405-b351-995fe880d14c.png",
+    "state": "generated-awaiting-QA",
+    "normalized": "C:\\workspace\\msw\\.beaver\\output\\five-class-motion\\normalized\\night-lord\\wait\\motion02.png",
+    "size": 576,
+    "bbox": [
+      165,
+      155,
+      495,
+      511
+    ],
+    "edgePixels": 0,
+    "alphaMin": 0,
+    "alphaMax": 255,
+    "sha256": "aa915ba2223117837d465709caa8d6935f67c5f0b8c562e21ac62ca30229c5da"
+  },
+  {
+    "id": "night-lord",
+    "skill": "wait",
+    "n": 3,
+    "pose": "Small exhalation: preserve exact idle pose and planted feet, relax shoulders subtly lower, cape/scarf/hair tips settle slightly inward. Same eyes and expression, no stance change.",
+    "key": "night-lord--wait--03",
+    "prompt": "Use case: identity-preserve animation pose edit. Generate ONE transparent PNG animation frame, not a sheet.\nImage1 EDIT TARGET and exact framing/scale master: night-lord character on 576x576 square canvas. Image2 approved identity/costume master, do not copy its larger framing. Image3 Bishop style/anatomy master, do not copy its clothes/hair/staff.\nKeep character SAME small on-canvas size as image1, with generous empty transparent space above. Do not zoom in or fill canvas. In 576-unit canvas coordinates, anatomical head crown-to-chin147units, feet ground y512, centerx288. Underlying standing body height338units and2.3heads, ignoring hats/feathers/tall hair/weapon. Pose may bend knees, never lengthen limbs/boots. Preserve exact face, hair, eye color, all clothing panels, jewelry, weapon design, clean line weight and soft cel shading.\nFrame 3 for wait: Small exhalation: preserve exact idle pose and planted feet, relax shoulders subtly lower, cape/scarf/hair tips settle slightly inward. Same eyes and expression, no stance change.\n\n\nOnly body pose and subtle expression changes allowed. Entire hair/hat/weapon/cape/boots visible with transparent margins. No extra limbs or weapons, no blur or motion trails, no aura/projectiles/glows/environment, no text/numbers/grid/border/shadow. Feet grounded. Actual transparent background. Same fine polished 2D SD game illustration as Bishop, no pixel art. Output ONE frame.",
+    "refs": [
+      "C:/workspace/msw/.beaver/output/five-class-motion/base/night-lord.png",
+      "C:/workspace/msw/assets/design/characters/night-lord/concept.png",
+      "C:/workspace/msw/assets/design/characters/bishop/frames/wait/motion01.png"
+    ],
+    "source": "C:/Users/timec/.codex/generated_images/01a0dbf3-5094-7520-bfc7-f24b6496f5e5/exec-e686e2bb-17f3-4455-8b45-a27989f33973.png",
+    "state": "generated-awaiting-QA",
+    "previousSource": "C:/Users/timec/.codex/generated_images/01a0dbf3-5094-7520-bfc7-f24b6496f5e5/exec-28a0ad96-4497-4598-b1a9-d5cfd810183a.png",
+    "correctionPrompt": "Use case: precise-object-edit. Image1 target animation frame. Image2 approved identity/weapon reference. Remove ONLY the small white exhalation cloud/puff next to the mouth and left side of cheek. That area must be transparent. No breath vapor, effects, stars or symbols. Keep the character, weapon, pose and every other pixel appearance unchanged. Same original canvas framing, true transparent background, full body/weapon visible, no text/shadow. Output ONE corrected frame.",
+    "normalized": "C:\\workspace\\msw\\.beaver\\output\\five-class-motion\\normalized\\night-lord\\wait\\motion03.png",
+    "size": 576,
+    "bbox": [
+      166,
+      143,
+      491,
+      511
+    ],
+    "edgePixels": 0,
+    "alphaMin": 0,
+    "alphaMax": 255,
+    "sha256": "2c78544e3a0b00f9163b2c3372186a4f001a964a5ca4d54818e1ed54496adbc7"
+  },
+  {
+    "id": "paladin",
+    "skill": "divine-charge",
+    "n": 1,
+    "pose": "Preparation: feet planted, both hands close on hammer handle at waist, hammer head drawn back low toward viewer RIGHT. Face looks toward viewer LEFT.",
+    "key": "paladin--divine-charge--01",
+    "prompt": "Use case: identity-preserve animation pose edit. Generate ONE transparent PNG animation frame, not a sheet.\nImage1 EDIT TARGET and exact framing/scale master: paladin character on 704x704 square canvas. Image2 approved identity/costume master, do not copy its larger framing. Image3 Bishop style/anatomy master, do not copy its clothes/hair/staff.\nKeep character SAME small on-canvas size as image1, with generous empty transparent space above. Do not zoom in or fill canvas. In 704-unit canvas coordinates, anatomical head crown-to-chin147units, feet ground y640, centerx352. Underlying standing body height338units and2.3heads, ignoring hats/feathers/tall hair/weapon. Pose may bend knees, never lengthen limbs/boots. Preserve exact face, hair, eye color, all clothing panels, jewelry, weapon design, clean line weight and soft cel shading.\nFrame 1 for divine-charge: Preparation: feet planted, both hands close on hammer handle at waist, hammer head drawn back low toward viewer RIGHT. Face looks toward viewer LEFT.\n\n\nOnly body pose and subtle expression changes allowed. Entire hair/hat/weapon/cape/boots visible with transparent margins. No extra limbs or weapons, no blur or motion trails, no aura/projectiles/glows/environment, no text/numbers/grid/border/shadow. Feet grounded. Actual transparent background. Same fine polished 2D SD game illustration as Bishop, no pixel art. Output ONE frame.",
+    "refs": [
+      "C:/workspace/msw/.beaver/output/five-class-motion/base/paladin-attack.png",
+      "C:/workspace/msw/assets/design/characters/paladin/concept.png",
+      "C:/workspace/msw/assets/design/characters/bishop/frames/angel-ray/motion03.png"
+    ],
+    "source": "C:/Users/timec/.codex/generated_images/01a0dbf3-5094-7520-bfc7-f24b6496f5e5/exec-6dbc2702-dcea-429c-b059-8a33cb28191f.png",
+    "state": "generated-awaiting-QA",
+    "normalized": "C:\\workspace\\msw\\.beaver\\output\\five-class-motion\\normalized\\paladin\\divine-charge\\motion01.png",
+    "size": 704,
+    "bbox": [
+      157,
+      284,
+      584,
+      639
+    ],
+    "edgePixels": 0,
+    "alphaMin": 0,
+    "alphaMax": 255,
+    "sha256": "f449d848f7e6555fc03fa49341b70892d0a766eb68fc6eaf768546e137f0bd53"
+  },
+  {
+    "id": "paladin",
+    "skill": "divine-charge",
+    "n": 2,
+    "pose": "Wind-up: turn torso slightly toward viewer RIGHT, both hands bring hammer back beside right hip, bend knees subtly. Hammer head low, face still LEFT.",
+    "key": "paladin--divine-charge--02",
+    "prompt": "Use case: identity-preserve animation pose edit. Generate ONE transparent PNG animation frame, not a sheet.\nImage1 EDIT TARGET and exact framing/scale master: paladin character on 704x704 square canvas. Image2 approved identity/costume master, do not copy its larger framing. Image3 Bishop style/anatomy master, do not copy its clothes/hair/staff.\nKeep character SAME small on-canvas size as image1, with generous empty transparent space above. Do not zoom in or fill canvas. In 704-unit canvas coordinates, anatomical head crown-to-chin147units, feet ground y640, centerx352. Underlying standing body height338units and2.3heads, ignoring hats/feathers/tall hair/weapon. Pose may bend knees, never lengthen limbs/boots. Preserve exact face, hair, eye color, all clothing panels, jewelry, weapon design, clean line weight and soft cel shading.\nFrame 2 for divine-charge: Wind-up: turn torso slightly toward viewer RIGHT, both hands bring hammer back beside right hip, bend knees subtly. Hammer head low, face still LEFT.\n\n\nOnly body pose and subtle expression changes allowed. Entire hair/hat/weapon/cape/boots visible with transparent margins. No extra limbs or weapons, no blur or motion trails, no aura/projectiles/glows/environment, no text/numbers/grid/border/shadow. Feet grounded. Actual transparent background. Same fine polished 2D SD game illustration as Bishop, no pixel art. Output ONE frame.",
+    "refs": [
+      "C:/workspace/msw/.beaver/output/five-class-motion/base/paladin-attack.png",
+      "C:/workspace/msw/assets/design/characters/paladin/concept.png",
+      "C:/workspace/msw/assets/design/characters/bishop/frames/angel-ray/motion03.png"
+    ],
+    "source": "C:/Users/timec/.codex/generated_images/01a0dbf3-5094-7520-bfc7-f24b6496f5e5/exec-4b6c6381-b72a-4e9d-8c83-d1a010f37b30.png",
+    "state": "generated-awaiting-QA",
+    "normalized": "C:\\workspace\\msw\\.beaver\\output\\five-class-motion\\normalized\\paladin\\divine-charge\\motion02.png",
+    "size": 704,
+    "bbox": [
+      158,
+      302,
+      558,
+      639
+    ],
+    "edgePixels": 0,
+    "alphaMin": 0,
+    "alphaMax": 255,
+    "sha256": "ddf092cedc896f3850e16966de7baf27e52a17bfeee9d59c88a7ef6273a4f7af"
+  },
+  {
+    "id": "paladin",
+    "skill": "divine-charge",
+    "n": 3,
+    "pose": "Impact at0.30s: decisive upward-forward swing toward viewer LEFT. Both hands on handle, hammer head extended to left at chest height, torso leans left slightly, rear heel lifted.",
+    "key": "paladin--divine-charge--03",
+    "prompt": "Use case: identity-preserve animation pose edit. Generate ONE transparent PNG animation frame, not a sheet.\nImage1 EDIT TARGET and exact framing/scale master: paladin character on 704x704 square canvas. Image2 approved identity/costume master, do not copy its larger framing. Image3 Bishop style/anatomy master, do not copy its clothes/hair/staff.\nKeep character SAME small on-canvas size as image1, with generous empty transparent space above. Do not zoom in or fill canvas. In 704-unit canvas coordinates, anatomical head crown-to-chin147units, feet ground y640, centerx352. Underlying standing body height338units and2.3heads, ignoring hats/feathers/tall hair/weapon. Pose may bend knees, never lengthen limbs/boots. Preserve exact face, hair, eye color, all clothing panels, jewelry, weapon design, clean line weight and soft cel shading.\nFrame 3 for divine-charge: Impact at0.30s: decisive upward-forward swing toward viewer LEFT. Both hands on handle, hammer head extended to left at chest height, torso leans left slightly, rear heel lifted.\n\n\nOnly body pose and subtle expression changes allowed. Entire hair/hat/weapon/cape/boots visible with transparent margins. No extra limbs or weapons, no blur or motion trails, no aura/projectiles/glows/environment, no text/numbers/grid/border/shadow. Feet grounded. Actual transparent background. Same fine polished 2D SD game illustration as Bishop, no pixel art. Output ONE frame.",
+    "refs": [
+      "C:/workspace/msw/.beaver/output/five-class-motion/base/paladin-attack.png",
+      "C:/workspace/msw/assets/design/characters/paladin/concept.png",
+      "C:/workspace/msw/assets/design/characters/bishop/frames/angel-ray/motion03.png"
+    ],
+    "source": "C:/Users/timec/.codex/generated_images/01a0dbf3-5094-7520-bfc7-f24b6496f5e5/exec-45a1e924-c582-4c62-aef3-58a4c4a1fd04.png",
+    "state": "generated-awaiting-QA",
+    "normalized": "C:\\workspace\\msw\\.beaver\\output\\five-class-motion\\normalized\\paladin\\divine-charge\\motion03.png",
+    "size": 704,
+    "bbox": [
+      83,
+      312,
+      568,
+      640
+    ],
+    "edgePixels": 0,
+    "alphaMin": 0,
+    "alphaMax": 255,
+    "sha256": "eceaed7cb8d91ed434acd4dd9bfbe607bccb8323f67dcf7776c7f90aca4d9d7e"
+  },
+  {
+    "id": "paladin",
+    "skill": "divine-charge",
+    "n": 4,
+    "pose": "Follow-through: hammer continues upward over left shoulder, elbows bent, torso straightening. Keep hammer fully visible above LEFT side of head.",
+    "key": "paladin--divine-charge--04",
+    "prompt": "Use case: identity-preserve animation pose edit. Generate ONE transparent PNG animation frame, not a sheet.\nImage1 EDIT TARGET and exact framing/scale master: paladin character on 704x704 square canvas. Image2 approved identity/costume master, do not copy its larger framing. Image3 Bishop style/anatomy master, do not copy its clothes/hair/staff.\nKeep character SAME small on-canvas size as image1, with generous empty transparent space above. Do not zoom in or fill canvas. In 704-unit canvas coordinates, anatomical head crown-to-chin147units, feet ground y640, centerx352. Underlying standing body height338units and2.3heads, ignoring hats/feathers/tall hair/weapon. Pose may bend knees, never lengthen limbs/boots. Preserve exact face, hair, eye color, all clothing panels, jewelry, weapon design, clean line weight and soft cel shading.\nFrame 4 for divine-charge: Follow-through: hammer continues upward over left shoulder, elbows bent, torso straightening. Keep hammer fully visible above LEFT side of head.\n\n\nOnly body pose and subtle expression changes allowed. Entire hair/hat/weapon/cape/boots visible with transparent margins. No extra limbs or weapons, no blur or motion trails, no aura/projectiles/glows/environment, no text/numbers/grid/border/shadow. Feet grounded. Actual transparent background. Same fine polished 2D SD game illustration as Bishop, no pixel art. Output ONE frame.",
+    "refs": [
+      "C:/workspace/msw/.beaver/output/five-class-motion/base/paladin-attack.png",
+      "C:/workspace/msw/assets/design/characters/paladin/concept.png",
+      "C:/workspace/msw/assets/design/characters/bishop/frames/angel-ray/motion03.png"
+    ],
+    "source": "C:/Users/timec/.codex/generated_images/01a0dbf3-5094-7520-bfc7-f24b6496f5e5/exec-787bb799-572e-4e87-8c1e-903eaccaf7f6.png",
+    "state": "generated-awaiting-QA",
+    "normalized": "C:\\workspace\\msw\\.beaver\\output\\five-class-motion\\normalized\\paladin\\divine-charge\\motion04.png",
+    "size": 704,
+    "bbox": [
+      169,
+      203,
+      578,
+      639
+    ],
+    "edgePixels": 0,
+    "alphaMin": 0,
+    "alphaMax": 255,
+    "sha256": "28eea2e2c3e2bf7d9d45942b6503a407442619163f5db9f631d41039953e81ee"
+  },
+  {
+    "id": "paladin",
+    "skill": "divine-charge",
+    "n": 5,
+    "pose": "Recovery: hammer head near left shoulder now being lowered, elbows relax, feet settle, cape follows motion gently.",
+    "key": "paladin--divine-charge--05",
+    "prompt": "Use case: identity-preserve animation pose edit. Generate ONE transparent PNG animation frame, not a sheet.\nImage1 EDIT TARGET and exact framing/scale master: paladin character on 704x704 square canvas. Image2 approved identity/costume master, do not copy its larger framing. Image3 Bishop style/anatomy master, do not copy its clothes/hair/staff.\nKeep character SAME small on-canvas size as image1, with generous empty transparent space above. Do not zoom in or fill canvas. In 704-unit canvas coordinates, anatomical head crown-to-chin147units, feet ground y640, centerx352. Underlying standing body height338units and2.3heads, ignoring hats/feathers/tall hair/weapon. Pose may bend knees, never lengthen limbs/boots. Preserve exact face, hair, eye color, all clothing panels, jewelry, weapon design, clean line weight and soft cel shading.\nFrame 5 for divine-charge: Recovery: hammer head near left shoulder now being lowered, elbows relax, feet settle, cape follows motion gently.\n\n\nOnly body pose and subtle expression changes allowed. Entire hair/hat/weapon/cape/boots visible with transparent margins. No extra limbs or weapons, no blur or motion trails, no aura/projectiles/glows/environment, no text/numbers/grid/border/shadow. Feet grounded. Actual transparent background. Same fine polished 2D SD game illustration as Bishop, no pixel art. Output ONE frame.",
+    "refs": [
+      "C:/workspace/msw/.beaver/output/five-class-motion/base/paladin-attack.png",
+      "C:/workspace/msw/assets/design/characters/paladin/concept.png",
+      "C:/workspace/msw/assets/design/characters/bishop/frames/angel-ray/motion03.png"
+    ],
+    "source": "C:/Users/timec/.codex/generated_images/01a0dbf3-5094-7520-bfc7-f24b6496f5e5/exec-c16b72e5-2b4b-4778-a4eb-e2f722f2ea33.png",
+    "state": "generated-awaiting-QA",
+    "normalized": "C:\\workspace\\msw\\.beaver\\output\\five-class-motion\\normalized\\paladin\\divine-charge\\motion05.png",
+    "size": 704,
+    "bbox": [
+      196,
+      263,
+      586,
+      639
+    ],
+    "edgePixels": 0,
+    "alphaMin": 0,
+    "alphaMax": 255,
+    "sha256": "6e8ded1c90ba132bf39637115103312d0126368419732582cf6e4e9a39968b98"
+  },
+  {
+    "id": "paladin",
+    "skill": "divine-charge",
+    "n": 6,
+    "pose": "Return: lower hammer beside viewer LEFT thigh toward original idle resting position; gentle expression restored, compact upright posture.",
+    "key": "paladin--divine-charge--06",
+    "prompt": "Use case: identity-preserve animation pose edit. Generate ONE transparent PNG animation frame, not a sheet.\nImage1 EDIT TARGET and exact framing/scale master: paladin character on 704x704 square canvas. Image2 approved identity/costume master, do not copy its larger framing. Image3 Bishop style/anatomy master, do not copy its clothes/hair/staff.\nKeep character SAME small on-canvas size as image1, with generous empty transparent space above. Do not zoom in or fill canvas. In 704-unit canvas coordinates, anatomical head crown-to-chin147units, feet ground y640, centerx352. Underlying standing body height338units and2.3heads, ignoring hats/feathers/tall hair/weapon. Pose may bend knees, never lengthen limbs/boots. Preserve exact face, hair, eye color, all clothing panels, jewelry, weapon design, clean line weight and soft cel shading.\nFrame 6 for divine-charge: Return: lower hammer beside viewer LEFT thigh toward original idle resting position; gentle expression restored, compact upright posture.\n\n\nOnly body pose and subtle expression changes allowed. Entire hair/hat/weapon/cape/boots visible with transparent margins. No extra limbs or weapons, no blur or motion trails, no aura/projectiles/glows/environment, no text/numbers/grid/border/shadow. Feet grounded. Actual transparent background. Same fine polished 2D SD game illustration as Bishop, no pixel art. Output ONE frame.",
+    "refs": [
+      "C:/workspace/msw/.beaver/output/five-class-motion/base/paladin-attack.png",
+      "C:/workspace/msw/assets/design/characters/paladin/concept.png",
+      "C:/workspace/msw/assets/design/characters/bishop/frames/angel-ray/motion03.png"
+    ],
+    "source": "C:/Users/timec/.codex/generated_images/01a0dbf3-5094-7520-bfc7-f24b6496f5e5/exec-aa5e1e17-5d34-4bfa-b768-44d378395cf9.png",
+    "state": "generated-awaiting-QA",
+    "normalized": "C:\\workspace\\msw\\.beaver\\output\\five-class-motion\\normalized\\paladin\\divine-charge\\motion06.png",
+    "size": 704,
+    "bbox": [
+      200,
+      277,
+      581,
+      640
+    ],
+    "edgePixels": 0,
+    "alphaMin": 0,
+    "alphaMax": 255,
+    "sha256": "d61639424c90ee8585ef8177809caa3786cd2fdfe9a6fab9e3043336a838a257"
+  },
+  {
+    "id": "paladin",
+    "skill": "sanctuary",
+    "n": 1,
+    "pose": "Preparation for heavy overhead hammer strike: slightly lower hips, both hands grip hammer handle before chest, hammer head beside right shoulder.",
+    "key": "paladin--sanctuary--01",
+    "prompt": "Use case: identity-preserve animation pose edit. Generate ONE transparent PNG animation frame, not a sheet.\nImage1 EDIT TARGET and exact framing/scale master: paladin character on 704x704 square canvas. Image2 approved identity/costume master, do not copy its larger framing. Image3 Bishop style/anatomy master, do not copy its clothes/hair/staff.\nKeep character SAME small on-canvas size as image1, with generous empty transparent space above. Do not zoom in or fill canvas. In 704-unit canvas coordinates, anatomical head crown-to-chin147units, feet ground y640, centerx352. Underlying standing body height338units and2.3heads, ignoring hats/feathers/tall hair/weapon. Pose may bend knees, never lengthen limbs/boots. Preserve exact face, hair, eye color, all clothing panels, jewelry, weapon design, clean line weight and soft cel shading.\nFrame 1 for sanctuary: Preparation for heavy overhead hammer strike: slightly lower hips, both hands grip hammer handle before chest, hammer head beside right shoulder.\n\n\nOnly body pose and subtle expression changes allowed. Entire hair/hat/weapon/cape/boots visible with transparent margins. No extra limbs or weapons, no blur or motion trails, no aura/projectiles/glows/environment, no text/numbers/grid/border/shadow. Feet grounded. Actual transparent background. Same fine polished 2D SD game illustration as Bishop, no pixel art. Output ONE frame.",
+    "refs": [
+      "C:/workspace/msw/.beaver/output/five-class-motion/base/paladin-attack.png",
+      "C:/workspace/msw/assets/design/characters/paladin/concept.png",
+      "C:/workspace/msw/assets/design/characters/bishop/frames/angel-ray/motion03.png"
+    ],
+    "source": "C:/Users/timec/.codex/generated_images/01a0dbf3-5094-7520-bfc7-f24b6496f5e5/exec-7a00bd20-2974-4299-a249-b91e594ed2e8.png",
+    "state": "generated-awaiting-QA",
+    "normalized": "C:\\workspace\\msw\\.beaver\\output\\five-class-motion\\normalized\\paladin\\sanctuary\\motion01.png",
+    "size": 704,
+    "bbox": [
+      236,
+      231,
+      570,
+      639
+    ],
+    "edgePixels": 0,
+    "alphaMin": 0,
+    "alphaMax": 255,
+    "sha256": "e4486b8d8f2d9d73f6f87e1e4b1390a92c5025d8a1f6fbbf97f97fbe45849773"
+  },
+  {
+    "id": "paladin",
+    "skill": "sanctuary",
+    "n": 2,
+    "pose": "Lift: both arms raise hammer above crown, elbows bent; hammer head above and slightly to viewer RIGHT, cape begins to lift.",
+    "key": "paladin--sanctuary--02",
+    "prompt": "Use case: identity-preserve animation pose edit. Generate ONE transparent PNG animation frame, not a sheet.\nImage1 EDIT TARGET and exact framing/scale master: paladin character on 704x704 square canvas. Image2 approved identity/costume master, do not copy its larger framing. Image3 Bishop style/anatomy master, do not copy its clothes/hair/staff.\nKeep character SAME small on-canvas size as image1, with generous empty transparent space above. Do not zoom in or fill canvas. In 704-unit canvas coordinates, anatomical head crown-to-chin147units, feet ground y640, centerx352. Underlying standing body height338units and2.3heads, ignoring hats/feathers/tall hair/weapon. Pose may bend knees, never lengthen limbs/boots. Preserve exact face, hair, eye color, all clothing panels, jewelry, weapon design, clean line weight and soft cel shading.\nFrame 2 for sanctuary: Lift: both arms raise hammer above crown, elbows bent; hammer head above and slightly to viewer RIGHT, cape begins to lift.\n\n\nOnly body pose and subtle expression changes allowed. Entire hair/hat/weapon/cape/boots visible with transparent margins. No extra limbs or weapons, no blur or motion trails, no aura/projectiles/glows/environment, no text/numbers/grid/border/shadow. Feet grounded. Actual transparent background. Same fine polished 2D SD game illustration as Bishop, no pixel art. Output ONE frame.",
+    "refs": [
+      "C:/workspace/msw/.beaver/output/five-class-motion/base/paladin-attack.png",
+      "C:/workspace/msw/assets/design/characters/paladin/concept.png",
+      "C:/workspace/msw/assets/design/characters/bishop/frames/angel-ray/motion03.png"
+    ],
+    "source": "C:/Users/timec/.codex/generated_images/01a0dbf3-5094-7520-bfc7-f24b6496f5e5/exec-bb53d162-7397-4073-b8f6-a35740acb812.png",
+    "state": "generated-awaiting-QA",
+    "normalized": "C:\\workspace\\msw\\.beaver\\output\\five-class-motion\\normalized\\paladin\\sanctuary\\motion02.png",
+    "size": 704,
+    "bbox": [
+      236,
+      170,
+      619,
+      639
+    ],
+    "edgePixels": 0,
+    "alphaMin": 0,
+    "alphaMax": 255,
+    "sha256": "81d37c92c6dab96fc1ca6d07e224b13c964193e0308a903ee6d74575c9e47a7c"
+  },
+  {
+    "id": "paladin",
+    "skill": "sanctuary",
+    "n": 3,
+    "pose": "Peak anticipation: hammer held above and behind head, knees bent gently, weight on rear foot, gaze LEFT. No giant halo.",
+    "key": "paladin--sanctuary--03",
+    "prompt": "Use case: identity-preserve animation pose edit. Generate ONE transparent PNG animation frame, not a sheet.\nImage1 EDIT TARGET and exact framing/scale master: paladin character on 704x704 square canvas. Image2 approved identity/costume master, do not copy its larger framing. Image3 Bishop style/anatomy master, do not copy its clothes/hair/staff.\nKeep character SAME small on-canvas size as image1, with generous empty transparent space above. Do not zoom in or fill canvas. In 704-unit canvas coordinates, anatomical head crown-to-chin147units, feet ground y640, centerx352. Underlying standing body height338units and2.3heads, ignoring hats/feathers/tall hair/weapon. Pose may bend knees, never lengthen limbs/boots. Preserve exact face, hair, eye color, all clothing panels, jewelry, weapon design, clean line weight and soft cel shading.\nFrame 3 for sanctuary: Peak anticipation: hammer held above and behind head, knees bent gently, weight on rear foot, gaze LEFT. No giant halo.\n\n\nOnly body pose and subtle expression changes allowed. Entire hair/hat/weapon/cape/boots visible with transparent margins. No extra limbs or weapons, no blur or motion trails, no aura/projectiles/glows/environment, no text/numbers/grid/border/shadow. Feet grounded. Actual transparent background. Same fine polished 2D SD game illustration as Bishop, no pixel art. Output ONE frame.",
+    "refs": [
+      "C:/workspace/msw/.beaver/output/five-class-motion/base/paladin-attack.png",
+      "C:/workspace/msw/assets/design/characters/paladin/concept.png",
+      "C:/workspace/msw/assets/design/characters/bishop/frames/angel-ray/motion03.png"
+    ],
+    "source": "C:/Users/timec/.codex/generated_images/01a0dbf3-5094-7520-bfc7-f24b6496f5e5/exec-9f13091e-5a9d-4b13-88a0-d481f8ed37db.png",
+    "state": "generated-awaiting-QA",
+    "normalized": "C:\\workspace\\msw\\.beaver\\output\\five-class-motion\\normalized\\paladin\\sanctuary\\motion03.png",
+    "size": 704,
+    "bbox": [
+      210,
+      268,
+      570,
+      639
+    ],
+    "edgePixels": 0,
+    "alphaMin": 0,
+    "alphaMax": 255,
+    "sha256": "22babba5e67fbcc0b3ad3404116678f497fe6e88b076de45c836654e17d7ea5b"
+  },
+  {
+    "id": "paladin",
+    "skill": "sanctuary",
+    "n": 4,
+    "pose": "Impact at0.50s: bring hammer forcefully down toward viewer LEFT, hammer head near ground in front of left foot, body crouched but head same size, both hands grip handle.",
+    "key": "paladin--sanctuary--04",
+    "prompt": "Use case: identity-preserve animation pose edit. Generate ONE transparent PNG animation frame, not a sheet.\nImage1 EDIT TARGET and exact framing/scale master: paladin character on 704x704 square canvas. Image2 approved identity/costume master, do not copy its larger framing. Image3 Bishop style/anatomy master, do not copy its clothes/hair/staff.\nKeep character SAME small on-canvas size as image1, with generous empty transparent space above. Do not zoom in or fill canvas. In 704-unit canvas coordinates, anatomical head crown-to-chin147units, feet ground y640, centerx352. Underlying standing body height338units and2.3heads, ignoring hats/feathers/tall hair/weapon. Pose may bend knees, never lengthen limbs/boots. Preserve exact face, hair, eye color, all clothing panels, jewelry, weapon design, clean line weight and soft cel shading.\nFrame 4 for sanctuary: Impact at0.50s: bring hammer forcefully down toward viewer LEFT, hammer head near ground in front of left foot, body crouched but head same size, both hands grip handle.\n\n\nOnly body pose and subtle expression changes allowed. Entire hair/hat/weapon/cape/boots visible with transparent margins. No extra limbs or weapons, no blur or motion trails, no aura/projectiles/glows/environment, no text/numbers/grid/border/shadow. Feet grounded. Actual transparent background. Same fine polished 2D SD game illustration as Bishop, no pixel art. Output ONE frame.",
+    "refs": [
+      "C:/workspace/msw/.beaver/output/five-class-motion/base/paladin-attack.png",
+      "C:/workspace/msw/assets/design/characters/paladin/concept.png",
+      "C:/workspace/msw/assets/design/characters/bishop/frames/angel-ray/motion03.png"
+    ],
+    "source": "C:/Users/timec/.codex/generated_images/01a0dbf3-5094-7520-bfc7-f24b6496f5e5/exec-2908a48b-444c-414d-a4a3-932f9744e914.png",
+    "state": "generated-awaiting-QA",
+    "normalized": "C:\\workspace\\msw\\.beaver\\output\\five-class-motion\\normalized\\paladin\\sanctuary\\motion04.png",
+    "size": 704,
+    "bbox": [
+      131,
+      294,
+      577,
+      659
+    ],
+    "edgePixels": 0,
+    "alphaMin": 0,
+    "alphaMax": 255,
+    "sha256": "997a77001bcf7d7f9a45f9ab409401670f58e0fc220dc67cec38c4ecaece2cf0"
+  },
+  {
+    "id": "paladin",
+    "skill": "sanctuary",
+    "n": 5,
+    "pose": "Follow-through hold: head and shoulders slightly lowered, hammer head still near LEFT ground, cape settling, body stable.",
+    "key": "paladin--sanctuary--05",
+    "prompt": "Use case: identity-preserve animation pose edit. Generate ONE transparent PNG animation frame, not a sheet.\nImage1 EDIT TARGET and exact framing/scale master: paladin character on 704x704 square canvas. Image2 approved identity/costume master, do not copy its larger framing. Image3 Bishop style/anatomy master, do not copy its clothes/hair/staff.\nKeep character SAME small on-canvas size as image1, with generous empty transparent space above. Do not zoom in or fill canvas. In 704-unit canvas coordinates, anatomical head crown-to-chin147units, feet ground y640, centerx352. Underlying standing body height338units and2.3heads, ignoring hats/feathers/tall hair/weapon. Pose may bend knees, never lengthen limbs/boots. Preserve exact face, hair, eye color, all clothing panels, jewelry, weapon design, clean line weight and soft cel shading.\nFrame 5 for sanctuary: Follow-through hold: head and shoulders slightly lowered, hammer head still near LEFT ground, cape settling, body stable.\n\n\nOnly body pose and subtle expression changes allowed. Entire hair/hat/weapon/cape/boots visible with transparent margins. No extra limbs or weapons, no blur or motion trails, no aura/projectiles/glows/environment, no text/numbers/grid/border/shadow. Feet grounded. Actual transparent background. Same fine polished 2D SD game illustration as Bishop, no pixel art. Output ONE frame.",
+    "refs": [
+      "C:/workspace/msw/.beaver/output/five-class-motion/base/paladin-attack.png",
+      "C:/workspace/msw/assets/design/characters/paladin/concept.png",
+      "C:/workspace/msw/assets/design/characters/bishop/frames/angel-ray/motion03.png"
+    ],
+    "source": "C:/Users/timec/.codex/generated_images/01a0dbf3-5094-7520-bfc7-f24b6496f5e5/exec-52878165-fdd3-4a38-97b9-f17a574e5e2e.png",
+    "state": "generated-awaiting-QA",
+    "normalized": "C:\\workspace\\msw\\.beaver\\output\\five-class-motion\\normalized\\paladin\\sanctuary\\motion05.png",
+    "size": 704,
+    "bbox": [
+      183,
+      289,
+      577,
+      641
+    ],
+    "edgePixels": 0,
+    "alphaMin": 0,
+    "alphaMax": 255,
+    "sha256": "dead476ff2e674ba5b7ff6ed9b07edba0454826d114ea5da0423cd42f5315db5"
+  },
+  {
+    "id": "paladin",
+    "skill": "sanctuary",
+    "n": 6,
+    "pose": "Recovery: lift hammer back to lowered resting position on viewer LEFT, rise almost upright, knees straightening naturally.",
+    "key": "paladin--sanctuary--06",
+    "prompt": "Use case: identity-preserve animation pose edit. Generate ONE transparent PNG animation frame, not a sheet.\nImage1 EDIT TARGET and exact framing/scale master: paladin character on 704x704 square canvas. Image2 approved identity/costume master, do not copy its larger framing. Image3 Bishop style/anatomy master, do not copy its clothes/hair/staff.\nKeep character SAME small on-canvas size as image1, with generous empty transparent space above. Do not zoom in or fill canvas. In 704-unit canvas coordinates, anatomical head crown-to-chin147units, feet ground y640, centerx352. Underlying standing body height338units and2.3heads, ignoring hats/feathers/tall hair/weapon. Pose may bend knees, never lengthen limbs/boots. Preserve exact face, hair, eye color, all clothing panels, jewelry, weapon design, clean line weight and soft cel shading.\nFrame 6 for sanctuary: Recovery: lift hammer back to lowered resting position on viewer LEFT, rise almost upright, knees straightening naturally.\n\n\nOnly body pose and subtle expression changes allowed. Entire hair/hat/weapon/cape/boots visible with transparent margins. No extra limbs or weapons, no blur or motion trails, no aura/projectiles/glows/environment, no text/numbers/grid/border/shadow. Feet grounded. Actual transparent background. Same fine polished 2D SD game illustration as Bishop, no pixel art. Output ONE frame.",
+    "refs": [
+      "C:/workspace/msw/.beaver/output/five-class-motion/base/paladin-attack.png",
+      "C:/workspace/msw/assets/design/characters/paladin/concept.png",
+      "C:/workspace/msw/assets/design/characters/bishop/frames/angel-ray/motion03.png"
+    ],
+    "source": "C:/Users/timec/.codex/generated_images/01a0dbf3-5094-7520-bfc7-f24b6496f5e5/exec-e5027283-50a9-408a-9f12-c43e1f3f6e4f.png",
+    "state": "generated-awaiting-QA",
+    "normalized": "C:\\workspace\\msw\\.beaver\\output\\five-class-motion\\normalized\\paladin\\sanctuary\\motion06.png",
+    "size": 704,
+    "bbox": [
+      190,
+      276,
+      578,
+      639
+    ],
+    "edgePixels": 0,
+    "alphaMin": 0,
+    "alphaMax": 255,
+    "sha256": "f7fe48a1dac5f6fca5b2f63d84b1fe410ed0ea0b84dbc888a1e0cff12e36839f"
+  },
+  {
+    "id": "paladin",
+    "skill": "wait",
+    "n": 2,
+    "pose": "Small inhalation: preserve exact idle pose and planted feet, lift shoulders and upper chest subtly, shift cape/scarf/hair tips outward by tiny amount. Same eyes and expression, no stance change.",
+    "key": "paladin--wait--02",
+    "prompt": "Use case: identity-preserve animation pose edit. Generate ONE transparent PNG animation frame, not a sheet.\nImage1 EDIT TARGET and exact framing/scale master: paladin character on 576x576 square canvas. Image2 approved identity/costume master, do not copy its larger framing. Image3 Bishop style/anatomy master, do not copy its clothes/hair/staff.\nKeep character SAME small on-canvas size as image1, with generous empty transparent space above. Do not zoom in or fill canvas. In 576-unit canvas coordinates, anatomical head crown-to-chin147units, feet ground y512, centerx288. Underlying standing body height338units and2.3heads, ignoring hats/feathers/tall hair/weapon. Pose may bend knees, never lengthen limbs/boots. Preserve exact face, hair, eye color, all clothing panels, jewelry, weapon design, clean line weight and soft cel shading.\nFrame 2 for wait: Small inhalation: preserve exact idle pose and planted feet, lift shoulders and upper chest subtly, shift cape/scarf/hair tips outward by tiny amount. Same eyes and expression, no stance change.\n\n\nOnly body pose and subtle expression changes allowed. Entire hair/hat/weapon/cape/boots visible with transparent margins. No extra limbs or weapons, no blur or motion trails, no aura/projectiles/glows/environment, no text/numbers/grid/border/shadow. Feet grounded. Actual transparent background. Same fine polished 2D SD game illustration as Bishop, no pixel art. Output ONE frame.",
+    "refs": [
+      "C:/workspace/msw/.beaver/output/five-class-motion/base/paladin.png",
+      "C:/workspace/msw/assets/design/characters/paladin/concept.png",
+      "C:/workspace/msw/assets/design/characters/bishop/frames/wait/motion01.png"
+    ],
+    "source": "C:/Users/timec/.codex/generated_images/01a0dbf3-5094-7520-bfc7-f24b6496f5e5/exec-1127026e-23f6-41e9-86a2-68a99b02ae30.png",
+    "state": "generated-awaiting-QA",
+    "normalized": "C:\\workspace\\msw\\.beaver\\output\\five-class-motion\\normalized\\paladin\\wait\\motion02.png",
+    "size": 576,
+    "bbox": [
+      113,
+      155,
+      518,
+      512
+    ],
+    "edgePixels": 0,
+    "alphaMin": 0,
+    "alphaMax": 255,
+    "sha256": "70c526ef17aa6a4d4e64b2f7ad9624625d320c31a8de599a9bd01c566d7a4ff5"
+  },
+  {
+    "id": "paladin",
+    "skill": "wait",
+    "n": 3,
+    "pose": "Small exhalation: preserve exact idle pose and planted feet, relax shoulders subtly lower, cape/scarf/hair tips settle slightly inward. Same eyes and expression, no stance change.",
+    "key": "paladin--wait--03",
+    "prompt": "Use case: identity-preserve animation pose edit. Generate ONE transparent PNG animation frame, not a sheet.\nImage1 EDIT TARGET and exact framing/scale master: paladin character on 576x576 square canvas. Image2 approved identity/costume master, do not copy its larger framing. Image3 Bishop style/anatomy master, do not copy its clothes/hair/staff.\nKeep character SAME small on-canvas size as image1, with generous empty transparent space above. Do not zoom in or fill canvas. In 576-unit canvas coordinates, anatomical head crown-to-chin147units, feet ground y512, centerx288. Underlying standing body height338units and2.3heads, ignoring hats/feathers/tall hair/weapon. Pose may bend knees, never lengthen limbs/boots. Preserve exact face, hair, eye color, all clothing panels, jewelry, weapon design, clean line weight and soft cel shading.\nFrame 3 for wait: Small exhalation: preserve exact idle pose and planted feet, relax shoulders subtly lower, cape/scarf/hair tips settle slightly inward. Same eyes and expression, no stance change.\n\n\nOnly body pose and subtle expression changes allowed. Entire hair/hat/weapon/cape/boots visible with transparent margins. No extra limbs or weapons, no blur or motion trails, no aura/projectiles/glows/environment, no text/numbers/grid/border/shadow. Feet grounded. Actual transparent background. Same fine polished 2D SD game illustration as Bishop, no pixel art. Output ONE frame.",
+    "refs": [
+      "C:/workspace/msw/.beaver/output/five-class-motion/base/paladin.png",
+      "C:/workspace/msw/assets/design/characters/paladin/concept.png",
+      "C:/workspace/msw/assets/design/characters/bishop/frames/wait/motion01.png"
+    ],
+    "source": "C:/Users/timec/.codex/generated_images/01a0dbf3-5094-7520-bfc7-f24b6496f5e5/exec-c6ed3bcd-5c36-4b2c-8c11-7de1cf03d81b.png",
+    "state": "generated-awaiting-QA",
+    "normalized": "C:\\workspace\\msw\\.beaver\\output\\five-class-motion\\normalized\\paladin\\wait\\motion03.png",
+    "size": 576,
+    "bbox": [
+      123,
+      159,
+      483,
+      514
+    ],
+    "edgePixels": 0,
+    "alphaMin": 0,
+    "alphaMax": 255,
+    "sha256": "8c4f0ccb3aad098488d0a16b49476ebc540bfa979107c0b8468231e70cfea621"
+  },
+  {
+    "id": "phantom",
+    "skill": "joker",
+    "n": 1,
+    "pose": "Preparation: original front three-quarter LEFT-facing identity, lift red-jewel cane off floor, left arm lightly out, right hand fans three wine-red gold cards near chest. Feet close and steady.",
+    "key": "phantom--joker--01",
+    "prompt": "Use case: identity-preserve animation pose edit. Generate ONE transparent PNG animation frame, not a sheet.\nImage1 EDIT TARGET and exact framing/scale master: phantom character on 704x704 square canvas. Image2 approved identity/costume master, do not copy its larger framing. Image3 Bishop style/anatomy master, do not copy its clothes/hair/staff.\nKeep character SAME small on-canvas size as image1, with generous empty transparent space above. Do not zoom in or fill canvas. In 704-unit canvas coordinates, anatomical head crown-to-chin147units, feet ground y640, centerx352. Underlying standing body height338units and2.3heads, ignoring hats/feathers/tall hair/weapon. Pose may bend knees, never lengthen limbs/boots. Preserve exact face, hair, eye color, all clothing panels, jewelry, weapon design, clean line weight and soft cel shading.\nFrame 1 for joker: Preparation: original front three-quarter LEFT-facing identity, lift red-jewel cane off floor, left arm lightly out, right hand fans three wine-red gold cards near chest. Feet close and steady.\n\nPreserve approved LAST concept's compact body and huge ornate hat. Three-card fan uses wine-red/brown card backs, gold double borders, gold corner scrollwork and central gold star. Original white/blue/gold cape and red-jewel cane. Rotation must turn actual body and head in 3D, not tilt a flat image. Never add faces on rear view.\nOnly body pose and subtle expression changes allowed. Entire hair/hat/weapon/cape/boots visible with transparent margins. No extra limbs or weapons, no blur or motion trails, no aura/projectiles/glows/environment, no text/numbers/grid/border/shadow. Feet grounded. Actual transparent background. Same fine polished 2D SD game illustration as Bishop, no pixel art. Output ONE frame.",
+    "refs": [
+      "C:/workspace/msw/.beaver/output/five-class-motion/base/phantom-attack.png",
+      "C:/workspace/msw/assets/design/characters/phantom/concept.png",
+      "C:/workspace/msw/assets/design/characters/bishop/frames/angel-ray/motion03.png"
+    ],
+    "source": "C:/Users/timec/.codex/generated_images/01a0dbf3-5094-7520-bfc7-f24b6496f5e5/exec-ac5b7353-8bd3-4025-9bab-2e36ecd2c905.png",
+    "state": "generated-awaiting-QA",
+    "previousSource": "C:/Users/timec/.codex/generated_images/01a0dbf3-5094-7520-bfc7-f24b6496f5e5/exec-65d15162-7422-4223-b391-9de8ea66cc57.png",
+    "correctionPrompt": "Use case: precise-object-edit. Image1 target animation frame. Image2 approved identity/weapon reference. Correct the prop hands and cane length ONLY: viewer LEFT hand (character's anatomical right hand) holds the original LONG red-jewel gold/black cane, lifted slightly from ground and slanted across waist for preparing a spin. Viewer RIGHT hand (anatomical left) holds the three wine-red/gold cards near shoulder. Do NOT swap these. Cane shaft keeps original approved length, not a short wand. Keep face/hat/costume/proportions/feet identical. Same original canvas framing, true transparent background, full body/weapon visible, no text/shadow. Output ONE corrected frame.",
+    "normalized": "C:\\workspace\\msw\\.beaver\\output\\five-class-motion\\normalized\\phantom\\joker\\motion01.png",
+    "size": 704,
+    "bbox": [
+      164,
+      189,
+      553,
+      640
+    ],
+    "edgePixels": 0,
+    "alphaMin": 0,
+    "alphaMax": 255,
+    "sha256": "370a090a9c295f42d4817c65e6554dca5bb7ce0e4da3299a33463071a1f16dbb"
+  },
+  {
+    "id": "phantom",
+    "skill": "joker",
+    "n": 2,
+    "pose": "Rotation0deg LOOP START: front three-quarter view looking LEFT, begin elegant upright turn on balls of feet, cane angled horizontally across waist, free gloved palm poised with one wine-red gold card. Coat tails flare slightly.",
+    "key": "phantom--joker--02",
+    "prompt": "Use case: identity-preserve animation pose edit. Generate ONE transparent PNG animation frame, not a sheet.\nImage1 EDIT TARGET and exact framing/scale master: phantom character on 704x704 square canvas. Image2 approved identity/costume master, do not copy its larger framing. Image3 Bishop style/anatomy master, do not copy its clothes/hair/staff.\nKeep character SAME small on-canvas size as image1, with generous empty transparent space above. Do not zoom in or fill canvas. In 704-unit canvas coordinates, anatomical head crown-to-chin147units, feet ground y640, centerx352. Underlying standing body height338units and2.3heads, ignoring hats/feathers/tall hair/weapon. Pose may bend knees, never lengthen limbs/boots. Preserve exact face, hair, eye color, all clothing panels, jewelry, weapon design, clean line weight and soft cel shading.\nFrame 2 for joker: Rotation0deg LOOP START: front three-quarter view looking LEFT, begin elegant upright turn on balls of feet, cane angled horizontally across waist, free gloved palm poised with one wine-red gold card. Coat tails flare slightly.\n\nPreserve approved LAST concept's compact body and huge ornate hat. Three-card fan uses wine-red/brown card backs, gold double borders, gold corner scrollwork and central gold star. Original white/blue/gold cape and red-jewel cane. Rotation must turn actual body and head in 3D, not tilt a flat image. Never add faces on rear view.\nOnly body pose and subtle expression changes allowed. Entire hair/hat/weapon/cape/boots visible with transparent margins. No extra limbs or weapons, no blur or motion trails, no aura/projectiles/glows/environment, no text/numbers/grid/border/shadow. Feet grounded. Actual transparent background. Same fine polished 2D SD game illustration as Bishop, no pixel art. Output ONE frame.",
+    "refs": [
+      "C:/workspace/msw/.beaver/output/five-class-motion/base/phantom-attack.png",
+      "C:/workspace/msw/assets/design/characters/phantom/concept.png",
+      "C:/workspace/msw/assets/design/characters/bishop/frames/angel-ray/motion03.png"
+    ],
+    "source": "C:/Users/timec/.codex/generated_images/01a0dbf3-5094-7520-bfc7-f24b6496f5e5/exec-4f79dfb4-842d-425f-bf61-2d47c9466752.png",
+    "state": "generated-awaiting-QA",
+    "normalized": "C:\\workspace\\msw\\.beaver\\output\\five-class-motion\\normalized\\phantom\\joker\\motion02.png",
+    "size": 704,
+    "bbox": [
+      175,
+      188,
+      574,
+      639
+    ],
+    "edgePixels": 0,
+    "alphaMin": 0,
+    "alphaMax": 255,
+    "sha256": "dbd31c75115dbf5752298bc4ce04b595d072ceb54ba7059ff454189640c4b72a"
+  },
+  {
+    "id": "phantom",
+    "skill": "joker",
+    "n": 3,
+    "pose": "Rotation45deg: LEFT-facing profile, visible near violet eye, nose points LEFT, both shoulders turning; cane angled diagonally before waist, short legs pivot in place, hat and blue feathers retain exact design.",
+    "key": "phantom--joker--03",
+    "prompt": "Use case: identity-preserve animation pose edit. Generate ONE transparent PNG animation frame, not a sheet.\nImage1 EDIT TARGET and exact framing/scale master: phantom character on 704x704 square canvas. Image2 approved identity/costume master, do not copy its larger framing. Image3 Bishop style/anatomy master, do not copy its clothes/hair/staff.\nKeep character SAME small on-canvas size as image1, with generous empty transparent space above. Do not zoom in or fill canvas. In 704-unit canvas coordinates, anatomical head crown-to-chin147units, feet ground y640, centerx352. Underlying standing body height338units and2.3heads, ignoring hats/feathers/tall hair/weapon. Pose may bend knees, never lengthen limbs/boots. Preserve exact face, hair, eye color, all clothing panels, jewelry, weapon design, clean line weight and soft cel shading.\nFrame 3 for joker: Rotation45deg: LEFT-facing profile, visible near violet eye, nose points LEFT, both shoulders turning; cane angled diagonally before waist, short legs pivot in place, hat and blue feathers retain exact design.\n\nPreserve approved LAST concept's compact body and huge ornate hat. Three-card fan uses wine-red/brown card backs, gold double borders, gold corner scrollwork and central gold star. Original white/blue/gold cape and red-jewel cane. Rotation must turn actual body and head in 3D, not tilt a flat image. Never add faces on rear view.\nOnly body pose and subtle expression changes allowed. Entire hair/hat/weapon/cape/boots visible with transparent margins. No extra limbs or weapons, no blur or motion trails, no aura/projectiles/glows/environment, no text/numbers/grid/border/shadow. Feet grounded. Actual transparent background. Same fine polished 2D SD game illustration as Bishop, no pixel art. Output ONE frame.",
+    "refs": [
+      "C:/workspace/msw/.beaver/output/five-class-motion/base/phantom-attack.png",
+      "C:/workspace/msw/assets/design/characters/phantom/concept.png",
+      "C:/workspace/msw/assets/design/characters/bishop/frames/angel-ray/motion03.png"
+    ],
+    "source": "C:/Users/timec/.codex/generated_images/01a0dbf3-5094-7520-bfc7-f24b6496f5e5/exec-98f8bf31-ba61-4035-ab97-aedde8a248c5.png",
+    "state": "generated-awaiting-QA",
+    "normalized": "C:\\workspace\\msw\\.beaver\\output\\five-class-motion\\normalized\\phantom\\joker\\motion03.png",
+    "size": 704,
+    "bbox": [
+      159,
+      172,
+      593,
+      639
+    ],
+    "edgePixels": 0,
+    "alphaMin": 0,
+    "alphaMax": 255,
+    "sha256": "fc707fbd7810a1aeb6251918e991d42b48df898672ac09612924cb232ba60dcf"
+  },
+  {
+    "id": "phantom",
+    "skill": "joker",
+    "n": 4,
+    "pose": "Rotation90deg: rear-left three-quarter view, mostly back of blond hair and hat visible, only sliver of cheek, white cape with gold edge opens right, cane in same anatomical hand follows turn.",
+    "key": "phantom--joker--04",
+    "prompt": "Use case: identity-preserve animation pose edit. Generate ONE transparent PNG animation frame, not a sheet.\nImage1 EDIT TARGET and exact framing/scale master: phantom character on 704x704 square canvas. Image2 approved identity/costume master, do not copy its larger framing. Image3 Bishop style/anatomy master, do not copy its clothes/hair/staff.\nKeep character SAME small on-canvas size as image1, with generous empty transparent space above. Do not zoom in or fill canvas. In 704-unit canvas coordinates, anatomical head crown-to-chin147units, feet ground y640, centerx352. Underlying standing body height338units and2.3heads, ignoring hats/feathers/tall hair/weapon. Pose may bend knees, never lengthen limbs/boots. Preserve exact face, hair, eye color, all clothing panels, jewelry, weapon design, clean line weight and soft cel shading.\nFrame 4 for joker: Rotation90deg: rear-left three-quarter view, mostly back of blond hair and hat visible, only sliver of cheek, white cape with gold edge opens right, cane in same anatomical hand follows turn.\n\nPreserve approved LAST concept's compact body and huge ornate hat. Three-card fan uses wine-red/brown card backs, gold double borders, gold corner scrollwork and central gold star. Original white/blue/gold cape and red-jewel cane. Rotation must turn actual body and head in 3D, not tilt a flat image. Never add faces on rear view.\nOnly body pose and subtle expression changes allowed. Entire hair/hat/weapon/cape/boots visible with transparent margins. No extra limbs or weapons, no blur or motion trails, no aura/projectiles/glows/environment, no text/numbers/grid/border/shadow. Feet grounded. Actual transparent background. Same fine polished 2D SD game illustration as Bishop, no pixel art. Output ONE frame.",
+    "refs": [
+      "C:/workspace/msw/.beaver/output/five-class-motion/base/phantom-attack.png",
+      "C:/workspace/msw/assets/design/characters/phantom/concept.png",
+      "C:/workspace/msw/assets/design/characters/bishop/frames/angel-ray/motion03.png"
+    ],
+    "source": "C:/Users/timec/.codex/generated_images/01a0dbf3-5094-7520-bfc7-f24b6496f5e5/exec-47c48b2c-ea85-4355-9313-52ec40d2c749.png",
+    "state": "generated-awaiting-QA",
+    "normalized": "C:\\workspace\\msw\\.beaver\\output\\five-class-motion\\normalized\\phantom\\joker\\motion04.png",
+    "size": 704,
+    "bbox": [
+      190,
+      197,
+      582,
+      639
+    ],
+    "edgePixels": 0,
+    "alphaMin": 0,
+    "alphaMax": 255,
+    "sha256": "05fa70d98b165b79c2553a2b2414d222326c6700a181eea01029cefca3ace31d"
+  },
+  {
+    "id": "phantom",
+    "skill": "joker",
+    "n": 5,
+    "pose": "Rotation135deg: nearly BACK view, face mostly hidden, crown/back of hat and blue feather attachment coherent, cape shows white/gold exterior and royal blue lining; cane held at waist follows body.",
+    "key": "phantom--joker--05",
+    "prompt": "Use case: identity-preserve animation pose edit. Generate ONE transparent PNG animation frame, not a sheet.\nImage1 EDIT TARGET and exact framing/scale master: phantom character on 704x704 square canvas. Image2 approved identity/costume master, do not copy its larger framing. Image3 Bishop style/anatomy master, do not copy its clothes/hair/staff.\nKeep character SAME small on-canvas size as image1, with generous empty transparent space above. Do not zoom in or fill canvas. In 704-unit canvas coordinates, anatomical head crown-to-chin147units, feet ground y640, centerx352. Underlying standing body height338units and2.3heads, ignoring hats/feathers/tall hair/weapon. Pose may bend knees, never lengthen limbs/boots. Preserve exact face, hair, eye color, all clothing panels, jewelry, weapon design, clean line weight and soft cel shading.\nFrame 5 for joker: Rotation135deg: nearly BACK view, face mostly hidden, crown/back of hat and blue feather attachment coherent, cape shows white/gold exterior and royal blue lining; cane held at waist follows body.\n\nPreserve approved LAST concept's compact body and huge ornate hat. Three-card fan uses wine-red/brown card backs, gold double borders, gold corner scrollwork and central gold star. Original white/blue/gold cape and red-jewel cane. Rotation must turn actual body and head in 3D, not tilt a flat image. Never add faces on rear view.\nOnly body pose and subtle expression changes allowed. Entire hair/hat/weapon/cape/boots visible with transparent margins. No extra limbs or weapons, no blur or motion trails, no aura/projectiles/glows/environment, no text/numbers/grid/border/shadow. Feet grounded. Actual transparent background. Same fine polished 2D SD game illustration as Bishop, no pixel art. Output ONE frame.",
+    "refs": [
+      "C:/workspace/msw/.beaver/output/five-class-motion/base/phantom-attack.png",
+      "C:/workspace/msw/assets/design/characters/phantom/concept.png",
+      "C:/workspace/msw/assets/design/characters/bishop/frames/angel-ray/motion03.png"
+    ],
+    "source": "C:/Users/timec/.codex/generated_images/01a0dbf3-5094-7520-bfc7-f24b6496f5e5/exec-2ecbdbb5-ff5a-45d9-81e4-fb76dea9fda6.png",
+    "state": "generated-awaiting-QA",
+    "normalized": "C:\\workspace\\msw\\.beaver\\output\\five-class-motion\\normalized\\phantom\\joker\\motion05.png",
+    "size": 704,
+    "bbox": [
+      131,
+      194,
+      519,
+      639
+    ],
+    "edgePixels": 0,
+    "alphaMin": 0,
+    "alphaMax": 255,
+    "sha256": "f0ca6bb4dd864caa0f368ebcbfc07d81238320b2bd97581fa4a86bb1cbe14530"
+  },
+  {
+    "id": "phantom",
+    "skill": "joker",
+    "n": 6,
+    "pose": "Rotation180deg: full BACK view, NO face or front eyes visible, blond nape under white/blue/gold hat, white cape with gold scroll borders, short trouser legs and small boots pivot. Cane partly visible beside waist.",
+    "key": "phantom--joker--06",
+    "prompt": "Use case: identity-preserve animation pose edit. Generate ONE transparent PNG animation frame, not a sheet.\nImage1 EDIT TARGET and exact framing/scale master: phantom character on 704x704 square canvas. Image2 approved identity/costume master, do not copy its larger framing. Image3 Bishop style/anatomy master, do not copy its clothes/hair/staff.\nKeep character SAME small on-canvas size as image1, with generous empty transparent space above. Do not zoom in or fill canvas. In 704-unit canvas coordinates, anatomical head crown-to-chin147units, feet ground y640, centerx352. Underlying standing body height338units and2.3heads, ignoring hats/feathers/tall hair/weapon. Pose may bend knees, never lengthen limbs/boots. Preserve exact face, hair, eye color, all clothing panels, jewelry, weapon design, clean line weight and soft cel shading.\nFrame 6 for joker: Rotation180deg: full BACK view, NO face or front eyes visible, blond nape under white/blue/gold hat, white cape with gold scroll borders, short trouser legs and small boots pivot. Cane partly visible beside waist.\n\nPreserve approved LAST concept's compact body and huge ornate hat. Three-card fan uses wine-red/brown card backs, gold double borders, gold corner scrollwork and central gold star. Original white/blue/gold cape and red-jewel cane. Rotation must turn actual body and head in 3D, not tilt a flat image. Never add faces on rear view.\nOnly body pose and subtle expression changes allowed. Entire hair/hat/weapon/cape/boots visible with transparent margins. No extra limbs or weapons, no blur or motion trails, no aura/projectiles/glows/environment, no text/numbers/grid/border/shadow. Feet grounded. Actual transparent background. Same fine polished 2D SD game illustration as Bishop, no pixel art. Output ONE frame.",
+    "refs": [
+      "C:/workspace/msw/.beaver/output/five-class-motion/base/phantom-attack.png",
+      "C:/workspace/msw/assets/design/characters/phantom/concept.png",
+      "C:/workspace/msw/assets/design/characters/bishop/frames/angel-ray/motion03.png"
+    ],
+    "source": "C:/Users/timec/.codex/generated_images/01a0dbf3-5094-7520-bfc7-f24b6496f5e5/exec-452a9f05-d349-4c65-8af1-52778dc9975a.png",
+    "state": "generated-awaiting-QA",
+    "normalized": "C:\\workspace\\msw\\.beaver\\output\\five-class-motion\\normalized\\phantom\\joker\\motion06.png",
+    "size": 704,
+    "bbox": [
+      180,
+      237,
+      513,
+      640
+    ],
+    "edgePixels": 0,
+    "alphaMin": 0,
+    "alphaMax": 255,
+    "sha256": "c94f27dce1b6e6e61cb869de18a488db8924a85c658e7faa511015e5a8bca031"
+  },
+  {
+    "id": "phantom",
+    "skill": "joker",
+    "n": 7,
+    "pose": "Rotation225deg: rear-RIGHT three-quarter view, back mostly visible, far profile begins to appear on RIGHT, cape flares opposite side, same hat/cane outfit not mirrored accessory positions.",
+    "key": "phantom--joker--07",
+    "prompt": "Use case: identity-preserve animation pose edit. Generate ONE transparent PNG animation frame, not a sheet.\nImage1 EDIT TARGET and exact framing/scale master: phantom character on 704x704 square canvas. Image2 approved identity/costume master, do not copy its larger framing. Image3 Bishop style/anatomy master, do not copy its clothes/hair/staff.\nKeep character SAME small on-canvas size as image1, with generous empty transparent space above. Do not zoom in or fill canvas. In 704-unit canvas coordinates, anatomical head crown-to-chin147units, feet ground y640, centerx352. Underlying standing body height338units and2.3heads, ignoring hats/feathers/tall hair/weapon. Pose may bend knees, never lengthen limbs/boots. Preserve exact face, hair, eye color, all clothing panels, jewelry, weapon design, clean line weight and soft cel shading.\nFrame 7 for joker: Rotation225deg: rear-RIGHT three-quarter view, back mostly visible, far profile begins to appear on RIGHT, cape flares opposite side, same hat/cane outfit not mirrored accessory positions.\n\nPreserve approved LAST concept's compact body and huge ornate hat. Three-card fan uses wine-red/brown card backs, gold double borders, gold corner scrollwork and central gold star. Original white/blue/gold cape and red-jewel cane. Rotation must turn actual body and head in 3D, not tilt a flat image. Never add faces on rear view.\nOnly body pose and subtle expression changes allowed. Entire hair/hat/weapon/cape/boots visible with transparent margins. No extra limbs or weapons, no blur or motion trails, no aura/projectiles/glows/environment, no text/numbers/grid/border/shadow. Feet grounded. Actual transparent background. Same fine polished 2D SD game illustration as Bishop, no pixel art. Output ONE frame.",
+    "refs": [
+      "C:/workspace/msw/.beaver/output/five-class-motion/base/phantom-attack.png",
+      "C:/workspace/msw/assets/design/characters/phantom/concept.png",
+      "C:/workspace/msw/assets/design/characters/bishop/frames/angel-ray/motion03.png"
+    ],
+    "source": "C:/Users/timec/.codex/generated_images/01a0dbf3-5094-7520-bfc7-f24b6496f5e5/exec-741816b8-495a-40b3-a550-41fc4222d462.png",
+    "state": "generated-awaiting-QA",
+    "normalized": "C:\\workspace\\msw\\.beaver\\output\\five-class-motion\\normalized\\phantom\\joker\\motion07.png",
+    "size": 704,
+    "bbox": [
+      122,
+      194,
+      516,
+      640
+    ],
+    "edgePixels": 0,
+    "alphaMin": 0,
+    "alphaMax": 255,
+    "sha256": "928a120ce5a489d4b72bb098ffab077088cdce57a15c0c4e8c69ac0cf03b0e1c"
+  },
+  {
+    "id": "phantom",
+    "skill": "joker",
+    "n": 8,
+    "pose": "Rotation270deg: RIGHT-facing profile, one violet eye visible looking RIGHT as he turns through, shoulders side-on, cane crosses waist, small feet pivot, blue feathers at correct hat attachment.",
+    "key": "phantom--joker--08",
+    "prompt": "Use case: identity-preserve animation pose edit. Generate ONE transparent PNG animation frame, not a sheet.\nImage1 EDIT TARGET and exact framing/scale master: phantom character on 704x704 square canvas. Image2 approved identity/costume master, do not copy its larger framing. Image3 Bishop style/anatomy master, do not copy its clothes/hair/staff.\nKeep character SAME small on-canvas size as image1, with generous empty transparent space above. Do not zoom in or fill canvas. In 704-unit canvas coordinates, anatomical head crown-to-chin147units, feet ground y640, centerx352. Underlying standing body height338units and2.3heads, ignoring hats/feathers/tall hair/weapon. Pose may bend knees, never lengthen limbs/boots. Preserve exact face, hair, eye color, all clothing panels, jewelry, weapon design, clean line weight and soft cel shading.\nFrame 8 for joker: Rotation270deg: RIGHT-facing profile, one violet eye visible looking RIGHT as he turns through, shoulders side-on, cane crosses waist, small feet pivot, blue feathers at correct hat attachment.\n\nPreserve approved LAST concept's compact body and huge ornate hat. Three-card fan uses wine-red/brown card backs, gold double borders, gold corner scrollwork and central gold star. Original white/blue/gold cape and red-jewel cane. Rotation must turn actual body and head in 3D, not tilt a flat image. Never add faces on rear view.\nOnly body pose and subtle expression changes allowed. Entire hair/hat/weapon/cape/boots visible with transparent margins. No extra limbs or weapons, no blur or motion trails, no aura/projectiles/glows/environment, no text/numbers/grid/border/shadow. Feet grounded. Actual transparent background. Same fine polished 2D SD game illustration as Bishop, no pixel art. Output ONE frame.",
+    "refs": [
+      "C:/workspace/msw/.beaver/output/five-class-motion/base/phantom-attack.png",
+      "C:/workspace/msw/assets/design/characters/phantom/concept.png",
+      "C:/workspace/msw/assets/design/characters/bishop/frames/angel-ray/motion03.png"
+    ],
+    "source": "C:/Users/timec/.codex/generated_images/01a0dbf3-5094-7520-bfc7-f24b6496f5e5/exec-f3d35838-3d50-4c5b-a691-cb4a979634df.png",
+    "state": "generated-awaiting-QA",
+    "normalized": "C:\\workspace\\msw\\.beaver\\output\\five-class-motion\\normalized\\phantom\\joker\\motion08.png",
+    "size": 704,
+    "bbox": [
+      105,
+      171,
+      529,
+      640
+    ],
+    "edgePixels": 0,
+    "alphaMin": 0,
+    "alphaMax": 255,
+    "sha256": "0ef85cba910257420b5b975278c43ba899c6dc8f085eaee312e2b6ac122da518"
+  },
+  {
+    "id": "phantom",
+    "skill": "joker",
+    "n": 9,
+    "pose": "Rotation315deg LOOP END: front-right three-quarter view turning back toward original left-facing front pose, both violet eyes emerging, cane angled across waist, hand poised for cards, cape returning to initial flare.",
+    "key": "phantom--joker--09",
+    "prompt": "Use case: identity-preserve animation pose edit. Generate ONE transparent PNG animation frame, not a sheet.\nImage1 EDIT TARGET and exact framing/scale master: phantom character on 704x704 square canvas. Image2 approved identity/costume master, do not copy its larger framing. Image3 Bishop style/anatomy master, do not copy its clothes/hair/staff.\nKeep character SAME small on-canvas size as image1, with generous empty transparent space above. Do not zoom in or fill canvas. In 704-unit canvas coordinates, anatomical head crown-to-chin147units, feet ground y640, centerx352. Underlying standing body height338units and2.3heads, ignoring hats/feathers/tall hair/weapon. Pose may bend knees, never lengthen limbs/boots. Preserve exact face, hair, eye color, all clothing panels, jewelry, weapon design, clean line weight and soft cel shading.\nFrame 9 for joker: Rotation315deg LOOP END: front-right three-quarter view turning back toward original left-facing front pose, both violet eyes emerging, cane angled across waist, hand poised for cards, cape returning to initial flare.\n\nPreserve approved LAST concept's compact body and huge ornate hat. Three-card fan uses wine-red/brown card backs, gold double borders, gold corner scrollwork and central gold star. Original white/blue/gold cape and red-jewel cane. Rotation must turn actual body and head in 3D, not tilt a flat image. Never add faces on rear view.\nOnly body pose and subtle expression changes allowed. Entire hair/hat/weapon/cape/boots visible with transparent margins. No extra limbs or weapons, no blur or motion trails, no aura/projectiles/glows/environment, no text/numbers/grid/border/shadow. Feet grounded. Actual transparent background. Same fine polished 2D SD game illustration as Bishop, no pixel art. Output ONE frame.",
+    "refs": [
+      "C:/workspace/msw/.beaver/output/five-class-motion/base/phantom-attack.png",
+      "C:/workspace/msw/assets/design/characters/phantom/concept.png",
+      "C:/workspace/msw/assets/design/characters/bishop/frames/angel-ray/motion03.png"
+    ],
+    "source": "C:/Users/timec/.codex/generated_images/01a0dbf3-5094-7520-bfc7-f24b6496f5e5/exec-b529a59b-066f-46b5-ad7c-387f9ad4f817.png",
+    "state": "generated-awaiting-QA",
+    "normalized": "C:\\workspace\\msw\\.beaver\\output\\five-class-motion\\normalized\\phantom\\joker\\motion09.png",
+    "size": 704,
+    "bbox": [
+      125,
+      199,
+      527,
+      639
+    ],
+    "edgePixels": 0,
+    "alphaMin": 0,
+    "alphaMax": 255,
+    "sha256": "d95a7754134dba6112330afdc50058507830e9c6e8f6f8b873905099b4657835"
+  },
+  {
+    "id": "phantom",
+    "skill": "joker",
+    "n": 10,
+    "pose": "Finish: original front three-quarter LEFT view, stop turn gently, lower cane back to floor and raise three cards near shoulder, coat tails settle, relaxed sly smile. No painted card projectiles or swirls.",
+    "key": "phantom--joker--10",
+    "prompt": "Use case: identity-preserve animation pose edit. Generate ONE transparent PNG animation frame, not a sheet.\nImage1 EDIT TARGET and exact framing/scale master: phantom character on 704x704 square canvas. Image2 approved identity/costume master, do not copy its larger framing. Image3 Bishop style/anatomy master, do not copy its clothes/hair/staff.\nKeep character SAME small on-canvas size as image1, with generous empty transparent space above. Do not zoom in or fill canvas. In 704-unit canvas coordinates, anatomical head crown-to-chin147units, feet ground y640, centerx352. Underlying standing body height338units and2.3heads, ignoring hats/feathers/tall hair/weapon. Pose may bend knees, never lengthen limbs/boots. Preserve exact face, hair, eye color, all clothing panels, jewelry, weapon design, clean line weight and soft cel shading.\nFrame 10 for joker: Finish: original front three-quarter LEFT view, stop turn gently, lower cane back to floor and raise three cards near shoulder, coat tails settle, relaxed sly smile. No painted card projectiles or swirls.\n\nPreserve approved LAST concept's compact body and huge ornate hat. Three-card fan uses wine-red/brown card backs, gold double borders, gold corner scrollwork and central gold star. Original white/blue/gold cape and red-jewel cane. Rotation must turn actual body and head in 3D, not tilt a flat image. Never add faces on rear view.\nOnly body pose and subtle expression changes allowed. Entire hair/hat/weapon/cape/boots visible with transparent margins. No extra limbs or weapons, no blur or motion trails, no aura/projectiles/glows/environment, no text/numbers/grid/border/shadow. Feet grounded. Actual transparent background. Same fine polished 2D SD game illustration as Bishop, no pixel art. Output ONE frame.",
+    "refs": [
+      "C:/workspace/msw/.beaver/output/five-class-motion/base/phantom-attack.png",
+      "C:/workspace/msw/assets/design/characters/phantom/concept.png",
+      "C:/workspace/msw/assets/design/characters/bishop/frames/angel-ray/motion03.png"
+    ],
+    "source": "C:/Users/timec/.codex/generated_images/01a0dbf3-5094-7520-bfc7-f24b6496f5e5/exec-7f59bded-a6f0-471e-ac39-9f3fc5d95173.png",
+    "state": "generated-awaiting-QA",
+    "normalized": "C:\\workspace\\msw\\.beaver\\output\\five-class-motion\\normalized\\phantom\\joker\\motion10.png",
+    "size": 704,
+    "bbox": [
+      155,
+      181,
+      549,
+      640
+    ],
+    "edgePixels": 0,
+    "alphaMin": 0,
+    "alphaMax": 255,
+    "sha256": "f00fa9370d445eaf60ac2877af4f019086858e61fafac89ecc6897d01fcdabd4"
+  },
+  {
+    "id": "phantom",
+    "skill": "wait",
+    "n": 2,
+    "pose": "Small inhalation: preserve exact idle pose and planted feet, lift shoulders and upper chest subtly, shift cape/scarf/hair tips outward by tiny amount. Same eyes and expression, no stance change.",
+    "key": "phantom--wait--02",
+    "prompt": "Use case: identity-preserve animation pose edit. Generate ONE transparent PNG animation frame, not a sheet.\nImage1 EDIT TARGET and exact framing/scale master: phantom character on 576x576 square canvas. Image2 approved identity/costume master, do not copy its larger framing. Image3 Bishop style/anatomy master, do not copy its clothes/hair/staff.\nKeep character SAME small on-canvas size as image1, with generous empty transparent space above. Do not zoom in or fill canvas. In 576-unit canvas coordinates, anatomical head crown-to-chin147units, feet ground y512, centerx288. Underlying standing body height338units and2.3heads, ignoring hats/feathers/tall hair/weapon. Pose may bend knees, never lengthen limbs/boots. Preserve exact face, hair, eye color, all clothing panels, jewelry, weapon design, clean line weight and soft cel shading.\nFrame 2 for wait: Small inhalation: preserve exact idle pose and planted feet, lift shoulders and upper chest subtly, shift cape/scarf/hair tips outward by tiny amount. Same eyes and expression, no stance change.\n\nPreserve approved LAST concept's compact body and huge ornate hat. Three-card fan uses wine-red/brown card backs, gold double borders, gold corner scrollwork and central gold star. Original white/blue/gold cape and red-jewel cane. Rotation must turn actual body and head in 3D, not tilt a flat image. Never add faces on rear view.\nOnly body pose and subtle expression changes allowed. Entire hair/hat/weapon/cape/boots visible with transparent margins. No extra limbs or weapons, no blur or motion trails, no aura/projectiles/glows/environment, no text/numbers/grid/border/shadow. Feet grounded. Actual transparent background. Same fine polished 2D SD game illustration as Bishop, no pixel art. Output ONE frame.",
+    "refs": [
+      "C:/workspace/msw/.beaver/output/five-class-motion/base/phantom.png",
+      "C:/workspace/msw/assets/design/characters/phantom/concept.png",
+      "C:/workspace/msw/assets/design/characters/bishop/frames/wait/motion01.png"
+    ],
+    "source": "C:/Users/timec/.codex/generated_images/01a0dbf3-5094-7520-bfc7-f24b6496f5e5/exec-da477969-905b-4a25-a8e6-699b6fbe77fe.png",
+    "state": "generated-awaiting-QA",
+    "normalized": "C:\\workspace\\msw\\.beaver\\output\\five-class-motion\\normalized\\phantom\\wait\\motion02.png",
+    "size": 576,
+    "bbox": [
+      136,
+      105,
+      492,
+      511
+    ],
+    "edgePixels": 0,
+    "alphaMin": 0,
+    "alphaMax": 255,
+    "sha256": "21d62c93f8af1be281630069afc3301387dcac3665fdfe3f3bb021ba325248e5"
+  },
+  {
+    "id": "phantom",
+    "skill": "wait",
+    "n": 3,
+    "pose": "Small exhalation: preserve exact idle pose and planted feet, relax shoulders subtly lower, cape/scarf/hair tips settle slightly inward. Same eyes and expression, no stance change.",
+    "key": "phantom--wait--03",
+    "prompt": "Use case: identity-preserve animation pose edit. Generate ONE transparent PNG animation frame, not a sheet.\nImage1 EDIT TARGET and exact framing/scale master: phantom character on 576x576 square canvas. Image2 approved identity/costume master, do not copy its larger framing. Image3 Bishop style/anatomy master, do not copy its clothes/hair/staff.\nKeep character SAME small on-canvas size as image1, with generous empty transparent space above. Do not zoom in or fill canvas. In 576-unit canvas coordinates, anatomical head crown-to-chin147units, feet ground y512, centerx288. Underlying standing body height338units and2.3heads, ignoring hats/feathers/tall hair/weapon. Pose may bend knees, never lengthen limbs/boots. Preserve exact face, hair, eye color, all clothing panels, jewelry, weapon design, clean line weight and soft cel shading.\nFrame 3 for wait: Small exhalation: preserve exact idle pose and planted feet, relax shoulders subtly lower, cape/scarf/hair tips settle slightly inward. Same eyes and expression, no stance change.\n\nPreserve approved LAST concept's compact body and huge ornate hat. Three-card fan uses wine-red/brown card backs, gold double borders, gold corner scrollwork and central gold star. Original white/blue/gold cape and red-jewel cane. Rotation must turn actual body and head in 3D, not tilt a flat image. Never add faces on rear view.\nOnly body pose and subtle expression changes allowed. Entire hair/hat/weapon/cape/boots visible with transparent margins. No extra limbs or weapons, no blur or motion trails, no aura/projectiles/glows/environment, no text/numbers/grid/border/shadow. Feet grounded. Actual transparent background. Same fine polished 2D SD game illustration as Bishop, no pixel art. Output ONE frame.",
+    "refs": [
+      "C:/workspace/msw/.beaver/output/five-class-motion/base/phantom.png",
+      "C:/workspace/msw/assets/design/characters/phantom/concept.png",
+      "C:/workspace/msw/assets/design/characters/bishop/frames/wait/motion01.png"
+    ],
+    "source": "C:/Users/timec/.codex/generated_images/01a0dbf3-5094-7520-bfc7-f24b6496f5e5/exec-2cd7cc83-3fb5-48aa-b1e6-da92ef301c95.png",
+    "state": "generated-awaiting-QA",
+    "normalized": "C:\\workspace\\msw\\.beaver\\output\\five-class-motion\\normalized\\phantom\\wait\\motion03.png",
+    "size": 576,
+    "bbox": [
+      128,
+      94,
+      487,
+      511
+    ],
+    "edgePixels": 0,
+    "alphaMin": 0,
+    "alphaMax": 255,
+    "sha256": "f4e67d8b459ebb4828db2e8ec35c6bab76280658d4b9df3c879b8edfb14659eb"
+  },
+  {
+    "id": "shadower",
+    "skill": "blade-tornado-karma-fury",
+    "n": 1,
+    "pose": "Prepare special strike: compact low stance, original curved dagger held back at right hip, free hand extends slightly LEFT, shoulders coiled.",
+    "key": "shadower--blade-tornado-karma-fury--01",
+    "prompt": "Use case: identity-preserve animation pose edit. Generate ONE transparent PNG animation frame, not a sheet.\nImage1 EDIT TARGET and exact framing/scale master: shadower character on 704x704 square canvas. Image2 approved identity/costume master, do not copy its larger framing. Image3 Bishop style/anatomy master, do not copy its clothes/hair/staff.\nKeep character SAME small on-canvas size as image1, with generous empty transparent space above. Do not zoom in or fill canvas. In 704-unit canvas coordinates, anatomical head crown-to-chin147units, feet ground y640, centerx352. Underlying standing body height338units and2.3heads, ignoring hats/feathers/tall hair/weapon. Pose may bend knees, never lengthen limbs/boots. Preserve exact face, hair, eye color, all clothing panels, jewelry, weapon design, clean line weight and soft cel shading.\nFrame 1 for blade-tornado-karma-fury: Prepare special strike: compact low stance, original curved dagger held back at right hip, free hand extends slightly LEFT, shoulders coiled.\n\n\nOnly body pose and subtle expression changes allowed. Entire hair/hat/weapon/cape/boots visible with transparent margins. No extra limbs or weapons, no blur or motion trails, no aura/projectiles/glows/environment, no text/numbers/grid/border/shadow. Feet grounded. Actual transparent background. Same fine polished 2D SD game illustration as Bishop, no pixel art. Output ONE frame.",
+    "refs": [
+      "C:/workspace/msw/.beaver/output/five-class-motion/base/shadower-attack.png",
+      "C:/workspace/msw/assets/design/characters/shadower/concept.png",
+      "C:/workspace/msw/assets/design/characters/bishop/frames/angel-ray/motion03.png"
+    ],
+    "source": "C:/Users/timec/.codex/generated_images/01a0dbf3-5094-7520-bfc7-f24b6496f5e5/exec-318b6dfd-65fb-437d-8648-11e6717ae26e.png",
+    "state": "generated-awaiting-QA",
+    "normalized": "C:\\workspace\\msw\\.beaver\\output\\five-class-motion\\normalized\\shadower\\blade-tornado-karma-fury\\motion01.png",
+    "size": 704,
+    "bbox": [
+      227,
+      350,
+      570,
+      640
+    ],
+    "edgePixels": 0,
+    "alphaMin": 0,
+    "alphaMax": 255,
+    "sha256": "f380d1fb1fe53e7bbdb3b20886162db5432af86b8c8af793d9d9cbbd690a3e43"
+  },
+  {
+    "id": "shadower",
+    "skill": "blade-tornado-karma-fury",
+    "n": 2,
+    "pose": "Wind-up rotation: torso turns slightly right, dagger arm lifts behind shoulder, free forearm crosses chest, feet pivot in place.",
+    "key": "shadower--blade-tornado-karma-fury--02",
+    "prompt": "Use case: identity-preserve animation pose edit. Generate ONE transparent PNG animation frame, not a sheet.\nImage1 EDIT TARGET and exact framing/scale master: shadower character on 704x704 square canvas. Image2 approved identity/costume master, do not copy its larger framing. Image3 Bishop style/anatomy master, do not copy its clothes/hair/staff.\nKeep character SAME small on-canvas size as image1, with generous empty transparent space above. Do not zoom in or fill canvas. In 704-unit canvas coordinates, anatomical head crown-to-chin147units, feet ground y640, centerx352. Underlying standing body height338units and2.3heads, ignoring hats/feathers/tall hair/weapon. Pose may bend knees, never lengthen limbs/boots. Preserve exact face, hair, eye color, all clothing panels, jewelry, weapon design, clean line weight and soft cel shading.\nFrame 2 for blade-tornado-karma-fury: Wind-up rotation: torso turns slightly right, dagger arm lifts behind shoulder, free forearm crosses chest, feet pivot in place.\n\n\nOnly body pose and subtle expression changes allowed. Entire hair/hat/weapon/cape/boots visible with transparent margins. No extra limbs or weapons, no blur or motion trails, no aura/projectiles/glows/environment, no text/numbers/grid/border/shadow. Feet grounded. Actual transparent background. Same fine polished 2D SD game illustration as Bishop, no pixel art. Output ONE frame.",
+    "refs": [
+      "C:/workspace/msw/.beaver/output/five-class-motion/base/shadower-attack.png",
+      "C:/workspace/msw/assets/design/characters/shadower/concept.png",
+      "C:/workspace/msw/assets/design/characters/bishop/frames/angel-ray/motion03.png"
+    ],
+    "source": "C:/Users/timec/.codex/generated_images/01a0dbf3-5094-7520-bfc7-f24b6496f5e5/exec-4d3684f4-a99c-4aa5-8144-58ba31397a66.png",
+    "state": "generated-awaiting-QA",
+    "normalized": "C:\\workspace\\msw\\.beaver\\output\\five-class-motion\\normalized\\shadower\\blade-tornado-karma-fury\\motion02.png",
+    "size": 704,
+    "bbox": [
+      258,
+      304,
+      577,
+      639
+    ],
+    "edgePixels": 0,
+    "alphaMin": 0,
+    "alphaMax": 255,
+    "sha256": "fdba0b181641281498d8a405116892e9a0c0c547573ed2bfbeddcb4425b1c4d3"
+  },
+  {
+    "id": "shadower",
+    "skill": "blade-tornado-karma-fury",
+    "n": 3,
+    "pose": "Tornado launch at0.30s: sweep original dagger in broad horizontal arc toward viewer LEFT, free palm pushes left, torso follows. Keep one real dagger; magical blades are separate effects.",
+    "key": "shadower--blade-tornado-karma-fury--03",
+    "prompt": "Use case: identity-preserve animation pose edit. Generate ONE transparent PNG animation frame, not a sheet.\nImage1 EDIT TARGET and exact framing/scale master: shadower character on 704x704 square canvas. Image2 approved identity/costume master, do not copy its larger framing. Image3 Bishop style/anatomy master, do not copy its clothes/hair/staff.\nKeep character SAME small on-canvas size as image1, with generous empty transparent space above. Do not zoom in or fill canvas. In 704-unit canvas coordinates, anatomical head crown-to-chin147units, feet ground y640, centerx352. Underlying standing body height338units and2.3heads, ignoring hats/feathers/tall hair/weapon. Pose may bend knees, never lengthen limbs/boots. Preserve exact face, hair, eye color, all clothing panels, jewelry, weapon design, clean line weight and soft cel shading.\nFrame 3 for blade-tornado-karma-fury: Tornado launch at0.30s: sweep original dagger in broad horizontal arc toward viewer LEFT, free palm pushes left, torso follows. Keep one real dagger; magical blades are separate effects.\n\n\nOnly body pose and subtle expression changes allowed. Entire hair/hat/weapon/cape/boots visible with transparent margins. No extra limbs or weapons, no blur or motion trails, no aura/projectiles/glows/environment, no text/numbers/grid/border/shadow. Feet grounded. Actual transparent background. Same fine polished 2D SD game illustration as Bishop, no pixel art. Output ONE frame.",
+    "refs": [
+      "C:/workspace/msw/.beaver/output/five-class-motion/base/shadower-attack.png",
+      "C:/workspace/msw/assets/design/characters/shadower/concept.png",
+      "C:/workspace/msw/assets/design/characters/bishop/frames/angel-ray/motion03.png"
+    ],
+    "source": "C:/Users/timec/.codex/generated_images/01a0dbf3-5094-7520-bfc7-f24b6496f5e5/exec-d53d064f-864c-42be-a622-fbfe2baa730b.png",
+    "state": "generated-awaiting-QA",
+    "normalized": "C:\\workspace\\msw\\.beaver\\output\\five-class-motion\\normalized\\shadower\\blade-tornado-karma-fury\\motion03.png",
+    "size": 704,
+    "bbox": [
+      132,
+      341,
+      556,
+      639
+    ],
+    "edgePixels": 0,
+    "alphaMin": 0,
+    "alphaMax": 255,
+    "sha256": "f56a447881b2bd891760978314d269e1afe8fdd76202e0d24621fec283df5bbb"
+  },
+  {
+    "id": "shadower",
+    "skill": "blade-tornado-karma-fury",
+    "n": 4,
+    "pose": "Second cross slash: dagger arm crosses down-left in front of body, free arm draws back right, both knees bent, scarf thrown outward.",
+    "key": "shadower--blade-tornado-karma-fury--04",
+    "prompt": "Use case: identity-preserve animation pose edit. Generate ONE transparent PNG animation frame, not a sheet.\nImage1 EDIT TARGET and exact framing/scale master: shadower character on 704x704 square canvas. Image2 approved identity/costume master, do not copy its larger framing. Image3 Bishop style/anatomy master, do not copy its clothes/hair/staff.\nKeep character SAME small on-canvas size as image1, with generous empty transparent space above. Do not zoom in or fill canvas. In 704-unit canvas coordinates, anatomical head crown-to-chin147units, feet ground y640, centerx352. Underlying standing body height338units and2.3heads, ignoring hats/feathers/tall hair/weapon. Pose may bend knees, never lengthen limbs/boots. Preserve exact face, hair, eye color, all clothing panels, jewelry, weapon design, clean line weight and soft cel shading.\nFrame 4 for blade-tornado-karma-fury: Second cross slash: dagger arm crosses down-left in front of body, free arm draws back right, both knees bent, scarf thrown outward.\n\n\nOnly body pose and subtle expression changes allowed. Entire hair/hat/weapon/cape/boots visible with transparent margins. No extra limbs or weapons, no blur or motion trails, no aura/projectiles/glows/environment, no text/numbers/grid/border/shadow. Feet grounded. Actual transparent background. Same fine polished 2D SD game illustration as Bishop, no pixel art. Output ONE frame.",
+    "refs": [
+      "C:/workspace/msw/.beaver/output/five-class-motion/base/shadower-attack.png",
+      "C:/workspace/msw/assets/design/characters/shadower/concept.png",
+      "C:/workspace/msw/assets/design/characters/bishop/frames/angel-ray/motion03.png"
+    ],
+    "source": "C:/Users/timec/.codex/generated_images/01a0dbf3-5094-7520-bfc7-f24b6496f5e5/exec-9804a85f-ca35-4867-96fa-9dd163a879a6.png",
+    "state": "generated-awaiting-QA",
+    "normalized": "C:\\workspace\\msw\\.beaver\\output\\five-class-motion\\normalized\\shadower\\blade-tornado-karma-fury\\motion04.png",
+    "size": 704,
+    "bbox": [
+      242,
+      344,
+      580,
+      640
+    ],
+    "edgePixels": 0,
+    "alphaMin": 0,
+    "alphaMax": 255,
+    "sha256": "bca387e7d240b681ca8892c6c900bde36f3da695b126a92f08b9b2f04e0abd3b"
+  },
+  {
+    "id": "shadower",
+    "skill": "blade-tornado-karma-fury",
+    "n": 5,
+    "pose": "Release: open chest slightly, dagger at low LEFT completing slash, free hand raised to shoulder, look LEFT, no magical letters or tornado painted in.",
+    "key": "shadower--blade-tornado-karma-fury--05",
+    "prompt": "Use case: identity-preserve animation pose edit. Generate ONE transparent PNG animation frame, not a sheet.\nImage1 EDIT TARGET and exact framing/scale master: shadower character on 704x704 square canvas. Image2 approved identity/costume master, do not copy its larger framing. Image3 Bishop style/anatomy master, do not copy its clothes/hair/staff.\nKeep character SAME small on-canvas size as image1, with generous empty transparent space above. Do not zoom in or fill canvas. In 704-unit canvas coordinates, anatomical head crown-to-chin147units, feet ground y640, centerx352. Underlying standing body height338units and2.3heads, ignoring hats/feathers/tall hair/weapon. Pose may bend knees, never lengthen limbs/boots. Preserve exact face, hair, eye color, all clothing panels, jewelry, weapon design, clean line weight and soft cel shading.\nFrame 5 for blade-tornado-karma-fury: Release: open chest slightly, dagger at low LEFT completing slash, free hand raised to shoulder, look LEFT, no magical letters or tornado painted in.\n\n\nOnly body pose and subtle expression changes allowed. Entire hair/hat/weapon/cape/boots visible with transparent margins. No extra limbs or weapons, no blur or motion trails, no aura/projectiles/glows/environment, no text/numbers/grid/border/shadow. Feet grounded. Actual transparent background. Same fine polished 2D SD game illustration as Bishop, no pixel art. Output ONE frame.",
+    "refs": [
+      "C:/workspace/msw/.beaver/output/five-class-motion/base/shadower-attack.png",
+      "C:/workspace/msw/assets/design/characters/shadower/concept.png",
+      "C:/workspace/msw/assets/design/characters/bishop/frames/angel-ray/motion03.png"
+    ],
+    "source": "C:/Users/timec/.codex/generated_images/01a0dbf3-5094-7520-bfc7-f24b6496f5e5/exec-6221ad60-2a57-4383-8d94-91884805ebff.png",
+    "state": "generated-awaiting-QA",
+    "normalized": "C:\\workspace\\msw\\.beaver\\output\\five-class-motion\\normalized\\shadower\\blade-tornado-karma-fury\\motion05.png",
+    "size": 704,
+    "bbox": [
+      122,
+      332,
+      557,
+      640
+    ],
+    "edgePixels": 0,
+    "alphaMin": 0,
+    "alphaMax": 255,
+    "sha256": "2272e486de02a677ee245799349b6e9ebec9edf43c57d405d908936e284cda07"
+  },
+  {
+    "id": "shadower",
+    "skill": "blade-tornado-karma-fury",
+    "n": 6,
+    "pose": "Sustained casting hold: balanced low guard, dagger forward-left at waist, free palm extended left, intense eyes; keep same short limbs. This pose holds while separately rendered attacks continue.",
+    "key": "shadower--blade-tornado-karma-fury--06",
+    "prompt": "Use case: identity-preserve animation pose edit. Generate ONE transparent PNG animation frame, not a sheet.\nImage1 EDIT TARGET and exact framing/scale master: shadower character on 704x704 square canvas. Image2 approved identity/costume master, do not copy its larger framing. Image3 Bishop style/anatomy master, do not copy its clothes/hair/staff.\nKeep character SAME small on-canvas size as image1, with generous empty transparent space above. Do not zoom in or fill canvas. In 704-unit canvas coordinates, anatomical head crown-to-chin147units, feet ground y640, centerx352. Underlying standing body height338units and2.3heads, ignoring hats/feathers/tall hair/weapon. Pose may bend knees, never lengthen limbs/boots. Preserve exact face, hair, eye color, all clothing panels, jewelry, weapon design, clean line weight and soft cel shading.\nFrame 6 for blade-tornado-karma-fury: Sustained casting hold: balanced low guard, dagger forward-left at waist, free palm extended left, intense eyes; keep same short limbs. This pose holds while separately rendered attacks continue.\n\n\nOnly body pose and subtle expression changes allowed. Entire hair/hat/weapon/cape/boots visible with transparent margins. No extra limbs or weapons, no blur or motion trails, no aura/projectiles/glows/environment, no text/numbers/grid/border/shadow. Feet grounded. Actual transparent background. Same fine polished 2D SD game illustration as Bishop, no pixel art. Output ONE frame.",
+    "refs": [
+      "C:/workspace/msw/.beaver/output/five-class-motion/base/shadower-attack.png",
+      "C:/workspace/msw/assets/design/characters/shadower/concept.png",
+      "C:/workspace/msw/assets/design/characters/bishop/frames/angel-ray/motion03.png"
+    ],
+    "source": "C:/Users/timec/.codex/generated_images/01a0dbf3-5094-7520-bfc7-f24b6496f5e5/exec-f285d243-019c-44be-9cc2-60b0243c87d6.png",
+    "state": "generated-awaiting-QA",
+    "normalized": "C:\\workspace\\msw\\.beaver\\output\\five-class-motion\\normalized\\shadower\\blade-tornado-karma-fury\\motion06.png",
+    "size": 704,
+    "bbox": [
+      199,
+      342,
+      565,
+      640
+    ],
+    "edgePixels": 0,
+    "alphaMin": 0,
+    "alphaMax": 255,
+    "sha256": "77abf3bfc96f012414bc9406d162c3b2c3a6ed77bc3404a1733d884ceeb9b205"
+  },
+  {
+    "id": "shadower",
+    "skill": "blade-tornado-karma-fury",
+    "n": 7,
+    "pose": "Recovery start: withdraw free palm and dagger toward torso, knees straighten, scarf settles.",
+    "key": "shadower--blade-tornado-karma-fury--07",
+    "prompt": "Use case: identity-preserve animation pose edit. Generate ONE transparent PNG animation frame, not a sheet.\nImage1 EDIT TARGET and exact framing/scale master: shadower character on 704x704 square canvas. Image2 approved identity/costume master, do not copy its larger framing. Image3 Bishop style/anatomy master, do not copy its clothes/hair/staff.\nKeep character SAME small on-canvas size as image1, with generous empty transparent space above. Do not zoom in or fill canvas. In 704-unit canvas coordinates, anatomical head crown-to-chin147units, feet ground y640, centerx352. Underlying standing body height338units and2.3heads, ignoring hats/feathers/tall hair/weapon. Pose may bend knees, never lengthen limbs/boots. Preserve exact face, hair, eye color, all clothing panels, jewelry, weapon design, clean line weight and soft cel shading.\nFrame 7 for blade-tornado-karma-fury: Recovery start: withdraw free palm and dagger toward torso, knees straighten, scarf settles.\n\n\nOnly body pose and subtle expression changes allowed. Entire hair/hat/weapon/cape/boots visible with transparent margins. No extra limbs or weapons, no blur or motion trails, no aura/projectiles/glows/environment, no text/numbers/grid/border/shadow. Feet grounded. Actual transparent background. Same fine polished 2D SD game illustration as Bishop, no pixel art. Output ONE frame.",
+    "refs": [
+      "C:/workspace/msw/.beaver/output/five-class-motion/base/shadower-attack.png",
+      "C:/workspace/msw/assets/design/characters/shadower/concept.png",
+      "C:/workspace/msw/assets/design/characters/bishop/frames/angel-ray/motion03.png"
+    ],
+    "source": "C:/Users/timec/.codex/generated_images/01a0dbf3-5094-7520-bfc7-f24b6496f5e5/exec-edf946c5-8c79-4892-a5e0-62fca535e2b4.png",
+    "state": "generated-awaiting-QA",
+    "normalized": "C:\\workspace\\msw\\.beaver\\output\\five-class-motion\\normalized\\shadower\\blade-tornado-karma-fury\\motion07.png",
+    "size": 704,
+    "bbox": [
+      249,
+      294,
+      560,
+      640
+    ],
+    "edgePixels": 0,
+    "alphaMin": 0,
+    "alphaMax": 255,
+    "sha256": "9a7a0d56fdab49011f80522598cf3611fb471c1e05226c232e811c366c9a21f6"
+  },
+  {
+    "id": "shadower",
+    "skill": "blade-tornado-karma-fury",
+    "n": 8,
+    "pose": "Return: upright original dagger guard across chest, relaxed shoulders, original focused expression.",
+    "key": "shadower--blade-tornado-karma-fury--08",
+    "prompt": "Use case: identity-preserve animation pose edit. Generate ONE transparent PNG animation frame, not a sheet.\nImage1 EDIT TARGET and exact framing/scale master: shadower character on 704x704 square canvas. Image2 approved identity/costume master, do not copy its larger framing. Image3 Bishop style/anatomy master, do not copy its clothes/hair/staff.\nKeep character SAME small on-canvas size as image1, with generous empty transparent space above. Do not zoom in or fill canvas. In 704-unit canvas coordinates, anatomical head crown-to-chin147units, feet ground y640, centerx352. Underlying standing body height338units and2.3heads, ignoring hats/feathers/tall hair/weapon. Pose may bend knees, never lengthen limbs/boots. Preserve exact face, hair, eye color, all clothing panels, jewelry, weapon design, clean line weight and soft cel shading.\nFrame 8 for blade-tornado-karma-fury: Return: upright original dagger guard across chest, relaxed shoulders, original focused expression.\n\n\nOnly body pose and subtle expression changes allowed. Entire hair/hat/weapon/cape/boots visible with transparent margins. No extra limbs or weapons, no blur or motion trails, no aura/projectiles/glows/environment, no text/numbers/grid/border/shadow. Feet grounded. Actual transparent background. Same fine polished 2D SD game illustration as Bishop, no pixel art. Output ONE frame.",
+    "refs": [
+      "C:/workspace/msw/.beaver/output/five-class-motion/base/shadower-attack.png",
+      "C:/workspace/msw/assets/design/characters/shadower/concept.png",
+      "C:/workspace/msw/assets/design/characters/bishop/frames/angel-ray/motion03.png"
+    ],
+    "source": "C:/Users/timec/.codex/generated_images/01a0dbf3-5094-7520-bfc7-f24b6496f5e5/exec-ecd7bf3a-72ee-4e98-8473-981320a0041f.png",
+    "state": "generated-awaiting-QA",
+    "normalized": "C:\\workspace\\msw\\.beaver\\output\\five-class-motion\\normalized\\shadower\\blade-tornado-karma-fury\\motion08.png",
+    "size": 704,
+    "bbox": [
+      203,
+      297,
+      529,
+      640
+    ],
+    "edgePixels": 0,
+    "alphaMin": 0,
+    "alphaMax": 255,
+    "sha256": "4778ece10822c435fe69f1d2b66b4a8578db937f5c6b824e0f7c3c31935451e8"
+  },
+  {
+    "id": "shadower",
+    "skill": "meso-explosion",
+    "n": 1,
+    "pose": "Prepare detonation: upright near idle, original dagger lowered safely beside right thigh, free gloved hand raised before chest with fingers curled.",
+    "key": "shadower--meso-explosion--01",
+    "prompt": "Use case: identity-preserve animation pose edit. Generate ONE transparent PNG animation frame, not a sheet.\nImage1 EDIT TARGET and exact framing/scale master: shadower character on 704x704 square canvas. Image2 approved identity/costume master, do not copy its larger framing. Image3 Bishop style/anatomy master, do not copy its clothes/hair/staff.\nKeep character SAME small on-canvas size as image1, with generous empty transparent space above. Do not zoom in or fill canvas. In 704-unit canvas coordinates, anatomical head crown-to-chin147units, feet ground y640, centerx352. Underlying standing body height338units and2.3heads, ignoring hats/feathers/tall hair/weapon. Pose may bend knees, never lengthen limbs/boots. Preserve exact face, hair, eye color, all clothing panels, jewelry, weapon design, clean line weight and soft cel shading.\nFrame 1 for meso-explosion: Prepare detonation: upright near idle, original dagger lowered safely beside right thigh, free gloved hand raised before chest with fingers curled.\n\n\nOnly body pose and subtle expression changes allowed. Entire hair/hat/weapon/cape/boots visible with transparent margins. No extra limbs or weapons, no blur or motion trails, no aura/projectiles/glows/environment, no text/numbers/grid/border/shadow. Feet grounded. Actual transparent background. Same fine polished 2D SD game illustration as Bishop, no pixel art. Output ONE frame.",
+    "refs": [
+      "C:/workspace/msw/.beaver/output/five-class-motion/base/shadower-attack.png",
+      "C:/workspace/msw/assets/design/characters/shadower/concept.png",
+      "C:/workspace/msw/assets/design/characters/bishop/frames/angel-ray/motion03.png"
+    ],
+    "source": "C:/Users/timec/.codex/generated_images/01a0dbf3-5094-7520-bfc7-f24b6496f5e5/exec-f7ae1145-b7be-41a1-89cb-1bc7541cf38b.png",
+    "state": "generated-awaiting-QA",
+    "normalized": "C:\\workspace\\msw\\.beaver\\output\\five-class-motion\\normalized\\shadower\\meso-explosion\\motion01.png",
+    "size": 704,
+    "bbox": [
+      253,
+      296,
+      582,
+      638
+    ],
+    "edgePixels": 0,
+    "alphaMin": 0,
+    "alphaMax": 255,
+    "sha256": "808dc2211b7ea606d39c3a5331b80ebcd6453569dde38308c2f7a4a7cb91976b"
+  },
+  {
+    "id": "shadower",
+    "skill": "meso-explosion",
+    "n": 2,
+    "pose": "Gather: free hand lifts near chin, thumb and middle finger touching ready to snap, eyes LEFT, dagger still lowered.",
+    "key": "shadower--meso-explosion--02",
+    "prompt": "Use case: identity-preserve animation pose edit. Generate ONE transparent PNG animation frame, not a sheet.\nImage1 EDIT TARGET and exact framing/scale master: shadower character on 704x704 square canvas. Image2 approved identity/costume master, do not copy its larger framing. Image3 Bishop style/anatomy master, do not copy its clothes/hair/staff.\nKeep character SAME small on-canvas size as image1, with generous empty transparent space above. Do not zoom in or fill canvas. In 704-unit canvas coordinates, anatomical head crown-to-chin147units, feet ground y640, centerx352. Underlying standing body height338units and2.3heads, ignoring hats/feathers/tall hair/weapon. Pose may bend knees, never lengthen limbs/boots. Preserve exact face, hair, eye color, all clothing panels, jewelry, weapon design, clean line weight and soft cel shading.\nFrame 2 for meso-explosion: Gather: free hand lifts near chin, thumb and middle finger touching ready to snap, eyes LEFT, dagger still lowered.\n\n\nOnly body pose and subtle expression changes allowed. Entire hair/hat/weapon/cape/boots visible with transparent margins. No extra limbs or weapons, no blur or motion trails, no aura/projectiles/glows/environment, no text/numbers/grid/border/shadow. Feet grounded. Actual transparent background. Same fine polished 2D SD game illustration as Bishop, no pixel art. Output ONE frame.",
+    "refs": [
+      "C:/workspace/msw/.beaver/output/five-class-motion/base/shadower-attack.png",
+      "C:/workspace/msw/assets/design/characters/shadower/concept.png",
+      "C:/workspace/msw/assets/design/characters/bishop/frames/angel-ray/motion03.png"
+    ],
+    "source": "C:/Users/timec/.codex/generated_images/01a0dbf3-5094-7520-bfc7-f24b6496f5e5/exec-c8343848-b819-4faa-8972-dc7b29a9259a.png",
+    "state": "generated-awaiting-QA",
+    "normalized": "C:\\workspace\\msw\\.beaver\\output\\five-class-motion\\normalized\\shadower\\meso-explosion\\motion02.png",
+    "size": 704,
+    "bbox": [
+      261,
+      291,
+      562,
+      639
+    ],
+    "edgePixels": 0,
+    "alphaMin": 0,
+    "alphaMax": 255,
+    "sha256": "9164c75381cddde0bc86023cbe2a3a9f95e6e9bc8a100e39d0fa9946cddf5618"
+  },
+  {
+    "id": "shadower",
+    "skill": "meso-explosion",
+    "n": 3,
+    "pose": "Trigger at0.30s: snap fingers of free hand extending toward viewer LEFT, arm half-extended, torso steady. No coins, explosion or purple vortex painted in.",
+    "key": "shadower--meso-explosion--03",
+    "prompt": "Use case: identity-preserve animation pose edit. Generate ONE transparent PNG animation frame, not a sheet.\nImage1 EDIT TARGET and exact framing/scale master: shadower character on 704x704 square canvas. Image2 approved identity/costume master, do not copy its larger framing. Image3 Bishop style/anatomy master, do not copy its clothes/hair/staff.\nKeep character SAME small on-canvas size as image1, with generous empty transparent space above. Do not zoom in or fill canvas. In 704-unit canvas coordinates, anatomical head crown-to-chin147units, feet ground y640, centerx352. Underlying standing body height338units and2.3heads, ignoring hats/feathers/tall hair/weapon. Pose may bend knees, never lengthen limbs/boots. Preserve exact face, hair, eye color, all clothing panels, jewelry, weapon design, clean line weight and soft cel shading.\nFrame 3 for meso-explosion: Trigger at0.30s: snap fingers of free hand extending toward viewer LEFT, arm half-extended, torso steady. No coins, explosion or purple vortex painted in.\n\n\nOnly body pose and subtle expression changes allowed. Entire hair/hat/weapon/cape/boots visible with transparent margins. No extra limbs or weapons, no blur or motion trails, no aura/projectiles/glows/environment, no text/numbers/grid/border/shadow. Feet grounded. Actual transparent background. Same fine polished 2D SD game illustration as Bishop, no pixel art. Output ONE frame.",
+    "refs": [
+      "C:/workspace/msw/.beaver/output/five-class-motion/base/shadower-attack.png",
+      "C:/workspace/msw/assets/design/characters/shadower/concept.png",
+      "C:/workspace/msw/assets/design/characters/bishop/frames/angel-ray/motion03.png"
+    ],
+    "source": "C:/Users/timec/.codex/generated_images/01a0dbf3-5094-7520-bfc7-f24b6496f5e5/exec-0f4f801f-295c-4806-bcbd-7aec2c9b9f99.png",
+    "state": "generated-awaiting-QA",
+    "normalized": "C:\\workspace\\msw\\.beaver\\output\\five-class-motion\\normalized\\shadower\\meso-explosion\\motion03.png",
+    "size": 704,
+    "bbox": [
+      222,
+      312,
+      531,
+      640
+    ],
+    "edgePixels": 0,
+    "alphaMin": 0,
+    "alphaMax": 255,
+    "sha256": "35c8bf1e87eacb9ddb0802c6078a0e00f16281385f8eeb2bc33bcf25fe8c7383"
+  },
+  {
+    "id": "shadower",
+    "skill": "meso-explosion",
+    "n": 4,
+    "pose": "Follow-through: free palm opens toward LEFT after snap, shoulders relax, short legs planted, dagger still in other hand.",
+    "key": "shadower--meso-explosion--04",
+    "prompt": "Use case: identity-preserve animation pose edit. Generate ONE transparent PNG animation frame, not a sheet.\nImage1 EDIT TARGET and exact framing/scale master: shadower character on 704x704 square canvas. Image2 approved identity/costume master, do not copy its larger framing. Image3 Bishop style/anatomy master, do not copy its clothes/hair/staff.\nKeep character SAME small on-canvas size as image1, with generous empty transparent space above. Do not zoom in or fill canvas. In 704-unit canvas coordinates, anatomical head crown-to-chin147units, feet ground y640, centerx352. Underlying standing body height338units and2.3heads, ignoring hats/feathers/tall hair/weapon. Pose may bend knees, never lengthen limbs/boots. Preserve exact face, hair, eye color, all clothing panels, jewelry, weapon design, clean line weight and soft cel shading.\nFrame 4 for meso-explosion: Follow-through: free palm opens toward LEFT after snap, shoulders relax, short legs planted, dagger still in other hand.\n\n\nOnly body pose and subtle expression changes allowed. Entire hair/hat/weapon/cape/boots visible with transparent margins. No extra limbs or weapons, no blur or motion trails, no aura/projectiles/glows/environment, no text/numbers/grid/border/shadow. Feet grounded. Actual transparent background. Same fine polished 2D SD game illustration as Bishop, no pixel art. Output ONE frame.",
+    "refs": [
+      "C:/workspace/msw/.beaver/output/five-class-motion/base/shadower-attack.png",
+      "C:/workspace/msw/assets/design/characters/shadower/concept.png",
+      "C:/workspace/msw/assets/design/characters/bishop/frames/angel-ray/motion03.png"
+    ],
+    "source": "C:/Users/timec/.codex/generated_images/01a0dbf3-5094-7520-bfc7-f24b6496f5e5/exec-4da6aa5e-6237-4c41-beb3-6986ac578614.png",
+    "state": "generated-awaiting-QA",
+    "normalized": "C:\\workspace\\msw\\.beaver\\output\\five-class-motion\\normalized\\shadower\\meso-explosion\\motion04.png",
+    "size": 704,
+    "bbox": [
+      219,
+      327,
+      560,
+      639
+    ],
+    "edgePixels": 0,
+    "alphaMin": 0,
+    "alphaMax": 255,
+    "sha256": "7fac42860abb815b6b8123f951ecdb965faf0245cfe2dd81cb9bccdbd357fde1"
+  },
+  {
+    "id": "shadower",
+    "skill": "meso-explosion",
+    "n": 5,
+    "pose": "Recovery: free arm lowers, dagger returns to familiar diagonal chest guard, original face and stance.",
+    "key": "shadower--meso-explosion--05",
+    "prompt": "Use case: identity-preserve animation pose edit. Generate ONE transparent PNG animation frame, not a sheet.\nImage1 EDIT TARGET and exact framing/scale master: shadower character on 704x704 square canvas. Image2 approved identity/costume master, do not copy its larger framing. Image3 Bishop style/anatomy master, do not copy its clothes/hair/staff.\nKeep character SAME small on-canvas size as image1, with generous empty transparent space above. Do not zoom in or fill canvas. In 704-unit canvas coordinates, anatomical head crown-to-chin147units, feet ground y640, centerx352. Underlying standing body height338units and2.3heads, ignoring hats/feathers/tall hair/weapon. Pose may bend knees, never lengthen limbs/boots. Preserve exact face, hair, eye color, all clothing panels, jewelry, weapon design, clean line weight and soft cel shading.\nFrame 5 for meso-explosion: Recovery: free arm lowers, dagger returns to familiar diagonal chest guard, original face and stance.\n\n\nOnly body pose and subtle expression changes allowed. Entire hair/hat/weapon/cape/boots visible with transparent margins. No extra limbs or weapons, no blur or motion trails, no aura/projectiles/glows/environment, no text/numbers/grid/border/shadow. Feet grounded. Actual transparent background. Same fine polished 2D SD game illustration as Bishop, no pixel art. Output ONE frame.",
+    "refs": [
+      "C:/workspace/msw/.beaver/output/five-class-motion/base/shadower-attack.png",
+      "C:/workspace/msw/assets/design/characters/shadower/concept.png",
+      "C:/workspace/msw/assets/design/characters/bishop/frames/angel-ray/motion03.png"
+    ],
+    "source": "C:/Users/timec/.codex/generated_images/01a0dbf3-5094-7520-bfc7-f24b6496f5e5/exec-5fb6c168-5b14-4107-80ee-17864ed58112.png",
+    "state": "generated-awaiting-QA",
+    "normalized": "C:\\workspace\\msw\\.beaver\\output\\five-class-motion\\normalized\\shadower\\meso-explosion\\motion05.png",
+    "size": 704,
+    "bbox": [
+      210,
+      301,
+      519,
+      640
+    ],
+    "edgePixels": 0,
+    "alphaMin": 0,
+    "alphaMax": 255,
+    "sha256": "0916c2c69952515bb5b59e5d9a2ce9302cb079b3bbede76babab63b35a7d4dde"
+  },
+  {
+    "id": "shadower",
+    "skill": "savage-blow",
+    "n": 1,
+    "pose": "Wind-up: compact knees gently bent, original curved dagger drawn back across chest toward right shoulder, free hand guarding waist, face LEFT.",
+    "key": "shadower--savage-blow--01",
+    "prompt": "Use case: identity-preserve animation pose edit. Generate ONE transparent PNG animation frame, not a sheet.\nImage1 EDIT TARGET and exact framing/scale master: shadower character on 704x704 square canvas. Image2 approved identity/costume master, do not copy its larger framing. Image3 Bishop style/anatomy master, do not copy its clothes/hair/staff.\nKeep character SAME small on-canvas size as image1, with generous empty transparent space above. Do not zoom in or fill canvas. In 704-unit canvas coordinates, anatomical head crown-to-chin147units, feet ground y640, centerx352. Underlying standing body height338units and2.3heads, ignoring hats/feathers/tall hair/weapon. Pose may bend knees, never lengthen limbs/boots. Preserve exact face, hair, eye color, all clothing panels, jewelry, weapon design, clean line weight and soft cel shading.\nFrame 1 for savage-blow: Wind-up: compact knees gently bent, original curved dagger drawn back across chest toward right shoulder, free hand guarding waist, face LEFT.\n\n\nOnly body pose and subtle expression changes allowed. Entire hair/hat/weapon/cape/boots visible with transparent margins. No extra limbs or weapons, no blur or motion trails, no aura/projectiles/glows/environment, no text/numbers/grid/border/shadow. Feet grounded. Actual transparent background. Same fine polished 2D SD game illustration as Bishop, no pixel art. Output ONE frame.",
+    "refs": [
+      "C:/workspace/msw/.beaver/output/five-class-motion/base/shadower-attack.png",
+      "C:/workspace/msw/assets/design/characters/shadower/concept.png",
+      "C:/workspace/msw/assets/design/characters/bishop/frames/angel-ray/motion03.png"
+    ],
+    "source": "C:/Users/timec/.codex/generated_images/01a0dbf3-5094-7520-bfc7-f24b6496f5e5/exec-e81b5364-aeb6-40e9-8110-c1fe9cf8fea3.png",
+    "state": "generated-awaiting-QA",
+    "normalized": "C:\\workspace\\msw\\.beaver\\output\\five-class-motion\\normalized\\shadower\\savage-blow\\motion01.png",
+    "size": 704,
+    "bbox": [
+      240,
+      342,
+      543,
+      640
+    ],
+    "edgePixels": 0,
+    "alphaMin": 0,
+    "alphaMax": 255,
+    "sha256": "2b3db25cf712f68493240c21d289cab68c607941831b8dba1816a8bd293fc6b7"
+  },
+  {
+    "id": "shadower",
+    "skill": "savage-blow",
+    "n": 2,
+    "pose": "Fast slash one: extend dagger diagonally downward toward viewer LEFT in front of hips, torso turns left slightly, blade silhouette clear, no painted slash trails.",
+    "key": "shadower--savage-blow--02",
+    "prompt": "Use case: identity-preserve animation pose edit. Generate ONE transparent PNG animation frame, not a sheet.\nImage1 EDIT TARGET and exact framing/scale master: shadower character on 704x704 square canvas. Image2 approved identity/costume master, do not copy its larger framing. Image3 Bishop style/anatomy master, do not copy its clothes/hair/staff.\nKeep character SAME small on-canvas size as image1, with generous empty transparent space above. Do not zoom in or fill canvas. In 704-unit canvas coordinates, anatomical head crown-to-chin147units, feet ground y640, centerx352. Underlying standing body height338units and2.3heads, ignoring hats/feathers/tall hair/weapon. Pose may bend knees, never lengthen limbs/boots. Preserve exact face, hair, eye color, all clothing panels, jewelry, weapon design, clean line weight and soft cel shading.\nFrame 2 for savage-blow: Fast slash one: extend dagger diagonally downward toward viewer LEFT in front of hips, torso turns left slightly, blade silhouette clear, no painted slash trails.\n\n\nOnly body pose and subtle expression changes allowed. Entire hair/hat/weapon/cape/boots visible with transparent margins. No extra limbs or weapons, no blur or motion trails, no aura/projectiles/glows/environment, no text/numbers/grid/border/shadow. Feet grounded. Actual transparent background. Same fine polished 2D SD game illustration as Bishop, no pixel art. Output ONE frame.",
+    "refs": [
+      "C:/workspace/msw/.beaver/output/five-class-motion/base/shadower-attack.png",
+      "C:/workspace/msw/assets/design/characters/shadower/concept.png",
+      "C:/workspace/msw/assets/design/characters/bishop/frames/angel-ray/motion03.png"
+    ],
+    "source": "C:/Users/timec/.codex/generated_images/01a0dbf3-5094-7520-bfc7-f24b6496f5e5/exec-7bcad5bb-7267-4560-8b44-92a6ef6500ce.png",
+    "state": "generated-awaiting-QA",
+    "normalized": "C:\\workspace\\msw\\.beaver\\output\\five-class-motion\\normalized\\shadower\\savage-blow\\motion02.png",
+    "size": 704,
+    "bbox": [
+      183,
+      330,
+      535,
+      639
+    ],
+    "edgePixels": 0,
+    "alphaMin": 0,
+    "alphaMax": 255,
+    "sha256": "726b81406652ba904ead97a3bc69a56be5a76afc1bb71cf81d0c0cf8473e4708"
+  },
+  {
+    "id": "shadower",
+    "skill": "savage-blow",
+    "n": 3,
+    "pose": "Reverse slash: dagger moves up-left to shoulder height, leading elbow bent, shoulders twist back, head still LEFT.",
+    "key": "shadower--savage-blow--03",
+    "prompt": "Use case: identity-preserve animation pose edit. Generate ONE transparent PNG animation frame, not a sheet.\nImage1 EDIT TARGET and exact framing/scale master: shadower character on 704x704 square canvas. Image2 approved identity/costume master, do not copy its larger framing. Image3 Bishop style/anatomy master, do not copy its clothes/hair/staff.\nKeep character SAME small on-canvas size as image1, with generous empty transparent space above. Do not zoom in or fill canvas. In 704-unit canvas coordinates, anatomical head crown-to-chin147units, feet ground y640, centerx352. Underlying standing body height338units and2.3heads, ignoring hats/feathers/tall hair/weapon. Pose may bend knees, never lengthen limbs/boots. Preserve exact face, hair, eye color, all clothing panels, jewelry, weapon design, clean line weight and soft cel shading.\nFrame 3 for savage-blow: Reverse slash: dagger moves up-left to shoulder height, leading elbow bent, shoulders twist back, head still LEFT.\n\n\nOnly body pose and subtle expression changes allowed. Entire hair/hat/weapon/cape/boots visible with transparent margins. No extra limbs or weapons, no blur or motion trails, no aura/projectiles/glows/environment, no text/numbers/grid/border/shadow. Feet grounded. Actual transparent background. Same fine polished 2D SD game illustration as Bishop, no pixel art. Output ONE frame.",
+    "refs": [
+      "C:/workspace/msw/.beaver/output/five-class-motion/base/shadower-attack.png",
+      "C:/workspace/msw/assets/design/characters/shadower/concept.png",
+      "C:/workspace/msw/assets/design/characters/bishop/frames/angel-ray/motion03.png"
+    ],
+    "source": "C:/Users/timec/.codex/generated_images/01a0dbf3-5094-7520-bfc7-f24b6496f5e5/exec-b0a1c7f4-14c2-421e-b5b8-0cf32ad8226f.png",
+    "state": "generated-awaiting-QA",
+    "normalized": "C:\\workspace\\msw\\.beaver\\output\\five-class-motion\\normalized\\shadower\\savage-blow\\motion03.png",
+    "size": 704,
+    "bbox": [
+      211,
+      314,
+      564,
+      640
+    ],
+    "edgePixels": 0,
+    "alphaMin": 0,
+    "alphaMax": 255,
+    "sha256": "85891b7c89874c729b8550cc9486fb2a1ac3442b3f92ba16f961fe599d5eab79"
+  },
+  {
+    "id": "shadower",
+    "skill": "savage-blow",
+    "n": 4,
+    "pose": "Cross-body slash: dagger sweeps horizontally left across lower chest, free hand lifted behind for balance, knees bent, silver bob stable.",
+    "key": "shadower--savage-blow--04",
+    "prompt": "Use case: identity-preserve animation pose edit. Generate ONE transparent PNG animation frame, not a sheet.\nImage1 EDIT TARGET and exact framing/scale master: shadower character on 704x704 square canvas. Image2 approved identity/costume master, do not copy its larger framing. Image3 Bishop style/anatomy master, do not copy its clothes/hair/staff.\nKeep character SAME small on-canvas size as image1, with generous empty transparent space above. Do not zoom in or fill canvas. In 704-unit canvas coordinates, anatomical head crown-to-chin147units, feet ground y640, centerx352. Underlying standing body height338units and2.3heads, ignoring hats/feathers/tall hair/weapon. Pose may bend knees, never lengthen limbs/boots. Preserve exact face, hair, eye color, all clothing panels, jewelry, weapon design, clean line weight and soft cel shading.\nFrame 4 for savage-blow: Cross-body slash: dagger sweeps horizontally left across lower chest, free hand lifted behind for balance, knees bent, silver bob stable.\n\n\nOnly body pose and subtle expression changes allowed. Entire hair/hat/weapon/cape/boots visible with transparent margins. No extra limbs or weapons, no blur or motion trails, no aura/projectiles/glows/environment, no text/numbers/grid/border/shadow. Feet grounded. Actual transparent background. Same fine polished 2D SD game illustration as Bishop, no pixel art. Output ONE frame.",
+    "refs": [
+      "C:/workspace/msw/.beaver/output/five-class-motion/base/shadower-attack.png",
+      "C:/workspace/msw/assets/design/characters/shadower/concept.png",
+      "C:/workspace/msw/assets/design/characters/bishop/frames/angel-ray/motion03.png"
+    ],
+    "source": "C:/Users/timec/.codex/generated_images/01a0dbf3-5094-7520-bfc7-f24b6496f5e5/exec-c46861a0-e712-4006-a816-ddf24afafcdc.png",
+    "state": "generated-awaiting-QA",
+    "normalized": "C:\\workspace\\msw\\.beaver\\output\\five-class-motion\\normalized\\shadower\\savage-blow\\motion04.png",
+    "size": 704,
+    "bbox": [
+      178,
+      335,
+      548,
+      639
+    ],
+    "edgePixels": 0,
+    "alphaMin": 0,
+    "alphaMax": 255,
+    "sha256": "afaf0aeb55317ac73e360bbbc4eb758340bb4c0b6add9885d03691ef3245160e"
+  },
+  {
+    "id": "shadower",
+    "skill": "savage-blow",
+    "n": 5,
+    "pose": "Low slash: original single dagger extends low LEFT near knee level, torso crouches slightly without long legs, scarf trails right.",
+    "key": "shadower--savage-blow--05",
+    "prompt": "Use case: identity-preserve animation pose edit. Generate ONE transparent PNG animation frame, not a sheet.\nImage1 EDIT TARGET and exact framing/scale master: shadower character on 704x704 square canvas. Image2 approved identity/costume master, do not copy its larger framing. Image3 Bishop style/anatomy master, do not copy its clothes/hair/staff.\nKeep character SAME small on-canvas size as image1, with generous empty transparent space above. Do not zoom in or fill canvas. In 704-unit canvas coordinates, anatomical head crown-to-chin147units, feet ground y640, centerx352. Underlying standing body height338units and2.3heads, ignoring hats/feathers/tall hair/weapon. Pose may bend knees, never lengthen limbs/boots. Preserve exact face, hair, eye color, all clothing panels, jewelry, weapon design, clean line weight and soft cel shading.\nFrame 5 for savage-blow: Low slash: original single dagger extends low LEFT near knee level, torso crouches slightly without long legs, scarf trails right.\n\n\nOnly body pose and subtle expression changes allowed. Entire hair/hat/weapon/cape/boots visible with transparent margins. No extra limbs or weapons, no blur or motion trails, no aura/projectiles/glows/environment, no text/numbers/grid/border/shadow. Feet grounded. Actual transparent background. Same fine polished 2D SD game illustration as Bishop, no pixel art. Output ONE frame.",
+    "refs": [
+      "C:/workspace/msw/.beaver/output/five-class-motion/base/shadower-attack.png",
+      "C:/workspace/msw/assets/design/characters/shadower/concept.png",
+      "C:/workspace/msw/assets/design/characters/bishop/frames/angel-ray/motion03.png"
+    ],
+    "source": "C:/Users/timec/.codex/generated_images/01a0dbf3-5094-7520-bfc7-f24b6496f5e5/exec-fb756967-5861-4ca3-9aa7-485aa34490f6.png",
+    "state": "generated-awaiting-QA",
+    "normalized": "C:\\workspace\\msw\\.beaver\\output\\five-class-motion\\normalized\\shadower\\savage-blow\\motion05.png",
+    "size": 704,
+    "bbox": [
+      176,
+      376,
+      563,
+      640
+    ],
+    "edgePixels": 0,
+    "alphaMin": 0,
+    "alphaMax": 255,
+    "sha256": "3da0d094077bc3f23ae56a961c700fdfe92923219e4a84c1ab238919ad5c0883"
+  },
+  {
+    "id": "shadower",
+    "skill": "savage-blow",
+    "n": 6,
+    "pose": "Rising slash: dagger lifts high LEFT beside head, compact elbow then extends, knees begin to rise, no dagger duplication.",
+    "key": "shadower--savage-blow--06",
+    "prompt": "Use case: identity-preserve animation pose edit. Generate ONE transparent PNG animation frame, not a sheet.\nImage1 EDIT TARGET and exact framing/scale master: shadower character on 704x704 square canvas. Image2 approved identity/costume master, do not copy its larger framing. Image3 Bishop style/anatomy master, do not copy its clothes/hair/staff.\nKeep character SAME small on-canvas size as image1, with generous empty transparent space above. Do not zoom in or fill canvas. In 704-unit canvas coordinates, anatomical head crown-to-chin147units, feet ground y640, centerx352. Underlying standing body height338units and2.3heads, ignoring hats/feathers/tall hair/weapon. Pose may bend knees, never lengthen limbs/boots. Preserve exact face, hair, eye color, all clothing panels, jewelry, weapon design, clean line weight and soft cel shading.\nFrame 6 for savage-blow: Rising slash: dagger lifts high LEFT beside head, compact elbow then extends, knees begin to rise, no dagger duplication.\n\n\nOnly body pose and subtle expression changes allowed. Entire hair/hat/weapon/cape/boots visible with transparent margins. No extra limbs or weapons, no blur or motion trails, no aura/projectiles/glows/environment, no text/numbers/grid/border/shadow. Feet grounded. Actual transparent background. Same fine polished 2D SD game illustration as Bishop, no pixel art. Output ONE frame.",
+    "refs": [
+      "C:/workspace/msw/.beaver/output/five-class-motion/base/shadower-attack.png",
+      "C:/workspace/msw/assets/design/characters/shadower/concept.png",
+      "C:/workspace/msw/assets/design/characters/bishop/frames/angel-ray/motion03.png"
+    ],
+    "source": "C:/Users/timec/.codex/generated_images/01a0dbf3-5094-7520-bfc7-f24b6496f5e5/exec-fb375500-09bd-4a4b-9fb1-fef9a0cd8973.png",
+    "state": "generated-awaiting-QA",
+    "normalized": "C:\\workspace\\msw\\.beaver\\output\\five-class-motion\\normalized\\shadower\\savage-blow\\motion06.png",
+    "size": 704,
+    "bbox": [
+      177,
+      240,
+      541,
+      639
+    ],
+    "edgePixels": 0,
+    "alphaMin": 0,
+    "alphaMax": 255,
+    "sha256": "46b09d21164da920fffe9990d2228e565ce7e390e3b29b288bbfdedbfd8d0a32"
+  },
+  {
+    "id": "shadower",
+    "skill": "savage-blow",
+    "n": 7,
+    "pose": "Finishing slash hold: dagger ends horizontal LEFT near waist, leading shoulder forward, eyes intensely focused, original black mask.",
+    "key": "shadower--savage-blow--07",
+    "prompt": "Use case: identity-preserve animation pose edit. Generate ONE transparent PNG animation frame, not a sheet.\nImage1 EDIT TARGET and exact framing/scale master: shadower character on 704x704 square canvas. Image2 approved identity/costume master, do not copy its larger framing. Image3 Bishop style/anatomy master, do not copy its clothes/hair/staff.\nKeep character SAME small on-canvas size as image1, with generous empty transparent space above. Do not zoom in or fill canvas. In 704-unit canvas coordinates, anatomical head crown-to-chin147units, feet ground y640, centerx352. Underlying standing body height338units and2.3heads, ignoring hats/feathers/tall hair/weapon. Pose may bend knees, never lengthen limbs/boots. Preserve exact face, hair, eye color, all clothing panels, jewelry, weapon design, clean line weight and soft cel shading.\nFrame 7 for savage-blow: Finishing slash hold: dagger ends horizontal LEFT near waist, leading shoulder forward, eyes intensely focused, original black mask.\n\n\nOnly body pose and subtle expression changes allowed. Entire hair/hat/weapon/cape/boots visible with transparent margins. No extra limbs or weapons, no blur or motion trails, no aura/projectiles/glows/environment, no text/numbers/grid/border/shadow. Feet grounded. Actual transparent background. Same fine polished 2D SD game illustration as Bishop, no pixel art. Output ONE frame.",
+    "refs": [
+      "C:/workspace/msw/.beaver/output/five-class-motion/base/shadower-attack.png",
+      "C:/workspace/msw/assets/design/characters/shadower/concept.png",
+      "C:/workspace/msw/assets/design/characters/bishop/frames/angel-ray/motion03.png"
+    ],
+    "source": "C:/Users/timec/.codex/generated_images/01a0dbf3-5094-7520-bfc7-f24b6496f5e5/exec-dd7e52dd-4a89-4918-a268-a56ef6a8a685.png",
+    "state": "generated-awaiting-QA",
+    "normalized": "C:\\workspace\\msw\\.beaver\\output\\five-class-motion\\normalized\\shadower\\savage-blow\\motion07.png",
+    "size": 704,
+    "bbox": [
+      136,
+      341,
+      572,
+      640
+    ],
+    "edgePixels": 0,
+    "alphaMin": 0,
+    "alphaMax": 255,
+    "sha256": "0920cd8f09d867919d9aba57cc428f3c43117919173d935dd2e19ff684e933ca"
+  },
+  {
+    "id": "shadower",
+    "skill": "savage-blow",
+    "n": 8,
+    "pose": "Recover to guard: single dagger returns across chest as original, free hand lowers, feet stable, scarf settles.",
+    "key": "shadower--savage-blow--08",
+    "prompt": "Use case: identity-preserve animation pose edit. Generate ONE transparent PNG animation frame, not a sheet.\nImage1 EDIT TARGET and exact framing/scale master: shadower character on 704x704 square canvas. Image2 approved identity/costume master, do not copy its larger framing. Image3 Bishop style/anatomy master, do not copy its clothes/hair/staff.\nKeep character SAME small on-canvas size as image1, with generous empty transparent space above. Do not zoom in or fill canvas. In 704-unit canvas coordinates, anatomical head crown-to-chin147units, feet ground y640, centerx352. Underlying standing body height338units and2.3heads, ignoring hats/feathers/tall hair/weapon. Pose may bend knees, never lengthen limbs/boots. Preserve exact face, hair, eye color, all clothing panels, jewelry, weapon design, clean line weight and soft cel shading.\nFrame 8 for savage-blow: Recover to guard: single dagger returns across chest as original, free hand lowers, feet stable, scarf settles.\n\n\nOnly body pose and subtle expression changes allowed. Entire hair/hat/weapon/cape/boots visible with transparent margins. No extra limbs or weapons, no blur or motion trails, no aura/projectiles/glows/environment, no text/numbers/grid/border/shadow. Feet grounded. Actual transparent background. Same fine polished 2D SD game illustration as Bishop, no pixel art. Output ONE frame.",
+    "refs": [
+      "C:/workspace/msw/.beaver/output/five-class-motion/base/shadower-attack.png",
+      "C:/workspace/msw/assets/design/characters/shadower/concept.png",
+      "C:/workspace/msw/assets/design/characters/bishop/frames/angel-ray/motion03.png"
+    ],
+    "source": "C:/Users/timec/.codex/generated_images/01a0dbf3-5094-7520-bfc7-f24b6496f5e5/exec-11c35b09-36a4-4737-b803-56be7988b45a.png",
+    "state": "generated-awaiting-QA",
+    "normalized": "C:\\workspace\\msw\\.beaver\\output\\five-class-motion\\normalized\\shadower\\savage-blow\\motion08.png",
+    "size": 704,
+    "bbox": [
+      207,
+      289,
+      528,
+      639
+    ],
+    "edgePixels": 0,
+    "alphaMin": 0,
+    "alphaMax": 255,
+    "sha256": "f7f4e1a1ef9a66f4a0d67a00c7561b0202b19d86ac41b5e485820b4d762b1e63"
+  },
+  {
+    "id": "shadower",
+    "skill": "wait",
+    "n": 2,
+    "pose": "Small inhalation: preserve exact idle pose and planted feet, lift shoulders and upper chest subtly, shift cape/scarf/hair tips outward by tiny amount. Same eyes and expression, no stance change.",
+    "key": "shadower--wait--02",
+    "prompt": "Use case: identity-preserve animation pose edit. Generate ONE transparent PNG animation frame, not a sheet.\nImage1 EDIT TARGET and exact framing/scale master: shadower character on 576x576 square canvas. Image2 approved identity/costume master, do not copy its larger framing. Image3 Bishop style/anatomy master, do not copy its clothes/hair/staff.\nKeep character SAME small on-canvas size as image1, with generous empty transparent space above. Do not zoom in or fill canvas. In 576-unit canvas coordinates, anatomical head crown-to-chin147units, feet ground y512, centerx288. Underlying standing body height338units and2.3heads, ignoring hats/feathers/tall hair/weapon. Pose may bend knees, never lengthen limbs/boots. Preserve exact face, hair, eye color, all clothing panels, jewelry, weapon design, clean line weight and soft cel shading.\nFrame 2 for wait: Small inhalation: preserve exact idle pose and planted feet, lift shoulders and upper chest subtly, shift cape/scarf/hair tips outward by tiny amount. Same eyes and expression, no stance change.\n\n\nOnly body pose and subtle expression changes allowed. Entire hair/hat/weapon/cape/boots visible with transparent margins. No extra limbs or weapons, no blur or motion trails, no aura/projectiles/glows/environment, no text/numbers/grid/border/shadow. Feet grounded. Actual transparent background. Same fine polished 2D SD game illustration as Bishop, no pixel art. Output ONE frame.",
+    "refs": [
+      "C:/workspace/msw/.beaver/output/five-class-motion/base/shadower.png",
+      "C:/workspace/msw/assets/design/characters/shadower/concept.png",
+      "C:/workspace/msw/assets/design/characters/bishop/frames/wait/motion01.png"
+    ],
+    "source": "C:/Users/timec/.codex/generated_images/01a0dbf3-5094-7520-bfc7-f24b6496f5e5/exec-55b62933-d5a2-4b8d-9476-f5ea1d574fad.png",
+    "state": "generated-awaiting-QA",
+    "normalized": "C:\\workspace\\msw\\.beaver\\output\\five-class-motion\\normalized\\shadower\\wait\\motion02.png",
+    "size": 576,
+    "bbox": [
+      184,
+      197,
+      483,
+      512
+    ],
+    "edgePixels": 0,
+    "alphaMin": 0,
+    "alphaMax": 255,
+    "sha256": "17b78806687945165656cf1b56487130d9a0f5271cd517e9573f6d8380afcc9d"
+  },
+  {
+    "id": "shadower",
+    "skill": "wait",
+    "n": 3,
+    "pose": "Small exhalation: preserve exact idle pose and planted feet, relax shoulders subtly lower, cape/scarf/hair tips settle slightly inward. Same eyes and expression, no stance change.",
+    "key": "shadower--wait--03",
+    "prompt": "Use case: identity-preserve animation pose edit. Generate ONE transparent PNG animation frame, not a sheet.\nImage1 EDIT TARGET and exact framing/scale master: shadower character on 576x576 square canvas. Image2 approved identity/costume master, do not copy its larger framing. Image3 Bishop style/anatomy master, do not copy its clothes/hair/staff.\nKeep character SAME small on-canvas size as image1, with generous empty transparent space above. Do not zoom in or fill canvas. In 576-unit canvas coordinates, anatomical head crown-to-chin147units, feet ground y512, centerx288. Underlying standing body height338units and2.3heads, ignoring hats/feathers/tall hair/weapon. Pose may bend knees, never lengthen limbs/boots. Preserve exact face, hair, eye color, all clothing panels, jewelry, weapon design, clean line weight and soft cel shading.\nFrame 3 for wait: Small exhalation: preserve exact idle pose and planted feet, relax shoulders subtly lower, cape/scarf/hair tips settle slightly inward. Same eyes and expression, no stance change.\n\n\nOnly body pose and subtle expression changes allowed. Entire hair/hat/weapon/cape/boots visible with transparent margins. No extra limbs or weapons, no blur or motion trails, no aura/projectiles/glows/environment, no text/numbers/grid/border/shadow. Feet grounded. Actual transparent background. Same fine polished 2D SD game illustration as Bishop, no pixel art. Output ONE frame.",
+    "refs": [
+      "C:/workspace/msw/.beaver/output/five-class-motion/base/shadower.png",
+      "C:/workspace/msw/assets/design/characters/shadower/concept.png",
+      "C:/workspace/msw/assets/design/characters/bishop/frames/wait/motion01.png"
+    ],
+    "source": "C:/Users/timec/.codex/generated_images/01a0dbf3-5094-7520-bfc7-f24b6496f5e5/exec-6c306e3c-c87b-492b-867b-e135ce65356a.png",
+    "state": "generated-awaiting-QA",
+    "normalized": "C:\\workspace\\msw\\.beaver\\output\\five-class-motion\\normalized\\shadower\\wait\\motion03.png",
+    "size": 576,
+    "bbox": [
+      183,
+      184,
+      465,
+      512
+    ],
+    "edgePixels": 0,
+    "alphaMin": 0,
+    "alphaMax": 255,
+    "sha256": "cd78016b1cafd3dbed730095be71a963f50f8d147554ac8734dc0cf4159c1cad"
+  }
+]

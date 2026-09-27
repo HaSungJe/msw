@@ -1,0 +1,74 @@
+[
+  {
+    "key": "phantom/wait/01",
+    "status": 200
+  },
+  {
+    "key": "phantom/wait/02",
+    "status": 200
+  },
+  {
+    "key": "phantom/wait/03",
+    "status": 200
+  },
+  {
+    "key": "phantom/joker/01",
+    "status": 200
+  },
+  {
+    "key": "phantom/joker/02",
+    "status": 200
+  },
+  {
+    "key": "phantom/joker/03",
+    "status": 200
+  },
+  {
+    "key": "phantom/joker/04",
+    "status": 200
+  },
+  {
+    "key": "phantom/joker/05",
+    "status": 200
+  },
+  {
+    "key": "phantom/joker/06",
+    "status": 200
+  },
+  {
+    "key": "phantom/joker/07",
+    "status": 200
+  },
+  {
+    "key": "phantom/joker/08",
+    "status": 200
+  },
+  {
+    "key": "phantom/card",
+    "status": 200
+  },
+  {
+    "key": "phantom/ring",
+    "status": 200
+  },
+  {
+    "key": "paladin/portrait",
+    "status": 200
+  },
+  {
+    "key": "dark-knight/portrait",
+    "status": 200
+  },
+  {
+    "key": "night-lord/portrait",
+    "status": 200
+  },
+  {
+    "key": "shadower/portrait",
+    "status": 200
+  },
+  {
+    "key": "phantom/portrait",
+    "status": 200
+  }
+]

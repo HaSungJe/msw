@@ -1,0 +1,126 @@
+[
+  {
+    "key": "ice-lightning-mage/frames/blizzard/motion01.png",
+    "status": 200
+  },
+  {
+    "key": "ice-lightning-mage/frames/blizzard/motion02.png",
+    "status": 200
+  },
+  {
+    "key": "ice-lightning-mage/frames/blizzard/motion03.png",
+    "status": 200
+  },
+  {
+    "key": "ice-lightning-mage/frames/blizzard/motion04.png",
+    "status": 200
+  },
+  {
+    "key": "ice-lightning-mage/frames/blizzard/motion05.png",
+    "status": 200
+  },
+  {
+    "key": "ice-lightning-mage/frames/chain-lightning/motion01.png",
+    "status": 200
+  },
+  {
+    "key": "ice-lightning-mage/frames/chain-lightning/motion02.png",
+    "status": 200
+  },
+  {
+    "key": "ice-lightning-mage/frames/chain-lightning/motion03.png",
+    "status": 200
+  },
+  {
+    "key": "ice-lightning-mage/frames/chain-lightning/motion04.png",
+    "status": 200
+  },
+  {
+    "key": "ice-lightning-mage/frames/chain-lightning/motion05.png",
+    "status": 200
+  },
+  {
+    "key": "ice-lightning-mage/frames/wait/motion01.png",
+    "status": 200
+  },
+  {
+    "key": "ice-lightning-mage/frames/wait/motion02.png",
+    "status": 200
+  },
+  {
+    "key": "ice-lightning-mage/frames/wait/motion03.png",
+    "status": 200
+  },
+  {
+    "key": "hero/frames/enraged-raging-blow/motion01.png",
+    "status": 200
+  },
+  {
+    "key": "hero/frames/enraged-raging-blow/motion02.png",
+    "status": 200
+  },
+  {
+    "key": "hero/frames/enraged-raging-blow/motion03.png",
+    "status": 200
+  },
+  {
+    "key": "hero/frames/enraged-raging-blow/motion04.png",
+    "status": 200
+  },
+  {
+    "key": "hero/frames/enraged-raging-blow/motion05.png",
+    "status": 200
+  },
+  {
+    "key": "hero/frames/enraged-raging-blow/motion06.png",
+    "status": 200
+  },
+  {
+    "key": "hero/frames/enraged-raging-blow/motion07.png",
+    "status": 200
+  },
+  {
+    "key": "hero/frames/raging-blow/motion01.png",
+    "status": 200
+  },
+  {
+    "key": "hero/frames/raging-blow/motion02.png",
+    "status": 200
+  },
+  {
+    "key": "hero/frames/raging-blow/motion03.png",
+    "status": 200
+  },
+  {
+    "key": "hero/frames/raging-blow/motion04.png",
+    "status": 200
+  },
+  {
+    "key": "hero/frames/raging-blow/motion05.png",
+    "status": 200
+  },
+  {
+    "key": "hero/frames/raging-blow/motion06.png",
+    "status": 200
+  },
+  {
+    "key": "hero/frames/raging-blow/motion07.png",
+    "status": 200
+  },
+  {
+    "key": "hero/frames/raging-blow/motion08.png",
+    "status": 200
+  },
+  {
+    "key": "hero/frames/wait/motion01.png",
+    "status": 200
+  },
+  {
+    "key": "hero/frames/wait/motion02.png",
+    "status": 200
+  },
+  {
+    "key": "hero/frames/wait/motion03.png",
+    "status": 200
+  }
+]

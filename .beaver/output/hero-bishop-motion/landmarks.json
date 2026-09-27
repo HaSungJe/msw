@@ -1,0 +1,20 @@
+{
+ "wait/motion01.png": [487, 635],
+ "raging-blow/motion01.png": [475, 598, 724, 816],
+ "raging-blow/motion03.png": [409, 644, 698, 790],
+ "raging-blow/motion06.png": [446, 610, 283, 814],
+ "raging-blow/motion07.png": [407, 648, 345, 834],
+ "enraged-raging-blow/motion03.png": [431, 555],
+ "enraged-raging-blow/motion04.png": [420, 627],
+ "wait/motion02.png": [464, 650],
+ "wait/motion03.png": [487, 635],
+ "raging-blow/motion02.png": [402, 636, 830, 824],
+ "raging-blow/motion04.png": [470, 615, 655, 843],
+ "raging-blow/motion05.png": [476, 623, 577, 865],
+ "raging-blow/motion08.png": [400, 580],
+ "enraged-raging-blow/motion01.png": [416, 600],
+ "enraged-raging-blow/motion02.png": [433, 510],
+ "enraged-raging-blow/motion05.png": [387, 683],
+ "enraged-raging-blow/motion06.png": [365, 635],
+ "enraged-raging-blow/motion07.png": [406, 610]
+}

@@ -1,0 +1,9 @@
+{
+  "id": "phantom",
+  "n": 2,
+  "source": "C:/Users/timec/.codex/generated_images/01a0dbf3-5094-7520-bfc7-f24b6496f5e5/exec-235f7331-7798-4b10-8824-9728582c4138.png",
+  "prompt": "Use case: identity-preserve. Edit target Image1 ONLY. This is idle breathing frame 2 for phantom. Preserve every face/hair/costume/weapon detail and SAME natural idle stance and physical size. Change ONLY: Tiny INHALE: chest/shoulders lift by only about 1% of head height, outer cloth hems curve subtly outward. Keep head and legs stationary.\nABSOLUTELY keep identical head size, face expression, hat/hair shape, canvas framing, two boot sole coordinates, knee angles and feet distance. No whole-body translation/scaling or pose change. No big arm motion; fingers grip weapon at the SAME exact spot. Original weapon length/angle. For Phantom cane: closed fist around neck below red jewel, diagonally held above floor exactly as Image1; never palm on top, no walking-stick stance. Original low card hand unchanged.\nSubtle cloth breathing must look like the same animation character on next frame, not another illustration. All props low/relaxed, no attack guard. Single transparent PNG, no text/effects/shadow/clouds/glow, full original extent.",
+  "refs": [
+    "C:/Users/timec/.codex/generated_images/01a0dbf3-5094-7520-bfc7-f24b6496f5e5/exec-badc1583-8a3a-4983-9134-d678dec5e197.png"
+  ]
+}

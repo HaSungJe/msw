@@ -1,0 +1,130 @@
+[
+  {
+    "key": "paladin/frames/divine-charge/motion01.png",
+    "status": 200
+  },
+  {
+    "key": "paladin/frames/divine-charge/motion02.png",
+    "status": 200
+  },
+  {
+    "key": "paladin/frames/divine-charge/motion03.png",
+    "status": 200
+  },
+  {
+    "key": "paladin/frames/divine-charge/motion04.png",
+    "status": 200
+  },
+  {
+    "key": "paladin/frames/divine-charge/motion05.png",
+    "status": 200
+  },
+  {
+    "key": "paladin/frames/divine-charge/motion06.png",
+    "status": 200
+  },
+  {
+    "key": "paladin/frames/sanctuary/motion01.png",
+    "status": 200
+  },
+  {
+    "key": "paladin/frames/sanctuary/motion02.png",
+    "status": 200
+  },
+  {
+    "key": "paladin/frames/sanctuary/motion03.png",
+    "status": 200
+  },
+  {
+    "key": "paladin/frames/sanctuary/motion04.png",
+    "status": 200
+  },
+  {
+    "key": "paladin/frames/sanctuary/motion05.png",
+    "status": 200
+  },
+  {
+    "key": "paladin/frames/sanctuary/motion06.png",
+    "status": 200
+  },
+  {
+    "key": "paladin/frames/wait/motion01.png",
+    "status": 200
+  },
+  {
+    "key": "paladin/frames/wait/motion02.png",
+    "status": 200
+  },
+  {
+    "key": "paladin/frames/wait/motion03.png",
+    "status": 200
+  },
+  {
+    "key": "dark-knight/frames/dragon-roar/motion01.png",
+    "status": 200
+  },
+  {
+    "key": "dark-knight/frames/dragon-roar/motion02.png",
+    "status": 200
+  },
+  {
+    "key": "dark-knight/frames/dragon-roar/motion03.png",
+    "status": 200
+  },
+  {
+    "key": "dark-knight/frames/dragon-roar/motion04.png",
+    "status": 200
+  },
+  {
+    "key": "dark-knight/frames/dragon-roar/motion05.png",
+    "status": 200
+  },
+  {
+    "key": "dark-knight/frames/dragon-roar/motion06.png",
+    "status": 200
+  },
+  {
+    "key": "dark-knight/frames/spear-buster/motion01.png",
+    "status": 200
+  },
+  {
+    "key": "dark-knight/frames/spear-buster/motion02.png",
+    "status": 200
+  },
+  {
+    "key": "dark-knight/frames/spear-buster/motion03.png",
+    "status": 200
+  },
+  {
+    "key": "dark-knight/frames/spear-buster/motion04.png",
+    "status": 200
+  },
+  {
+    "key": "dark-knight/frames/spear-buster/motion05.png",
+    "status": 200
+  },
+  {
+    "key": "dark-knight/frames/spear-buster/motion06.png",
+    "status": 200
+  },
+  {
+    "key": "dark-knight/frames/spear-buster/motion07.png",
+    "status": 200
+  },
+  {
+    "key": "dark-knight/frames/spear-buster/motion08.png",
+    "status": 200
+  },
+  {
+    "key": "dark-knight/frames/wait/motion01.png",
+    "status": 200
+  },
+  {
+    "key": "dark-knight/frames/wait/motion02.png",
+    "status": 200
+  },
+  {
+    "key": "dark-knight/frames/wait/motion03.png",
+    "status": 200
+  }
+]

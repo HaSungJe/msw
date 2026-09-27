@@ -1,0 +1,15 @@
+{
+  "id": "shadower",
+  "skill": "wait",
+  "n": 3,
+  "pose": "Small exhalation: preserve exact idle pose and planted feet, relax shoulders subtly lower, cape/scarf/hair tips settle slightly inward. Same eyes and expression, no stance change.",
+  "key": "shadower--wait--03",
+  "prompt": "Use case: identity-preserve animation pose edit. Generate ONE transparent PNG animation frame, not a sheet.\nImage1 EDIT TARGET and exact framing/scale master: shadower character on 576x576 square canvas. Image2 approved identity/costume master, do not copy its larger framing. Image3 Bishop style/anatomy master, do not copy its clothes/hair/staff.\nKeep character SAME small on-canvas size as image1, with generous empty transparent space above. Do not zoom in or fill canvas. In 576-unit canvas coordinates, anatomical head crown-to-chin147units, feet ground y512, centerx288. Underlying standing body height338units and2.3heads, ignoring hats/feathers/tall hair/weapon. Pose may bend knees, never lengthen limbs/boots. Preserve exact face, hair, eye color, all clothing panels, jewelry, weapon design, clean line weight and soft cel shading.\nFrame 3 for wait: Small exhalation: preserve exact idle pose and planted feet, relax shoulders subtly lower, cape/scarf/hair tips settle slightly inward. Same eyes and expression, no stance change.\n\n\nOnly body pose and subtle expression changes allowed. Entire hair/hat/weapon/cape/boots visible with transparent margins. No extra limbs or weapons, no blur or motion trails, no aura/projectiles/glows/environment, no text/numbers/grid/border/shadow. Feet grounded. Actual transparent background. Same fine polished 2D SD game illustration as Bishop, no pixel art. Output ONE frame.",
+  "refs": [
+    "C:/workspace/msw/.beaver/output/five-class-motion/base/shadower.png",
+    "C:/workspace/msw/assets/design/characters/shadower/concept.png",
+    "C:/workspace/msw/assets/design/characters/bishop/frames/wait/motion01.png"
+  ],
+  "source": "C:/Users/timec/.codex/generated_images/01a0dbf3-5094-7520-bfc7-f24b6496f5e5/exec-6c306e3c-c87b-492b-867b-e135ce65356a.png",
+  "state": "generated-awaiting-QA"
+}

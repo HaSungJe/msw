@@ -1,0 +1,164 @@
+[
+  {
+    "key": "enraged-raging-blow/motion01.png",
+    "file": "C:/workspace/msw/assets/design/characters/hero/frames/enraged-raging-blow/motion01.png",
+    "oldRuid": "19947fbd964e4b489c0001801974c64b",
+    "name": "RtsHeroBishop_Enrage01",
+    "contentLength": 171382,
+    "sha256": "15ac6f56496450ea34d3db1bb4e1f692fc01a2a7d9fedbd1dd37d3eb4de3e64a",
+    "ruid": "b64a6805781448eb875ea1d4629f3bc5"
+  },
+  {
+    "key": "enraged-raging-blow/motion02.png",
+    "file": "C:/workspace/msw/assets/design/characters/hero/frames/enraged-raging-blow/motion02.png",
+    "oldRuid": "5dd68521050d49ff93c3b857f5d6b7dd",
+    "name": "RtsHeroBishop_Enrage02",
+    "contentLength": 179264,
+    "sha256": "c382ff058e390e0f76dad2fced4c85e0e501fc228be00ba3c90a5b9cbb7dd3c2",
+    "ruid": "77faeca61b3e4bec80ec0a66faee52e6"
+  },
+  {
+    "key": "enraged-raging-blow/motion03.png",
+    "file": "C:/workspace/msw/assets/design/characters/hero/frames/enraged-raging-blow/motion03.png",
+    "oldRuid": "5262f569ef4841bab7407ba0681ff9ad",
+    "name": "RtsHeroBishop_Enrage03",
+    "contentLength": 185021,
+    "sha256": "ba2a1f38d1ce6c88a914e48cf7d5ccaf64588f2264a1f3eb6f7e89b0f4d09b92",
+    "ruid": "29bc48d64e1f4f78bb56cc0948dda058"
+  },
+  {
+    "key": "enraged-raging-blow/motion04.png",
+    "file": "C:/workspace/msw/assets/design/characters/hero/frames/enraged-raging-blow/motion04.png",
+    "oldRuid": "31a5f27e11574ed2950c4bc485a9b24c",
+    "name": "RtsHeroBishop_Enrage04",
+    "contentLength": 169863,
+    "sha256": "050395bbd1a6f772d4ef0d7f643e44b6526fe5a2b48034e59414b59683f7a1e2",
+    "ruid": "f8199840321d4eed9bfd3395afcc8a77"
+  },
+  {
+    "key": "enraged-raging-blow/motion05.png",
+    "file": "C:/workspace/msw/assets/design/characters/hero/frames/enraged-raging-blow/motion05.png",
+    "oldRuid": "4b8cf6b5cc1d49838435b413b751d9f3",
+    "name": "RtsHeroBishop_Enrage05",
+    "contentLength": 190233,
+    "sha256": "fa9bad882a59a070cd1c64282c2c3c4005790ae857d543e9c4fdd6d085901ac9",
+    "ruid": "591f6cf9adb34a099a3f435b2e40dbc4"
+  },
+  {
+    "key": "enraged-raging-blow/motion06.png",
+    "file": "C:/workspace/msw/assets/design/characters/hero/frames/enraged-raging-blow/motion06.png",
+    "oldRuid": "a4290f2e136e4354b3452efbef719f5c",
+    "name": "RtsHeroBishop_Enrage06",
+    "contentLength": 188359,
+    "sha256": "6b21677392e6f881f7099c285c84a4cb82528e10ef7a0a4e6c7c78bb36ca0ffb",
+    "ruid": "8ce4f50c18a04c93b060320e30f68858"
+  },
+  {
+    "key": "enraged-raging-blow/motion07.png",
+    "file": "C:/workspace/msw/assets/design/characters/hero/frames/enraged-raging-blow/motion07.png",
+    "oldRuid": "9809cb50b85c451caea7dc830d7f0f29",
+    "name": "RtsHeroBishop_Enrage07",
+    "contentLength": 177720,
+    "sha256": "c021d8260e5b79abffdd4108f627998cebe1f1f41097704bce86f4c236b0be84",
+    "ruid": "a992dea232544bdd972d0978a94b25fd"
+  },
+  {
+    "key": "raging-blow/motion03.png",
+    "file": "C:/workspace/msw/assets/design/characters/hero/frames/raging-blow/motion03.png",
+    "oldRuid": "c36993a5db9a46bc9b8a77001c76041c",
+    "name": "RtsHeroBishop_Rage03",
+    "contentLength": 173621,
+    "sha256": "efec461d13b2c81600879ae9633a03f8da21caa62c717cfd0930341200d7eed6",
+    "ruid": "1b789ed0b21f404297592ca1bd0666af"
+  },
+  {
+    "key": "raging-blow/motion01.png",
+    "file": "C:/workspace/msw/assets/design/characters/hero/frames/raging-blow/motion01.png",
+    "oldRuid": "96bdf836b6514461a69bda96870657b5",
+    "name": "RtsHeroBishop_Rage01",
+    "contentLength": 147584,
+    "sha256": "1956fa9375a6c1ad59b122d8d49eb48c46b83bc8ca5e9e2c2608a656efa960d7",
+    "ruid": "aac52a1acd1f414d9aa9f68167aeb2d0"
+  },
+  {
+    "key": "raging-blow/motion02.png",
+    "file": "C:/workspace/msw/assets/design/characters/hero/frames/raging-blow/motion02.png",
+    "oldRuid": "c7dda93ed6234323a85b19a2a23f553c",
+    "name": "RtsHeroBishop_Rage02",
+    "contentLength": 163867,
+    "sha256": "da7597f880311b629dca86e2af4abf69222b18a87b1ff460b9bd97fbdfe75df5",
+    "ruid": "a302b38cd51543059e46a3162b209b02"
+  },
+  {
+    "key": "raging-blow/motion04.png",
+    "file": "C:/workspace/msw/assets/design/characters/hero/frames/raging-blow/motion04.png",
+    "oldRuid": "ccdf5af88b3e4bfaab28fb55701c59ca",
+    "name": "RtsHeroBishop_Rage04",
+    "contentLength": 158369,
+    "sha256": "cbf5293cd1af0bd6c40a54315712748b3808c8818c9f413c10c7f9e14e89dd34",
+    "ruid": "29beedf569f7412483c02c99e0e5fe2e"
+  },
+  {
+    "key": "raging-blow/motion05.png",
+    "file": "C:/workspace/msw/assets/design/characters/hero/frames/raging-blow/motion05.png",
+    "oldRuid": "db3e2b531cd5489d91aa25419b8416d3",
+    "name": "RtsHeroBishop_Rage05",
+    "contentLength": 159033,
+    "sha256": "bc9f0a5ee02da3ffc9a9485ef2298d9277002080e44a408b63b46ba4f36baee2",
+    "ruid": "cdd8a42144c949979ef9a7d1b0fa9e51"
+  },
+  {
+    "key": "raging-blow/motion06.png",
+    "file": "C:/workspace/msw/assets/design/characters/hero/frames/raging-blow/motion06.png",
+    "oldRuid": "b9ce7c452ae442998d92be331966d7d5",
+    "name": "RtsHeroBishop_Rage06",
+    "contentLength": 172460,
+    "sha256": "aad5cdb8d620381208c17a83d0e14a52dde9eb12c5b64b43c7c4c5af8d68db98",
+    "ruid": "be37495f3da24fa1ba32404daeb1c998"
+  },
+  {
+    "key": "raging-blow/motion07.png",
+    "file": "C:/workspace/msw/assets/design/characters/hero/frames/raging-blow/motion07.png",
+    "oldRuid": "e2414958bfab429fbc772c36e45a32a1",
+    "name": "RtsHeroBishop_Rage07",
+    "contentLength": 165867,
+    "sha256": "65b97c8d19eb93808ff7a80bdf27bdf880c91f1298ddfea13c07a71f423e495e",
+    "ruid": "bfe48ef4838c4d16a3f86ee914cf9440"
+  },
+  {
+    "key": "raging-blow/motion08.png",
+    "file": "C:/workspace/msw/assets/design/characters/hero/frames/raging-blow/motion08.png",
+    "oldRuid": "5d3b537c9e064132889202ef7baaa2d3",
+    "name": "RtsHeroBishop_Rage08",
+    "contentLength": 162085,
+    "sha256": "acbef2e23599c5616d885d3e5981a1014c7790eeda91f740c8be04e286f83741",
+    "ruid": "b9daa2a09e874aeea2a82b15cfb328ca"
+  },
+  {
+    "key": "wait/motion02.png",
+    "file": "C:/workspace/msw/assets/design/characters/hero/frames/wait/motion02.png",
+    "oldRuid": "0ba0aefe060541e4aa324413649015ac",
+    "name": "RtsHeroBishop_Wait02",
+    "contentLength": 200694,
+    "sha256": "0d18ad1ae357e0e15f5d71d652160229e4b07ab0aca87d25ce5ef61029a3139d",
+    "ruid": "66beab16ed794e27b49a33ee52a82b18"
+  },
+  {
+    "key": "wait/motion03.png",
+    "file": "C:/workspace/msw/assets/design/characters/hero/frames/wait/motion03.png",
+    "oldRuid": "7b1d083de256470db661146dc9366b48",
+    "name": "RtsHeroBishop_Wait03",
+    "contentLength": 188800,
+    "sha256": "2013ecdb94f961b1b33f18ff340ee177e6ebde97216beeb0bf4448793c79c6aa",
+    "ruid": "f5ce5824f3a24e069ec0a523028c7f79"
+  },
+  {
+    "key": "wait/motion01.png",
+    "file": "C:/workspace/msw/assets/design/characters/hero/frames/wait/motion01.png",
+    "oldRuid": "29dab38a22b744279674cbe2632b73d0",
+    "name": "RtsHeroBishop_Wait01",
+    "contentLength": 188108,
+    "sha256": "73b02100ae79d5f71d76947fec9ee343fff5f75c8060fff4c7a3de9a86e04e23",
+    "ruid": "6142e6907e054a4c86bda1719698af21"
+  }
+]

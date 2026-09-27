@@ -1,0 +1,27 @@
+{
+  "checkedAt": "2026-09-27",
+  "registered": 31,
+  "loaded": 31,
+  "buildErrors": [],
+  "runtimeErrors": [],
+  "positiveLogs": [
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-27T10:46:46",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "[BISHOP_RATIO] loaded=31/31 mappings_or_timing_errors=0",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 19,
+          "codeBlockFileId": null
+        }
+      ]
+    }
+  ],
+  "scope": "Maker restarted; resource table and durations verified; all31 sprites loaded. Full visual action playback not automated."
+}

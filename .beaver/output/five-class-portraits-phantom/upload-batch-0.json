@@ -1,0 +1,26 @@
+[
+  {
+    "key": "phantom/wait/01",
+    "file": "C:\\workspace\\msw\\assets\\design\\characters\\phantom\\frames\\wait\\motion01.png",
+    "name": "RtsPhantom_wait01",
+    "size": 293720,
+    "sha256": "7cdfe3c6c1d1da25d417841c9905628b7197c4e38d380edbef1b5e6f0e4605b8",
+    "ruid": "283726be0d0e4cf7baf54840aae336f6"
+  },
+  {
+    "key": "phantom/wait/02",
+    "file": "C:\\workspace\\msw\\assets\\design\\characters\\phantom\\frames\\wait\\motion02.png",
+    "name": "RtsPhantom_wait02",
+    "size": 300966,
+    "sha256": "319413c63c4bda4187c3c67138bb390e0a2b5be86ca0756556503916b1b0b6f3",
+    "ruid": "0bfd511879954157ba0dbd9bfb8003d9"
+  },
+  {
+    "key": "phantom/wait/03",
+    "file": "C:\\workspace\\msw\\assets\\design\\characters\\phantom\\frames\\wait\\motion03.png",
+    "name": "RtsPhantom_wait03",
+    "size": 295786,
+    "sha256": "3869d5f5cba57299dc0f8626467d695130c1bd1df6dc57642f787527c1c7c1fd",
+    "ruid": "862241619fc444eba0449187c43732a6"
+  }
+]

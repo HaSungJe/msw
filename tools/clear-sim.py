@@ -75,8 +75,9 @@ class Run:
             p = PRISM_OF[u.job]
             if p not in self.owned: need.append(p)
         return need
-    def prism_event(self, no):
-        o = offer(self.owned, self.rng)
+    def prism_event(self, no, pick_all=False):
+        # 자쿰 보상(pick_all)은 아직 없는 프리즘 전체에서 선택, 나머지(시그너스·루시드·뽑기)는 가중치 3장(2026-09-27 — 게임 RtsAugmentLogic.OnBossDown)
+        o = [k for k in POOL if k in CORE or k not in self.owned] if pick_all else offer(self.owned, self.rng)
         need = self.need(no)
         # 우선: 1티어 > 서포터(홀리 → 디바인) > 2티어
         order = [PRISM_OF[self.units[0].job], "holy", "dp"] + [PRISM_OF[u.job] for u in self.units if u.role == "t2"]
@@ -159,7 +160,7 @@ def one_run(t1, t2s, G, rng):
                 if run.buy_prisms < 2: run.pity += 2
                 run.give_card(g, no, lv_role)
         caps[no] = capacity(run, s, G)
-        if no in GUAR_PRISM: run.prism_event(no)   # 처치 뒤 3택1(다음 보스부터)
+        if no in GUAR_PRISM: run.prism_event(no, no == GUAR_PRISM[0])   # 처치 뒤(다음 보스부터) — 자쿰은 전체에서 선택, 나머지 3택1
     return caps
 
 def boss_hp(s): return float(s["hp"]) * len(s["mobs"])

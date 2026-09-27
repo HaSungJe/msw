@@ -1,0 +1,11 @@
+{
+  "key": "ice-lightning-mage/frames/chain-lightning/motion05.png",
+  "id": "ice-lightning-mage",
+  "rel": "frames/chain-lightning/motion05.png",
+  "original": "C:/workspace/msw/.beaver/output/bishop-standard/originals/ice-lightning-mage/frames/chain-lightning/motion05.png",
+  "width": 704,
+  "height": 704,
+  "originalSha256": "c8d62b3d0aff6a0ed7ba9b4a4503de9aab4545ebb0bc255dc470b35729df1685",
+  "generated": "C:/Users/timec/.codex/generated_images/01a0dbf3-5094-7520-bfc7-f24b6496f5e5/exec-08a06579-4a59-4cd7-a9f3-f45fffcdf31e.png",
+  "prompt": "Edit IMAGE1 existing ice mage frames/chain-lightning/motion05.png. IMAGE2 is same character corrected concept: match ONLY its2.30-head anatomy and character identity. Preserve original image1 pose, precise face eyes blue hair and rendering/color palette, staff/book/costume details and gesture. No style transfer or redesign. Preserve exact action stance, raised staff angle and hands from IMAGE1; short articulated legs and compact torso per image2, with pose bending maintained. Single complete full-body frame, no VFX, no text, transparent square. Generous margins and no clipping."
+}

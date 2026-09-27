@@ -1,0 +1,126 @@
+{
+  "tasks": [
+    {
+      "key": "wait/motion01.png",
+      "file": "C:/workspace/msw/assets/design/characters/hero/frames/wait/motion01.png",
+      "backup": "C:\\workspace\\msw\\.beaver\\output\\hero-bishop-motion/originals/wait/motion01.png",
+      "size": 576
+    },
+    {
+      "key": "wait/motion02.png",
+      "file": "C:/workspace/msw/assets/design/characters/hero/frames/wait/motion02.png",
+      "backup": "C:\\workspace\\msw\\.beaver\\output\\hero-bishop-motion/originals/wait/motion02.png",
+      "size": 576
+    },
+    {
+      "key": "wait/motion03.png",
+      "file": "C:/workspace/msw/assets/design/characters/hero/frames/wait/motion03.png",
+      "backup": "C:\\workspace\\msw\\.beaver\\output\\hero-bishop-motion/originals/wait/motion03.png",
+      "size": 576
+    },
+    {
+      "key": "raging-blow/motion01.png",
+      "file": "C:/workspace/msw/assets/design/characters/hero/frames/raging-blow/motion01.png",
+      "backup": "C:\\workspace\\msw\\.beaver\\output\\hero-bishop-motion/originals/raging-blow/motion01.png",
+      "size": 704
+    },
+    {
+      "key": "raging-blow/motion02.png",
+      "file": "C:/workspace/msw/assets/design/characters/hero/frames/raging-blow/motion02.png",
+      "backup": "C:\\workspace\\msw\\.beaver\\output\\hero-bishop-motion/originals/raging-blow/motion02.png",
+      "size": 704
+    },
+    {
+      "key": "raging-blow/motion03.png",
+      "file": "C:/workspace/msw/assets/design/characters/hero/frames/raging-blow/motion03.png",
+      "backup": "C:\\workspace\\msw\\.beaver\\output\\hero-bishop-motion/originals/raging-blow/motion03.png",
+      "size": 704
+    },
+    {
+      "key": "raging-blow/motion04.png",
+      "file": "C:/workspace/msw/assets/design/characters/hero/frames/raging-blow/motion04.png",
+      "backup": "C:\\workspace\\msw\\.beaver\\output\\hero-bishop-motion/originals/raging-blow/motion04.png",
+      "size": 704
+    },
+    {
+      "key": "raging-blow/motion05.png",
+      "file": "C:/workspace/msw/assets/design/characters/hero/frames/raging-blow/motion05.png",
+      "backup": "C:\\workspace\\msw\\.beaver\\output\\hero-bishop-motion/originals/raging-blow/motion05.png",
+      "size": 704
+    },
+    {
+      "key": "raging-blow/motion06.png",
+      "file": "C:/workspace/msw/assets/design/characters/hero/frames/raging-blow/motion06.png",
+      "backup": "C:\\workspace\\msw\\.beaver\\output\\hero-bishop-motion/originals/raging-blow/motion06.png",
+      "size": 704
+    },
+    {
+      "key": "raging-blow/motion07.png",
+      "file": "C:/workspace/msw/assets/design/characters/hero/frames/raging-blow/motion07.png",
+      "backup": "C:\\workspace\\msw\\.beaver\\output\\hero-bishop-motion/originals/raging-blow/motion07.png",
+      "size": 704
+    },
+    {
+      "key": "raging-blow/motion08.png",
+      "file": "C:/workspace/msw/assets/design/characters/hero/frames/raging-blow/motion08.png",
+      "backup": "C:\\workspace\\msw\\.beaver\\output\\hero-bishop-motion/originals/raging-blow/motion08.png",
+      "size": 704
+    },
+    {
+      "key": "enraged-raging-blow/motion01.png",
+      "file": "C:/workspace/msw/assets/design/characters/hero/frames/enraged-raging-blow/motion01.png",
+      "backup": "C:\\workspace\\msw\\.beaver\\output\\hero-bishop-motion/originals/enraged-raging-blow/motion01.png",
+      "size": 704
+    },
+    {
+      "key": "enraged-raging-blow/motion02.png",
+      "file": "C:/workspace/msw/assets/design/characters/hero/frames/enraged-raging-blow/motion02.png",
+      "backup": "C:\\workspace\\msw\\.beaver\\output\\hero-bishop-motion/originals/enraged-raging-blow/motion02.png",
+      "size": 704
+    },
+    {
+      "key": "enraged-raging-blow/motion03.png",
+      "file": "C:/workspace/msw/assets/design/characters/hero/frames/enraged-raging-blow/motion03.png",
+      "backup": "C:\\workspace\\msw\\.beaver\\output\\hero-bishop-motion/originals/enraged-raging-blow/motion03.png",
+      "size": 704
+    },
+    {
+      "key": "enraged-raging-blow/motion04.png",
+      "file": "C:/workspace/msw/assets/design/characters/hero/frames/enraged-raging-blow/motion04.png",
+      "backup": "C:\\workspace\\msw\\.beaver\\output\\hero-bishop-motion/originals/enraged-raging-blow/motion04.png",
+      "size": 704
+    },
+    {
+      "key": "enraged-raging-blow/motion05.png",
+      "file": "C:/workspace/msw/assets/design/characters/hero/frames/enraged-raging-blow/motion05.png",
+      "backup": "C:\\workspace\\msw\\.beaver\\output\\hero-bishop-motion/originals/enraged-raging-blow/motion05.png",
+      "size": 704
+    },
+    {
+      "key": "enraged-raging-blow/motion06.png",
+      "file": "C:/workspace/msw/assets/design/characters/hero/frames/enraged-raging-blow/motion06.png",
+      "backup": "C:\\workspace\\msw\\.beaver\\output\\hero-bishop-motion/originals/enraged-raging-blow/motion06.png",
+      "size": 704
+    },
+    {
+      "key": "enraged-raging-blow/motion07.png",
+      "file": "C:/workspace/msw/assets/design/characters/hero/frames/enraged-raging-blow/motion07.png",
+      "backup": "C:\\workspace\\msw\\.beaver\\output\\hero-bishop-motion/originals/enraged-raging-blow/motion07.png",
+      "size": 704
+    }
+  ],
+  "refs": [
+    {
+      "file": "C:/workspace/msw/assets/design/characters/hero/concept.png",
+      "sha256": "18ef6139dfe18fac5fd9644df0b79ca41e6baafac02e333b368035e3f9970122"
+    },
+    {
+      "file": "C:/workspace/msw/assets/design/characters/bishop/frames/wait/motion01.png",
+      "sha256": "7949a8bdfd86a72d5ef45c67856df447f4c2e319eb5e9a6978d8800648e45849"
+    },
+    {
+      "file": "C:/workspace/msw/assets/design/characters/bishop/frames/angel-ray/motion03.png",
+      "sha256": "ce5ccc4af941fcd2fd22ce979a0f53698734217b8ec1517f8bf8c4dc53ca5d51"
+    }
+  ]
+}

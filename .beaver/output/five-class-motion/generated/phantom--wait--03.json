@@ -1,0 +1,15 @@
+{
+  "id": "phantom",
+  "skill": "wait",
+  "n": 3,
+  "pose": "Small exhalation: preserve exact idle pose and planted feet, relax shoulders subtly lower, cape/scarf/hair tips settle slightly inward. Same eyes and expression, no stance change.",
+  "key": "phantom--wait--03",
+  "prompt": "Use case: identity-preserve animation pose edit. Generate ONE transparent PNG animation frame, not a sheet.\nImage1 EDIT TARGET and exact framing/scale master: phantom character on 576x576 square canvas. Image2 approved identity/costume master, do not copy its larger framing. Image3 Bishop style/anatomy master, do not copy its clothes/hair/staff.\nKeep character SAME small on-canvas size as image1, with generous empty transparent space above. Do not zoom in or fill canvas. In 576-unit canvas coordinates, anatomical head crown-to-chin147units, feet ground y512, centerx288. Underlying standing body height338units and2.3heads, ignoring hats/feathers/tall hair/weapon. Pose may bend knees, never lengthen limbs/boots. Preserve exact face, hair, eye color, all clothing panels, jewelry, weapon design, clean line weight and soft cel shading.\nFrame 3 for wait: Small exhalation: preserve exact idle pose and planted feet, relax shoulders subtly lower, cape/scarf/hair tips settle slightly inward. Same eyes and expression, no stance change.\n\nPreserve approved LAST concept's compact body and huge ornate hat. Three-card fan uses wine-red/brown card backs, gold double borders, gold corner scrollwork and central gold star. Original white/blue/gold cape and red-jewel cane. Rotation must turn actual body and head in 3D, not tilt a flat image. Never add faces on rear view.\nOnly body pose and subtle expression changes allowed. Entire hair/hat/weapon/cape/boots visible with transparent margins. No extra limbs or weapons, no blur or motion trails, no aura/projectiles/glows/environment, no text/numbers/grid/border/shadow. Feet grounded. Actual transparent background. Same fine polished 2D SD game illustration as Bishop, no pixel art. Output ONE frame.",
+  "refs": [
+    "C:/workspace/msw/.beaver/output/five-class-motion/base/phantom.png",
+    "C:/workspace/msw/assets/design/characters/phantom/concept.png",
+    "C:/workspace/msw/assets/design/characters/bishop/frames/wait/motion01.png"
+  ],
+  "source": "C:/Users/timec/.codex/generated_images/01a0dbf3-5094-7520-bfc7-f24b6496f5e5/exec-2cd7cc83-3fb5-48aa-b1e6-da92ef301c95.png",
+  "state": "generated-awaiting-QA"
+}

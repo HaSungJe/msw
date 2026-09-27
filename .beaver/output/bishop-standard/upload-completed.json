@@ -1,0 +1,46 @@
+[
+  {
+    "key": "hero/frames/raging-blow/motion01.png",
+    "ruid": "96bdf836b6514461a69bda96870657b5"
+  },
+  {
+    "key": "hero/frames/raging-blow/motion02.png",
+    "ruid": "c7dda93ed6234323a85b19a2a23f553c"
+  },
+  {
+    "key": "hero/frames/raging-blow/motion03.png",
+    "ruid": "c36993a5db9a46bc9b8a77001c76041c"
+  },
+  {
+    "key": "hero/frames/raging-blow/motion04.png",
+    "ruid": "ccdf5af88b3e4bfaab28fb55701c59ca"
+  },
+  {
+    "key": "hero/frames/raging-blow/motion05.png",
+    "ruid": "db3e2b531cd5489d91aa25419b8416d3"
+  },
+  {
+    "key": "hero/frames/raging-blow/motion06.png",
+    "ruid": "b9ce7c452ae442998d92be331966d7d5"
+  },
+  {
+    "key": "hero/frames/raging-blow/motion07.png",
+    "ruid": "e2414958bfab429fbc772c36e45a32a1"
+  },
+  {
+    "key": "hero/frames/raging-blow/motion08.png",
+    "ruid": "5d3b537c9e064132889202ef7baaa2d3"
+  },
+  {
+    "key": "hero/frames/wait/motion01.png",
+    "ruid": "29dab38a22b744279674cbe2632b73d0"
+  },
+  {
+    "key": "hero/frames/wait/motion02.png",
+    "ruid": "0ba0aefe060541e4aa324413649015ac"
+  },
+  {
+    "key": "hero/frames/wait/motion03.png",
+    "ruid": "7b1d083de256470db661146dc9366b48"
+  }
+]

@@ -1,0 +1,15 @@
+{
+  "id": "shadower",
+  "skill": "meso-explosion",
+  "n": 5,
+  "pose": "Recovery: free arm lowers, dagger returns to familiar diagonal chest guard, original face and stance.",
+  "key": "shadower--meso-explosion--05",
+  "prompt": "Use case: identity-preserve animation pose edit. Generate ONE transparent PNG animation frame, not a sheet.\nImage1 EDIT TARGET and exact framing/scale master: shadower character on 704x704 square canvas. Image2 approved identity/costume master, do not copy its larger framing. Image3 Bishop style/anatomy master, do not copy its clothes/hair/staff.\nKeep character SAME small on-canvas size as image1, with generous empty transparent space above. Do not zoom in or fill canvas. In 704-unit canvas coordinates, anatomical head crown-to-chin147units, feet ground y640, centerx352. Underlying standing body height338units and2.3heads, ignoring hats/feathers/tall hair/weapon. Pose may bend knees, never lengthen limbs/boots. Preserve exact face, hair, eye color, all clothing panels, jewelry, weapon design, clean line weight and soft cel shading.\nFrame 5 for meso-explosion: Recovery: free arm lowers, dagger returns to familiar diagonal chest guard, original face and stance.\n\n\nOnly body pose and subtle expression changes allowed. Entire hair/hat/weapon/cape/boots visible with transparent margins. No extra limbs or weapons, no blur or motion trails, no aura/projectiles/glows/environment, no text/numbers/grid/border/shadow. Feet grounded. Actual transparent background. Same fine polished 2D SD game illustration as Bishop, no pixel art. Output ONE frame.",
+  "refs": [
+    "C:/workspace/msw/.beaver/output/five-class-motion/base/shadower-attack.png",
+    "C:/workspace/msw/assets/design/characters/shadower/concept.png",
+    "C:/workspace/msw/assets/design/characters/bishop/frames/angel-ray/motion03.png"
+  ],
+  "source": "C:/Users/timec/.codex/generated_images/01a0dbf3-5094-7520-bfc7-f24b6496f5e5/exec-5fb6c168-5b14-4107-80ee-17864ed58112.png",
+  "state": "generated-awaiting-QA"
+}

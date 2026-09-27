@@ -1,0 +1,28 @@
+[
+  {
+    "key": "phantom/ring",
+    "file": "C:\\workspace\\msw\\assets\\design\\effects\\phantom-joker\\ring.png",
+    "name": "RtsPhantom_ring",
+    "size": 383760,
+    "sha256": "1dc08111b89ada24a318aadd116fdbcfdd12a51b2e82f97acb0256ef8d4eb185",
+    "ruid": "dadc8093850a445394ea6b883e89f4a8"
+  },
+  {
+    "key": "paladin/portrait",
+    "file": "C:/workspace/msw/assets/design/characters/paladin/portrait.png",
+    "name": "RtsPortrait_paladin",
+    "size": 387731,
+    "sha256": "7eea9d859ad88c9895e7aedc6f8d20556331bfc1a67631ec709c5a2a5b6b765a",
+    "source": "C:\\Users\\timec\\.codex\\generated_images\\01a0dbf3-5094-7520-bfc7-f24b6496f5e5\\exec-bfe9b021-0115-40f2-bf2e-3f6adfb331d4.png",
+    "ruid": "0e14a7ba1554474fb46cb13ab22bdbfb"
+  },
+  {
+    "key": "dark-knight/portrait",
+    "file": "C:/workspace/msw/assets/design/characters/dark-knight/portrait.png",
+    "name": "RtsPortrait_dark-knight",
+    "size": 347805,
+    "sha256": "ed89f4e24634e8aaab005cd6d1d39d0065bf3ce403fccb86cad195ecc3542bed",
+    "source": "C:\\Users\\timec\\.codex\\generated_images\\01a0dbf3-5094-7520-bfc7-f24b6496f5e5\\exec-fe5d3d13-91fc-4700-92b1-b76e68efe58f.png",
+    "ruid": "bc09a2f673ba42b6b5989e4ac39a0fc5"
+  }
+]

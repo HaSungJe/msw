@@ -1,0 +1,61 @@
+{
+  "loopDy": 0.68,
+  "loopDx": 0,
+  "rotationDegrees": 12,
+  "loopOrder": -2,
+  "characterMuzzlePixel": [
+    307,
+    222
+  ],
+  "sourceMuzzleFromPivotPixel": [
+    2,
+    92
+  ],
+  "screenshot": "C:/Users/timec/AppData/LocalLow/nexon/MapleStory Worlds\\McpScreenshots\\maker_play_20260927_120706_631.png",
+  "logs": [
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-27T12:07:02",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "BOW_MUZZLE x=0.0 y=0.34000000357628 rotation=-12.0 face=1.0 order=-2",
+      "stackTrace": [
+        {
+          "methodName": "RtsConfigLogic.Log",
+          "methodLineNum": 1,
+          "codeBlockFileId": "d37e9a35-70f8-4794-b601-8f32062cfc6c"
+        },
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 8,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-27T12:07:19",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "BOW_MUZZLE x=0.0 y=0.34000000357628 rotation=12.0 face=-1.0 order=-2",
+      "stackTrace": [
+        {
+          "methodName": "RtsConfigLogic.Log",
+          "methodLineNum": 1,
+          "codeBlockFileId": "d37e9a35-70f8-4794-b601-8f32062cfc6c"
+        },
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 8,
+          "codeBlockFileId": null
+        }
+      ]
+    }
+  ]
+}

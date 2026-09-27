@@ -1,0 +1,247 @@
+[
+  {
+    "key": "night-lord/frames/quadruple-throw/motion01.png",
+    "file": "C:\\workspace\\msw\\assets\\design\\characters\\night-lord\\frames\\quadruple-throw\\motion01.png",
+    "name": "RtsArt_night_lord_frames_quadruple_throw_motion01",
+    "size": 203027,
+    "sha256": "8c562f1b3d1d661d6896b834d2880d277a184acece79faacdb7180ad31db4ee9"
+  },
+  {
+    "key": "night-lord/frames/quadruple-throw/motion02.png",
+    "file": "C:\\workspace\\msw\\assets\\design\\characters\\night-lord\\frames\\quadruple-throw\\motion02.png",
+    "name": "RtsArt_night_lord_frames_quadruple_throw_motion02",
+    "size": 211095,
+    "sha256": "ecabe5e1086c03706191e711818e4b5f347fe3fdbb4c22ef209028eff34f5ffc"
+  },
+  {
+    "key": "night-lord/frames/quadruple-throw/motion03.png",
+    "file": "C:\\workspace\\msw\\assets\\design\\characters\\night-lord\\frames\\quadruple-throw\\motion03.png",
+    "name": "RtsArt_night_lord_frames_quadruple_throw_motion03",
+    "size": 206172,
+    "sha256": "f3d1858d05a1c9f0af7e3741cd76d7d24ac2c08c89a10bf31b18cb50e8bf24ff"
+  },
+  {
+    "key": "night-lord/frames/quadruple-throw/motion04.png",
+    "file": "C:\\workspace\\msw\\assets\\design\\characters\\night-lord\\frames\\quadruple-throw\\motion04.png",
+    "name": "RtsArt_night_lord_frames_quadruple_throw_motion04",
+    "size": 209716,
+    "sha256": "b56d0b0411afefcffdd0f11e9d657e165a55b109d6236b4e9ddb345c5c7a41d7"
+  },
+  {
+    "key": "night-lord/frames/quadruple-throw/motion05.png",
+    "file": "C:\\workspace\\msw\\assets\\design\\characters\\night-lord\\frames\\quadruple-throw\\motion05.png",
+    "name": "RtsArt_night_lord_frames_quadruple_throw_motion05",
+    "size": 195432,
+    "sha256": "ab41b5dda2c505370a559203b6fcd4bc7ffc31f3064ffaeb09b3cdb85961cbbf"
+  },
+  {
+    "key": "night-lord/frames/quadruple-throw/motion06.png",
+    "file": "C:\\workspace\\msw\\assets\\design\\characters\\night-lord\\frames\\quadruple-throw\\motion06.png",
+    "name": "RtsArt_night_lord_frames_quadruple_throw_motion06",
+    "size": 219632,
+    "sha256": "030d77c3b06d423c1ea4eb61f55ddebd327bfe936f516345be656b190b403259"
+  },
+  {
+    "key": "night-lord/frames/quadruple-throw/motion07.png",
+    "file": "C:\\workspace\\msw\\assets\\design\\characters\\night-lord\\frames\\quadruple-throw\\motion07.png",
+    "name": "RtsArt_night_lord_frames_quadruple_throw_motion07",
+    "size": 212455,
+    "sha256": "039c94719ce779f5f67e96302bec339b160e954c4c93b5228d7a76b7e1fdfe84"
+  },
+  {
+    "key": "night-lord/frames/quadruple-throw/motion08.png",
+    "file": "C:\\workspace\\msw\\assets\\design\\characters\\night-lord\\frames\\quadruple-throw\\motion08.png",
+    "name": "RtsArt_night_lord_frames_quadruple_throw_motion08",
+    "size": 214919,
+    "sha256": "54ec7f0a38e1536e002bcb51c73433a9a9edf12451b8fed5d83c8057f6b4ea12"
+  },
+  {
+    "key": "night-lord/frames/wait/motion01.png",
+    "file": "C:\\workspace\\msw\\assets\\design\\characters\\night-lord\\frames\\wait\\motion01.png",
+    "name": "RtsArt_night_lord_frames_wait_motion01",
+    "size": 179017,
+    "sha256": "4564c4c3d2d89be7cd3128e9a7f27b14231301b57166ac8ddb566aa8dc24649e"
+  },
+  {
+    "key": "night-lord/frames/wait/motion02.png",
+    "file": "C:\\workspace\\msw\\assets\\design\\characters\\night-lord\\frames\\wait\\motion02.png",
+    "name": "RtsArt_night_lord_frames_wait_motion02",
+    "size": 184204,
+    "sha256": "8fb779cde4736c68820df9985ce982c3d504716f7479db2ddf0440c8b6234ca0"
+  },
+  {
+    "key": "night-lord/frames/wait/motion03.png",
+    "file": "C:\\workspace\\msw\\assets\\design\\characters\\night-lord\\frames\\wait\\motion03.png",
+    "name": "RtsArt_night_lord_frames_wait_motion03",
+    "size": 181410,
+    "sha256": "524a907da0051fcede8d3ea25c85ba69e5f70811c5a2a7869f491b2b0016c1c0"
+  },
+  {
+    "key": "shadower/frames/blade-tornado-karma-fury/motion01.png",
+    "file": "C:\\workspace\\msw\\assets\\design\\characters\\shadower\\frames\\blade-tornado-karma-fury\\motion01.png",
+    "name": "RtsArt_shadower_frames_blade_tornado_karma_fury_motion01",
+    "size": 147505,
+    "sha256": "f380d1fb1fe53e7bbdb3b20886162db5432af86b8c8af793d9d9cbbd690a3e43"
+  },
+  {
+    "key": "shadower/frames/blade-tornado-karma-fury/motion02.png",
+    "file": "C:\\workspace\\msw\\assets\\design\\characters\\shadower\\frames\\blade-tornado-karma-fury\\motion02.png",
+    "name": "RtsArt_shadower_frames_blade_tornado_karma_fury_motion02",
+    "size": 173812,
+    "sha256": "fdba0b181641281498d8a405116892e9a0c0c547573ed2bfbeddcb4425b1c4d3"
+  },
+  {
+    "key": "shadower/frames/blade-tornado-karma-fury/motion03.png",
+    "file": "C:\\workspace\\msw\\assets\\design\\characters\\shadower\\frames\\blade-tornado-karma-fury\\motion03.png",
+    "name": "RtsArt_shadower_frames_blade_tornado_karma_fury_motion03",
+    "size": 150445,
+    "sha256": "f56a447881b2bd891760978314d269e1afe8fdd76202e0d24621fec283df5bbb"
+  },
+  {
+    "key": "shadower/frames/blade-tornado-karma-fury/motion04.png",
+    "file": "C:\\workspace\\msw\\assets\\design\\characters\\shadower\\frames\\blade-tornado-karma-fury\\motion04.png",
+    "name": "RtsArt_shadower_frames_blade_tornado_karma_fury_motion04",
+    "size": 147953,
+    "sha256": "bca387e7d240b681ca8892c6c900bde36f3da695b126a92f08b9b2f04e0abd3b"
+  },
+  {
+    "key": "shadower/frames/blade-tornado-karma-fury/motion05.png",
+    "file": "C:\\workspace\\msw\\assets\\design\\characters\\shadower\\frames\\blade-tornado-karma-fury\\motion05.png",
+    "name": "RtsArt_shadower_frames_blade_tornado_karma_fury_motion05",
+    "size": 168315,
+    "sha256": "2272e486de02a677ee245799349b6e9ebec9edf43c57d405d908936e284cda07"
+  },
+  {
+    "key": "shadower/frames/blade-tornado-karma-fury/motion06.png",
+    "file": "C:\\workspace\\msw\\assets\\design\\characters\\shadower\\frames\\blade-tornado-karma-fury\\motion06.png",
+    "name": "RtsArt_shadower_frames_blade_tornado_karma_fury_motion06",
+    "size": 153433,
+    "sha256": "77abf3bfc96f012414bc9406d162c3b2c3a6ed77bc3404a1733d884ceeb9b205"
+  },
+  {
+    "key": "shadower/frames/blade-tornado-karma-fury/motion07.png",
+    "file": "C:\\workspace\\msw\\assets\\design\\characters\\shadower\\frames\\blade-tornado-karma-fury\\motion07.png",
+    "name": "RtsArt_shadower_frames_blade_tornado_karma_fury_motion07",
+    "size": 163367,
+    "sha256": "9a7a0d56fdab49011f80522598cf3611fb471c1e05226c232e811c366c9a21f6"
+  },
+  {
+    "key": "shadower/frames/blade-tornado-karma-fury/motion08.png",
+    "file": "C:\\workspace\\msw\\assets\\design\\characters\\shadower\\frames\\blade-tornado-karma-fury\\motion08.png",
+    "name": "RtsArt_shadower_frames_blade_tornado_karma_fury_motion08",
+    "size": 177735,
+    "sha256": "4778ece10822c435fe69f1d2b66b4a8578db937f5c6b824e0f7c3c31935451e8"
+  },
+  {
+    "key": "shadower/frames/meso-explosion/motion01.png",
+    "file": "C:\\workspace\\msw\\assets\\design\\characters\\shadower\\frames\\meso-explosion\\motion01.png",
+    "name": "RtsArt_shadower_frames_meso_explosion_motion01",
+    "size": 171967,
+    "sha256": "808dc2211b7ea606d39c3a5331b80ebcd6453569dde38308c2f7a4a7cb91976b"
+  },
+  {
+    "key": "shadower/frames/meso-explosion/motion02.png",
+    "file": "C:\\workspace\\msw\\assets\\design\\characters\\shadower\\frames\\meso-explosion\\motion02.png",
+    "name": "RtsArt_shadower_frames_meso_explosion_motion02",
+    "size": 169981,
+    "sha256": "9164c75381cddde0bc86023cbe2a3a9f95e6e9bc8a100e39d0fa9946cddf5618"
+  },
+  {
+    "key": "shadower/frames/meso-explosion/motion03.png",
+    "file": "C:\\workspace\\msw\\assets\\design\\characters\\shadower\\frames\\meso-explosion\\motion03.png",
+    "name": "RtsArt_shadower_frames_meso_explosion_motion03",
+    "size": 161356,
+    "sha256": "35c8bf1e87eacb9ddb0802c6078a0e00f16281385f8eeb2bc33bcf25fe8c7383"
+  },
+  {
+    "key": "shadower/frames/meso-explosion/motion04.png",
+    "file": "C:\\workspace\\msw\\assets\\design\\characters\\shadower\\frames\\meso-explosion\\motion04.png",
+    "name": "RtsArt_shadower_frames_meso_explosion_motion04",
+    "size": 152876,
+    "sha256": "7fac42860abb815b6b8123f951ecdb965faf0245cfe2dd81cb9bccdbd357fde1"
+  },
+  {
+    "key": "shadower/frames/meso-explosion/motion05.png",
+    "file": "C:\\workspace\\msw\\assets\\design\\characters\\shadower\\frames\\meso-explosion\\motion05.png",
+    "name": "RtsArt_shadower_frames_meso_explosion_motion05",
+    "size": 168380,
+    "sha256": "0916c2c69952515bb5b59e5d9a2ce9302cb079b3bbede76babab63b35a7d4dde"
+  },
+  {
+    "key": "shadower/frames/savage-blow/motion01.png",
+    "file": "C:\\workspace\\msw\\assets\\design\\characters\\shadower\\frames\\savage-blow\\motion01.png",
+    "name": "RtsArt_shadower_frames_savage_blow_motion01",
+    "size": 145637,
+    "sha256": "2b3db25cf712f68493240c21d289cab68c607941831b8dba1816a8bd293fc6b7"
+  },
+  {
+    "key": "shadower/frames/savage-blow/motion02.png",
+    "file": "C:\\workspace\\msw\\assets\\design\\characters\\shadower\\frames\\savage-blow\\motion02.png",
+    "name": "RtsArt_shadower_frames_savage_blow_motion02",
+    "size": 147129,
+    "sha256": "726b81406652ba904ead97a3bc69a56be5a76afc1bb71cf81d0c0cf8473e4708"
+  },
+  {
+    "key": "shadower/frames/savage-blow/motion03.png",
+    "file": "C:\\workspace\\msw\\assets\\design\\characters\\shadower\\frames\\savage-blow\\motion03.png",
+    "name": "RtsArt_shadower_frames_savage_blow_motion03",
+    "size": 169315,
+    "sha256": "85891b7c89874c729b8550cc9486fb2a1ac3442b3f92ba16f961fe599d5eab79"
+  },
+  {
+    "key": "shadower/frames/savage-blow/motion04.png",
+    "file": "C:\\workspace\\msw\\assets\\design\\characters\\shadower\\frames\\savage-blow\\motion04.png",
+    "name": "RtsArt_shadower_frames_savage_blow_motion04",
+    "size": 158858,
+    "sha256": "afaf0aeb55317ac73e360bbbc4eb758340bb4c0b6add9885d03691ef3245160e"
+  },
+  {
+    "key": "shadower/frames/savage-blow/motion05.png",
+    "file": "C:\\workspace\\msw\\assets\\design\\characters\\shadower\\frames\\savage-blow\\motion05.png",
+    "name": "RtsArt_shadower_frames_savage_blow_motion05",
+    "size": 137636,
+    "sha256": "3da0d094077bc3f23ae56a961c700fdfe92923219e4a84c1ab238919ad5c0883"
+  },
+  {
+    "key": "shadower/frames/savage-blow/motion06.png",
+    "file": "C:\\workspace\\msw\\assets\\design\\characters\\shadower\\frames\\savage-blow\\motion06.png",
+    "name": "RtsArt_shadower_frames_savage_blow_motion06",
+    "size": 184278,
+    "sha256": "46b09d21164da920fffe9990d2228e565ce7e390e3b29b288bbfdedbfd8d0a32"
+  },
+  {
+    "key": "shadower/frames/savage-blow/motion07.png",
+    "file": "C:\\workspace\\msw\\assets\\design\\characters\\shadower\\frames\\savage-blow\\motion07.png",
+    "name": "RtsArt_shadower_frames_savage_blow_motion07",
+    "size": 158458,
+    "sha256": "0920cd8f09d867919d9aba57cc428f3c43117919173d935dd2e19ff684e933ca"
+  },
+  {
+    "key": "shadower/frames/savage-blow/motion08.png",
+    "file": "C:\\workspace\\msw\\assets\\design\\characters\\shadower\\frames\\savage-blow\\motion08.png",
+    "name": "RtsArt_shadower_frames_savage_blow_motion08",
+    "size": 178148,
+    "sha256": "f7f4e1a1ef9a66f4a0d67a00c7561b0202b19d86ac41b5e485820b4d762b1e63"
+  },
+  {
+    "key": "shadower/frames/wait/motion01.png",
+    "file": "C:\\workspace\\msw\\assets\\design\\characters\\shadower\\frames\\wait\\motion01.png",
+    "name": "RtsArt_shadower_frames_wait_motion01",
+    "size": 143841,
+    "sha256": "79f123667adfd47b1e2367120453e2596cc829848d5502472f25859f5cac3f60"
+  },
+  {
+    "key": "shadower/frames/wait/motion02.png",
+    "file": "C:\\workspace\\msw\\assets\\design\\characters\\shadower\\frames\\wait\\motion02.png",
+    "name": "RtsArt_shadower_frames_wait_motion02",
+    "size": 144578,
+    "sha256": "921d49bae01383f3647fa253149f6a1a1b9edc4eb218b42df9f2a4cb233ac6a1"
+  },
+  {
+    "key": "shadower/frames/wait/motion03.png",
+    "file": "C:\\workspace\\msw\\assets\\design\\characters\\shadower\\frames\\wait\\motion03.png",
+    "name": "RtsArt_shadower_frames_wait_motion03",
+    "size": 140317,
+    "sha256": "3a260a3a5fa0e9bd60f1f9217c3afe743f00f484bb531c97ba45908431a53bbe"
+  }
+]

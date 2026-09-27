@@ -26,6 +26,17 @@ script RtsProfileLogic extends Logic
 
 	property string TombsKey = "tombs"
 
+	-- 계정별 화면 설정. 기존 꾸미기 저장 키와 독립적이며 값 없음은 light다.
+	property string UiModeKey = "uiMode"
+	property table UiModeByUser = {}
+	property table UiModeLoaded = {}
+	property table UiModeSaving = {}
+	property table UiModeNextSave = {}
+	property string MyUiMode = "light"
+	property boolean MyUiModeReady = false
+	property boolean MyUiModeSaving = false
+	property string MyUiModeNotice = ""
+
 	-- 늘 보유하는 아이콘(초록달팽이 — 2026-09-25 사용자 "기본 보유는 유지")
 	property string FreeIcon = "M001"
 
@@ -211,6 +222,8 @@ script RtsProfileLogic extends Logic
 		local packed = ""
 		local themes = ""
 		local tombs = ""
+		local uiMode = "light"
+		self.UiModeLoaded[userId] = false
 		-- 선택 키 3개를 읽는 데 성공했는가(읽기 실패를 '값 없음'으로 보고 기본값을 덮어쓰지 않게)
 		local readTheme = false
 		local readIcon = false
@@ -232,6 +245,10 @@ script RtsProfileLogic extends Logic
 			if c5 == 0 and v5 ~= nil then themes = v5 end
 			local c6, v6 = ds:GetAndWait(self.TombsKey)
 			if c6 == 0 and v6 ~= nil then tombs = v6 end
+			local c7, v7 = ds:GetAndWait(self.UiModeKey)
+			self.UiModeLoaded[userId] = c7 == 0
+			if c7 == 0 and v7 == "dark" then uiMode = "dark" end
+			_RtsConfigLogic:Log("RtsUiMode: load code=" .. tostring(c7) .. " mode=" .. uiMode)
 		end
 		local owned = self:ParseOwned(packed)
 		local themeSet = self:ParseKeys(themes)
@@ -252,6 +269,7 @@ script RtsProfileLogic extends Logic
 		self.OwnedByUser[userId] = owned
 		self.ThemesByUser[userId] = themeSet
 		self.TombsByUser[userId] = tombSet
+		self.UiModeByUser[userId] = uiMode
 		_RtsConfigLogic:Log("RtsProfile: load " .. userId .. " theme=" .. theme .. " icon=" .. icon .. " tomb=" .. tomb .. " owned=" .. string.format("%d", self:CountOwned(owned)))
 	end
 
@@ -281,6 +299,10 @@ script RtsProfileLogic extends Logic
 		self.ThemesByUser[userId] = nil
 		self.TombsByUser[userId] = nil
 		self.AnnouncedByUser[userId] = nil
+		self.UiModeByUser[userId] = nil
+		self.UiModeLoaded[userId] = nil
+		self.UiModeSaving[userId] = nil
+		self.UiModeNextSave[userId] = nil
 	end
 
 	method number CountOwned(table owned)
@@ -297,6 +319,86 @@ script RtsProfileLogic extends Logic
 		if owned == nil then owned = self:ParseOwned("") end
 		self:SendProfileState(self:ThemeOf(userId), self:IconOf(userId), self:TombOf(userId), self:PackOwned(owned),
 			self:SerializeKeys(self.ThemesByUser[userId]), self:SerializeKeys(self.TombsByUser[userId]), userId)
+		self:ReceiveUiMode(self.UiModeByUser[userId] or "light", self.UiModeLoaded[userId] == true, "", userId)
+	end
+
+	@ExecSpace("Server")
+	method void RequestSetUiMode(string mode)
+		-- 클라이언트가 보낸 사용자 ID는 받지 않고 호출자 계정의 설정만 저장한다.
+		local userId = senderUserId
+		if userId == nil or userId == "" then return end
+		if mode ~= "light" and mode ~= "dark" then return end
+		if _RtsZoneLogic:GetZoneOfUser(userId) < 1 then return end
+		if self.UiModeSaving[userId] then return end
+		local current = self.UiModeByUser[userId] or "light"
+		if not self.UiModeLoaded[userId] then
+			self:ReceiveUiMode(current, false, "설정을 불러오지 못했어요. 다시 접속해 주세요.", userId)
+			return
+		end
+		if current == mode then
+			self:ReceiveUiMode(current, true, "저장된 설정이에요.", userId)
+			return
+		end
+		local now = _UtilLogic.ElapsedSeconds
+		if now < (self.UiModeNextSave[userId] or 0) then
+			self:ReceiveUiMode(current, true, "잠시 후 다시 변경해 주세요.", userId)
+			return
+		end
+		local ds = _DataStorageService:GetUserDataStorage(userId)
+		if ds == nil then
+			self:ReceiveUiMode(current, true, "저장하지 못했어요. 다시 시도해 주세요.", userId)
+			return
+		end
+		local request = {}
+		self.UiModeSaving[userId] = request
+		self.UiModeNextSave[userId] = now + 1
+		ds:SetAsync(self.UiModeKey, mode, function(code, key)
+			-- 퇴장·재입장한 새 세션에 이전 저장 콜백을 적용하지 않는다.
+			if self.UiModeSaving[userId] ~= request then return end
+			self.UiModeSaving[userId] = nil
+			if code ~= 0 then
+				_RtsConfigLogic:Log("RtsUiMode: save failed code=" .. tostring(code))
+				self:ReceiveUiMode(current, true, "저장하지 못했어요. 다시 시도해 주세요.", userId)
+				return
+			end
+			self.UiModeByUser[userId] = mode
+			_RtsConfigLogic:Log("RtsUiMode: saved " .. mode)
+			self:ReceiveUiMode(mode, true, "저장했어요. 다음 접속에도 적용돼요.", userId)
+		end)
+	end
+
+	@ExecSpace("ClientOnly")
+	method void ChooseUiMode(string mode)
+		-- 저장 중 중복 입력은 막고 성공 응답 뒤에만 화면을 바꾼다.
+		if self.MyUiModeSaving then return end
+		if not self.MyUiModeReady then
+			local notice = self.MyUiModeNotice
+			if notice == "" then notice = "화면 설정을 불러오는 중이에요." end
+			_RtsHudLogic:ShowHintFor(notice, 3)
+			return
+		end
+		if mode ~= "light" and mode ~= "dark" then return end
+		if mode == self.MyUiMode then return end
+		self.MyUiModeSaving = true
+		self.MyUiModeNotice = "저장 중…"
+		_RtsHudLogic:RefreshUiModeSwitch()
+		self:RequestSetUiMode(mode)
+	end
+
+	@ExecSpace("Client")
+	method void ReceiveUiMode(string mode, boolean ready, string notice, string userId)
+		-- 개인 설정은 해당 클라이언트에만 전달된다. 기존 프로필 RPC 서명은 유지한다.
+		if mode ~= "dark" then mode = "light" end
+		local changed = self.MyUiMode ~= mode
+		self.MyUiMode = mode
+		self.MyUiModeReady = ready
+		self.MyUiModeSaving = false
+		self.MyUiModeNotice = notice
+		if not ready and notice == "" then self.MyUiModeNotice = "설정을 불러오지 못했어요. 다시 접속해 주세요." end
+		if changed then _RtsHudLogic:ApplyUiMode() end
+		_RtsHudLogic:RefreshUiModeSwitch()
+		if notice ~= "" then _RtsHudLogic:ShowHintFor(notice, 3) end
+		_RtsConfigLogic:Log("RtsUiMode: received " .. mode .. " ready=" .. tostring(ready))
 	end
 
 	-- 그 유저에게 전체 + 전 클라 목록(카드 배경·아이콘)

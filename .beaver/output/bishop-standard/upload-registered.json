@@ -1,0 +1,126 @@
+[
+  {
+    "key": "hero/frames/raging-blow/motion01.png",
+    "ruid": "96bdf836b6514461a69bda96870657b5"
+  },
+  {
+    "key": "hero/frames/raging-blow/motion02.png",
+    "ruid": "c7dda93ed6234323a85b19a2a23f553c"
+  },
+  {
+    "key": "hero/frames/raging-blow/motion03.png",
+    "ruid": "c36993a5db9a46bc9b8a77001c76041c"
+  },
+  {
+    "key": "hero/frames/raging-blow/motion04.png",
+    "ruid": "ccdf5af88b3e4bfaab28fb55701c59ca"
+  },
+  {
+    "key": "hero/frames/raging-blow/motion05.png",
+    "ruid": "db3e2b531cd5489d91aa25419b8416d3"
+  },
+  {
+    "key": "hero/frames/raging-blow/motion06.png",
+    "ruid": "b9ce7c452ae442998d92be331966d7d5"
+  },
+  {
+    "key": "hero/frames/raging-blow/motion07.png",
+    "ruid": "e2414958bfab429fbc772c36e45a32a1"
+  },
+  {
+    "key": "hero/frames/raging-blow/motion08.png",
+    "ruid": "5d3b537c9e064132889202ef7baaa2d3"
+  },
+  {
+    "key": "hero/frames/wait/motion01.png",
+    "ruid": "29dab38a22b744279674cbe2632b73d0"
+  },
+  {
+    "key": "hero/frames/wait/motion02.png",
+    "ruid": "0ba0aefe060541e4aa324413649015ac"
+  },
+  {
+    "key": "hero/frames/wait/motion03.png",
+    "ruid": "7b1d083de256470db661146dc9366b48"
+  },
+  {
+    "key": "ice-lightning-mage/frames/blizzard/motion01.png",
+    "ruid": "3166883e4dbb4fe68eade2f2605468f1"
+  },
+  {
+    "key": "ice-lightning-mage/frames/blizzard/motion02.png",
+    "ruid": "7b663ea7d9da42bf8a497213cca04848"
+  },
+  {
+    "key": "ice-lightning-mage/frames/blizzard/motion03.png",
+    "ruid": "24bee0fe7428442196ecb31813b6ba59"
+  },
+  {
+    "key": "ice-lightning-mage/frames/blizzard/motion04.png",
+    "ruid": "f1f16a077dee4a718e7f52d73545d2ae"
+  },
+  {
+    "key": "ice-lightning-mage/frames/blizzard/motion05.png",
+    "ruid": "0ca54631539d40e7b708b9f9609daa7e"
+  },
+  {
+    "key": "ice-lightning-mage/frames/chain-lightning/motion01.png",
+    "ruid": "f986bf2671c04e11b2f6aaf708f0c2bb"
+  },
+  {
+    "key": "ice-lightning-mage/frames/chain-lightning/motion02.png",
+    "ruid": "63a019d7ca084d78b084c29536c14999"
+  },
+  {
+    "key": "ice-lightning-mage/frames/chain-lightning/motion03.png",
+    "ruid": "02cde524cf654ae8b6000e402cbd0a4f"
+  },
+  {
+    "key": "ice-lightning-mage/frames/chain-lightning/motion04.png",
+    "ruid": "ebdb54d66e9042ffa2a2d35dd4732c89"
+  },
+  {
+    "key": "ice-lightning-mage/frames/chain-lightning/motion05.png",
+    "ruid": "de4d62586d274d28a336adf401e8ecde"
+  },
+  {
+    "key": "ice-lightning-mage/frames/wait/motion01.png",
+    "ruid": "31f7d3dc8bde42d6905eca8ca3d3d3aa"
+  },
+  {
+    "key": "ice-lightning-mage/frames/wait/motion02.png",
+    "ruid": "7480c71e7fc7406a89e74930c407ad87"
+  },
+  {
+    "key": "ice-lightning-mage/frames/wait/motion03.png",
+    "ruid": "440ab4519beb44f39a820aab4d2ef864"
+  },
+  {
+    "key": "hero/frames/enraged-raging-blow/motion01.png",
+    "ruid": "19947fbd964e4b489c0001801974c64b"
+  },
+  {
+    "key": "hero/frames/enraged-raging-blow/motion02.png",
+    "ruid": "5dd68521050d49ff93c3b857f5d6b7dd"
+  },
+  {
+    "key": "hero/frames/enraged-raging-blow/motion03.png",
+    "ruid": "5262f569ef4841bab7407ba0681ff9ad"
+  },
+  {
+    "key": "hero/frames/enraged-raging-blow/motion04.png",
+    "ruid": "31a5f27e11574ed2950c4bc485a9b24c"
+  },
+  {
+    "key": "hero/frames/enraged-raging-blow/motion05.png",
+    "ruid": "4b8cf6b5cc1d49838435b413b751d9f3"
+  },
+  {
+    "key": "hero/frames/enraged-raging-blow/motion06.png",
+    "ruid": "a4290f2e136e4354b3452efbef719f5c"
+  },
+  {
+    "key": "hero/frames/enraged-raging-blow/motion07.png",
+    "ruid": "9809cb50b85c451caea7dc830d7f0f29"
+  }
+]

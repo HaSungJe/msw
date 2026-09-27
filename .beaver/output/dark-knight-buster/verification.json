@@ -1,0 +1,360 @@
+{
+  "buildErrors": [],
+  "currentRuntimeErrors": [],
+  "previousPreviewShutdownWarning": [
+    {
+      "logType": "Error",
+      "dateTime": "2026-09-27T18:24:02",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": false,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "[LEA-3051] MemoryLeak : 'MakerScript'의 33번째 라인에서 생성된 3개의 타이머가 제거되지 않았습니다.",
+      "stackTrace": []
+    }
+  ],
+  "passes": [
+    {
+      "action": "dkGiantBuster",
+      "face": "1.0",
+      "pass": true
+    },
+    {
+      "action": "dkBuster",
+      "face": "1.0",
+      "pass": true
+    },
+    {
+      "action": "dkGiantBuster",
+      "face": "-1.0",
+      "pass": true
+    },
+    {
+      "action": "dkGiantBuster",
+      "face": "1.0",
+      "pass": true
+    },
+    {
+      "action": "dkBuster",
+      "face": "-1.0",
+      "pass": true
+    },
+    {
+      "action": "dkGiantBuster",
+      "face": "-1.0",
+      "pass": true
+    },
+    {
+      "action": "dkGiantBuster",
+      "face": "1.0",
+      "pass": true
+    },
+    {
+      "action": "dkBuster",
+      "face": "1.0",
+      "pass": true
+    },
+    {
+      "action": "dkGiantBuster",
+      "face": "-1.0",
+      "pass": true
+    },
+    {
+      "action": "dkGiantBuster",
+      "face": "1.0",
+      "pass": true
+    },
+    {
+      "action": "dkBuster",
+      "face": "-1.0",
+      "pass": true
+    },
+    {
+      "action": "dkGiantBuster",
+      "face": "-1.0",
+      "pass": true
+    },
+    {
+      "action": "dkGiantBuster",
+      "face": "1.0",
+      "pass": true
+    }
+  ],
+  "evidence": [
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-27T18:25:25",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "[DK_BUSTER_VERIFY] watching=2",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 27,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-27T18:25:26",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "[DK_BUSTER_VERIFY] ZzWarriorMotionGiant dkGiantBuster face=1.0 sequence=0e1c9aecd84f4c10984932aa52441481,a1c730f53f0249449329a6c5751e3df3,6fbf840e8da146fd8951de0e68f631c4,5a4ae361c00240128dab626b00cd7ca7,d05450084ea54dc7a22c4a61f1b3d42f,2aac0b1ea953485085c7c0b53fc4dbf4,0e1c9aecd84f4c10984932aa52441481,a1c730f53f0249449329a6c5751e3df3,6fbf840e8da146fd8951de0e68f631c4,5a4ae361c00240128dab626b00cd7ca7,d05450084ea54dc7a22c4a61f1b3d42f,2aac0b1ea953485085c7c0b53fc4dbf4,d05450084ea54dc7a22c4a61f1b3d42f next=stand1",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 19,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-27T18:25:29",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "[DK_BUSTER_VERIFY] ZzWarriorMotionDarkKnight dkBuster face=1.0 sequence=0e1c9aecd84f4c10984932aa52441481,a1c730f53f0249449329a6c5751e3df3,6fbf840e8da146fd8951de0e68f631c4,5a4ae361c00240128dab626b00cd7ca7,d05450084ea54dc7a22c4a61f1b3d42f,2aac0b1ea953485085c7c0b53fc4dbf4,d05450084ea54dc7a22c4a61f1b3d42f next=stand1",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 19,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-27T18:25:30",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "[DK_BUSTER_VERIFY] ZzWarriorMotionGiant dkGiantBuster face=-1.0 sequence=0e1c9aecd84f4c10984932aa52441481,a1c730f53f0249449329a6c5751e3df3,6fbf840e8da146fd8951de0e68f631c4,5a4ae361c00240128dab626b00cd7ca7,d05450084ea54dc7a22c4a61f1b3d42f,2aac0b1ea953485085c7c0b53fc4dbf4,0e1c9aecd84f4c10984932aa52441481,a1c730f53f0249449329a6c5751e3df3,6fbf840e8da146fd8951de0e68f631c4,5a4ae361c00240128dab626b00cd7ca7,d05450084ea54dc7a22c4a61f1b3d42f,2aac0b1ea953485085c7c0b53fc4dbf4,d05450084ea54dc7a22c4a61f1b3d42f next=stand1",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 19,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-27T18:25:33",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "[DK_BUSTER_VERIFY] ZzWarriorMotionGiant dkGiantBuster face=1.0 sequence=0e1c9aecd84f4c10984932aa52441481,a1c730f53f0249449329a6c5751e3df3,6fbf840e8da146fd8951de0e68f631c4,5a4ae361c00240128dab626b00cd7ca7,d05450084ea54dc7a22c4a61f1b3d42f,2aac0b1ea953485085c7c0b53fc4dbf4,0e1c9aecd84f4c10984932aa52441481,a1c730f53f0249449329a6c5751e3df3,6fbf840e8da146fd8951de0e68f631c4,5a4ae361c00240128dab626b00cd7ca7,d05450084ea54dc7a22c4a61f1b3d42f,2aac0b1ea953485085c7c0b53fc4dbf4,d05450084ea54dc7a22c4a61f1b3d42f next=stand1",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 19,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-27T18:25:36",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "[DK_BUSTER_VERIFY] ZzWarriorMotionDarkKnight dkBuster face=-1.0 sequence=0e1c9aecd84f4c10984932aa52441481,a1c730f53f0249449329a6c5751e3df3,6fbf840e8da146fd8951de0e68f631c4,5a4ae361c00240128dab626b00cd7ca7,d05450084ea54dc7a22c4a61f1b3d42f,2aac0b1ea953485085c7c0b53fc4dbf4,d05450084ea54dc7a22c4a61f1b3d42f next=stand1",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 19,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-27T18:25:37",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "[DK_BUSTER_VERIFY] ZzWarriorMotionGiant dkGiantBuster face=-1.0 sequence=0e1c9aecd84f4c10984932aa52441481,a1c730f53f0249449329a6c5751e3df3,6fbf840e8da146fd8951de0e68f631c4,5a4ae361c00240128dab626b00cd7ca7,d05450084ea54dc7a22c4a61f1b3d42f,2aac0b1ea953485085c7c0b53fc4dbf4,0e1c9aecd84f4c10984932aa52441481,a1c730f53f0249449329a6c5751e3df3,6fbf840e8da146fd8951de0e68f631c4,5a4ae361c00240128dab626b00cd7ca7,d05450084ea54dc7a22c4a61f1b3d42f,2aac0b1ea953485085c7c0b53fc4dbf4,d05450084ea54dc7a22c4a61f1b3d42f next=stand1",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 19,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-27T18:25:40",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "[DK_BUSTER_VERIFY] ZzWarriorMotionGiant dkGiantBuster face=1.0 sequence=0e1c9aecd84f4c10984932aa52441481,a1c730f53f0249449329a6c5751e3df3,6fbf840e8da146fd8951de0e68f631c4,5a4ae361c00240128dab626b00cd7ca7,d05450084ea54dc7a22c4a61f1b3d42f,2aac0b1ea953485085c7c0b53fc4dbf4,0e1c9aecd84f4c10984932aa52441481,a1c730f53f0249449329a6c5751e3df3,6fbf840e8da146fd8951de0e68f631c4,5a4ae361c00240128dab626b00cd7ca7,d05450084ea54dc7a22c4a61f1b3d42f,2aac0b1ea953485085c7c0b53fc4dbf4,d05450084ea54dc7a22c4a61f1b3d42f next=stand1",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 19,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-27T18:25:43",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "[DK_BUSTER_VERIFY] ZzWarriorMotionDarkKnight dkBuster face=1.0 sequence=0e1c9aecd84f4c10984932aa52441481,a1c730f53f0249449329a6c5751e3df3,6fbf840e8da146fd8951de0e68f631c4,5a4ae361c00240128dab626b00cd7ca7,d05450084ea54dc7a22c4a61f1b3d42f,2aac0b1ea953485085c7c0b53fc4dbf4,d05450084ea54dc7a22c4a61f1b3d42f next=stand1",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 19,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-27T18:25:44",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "[DK_BUSTER_VERIFY] ZzWarriorMotionGiant dkGiantBuster face=-1.0 sequence=0e1c9aecd84f4c10984932aa52441481,a1c730f53f0249449329a6c5751e3df3,6fbf840e8da146fd8951de0e68f631c4,5a4ae361c00240128dab626b00cd7ca7,d05450084ea54dc7a22c4a61f1b3d42f,2aac0b1ea953485085c7c0b53fc4dbf4,0e1c9aecd84f4c10984932aa52441481,a1c730f53f0249449329a6c5751e3df3,6fbf840e8da146fd8951de0e68f631c4,5a4ae361c00240128dab626b00cd7ca7,d05450084ea54dc7a22c4a61f1b3d42f,2aac0b1ea953485085c7c0b53fc4dbf4,d05450084ea54dc7a22c4a61f1b3d42f next=stand1",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 19,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-27T18:25:47",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "[DK_BUSTER_VERIFY] ZzWarriorMotionGiant dkGiantBuster face=1.0 sequence=0e1c9aecd84f4c10984932aa52441481,a1c730f53f0249449329a6c5751e3df3,6fbf840e8da146fd8951de0e68f631c4,5a4ae361c00240128dab626b00cd7ca7,d05450084ea54dc7a22c4a61f1b3d42f,2aac0b1ea953485085c7c0b53fc4dbf4,0e1c9aecd84f4c10984932aa52441481,a1c730f53f0249449329a6c5751e3df3,6fbf840e8da146fd8951de0e68f631c4,5a4ae361c00240128dab626b00cd7ca7,d05450084ea54dc7a22c4a61f1b3d42f,2aac0b1ea953485085c7c0b53fc4dbf4,d05450084ea54dc7a22c4a61f1b3d42f next=stand1",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 19,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-27T18:25:50",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "[DK_BUSTER_VERIFY] ZzWarriorMotionDarkKnight dkBuster face=-1.0 sequence=0e1c9aecd84f4c10984932aa52441481,a1c730f53f0249449329a6c5751e3df3,6fbf840e8da146fd8951de0e68f631c4,5a4ae361c00240128dab626b00cd7ca7,d05450084ea54dc7a22c4a61f1b3d42f,2aac0b1ea953485085c7c0b53fc4dbf4,d05450084ea54dc7a22c4a61f1b3d42f next=stand1",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 19,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-27T18:25:51",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "[DK_BUSTER_VERIFY] ZzWarriorMotionGiant dkGiantBuster face=-1.0 sequence=0e1c9aecd84f4c10984932aa52441481,a1c730f53f0249449329a6c5751e3df3,6fbf840e8da146fd8951de0e68f631c4,5a4ae361c00240128dab626b00cd7ca7,d05450084ea54dc7a22c4a61f1b3d42f,2aac0b1ea953485085c7c0b53fc4dbf4,0e1c9aecd84f4c10984932aa52441481,a1c730f53f0249449329a6c5751e3df3,6fbf840e8da146fd8951de0e68f631c4,5a4ae361c00240128dab626b00cd7ca7,d05450084ea54dc7a22c4a61f1b3d42f,2aac0b1ea953485085c7c0b53fc4dbf4,d05450084ea54dc7a22c4a61f1b3d42f next=stand1",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 19,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-27T18:25:54",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "[DK_BUSTER_VERIFY] ZzWarriorMotionGiant dkGiantBuster face=1.0 sequence=0e1c9aecd84f4c10984932aa52441481,a1c730f53f0249449329a6c5751e3df3,6fbf840e8da146fd8951de0e68f631c4,5a4ae361c00240128dab626b00cd7ca7,d05450084ea54dc7a22c4a61f1b3d42f,2aac0b1ea953485085c7c0b53fc4dbf4,0e1c9aecd84f4c10984932aa52441481,a1c730f53f0249449329a6c5751e3df3,6fbf840e8da146fd8951de0e68f631c4,5a4ae361c00240128dab626b00cd7ca7,d05450084ea54dc7a22c4a61f1b3d42f,2aac0b1ea953485085c7c0b53fc4dbf4,d05450084ea54dc7a22c4a61f1b3d42f next=stand1",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 19,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-27T18:25:56",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "[DK_BUSTER_VERIFY] complete",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 25,
+          "codeBlockFileId": null
+        }
+      ]
+    }
+  ],
+  "loadEvidence": [
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-27T18:26:51",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "[DK_BUSTER_LOAD] 6/6",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 0,
+          "codeBlockFileId": null
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,653 @@
+{
+  "status": "user-approved",
+  "buildErrors": [],
+  "runtimeErrors": [],
+  "evidence": [
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-27T18:44:53",
+      "isGeneratedFromServer": true,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "[THIEF_SPAWN] nl avatarAbsent=true shadow=true",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 6,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-27T18:44:53",
+      "isGeneratedFromServer": true,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "[THIEF_SPAWN] shad avatarAbsent=true shadow=false",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 6,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-27T18:44:59",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "[THIEF_QA] loaded=35/35 connectionErrors=0",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 16,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-27T18:45:30",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "[THIEF_QA] ZzThiefNightLord nlThrow:L frames=8/8",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 66,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-27T18:45:30",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "[THIEF_QA] ZzThiefNightLord nlThrow:R frames=8/8",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 66,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-27T18:45:30",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "[THIEF_QA] ZzThiefNightLord returns=7 idle=3/3 avatarAbsent=true",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 72,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-27T18:45:30",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "[THIEF_QA] ZzThiefNightLord shadowAttack=true shadowStand=true shadowDelays=0.518,0.521,0.521,0.521,0.517,0.516,0.518",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 73,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-27T18:45:30",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "[THIEF_QA] ZzThiefFuma nlThrow:L frames=8/8",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 66,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-27T18:45:30",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "[THIEF_QA] ZzThiefFuma nlThrow:R frames=8/8",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 66,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-27T18:45:30",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "[THIEF_QA] ZzThiefFuma returns=6 idle=3/3 avatarAbsent=true",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 72,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-27T18:45:30",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "[THIEF_QA] ZzThiefFuma shadowAttack=true shadowStand=true shadowDelays=0.522,0.524,0.533,0.519,0.521,0.524",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 73,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-27T18:45:30",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "[THIEF_QA] ZzThiefShadower shadSavage:L frames=8/8",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 66,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-27T18:45:30",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "[THIEF_QA] ZzThiefShadower shadSavage:R frames=8/8",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 66,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-27T18:45:30",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "[THIEF_QA] ZzThiefShadower shadMeso:L frames=5/5",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 66,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-27T18:45:30",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "[THIEF_QA] ZzThiefShadower shadMeso:R frames=5/5",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 66,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-27T18:45:30",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "[THIEF_QA] ZzThiefShadower returns=7 idle=3/3 avatarAbsent=true",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 72,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-27T18:45:30",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "[THIEF_QA] ZzThiefDualblade shadDualblade:L frames=8/8",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 66,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-27T18:45:30",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "[THIEF_QA] ZzThiefDualblade shadDualblade:R frames=8/8",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 66,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-27T18:45:30",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "[THIEF_QA] ZzThiefDualblade returns=7 idle=2/3 avatarAbsent=true",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 72,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-27T18:45:30",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "[THIEF_QA] complete",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 75,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-27T18:47:10",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "[THIEF_QA] loaded=35/35 connectionErrors=0",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 16,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-27T18:47:41",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "[THIEF_QA] ZzThiefNightLord nlThrow:L frames=8/8",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 66,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-27T18:47:41",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "[THIEF_QA] ZzThiefNightLord nlThrow:R frames=8/8",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 66,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-27T18:47:41",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "[THIEF_QA] ZzThiefNightLord returns=5 idle=3/3 avatarAbsent=true",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 72,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-27T18:47:41",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "[THIEF_QA] ZzThiefNightLord shadowAttack=true shadowStand=true shadowDelays=0.520,0.520,0.531,0.519,0.517",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 73,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-27T18:47:41",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "[THIEF_QA] ZzThiefFuma nlThrow:L frames=8/8",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 66,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-27T18:47:41",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "[THIEF_QA] ZzThiefFuma nlThrow:R frames=8/8",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 66,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-27T18:47:41",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "[THIEF_QA] ZzThiefFuma returns=5 idle=3/3 avatarAbsent=true",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 72,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-27T18:47:41",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "[THIEF_QA] ZzThiefFuma shadowAttack=true shadowStand=true shadowDelays=0.522,0.520,0.531,0.527,0.523",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 73,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-27T18:47:41",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "[THIEF_QA] ZzThiefShadower shadSavage:L frames=8/8",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 66,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-27T18:47:41",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "[THIEF_QA] ZzThiefShadower shadSavage:R frames=8/8",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 66,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-27T18:47:41",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "[THIEF_QA] ZzThiefShadower shadMeso:L frames=5/5",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 66,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-27T18:47:41",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "[THIEF_QA] ZzThiefShadower shadMeso:R frames=5/5",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 66,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-27T18:47:41",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "[THIEF_QA] ZzThiefShadower returns=5 idle=3/3 avatarAbsent=true",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 72,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-27T18:47:41",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "[THIEF_QA] ZzThiefDualblade shadDualblade:L frames=8/8",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 66,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-27T18:47:41",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "[THIEF_QA] ZzThiefDualblade shadDualblade:R frames=8/8",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 66,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-27T18:47:41",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "[THIEF_QA] ZzThiefDualblade returns=5 idle=3/3 avatarAbsent=true",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 72,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-09-27T18:47:41",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "[THIEF_QA] complete",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 75,
+          "codeBlockFileId": null
+        }
+      ]
+    }
+  ]
+}

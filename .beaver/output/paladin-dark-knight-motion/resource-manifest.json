@@ -1,0 +1,258 @@
+[
+  {
+    "key": "paladin/frames/divine-charge/motion01.png",
+    "file": "C:\\workspace\\msw\\assets\\design\\characters\\paladin\\frames\\divine-charge\\motion01.png",
+    "name": "RtsArt_paladin_frames_divine-charge_motion01",
+    "size": 248794,
+    "sha256": "f449d848f7e6555fc03fa49341b70892d0a766eb68fc6eaf768546e137f0bd53",
+    "ruid": "a5be5b20b9d8440ab5af38cc595ba2f8"
+  },
+  {
+    "key": "paladin/frames/divine-charge/motion02.png",
+    "file": "C:\\workspace\\msw\\assets\\design\\characters\\paladin\\frames\\divine-charge\\motion02.png",
+    "name": "RtsArt_paladin_frames_divine-charge_motion02",
+    "size": 217932,
+    "sha256": "ddf092cedc896f3850e16966de7baf27e52a17bfeee9d59c88a7ef6273a4f7af",
+    "ruid": "1db1a18d2bde472c88e72ab3d70d14bf"
+  },
+  {
+    "key": "paladin/frames/divine-charge/motion03.png",
+    "file": "C:\\workspace\\msw\\assets\\design\\characters\\paladin\\frames\\divine-charge\\motion03.png",
+    "name": "RtsArt_paladin_frames_divine-charge_motion03",
+    "size": 239969,
+    "sha256": "eceaed7cb8d91ed434acd4dd9bfbe607bccb8323f67dcf7776c7f90aca4d9d7e",
+    "ruid": "6c9a71053f3a4f259dd41e270e4c94bd"
+  },
+  {
+    "key": "paladin/frames/divine-charge/motion04.png",
+    "file": "C:\\workspace\\msw\\assets\\design\\characters\\paladin\\frames\\divine-charge\\motion04.png",
+    "name": "RtsArt_paladin_frames_divine-charge_motion04",
+    "size": 256480,
+    "sha256": "28eea2e2c3e2bf7d9d45942b6503a407442619163f5db9f631d41039953e81ee",
+    "ruid": "a17d41771324411b9d1b0b78ddb1bb74"
+  },
+  {
+    "key": "paladin/frames/divine-charge/motion05.png",
+    "file": "C:\\workspace\\msw\\assets\\design\\characters\\paladin\\frames\\divine-charge\\motion05.png",
+    "name": "RtsArt_paladin_frames_divine-charge_motion05",
+    "size": 249231,
+    "sha256": "6e8ded1c90ba132bf39637115103312d0126368419732582cf6e4e9a39968b98",
+    "ruid": "cc366fbe0bdb40a38b6efd846aaccb48"
+  },
+  {
+    "key": "paladin/frames/divine-charge/motion06.png",
+    "file": "C:\\workspace\\msw\\assets\\design\\characters\\paladin\\frames\\divine-charge\\motion06.png",
+    "name": "RtsArt_paladin_frames_divine-charge_motion06",
+    "size": 233240,
+    "sha256": "d61639424c90ee8585ef8177809caa3786cd2fdfe9a6fab9e3043336a838a257",
+    "ruid": "af6ec8fb94ae40f4abb3002779fc8994"
+  },
+  {
+    "key": "paladin/frames/sanctuary/motion01.png",
+    "file": "C:\\workspace\\msw\\assets\\design\\characters\\paladin\\frames\\sanctuary\\motion01.png",
+    "name": "RtsArt_paladin_frames_sanctuary_motion01",
+    "size": 275776,
+    "sha256": "e4486b8d8f2d9d73f6f87e1e4b1390a92c5025d8a1f6fbbf97f97fbe45849773",
+    "ruid": "cdcbfe6d6e9146a6a1920baa69b90751"
+  },
+  {
+    "key": "paladin/frames/sanctuary/motion02.png",
+    "file": "C:\\workspace\\msw\\assets\\design\\characters\\paladin\\frames\\sanctuary\\motion02.png",
+    "name": "RtsArt_paladin_frames_sanctuary_motion02",
+    "size": 293372,
+    "sha256": "81d37c92c6dab96fc1ca6d07e224b13c964193e0308a903ee6d74575c9e47a7c",
+    "ruid": "86cd9fda03684baabc4bfdfe050fac74"
+  },
+  {
+    "key": "paladin/frames/sanctuary/motion03.png",
+    "file": "C:\\workspace\\msw\\assets\\design\\characters\\paladin\\frames\\sanctuary\\motion03.png",
+    "name": "RtsArt_paladin_frames_sanctuary_motion03",
+    "size": 246788,
+    "sha256": "22babba5e67fbcc0b3ad3404116678f497fe6e88b076de45c836654e17d7ea5b",
+    "ruid": "ba408ac01fcd4974a5b9d15fb910cdf0"
+  },
+  {
+    "key": "paladin/frames/sanctuary/motion04.png",
+    "file": "C:\\workspace\\msw\\assets\\design\\characters\\paladin\\frames\\sanctuary\\motion04.png",
+    "name": "RtsArt_paladin_frames_sanctuary_motion04",
+    "size": 244507,
+    "sha256": "997a77001bcf7d7f9a45f9ab409401670f58e0fc220dc67cec38c4ecaece2cf0",
+    "ruid": "16619a38e9104bd99c5bc0a0b59a3096"
+  },
+  {
+    "key": "paladin/frames/sanctuary/motion05.png",
+    "file": "C:\\workspace\\msw\\assets\\design\\characters\\paladin\\frames\\sanctuary\\motion05.png",
+    "name": "RtsArt_paladin_frames_sanctuary_motion05",
+    "size": 236243,
+    "sha256": "dead476ff2e674ba5b7ff6ed9b07edba0454826d114ea5da0423cd42f5315db5",
+    "ruid": "0a9d251c2a494888a0f1ebc47927bb15"
+  },
+  {
+    "key": "paladin/frames/sanctuary/motion06.png",
+    "file": "C:\\workspace\\msw\\assets\\design\\characters\\paladin\\frames\\sanctuary\\motion06.png",
+    "name": "RtsArt_paladin_frames_sanctuary_motion06",
+    "size": 230864,
+    "sha256": "f7fe48a1dac5f6fca5b2f63d84b1fe410ed0ea0b84dbc888a1e0cff12e36839f",
+    "ruid": "371429c6ddab4a1cb26d06fa3149bea6"
+  },
+  {
+    "key": "paladin/frames/wait/motion01.png",
+    "file": "C:\\workspace\\msw\\assets\\design\\characters\\paladin\\frames\\wait\\motion01.png",
+    "name": "RtsArt_paladin_frames_wait_motion01",
+    "size": 208602,
+    "sha256": "083dbcaf4e276b41265681df8b4c51b6641aff1445f78ee0284ccee483f16012",
+    "ruid": "17e0e0811cd742bea27591ffbc9b723b"
+  },
+  {
+    "key": "paladin/frames/wait/motion02.png",
+    "file": "C:\\workspace\\msw\\assets\\design\\characters\\paladin\\frames\\wait\\motion02.png",
+    "name": "RtsArt_paladin_frames_wait_motion02",
+    "size": 214299,
+    "sha256": "6425f75326d96904c1527e71b7b07085f11d34b4541a0edcfe570119f2ff41e0",
+    "ruid": "019b667361c1459c819353dcc5a0ed8b"
+  },
+  {
+    "key": "paladin/frames/wait/motion03.png",
+    "file": "C:\\workspace\\msw\\assets\\design\\characters\\paladin\\frames\\wait\\motion03.png",
+    "name": "RtsArt_paladin_frames_wait_motion03",
+    "size": 208047,
+    "sha256": "9b0027fd792a29204a36862b6b2592cd923d0ed9d780ae97545009f4e760ad0d",
+    "ruid": "2838ebd8b5d044a693a4c43b0bf77879"
+  },
+  {
+    "key": "dark-knight/frames/dragon-roar/motion01.png",
+    "file": "C:\\workspace\\msw\\assets\\design\\characters\\dark-knight\\frames\\dragon-roar\\motion01.png",
+    "name": "RtsArt_darkknight_frames_dragon-roar_motion01",
+    "size": 212588,
+    "sha256": "72a969fef826e0cad6b948e4ae05c985ba1c934a7cfe5c75950e47a3ac5aa8f9",
+    "ruid": "ed125f0a1730494d95c759927e035556"
+  },
+  {
+    "key": "dark-knight/frames/dragon-roar/motion02.png",
+    "file": "C:\\workspace\\msw\\assets\\design\\characters\\dark-knight\\frames\\dragon-roar\\motion02.png",
+    "name": "RtsArt_darkknight_frames_dragon-roar_motion02",
+    "size": 206623,
+    "sha256": "3ee92f3a21c2d00412e0a04c75fdd796565efc0c64d6a75785ecd38eceed4136",
+    "ruid": "310c4f9feeb3407597dcce8138e66cd5"
+  },
+  {
+    "key": "dark-knight/frames/dragon-roar/motion03.png",
+    "file": "C:\\workspace\\msw\\assets\\design\\characters\\dark-knight\\frames\\dragon-roar\\motion03.png",
+    "name": "RtsArt_darkknight_frames_dragon-roar_motion03",
+    "size": 212762,
+    "sha256": "ab49397d807e1e1d07e70e031fc7201cc6efa8823823990d9dc612ba38e37a41",
+    "ruid": "7005c13026024b839785ebf274ca4ea9"
+  },
+  {
+    "key": "dark-knight/frames/dragon-roar/motion04.png",
+    "file": "C:\\workspace\\msw\\assets\\design\\characters\\dark-knight\\frames\\dragon-roar\\motion04.png",
+    "name": "RtsArt_darkknight_frames_dragon-roar_motion04",
+    "size": 263346,
+    "sha256": "28bb67d1d504bf0517084726d381100769aee4eb241381e1d9616d0b2d15549f",
+    "ruid": "b95f492ef7bf43a2ab0243d81ea9bc20"
+  },
+  {
+    "key": "dark-knight/frames/dragon-roar/motion05.png",
+    "file": "C:\\workspace\\msw\\assets\\design\\characters\\dark-knight\\frames\\dragon-roar\\motion05.png",
+    "name": "RtsArt_darkknight_frames_dragon-roar_motion05",
+    "size": 243025,
+    "sha256": "4c98a9e5955b08b2c5515e9f8a58bc5914912edee5391e99b0e3caf589e9d143",
+    "ruid": "9c54e19b80b54384a2950c3f9905f560"
+  },
+  {
+    "key": "dark-knight/frames/dragon-roar/motion06.png",
+    "file": "C:\\workspace\\msw\\assets\\design\\characters\\dark-knight\\frames\\dragon-roar\\motion06.png",
+    "name": "RtsArt_darkknight_frames_dragon-roar_motion06",
+    "size": 229570,
+    "sha256": "3c01c61d6c072a28c05e5e2d854450cba33df460623b5f3032ff948cec48e589",
+    "ruid": "1374b63a6fe14ee2ab0d200b61bf0e97"
+  },
+  {
+    "key": "dark-knight/frames/spear-buster/motion01.png",
+    "file": "C:\\workspace\\msw\\assets\\design\\characters\\dark-knight\\frames\\spear-buster\\motion01.png",
+    "name": "RtsArt_darkknight_frames_spear-buster_motion01",
+    "size": 210525,
+    "sha256": "be9b7abda8ae68550fd663a376ffd33a1732199f6c3ad471f87c77c7fe1ff749",
+    "ruid": "db441b80de084e379a78abef334b222d"
+  },
+  {
+    "key": "dark-knight/frames/spear-buster/motion02.png",
+    "file": "C:\\workspace\\msw\\assets\\design\\characters\\dark-knight\\frames\\spear-buster\\motion02.png",
+    "name": "RtsArt_darkknight_frames_spear-buster_motion02",
+    "size": 196493,
+    "sha256": "9d4c22b172d90ec09730706f1aca60cb8def75a66f96a7a22fa3d4a1988381a2",
+    "ruid": "44b618f978a64d6ab413e65c53eb5bb3"
+  },
+  {
+    "key": "dark-knight/frames/spear-buster/motion03.png",
+    "file": "C:\\workspace\\msw\\assets\\design\\characters\\dark-knight\\frames\\spear-buster\\motion03.png",
+    "name": "RtsArt_darkknight_frames_spear-buster_motion03",
+    "size": 190096,
+    "sha256": "d23f7b9735fcdf40a169d7ecea860b5180917a843a13b6f40b89629f524978b2",
+    "ruid": "147f40da0e0f489ca2b21ec4d0ff100a"
+  },
+  {
+    "key": "dark-knight/frames/spear-buster/motion04.png",
+    "file": "C:\\workspace\\msw\\assets\\design\\characters\\dark-knight\\frames\\spear-buster\\motion04.png",
+    "name": "RtsArt_darkknight_frames_spear-buster_motion04",
+    "size": 214502,
+    "sha256": "f5377a0a89c2ac7b392f097a34824c4c231a0a3a42b289a906226dfdfe66fc53",
+    "ruid": "9782ca7375084fbbbd53f61f98282761"
+  },
+  {
+    "key": "dark-knight/frames/spear-buster/motion05.png",
+    "file": "C:\\workspace\\msw\\assets\\design\\characters\\dark-knight\\frames\\spear-buster\\motion05.png",
+    "name": "RtsArt_darkknight_frames_spear-buster_motion05",
+    "size": 209029,
+    "sha256": "8febad1367b22b26e72038dd9e95332c743ddc301572afc59556de1c38212039",
+    "ruid": "75434da8b1d941c7bcf2d8761010db5b"
+  },
+  {
+    "key": "dark-knight/frames/spear-buster/motion06.png",
+    "file": "C:\\workspace\\msw\\assets\\design\\characters\\dark-knight\\frames\\spear-buster\\motion06.png",
+    "name": "RtsArt_darkknight_frames_spear-buster_motion06",
+    "size": 198407,
+    "sha256": "d8f9a4f9ca1a1ce31c8bca9f9bb0b2a59534f27547a29c63eab813748271683c",
+    "ruid": "7f5f9ec7b7584a70b5d01e374cee5c68"
+  },
+  {
+    "key": "dark-knight/frames/spear-buster/motion07.png",
+    "file": "C:\\workspace\\msw\\assets\\design\\characters\\dark-knight\\frames\\spear-buster\\motion07.png",
+    "name": "RtsArt_darkknight_frames_spear-buster_motion07",
+    "size": 202433,
+    "sha256": "24681311c86112d768b9ad1c4ffa5e564c7e39ca67da736112d2d1337b95aeca",
+    "ruid": "196ec18d224d4b868a2dce4a4c4a729c"
+  },
+  {
+    "key": "dark-knight/frames/spear-buster/motion08.png",
+    "file": "C:\\workspace\\msw\\assets\\design\\characters\\dark-knight\\frames\\spear-buster\\motion08.png",
+    "name": "RtsArt_darkknight_frames_spear-buster_motion08",
+    "size": 212067,
+    "sha256": "6925b46067cb55b39ad1dbdd119501283f008383f706ea92c410571872552034",
+    "ruid": "70cf79c13cf34ea8a754b74b47bb56fa"
+  },
+  {
+    "key": "dark-knight/frames/wait/motion01.png",
+    "file": "C:\\workspace\\msw\\assets\\design\\characters\\dark-knight\\frames\\wait\\motion01.png",
+    "name": "RtsArt_darkknight_frames_wait_motion01",
+    "size": 211884,
+    "sha256": "01fe9e81618b5b860e3da8de7c54e78d0d77d9a9c6f7a34a017652a36efebb15",
+    "ruid": "8e918f5a58d84f0880f30802e53ec1cb"
+  },
+  {
+    "key": "dark-knight/frames/wait/motion02.png",
+    "file": "C:\\workspace\\msw\\assets\\design\\characters\\dark-knight\\frames\\wait\\motion02.png",
+    "name": "RtsArt_darkknight_frames_wait_motion02",
+    "size": 216834,
+    "sha256": "8c8e1364bbdc249695baedc365a77dff38d376f50019aa3622c5e69197a3468a",
+    "ruid": "a97d69b1da2244c3bbe72930a3215557"
+  },
+  {
+    "key": "dark-knight/frames/wait/motion03.png",
+    "file": "C:\\workspace\\msw\\assets\\design\\characters\\dark-knight\\frames\\wait\\motion03.png",
+    "name": "RtsArt_darkknight_frames_wait_motion03",
+    "size": 207275,
+    "sha256": "196b8447b320834593f05d8ec04a501820822dc44bdacbcd8614ac8ce62b5cd5",
+    "ruid": "469c0c8e7bab4319a830615eb520aa25"
+  }
+]

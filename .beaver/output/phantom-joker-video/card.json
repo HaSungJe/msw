@@ -1,0 +1,8 @@
+{
+  "source": "C:/Users/timec/.codex/generated_images/01a0dbf3-5094-7520-bfc7-f24b6496f5e5/exec-ff73de81-0482-4aa2-9bbf-f48f22427a72.png",
+  "prompt": "Use case: precise-object-edit. Create ONE isolated game projectile card sprite from the cards visible in image1 and image2. Image1 approved Phantom hand-held cards: identity/design. Image2 actual Joker gameplay cards: wine-red/magenta center, bright ornate GOLD double border, gold compass star center and delicate curved corner filigree. Only ONE CARD BACK, fully frontal, flat rectangular playing card with subtle rounded corners, vertical 2:3 aspect ratio, clean crisp thin outline and polished 2D illustration matching the character. No perspective, no tilt, no stack, no letters/numbers, no face card person, no hands/character/background, no sparkles or swirling aura. Actual transparent background, generous transparent margin around entire card. This sprite will be scaled and spun as an independent projectile layer; do not draw any motion trail into it.",
+  "refs": [
+    "C:/workspace/msw/assets/design/characters/phantom/concept.png",
+    "C:/workspace/msw/.beaver/output/five-class-design/reference/joker-6.75.png"
+  ]
+}

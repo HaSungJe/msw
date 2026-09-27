@@ -1,0 +1,15 @@
+{
+  "id": "dark-knight",
+  "skill": "spear-buster",
+  "n": 1,
+  "pose": "Ready after magic charge: rotate spear to horizontal at waist with blade toward viewer LEFT, two hands spaced on shaft, compact slight knee bend.",
+  "key": "dark-knight--spear-buster--01",
+  "prompt": "Use case: identity-preserve animation pose edit. Generate ONE transparent PNG animation frame, not a sheet.\nImage1 EDIT TARGET and exact framing/scale master: dark-knight character on 704x704 square canvas. Image2 approved identity/costume master, do not copy its larger framing. Image3 Bishop style/anatomy master, do not copy its clothes/hair/staff.\nKeep character SAME small on-canvas size as image1, with generous empty transparent space above. Do not zoom in or fill canvas. In 704-unit canvas coordinates, anatomical head crown-to-chin147units, feet ground y640, centerx352. Underlying standing body height338units and2.3heads, ignoring hats/feathers/tall hair/weapon. Pose may bend knees, never lengthen limbs/boots. Preserve exact face, hair, eye color, all clothing panels, jewelry, weapon design, clean line weight and soft cel shading.\nFrame 1 for spear-buster: Ready after magic charge: rotate spear to horizontal at waist with blade toward viewer LEFT, two hands spaced on shaft, compact slight knee bend.\nABSOLUTELY NO Beholder/eye orb/companion. ONE complete spear only, maintain two hand grips and original weapon length.\n\nOnly body pose and subtle expression changes allowed. Entire hair/hat/weapon/cape/boots visible with transparent margins. No extra limbs or weapons, no blur or motion trails, no aura/projectiles/glows/environment, no text/numbers/grid/border/shadow. Feet grounded. Actual transparent background. Same fine polished 2D SD game illustration as Bishop, no pixel art. Output ONE frame.",
+  "refs": [
+    "C:/workspace/msw/.beaver/output/five-class-motion/base/dark-knight-attack.png",
+    "C:/workspace/msw/assets/design/characters/dark-knight/concept.png",
+    "C:/workspace/msw/assets/design/characters/bishop/frames/angel-ray/motion03.png"
+  ],
+  "source": "C:/Users/timec/.codex/generated_images/01a0dbf3-5094-7520-bfc7-f24b6496f5e5/exec-d293502d-3734-4855-8a97-c059977c4279.png",
+  "state": "generated-awaiting-QA"
+}

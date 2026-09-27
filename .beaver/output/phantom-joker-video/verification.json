@@ -1,0 +1,32 @@
+{
+  "bodyFrames": 8,
+  "projectileSprite": "C:\\workspace\\msw\\assets\\design\\effects\\phantom-joker\\card.png",
+  "ringSprite": "C:\\workspace\\msw\\assets\\design\\effects\\phantom-joker\\ring.png",
+  "cardDisplayScaleChange": 2,
+  "totalCharacterFrames": 78,
+  "untouchedFramesVerified": 70,
+  "conceptsUnchanged": 5,
+  "dimensionsAlphaEdges": "passed",
+  "gameIntegration": false,
+  "gifEncodedFrames": 80,
+  "gifDurationMs": 3560,
+  "previewJavaScriptSyntax": "passed",
+  "ringCenterTransparent": true,
+  "cardDisplaySize": [
+    288,
+    432
+  ],
+  "ringDisplaySize": [
+    632,
+    632
+  ],
+  "cardSizePrevious": [
+    144,
+    216
+  ],
+  "ringSizePrevious": [
+    316,
+    316
+  ],
+  "ringVisibilityFix": "same proportional enlargement as card"
+}
