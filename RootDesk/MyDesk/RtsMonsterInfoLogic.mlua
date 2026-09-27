@@ -63,9 +63,9 @@ script RtsMonsterInfoLogic extends Logic
 	-- 화면 좌표의 몬스터(지금 보고 있는 구역, 살아 있는 것). 피격 박스(표 boxW·boxH·boxX·boxY × 스케일)에 약간 여유를 두고, 여럿이면 박스 가운데가 가장 가까운 것
 	@ExecSpace("ClientOnly")
 	method any MonsterAtScreen(Vector2 screen)
-		local w = _UILogic:ScreenToWorldPosition(screen)
+		local w = _RtsBoardViewLogic:ScreenToBoard(screen)
 		local zone = math.floor(_RtsHudLogic.WatchedZone + 0.5)
-		local mapRoot = _EntityService:GetEntityByPath("/maps/RtsMap")
+		local mapRoot = _RtsBoardViewLogic:GetRoot()
 		if mapRoot == nil then return nil end
 		local comps = mapRoot:GetChildComponentsByTypeName("RtsMonsterComponent", false)
 		local best = nil
@@ -75,7 +75,7 @@ script RtsMonsterInfoLogic extends Logic
 			if m ~= nil and isvalid(m.Entity) and m.Entity.Enable and not m.Dead and math.floor(m.Zone + 0.5) == zone then
 				local mon = _RtsStageTableLogic:GetMonster(m.MonsterId)
 				if mon ~= nil then
-					local p = m.Entity.TransformComponent.WorldPosition
+					local p = _RtsBoardViewLogic:BoardPosition(m.Entity)
 					local sc = math.abs(m.Entity.TransformComponent.Scale.x)
 					local cx = p.x + (mon.boxX or 0) * sc
 					local cy = p.y + (mon.boxY or 0) * sc
@@ -103,11 +103,14 @@ script RtsMonsterInfoLogic extends Logic
 		self:Close()
 		if not same then H:PlayUi(H.OpenSound) end -- 창 여는 소리(2026-09-24 사용자) — 같은 몬스터 다시 그리기는 빼고
 		self.Target = target
+		self.PanelH = _RtsBoardViewLogic:IsMobileView() and 248 or 208
 		local x0 = self.LeftX
 		local panel = H:SpawnRoundedPanel("RtsMonInfo", H.HudGroup, Vector2(0.5, 0), Vector2(0.5, 0), Vector2(0, 16), Vector2(x0 + self.BarW + 4 + self.PctW + 18, self.PanelH),
 			Color(0.98, 0.985, 1, 0.95), H:ColBorder(), 1.5)
 		self.Panel = panel.Parent
 		self.PanelIn = panel
+		local v = H:MobileViewport()
+		if v ~= nil then H:PlaceMobile(self.Panel,v,0.5,0,0,156,x0+self.BarW+4+self.PctW+18,self.PanelH,_RtsBoardViewLogic:IsMobileView() and 1.35 or 1) end
 		H:SpawnWater(panel)
 		local slot = H:SpawnRoundedPanel("RtsMonInfoIconBack", panel, Vector2(0, 1), Vector2(0, 1), Vector2(16, -16), Vector2(self.IconW, self.IconW), Color(1, 1, 1, 0.85), H:ColBorderSoft(), 1)
 		if slot.MaskComponent == nil then slot:AddComponent("MaskComponent") end
@@ -117,6 +120,10 @@ script RtsMonsterInfoLogic extends Logic
 		if boss then kind = "보스" end
 		local badge = H:SpawnRoundedPanel("RtsMonInfoKind", panel, Vector2(1, 1), Vector2(1, 1), Vector2(-16, -16), Vector2(76, 28), Color(0.92, 0.91, 0.97, 1), H:ColBorderSoft(), 1)
 		H:SpawnLabel("RtsMonInfoKindText", badge, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2.zero, Vector2(70, 24), kind, Color(0.43, 0.42, 0.62, 1), 14, TextAlignmentType.MiddleCenter, false)
+		badge.Parent:SetEnable(false)
+		local close = H:SpawnRoundedPanel("RtsMonInfoClose",panel,Vector2(1,1),Vector2(1,1),Vector2(-8,-4),Vector2(72,44),H:ColPanel(),H:ColBorder(),1)
+		H:SpawnLabel("RtsMonInfoCloseText",close,Vector2(0.5,0.5),Vector2(0.5,0.5),Vector2.zero,Vector2(64,40),"닫기",H:ColInk(),18,TextAlignmentType.MiddleCenter,true)
+		H:SpawnClick("RtsMonInfoCloseClick",close):ConnectEvent(ButtonClickEvent,function() self:Close() end)
 		self.NameText = H:SpawnLabel("RtsMonInfoName", panel, Vector2(0, 1), Vector2(0, 1), Vector2(x0, -14), Vector2(self.BarW - 8, 30), "", H:ColInk(), 22, TextAlignmentType.MiddleLeft, true)
 		self.HpText = H:SpawnLabel("RtsMonInfoHpText", panel, Vector2(0, 1), Vector2(0, 1), Vector2(x0, -49), Vector2(self.BarW, 26), "", H:ColInk(), 16, TextAlignmentType.MiddleLeft, false)
 		self.HpPctText = H:SpawnLabel("RtsMonInfoHpPct", panel, Vector2(0, 1), Vector2(0, 1), Vector2(x0 + self.BarW + 4, -49), Vector2(self.PctW, 26), "", Color(0.43, 0.42, 0.62, 1), 18, TextAlignmentType.MiddleRight, false)
@@ -287,6 +294,7 @@ script RtsMonsterInfoLogic extends Logic
 			-- 줄 = 창 폭 전체(초상 아래까지), 위에 가는 구분선
 			local avail = self.LeftX + self.BarW + 4 + self.PctW + 18 - 24
 			local row = H:SpawnUI("model://uisprite", "RtsMonInfoDebuffs", self.PanelIn, Vector2(0, 0), Vector2(0, 0), Vector2(12, 8), Vector2(avail, 34))
+			if _RtsBoardViewLogic:IsMobileView() then row.UITransformComponent.RectSize = Vector2(avail,68) end
 			_RtsHudLogic:SetUiColor(row, Color(1, 1, 1, 0), "surface")
 			row.SpriteGUIRendererComponent.RaycastTarget = false
 			self.DebuffRow = row
@@ -324,6 +332,7 @@ script RtsMonsterInfoLogic extends Logic
 					Color(0.95, 0.95, 0.99, 1), H:ColBorderSoft(), 1)
 				x = x + w + math.floor(6 * k)
 				local outer = chip.Parent
+				if _RtsBoardViewLogic:IsMobileView() then outer.UITransformComponent.RectSize = Vector2(w,64) end
 				chip.SpriteGUIRendererComponent.RaycastTarget = false
 				if d.ruid ~= "" then
 					local icon = H:SpawnUI("model://uisprite", "RtsMonInfoDebuffIcon", chip, Vector2(0, 0.5), Vector2(0, 0.5), Vector2(4, 0), Vector2(24, 24))
@@ -346,8 +355,14 @@ script RtsMonsterInfoLogic extends Logic
 				local tr = outer.UITouchReceiveComponent
 				if tr == nil then tr = outer:AddComponent("UITouchReceiveComponent") end
 				local id = d.id
-				outer:ConnectEvent(UITouchEnterEvent, function(ev) self:ShowTip(id, 0) end)
-				outer:ConnectEvent(UITouchExitEvent, function(ev) if self.TipId == id then self:HideTip() end end)
+				if _RtsBoardViewLogic:IsMobileView() then
+					H:SpawnClickQuiet("RtsMonDebuffClick",chip):ConnectEvent(ButtonClickEvent,function()
+						if self.TipId == id then self:HideTip() else self:ShowTip(id,0) end
+					end)
+				else
+					outer:ConnectEvent(UITouchEnterEvent, function(ev) self:ShowTip(id, 0) end)
+					outer:ConnectEvent(UITouchExitEvent, function(ev) if self.TipId == id then self:HideTip() end end)
+				end
 			end
 		end
 		for i = 1, #list do
@@ -386,6 +401,7 @@ script RtsMonsterInfoLogic extends Logic
 		local h = math.max(self.PanelH, 16 + 26 + lines * 23 + 26)
 		local tip = H:SpawnRoundedPanel("RtsMonInfoTip", self.Panel, Vector2(1, 0), Vector2(0, 0), Vector2(8, 0), Vector2(W, h), Color(0.98, 0.985, 1, 0.98), H:ColBorder(), 1.5)
 		self.Tip = tip.Parent
+		if _RtsBoardViewLogic:IsMobileView() then _RtsUiLayoutLogic:Rect(self.Tip,0.5,1,0,12,W,h); self.Tip.UITransformComponent.Pivot = Vector2(0.5,0) end
 		self.Tip.SpriteGUIRendererComponent.RaycastTarget = false
 		tip.SpriteGUIRendererComponent.RaycastTarget = false
 		self.TipId = id

@@ -540,9 +540,9 @@ script RtsMonsterComponent extends Component
 			end
 		end
 		if clip == nil or clip == "" then return end
-		local mapRoot = _EntityService:GetEntityByPath("/maps/RtsMap")
+		local mapRoot = _RtsBoardViewLogic:GetRoot()
 		if mapRoot == nil then return end
-		local p = e.TransformComponent.WorldPosition
+		local p = _RtsBoardViewLogic:BoardPosition(e)
 		local at = Vector3(p.x, p.y + (fx.hitDy or 0.6), 0)
 		-- 보스(3배 크기)는 발밑이 아니라 몸 가운데(피격 박스 중심)에
 		if self.IsBoss and e.HitComponent ~= nil then

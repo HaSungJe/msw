@@ -67,7 +67,7 @@ script RtsWaveLogic extends Logic
 	--   표에 없는 id는 초록달팽이(M001)로 대신한다
 	@ExecSpace("ServerOnly")
 	method Entity SpawnMonsterEntity(string name, number zone, string mobId, number hp, boolean isBoss)
-		local mapRoot = _EntityService:GetEntityByPath("/maps/RtsMap")
+		local mapRoot = _RtsBoardViewLogic:GetRoot()
 		if mapRoot == nil then return nil end
 		local id = mobId
 		local mon = _RtsStageTableLogic:GetMonster(id)
@@ -167,7 +167,7 @@ script RtsWaveLogic extends Logic
 	-- 일시정지 모션(2026-09-25): 맵의 몬스터·보스 스프라이트 재생 속도 0 / 1(몬스터 본체 스프라이트는 기본 1 — 이펙트 자식은 건드리지 않는다)
 	@ExecSpace("ServerOnly")
 	method void SetMotionPaused(boolean on)
-		local mapRoot = _EntityService:GetEntityByPath("/maps/RtsMap")
+		local mapRoot = _RtsBoardViewLogic:GetRoot()
 		if mapRoot == nil then return end
 		local rate = 1
 		if on then rate = 0 end
@@ -280,7 +280,7 @@ script RtsWaveLogic extends Logic
 	method void ClearAll()
 		for n = 1, _RtsZoneLogic:GetZoneCount() do self:ClearZone(n) end
 		-- 죽는 연출 중인 시체까지(이름 "Mob…")
-		local mapRoot = _EntityService:GetEntityByPath("/maps/RtsMap")
+		local mapRoot = _RtsBoardViewLogic:GetRoot()
 		if mapRoot == nil then return end
 		local comps = mapRoot:GetChildComponentsByTypeName("RtsMonsterComponent", false)
 		for i = 1, #comps do

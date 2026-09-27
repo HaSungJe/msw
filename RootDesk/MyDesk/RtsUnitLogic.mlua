@@ -2,7 +2,7 @@
 --   유저별 유닛 6기(번호 1~6 = HUD 슬롯), 메소, 영입·레벨업·대상 지정·스킨·위치 이동·방출 요청 처리.
 --   판 시작 = 유닛 없음·메소 0(InitUser). 영입은 Lv1·무료, 보유 수 < 영입 한도(1·5·자쿰·혼테일·핑크빈·시그너스에서 1칸씩, RtsStageTableLogic.RecruitLimit)일 때만. 메소는 몹 처치 드랍(AddMeso).
 --   위치 이동과 대상 변경은 유닛마다 3분 쿨타임(고정). 탈락하면 유닛 전멸(WipeUnits), 새 판이면 초기화(ResetUser).
---   유닛 엔티티 이름 = "Unit<구역>_<번호>" (/maps/RtsMap 아래) — 클라는 이 이름으로 내 유닛을 찾는다.
+--   유닛 엔티티 이름 = "Unit<구역>_<번호>" (/maps/RtsMap/RtsBoard 아래) — 클라는 이 이름으로 내 유닛을 찾는다.
 @Logic
 script RtsUnitLogic extends Logic
 
@@ -38,11 +38,11 @@ script RtsUnitLogic extends Logic
 		return self.MaxUnits
 	end
 
-	-- 구역 zone에 실제로 있는 유닛 번호 목록(오름차순). 서버·클라 모두 맵 루트 자식 이름 "Unit<구역>_<번호>"를 스캔한다 — 6기 상한 없음
+	-- 구역 zone에 실제로 있는 유닛 번호 목록(오름차순). 서버·클라 모두 보드 루트 자식 이름 "Unit<구역>_<번호>"를 스캔한다 — 6기 상한 없음
 	method table ListZoneUnits(number zone)
 		local out = {}
 		if zone < 1 then return out end
-		local mapRoot = _EntityService:GetEntityByPath("/maps/RtsMap")
+		local mapRoot = _RtsBoardViewLogic:GetRoot()
 		if mapRoot == nil then return out end
 		local prefix = "Unit" .. string.format("%d", math.floor(zone + 0.5)) .. "_"
 		local kids = mapRoot.Children:ToTable()
@@ -83,7 +83,7 @@ script RtsUnitLogic extends Logic
 	@ExecSpace("ClientOnly")
 	method any GetZoneUnit(number zone, number no)
 		if zone < 1 then return nil end
-		local e = _EntityService:GetEntityByPath("/maps/RtsMap/" .. self:UnitName(zone, no))
+		local e = _EntityService:GetEntityByPath("/maps/RtsMap/RtsBoard/" .. self:UnitName(zone, no))
 		if e == nil then return nil end
 		return e.RtsUnitComponent
 	end
@@ -193,7 +193,7 @@ script RtsUnitLogic extends Logic
 	-- 유닛 엔티티 = MapObject + AvatarRenderer + CostumeManager(직업 세트) + RtsUnitComponent. 스케일 2 = 칸 80px. 클릭 판정은 RtsUnitSelectLogic(화면 터치 상자) — TouchReceive 없음
 	@ExecSpace("ServerOnly")
 	method Entity SpawnUnit(string userId, number zone, number no, string jobId, number level, number col, number row)
-		local mapRoot = _EntityService:GetEntityByPath("/maps/RtsMap")
+		local mapRoot = _RtsBoardViewLogic:GetRoot()
 		if mapRoot == nil then return nil end
 		-- 같은 슬롯에 이미 유닛이 있으면 먼저 지운다(2026-09-22: 개발 스크립트 스폰과 영입이 같은 순간 겹쳐 슬롯 1에 엔티티가 둘 → 방출 뒤 유령 유닛이 남아 계속 공격). 루프도 정지
 		local old = nil

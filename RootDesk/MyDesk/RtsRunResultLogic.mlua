@@ -374,7 +374,7 @@ script RtsRunResultLogic extends Logic
 	@ExecSpace("ServerOnly")
 	method void SpawnTomb(number zone)
 		if zone < 1 then return end
-		local mapRoot = _EntityService:GetEntityByPath("/maps/RtsMap")
+		local mapRoot = _RtsBoardViewLogic:GetRoot()
 		if mapRoot == nil then return end
 		local at = _RtsZoneLogic:GetBossPoint(zone)
 		local owner = self:OwnerOfZone(zone)

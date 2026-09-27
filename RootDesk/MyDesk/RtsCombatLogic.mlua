@@ -59,7 +59,7 @@ script RtsCombatLogic extends Logic
 	@ExecSpace("ServerOnly")
 	method table GetZoneMonsters(number zone)
 		local out = {}
-		local mapRoot = _EntityService:GetEntityByPath("/maps/RtsMap")
+		local mapRoot = _RtsBoardViewLogic:GetRoot()
 		if mapRoot == nil then return out end
 		local comps = mapRoot:GetChildComponentsByTypeName("RtsMonsterComponent", false)
 		for i = 1, #comps do
@@ -792,7 +792,7 @@ script RtsCombatLogic extends Logic
 		if k == nil or k.fx == nil then return end
 		local targets = {}
 		for nm in string.gmatch(targetNames, "[^,]+") do
-			local t = _EntityService:GetEntityByPath("/maps/RtsMap/" .. nm)
+			local t = _EntityService:GetEntityByPath("/maps/RtsMap/RtsBoard/" .. nm)
 			if t ~= nil then targets[#targets + 1] = t end
 		end
 		_RtsSkillFxLogic:Preload(k.fx)
@@ -803,7 +803,7 @@ script RtsCombatLogic extends Logic
 	--   h = 이 시전 안에서 몇 번째 타격인지(1부터; 쉐도우 파트너 ½타는 hits+h) — hitSoundEvery(n타마다 1번 소리, 39타 블레이드 토네이도)에 쓴다
 	@ExecSpace("Client")
 	method void HitFx(string targetName, number zone, number no, number idx, boolean crit, number h)
-		local t = _EntityService:GetEntityByPath("/maps/RtsMap/" .. targetName)
+		local t = _EntityService:GetEntityByPath("/maps/RtsMap/RtsBoard/" .. targetName)
 		if t == nil or t.RtsMonsterComponent == nil then return end
 		local u = _RtsUnitLogic:GetZoneUnit(zone, no)
 		if u == nil then return end
@@ -817,7 +817,7 @@ script RtsCombatLogic extends Logic
 	-- 전 클라: 도트 퍼니셔 구체 재조준 — (x, y)(대상이 죽은 자리)에서 새 대상 targetName으로 이어 날아가는 구체(서버 구체 재조준 redirect와 짝)
 	@ExecSpace("Client")
 	method void RedirectOrbFx(number zone, number no, number idx, number x, number y, string targetName, number lifeLeft)
-		local t = _EntityService:GetEntityByPath("/maps/RtsMap/" .. targetName)
+		local t = _EntityService:GetEntityByPath("/maps/RtsMap/RtsBoard/" .. targetName)
 		if t == nil or not isvalid(t) then return end
 		local u = _RtsUnitLogic:GetZoneUnit(zone, no)
 		if u == nil then return end

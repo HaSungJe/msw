@@ -11,7 +11,7 @@ script RtsUnitPopupLogic extends Logic
 	property number PanelW = 1360
 
 	-- 2026-09-27 880 → 960(사용자 "아래쪽 공간이 너무 부족" — 왼쪽 아래 보스 DPS 상자가 들어오며 도형 기준 안내가 창 밖으로 잘렸다)
-	property number PanelH = 960
+	property number PanelH = 780
 
 	-- 지금 보고 있는 유닛 번호(0 = 닫힘)
 	property number CurNo = 0
@@ -23,7 +23,7 @@ script RtsUnitPopupLogic extends Logic
 	property Entity Dropdown = nil
 
 	-- 우측 탭: skill / aug / buff (팝업을 닫아도 유지)
-	property string Tab = "active"
+	property string Tab = "info"
 
 	property Entity BondCoolText = nil
 
@@ -70,6 +70,7 @@ script RtsUnitPopupLogic extends Logic
 		-- 이미 열려 있으면(같은 유닛을 다시 클릭 등) 먼저 닫는다 — Open 안의 Close가 CurNo를 지우기 때문
 		if _RtsPopupLogic:IsOpen() then _RtsPopupLogic:Close() end
 		self.CurNo = no
+		self.Tab = "info"
 		_RtsPopupLogic:Open("unit")
 	end
 
@@ -357,19 +358,21 @@ script RtsUnitPopupLogic extends Logic
 		self:ApplyDps(u)
 
 		-- ----- 우: 탭(스킬 / 증강 n / 적용 중인 버프 n) + 목록 -----
-		local rx = 647
+		local rx = 27
 		local rw = self.PanelW - rx - 27
 		local augs = B:GetAugmentsFor(u.Zone, u.No)
+		self._T.InfoPage = _RtsUiLayoutLogic:UnitInfo(content)
 		local tabs = {
-			{ id = "active", text = "액티브", w = 104 },
-			{ id = "passive", text = "패시브", w = 104 },
-			{ id = "aug", text = "증강 " .. H:Int(#augs), w = 130 },
-			{ id = "buff", text = "버프 " .. H:Int(self:BuffCount(u, buffs)), w = 130 },
+			{ id = "info", text = "능력치", w = 220 },
+			{ id = "active", text = "액티브", w = 220 },
+			{ id = "passive", text = "패시브", w = 220 },
+			{ id = "aug", text = "증강 " .. H:Int(#augs), w = 220 },
+			{ id = "buff", text = "버프 " .. H:Int(self:BuffCount(u, buffs)), w = 220 },
 		}
 		-- 탭은 제자리(켜짐·개수 글자만 바뀜 — RenderRight), 누르면 오른쪽 내용만 다시(2026-09-25 "필요한 부분만")
 		local items = {}
 		for i = 1, #tabs do items[i] = { tabs[i].id, tabs[i].text, tabs[i].w } end
-		self.TabBar = P:SpawnTabBar(content, "RtsUnitTab", items, self.Tab, rx, -10, 120, 48, 8, 18, function(key)
+		self.TabBar = P:SpawnTabBar(content, "RtsUnitTab", items, self.Tab, rx, -10, 220, 72, 12, 24, function(key)
 			self.Tab = key
 			self:RenderRight(_RtsUnitLogic:GetMyUnit(self.CurNo))
 		end)
@@ -386,10 +389,10 @@ script RtsUnitPopupLogic extends Logic
 		--   누적 투자·다음 벽까지 비용·보유 메소는 안 보인다(2026-09-16 사용자: 유저에게 필요 없는 내부 정보. 메소는 HUD 좌상단에 있음).
 		--   벽 레벨(10·20·…)도 유저에겐 그냥 다음 레벨 — 비용만 보여 주고 '(벽)' 문구·붉은색 없음
 		-- 레벨업 → Lv n (메소 부족·최대 레벨은 흐리게). 모양·글자는 ApplyLevelButton이 제자리에서 바꾸고, 클릭은 누를 때 가능 여부를 본다
-		local lbtn = H:SpawnRoundedPanel("RtsUnitLvUp", content, Vector2(1, 0), Vector2(1, 0), Vector2(-27, 10), Vector2(340, 54), H:ColGold(), H:ColGold(), 1.5)
+		local lbtn = H:SpawnRoundedPanel("RtsUnitLvUp", content, Vector2(1, 0), Vector2(1, 0), Vector2(-27, 10), Vector2(380, 80), H:ColGold(), H:ColGold(), 1.5)
 		self.LvBtn = lbtn
 		-- 오른쪽 72 = [Space] 키캡(58, 여백 6) + 틈 8 — 전엔 14라 글자·메소 아이콘이 키캡과 겹쳤다(2026-09-25 사용자 "레벨업과 스페이스 버튼이 겹침")
-		self.LvRow = _RtsUnitSelectLogic:SpawnLvRow(lbtn, 72, 16)
+		self.LvRow = _RtsUnitSelectLogic:SpawnLvRow(lbtn, 72, 24)
 		self:ApplyLevelButton(u)
 		local lclick = H:SpawnClick("RtsUnitLvUpClick", lbtn)
 		lclick:ConnectEvent(ButtonClickEvent, function(event)
@@ -469,22 +472,22 @@ script RtsUnitPopupLogic extends Logic
 	method void BuildTargetRow(Entity row, any u, number rx, number sy)
 		local H = _RtsHudLogic
 		local P = _RtsPopupLogic
-		local targetY = row.Parent.UITransformComponent.RectSize.y - 46
-		H:SpawnLabel("RtsUnitTgtK", row, Vector2(0, 1), Vector2(0, 1), Vector2(70, -targetY), Vector2(50, 30),
+		local targetY = row.Parent.UITransformComponent.RectSize.y - 108
+		H:SpawnLabel("RtsUnitTgtK", row, Vector2(0, 1), Vector2(0, 1), Vector2(70, -targetY), Vector2(50, 96),
 			"대상:", _RtsPopupLogic:Muted(), 14, TextAlignmentType.MiddleLeft, false)
 		self.BondLocked = u:BondCoolLeft() > 0
 		local bg = P:Mix(Color.white, 0.55)
 		local border = P:Mix(Color.white, 0.28)
 		if self.BondLocked then border = P:Edge() end
-		local btn = H:SpawnRoundedPanel("RtsUnitTgtSel", row, Vector2(0, 1), Vector2(0, 1), Vector2(118, -targetY), Vector2(250, 30), bg, border, 1.5)
+		local btn = H:SpawnRoundedPanel("RtsUnitTgtSel", row, Vector2(0, 1), Vector2(0, 1), Vector2(118, -targetY), Vector2(360, 96), bg, border, 1.5)
 		self.BondBtn = btn
 		local ink = _RtsPopupLogic:Ink()
 		if self.BondLocked then ink = Color(0.6, 0.56, 0.5, 1) end
-		H:SpawnLabel("RtsUnitTgtCur", btn, Vector2(0, 0.5), Vector2(0, 0.5), Vector2(10, 0), Vector2(200, 26),
-			self:TargetLabel(u.BondNo), ink, 14, TextAlignmentType.MiddleLeft, false)
+		H:SpawnLabel("RtsUnitTgtCur", btn, Vector2(0, 0.5), Vector2(0, 0.5), Vector2(10, 0), Vector2(310, 84),
+			self:TargetLabel(u.BondNo), ink, 22, TextAlignmentType.MiddleLeft, false)
 		H:SpawnLabel("RtsUnitTgtArrow", btn, Vector2(1, 0.5), Vector2(1, 0.5), Vector2(-8, 0), Vector2(20, 26),
 			"▼", _RtsPopupLogic:Muted(), 11, TextAlignmentType.MiddleCenter, false)
-		local cool = H:SpawnLabel("RtsUnitTgtCool", row, Vector2(0, 1), Vector2(0, 1), Vector2(380, -targetY), Vector2(320, 30),
+		local cool = H:SpawnLabel("RtsUnitTgtCool", row, Vector2(0, 1), Vector2(0, 1), Vector2(498, -targetY), Vector2(650, 96),
 			"", _RtsPopupLogic:Muted(), 13, TextAlignmentType.MiddleLeft, false)
 		self.BondCoolText = cool
 		self:ApplyBondCool(u)
@@ -508,8 +511,8 @@ script RtsUnitPopupLogic extends Logic
 					y = y + scroll:GetScrollNormalizedPosition().y * math.max(0, bottom - scroll.Entity.UITransformComponent.RectSize.y)
 				end
 				local count = #_RtsUnitLogic:ListZoneUnits(_RtsUnitLogic:MyZone())
-				x = math.max(16, math.min(x, transform.RectSize.x - 266))
-				y = math.max(-transform.RectSize.y + 30 * count + 20, y)
+				x = math.max(16, math.min(x, transform.RectSize.x - 376))
+				y = math.max(-transform.RectSize.y + 84 * count + 20, y)
 				self:ToggleDropdown(x, y)
 			end)
 		end
@@ -550,8 +553,8 @@ script RtsUnitPopupLogic extends Logic
 
 			local lines = self:DescLines(k.desc, descW)
 			local rh = rh0 + (lines - 1) * 24
-			if lockable0 then rh = rh + 48 end
-			if isTarget then rh = rh + 52 end
+			if lockable0 then rh = rh + 108 end
+			if isTarget then rh = rh + 108 end
 			local bg = P:Card()
 			local border = P:Edge()
 			if not got then
@@ -633,6 +636,9 @@ script RtsUnitPopupLogic extends Logic
 		local H = _RtsHudLogic
 		local P = _RtsPopupLogic
 		local cur = _RtsJobTableLogic:GetLock(u.SkillLocks, idx)
+		local by = 12
+		local skill = _RtsJobTableLogic:GetSkillsFor(u)[idx]
+		if skill ~= nil and skill.target then by = 120 end
 		if cur == 3 then
 			local pc = P:GradeColor("prism")
 			local pill = H:SpawnRoundedPanel("RtsUnitLock" .. H:Int(idx) .. "_3", row, Vector2(0, 0), Vector2(0, 0), Vector2(70, 12), Vector2(150, 36), P:Mix(pc, 0.22), pc, 1.5)
@@ -640,7 +646,7 @@ script RtsUnitPopupLogic extends Logic
 				"영구 잠금", _RtsPopupLogic:Ink(), 16, TextAlignmentType.MiddleCenter, true)   -- 이모지(🔒)는 게임 폰트에 없어 안 그려진다(실측)
 			return
 		end
-		local opts = { { m = 0, w = 104, c = Color(0.624, 0.827, 0.604, 1) }, { m = 1, w = 154, c = Color(0.91, 0.635, 0.416, 1) }, { m = 2, w = 104, c = Color(0.86, 0.47, 0.44, 1) } }
+		local opts = { { m = 0, w = 220, c = Color(0.624, 0.827, 0.604, 1) }, { m = 1, w = 260, c = Color(0.91, 0.635, 0.416, 1) }, { m = 2, w = 220, c = Color(0.86, 0.47, 0.44, 1) } }
 		local total = 0
 		for i = 1, #opts do total = total + opts[i].w end
 		total = total + 4 * (#opts - 1)
@@ -656,9 +662,9 @@ script RtsUnitPopupLogic extends Logic
 				border = o.c
 				ink = _RtsPopupLogic:Ink()
 			end
-			local btn = H:SpawnRoundedPanel("RtsUnitLock" .. H:Int(idx) .. "_" .. H:Int(o.m), row, Vector2(0, 0), Vector2(0, 0), Vector2(x, 12), Vector2(o.w, 36), bg, border, 1.5)
-			H:SpawnLabel("RtsUnitLockText", btn, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2(0, 0), Vector2(o.w - 8, 32),
-				_RtsJobTableLogic:LockName(o.m), ink, 16, TextAlignmentType.MiddleCenter, on)
+			local btn = H:SpawnRoundedPanel("RtsUnitLock" .. H:Int(idx) .. "_" .. H:Int(o.m), row, Vector2(0, 0), Vector2(0, 0), Vector2(x, by), Vector2(o.w, 96), bg, border, 1.5)
+			H:SpawnLabel("RtsUnitLockText", btn, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2(0, 0), Vector2(o.w - 8, 84),
+				_RtsJobTableLogic:LockName(o.m), ink, 22, TextAlignmentType.MiddleCenter, on)
 			if not on then
 				local mode = o.m
 				local click = H:SpawnClick("RtsUnitLockClick", btn)
@@ -666,7 +672,7 @@ script RtsUnitPopupLogic extends Logic
 					_RtsUnitLogic:RequestSkillLock(self.CurNo, idx, mode)
 				end)
 			end
-			x = x + o.w + 4
+			x = x + o.w + 12
 		end
 	end
 
@@ -675,7 +681,7 @@ script RtsUnitPopupLogic extends Logic
 	@ExecSpace("ClientOnly")
 	method Entity SpawnScrollList(Entity content, string name, number rx, number rw, number top, number rows)
 		local H = _RtsHudLogic
-		local list = H:SpawnStretch("model://uisprite", name, content, Vector2(0, 0), Vector2(0, 1), Vector2(rx, 66), Vector2(rx + rw, top))
+		local list = H:SpawnStretch("model://uisprite", name, content, Vector2(0, 0), Vector2(0, 1), Vector2(rx, 104), Vector2(rx + rw, top))
 		if list == nil then return nil end
 		H:Tint(list, 1, 1, 1, 0)
 		local viewH = (self.PanelH - 70) - 66 + top
@@ -905,8 +911,8 @@ script RtsUnitPopupLogic extends Logic
 				if o ~= nil then options[#options + 1] = { no = no, text = self:TargetLabel(no) } end
 			end
 		end
-		local rowH = 30
-		local list = H:SpawnRoundedPanel("RtsUnitTgtList", self.Content, Vector2(0, 1), Vector2(0, 1), Vector2(x, y), Vector2(250, rowH * #options + 4),
+		local rowH = 84
+		local list = H:SpawnRoundedPanel("RtsUnitTgtList", self.Content, Vector2(0, 1), Vector2(0, 1), Vector2(x, y), Vector2(360, rowH * #options + 4),
 			P:Card(), H:ColGold(), 1.5)
 		self.Dropdown = list.Parent
 		for i = 1, #options do
@@ -914,10 +920,10 @@ script RtsUnitPopupLogic extends Logic
 			local on = (o.no == u.BondNo)
 			local bg = P:Card()
 			if on then bg = P:Mix(H:ColGold(), 0.2) end
-			local item = H:SpawnUI("model://uisprite", "RtsUnitTgtItem" .. tostring(i), list, Vector2(0, 1), Vector2(0, 1), Vector2(2, -2 - (i - 1) * rowH), Vector2(246, rowH))
+			local item = H:SpawnUI("model://uisprite", "RtsUnitTgtItem" .. tostring(i), list, Vector2(0, 1), Vector2(0, 1), Vector2(2, -2 - (i - 1) * rowH), Vector2(356, rowH))
 			_RtsHudLogic:SetUiColor(item, bg, "surface")
-			H:SpawnLabel("RtsUnitTgtItemText", item, Vector2(0, 0.5), Vector2(0, 0.5), Vector2(10, 0), Vector2(230, 26),
-				o.text, _RtsPopupLogic:Ink(), 14, TextAlignmentType.MiddleLeft, false)
+			H:SpawnLabel("RtsUnitTgtItemText", item, Vector2(0, 0.5), Vector2(0, 0.5), Vector2(10, 0), Vector2(332, 72),
+				o.text, _RtsPopupLogic:Ink(), 22, TextAlignmentType.MiddleLeft, false)
 			local pick = o.no
 			local click = H:SpawnClick("RtsUnitTgtItemClick", item)
 			click:ConnectEvent(ButtonClickEvent, function(event)
@@ -947,14 +953,16 @@ script RtsUnitPopupLogic extends Logic
 	@ExecSpace("ClientOnly")
 	method void CycleTab()
 		if self.CurNo == 0 or self.Body == nil then return end
-		if self.Tab == "active" then
+		if self.Tab == "info" then
+			self.Tab = "active"
+		elseif self.Tab == "active" then
 			self.Tab = "passive"
 		elseif self.Tab == "passive" then
 			self.Tab = "aug"
 		elseif self.Tab == "aug" then
 			self.Tab = "buff"
 		else
-			self.Tab = "active"
+			self.Tab = "info"
 		end
 		self:RenderRight(_RtsUnitLogic:GetMyUnit(self.CurNo))
 	end
@@ -984,14 +992,15 @@ script RtsUnitPopupLogic extends Logic
 		self._T.RightTab = self.Tab
 		local box = P:SpawnBox(self.Content, "RtsUnitRight")
 		self.RightBox = box
-		local rx = 647
+		local rx = 27
 		local rw = self.PanelW - rx - 27
-		local top = -74
+		local top = -98
+		if isvalid(self._T.InfoPage) then self._T.InfoPage:SetEnable(self.Tab == "info") end
 		if self.Tab == "aug" then
 			self:BuildAugTabFor(box, u, rx, rw, top, augs)
 		elseif self.Tab == "buff" then
 			self:BuildBuffTabFor(box, u, rx, rw, top, buffs)
-		else
+		elseif self.Tab ~= "info" then
 			self:BuildSkillTab(box, u, rx, rw, top)
 		end
 		if scrollPos ~= nil then

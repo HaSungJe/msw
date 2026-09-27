@@ -52,7 +52,7 @@ script RtsUnitBuffLogic extends Logic
 	-- 구역 zone의 유닛 no의 상태 컴포넌트 — 서버·클라 어디서든(엔티티 경로 조회). 2026-09-19: 전투(서버)도 버프를 써야 해서 ClientOnly인 RtsUnitLogic.GetZoneUnit 대신
 	method any UnitAt(number zone, number no)
 		if zone < 1 then return nil end
-		local e = _EntityService:GetEntityByPath("/maps/RtsMap/" .. _RtsUnitLogic:UnitName(zone, no))
+		local e = _EntityService:GetEntityByPath("/maps/RtsMap/RtsBoard/" .. _RtsUnitLogic:UnitName(zone, no))
 		if e == nil or not isvalid(e) then return nil end
 		return e.RtsUnitComponent
 	end
@@ -190,7 +190,7 @@ script RtsUnitBuffLogic extends Logic
 		if badge.TextRendererComponent.Text ~= label then badge.TextRendererComponent.Text = label end
 		local cell = _RtsConfigLogic:GetGridCell()
 		local center = _RtsZoneLogic:GetCellCenter(u.Zone, u.Col, u.Row)
-		local pos = e.TransformComponent.WorldPosition
+		local pos = _RtsBoardViewLogic:BoardPosition(e)
 		local scale = e.TransformComponent.Scale
 		local dx = center.x + cell / 2 - self.BadgeInset - 0.6 - pos.x
 		local dy = center.y + cell / 2 - self.BadgeInset - 0.2 - pos.y

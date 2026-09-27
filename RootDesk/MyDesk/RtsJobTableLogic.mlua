@@ -698,11 +698,11 @@ script RtsJobTableLogic extends Logic
 		end
 		if jobId == "phantom" then
 			return {
-				-- 조커: 전용 PNG 8장 연사 루프 + 독립 카드/고리. 대상 방향 1.55유닛 앞에서 출발해 고리 가장자리가 몸 앞부분에 살짝 겹친다.
+				-- 조커: 전용 PNG 8장 연사 루프 + 독립 카드/고리. 대상 방향 1.10유닛 앞에서 출발, 1칸 미만은 직선으로 날아간다.
 				{ lv = 1, kind = "액티브", name = "조커", desc = "사거리 5 안의 적 1마리를 192.5%의 데미지로 공격한다. 공격속도와 관계없이 0.1초마다 카드를 던진다.", target = false, range = 5,
 					fx = { motion = "phantomJoker", motionLoop = true,
 						proj = "019edd955d0e4e3eac59989654278fac", projRing = "dadc8093850a445394ea6b883e89f4a8", projWidth = 1.152, projRingSize = 2.528, projSpin = 458.37, projRingSpin = 286.48,
-						projCount = 2, projStagger = 0.05, projSec = 0.4, projDx = 1.55, projDy = 0.84, projNoRotate = true, projArc = 1.0, projArcByDist = { 1.0, 1.1, 1.2, 1.3 }, assetFacesLeft = true,
+						projCount = 2, projStagger = 0.05, projSec = 0.4, projDx = 1.10, projDy = 1.04, projNoRotate = true, projArc = 1.0, projArcMinCells = 1, projArcByDist = { 1.0, 1.1, 1.2, 1.3 }, assetFacesLeft = true,
 						hitDelay = 0.35, hitClips = { "6c691c6d80724c7f966326006e210fcc", "f0f23e845b144475b9b8a7059e4821cc", "8b23673c5c2d4443b384b080eaa1dac2" }, hitScale = 1.4, hitDy = 0.6, hitSound = "e37b311a831546b99b6e512f7ba6983c" } },
 				{ lv = 10, kind = "패시브", name = "조커: 날카로운 검", desc = "모든 아군 유닛의 최종 데미지가 5% 증가한다.", target = false },
 				{ lv = 20, kind = "패시브", name = "문라이트", desc = "공격력이 150, 공격력이 10% 증가한다.", target = false },

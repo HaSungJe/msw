@@ -184,7 +184,7 @@ script RtsHudLogic extends Logic
 			return Color(0.60 + light.r * 0.40, 0.60 + light.g * 0.40, 0.63 + light.b * 0.37, light.a)
 		end
 		if role == "border" then
-			if hi - lo < 0.13 then return Color(0.31, 0.36, 0.47, light.a) end
+			if hi - lo < 0.13 then return Color(0.247, 0.286, 0.392, light.a) end
 			-- 등급·위험·성공 테두리는 기존의 의미 색을 그대로 유지한다.
 			return light
 		end
@@ -192,6 +192,10 @@ script RtsHudLogic extends Logic
 			if hi < 0.55 then return light end
 			local alpha = light.a
 			if alpha >= 0.35 then alpha = math.max(alpha, 0.94) end
+			if hi-lo < 0.08 then
+				if light.a < 0.8 or lo < 0.975 then return Color(0.141,0.18,0.267,alpha) end
+				return Color(0.106,0.133,0.208,alpha)
+			end
 			return Color(0.10 + (light.r - lo) * 0.38, 0.125 + (light.g - lo) * 0.38, 0.18 + (light.b - lo) * 0.38, alpha)
 		end
 		return light
@@ -447,11 +451,11 @@ script RtsHudLogic extends Logic
 	end
 
 	method Color ColGold()
-		return Color(0.65, 0.64, 0.81, 1)
+		return Color(0.533, 0.400, 0.863, 1)
 	end
 
 	method Color ColPanel()
-		return Color(0.98, 0.985, 1, 0.88)
+		return Color(0.988, 0.988, 1, 0.98)
 	end
 
 	method Color MixPanel(Color top, number amount)
@@ -461,7 +465,7 @@ script RtsHudLogic extends Logic
 	end
 
 	method Color ColBorder()
-		return Color(0.83, 0.85, 0.93, 0.85)
+		return Color(0.851, 0.851, 0.922, 1)
 	end
 
 	method Color ColBorderSoft()
@@ -606,6 +610,7 @@ script RtsHudLogic extends Logic
 		-- 배속 스위치: 화면 모드 위 12px 간격, 오른쪽 16px·아래 92px. 묶음 212×92, 트랙 212×64.
 		--   손잡이 100×52(1배속 왼쪽 초록 · 2배속 오른쪽 빨강), 반쪽마다 글자 1배속·2배속과 누르는 칸(RtsStageLogic.RequestSpeedChoice). 위 = 여럿일 때 배속마다 고른 사람 수
 		local sbox = self:SpawnUI("model://uisprite", "RtsSpeedBox", grp, Vector2(1, 0), Vector2(1, 0), Vector2(-16, 92), Vector2(212, 92))
+		sbox:SetEnable(false)
 		self:SetUiColor(sbox, Color(1, 1, 1, 0), "surface")
 		sbox.SpriteGUIRendererComponent.RaycastTarget = false
 		local track = self:SpawnRoundedPanel("RtsSpeedTrack", sbox, Vector2(0, 0), Vector2(0, 0), Vector2(0, 0), Vector2(212, 64), self:ColPanel(), self:ColBorder(), 2)
@@ -922,10 +927,11 @@ script RtsHudLogic extends Logic
 		local key = tostring(show) .. "|" .. tostring(mine) .. "|" .. tostring(solo) .. "|" .. self:Int(fastN) .. "|" .. self:Int(slowN)
 		if key == self.SpeedShown then return end
 		self.SpeedShown = key
-		self.SpeedBox:SetEnable(show)
+		-- 배속 조작은 왼쪽 버튼에서만 제공한다. 상태 변경 때 기존 스위치를 다시 켜지 않는다.
+		self.SpeedBox:SetEnable(false)
 		if not show then return end
 		-- 일시정지 표시 여부와 관계없이 화면 모드 위에 고정한다.
-		if not Environment:IsMobilePlatform() then self.SpeedBox.UITransformComponent.anchoredPosition = Vector2(-16, 92) end
+		-- 화면 배치는 RtsUiLayoutLogic이 유지한다.
 		-- 손잡이: 1배속 왼쪽(4) 초록 / 2배속 오른쪽(104) 빨강
 		local knob = self.SpeedKnob
 		if mine then
@@ -986,9 +992,11 @@ script RtsHudLogic extends Logic
 		local y1 = math.max(lo.y, hi.y)
 		local unit = (y1 - y0) / 1080
 		if unit <= 0 then return nil end
-		-- 공개 SafeArea API가 없어 노치·내비게이션 영역에 보수적인 여백을 둔다.
-		return { x0 = x0 + 96 * unit, x1 = x1 - 96 * unit,
-			y0 = y0 + 64 * unit, y1 = y1 - 48 * unit, unit = unit,
+		-- 화면 실측 경계에 붙이고 최소 여백만 둔다. 플랫폼 메뉴는 오른쪽 레일 상단에서 별도로 피한다.
+		local mobile = _RtsBoardViewLogic:IsMobileView()
+		local side = mobile and 32 or 28
+		return { x0 = x0 + side * unit, x1 = x1 - side * unit,
+			y0 = y0 + (mobile and 20 or 24) * unit, y1 = y1 - (mobile and 20 or 24) * unit, unit = unit,
 			key = tostring(w) .. ":" .. tostring(h) .. ":" .. tostring(x1 - x0) .. ":" .. tostring(y1 - y0) }
 	end
 
@@ -1009,7 +1017,7 @@ script RtsHudLogic extends Logic
 	@ExecSpace("ClientOnly")
 	method void OnUpdate(number delta)
 		-- 해상도가 달라진 때만 기존 엔티티를 이동한다. 창을 다시 열지 않는다.
-		if not self.Built or not Environment:IsMobilePlatform() then return end
+		if not self.Built then return end
 		self.MobileLayoutElapsed = self.MobileLayoutElapsed + delta
 		if self.MobileLayoutElapsed < 0.25 then return end
 		self.MobileLayoutElapsed = 0
@@ -1018,79 +1026,13 @@ script RtsHudLogic extends Logic
 
 	@ExecSpace("ClientOnly")
 	method void RefreshMobileLayout(boolean force)
-		-- PC 레이아웃과 서버 게임 상태는 건드리지 않는 모바일 전용 배치다.
-		if not self.Built or not Environment:IsMobilePlatform() then return end
-		local v = self:MobileViewport()
-		if v == nil then return end
-		local diff = _RtsDifficultyLogic.Bar
-		local diffKey = ""
-		if isvalid(diff) then diffKey = diff.Id end
-		local key = v.key .. ":" .. diffKey
-		if not force and self._T.MobileLayoutKey == key then return end
-		local top = self.HudGroup:GetChildByName("RtsTopBox")
-		self:PlaceMobile(top, v, 0, 1, 0, 0, 400, 208, 1.15)
-		self:PlaceMobile(self.PlayersBox, v, 0, 1, 0, -252, self.CardW, 24 + 4 * (self.CardH + self.CardGap), 1.15)
-		self.PlayersBox.SpriteGUIRendererComponent.RaycastTarget = false
-		self:PlaceMobile(self.RestartBtn.Parent, v, 0.5, 1, -118, 0, 220, 88, 1)
-		self:PlaceMobile(self.PauseBtn.Parent, v, 0.5, 1, 118, 0, 220, 88, 1)
-		self:SetLabelSize(self.RestartText, 26)
-		self:SetLabelSize(self.PauseText, 26)
-		self.PauseText.UITransformComponent.anchoredPosition = Vector2.zero
-		self.PauseText.UITransformComponent.RectSize = Vector2(204, 60)
-		local pkey = self.PauseBtn:GetChildByName("RtsPauseKey")
-		if isvalid(pkey) then pkey:SetEnable(false) end
-		self:PlaceMobile(self.VotePanel.Parent, v, 0.5, 1, 0, -100, 420, 160, 1)
-		self.VoteText.UITransformComponent.RectSize = Vector2(396, 48)
-		self:SetLabelSize(self.VoteText, 20)
-		for i, button in ipairs({self.VoteYesBtn, self.VoteNoBtn}) do
-			button.Parent.UITransformComponent.RectSize = Vector2(190, 88)
-			button.Parent.UITransformComponent.anchoredPosition = Vector2(12 + (i - 1) * 204, 12)
-		end
-		for i = 1, 6 do
-			local slot = self.UnitSlots[i]
-			if slot ~= nil then
-				self:PlaceMobile(slot.box.Parent, v, 1, 1, 0, -96 - (i - 1) * 100, 260, 88, 1)
-				self:LayoutMobileSlot(i)
-			end
-		end
-		self:PlaceMobile(self.AugBtn.Parent, v, 0, 0, 0, 0, 250, 78, 1.4)
-		self:PlaceMobile(self.RecruitBtn.Parent, v, 0, 0, 370, 0, 240, 96, 1)
-		self.RecruitText.UITransformComponent.RectSize = Vector2(224, 72)
-		self:SetLabelSize(self.RecruitText, 26)
-		self:PlaceMobile(self.SpeedBox, v, 1, 0, 0, 112, 212, 92, 1.5)
-		self:PlaceMobile(self.HudGroup:GetChildByName("RtsUiModeSwitch"), v, 1, 0, 0, 0, 212, 64, 1.5)
-		self:PlaceMobile(self.Hint, v, 0.5, 1, 0, -290, 720, 60, 1)
-		self:SetLabelSize(self.HintText, 24)
-		self.HintText.UITransformComponent.RectSize = Vector2(696, 52)
-		local dev = self.HudGroup:GetChildByName("RtsDevBtn")
-		self:PlaceMobile(dev, v, 1, 0, -340, 0, 160, 80, 1)
-		if isvalid(diff) then
-			self:PlaceMobile(diff.Parent, v, 0.5, 1, 0, 0, 690, 132, 1.15)
-			for _, button in ipairs(_RtsDifficultyLogic.Btns) do
-				local size = button.Parent.UITransformComponent.RectSize
-				button.Parent.UITransformComponent.RectSize = Vector2(size.x, 78)
-			end
-			if isvalid(_RtsDifficultyLogic.StartBtn) then
-				_RtsDifficultyLogic.StartBtn.Parent.UITransformComponent.RectSize = Vector2(220, 78)
-			end
-		end
-		_RtsPopupLogic:RefreshMobilePopup()
-		self._T.MobileLayoutKey = key
-		_RtsConfigLogic:Log("RtsHud mobile viewport " .. v.key)
+		-- 승인된 PC/모바일 시안을 공통 배치 로직으로 적용한다.
+		_RtsUiLayoutLogic:Refresh(force)
 	end
 
 	@ExecSpace("ClientOnly")
 	method void LayoutMobileSlot(number i)
-		-- 유닛 갱신이 기존 PC용 글자 폭을 덮어쓴 뒤 모바일 폭을 다시 맞춘다.
-		if not Environment:IsMobilePlatform() then return end
-		local s = self.UnitSlots[i]
-		if s == nil then return end
-		local width = 238
-		if s.filled then width = 168 end
-		s.name.UITransformComponent.RectSize = Vector2(width, 60)
-		self:SetLabelSize(s.name, 24)
-		s.lv.UITransformComponent.RectSize = Vector2(64, 60)
-		self:SetLabelSize(s.lv, 22)
+		_RtsUiLayoutLogic:Slot(i)
 	end
 
 	@ExecSpace("ClientOnly")

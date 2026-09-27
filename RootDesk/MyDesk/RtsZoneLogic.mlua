@@ -270,9 +270,9 @@ script RtsZoneLogic extends Logic
 	@ExecSpace("ServerOnly")
 	method void EnsureZoneVisuals()
 		if self.VisualsBuilt then return end
-		local mapRoot = _EntityService:GetEntityByPath("/maps/RtsMap")
+		local mapRoot = _RtsBoardViewLogic:GetRoot()
 		if mapRoot == nil then return end
-		if _EntityService:GetEntityByPath("/maps/RtsMap/ZoneGrid1") ~= nil then
+		if _EntityService:GetEntityByPath("/maps/RtsMap/RtsBoard/ZoneGrid1") ~= nil then
 			self.VisualsBuilt = true
 			return
 		end
@@ -316,14 +316,14 @@ script RtsZoneLogic extends Logic
 	--   2026-09-25 구역마다 테마가 다를 수 있어 구역 단위로(RtsThemeLogic.ApplyToZone). 전엔 8구역 한꺼번에 SetDecor
 	@ExecSpace("ServerOnly")
 	method void SetZoneDecor(number zone, table list)
-		local mapRoot = _EntityService:GetEntityByPath("/maps/RtsMap")
+		local mapRoot = _RtsBoardViewLogic:GetRoot()
 		if mapRoot == nil then return end
 		local n = math.floor(zone + 0.5)
 		-- 옛 장식: 기록한 개수까지 + 그 뒤로도 이름이 이어지는 동안 지운다(개수 기록이 없는 경로에서도 남지 않게)
 		local old = self.DecorCountByZone[n] or 0
 		local i = 1
 		while true do
-			local e = _EntityService:GetEntityByPath("/maps/RtsMap/ZoneDecor" .. string.format("%d_%d", n, i))
+			local e = _EntityService:GetEntityByPath("/maps/RtsMap/RtsBoard/ZoneDecor" .. string.format("%d_%d", n, i))
 			if e == nil and i > old then break end
 			if e ~= nil then e:Destroy() end
 			i = i + 1
@@ -352,9 +352,9 @@ script RtsZoneLogic extends Logic
 		if ruid == nil or ruid == "" then return end
 		local n = math.floor(zone + 0.5)
 		local name = "ZoneBackground" .. string.format("%d", n)
-		local bg = _EntityService:GetEntityByPath("/maps/RtsMap/" .. name)
+		local bg = _EntityService:GetEntityByPath("/maps/RtsMap/RtsBoard/" .. name)
 		if bg == nil then
-			local mapRoot = _EntityService:GetEntityByPath("/maps/RtsMap")
+			local mapRoot = _RtsBoardViewLogic:GetRoot()
 			if mapRoot == nil then return end
 			bg = self:SpawnProp(name, mapRoot, _RtsConfigLogic:GetZoneCenter(n), ruid, 90)
 			if bg == nil then return end
@@ -371,7 +371,7 @@ script RtsZoneLogic extends Logic
 	-- 트랙 판(구역 하나): 이미 세워진 ZoneGrid{n}의 텍스처·색만 바꾼다(RtsThemeLogic.ApplyToZone)
 	@ExecSpace("ServerOnly")
 	method void SetZoneGrid(number zone, string ruid, Color tint)
-		local grid = _EntityService:GetEntityByPath("/maps/RtsMap/ZoneGrid" .. string.format("%d", math.floor(zone + 0.5)))
+		local grid = _EntityService:GetEntityByPath("/maps/RtsMap/RtsBoard/ZoneGrid" .. string.format("%d", math.floor(zone + 0.5)))
 		if grid == nil or grid.SpriteRendererComponent == nil then return end
 		grid.SpriteRendererComponent.SpriteRUID = ruid
 		grid.SpriteRendererComponent.Color = tint

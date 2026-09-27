@@ -1,0 +1,564 @@
+@Logic
+script RtsUiLayoutLogic extends Logic
+
+	@ExecSpace("ClientOnly")
+	method void Rect(Entity e, number ax, number ay, number x, number y, number w, number h)
+		-- 공통 기준점 안에서 기존 컨트롤의 자리만 바꾼다.
+		if not isvalid(e) then return end
+		local t = e.UITransformComponent
+		t.AnchorsMin = Vector2(ax, ay)
+		t.AnchorsMax = Vector2(ax, ay)
+		t.Pivot = Vector2(ax, ay)
+		t.anchoredPosition = Vector2(x, y)
+		t.RectSize = Vector2(w, h)
+		t.UIScale = Vector3.one
+	end
+
+	@ExecSpace("ClientOnly")
+	method table SideLayout(table v)
+		-- HUD와 보드가 같은 사이드 영역을 기준으로 배치되어 서로 겹치지 않는다.
+		local height = (v.y1-v.y0)/v.unit
+		return {left=340, right=300, gap=20, top=140, height=height-240, boardTop=12, boardBottom=12}
+	end
+
+	@ExecSpace("ClientOnly")
+	method void RailAction(table action, number w, number h)
+		-- 세로 레일에서는 두 줄까지 읽을 수 있게 하고 단축키는 버튼 아래쪽에 분리한다.
+		local H = _RtsHudLogic
+		action.icon.UITransformComponent.anchoredPosition = Vector2(28-w/2,0)
+		local cap = action.box:GetChildByName("RtsActionKey")
+		local showKey = isvalid(cap) and not _RtsBoardViewLogic:IsMobileView()
+		local keyHeight = showKey and 28 or 0
+		self:Rect(action.label,0,0.5,52,keyHeight/2,w-68,h-20-keyHeight)
+		H:SetLabelSize(action.label,24)
+		if isvalid(cap) then
+			cap.Parent:SetEnable(showKey)
+			self:Rect(cap,1,0,-10,8,cap.UITransformComponent.RectSize.x,24)
+		end
+	end
+
+	@ExecSpace("ClientOnly")
+	method table Pager(Entity parent, string key, table items, table layout)
+		local H = _RtsHudLogic
+		if self._T.Pages == nil then self._T.Pages = {} end
+		local p = {key=key, items=items, layout=layout, page=self._T.Pages[key] or 1, pages=1}
+		local nav = H:SpawnUI("model://uisprite","RtsPager_"..key,parent,Vector2(0,0),Vector2(0,0),Vector2(layout.navX or 0,layout.navY or 0),Vector2(layout.w,64))
+		H:Tint(nav,1,1,1,0)
+		nav.SpriteGUIRendererComponent.RaycastTarget = false
+		p.nav = nav
+		p.label = H:SpawnLabel("RtsPageNumber",nav,Vector2(0.5,0.5),Vector2(0.5,0.5),Vector2.zero,Vector2(layout.w-144,52),"",H:ColInk(),24,TextAlignmentType.MiddleCenter,true)
+		p.arrows = {}
+		for i,direction in ipairs({-1,1}) do
+			local step = direction
+			local button = H:SpawnRoundedPanel("RtsPageArrow"..H:Int(i),nav,Vector2(i-1,0.5),Vector2(i-1,0.5),Vector2.zero,Vector2(64,64),H:ColPanel(),H:ColBorder(),1.5)
+			local icon = self:Icon(button,"back",Vector2.zero,28)
+			if direction == 1 then icon.UITransformComponent.UIRotation = Vector3(0,0,180) end
+			local click = H:SpawnClickQuiet("RtsPageClick",button)
+			click:ConnectEvent(ButtonClickEvent,function()
+				if (step < 0 and p.page > 1) or (step > 0 and p.page < p.pages) then self:ApplyPager(p,step) end
+			end)
+			p.arrows[i] = {box=button,canvas=button.Parent:AddComponent("CanvasGroupComponent")}
+		end
+		self:ApplyPager(p,0)
+		return p
+	end
+
+	@ExecSpace("ClientOnly")
+	method void ApplyPager(table p, number delta)
+		if p == nil or not isvalid(p.nav) then return end
+		local l = p.layout
+		local ranges = {}
+		local first = 1
+		local used = 0
+		for i,e in ipairs(p.items) do
+			local h = e.UITransformComponent.RectSize.y
+			local full = i-first >= l.size
+			if l.maxHeight ~= nil and i > first then full = full or used+h > l.maxHeight end
+			if full then ranges[#ranges+1]={first=first,last=i-1}; first=i; used=0 end
+			used = used+h+(l.gap or 0)
+		end
+		ranges[#ranges+1] = {first=first,last=#p.items}
+		p.pages = #ranges
+		p.page = math.max(1,math.min(p.pages,p.page+delta))
+		if p.focus ~= nil then
+			for pageIndex,r in ipairs(ranges) do
+				for i=r.first,r.last do if p.items[i] == p.focus then p.page=pageIndex end end
+			end
+			p.focus = nil
+		end
+		self._T.Pages[p.key] = p.page
+		local range = ranges[p.page]
+		local y = l.y or 0
+		for i,e in ipairs(p.items) do
+			local show = i >= range.first and i <= range.last
+			e:SetEnable(show)
+			if show then
+				local j = i-range.first
+				if l.maxHeight ~= nil then
+					e.UITransformComponent.anchoredPosition = Vector2(l.x or 0,y)
+					y = y-e.UITransformComponent.RectSize.y-(l.gap or 0)
+				else
+					e.UITransformComponent.anchoredPosition = Vector2((l.x or 0)+(j%l.cols)*(l.dx or 0),(l.y or 0)-math.floor(j/l.cols)*(l.dy or 0))
+				end
+			end
+		end
+		_RtsHudLogic:SetUiText(p.label,_RtsHudLogic:Int(p.page).."/".._RtsHudLogic:Int(p.pages))
+		for i,a in ipairs(p.arrows) do
+			local enabled = (i == 1 and p.page > 1) or (i == 2 and p.page < p.pages)
+			a.canvas.GroupAlpha = enabled and 1 or 0.3
+			a.canvas.BlocksRaycasts = enabled
+		end
+	end
+
+	@ExecSpace("ClientOnly")
+	method Entity Icon(Entity parent, string key, Vector2 pos, number size)
+		-- 같은 선 굵기의 벡터 아이콘. 문자 글리프나 플랫폼 폰트에 의존하지 않는다.
+		local H = _RtsHudLogic
+		local root = H:SpawnUI("model://uisprite", "RtsIcon_" .. key, parent, Vector2(0.5, 0.5), Vector2(0.5, 0.5), pos, Vector2(size, size))
+		H:Tint(root, 1, 1, 1, 0)
+		root.SpriteGUIRendererComponent.RaycastTarget = false
+		local paths = {
+			add = {{{-7,0},{7,0}},{{0,-7},{0,7}}},
+			gem = {{{-9,3},{-5,8},{5,8},{9,3},{0,-9},{-9,3}},{{-9,3},{9,3}},{{-5,8},{0,-9},{5,8}}},
+			units = {{{-8,-8},{-8,-3},{-4,0},{3,0},{7,-3},{7,-8}},{{-4,3},{-5,6},{-3,9},{1,9},{3,6},{2,3},{-4,3}}},
+			settings = {{{-8,-4},{-8,4},{-4,8},{4,8},{8,4},{8,-4},{4,-8},{-4,-8},{-8,-4}},{{-3,-3},{-3,3},{3,3},{3,-3},{-3,-3}},{{0,8},{0,11}},{{8,0},{11,0}},{{0,-8},{0,-11}},{{-8,0},{-11,0}}},
+			info = {{{-8,-8},{-8,8},{8,8},{8,-8},{-8,-8}},{{-3,3},{3,3}},{{-3,-2},{3,-2}}},
+			level = {{{-8,0},{0,8},{8,0}},{{0,8},{0,-9}}},
+			move = {{{-10,0},{10,0}},{{0,-10},{0,10}},{{-6,4},{-10,0},{-6,-4}},{{6,4},{10,0},{6,-4}},{{-4,6},{0,10},{4,6}},{{-4,-6},{0,-10},{4,-6}}},
+			dismiss = {{{-6,4},{-5,-9},{5,-9},{6,4}},{{-9,5},{9,5}},{{-3,6},{-3,9},{3,9},{3,6}},{{-2,1},{-2,-5}},{{2,1},{2,-5}}},
+			back = {{{3,8},{-5,0},{3,-8}}},
+			close = {{{-6,-6},{6,6}},{{-6,6},{6,-6}}},
+			pause = {{{-4,-8},{-4,8}},{{4,-8},{4,8}}},
+			restart = {{{-7,2},{-5,7},{2,8},{8,3},{7,-4},{2,-8},{-5,-6}},{{-8,8},{-8,1},{-1,1}}}
+		}
+		for i, path in ipairs(paths[key] or paths.info) do
+			for j = 1, #path - 1 do
+				local a = path[j]
+				local b = path[j + 1]
+				local dx = b[1] - a[1]
+				local dy = b[2] - a[2]
+				local k = size / 24
+				local line = H:SpawnUI("model://uisprite", "RtsIconStroke", root, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2((a[1] + b[1]) * k / 2, (a[2] + b[2]) * k / 2), Vector2(math.sqrt(dx * dx + dy * dy) * k + 1, 1.8 * k))
+				line.UITransformComponent.UIRotation = Vector3(0, 0, math.atan(dy, dx) * 180 / math.pi)
+				H:SetUiColor(line, H:ColGold(), "border")
+				line.SpriteGUIRendererComponent.RaycastTarget = false
+			end
+		end
+		return root
+	end
+
+	@ExecSpace("ClientOnly")
+	method table Action(Entity parent, string key, string label, number x, number w, number h, any onClick)
+		-- 텍스트와 아이콘을 하나의 넉넉한 입력 영역으로 묶는다.
+		local H = _RtsHudLogic
+		local box = H:SpawnRoundedPanel("RtsAction_" .. key, parent, Vector2(0, 0.5), Vector2(0, 0.5), Vector2(x, 0), Vector2(w, h), Color(0.95, 0.95, 0.98, 1), H:ColBorder(), 1.5)
+		local icon = self:Icon(box, key, Vector2(-w * 0.31, 0), 32)
+		local text = H:SpawnLabel("RtsActionLabel", box, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2(18, 0), Vector2(w - 62, h - 12), label, H:ColInk(), 24, TextAlignmentType.MiddleCenter, true)
+		H:SpawnClick("RtsActionClick", box):ConnectEvent(ButtonClickEvent, onClick)
+		return {box = box, label = text, icon = icon}
+	end
+
+	@ExecSpace("ClientOnly")
+	method void ActionKey(table action, string key)
+		-- 행동 문구·비용 오른쪽에 단축키를 한 줄로 나란히 표시한다.
+		if _RtsBoardViewLogic:IsMobileView() then return end
+		local H = _RtsHudLogic
+		local w = action.box.Parent.UITransformComponent.RectSize.x
+		local width = key == "스페이스" and 74 or 36
+		action.icon.UITransformComponent.anchoredPosition = Vector2(28-w/2,0)
+		self:Rect(action.label,0,0.5,54,0,w-68-width,24)
+		H:SetLabelSize(action.label,22)
+		local cap = H:SpawnRoundedPanel("RtsActionKey", action.box, Vector2(1,0.5), Vector2(1,0.5), Vector2(-8,0), Vector2(width,24), Color(0.92,0.93,0.98,1), H:ColBorder(), 1)
+		H:SpawnLabel("RtsActionKeyText", cap, Vector2(0.5,0.5), Vector2(0.5,0.5), Vector2.zero, Vector2(width-4,20), key, H:ColMuted(), 16, TextAlignmentType.MiddleCenter, true)
+		if key == "Esc" and action.label.TextComponent.Text == "" then
+			local icon = action.box:GetChildByName("RtsIcon_back")
+			if isvalid(icon) then icon.UITransformComponent.anchoredPosition = Vector2(-24,0) end
+		end
+	end
+
+	@ExecSpace("ClientOnly")
+	method number RecruitSlots()
+		if _RtsStageLogic.RunState ~= "running" or not _RtsRunResultLogic:IsMeAlive() then return 0 end
+		local owned = #_RtsUnitLogic:ListZoneUnits(_RtsUnitLogic:MyZone())
+		return math.max(0,math.min(_RtsStageTableLogic:RecruitLimit(_RtsStageLogic.StageNo),_RtsUnitLogic:GetMaxUnits())-owned)
+	end
+
+	@ExecSpace("ClientOnly")
+	method void OpenUnits()
+		-- 첫 영입을 ESC로 닫아도 유닛 진입점에서 다시 시작할 수 있다.
+		local owned = #_RtsUnitLogic:ListZoneUnits(_RtsUnitLogic:MyZone())
+		if owned == 0 and self:RecruitSlots() > 0 then
+			_RtsHudLogic:OnTopButton()
+		else
+			_RtsPopupLogic:Open("units")
+		end
+	end
+
+	@ExecSpace("ClientOnly")
+	method void Build()
+		-- HUD의 기존 상태 갱신은 유지하고 사용자 진입점만 한 줄로 정리한다.
+		local H = _RtsHudLogic
+		if isvalid(self._T.Dock) or self._T.Building or not H.Built then return end
+		self._T.Building = true
+		local dock = H:SpawnRoundedPanel("RtsMainDock", H.HudGroup, Vector2(0.5, 0), Vector2(0.5, 0), Vector2(0, 24), Vector2(800, 100), H:ColPanel(), H:ColBorder(), 1.5)
+		self._T.Dock = dock
+		self._T.Actions = {
+			self:Action(dock, "add", "영입", 12, 182, 76, function() H:OnTopButton() end),
+			self:Action(dock, "gem", "증강", 210, 182, 76, function() _RtsPopupLogic:OpenHubTab("augment") end),
+			self:Action(dock, "units", "유닛", 408, 182, 76, function() self:OpenUnits() end)
+		}
+		self._T.MobileSpeeds = {}
+		for i = 1, 2 do
+			local speed = i
+			self._T.MobileSpeeds[i] = self:Action(dock,"level",H:Int(i).."배속",0,134,108,function() H:ChooseSpeed(speed) end)
+		end
+		local cancel = H:SpawnRoundedPanel("RtsPlacementDock", H.HudGroup, Vector2(0.5, 0), Vector2(0.5, 0), Vector2(0, 24), Vector2(1000, 120), H:ColPanel(), H:ColBorder(), 1.5)
+		self._T.Placement = cancel
+		self._T.PlaceLabel = H:SpawnLabel("RtsPlacementLabel", cancel, Vector2(0, 0.5), Vector2(0, 0.5), Vector2(24, 0), Vector2(680, 88), "빈 발판을 선택하세요", H:ColInk(), 27, TextAlignmentType.MiddleLeft, true)
+		local cancelAction = self:Action(cancel, "close", "취소", 742, 236, 92, function()
+			_RtsUnitSelectLogic:EndPlace()
+			_RtsUnitSelectLogic:EndMove()
+		end)
+		self._T.CancelAction = cancelAction
+		self:ActionKey(cancelAction, "Esc")
+		cancel.Parent:SetEnable(false)
+		local rail = H:SpawnUI("model://uisprite", "RtsUnitRail", H.HudGroup, Vector2(1, 1), Vector2(1, 1), Vector2(-28, -150), Vector2(280, 660))
+		H:Tint(rail, 1, 1, 1, 0)
+		rail.SpriteGUIRendererComponent.RaycastTarget = false
+		self._T.Rail = rail
+		for i, slot in ipairs(H.UnitSlots) do slot.box.Parent:AttachTo(rail) end
+		self._T.UnitPager = self:Pager(rail,"hudUnits",{},{size=3,cols=1,x=0,y=0,dy=124,navX=0,navY=0,w=300})
+		self._T.Hidden = H:SpawnUI("model://uisprite", "RtsLegacyHudState", H.HudGroup, Vector2(0, 0), Vector2(0, 0), Vector2.zero, Vector2(1, 1))
+		self._T.Hidden:SetEnable(false)
+		H.RecruitBtn.Parent:AttachTo(self._T.Hidden)
+		H.AugBtn.Parent:AttachTo(self._T.Hidden)
+		H.PlayersBox:AttachTo(self._T.Hidden)
+		self._T.Shortcuts = H:SpawnUI("model://uisprite", "RtsProfileShortcuts", H.HudGroup, Vector2(0, 1), Vector2(0, 1), Vector2(28, -492), Vector2(300, 92))
+		H:Tint(self._T.Shortcuts, 1, 1, 1, 0)
+		self._T.Shortcuts.SpriteGUIRendererComponent.RaycastTarget = false
+		self._T.PlayersAction = self:Action(self._T.Shortcuts, "units", "유저 목록", 0, 340, 88, function() _RtsPopupLogic:Open("players") end)
+		self._T.Building = false
+	end
+
+	@ExecSpace("ClientOnly")
+	method void Refresh(boolean force)
+		-- 해상도·플랫폼이 바뀌면 재배치하고 상태 문구만 제자리에서 갱신한다.
+		local H = _RtsHudLogic
+		if not H.Built then return end
+		self:Build()
+		if self._T.Building or self._T.Actions == nil then return end
+		local v = H:MobileViewport()
+		if v == nil then return end
+		local mobile = _RtsBoardViewLogic:IsMobileView()
+		local S = _RtsUnitSelectLogic
+		local placing = S.PlaceJob ~= "" or S.MoveNo > 0
+		self._T.Dock.Parent:SetEnable(S.MenuNo == 0 and not placing)
+		self._T.Placement.Parent:SetEnable(placing)
+		if placing then
+			H.Hint:SetEnable(false)
+			local text = "이동할 발판을 선택하세요"
+			if S.PlaceJob ~= "" then text = _RtsJobTableLogic:GetJobName(S.PlaceJob) .. " · 빈 발판을 선택하세요" end
+			H:SetUiText(self._T.PlaceLabel, text)
+		end
+		local pending = H.PendingShown
+		H:SetUiText(self._T.PlayersAction.label,"유저 목록 · " .. H:Int(#H.PlayerOrder) .. "명")
+		local aug = "증강"
+		if pending > 0 then aug = "증강 · " .. H:Int(pending) end
+		H:SetUiText(self._T.Actions[2].label, aug)
+		-- 기존 영입 상태 안내를 새 진입점에도 연결한다. 가능 여부는 서버와 같은 진행·생존·한도 조건이다.
+		local owned = #_RtsUnitLogic:ListZoneUnits(_RtsUnitLogic:MyZone())
+		local room = math.max(0, math.min(_RtsStageTableLogic:RecruitLimit(_RtsStageLogic.StageNo), _RtsUnitLogic:GetMaxUnits()) - owned)
+		local ready = _RtsStageLogic.RunState == "running" and _RtsRunResultLogic:IsMeAlive() and room > 0
+		H:SetUiText(self._T.Actions[3].label,(owned == 0 and ready) and "유닛 영입" or "유닛")
+		local recruit = H.RecruitText.TextComponent.Text
+		if ready then recruit = "영입 가능 " .. H:Int(room) .. "명" end
+		if recruit == "" or recruit == "영입 불가" then recruit = "영입" end
+		local recruitAction = self._T.Actions[1]
+		H:SetUiText(recruitAction.label, recruit)
+		H:SetUiColor(recruitAction.box, ready and Color(0.87,0.86,0.96,1) or Color(0.95,0.95,0.98,1), "surface")
+		H:SetUiColor(recruitAction.box.Parent, ready and H:ColGold() or H:ColBorder(), "border")
+		H:SetUiColor(recruitAction.label, ready and Color(0.36,0.27,0.60,1) or H:ColInk(), "text")
+		local speed = _RtsStageLogic.SpeedVotes[_RtsUnitLogic:MyUserId()] ~= nil and 2 or 1
+		for i, a in ipairs(self._T.MobileSpeeds) do
+			H:SetUiColor(a.box,i == speed and Color(0.90,0.86,0.98,1) or Color(0.95,0.95,0.98,1),"surface")
+		end
+		local diff = _RtsDifficultyLogic.Bar
+		local diffId = ""
+		if isvalid(diff) then diffId = diff.Id end
+		local key = v.key .. tostring(mobile) .. diffId
+		if force or self._T.Key ~= key then
+			local side = self:SideLayout(v)
+			local dw = side.right
+			local dh = side.height
+			H:PlaceMobile(self._T.Dock.Parent,v,1,1,0,-side.top,dw,336,1)
+			local bw = dw-24
+			local bh = 96
+			for i,a in ipairs(self._T.Actions) do
+				self:Rect(a.box.Parent,0,1,12,-12-(i-1)*(bh+12),bw,bh)
+				self:RailAction(a,bw,bh)
+			end
+			for i,a in ipairs(self._T.MobileSpeeds) do
+				a.box.Parent:AttachTo(H.HudGroup)
+				a.box.Parent:SetEnable(true)
+				H:PlaceMobile(a.box.Parent,v,0,0,(i-1)*176,0,164,88,1)
+				self:RailAction(a,164,88)
+			end
+			H:PlaceMobile(self._T.Placement.Parent,v,1,1,0,-side.top,dw,296,1)
+			self:Rect(self._T.PlaceLabel,0,1,20,-16,dw-40,136)
+			self:Rect(self._T.CancelAction.box.Parent,0,1,12,-168,bw,112)
+			self:RailAction(self._T.CancelAction,bw,112)
+			local top = H.HudGroup:GetChildByName("RtsTopBox")
+			local inner = top:GetChildByName("RtsTopBoxIn")
+			local info = inner:GetChildByName("RtsInfoCard")
+			local profile = inner:GetChildByName("RtsProfileRow")
+			H:PlaceMobile(top,v,0,1,0,0,side.left,316,1)
+			profile:SetEnable(true)
+			self:Rect(profile,0,1,0,0,side.left-2,76)
+			self:Rect(profile:GetChildByName("RtsProfileTitle"),0,1,66,-8,side.left-84,30)
+			self:Rect(H.ProfileSummary,0,1,66,-40,side.left-84,26)
+			profile:GetChildByName("RtsProfileChange"):SetEnable(false)
+			local line = inner:GetChildByName("RtsTopLine")
+			line:SetEnable(true)
+			self:Rect(line,0,1,12,-80,side.left-26,1.5)
+			self:Rect(info,0,0,0,0,side.left-2,230)
+			self:Rect(H.StageTitleText,0,1,16,-8,210,40)
+			self:Rect(H.StageClockText,1,1,-16,-8,96,40)
+			H.StageClockText.TextComponent.Alignment = TextAlignmentType.MiddleRight
+			self:Rect(H.StageSubText,0,1,16,-54,side.left-34,60)
+			self:Rect(H.StageDifficultyText,0,1,16,-122,120,38)
+			H.StageDifficultyText.TextComponent.Alignment = TextAlignmentType.MiddleLeft
+			self:Rect(info:GetChildByName("RtsFieldKey"),1,1,-158,-122,62,38)
+			info:GetChildByName("RtsFieldKey"):SetEnable(true)
+			self:Rect(H.FieldText,1,1,-16,-122,136,38)
+			self:Rect(info:GetChildByName("RtsInfoLine"),0,1,12,-170,side.left-26,1.5)
+			info:GetChildByName("RtsInfoLine"):SetEnable(true)
+			self:Rect(info:GetChildByName("RtsMesoCoin"),0,0,16,17,28,28)
+			self:Rect(H.MesoText,0,0,52,12,side.left-70,38)
+			H.MesoText.TextComponent.Alignment = TextAlignmentType.MiddleLeft
+			H:PlaceMobile(H.RestartBtn.Parent,v,0,0,0,100,164,96,1)
+			H:PlaceMobile(H.PauseBtn.Parent,v,0,0,176,100,164,96,1)
+			for _,label in ipairs({H.StageTitleText,H.StageSubText,H.StageClockText,H.StageDifficultyText,H.MesoText,H.FieldText}) do H:SetLabelSize(label,26) end
+			H:SetLabelSize(H.StageSubText,24)
+			self:Rect(H.PauseText,0.5,0.5,0,0,154,76)
+			self:Rect(H.RestartText,0.5,0.5,0,0,154,76)
+			H:SetLabelSize(H.PauseText,24)
+			H:SetLabelSize(H.RestartText,24)
+			local cap = H.PauseBtn:GetChildByName("RtsPauseKey")
+			if isvalid(cap) then
+				cap:SetEnable(not mobile)
+				if not mobile then
+					self:Rect(H.PauseText,0,0.5,4,0,102,34)
+					self:Rect(cap,1,0.5,-5,0,26,24)
+				end
+			end
+			self._T.Shortcuts:SetEnable(true)
+			H:PlaceMobile(self._T.Shortcuts,v,0,1,0,-330,side.left,88,1)
+			self:Rect(self._T.PlayersAction.box.Parent,0,1,0,0,side.left,88)
+			self:RailAction(self._T.PlayersAction,side.left,88)
+			H:PlaceMobile(self._T.Rail,v,1,1,0,-488,side.right,440,1)
+			H:PlaceMobile(H.SpeedBox, v, 1, 0, 0, 94, 212, 92, 1.25)
+			H:PlaceMobile(H.HudGroup:GetChildByName("RtsUiModeSwitch"),v,1,0,0,0,212,64,1.4)
+			H:PlaceMobile(H.Hint,v,0.5,1,0,-12,760,64,1)
+			H:PlaceMobile(H.VotePanel.Parent, v, 0.5, 1, 0, -220, 420, 160, 1)
+			H.VoteText.UITransformComponent.RectSize = Vector2(396, 48)
+			for i, b in ipairs({H.VoteYesBtn,H.VoteNoBtn}) do self:Rect(b.Parent,0,0,12+(i-1)*204,12,190,88) end
+			if isvalid(diff) then
+				H:PlaceMobile(diff.Parent, v, 0.5, 1, 0, -10, 960, 160, 1)
+				diff:GetChildByName("RtsDiffTitle"):SetEnable(false)
+				for i, b in ipairs(_RtsDifficultyLogic.Btns) do
+					self:Rect(b.Parent,0,1,12+(i-1)*156,-10,146,100)
+					local label = b:GetChildByName("RtsDiffBtnText"..H:Int(i))
+					self:Rect(label,0.5,0.5,0,0,140,88)
+					H:SetLabelSize(label,21)
+				end
+				_RtsDifficultyLogic.StartBtn.Parent.UITransformComponent.RectSize = Vector2(300, 104)
+			end
+			self:LayoutSelection(v)
+			_RtsConfigLogic:Log("RtsUiLayout: side rails mobile=" .. tostring(mobile) .. " height=" .. tostring(dh))
+			self._T.Key = key
+			_RtsPopupLogic:RefreshMobilePopup()
+		end
+		self._T.Rail:SetEnable(not mobile and S.MenuNo == 0 and not placing)
+		H.SpeedBox:SetEnable(false)
+		H.HudGroup:GetChildByName("RtsUiModeSwitch"):SetEnable(true)
+		if self._T.ModeLabels ~= nil then
+			for mode, label in pairs(self._T.ModeLabels) do
+				if isvalid(label) then H:SetUiText(label,(mode == "light" and "라이트" or "다크") .. (_RtsProfileLogic.MyUiMode == mode and " · 사용 중" or "")) end
+			end
+		end
+		for i = 1, 6 do self:Slot(i) end
+		local unitItems = {}
+		for _,slot in ipairs(H.UnitSlots) do
+			if slot.filled then unitItems[#unitItems+1]=slot.box.Parent end
+		end
+		self._T.UnitPager.items = unitItems
+		self:ApplyPager(self._T.UnitPager,0)
+		if _RtsPopupLogic.Kind == "players" then
+			self:Rect(H.PlayerHead,0,1,0,0,880,32)
+			for i,userId in ipairs(H.PlayerOrder) do
+				local card = H.Players[userId]
+				if card ~= nil then self:Rect(card.row.Parent,0,1,((i-1)%2)*456,-42-math.floor((i-1)/2)*118,400,H.CardH) end
+			end
+		end
+	end
+
+	@ExecSpace("ClientOnly")
+	method Entity UnitInfo(Entity content)
+		-- 능력치 페이지를 독립시켜 다른 탭이 가로폭 전체를 쓰게 한다.
+		local H = _RtsHudLogic
+		local children = content.Children:ToTable()
+		local page = H:SpawnStretch("model://uisprite","RtsUnitInfoPage",content,Vector2(0,0),Vector2(1,1),Vector2(0,96),Vector2(0,-92))
+		H:Tint(page,1,1,1,0)
+		page.SpriteGUIRendererComponent.RaycastTarget = false
+		for _, child in ipairs(children) do
+			local pos = child.UITransformComponent.anchoredPosition
+			child:AttachTo(page)
+			child.UITransformComponent.anchoredPosition = pos
+		end
+		self:Rect(page:GetChildByName("RtsUnitAugGain"),0,1,647,-10,602,120)
+		self:Rect(page:GetChildByName("RtsUnitDps"),0,1,647,-148,602,150)
+		self:Rect(page:GetChildByName("RtsStatChartScale"),0,1,647,-324,602,112)
+		return page
+	end
+
+	@ExecSpace("ClientOnly")
+	method void Slot(number i)
+		-- 채워진 유닛만 표시하며 흉상·직업·레벨을 한 카드에 정렬한다.
+		local H = _RtsHudLogic
+		local s = H.UnitSlots[i]
+		if s == nil or not isvalid(self._T.Rail) then return end
+		s.box.Parent:SetEnable(s.filled)
+		if not s.filled then return end
+		self:Rect(s.box.Parent,0,1,0,-((i-1)%3)*124,300,116)
+		self:Rect(s.name, 0, 0.5, 98, 20, 188, 58)
+		self:Rect(s.lv, 0, 0.5, 98, -30, 188, 30)
+		s.lv.TextComponent.Alignment = TextAlignmentType.MiddleLeft
+		H:SetLabelSize(s.name, 22)
+		H:SetLabelSize(s.lv, 20)
+		local u = _RtsUnitLogic:GetMyUnit(s.no)
+		if u == nil then return end
+		if not isvalid(s.portrait) then
+			s.portrait = H:SpawnUI("model://uisprite", "RtsUnitRailPortrait", s.box, Vector2(0,0.5), Vector2(0,0.5), Vector2(8,0), Vector2(80,80))
+			s.portrait.SpriteGUIRendererComponent.RaycastTarget = false
+		end
+		if s.portraitJob ~= u.JobId then
+			s.portrait.SpriteGUIRendererComponent.ImageRUID = DataRef(_RtsJobTableLogic:GetMagePortraitRUID(u.JobId))
+			s.portraitJob = u.JobId
+		end
+	end
+
+	@ExecSpace("ClientOnly")
+	method void LayoutSelection(table v)
+		-- 해상도 변경 때도 선택 메뉴의 표시 영역과 월드 클릭 차단 영역을 함께 갱신한다.
+		local S = _RtsUnitSelectLogic
+		if not isvalid(S.Menu) or self._T.SelectionActions == nil then return end
+		local side = self:SideLayout(v)
+		local w = side.right
+		local h = side.height
+		_RtsHudLogic:PlaceMobile(S.Menu,v,1,1,0,-side.top,w,h,1)
+		S.MenuRect = {x0=v.x1-w*v.unit,y0=v.y1-(side.top+h)*v.unit,x1=v.x1,y1=v.y1-side.top*v.unit}
+		self:Rect(S.MenuHead,0,1,18,-12,w-36,92)
+		local bh = (h-180)/5
+		for i,a in ipairs(self._T.SelectionActions) do
+			self:Rect(a.box.Parent,0,1,12,-112-(i-1)*(bh+12),w-24,bh)
+			self:RailAction(a,w-24,bh)
+		end
+	end
+
+	@ExecSpace("ClientOnly")
+	method void Selection(number no)
+		-- 선택한 캐릭터의 조작도 중앙을 가리지 않고 오른쪽 레일 안에서 전환한다.
+		local H = _RtsHudLogic
+		local S = _RtsUnitSelectLogic
+		local u = _RtsUnitLogic:GetMyUnit(no)
+		local v = H:MobileViewport()
+		if u == nil or v == nil then return end
+		local side = self:SideLayout(v)
+		local box = H:SpawnRoundedPanel("RtsUnitMenu",H.HudGroup,Vector2(1,1),Vector2(1,1),Vector2.zero,Vector2(side.right,side.height),H:ColPanel(),H:ColGold(),1.5)
+		S.Menu = box.Parent
+		S.MenuNo = no
+		S.MenuHead = H:SpawnLabel("RtsUnitMenuHead",box,Vector2(0,1),Vector2(0,1),Vector2(18,-12),Vector2(side.right-36,92),"",H:ColInk(),24,TextAlignmentType.MiddleLeft,true)
+		local back = self:Action(box,"back","뒤로",0,276,116,function() S:CloseMenu() end)
+		self:ActionKey(back,"Esc")
+		local info = self:Action(box,"info","상세보기",0,276,116,function() S:MenuInfo() end)
+		self:ActionKey(info,"S")
+		local level = self:Action(box,"level","레벨업",0,276,116,function() S:LevelUpShortcut() end)
+		self:ActionKey(level,"스페이스")
+		S.MenuLvBtn = level.box
+		S.MenuLvRow = {text=level.label,dock=true}
+		local move = self:Action(box,"move","이동",0,276,116,function() S:MenuMove() end)
+		self:ActionKey(move,"L")
+		if u:MoveCoolLeft()>0 then H:SetUiText(move.label,"이동 ".._RtsUnitPopupLogic:FmtSec(u:MoveCoolLeft())) end
+		local dismiss = self:Action(box,"dismiss","방출",0,276,116,function()
+			local selectedNo = S.MenuNo
+			S:CloseMenu()
+			_RtsPopupLogic:OpenDismiss(selectedNo)
+		end)
+		H:SetUiColor(dismiss.label,Color(0.78,0.37,0.49,1),"text")
+		self._T.SelectionActions = {back,info,level,move,dismiss}
+		self:LayoutSelection(v)
+		S:RefreshMenuLevel()
+		self:Refresh(false)
+	end
+
+	@ExecSpace("ClientOnly")
+	method void BuildPage(Entity body, string kind)
+		-- 기존 서버·프로필·유닛 기능을 새 메뉴에서 그대로 호출한다.
+		local H = _RtsHudLogic
+		local P = _RtsPopupLogic
+		if kind == "players" then
+			H.PlayersBox:AttachTo(body)
+			self:Rect(H.PlayersBox, 0.5, 1, 0, -12, 880, 550)
+			H.PlayersBox:SetEnable(true)
+		elseif kind == "units" then
+			local nos = _RtsUnitLogic:ListZoneUnits(_RtsUnitLogic:MyZone())
+			local cards = {}
+			for i, no in ipairs(nos) do
+				local u = _RtsUnitLogic:GetMyUnit(no)
+				local card = H:SpawnRoundedPanel("RtsUnitDrawerCard",body,Vector2(0,1),Vector2(0,1),Vector2(24+((i-1)%3)*304,-20-math.floor((i-1)/3)*218),Vector2(288,198),P:Card(),P:Edge(),1.5)
+				cards[#cards+1]=card.Parent
+				local image = H:SpawnUI("model://uisprite","RtsUnitDrawerPortrait",card,Vector2(0.5,1),Vector2(0.5,1),Vector2(0,-8),Vector2(110,110))
+				image.SpriteGUIRendererComponent.ImageRUID = DataRef(_RtsJobTableLogic:GetMagePortraitRUID(u.JobId))
+				image.SpriteGUIRendererComponent.RaycastTarget = false
+				H:SpawnLabel("RtsUnitDrawerName",card,Vector2(0.5,0),Vector2(0.5,0),Vector2(0,12),Vector2(270,64),_RtsJobTableLogic:GetJobNameFor(u).."\nLv "..H:Int(u.Level),H:ColInk(),24,TextAlignmentType.MiddleCenter,true)
+				local selectedNo = no
+				H:SpawnClick("RtsUnitDrawerClick",card):ConnectEvent(ButtonClickEvent,function() P:Close(); _RtsUnitSelectLogic:OpenMenu(selectedNo) end)
+			end
+			self._T.DrawerPager = self:Pager(body,"unitDrawer",cards,{size=3,cols=3,x=24,y=-80,dx=304,dy=218,navX=24,navY=24,w=912})
+			if self:RecruitSlots() > 0 then
+				local recruit = self:Action(body,"add","캐릭터 영입 · "..H:Int(self:RecruitSlots()).."명 가능",0,912,80,function() H:OnTopButton() end)
+				self:Rect(recruit.box.Parent,0,0,24,110,912,80)
+			end
+			if #nos == 0 then H:SpawnLabel("RtsUnitDrawerEmpty",body,Vector2(0.5,0.5),Vector2(0.5,0.5),Vector2.zero,Vector2(800,100),"아직 영입한 캐릭터가 없어요",H:ColMuted(),28,TextAlignmentType.MiddleCenter,false) end
+		else
+			self:Action(body,"settings","프로필 설정",32,428,104,function() P:Open("profile") end).box.Parent.UITransformComponent.anchoredPosition = Vector2(32,142)
+			self:Action(body,"units","유저 목록",488,428,104,function() P:Open("players") end).box.Parent.UITransformComponent.anchoredPosition = Vector2(488,142)
+			H:SpawnLabel("RtsSettingsModeTitle",body,Vector2(0,1),Vector2(0,1),Vector2(40,-204),Vector2(390,52),"화면 모드",H:ColInk(),28,TextAlignmentType.MiddleLeft,true)
+			H:SpawnLabel("RtsSettingsModeHint",body,Vector2(0,1),Vector2(0,1),Vector2(40,-266),Vector2(390,110),"선택한 모드는 다음 게임에서도\n계속 사용돼요",H:ColMuted(),23,TextAlignmentType.UpperLeft,false)
+			local modes = {"light","dark"}
+			self._T.ModeLabels = {}
+			for i, mode in ipairs(modes) do
+				local selectedMode = mode
+				local text = i == 1 and "라이트" or "다크"
+				if _RtsProfileLogic.MyUiMode == mode then text = text .. " · 사용 중" end
+				local a = self:Action(body,"settings",text,488,428,100,function() _RtsProfileLogic:ChooseUiMode(selectedMode) end)
+				self._T.ModeLabels[mode] = a.label
+				a.box.Parent.UITransformComponent.anchoredPosition = Vector2(488,20-(i-1)*120)
+			end
+			H:SpawnLabel("RtsSettingsSpeedTitle",body,Vector2(0,0),Vector2(0,0),Vector2(40,32),Vector2(380,60),"게임 속도",H:ColInk(),28,TextAlignmentType.MiddleLeft,true)
+			for i = 1, 2 do
+				local speed = i
+				local a = self:Action(body,"level",H:Int(i).."배속",488+(i-1)*224,204,88,function() H:ChooseSpeed(speed) end)
+				self:Rect(a.box.Parent,0,0,488+(i-1)*224,24,204,88)
+			end
+		end
+	end
+
+	@ExecSpace("ClientOnly")
+	method void ReleasePage()
+		-- 팝업을 닫을 때 재사용할 유저 카드를 파괴 대상에서 꺼낸다.
+		local H = _RtsHudLogic
+		if isvalid(H.PlayersBox) and isvalid(self._T.Hidden) then H.PlayersBox:AttachTo(self._T.Hidden) end
+	end
+
+end

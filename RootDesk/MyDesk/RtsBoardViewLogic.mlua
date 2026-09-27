@@ -1,0 +1,149 @@
+-- 전투 좌표는 유지하고 PC/모바일의 조작 영역 안에 보드 표시를 맞춘다.
+-- 서버의 RtsBoard 변환은 identity. 자식 Position은 기존 전투 월드 좌표다.
+@Logic
+script RtsBoardViewLogic extends Logic
+
+	property number LayoutElapsed = 0
+
+	method Entity GetRoot()
+		if isvalid(self._T.Root) then return self._T.Root end
+		local map = _EntityService:GetEntityByPath("/maps/RtsMap")
+		if map == nil then return nil end
+		local root = map:GetChildByName("RtsBoard")
+		if root == nil and self:IsServer() then
+			root = _SpawnService:SpawnByModelId("model://MapObject", "RtsBoard", Vector3.zero, map)
+			if root ~= nil then root:RemoveComponent("SpriteRendererComponent") end
+		end
+		self._T.Root = root
+		return root
+	end
+
+	@ExecSpace("ClientOnly")
+	method boolean IsMobileView()
+		-- Maker에서 동일한 모바일 경로를 검증할 때만 런타임 임시 preview를 허용한다.
+		return Environment:IsMobilePlatform() or (Environment:IsMakerPlay() and self._T.Preview == true)
+	end
+
+	method Vector3 BoardPosition(Entity entity)
+		local p = entity.TransformComponent.WorldPosition
+		if self:IsServer() then return p end
+		local root = self:GetRoot()
+		if root == nil then return p end
+		return root.TransformComponent:ToLocalPoint(p)
+	end
+
+	@ExecSpace("ClientOnly")
+	method Vector2 ScreenToBoard(Vector2 screen)
+		local p = _UILogic:ScreenToWorldPosition(screen)
+		local root = self:GetRoot()
+		if root == nil then return p end
+		local q = root.TransformComponent:ToLocalPoint(Vector3(p.x, p.y, 0))
+		return Vector2(q.x, q.y)
+	end
+
+	@ExecSpace("ClientOnly")
+	method Vector2 BoardToScreen(Vector2 point)
+		local p = Vector3(point.x, point.y, 0)
+		local root = self:GetRoot()
+		if root ~= nil then p = root.TransformComponent:ToWorldPoint(p) end
+		return _UILogic:WorldToScreenPosition(Vector2(p.x, p.y))
+	end
+
+	@ExecSpace("ClientOnly")
+	method void OnUpdate(number delta)
+		self.LayoutElapsed = self.LayoutElapsed + delta
+		if self.LayoutElapsed < 0.1 then return end
+		self.LayoutElapsed = 0
+		self:Refresh(false)
+		self:RefreshSurroundings()
+	end
+
+	-- 축소로 이웃 구역까지 보이지 않게 렌더링만 숨긴다. 서버 동작은 유지한다.
+	-- 현재 테마 배경은 화면 전체를 채우고 트랙/캐릭터만 안쪽에 놓는다.
+	@ExecSpace("ClientOnly")
+	method void RefreshSurroundings()
+		local root = self:GetRoot()
+		local player = _UserService.LocalPlayer
+		if root == nil or player == nil or player.RtsCameraAnchorComponent == nil then return end
+		local zone = player.RtsCameraAnchorComponent.CurrentZone
+		local center = _RtsConfigLogic:GetZoneCenter(zone)
+		local halfW = _RtsConfigLogic:GetZonePitchX() / 2
+		local halfH = _RtsConfigLogic:GetZonePitchY() / 2
+		if self._T.Hidden == nil then self._T.Hidden = {} end
+		local hidden = self._T.Hidden
+		for entity, visible in pairs(hidden) do
+			if not isvalid(entity) then hidden[entity] = nil end
+		end
+		for _, entity in ipairs(root.Children:ToTable()) do
+			if isvalid(entity) and entity.TransformComponent ~= nil then
+				local backgroundZone = tonumber(string.match(entity.Name, "^ZoneBackground(%d+)$"))
+				local p = entity.TransformComponent.Position
+				local show = math.abs(p.x - center.x) < halfW and math.abs(p.y - center.y) < halfH
+				if backgroundZone ~= nil then show = backgroundZone == zone end
+				if not show then
+					if hidden[entity] == nil then hidden[entity] = entity.Visible end
+					entity.Visible = false
+				elseif hidden[entity] ~= nil then
+					entity.Visible = hidden[entity]
+					hidden[entity] = nil
+				end
+				if backgroundZone == zone then
+					local low = _UILogic:ScreenToWorldPosition(Vector2.zero)
+					local high = _UILogic:ScreenToWorldPosition(Vector2(_UILogic.ScreenWidth, _UILogic.ScreenHeight))
+					local cover = math.max(math.abs(high.x - low.x) / (1920 / 100), math.abs(high.y - low.y) / (1080 / 100))
+					local scale = cover / root.TransformComponent.Scale.x
+					local sx = scale
+					local sy = scale
+					if entity.SpriteRendererComponent.SpriteRUID == _RtsActionThemeLogic.BackgroundRUID then
+						sx = sx * 1920 / 1672
+						sy = sy * 1080 / 941
+					end
+					entity.TransformComponent.Scale = Vector3(sx, sy, 1)
+					entity.TransformComponent.Position = root.TransformComponent:ToLocalPoint(Vector3((low.x + high.x) / 2, (low.y + high.y) / 2, 0))
+				end
+			end
+		end
+	end
+
+	@ExecSpace("ClientOnly")
+	method void Refresh(boolean force)
+		local root = self:GetRoot()
+		local player = _UserService.LocalPlayer
+		if root == nil or player == nil or player.RtsCameraAnchorComponent == nil then return end
+		local camera = player.CameraComponent
+		if camera == nil or _CameraService:GetCurrentCameraComponent() ~= camera then return end
+		local v = _RtsHudLogic:MobileViewport()
+		if v == nil then return end
+		local zone = player.RtsCameraAnchorComponent.CurrentZone
+		local config = _RtsConfigLogic
+		local center = config:GetZoneCenter(zone)
+		local screenCenter = _UILogic:WorldToScreenPosition(center)
+		local signature = tostring(self:IsMobileView()) .. root.Id .. ":" .. v.key .. ":" .. tostring(zone) .. ":" .. tostring(camera.ZoomRatio)
+			.. ":" .. tostring(math.floor(screenCenter.x)) .. ":" .. tostring(math.floor(screenCenter.y))
+		if not force and self._T.LayoutKey == signature then return end
+		-- 좌우 정보·조작 레일 사이의 높이 전체를 쓴다. 캐릭터와 트랙은 함께 균등 확대한다.
+		local side = _RtsUiLayoutLogic:SideLayout(v)
+		local left = v.x0 + (side.left + side.gap) * v.unit
+		local right = v.x1 - (side.right + side.gap) * v.unit
+		local bottom = v.y0 + side.boardBottom * v.unit
+		local top = v.y1 - side.boardTop * v.unit
+		if right <= left or top <= bottom then return end
+		-- ScreenToUIPosition의 역변환을 화면 양끝으로 계산한다(해상도 고정값 없음).
+		local ui0 = _UILogic:ScreenToUIPosition(Vector2.zero)
+		local ui1 = _UILogic:ScreenToUIPosition(Vector2(_UILogic.ScreenWidth, _UILogic.ScreenHeight))
+		local lo = _UILogic:ScreenToWorldPosition(Vector2((left - ui0.x) / (ui1.x - ui0.x) * _UILogic.ScreenWidth,
+			(bottom - ui0.y) / (ui1.y - ui0.y) * _UILogic.ScreenHeight))
+		local hi = _UILogic:ScreenToWorldPosition(Vector2((right - ui0.x) / (ui1.x - ui0.x) * _UILogic.ScreenWidth,
+			(top - ui0.y) / (ui1.y - ui0.y) * _UILogic.ScreenHeight))
+		-- 끝줄 캐릭터/몬스터가 타일보다 위로 나오는 높이도 여유로 포함한다.
+		local boardW = config:GetGridCols() * config:GetGridCell() + 1.6
+		local boardH = config:GetGridRows() * config:GetGridCell() + 2.8
+		local scale = math.min(1, math.abs(hi.x - lo.x) / boardW, math.abs(hi.y - lo.y) / boardH)
+		local t = root.TransformComponent
+		t.Scale = Vector3(scale, scale, 1)
+		t.Position = Vector3((lo.x + hi.x) / 2 - center.x * scale, (lo.y + hi.y) / 2 - (center.y + 0.6) * scale, 0)
+		self._T.LayoutKey = signature
+		_RtsConfigLogic:Log("RtsBoardView: scale=" .. tostring(scale) .. " zone=" .. tostring(zone))
+	end
+
+end

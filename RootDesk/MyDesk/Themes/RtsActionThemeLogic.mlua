@@ -55,7 +55,7 @@ script RtsActionThemeLogic extends Logic
 		-- 배경 RUID를 관찰하므로 테마 변경·늦은 입장도 같은 경로로 처리한다.
 		local zone = _RtsHudLogic.WatchedZone
 		if zone < 1 then return end
-		local host = _EntityService:GetEntityByPath("/maps/RtsMap/ZoneBackground" .. string.format("%d", zone))
+		local host = _EntityService:GetEntityByPath("/maps/RtsMap/RtsBoard/ZoneBackground" .. string.format("%d", zone))
 		if not isvalid(host) or host.SpriteRendererComponent == nil then return end
 		if host.SpriteRendererComponent.SpriteRUID ~= self.BackgroundRUID then return end
 		for _, scene in ipairs(self.Scenes) do if scene.host == host then return end end

@@ -20,6 +20,13 @@ Maker 26.7에서 실측으로 확인한 엔진 동작과 그에 따른 작성 �
 - `CameraComponent.IsAllowZoomInOut=false`이면 `_CameraService:ZoomTo`가 무시됨 → 잠깐 true로 풀고 ZoomTo 후 다시 잠근다(`RtsCameraAnchorComponent.ClaimCamera`). 최대 줌아웃 30%에서 뷰는 42.66×24 유닛, 1유닛 = 45px(1920 기준).
 - 근거: 실측 2026-09-14
 
+## PC·모바일 보드 표시와 서버 전투 좌표 분리
+- `RtsMap` 맵 엔티티에는 TransformComponent가 없으므로 맵 자체를 축소하지 않는다. `RtsBoardViewLogic.GetRoot()`가 맵 자식 `RtsBoard`(MapObject의 SpriteRenderer 제거)를 서버에서 생성한다. 트랙·유닛·몬스터·월드 연출의 공통 부모다. 네이티브 RectTileMap과 카메라용 플레이어는 기존 맵에 남는다.
+- Maker 실측: 부모 Position=(10,20), Scale=.5일 때 SpawnByModelId의 위치(4,6)는 자식 **로컬 좌표**이고 월드 위치는(12,23)이다. 서버가 만든 컨테이너의 Scale을 클라이언트에서 .5로 바꾸면 서버 자식은(4,6), 클라이언트 자식만(2,3)이 된다.
+- 서버 보드는 identity이고 PC·모바일 모두 클라이언트 Transform을 변경한다. 서버 전투 좌표는 보드의 자식 로컬 좌표와 같다. 클라이언트 연출은 `BoardPosition`으로 읽고 `Position`에 쓴다. 화면 클릭은 `ScreenToBoard`, 메뉴 투영은 `BoardToScreen`을 사용한다. `WorldPosition`을 읽어 보드 자식 Position으로 그대로 넣으면 이중 변환되므로 금지한다.
+- 카메라 최소 줌30을 낮추는 방식으로 해결하지 않는다. 각 플랫폼의 HUD 영역을 뺀 실제 화면에 보드가 들어오도록 표시 배율을 계산한다. 테마 배경은 별도로 화면을 채운다. Maker Preview는 런타임 `_T.Preview`만 사용하며 일반 PC/실서비스에서는 켜지지 않는다.
+- 근거: Maker 서버·클라 좌표 비교, 208칸 클릭 좌표 왕복, 6캐릭터 선택, 투사체·타격·피해 적용 검증(2026-09-27). 실제 모바일 손가락 입력은 별도 검증 대상.
+
 ## 업로드 대형 스프라이트는 PPU 30, 텍스트 넘침은 Truncate
 - 1440px급 업로드 스프라이트는 PPU 30(740px짜리는 100이었음) — 스케일은 스크린샷으로 실측해 맞춘다. `TextComponent.Overflow`의 `ellipsis`는 박스보다 긴 새 글이 오면 이전 글을 그대로 보여주는 버그가 있어 `Truncate` 사용(리치텍스트 태그도 잘리므로 plain text).
 - 근거: 실측 2026-09-14
@@ -44,3 +51,5 @@ Maker 26.7에서 실측으로 확인한 엔진 동작과 그에 따른 작성 �
 - 멈춘 동안 게임 조작 RPC(영입·방출·레벨업·결속·스킬 잠금·위치 이동·증강 선택/지정/뽑기)는 서버 첫 줄에서 `if _RtsStageLogic.Paused then return end`. 몬스터 걷기 모션은 `RtsWaveLogic.SetMotionPaused`(본체 스프라이트 `PlayRate` 0/1).
 - 새 판정 시각·지연 판정을 추가할 때도 이 규칙을 따른다(서버 시계와 섞으면 한 번 멈춘 뒤부터 어긋난다).
 
+
+- UI 엔티티 `AttachTo`는 화면 위치를 보존하며 anchoredPosition을 바꿀 수 있다. 새 컨테이너 안의 상대 배치를 유지하려면 재부모화 전 위치를 저장하고 이후 복원한다(`RtsUiLayoutLogic.UnitInfo`, Maker 실측).

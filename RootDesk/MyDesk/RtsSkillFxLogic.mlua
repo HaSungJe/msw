@@ -78,7 +78,7 @@ script RtsSkillFxLogic extends Logic
 	@ExecSpace("ClientOnly")
 	method void Preload(table fx)
 		if fx == nil then return end
-		local mapRoot = _EntityService:GetEntityByPath("/maps/RtsMap")
+		local mapRoot = _RtsBoardViewLogic:GetRoot()
 		if mapRoot == nil then return end
 		local list = {}
 		if fx.frames ~= nil then for i = 1, #fx.frames do list[#list + 1] = fx.frames[i] end end
@@ -152,7 +152,7 @@ script RtsSkillFxLogic extends Logic
 			_SoundService:PlaySound(ruid, vol)
 			return
 		end
-		local mapRoot = _EntityService:GetEntityByPath("/maps/RtsMap")
+		local mapRoot = _RtsBoardViewLogic:GetRoot()
 		if mapRoot == nil then return end
 		self.SfxIdx = (self.SfxIdx % self.SfxPoolSize) + 1
 		local e = self.SfxPool[self.SfxIdx]
@@ -176,7 +176,7 @@ script RtsSkillFxLogic extends Logic
 	@ExecSpace("ClientOnly")
 	method void WarmSfx(string ruid)
 		if ruid == nil or ruid == "" then return end
-		local mapRoot = _EntityService:GetEntityByPath("/maps/RtsMap")
+		local mapRoot = _RtsBoardViewLogic:GetRoot()
 		if mapRoot == nil then return end
 		for i = 1, self.SfxPoolSize do
 			local e = self.SfxPool[i]
@@ -196,7 +196,7 @@ script RtsSkillFxLogic extends Logic
 	method void PlayCast(Entity unitEntity, number no, table fx, Entity target, table targets)
 		-- 원화 유닛의 프레임과 기존 스킬 이펙트를 함께 재생한다.
 		if unitEntity == nil or fx == nil then return end
-		local mapRoot = _EntityService:GetEntityByPath("/maps/RtsMap")
+		local mapRoot = _RtsBoardViewLogic:GetRoot()
 		if mapRoot == nil then return end
 		if targets == nil or #targets == 0 then
 			targets = {}
@@ -419,7 +419,7 @@ script RtsSkillFxLogic extends Logic
 		local old = self.Active[no]
 		if old ~= nil and isvalid(old) then old:Destroy() end
 		local s = fx.scale or 1
-		local pos = unitEntity.TransformComponent.WorldPosition
+		local pos = _RtsBoardViewLogic:BoardPosition(unitEntity)
 		local facingRight = self:FacingRight(unitEntity)
 		local flip = self:FlipFor(fx, facingRight, "frames")
 		local dir = 1
@@ -653,10 +653,10 @@ script RtsSkillFxLogic extends Logic
 	--   targets가 여럿이면 projEach = 대상마다 1발, projFrom "around"(구체)는 유닛 손 높이 주위 반지름 projSpread에 각도 2π(i-1)/n + π/n로 골고루 생성돼 targets[i](서버가 구체마다 정한 대상 — 가까운 적, 보스 우선)로 달려든다, 그 외는 메인 대상 1발
 	@ExecSpace("ClientOnly")
 	method void PlayProjectile(Entity unitEntity, table fx, Entity target, table targets)
-		local mapRoot = _EntityService:GetEntityByPath("/maps/RtsMap")
+		local mapRoot = _RtsBoardViewLogic:GetRoot()
 		if mapRoot == nil then return end
 		if targets == nil or #targets == 0 then targets = { target } end
-		local up = unitEntity.TransformComponent.WorldPosition
+		local up = _RtsBoardViewLogic:BoardPosition(unitEntity)
 		local count = fx.projCount or 1
 		local list = { target }
 		if fx.projEach then list = targets end
@@ -665,13 +665,12 @@ script RtsSkillFxLogic extends Logic
 				local t = list[j]
 				if fx.projFrom == "around" then t = targets[((i - 1) % #targets) + 1] end
 				if t ~= nil and isvalid(t) then
-					local tp = t.TransformComponent.WorldPosition
+					local tp = _RtsBoardViewLogic:BoardPosition(t)
 					local to = Vector2(tp.x, tp.y + (fx.hitDy or 0.6))
 					-- 칸 거리(사거리 규칙과 같은 체비쇼프): projArcByDist(조커 — 거리별 포물선 높이)에 쓴다
 					local cellSz = _RtsConfigLogic:GetGridCell()
 					local cells = math.max(math.abs(tp.x - up.x), math.abs(tp.y - up.y)) / cellSz
-					cells = math.floor(cells + 0.5)
-					if cells < 1 then cells = 1 end
+					-- 근거리 직선 여부는 반올림 전 실제 칸 거리로 판단한다.
 					-- 피격 박스가 있으면 그 정중앙으로(구체가 몬스터 중앙에 박치기)
 					if t.HitComponent ~= nil then
 						local sc = t.TransformComponent.Scale
@@ -718,13 +717,13 @@ script RtsSkillFxLogic extends Logic
 	--   서버 판정 시각 = 도착 시각(OrbTravelSec). 원래 구체는 대상이 죽어 있으면 폭발 없이 사라진다(SpawnProjectileEx) — 그 자리에서 이 구체가 이어받는다
 	@ExecSpace("ClientOnly")
 	method void PlayOrbRedirect(table fx, Vector2 from, Entity target)
-		local mapRoot = _EntityService:GetEntityByPath("/maps/RtsMap")
+		local mapRoot = _RtsBoardViewLogic:GetRoot()
 		if mapRoot == nil or target == nil or not isvalid(target) then return end
 		local f2 = {}
 		for key, v in pairs(fx) do f2[key] = v end
 		f2.projHover = 0
 		if fx.projMaxLife ~= nil and fx.projMaxLife <= 0 then return end
-		local tp = target.TransformComponent.WorldPosition
+		local tp = _RtsBoardViewLogic:BoardPosition(target)
 		local to = Vector2(tp.x, tp.y + (fx.hitDy or 0.6))
 		if target.HitComponent ~= nil then
 			local sc = target.TransformComponent.Scale
@@ -889,7 +888,7 @@ script RtsSkillFxLogic extends Logic
 			if not isvalid(e) then return end
 			-- 기존 투사체의 Tween과 분리해 소멸 순간의 위치에서 폭발을 재생한다.
 			if (fx.projHitSprites ~= nil and #fx.projHitSprites > 0) or (fx.hitClip ~= nil and fx.hitClip ~= "") then
-				local burst = _SpawnService:SpawnByModelId("model://MapObject", "RtsProjExpiry_" .. e.Name, e.TransformComponent.WorldPosition, mapRoot)
+				local burst = _SpawnService:SpawnByModelId("model://MapObject", "RtsProjExpiry_" .. e.Name, _RtsBoardViewLogic:BoardPosition(e), mapRoot)
 				if burst ~= nil then
 					local burstSprite = burst.SpriteRendererComponent
 					if burstSprite == nil then burstSprite = burst:AddComponent("SpriteRendererComponent") end
@@ -918,13 +917,13 @@ script RtsSkillFxLogic extends Logic
 		if expiresAt > 0 then expiryTimer = _TimerService:SetTimerOnce(expire, fx.projMaxLife) end
 		local function fly()
 			if not isvalid(e) then return end
-			if fx.projArc ~= nil and fx.projArc ~= 0 then
+			if fx.projArc ~= nil and fx.projArc ~= 0 and (fx.projArcMinCells == nil or (cells or 1) >= fx.projArcMinCells) then
 				-- 포물선(2026-09-20 사용자 "포물선 그리면서 날아가야 하는 투사체" — 조커 카드): 직선 보간 + 비행 방향에 수직인 튀어오름 4t(1−t)·높이.
 				--   높이는 projArc의 50~100%, projArcRandom=true면 발마다 위/아래 무작위, 아니면(기본) 항상 위 → 머리 위에서 적에게 떨어지는 카드. 0.03초마다 위치 갱신
 				local h = fx.projArc * (math.random(50, 100) / 100)
 				-- projArcByDist = { 거리1, 거리2, 거리3, 거리4+ … }: 대상까지 칸 거리로 높이를 고르고 무작위 없이 그대로(조커 1.0/1.1/1.2/1.3 — 2026-09-20 사용자)
 				if fx.projArcByDist ~= nil and #fx.projArcByDist > 0 then
-					local i = cells or 1
+					local i = math.floor((cells or 1) + 0.5)
 					if i < 1 then i = 1 end
 					if i > #fx.projArcByDist then i = #fx.projArcByDist end
 					h = fx.projArcByDist[i]
@@ -951,7 +950,7 @@ script RtsSkillFxLogic extends Logic
 					local t = (DateTime.UtcNow.Elapsed - t0) / (sec * 1000)
 					if t > 1 then t = 1 end
 					local bump = h * 4 * t * (1 - t)
-					e.TransformComponent.WorldPosition = Vector3(sx + dx * t + nx * bump, sy + dy * t + ny * bump, 0)
+					e.TransformComponent.Position = Vector3(sx + dx * t + nx * bump, sy + dy * t + ny * bump, 0)
 					if t >= 1 and arcTimer ~= nil then
 						_TimerService:ClearTimer(arcTimer)
 						arcTimer = nil
@@ -968,7 +967,7 @@ script RtsSkillFxLogic extends Logic
 						return
 					end
 					if isvalid(homing) and homing.TransformComponent ~= nil then
-						local hp = homing.TransformComponent.WorldPosition
+						local hp = _RtsBoardViewLogic:BoardPosition(homing)
 						lastX = hp.x
 						lastY = hp.y + (fx.hitDy or 0.6)
 						if homing.HitComponent ~= nil then
@@ -982,7 +981,7 @@ script RtsSkillFxLogic extends Logic
 					-- 진행률: projNear가 있으면 1타일 밖은 일정한 느린 속도, 마지막 1타일은 돌진(RtsJobTableLogic.OrbProgress — 2026-09-23 사용자 "몬스터와 1타일 안일 때 빨라지게")
 					local kp = k
 					if fx.projNear ~= nil then kp = _RtsJobTableLogic:OrbProgress(fx, dist, k * sec) end
-					e.TransformComponent.WorldPosition = Vector3(sx + (lastX - sx) * kp, sy + (lastY - sy) * kp, 0)
+					e.TransformComponent.Position = Vector3(sx + (lastX - sx) * kp, sy + (lastY - sy) * kp, 0)
 					if k >= 1 and arcTimer ~= nil then
 						_TimerService:ClearTimer(arcTimer)
 						arcTimer = nil
@@ -1025,9 +1024,9 @@ script RtsSkillFxLogic extends Logic
 	--   targets가 여럿이면 유닛 → 1번 → 2번 … 차례로 잇는다(체인 라이트닝 — 가까운 순이라 자연스럽게 번진다)
 	@ExecSpace("ClientOnly")
 	method void PlayBeam(Entity unitEntity, table fx, table targets)
-		local mapRoot = _EntityService:GetEntityByPath("/maps/RtsMap")
+		local mapRoot = _RtsBoardViewLogic:GetRoot()
 		if mapRoot == nil then return end
-		local up = unitEntity.TransformComponent.WorldPosition
+		local up = _RtsBoardViewLogic:BoardPosition(unitEntity)
 		local dir = -1
 		if self:FacingRight(unitEntity) then dir = 1 end
 		local fromX = up.x + (fx.beamDx or 0.3) * dir
@@ -1035,7 +1034,7 @@ script RtsSkillFxLogic extends Logic
 		for j = 1, #targets do
 			local t = targets[j]
 			if t ~= nil and isvalid(t) then
-				local tp = t.TransformComponent.WorldPosition
+				local tp = _RtsBoardViewLogic:BoardPosition(t)
 				local tx = tp.x
 				local ty = tp.y + (fx.hitDy or 0.6)
 				local hit = t.HitComponent
@@ -1093,7 +1092,7 @@ script RtsSkillFxLogic extends Logic
 	--   피해는 서버(RtsCombatLogic.DoAttack의 dot)가 따로 준다 — 이 클립은 그림만
 	@ExecSpace("ClientOnly")
 	method void PlayZone(Entity unitEntity, table fx)
-		local mapRoot = _EntityService:GetEntityByPath("/maps/RtsMap")
+		local mapRoot = _RtsBoardViewLogic:GetRoot()
 		if mapRoot == nil then return end
 		local u = unitEntity.RtsUnitComponent
 		if u == nil then return end
@@ -1144,12 +1143,12 @@ script RtsSkillFxLogic extends Logic
 	@ExecSpace("ClientOnly")
 	--   markClips = {…}면 무작위 1개(블리자드 얼음 tile 9종). markAt = "feet"면 피격 박스 대신 몬스터 발 위치(+markDx·markDy)에 markScale로 — 원점이 땅인 낙하 클립(블리자드 얼음·제네시스 빛기둥)
 	method void PlayMark(table fx, Entity target, any dup)
-		local mapRoot = _EntityService:GetEntityByPath("/maps/RtsMap")
+		local mapRoot = _RtsBoardViewLogic:GetRoot()
 		if mapRoot == nil then return end
 		local clip = fx.markClip
 		if fx.markClips ~= nil and #fx.markClips > 0 then clip = fx.markClips[math.random(1, #fx.markClips)] end
 		if clip == nil or clip == "" then return end
-		local p = target.TransformComponent.WorldPosition
+		local p = _RtsBoardViewLogic:BoardPosition(target)
 		local sc = target.TransformComponent.Scale
 		local cx = p.x + (fx.markDx or 0)
 		local cy = p.y + (fx.markDy or 0.6)
@@ -1390,9 +1389,9 @@ script RtsSkillFxLogic extends Logic
 	-- 캐릭터 뒤 이펙트(블리자드 80003323/effect — 캐릭터 등 뒤로 솟는 얼음 결정 군집): 아바타 Body/Face 스프라이트는 "Default" 레이어 order 0(실측 2026-09-18 — SpawnUnit의 ar.OrderInLayer 200은 클라에 0으로 읽힘)이라 그보다 아래 −10에. 발 위치 + backDy, backScale. 방향은 backFacesLeft/assetFacesLeft/noFlip 규칙
 	@ExecSpace("ClientOnly")
 	method void PlayBack(Entity unitEntity, number no, table fx)
-		local mapRoot = _EntityService:GetEntityByPath("/maps/RtsMap")
+		local mapRoot = _RtsBoardViewLogic:GetRoot()
 		if mapRoot == nil then return end
-		local pos = unitEntity.TransformComponent.WorldPosition
+		local pos = _RtsBoardViewLogic:BoardPosition(unitEntity)
 		local facingRight = self:FacingRight(unitEntity)
 		local flip = self:FlipFor(fx, facingRight, "back")
 		local s = fx.backScale or 1.5
@@ -1422,10 +1421,10 @@ script RtsSkillFxLogic extends Logic
 	-- 추가 클립들(fx.clips): 각각 독립 엔티티로 같은 원점(발 + feetDx/feetDy, 항목별 dx/dy 추가)에 띄우고 마지막 프레임에서 지운다. 방향 반전은 clip과 같은 규칙. Active 슬롯·stand 복귀는 건드리지 않음
 	@ExecSpace("ClientOnly")
 	method void PlayExtraClips(Entity unitEntity, number no, table fx)
-		local mapRoot = _EntityService:GetEntityByPath("/maps/RtsMap")
+		local mapRoot = _RtsBoardViewLogic:GetRoot()
 		if mapRoot == nil then return end
 		local base = fx.scale or 1
-		local pos = unitEntity.TransformComponent.WorldPosition
+		local pos = _RtsBoardViewLogic:BoardPosition(unitEntity)
 		local facingRight = self:FacingRight(unitEntity)
 		local flip = self:FlipFor(fx, facingRight, "clip")
 		local dir = 1
@@ -1485,12 +1484,12 @@ script RtsSkillFxLogic extends Logic
 		-- 원화 히어로의 일반 레이징 블로우는 몸과 같은 시계로 검 이펙트를 직접 그린다.
 		local unit = unitEntity.RtsUnitComponent
 		if unit ~= nil and unit.JobId == "hero" and _RtsJobTableLogic:HasMageSkin("hero") and fx.clip == "fa2bfe8ff4f543fb815dd7ee5e02eac9" then return end
-		local mapRoot = _EntityService:GetEntityByPath("/maps/RtsMap")
+		local mapRoot = _RtsBoardViewLogic:GetRoot()
 		if mapRoot == nil then return end
 		local old = self.Active[no]
 		if old ~= nil and isvalid(old) then old:Destroy() end
 		local s = fx.scale or 1
-		local pos = unitEntity.TransformComponent.WorldPosition
+		local pos = _RtsBoardViewLogic:BoardPosition(unitEntity)
 		-- 유닛이 보는 방향(RtsUnitComponent.FaceDir)에 이펙트를 맞춘다. 원작 스킬 클립(assetFacesLeft/clipFacesLeft)은 왼쪽 보기로 그려져 있어 오른쪽을 볼 때 반전
 		local facingRight = self:FacingRight(unitEntity)
 		local flip = self:FlipFor(fx, facingRight, "clip")
@@ -1528,7 +1527,7 @@ script RtsSkillFxLogic extends Logic
 	--   발 위치 기준(원작 origin = 발), 유닛이 보는 방향에 맞춰 반전. bodyScale 없으면 유닛 스케일, bodyDy로 높이 보정
 	@ExecSpace("ClientOnly")
 	method void PlayBody(Entity unitEntity, number no, table fx)
-		local mapRoot = _EntityService:GetEntityByPath("/maps/RtsMap")
+		local mapRoot = _RtsBoardViewLogic:GetRoot()
 		if mapRoot == nil then return end
 		local old = self.ActiveBody[no]
 		if old ~= nil and isvalid(old) then old:Destroy() end
@@ -1536,7 +1535,7 @@ script RtsSkillFxLogic extends Logic
 		local s = fx.bodyScale or math.abs(us.x)
 		local facingRight = self:FacingRight(unitEntity)
 		local flip = self:FlipFor(fx, facingRight, "body")
-		local pos = unitEntity.TransformComponent.WorldPosition
+		local pos = _RtsBoardViewLogic:BoardPosition(unitEntity)
 		local at = Vector3(pos.x, pos.y + (fx.bodyDy or 0), 0)
 		local e = _SpawnService:SpawnByModelId("model://MapObject", "RtsFxBody" .. _RtsHudLogic:Int(no) .. "_" .. tostring(math.floor(DateTime.UtcNow.Elapsed)), at, mapRoot)
 		if e == nil then return end
