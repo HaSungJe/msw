@@ -39,11 +39,8 @@ script RtsPopupLogic extends Logic
 
 	property boolean KeepOldBody = false
 
-	-- 클리어 순위(RtsRunResultLogic.ShowClearRank → SetClearRank): { diff, count, rank, more, at } — count 0 = 기록 안 함(보통 이하·테스트 모드)
-	property any ClearRank = nil
-
-	-- 순위 창 탭(난이도 4 어려움 · 5 매우어려움 · 6 극악)과 받아 둔 목록(난이도 → { rows, myCount, myRank, myMore, at })
-	property number RankDiff = 4
+	-- 순위 창 탭(난이도 1 매우쉬움 ~ 6 극악 — 도전모드 최대 클리어 라운드, 2026-09-28)과 받아 둔 목록(난이도 → { rows, myCount = 내 최대 클리어 라운드, myRank, myMore, at })
+	property number RankDiff = 3
 
 	property table RankCache = {}
 
@@ -409,19 +406,15 @@ script RtsPopupLogic extends Logic
 	-- 판 결과(RtsRunResultLogic.ShowResult — 탈락·클리어한 그 유저에게만)
 	@ExecSpace("ClientOnly")
 	method void OpenResult(boolean cleared, string reason, number stageNo, number lastNo, number kills, number pct, number bestNo, boolean bestClear)
-		self.Result = { cleared = cleared, reason = reason, stageNo = stageNo, lastNo = lastNo, kills = kills, pct = pct, bestNo = bestNo, bestClear = bestClear }
-		-- 클리어 순위(SetClearRank)는 이 결과와 거의 같이 오므로 10초 안에 온 것만 쓴다(지난 판 값이 남지 않게)
-		if not cleared or (self.ClearRank ~= nil and _UtilLogic.ElapsedSeconds - self.ClearRank.at > 10) then self.ClearRank = nil end
+		self.Result = { race = false, cleared = cleared, reason = reason, stageNo = stageNo, lastNo = lastNo, kills = kills, pct = pct, bestNo = bestNo, bestClear = bestClear }
 		self:Open("result")
 	end
 
-	-- 클리어 순위 도착(RtsRunResultLogic.ShowClearRank): 결과 창이 열려 있으면 다시 그린다. 그 난이도 순위 창 목록은 새로 받게 비운다
+	-- 경주모드 결과(RtsRunResultLogic.ShowRaceResult — 검은 마법사 4페이즈를 잡은 그 유저에게만): 걸린 시간 · 등수 / 방 인원 · 처치 수
 	@ExecSpace("ClientOnly")
-	method void SetClearRank(number diff, number count, number rank, boolean more)
-		local d = math.floor(diff + 0.5)
-		self.ClearRank = { diff = d, count = count, rank = rank, more = more, at = _UtilLogic.ElapsedSeconds }
-		self.RankCache[d] = nil
-		-- (결과 창에 순위 줄을 그리지 않으니 다시 그리지 않는다 — 2026-09-25 사용자 "인게임 순위표 제거". 값은 대기방 순위표 때 다시 쓴다)
+	method void OpenRaceResult(number sec, number place, number total, number kills)
+		self.Result = { race = true, cleared = true, sec = sec, place = place, total = total, kills = kills, stageNo = _RtsStageLogic.StageNo }
+		self:Open("result")
 	end
 
 	-- 순위 목록 도착(RtsRunResultLogic.ShowRanking): 순위 창이 그 탭이면 다시 그린다
@@ -1229,6 +1222,20 @@ script RtsPopupLogic extends Logic
 		local total = _RtsStageTableLogic:GetStageCount()
 		local head = "클리어!"
 		local headColor = self:AccentInk()
+		if r.race then
+			-- 경주모드(2026-09-28): 등수 · 걸린 시간 · 처치 수 · 난이도(기록 저장 없음 — 순위표에 오르지 않는다)
+			head = "경주 완주! " .. H:Int(r.place) .. "등"
+			H:SpawnLabel("RtsRsHead", body, Vector2(0, 1), Vector2(0, 1), Vector2(27, -4), Vector2(586, 40),
+				head, headColor, 28, TextAlignmentType.MiddleLeft, true)
+			H:SpawnLabel("RtsRsRaceTime", body, Vector2(0, 1), Vector2(0, 1), Vector2(27, -54), Vector2(586, 28),
+				"걸린 시간: " .. _RtsStageLogic:ClockText(r.sec) .. "   ·   등수 " .. H:Int(r.place) .. " / " .. H:Int(r.total) .. "명", self:Ink(), 19, TextAlignmentType.MiddleLeft, false)
+			H:SpawnLabel("RtsRsKills", body, Vector2(0, 1), Vector2(0, 1), Vector2(27, -88), Vector2(586, 28),
+				"처치 " .. H:FormatNumber(r.kills) .. "마리   ·   난이도 " .. _RtsDifficultyLogic:NameOf(_RtsUnitLogic:MyUserId()), self:Ink(), 19, TextAlignmentType.MiddleLeft, false)
+			H:SpawnLabel("RtsRsBest", body, Vector2(0, 1), Vector2(0, 1), Vector2(27, -122), Vector2(586, 28),
+				"경주모드 기록은 순위표에 오르지 않아요", self:Muted(), 17, TextAlignmentType.MiddleLeft, false)
+			self:BuildResultButtons(body)
+			return
+		end
 		if not r.cleared then
 			headColor = Color(0.66, 0.24, 0.18, 1)
 			if r.reason == "boss" then head = "탈락 — 보스 시간 초과" else head = "탈락 — 필드 110" end
@@ -1254,9 +1261,14 @@ script RtsPopupLogic extends Logic
 		end
 		H:SpawnLabel("RtsRsBest", body, Vector2(0, 1), Vector2(0, 1), Vector2(27, -122), Vector2(586, 28),
 			best, self:Muted(), 17, TextAlignmentType.MiddleLeft, false)
+		-- (클리어 순위 두 줄은 뺐다 — 2026-09-25 사용자 "인게임 순위표 제거, 지금 저기서 보일 게 아니야". 순위 기록 저장은 그대로, 순위는 대기방(Phase 13)에서)
+		self:BuildResultButtons(body)
+	end
+
+	-- 결과 창 아래 버튼(도전·경주 공용): 여럿 = 관전하기 / 나가기(대기방 — 멀티 업데이트), 솔로(방 인원 1) = 닫기 / 다시 하기(바로 새 판, 2026-09-24 솔로 출시)
+	@ExecSpace("ClientOnly")
+	method void BuildResultButtons(Entity body)
 		local by = -186
-		-- (클리어 순위 두 줄은 뺐다 — 2026-09-25 사용자 "인게임 순위표 제거, 지금 저기서 보일 게 아니야". 클리어 기록 저장은 그대로, 순위는 대기방(Phase 13)에서)
-		-- 버튼: 여럿 = 관전하기 / 나가기(대기방 — 멀티 업데이트), 솔로(방 인원 1) = 닫기 / 다시 하기(바로 새 판, 2026-09-24 솔로 출시)
 		local solo = _RtsStageLogic:IsSolo()
 		local bw = 240
 		local bh = 88
@@ -1871,17 +1883,19 @@ script RtsPopupLogic extends Logic
 		end)
 	end
 
-	-- ===== 순위(2026-09-24 사용자 "어려움/매우어려움/극악을 따로따로 분리해서 클리어 횟수 순위로"): 탭 = 난이도, 행 = 순위 · 닉네임 · 클리어 횟수, 아래 = 내 순위 =====
-	--   서버 RtsRunResultLogic.RequestRanking → ShowRanking → SetRanking(RankCache[난이도]). 20초 안에 받은 목록은 다시 묻지 않는다
+	-- ===== 순위(2026-09-28 사용자 "각 난이도별 도전모드 랭킹 — 최대 클리어 라운드 + 최대 처치 보스"): 탭 = 난이도 6단계, 행 = 순위 · 닉네임 · 최대 클리어 라운드 · 최대 처치 보스, 아래 = 내 순위 =====
+	--   서버 RtsRunResultLogic.RequestRanking → ShowRanking → SetRanking(RankCache[난이도]). 20초 안에 받은 목록은 다시 묻지 않는다. 게임 안엔 여는 버튼이 없다(대기방 순위표 Phase 13에서 다시 씀)
 	@ExecSpace("ClientOnly")
 	method void BuildRank(Entity body, number W)
 		local H = _RtsHudLogic
 		local names = _RtsDifficultyLogic:GetNames()
 		local minD = _RtsRunResultLogic.RankMinDiff
 		if self.RankDiff < minD or self.RankDiff > #names then self.RankDiff = minD end
+		local tabGap = 8
+		local tabW = math.floor((W - 54 - tabGap * (#names - minD)) / (#names - minD + 1))
 		for d = minD, #names do
 			local dd = d
-			local tab = self:SpawnTab("RtsRankTab" .. H:Int(d), body, Vector2(27 + (d - minD) * 138, -10), Vector2(130, 34),
+			local tab = self:SpawnTab("RtsRankTab" .. H:Int(d), body, Vector2(27 + (d - minD) * (tabW + tabGap), -10), Vector2(tabW, 34),
 				names[d], self.RankDiff == d, 16)
 			if self.RankDiff ~= d then
 				local click = H:SpawnClick("RtsRankTabClick", tab)
@@ -1892,7 +1906,7 @@ script RtsPopupLogic extends Logic
 			end
 		end
 		H:SpawnLabel("RtsRankInfo", body, Vector2(0, 1), Vector2(0, 1), Vector2(27, -52), Vector2(W - 54, 26),
-			"그 난이도에서 검은 마법사 4페이즈를 깬 횟수 순 · 같으면 먼저 달성한 사람이 위", self:Muted(), 14, TextAlignmentType.MiddleLeft, false)
+			"그 난이도 도전모드의 최대 클리어 라운드 순 · 같으면 먼저 도달한 사람이 위 · 경주모드는 순위 없음", self:Muted(), 14, TextAlignmentType.MiddleLeft, false)
 		local c = self.RankCache[self.RankDiff]
 		if c == nil or _UtilLogic.ElapsedSeconds - c.at > 20 then _RtsRunResultLogic:RequestRanking(self.RankDiff) end
 		if c == nil then
@@ -1901,11 +1915,11 @@ script RtsPopupLogic extends Logic
 			return
 		end
 		-- 아래: 내 순위
-		local my = "내 기록: 아직 없음 — 이 난이도에서 검은 마법사를 깨면 올라가요"
+		local my = "내 기록: 아직 없음 — 이 난이도 도전모드 판이 끝나면 올라가요"
 		if c.myCount > 0 then
 			local rk = H:Int(c.myRank) .. "위"
 			if c.myMore then rk = H:Int(c.myRank - 1) .. "위 밖" end
-			my = "내 순위 " .. rk .. "   ·   클리어 " .. H:Int(c.myCount) .. "회"
+			my = "내 순위 " .. rk .. "   ·   " .. self:RankRoundText(c.myCount)
 		end
 		local mine = H:SpawnRoundedPanel("RtsRankMine", body, Vector2(0, 0), Vector2(0, 0), Vector2(27, 22), Vector2(W - 54, 46),
 			self:Mix(H:ColGold(), 0.14), self:Mix(H:ColGold(), 0.6), 1.5)
@@ -1922,7 +1936,7 @@ script RtsPopupLogic extends Logic
 		end
 		if #rows == 0 then
 			H:SpawnLabel("RtsRankEmpty", list, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2(0, 0), Vector2(listW - 20, 40),
-				"아직 기록이 없어요 — 첫 클리어의 주인공이 되어 보세요", self:Muted(), 17, TextAlignmentType.MiddleCenter, false)
+				"아직 기록이 없어요 — 첫 기록의 주인공이 되어 보세요", self:Muted(), 17, TextAlignmentType.MiddleCenter, false)
 			return
 		end
 		H:AddVScroll(list, 4, Color(1, 1, 1, 0.06))
@@ -1934,11 +1948,22 @@ script RtsPopupLogic extends Logic
 				self:Card(), self:Edge(), 1.5)
 			H:SpawnLabel("RtsRankNo", row, Vector2(0, 0.5), Vector2(0, 0.5), Vector2(14, 0), Vector2(70, 32),
 				H:Int(i) .. "위", ink, 17, TextAlignmentType.MiddleLeft, true)
-			H:SpawnLabel("RtsRankNick", row, Vector2(0, 0.5), Vector2(0, 0.5), Vector2(96, 0), Vector2(listW - 280, 32),
+			H:SpawnLabel("RtsRankNick", row, Vector2(0, 0.5), Vector2(0, 0.5), Vector2(96, 0), Vector2(listW - 420, 32),
 				rows[i].nick, self:Ink(), 17, TextAlignmentType.MiddleLeft, top)
-			H:SpawnLabel("RtsRankCnt", row, Vector2(1, 0.5), Vector2(1, 0.5), Vector2(-16, 0), Vector2(150, 32),
-				H:Int(rows[i].cnt) .. "회", ink, 17, TextAlignmentType.MiddleRight, true)
+			H:SpawnLabel("RtsRankCnt", row, Vector2(1, 0.5), Vector2(1, 0.5), Vector2(-16, 0), Vector2(300, 32),
+				self:RankRoundText(rows[i].cnt), ink, 17, TextAlignmentType.MiddleRight, true)
 		end
+	end
+
+	-- 순위 칸 글: "n라운드 · 최대 처치 보스"(끝까지 깼으면 "클리어 · 검은 마법사 4페이즈")
+	@ExecSpace("ClientOnly")
+	method string RankRoundText(number round)
+		local R = _RtsRunResultLogic
+		local boss = R:BossNameUpTo(round)
+		local head = _RtsHudLogic:Int(round) .. "라운드"
+		if round >= _RtsStageTableLogic:GetStageCount() then head = "클리어" end
+		if boss == "" then return head end
+		return head .. " · " .. boss
 	end
 
 	-- ===== 테스트 프리즘(개발모드, 2026-09-22 사용자 "우측 하단에 테스트 프리즘 증강 버튼 … 거기서 선택"): 프리즘 12종을 직업별로 나열, 누르면 그 직업인 내 유닛에 적용 =====

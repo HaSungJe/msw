@@ -394,22 +394,27 @@ script RtsMonsterComponent extends Component
 	method void Die()
 		if self.Dead then return end
 		self.Dead = true
+		-- 필드를 먼저 지역 값으로 잡아 둔다: 마지막 보스 처치 → 클리어 → 판 종료(RtsStageLogic.EndRun → RtsBossLogic.ClearAll)가 이 엔티티를 이 호출 안에서 지우면
+		--   그 뒤 self.Zone·MonsterId·DieGrace가 nil이 된다(2026-09-28 Maker 재현 — 같은 날 제보된 OnMonsterKilled 'zone' nil의 원인)
 		local e = self.Entity
+		local zone = self.Zone
+		local monsterId = self.MonsterId
+		local grace = self.DieGrace
 		if self.IsBoss then
-			_RtsBossLogic:OnBossKilled(self.Zone)
+			_RtsBossLogic:OnBossKilled(zone)
 		else
-			_RtsWaveLogic:OnMobGone(self.Zone, e.Name)
-			_RtsRunResultLogic:OnMobKilled(self.Zone, self.Meso)
+			_RtsWaveLogic:OnMobGone(zone, e.Name)
+			_RtsRunResultLogic:OnMobKilled(zone, self.Meso)
 		end
-		-- 아이콘 획득 굴림: 매우어려움 1% · 극악 2%, 보스 포함(RtsProfileLogic).
-		_RtsProfileLogic:OnMonsterKilled(self.Zone, self.MonsterId)
+		-- 아이콘 획득 굴림: 도전모드 매우어려움 1% · 극악 2%, 보스 포함(RtsProfileLogic).
+		_RtsProfileLogic:OnMonsterKilled(zone, monsterId)
 		local sec = 0.6
-		local mon = _RtsStageTableLogic:GetMonster(self.MonsterId)
+		local mon = _RtsStageTableLogic:GetMonster(monsterId)
 		if mon ~= nil and mon.dieSec ~= nil and mon.dieSec > 0 then sec = mon.dieSec end
 		-- 게임 시계로 잰다(RtsStageLogic.After — 2026-09-27 배속: 2배면 사망 그림도 클라에서 2배라 실제 절반 뒤 제거)
 		_RtsStageLogic:After(function()
 			if isvalid(e) then e:Destroy() end
-		end, sec + self.DieGrace)
+		end, sec + grace)
 	end
 
 	-- 빙결 sec초(블리자드 5초 — character.md "이동속도 감소 50%"). 서버는 끝 시각만 기록(걷기 감속은 FrozenUntil로), 전 클라에 틴트·결정체. 보스는 빙결 없음

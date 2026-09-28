@@ -5,7 +5,7 @@
 | 상황 | 현재 처리 |
 |---|---|
 | 잘못된 입력·권한 없음 | 서버 요청에서 조기 `return`; 일부 경우에만 조건부 개발 로그 (`RootDesk/MyDesk/RtsUnitLogic.mlua:322-361`). |
-| 사용자에게 반영할 상태 | 서버에서 `Client` 메서드로 값을 보내고 대상 `userId`를 전달 (`RootDesk/MyDesk/RtsProfileLogic.mlua:270-276,412-420`, `RootDesk/MyDesk/RtsRunResultLogic.mlua:295-299`). |
+| 사용자에게 반영할 상태 | 서버에서 `Client` 메서드로 값을 보내고 대상 `userId`를 전달 (`RootDesk/MyDesk/RtsProfileLogic.mlua:270-276,412-420`, `RtsRunResultLogic` `ShowResult`·`ShowRaceResult`). |
 | 저장 실패 | `RtsProfileLogic`의 일부 `SetAsync` 콜백은 결과 코드를 확인한다. `RtsRunResultLogic`의 일부 콜백은 확인하지 않으므로 성공 보장을 일반화하지 않는다 (`RootDesk/MyDesk/RtsProfileLogic.mlua:307-318,393-405`, `RootDesk/MyDesk/RtsRunResultLogic.mlua:213,271,277`). |
 | 로그 | `_RtsConfigLogic:Log`만 사용한다. `DebugLog=false`가 기본이며 서버·클라이언트에서 확인할 때만 켠다 (`RootDesk/MyDesk/RtsConfigLogic.mlua:1-9`). |
 

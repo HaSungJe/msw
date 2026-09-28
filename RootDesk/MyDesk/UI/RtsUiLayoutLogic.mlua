@@ -275,6 +275,8 @@ script RtsUiLayoutLogic extends Logic
 		H:Tint(self._T.Shortcuts, 1, 1, 1, 0)
 		self._T.Shortcuts.SpriteGUIRendererComponent.RaycastTarget = false
 		self._T.PlayersAction = self:Action(self._T.Shortcuts, "units", "유저 목록", 0, 340, 88, function() _RtsPopupLogic:Open("players") end)
+		-- 진행 현황(2026-09-28 미리보기 A): 유저 목록 버튼 아래 유저마다 한 줄 — 자리는 Refresh
+		self._T.Progress = H:BuildProgress(H.HudGroup)
 		self._T.Building = false
 	end
 
@@ -372,8 +374,11 @@ script RtsUiLayoutLogic extends Logic
 			self:Rect(info:GetChildByName("RtsInfoLine"),0,1,12,-170,side.left-26,1.5)
 			info:GetChildByName("RtsInfoLine"):SetEnable(true)
 			self:Rect(info:GetChildByName("RtsMesoCoin"),0,0,16,17,28,28)
-			self:Rect(H.MesoText,0,0,52,12,side.left-70,38)
+			-- 메소 줄 오른쪽 150은 경주모드 자동 입금 글(RtsIncomeText — 2026-09-28)
+			self:Rect(H.MesoText,0,0,52,12,side.left-70-150,38)
 			H.MesoText.TextComponent.Alignment = TextAlignmentType.MiddleLeft
+			self:Rect(H.IncomeText,1,0,-16,12,150,38)
+			H.IncomeText.TextComponent.Alignment = TextAlignmentType.MiddleRight
 			H:PlaceMobile(H.RestartBtn.Parent,v,0,0,0,100,164,96,1)
 			H:PlaceMobile(H.PauseBtn.Parent,v,0,0,176,100,164,96,1)
 			for _,label in ipairs({H.StageTitleText,H.StageSubText,H.StageClockText,H.StageDifficultyText,H.MesoText,H.FieldText}) do H:SetLabelSize(label,26) end
@@ -394,6 +399,12 @@ script RtsUiLayoutLogic extends Logic
 			H:PlaceMobile(self._T.Shortcuts,v,0,1,0,-330,side.left,88,1)
 			self:Rect(self._T.PlayersAction.box.Parent,0,1,0,0,side.left,88)
 			self:RailAction(self._T.PlayersAction,side.left,88)
+			-- 진행 현황: 유저 목록 버튼(−330, 높이 88) 10 아래, 줄 높이 44 · 간격 6 × 최대 8줄
+			H:PlaceMobile(self._T.Progress,v,0,1,0,-428,side.left,H.ProgressMax*(H.ProgressRowH+H.ProgressGap),1)
+			for _, r in ipairs(H.ProgressRows) do
+				r.row.Parent.UITransformComponent.RectSize = Vector2(side.left, H.ProgressRowH)
+			end
+			H:SetLabelSize(H.IncomeText,22)
 			H:PlaceMobile(self._T.Rail,v,1,1,0,-488,side.right,440,1)
 			H:PlaceMobile(H.HudGroup:GetChildByName("RtsUiModeSwitch"),v,1,0,0,0,212,64,1.4)
 			H:PlaceMobile(H.Hint,v,0.5,1,0,-12,760,64,1)
@@ -401,13 +412,26 @@ script RtsUiLayoutLogic extends Logic
 			H.VoteText.UITransformComponent.RectSize = Vector2(396, 48)
 			for i, b in ipairs({H.VoteYesBtn,H.VoteNoBtn}) do self:Rect(b.Parent,0,0,12+(i-1)*204,12,190,88) end
 			if isvalid(diff) then
-				H:PlaceMobile(diff.Parent, v, 0.5, 1, 0, -10, 960, 160, 1)
+				-- 난이도 6칸 한 줄 + 모드 2칸 한 줄(각 난이도 3칸 폭, 2026-09-28) + 안내 줄 — 높이 160 → 270
+				H:PlaceMobile(diff.Parent, v, 0.5, 1, 0, -10, 960, 270, 1)
 				diff:GetChildByName("RtsDiffTitle"):SetEnable(false)
 				for i, b in ipairs(_RtsDifficultyLogic.Btns) do
 					self:Rect(b.Parent,0,1,12+(i-1)*156,-10,146,100)
 					local label = b:GetChildByName("RtsDiffBtnText"..H:Int(i))
 					self:Rect(label,0.5,0.5,0,0,140,88)
 					H:SetLabelSize(label,21)
+				end
+				local modeTitle = diff:GetChildByName("RtsModeTitle")
+				if isvalid(modeTitle) then modeTitle:SetEnable(false) end
+				for i, b in ipairs(_RtsDifficultyLogic.ModeBtns) do
+					self:Rect(b.Parent,0,1,12+(i-1)*468,-120,458,100)
+					-- 이름은 위, 모드 설명 두 줄은 아래(2026-09-28 사용자 "각 모드별 설명 간략하게")
+					local label = b:GetChildByName("RtsModeBtnText"..H:Int(i))
+					self:Rect(label,0.5,1,0,-4,440,38)
+					H:SetLabelSize(label,21)
+					local desc = b:GetChildByName("RtsModeBtnDesc"..H:Int(i))
+					self:Rect(desc,0.5,0,0,6,440,50)
+					if isvalid(desc) then H:SetLabelSize(desc,15) end
 				end
 				_RtsDifficultyLogic.StartBtn.Parent.UITransformComponent.RectSize = Vector2(300, 104)
 			end

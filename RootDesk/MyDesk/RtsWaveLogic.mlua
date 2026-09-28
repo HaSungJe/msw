@@ -1,6 +1,6 @@
 -- Phase 6 (2026-09-23): 구역별 몬스터 웨이브. 몬스터 스테이지마다 살아 있는 구역에 40마리를 0.5초 간격으로 트랙 S(t=0)에서 내보낸다(20초).
 --   스폰 순서 = 스테이지 몹 목록을 40칸에 고르게 채우고 섞은 배열. 몹은 E에 닿으면 S로 돌아가 계속 돈다(순환).
---   필드 수(구역에 살아 있는 몹 수, 동기화)가 110이 되면 그 구역 주인은 탈락. 보스 스테이지 동안 일반 몹은 보관(숨김·정지·대상 제외)했다가 보스전 뒤 같은 자리에서 다시 돈다.
+--   필드 수(구역에 살아 있는 몹 수, 동기화)가 110이 되면 그 구역 주인은 탈락(도전모드만 — 경주모드는 탈락·시간 제한 없이 IsRoundCleared로 라운드 통과). 보스 스테이지 동안 일반 몹은 보관(숨김·정지·대상 제외)했다가 보스전 뒤 같은 자리에서 다시 돈다.
 --   몬스터 엔티티 생성(SpawnMonsterEntity)은 보스(RtsBossLogic)도 같이 쓴다 — 크기·피격 박스·체력바 높이는 RtsStageTableLogic 몬스터 표.
 @Logic
 script RtsWaveLogic extends Logic
@@ -10,6 +10,10 @@ script RtsWaveLogic extends Logic
 	property SyncTable<string, number> FieldByZone
 
 	property number FieldLimit = 110
+
+	-- 구역별 이번 라운드 아직 안 나온 수(진행 현황 '남은' = 필드 + 이것 — 2026-09-28): key = 구역 번호 문자열
+	@Sync
+	property SyncTable<string, number> PendingByZone
 
 	property number SpawnInterval = 0.5
 
@@ -50,6 +54,14 @@ script RtsWaveLogic extends Logic
 		local v = self.FieldByZone[self:ZoneKey(zone)]
 		if v == nil then return 0 end
 		return v
+	end
+
+	-- 이번 라운드에 남은 몬스터(필드 + 아직 안 나온 수 — 진행 현황, 서버·클라 공용)
+	method number RemainingInZone(number zone)
+		if zone < 1 then return 0 end
+		local pend = self.PendingByZone[self:ZoneKey(zone)]
+		if pend == nil then pend = 0 end
+		return self:GetField(zone) + pend
 	end
 
 	-- 사망음(RtsMonsterComponent.PlayDie — 보고 있는 구역만). 한꺼번에 죽어도 DieSoundGap초에 한 번
@@ -133,6 +145,7 @@ script RtsWaveLogic extends Logic
 			end
 			self.Queue[zone] = list
 			self.QueuePos[zone] = 1
+			self.PendingByZone[self:ZoneKey(zone)] = #list
 		end
 		self.Spawning = true
 		-- 실제 간격 = SpawnInterval ÷ 배속(2026-09-27 — RtsStageLogic.RealSpeed)
@@ -157,6 +170,7 @@ script RtsWaveLogic extends Logic
 			local pos = self.QueuePos[zone] or 1
 			if pos <= #list and _RtsRunResultLogic:IsZoneAlive(zone) then
 				self.QueuePos[zone] = pos + 1
+				self.PendingByZone[self:ZoneKey(zone)] = #list - pos
 				self:SpawnMob(zone, list[pos])
 				spawned = true
 			end
@@ -187,6 +201,17 @@ script RtsWaveLogic extends Logic
 		self.SpawnTimer = 0
 		self.Queue = {}
 		self.QueuePos = {}
+		self:ClearPending()
+	end
+
+	-- 아직 안 나온 수를 모두 0으로(스폰 멈춤·정리)
+	@ExecSpace("ServerOnly")
+	method void ClearPending()
+		local keys = {}
+		for k, v in pairs(self.PendingByZone) do
+			if v ~= 0 then keys[#keys + 1] = k end
+		end
+		for i = 1, #keys do self.PendingByZone[keys[i]] = 0 end
 	end
 
 	@ExecSpace("ServerOnly")
@@ -210,9 +235,21 @@ script RtsWaveLogic extends Logic
 		self.Mobs[z][name] = e
 		local field = self:GetField(z) + 1
 		self.FieldByZone[self:ZoneKey(z)] = field
-		if field >= self.FieldLimit then
+		-- 필드 110 탈락은 도전모드만(경주모드는 탈락 없음 — 2026-09-28)
+		if field >= self.FieldLimit and not _RtsStageLogic:IsRace() then
 			_RtsRunResultLogic:Eliminate(_RtsRunResultLogic:OwnerOfZone(z), "field", 0)
 		end
+	end
+
+	-- 경주모드 라운드 통과 판정(RtsStageLogic.Tick — 다 잡으면 바로 다음 라운드): 이번 라운드 몹이 다 나왔고(스폰 줄 끝) 살아 있는 구역의 필드가 모두 0
+	@ExecSpace("ServerOnly")
+	method boolean IsRoundCleared()
+		if self.Spawning then return false end
+		local zones = _RtsRunResultLogic:AliveZones()
+		for i = 1, #zones do
+			if self:GetField(zones[i]) > 0 then return false end
+		end
+		return true
 	end
 
 	-- 일반 몹이 죽었을 때(RtsMonsterComponent.Die) — 목록에서 빼고 필드 −1
@@ -274,6 +311,7 @@ script RtsWaveLogic extends Logic
 		self.Queue[z] = nil
 		self.QueuePos[z] = nil
 		self.FieldByZone[self:ZoneKey(z)] = 0
+		self.PendingByZone[self:ZoneKey(z)] = 0
 	end
 
 	@ExecSpace("ServerOnly")

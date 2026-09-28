@@ -2,8 +2,11 @@
 --   몬스터 체력(보스·일반 모두 — 사용자 "보스와 몬스터 모두", "보스와 같은 곡선") = 표 체력(RtsStageTableLogic) × 난이도 배율 × 극악 곡선.
 --   극악 곡선 = 보스 라운드마다 '표 체력 대비' 배율(tools/clear-sim.py 2000판 — 최적 조합을 아는 사람 기준 시그너스까지 보스별 통과 99·95·88%,
 --     스우부터 누적 생존 60 → … → 검마 4페 3.5%). 보스 = GetCurve, 일반 몬스터 = GetMobCurve(앞뒤 보스 지점 값을 라운드로 로그 보간 — 2026-09-28 분리).
---   난이도 배율 = 곡선에 곱하는 값(사용자 "한 곡선 × 배율" → 값 지정): 매우쉬움 0.2 · 쉬움 0.4 · 보통 0.6 · 어려움 0.7 · 매우어려움 0.8 · 극악 1.0 → 같은 시뮬 클리어 70.0 / 48.7 / 41.9 / 30.3 / 18.4 / 3.5%(프리즘 조건 · 천장 반영).
---   플레이어마다 자기 구역 난이도를 판 시작 전(대기·카운트다운·끝남)에 고르고(기본 보통), 진행 중엔 고정. 클리어 기록은 난이도별 저장소(RtsRunResultLogic.SaveClear).
+--   난이도 배율 = 곡선에 곱하는 값(사용자 "한 곡선 × 배율" → 값 지정): 매우쉬움 0.2 · 쉬움 0.3 · 보통 0.4 · 어려움 0.6 · 매우어려움 0.8 · 극악 1.0(2026-09-28 사용자 "극악 100% 기준 20/30/40/60/80%" —
+--     전 0.2 · 0.4 · 0.6 · 0.7 · 0.8 · 1.0, 그때 시뮬 클리어 70.0 / 48.7 / 41.9 / 30.3 / 18.4 / 3.5%. 새 배율 시뮬은 아직 안 돌림).
+--   경주모드는 누구든 어려움 고정(RaceDiff — 2026-09-28 사용자 "경주모드는 루즈하지 않게 난이도 고정"): Of가 경주 판이면 RaceDiff를 돌려주고, 고른 값(DiffByUser)은 도전모드로 돌아오면 그대로 쓴다.
+--   플레이어마다 자기 구역 난이도를 판 시작 전(대기·카운트다운·끝남)에 고르고(기본 보통), 진행 중엔 고정. 순위 기록은 난이도별 저장소(RtsRunResultLogic.SaveBestRound — 도전모드만).
+--   같은 막대 둘째 줄 = 모드 [도전 | 경주](RtsStageLogic.GameMode · RequestSetMode — 방 하나 = 모드 하나, 2026-09-28 Phase 15).
 @Logic
 script RtsDifficultyLogic extends Logic
 
@@ -15,6 +18,22 @@ script RtsDifficultyLogic extends Logic
 	property Entity Bar = nil
 
 	property table Btns = {}
+
+	-- 모드 줄 [도전 | 경주](2026-09-28 사용자 — Phase 15, RtsStageLogic.GameMode): 버튼 두 개(ModeKeys 순서)
+	property table ModeBtns = {}
+
+	property table ModeKeys = { "challenge", "race" }
+
+	property table ModeNames = { "도전", "경주" }
+
+	-- 모드 칸 설명 두 줄(2026-09-28 사용자 "각 모드별 설명 간략하게") — 이름 아래 작은 글씨. 규칙이 바뀌면 같이 고친다(.info/mode.md)
+	property table ModeDescs = {
+		"20초마다 다음 라운드 · 필드 110 / 보스 60초면 탈락\n난이도별 최고 라운드를 순위에 기록 · 아이콘 획득",
+		"난이도 어려움 고정 · 다 잡아야 다음 라운드 · 탈락 없음\n검은 마법사 4페이즈 최단 시간 경쟁 · 30초마다 메소 (기록 없음)"
+	}
+
+	-- 경주모드 고정 난이도(4 = 어려움 — 2026-09-28 사용자 "경주모드는 난이도를 어려움 단계로 고정"). 경주 판에선 난이도 칸을 못 누르고 이 칸만 켜진다
+	property number RaceDiff = 4
 
 	-- 막대 아랫줄 안내(2026-09-24 사용자 "난이도 안 골랐는데 보통으로 시작 — n초 후 자동 시작된다고 떠야"): 카운트다운 남은 초 · 지금 선택
 	property Entity MsgText = nil
@@ -39,7 +58,7 @@ script RtsDifficultyLogic extends Logic
 	end
 
 	method table GetFactors()
-		return { 0.2, 0.4, 0.6, 0.7, 0.8, 1.0 } -- 2026-09-24 사용자 지정(전 0.297/0.451/0.597/0.783/0.903 — 클리어 85/65/40/20/10% 역산값)
+		return { 0.2, 0.3, 0.4, 0.6, 0.8, 1.0 } -- 2026-09-28 사용자 "극악 100% 기준 매우쉬움~매우어려움 20/30/40/60/80%"(전 2026-09-24 0.2/0.4/0.6/0.7/0.8, 그 전 0.297/0.451/0.597/0.783/0.903)
 	end
 
 	-- 극악 곡선: { 보스 라운드, 표 체력 대비 배율 } — tools/clear-sim.py(2026-09-24 티어 재설계 반영). 표 체력이 바뀌면 다시 돌려 갱신
@@ -74,7 +93,9 @@ script RtsDifficultyLogic extends Logic
 		}
 	end
 
+	-- 적용 난이도(서버·클라 공용 — 체력 배율·HUD·결과 창): 경주 판이면 누구든 RaceDiff, 도전 판이면 그 유저가 고른 값(없으면 보통)
 	method number Of(string userId)
+		if _RtsStageLogic:IsRace() then return self.RaceDiff end
 		if userId == nil or userId == "" then return 3 end
 		local d = self.DiffByUser[userId]
 		if d == nil or d < 1 or d > 6 then return 3 end
@@ -132,6 +153,8 @@ script RtsDifficultyLogic extends Logic
 		local userId = senderUserId
 		if userId == nil or userId == "" then return end
 		if _RtsStageLogic.RunState == "running" then return end
+		-- 경주모드는 어려움 고정(칸도 잠김) — 도전모드로 돌아오면 다시 고를 수 있다
+		if _RtsStageLogic:IsRace() then return end
 		local i = math.floor(idx + 0.5)
 		if i < 1 or i > 6 then return end
 		self.DiffByUser[userId] = i
@@ -151,21 +174,26 @@ script RtsDifficultyLogic extends Logic
 		local running = state == "running"
 		local name = self:GetNames()[my]
 		if isvalid(H.StageDifficultyText) then H.StageDifficultyText.TextComponent.Text = name end
-		local msg = "판 시작 전 · 지금 선택: " .. name
+		local race = _RtsStageLogic:IsRace()
+		local modeIdx = 1
+		if race then modeIdx = 2 end
+		local pick = self.ModeNames[modeIdx] .. " · " .. name
+		if race then pick = pick .. " 고정" end
+		local msg = "판 시작 전 · 지금 선택: " .. pick
 		local startText = "바로 시작"
 		if state == "countdown" then
 			local left = math.ceil(_RtsStageLogic.StageEndsAt - _RtsStageLogic:GameNow())
 			if left < 0 then left = 0 end
-			msg = H:Int(left) .. "초 후 자동으로 시작합니다 · 난이도를 고르고 '바로 시작'(지금: " .. name .. ")"
+			msg = H:Int(left) .. "초 후 자동으로 시작합니다 · 모드와 난이도를 고르고 '바로 시작'(지금: " .. pick .. ")"
 			local S = _RtsStageLogic
 			if S.RoomCount > 1 then startText = "바로 시작 " .. H:Int(S.ReadyCount) .. "/" .. H:Int(S.RoomCount) end
 			if S:IsMyReady() and S.RoomCount > 1 then startText = "대기 " .. H:Int(S.ReadyCount) .. "/" .. H:Int(S.RoomCount) end
 		elseif state == "running" then
-			msg = "진행 중 · 난이도 " .. name
+			msg = "진행 중 · " .. pick
 		elseif state == "ended" then
-			msg = "판이 끝났어요 · 다음 판 난이도: " .. name
+			msg = "판이 끝났어요 · 다음 판: " .. pick
 		end
-		local sig = tostring(running) .. "|" .. H:Int(my) .. "|" .. msg .. "|" .. startText
+		local sig = tostring(running) .. "|" .. H:Int(my) .. "|" .. H:Int(modeIdx) .. "|" .. msg .. "|" .. startText
 		if sig == self.Shown then return end
 		self.Shown = sig
 		if self.MsgText ~= nil then self.MsgText.TextComponent.Text = msg end
@@ -176,14 +204,30 @@ script RtsDifficultyLogic extends Logic
 		-- 판 시작 전(대기·카운트다운)에만 — 판이 끝난 뒤(혼자면 죽으면 곧 끝남)·관전 중엔 안 띄운다(2026-09-24 사용자 "죽어서 관전하기 눌렀는데 난이도 선택창이 나온다"). 다음 판은 다시 하기 → 카운트다운에서 고른다
 		self.Bar.Parent:SetEnable(state == "idle" or state == "countdown")
 		for i = 1, #self.Btns do
-			local b = self.Btns[i]
-			if i == my then
-				_RtsHudLogic:SetUiColor(b, Color(0.86, 0.85, 0.96, 0.95), "surface")
-				_RtsHudLogic:SetUiColor(b.Parent, H:ColGold(), "border")
-			else
-				_RtsHudLogic:SetUiColor(b, H:ColPanel(), "surface")
-				_RtsHudLogic:SetUiColor(b.Parent, H:ColBorder(), "border")
+			self:PaintChoice(self.Btns[i], i == my)
+			-- 경주모드는 어려움 고정 — 나머지 난이도 칸 글자를 흐리게(누르면 서버가 거절)
+			local label = self.Btns[i]:GetChildByName("RtsDiffBtnText" .. tostring(i))
+			if label ~= nil and isvalid(label) then
+				local ink = H:ColInk()
+				if race and i ~= my then ink = H:ColMuted() end
+				H:SetUiColor(label, ink, "text")
 			end
+		end
+		for i = 1, #self.ModeBtns do
+			self:PaintChoice(self.ModeBtns[i], i == modeIdx)
+		end
+	end
+
+	-- 막대 칸 색: 고른 칸 = 연보라 바탕 + 금색 테두리(난이도·모드 공용)
+	@ExecSpace("ClientOnly")
+	method void PaintChoice(Entity b, boolean on)
+		local H = _RtsHudLogic
+		if on then
+			H:SetUiColor(b, Color(0.86, 0.85, 0.96, 0.95), "surface")
+			H:SetUiColor(b.Parent, H:ColGold(), "border")
+		else
+			H:SetUiColor(b, H:ColPanel(), "surface")
+			H:SetUiColor(b.Parent, H:ColBorder(), "border")
 		end
 	end
 
@@ -195,8 +239,8 @@ script RtsDifficultyLogic extends Logic
 		local w = 88
 		local gap = 6
 		local total = 86 + #names * w + (#names - 1) * gap + 12
-		-- 윗줄 = "난이도" + 6칸, 아랫줄 = 안내(남은 초 · 지금 선택)
-		local bar = H:SpawnRoundedPanel("RtsDiffBar", H.HudGroup, Vector2(0.5, 1), Vector2(0.5, 1), Vector2(0, -12), Vector2(total, 92),
+		-- 윗줄 = "난이도" + 6칸, 둘째 줄 = "모드" + [도전 | 경주](각 난이도 3칸 폭 — 2026-09-28 Phase 15), 아랫줄 = 안내(남은 초 · 지금 선택). 높이 92 → 138
+		local bar = H:SpawnRoundedPanel("RtsDiffBar", H.HudGroup, Vector2(0.5, 1), Vector2(0.5, 1), Vector2(0, -12), Vector2(total, 138),
 			H:ColPanel(), H:ColBorder(), 1.5)
 		if bar == nil then return end
 		H:SpawnWater(bar)
@@ -214,6 +258,23 @@ script RtsDifficultyLogic extends Logic
 				self:RequestSet(idx)
 			end)
 			self.Btns[#self.Btns + 1] = b
+		end
+		H:SpawnLabel("RtsModeTitle", bar, Vector2(0, 1), Vector2(0, 1), Vector2(12, -54), Vector2(70, 36), "모드", H:ColMuted(), 16, TextAlignmentType.MiddleLeft, true)
+		self.ModeBtns = {}
+		local mw = 3 * w + 2 * gap
+		for i = 1, #self.ModeKeys do
+			local x = 86 + (i - 1) * (mw + gap)
+			local b = H:SpawnRoundedPanel("RtsModeBtn" .. tostring(i), bar, Vector2(0, 1), Vector2(0, 1), Vector2(x, -54), Vector2(mw, 42),
+				H:ColPanel(), H:ColBorder(), 1.5)
+			H:SpawnLabel("RtsModeBtnText" .. tostring(i), b, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2(0, 0), Vector2(mw - 4, 32), self.ModeNames[i], H:ColInk(), 15, TextAlignmentType.MiddleCenter, true)
+			-- 설명(이름 아래 두 줄 — 자리·크기는 RtsUiLayoutLogic.Refresh가 잡는다)
+			H:SpawnLabel("RtsModeBtnDesc" .. tostring(i), b, Vector2(0.5, 0), Vector2(0.5, 0), Vector2(0, 2), Vector2(mw - 8, 24), self.ModeDescs[i], H:ColMuted(), 11, TextAlignmentType.MiddleCenter, false)
+			local click = H:SpawnClick("RtsModeClick" .. tostring(i), b)
+			local key = self.ModeKeys[i]
+			click:ConnectEvent(ButtonClickEvent, function(event)
+				_RtsStageLogic:RequestSetMode(key)
+			end)
+			self.ModeBtns[#self.ModeBtns + 1] = b
 		end
 		-- 바로 시작은 난이도 아래에, 진행 후 다시하기는 숨겨진 난이도 선택 자리에 표시한다.
 		local sb = H:SpawnRoundedPanel("RtsDiffStart", bar, Vector2(0.5, 0), Vector2(0.5, 1), Vector2(0, -10), Vector2(200, 48),

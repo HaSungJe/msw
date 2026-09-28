@@ -1,8 +1,9 @@
 -- Phase 6·7 (2026-09-23): 유저별 한 판 결과 — 진행 중 / 탈락 / 클리어, 처치 수, 마지막으로 버틴 스테이지, 보스 HP 깎은 비율.
 --   탈락(필드 110 또는 보스 시간 초과) → 그 구역 몹·보스 정리, 유닛 전멸, 구역 가운데 비석, 플레이어 목록 탈락, 개인 최고 기록 저장, 결과 팝업.
 --   클리어(검은 마법사 4페이즈 처치) → 결과 팝업. 솔로(방 인원 1)면 '다시 하기', 여럿이면 '나가기' = 대기방으로(RequestExit — 인스턴스 방이면 정적 방으로, 지금은 안내).
---   점수 = 마지막으로 버틴 스테이지 순번 × 100,000 + 탈락한 보스전의 보스 HP 깎은 비율(0~10,000) — 전광판 등록은 Phase 8 #42.
---   클리어 = 난이도별(어려움·매우어려움·극악) 검은 마법사 4페이즈 클리어 횟수 순위 저장(SaveClear, 2026-09-24 사용자 — 옛 최종 메소 순위 폐기).
+--   점수 = 마지막으로 버틴 스테이지 순번 × 100,000 + 탈락한 보스전의 보스 HP 깎은 비율(0~10,000) — 개인 최고(BestRun, 도전모드만).
+--   순위 기록(2026-09-28 사용자 — Phase 15 #52): 도전모드 판이 끝날 때(탈락·클리어) 난이도별 최대 클리어 라운드를 저장(SaveBestRound — 옛 검은 마법사 클리어 횟수 기준 폐기). 표시는 대기방 순위표(Phase 13).
+--   경주모드(RtsStageLogic.GameMode = "race"): 탈락 없음, 검은 마법사 4페이즈를 잡으면 걸린 시간(게임 시계)·등수(방에서 잡은 순서)를 결과 창에 — 기록 저장 없음.
 @Logic
 script RtsRunResultLogic extends Logic
 
@@ -23,15 +24,24 @@ script RtsRunResultLogic extends Logic
 
 	property number ScorePerStage = 100000
 
-	-- 순위(2026-09-24 사용자 "어려움/매우어려움/극악을 따로따로 분리해서 클리어 횟수 순위로" — 옛 최종 메소 순위 폐기):
-	--   난이도별 SortableDataStorage RankStorage .. "_D" .. 난이도(4 어려움 · 5 매우어려움 · 6 극악), userId → 값.
-	--   값 = 검은 마법사 4페이즈 클리어 횟수 × RankScale + (RankScale − 1 − 2026-01-01부터 흐른 초) → 횟수가 같으면 그 횟수에 먼저 도달한 사람이 위.
-	--   닉네임 = GlobalDataStorage RankNickStorage(userId → 닉네임, 클리어할 때 갱신). 보통 이하·테스트 모드 판은 기록하지 않는다
-	property string RankStorage = "RtsBm4Clear"
+	-- 순위(2026-09-28 사용자 "각 난이도별 도전모드 랭킹 — 최대 클리어 라운드 + 최대 처치 보스, 경주모드는 순위 없음"):
+	--   난이도별 SortableDataStorage RankStorage .. "_D" .. 난이도(1 매우쉬움 ~ 6 극악), userId → 값.
+	--   값 = 최대 클리어 라운드(마지막으로 버틴 순번 — 클리어면 132) × RankScale + (RankScale − 1 − 2026-01-01부터 흐른 초) → 라운드가 같으면 먼저 도달한 사람이 위.
+	--   최대 처치 보스 = 그 라운드까지 잡은 마지막 보스(BossNameUpTo — 보스는 정해진 라운드라 라운드에서 나온다). 더 높은 라운드일 때만 갱신.
+	--   닉네임 = GlobalDataStorage RankNickStorage(userId → 닉네임, 기록을 갱신할 때). 경주모드·테스트 모드 판은 기록하지 않는다.
+	--   (전: RtsBm4Clear_D4~6 = 어려움 이상 검은 마법사 4페이즈 클리어 횟수 — 지우지 않고 더 쓰지 않음)
+	property string RankStorage = "RtsBestRound"
 
 	property string RankNickStorage = "RtsRankNick"
 
-	property number RankMinDiff = 4
+	property number RankMinDiff = 1
+
+	-- 서버: 경주모드 이번 판에서 검은 마법사 4페이즈를 잡은 사람 수(등수 = 잡은 순서, ResetAll에서 0)
+	property number RaceFinished = 0
+
+	-- 경주모드 완주 등수(userId → 등수 — 진행 현황 '완주 n등', ResetAll·OnLeave에서 지움)
+	@Sync
+	property SyncTable<string, number> RacePlaceByUser
 
 	property number RankScale = 10000000000
 
@@ -75,6 +85,7 @@ script RtsRunResultLogic extends Logic
 	method void OnLeave(string userId)
 		self.Info[userId] = nil
 		self.StateByUser[userId] = nil
+		self.RacePlaceByUser[userId] = nil
 	end
 
 	-- 새 판: 비석 지우고 지금 있는 유저를 다시 진행 중으로
@@ -86,6 +97,10 @@ script RtsRunResultLogic extends Logic
 		end
 		self.Tombs = {}
 		self.Info = {}
+		self.RaceFinished = 0
+		local placed = {}
+		for uid, v in pairs(self.RacePlaceByUser) do placed[#placed + 1] = uid end
+		for i = 1, #placed do self.RacePlaceByUser[placed[i]] = nil end
 		for userId, zone in pairs(_RtsZoneLogic.ZoneByUser) do
 			self:InitUser(userId)
 		end
@@ -143,6 +158,8 @@ script RtsRunResultLogic extends Logic
 	@ExecSpace("ServerOnly")
 	method void Eliminate(string userId, string reason, number pct)
 		if userId == "" or not self:IsAlive(userId) then return end
+		-- 경주모드는 탈락 없음(필드 110 · 보스 시간 초과 둘 다 — 2026-09-28)
+		if _RtsStageLogic:IsRace() then return end
 		if self.Info[userId] == nil then self:InitUser(userId) end
 		self.StateByUser[userId] = 1
 		local inf = self.Info[userId]
@@ -170,17 +187,27 @@ script RtsRunResultLogic extends Logic
 		inf.reason = ""
 		inf.pct = 0
 		_RtsBootstrapLogic:BroadcastPlayerList()
-		_RtsConfigLogic:Log("RtsResult: CLEAR " .. userId)
-		self:SaveClear(userId)
+		_RtsConfigLogic:Log("RtsResult: CLEAR " .. userId .. " [" .. _RtsDifficultyLogic:NameOf(userId) .. "] " .. self:ComboText(userId))
 		self:Finish(userId, true)
 		if self:AliveCount() == 0 then _RtsStageLogic:EndRun() end
 	end
 
-	-- 개인 최고 기록 갱신(UserDataStorage "BestRun" = "점수|순번|클리어 0/1") 후 결과 팝업
+	-- 판 끝(탈락·클리어) → 결과 팝업. 경주모드 = 걸린 시간·등수만(기록 없음), 도전모드 = 순위 기록(SaveBestRound) + 개인 최고(UserDataStorage "BestRun" = "점수|순번|클리어 0/1")
 	@ExecSpace("ServerOnly")
 	method void Finish(string userId, boolean cleared)
 		local inf = self.Info[userId]
 		if inf == nil then return end
+		if _RtsStageLogic:IsRace() then
+			-- 등수 = 방에서 검은 마법사 4페이즈를 잡은 순서(솔로는 늘 1등), 걸린 시간 = 1라운드 시작부터 게임 시계(일시정지 빠짐)
+			self.RaceFinished = self.RaceFinished + 1
+			self.RacePlaceByUser[userId] = self.RaceFinished
+			local sec = _RtsStageLogic:RaceElapsed()
+			local total = _RtsStageLogic:RoomUserCount()
+			_RtsConfigLogic:Log("RtsResult: race finish " .. userId .. " place " .. string.format("%d/%d", self.RaceFinished, total) .. " time " .. _RtsStageLogic:ClockText(sec))
+			self:ShowRaceResult(sec, self.RaceFinished, total, inf.kills, userId)
+			return
+		end
+		self:SaveBestRound(userId, math.floor(_RtsDifficultyLogic:Of(userId) + 0.5), inf.last)
 		local stageNo = _RtsStageLogic.StageNo
 		local score = inf.last * self.ScorePerStage + math.floor(inf.pct * 10000 + 0.5)
 		local kills = inf.kills
@@ -234,13 +261,31 @@ script RtsRunResultLogic extends Logic
 		return table.concat(parts, ";")
 	end
 
-	-- 순위 값(RankStorage 주석): 횟수 × RankScale + (RankScale − 1 − 2026-01-01부터 흐른 초)
+	-- 순위 값(RankStorage 주석): 최대 클리어 라운드 × RankScale + (RankScale − 1 − 2026-01-01부터 흐른 초)
 	@ExecSpace("ServerOnly")
-	method number RankValue(number count)
+	method number RankValue(number round)
 		local sec = math.floor((DateTime.UtcNow.Elapsed - DateTime(2026, 1, 1).Elapsed) / 1000)
 		if sec < 0 then sec = 0 end
 		if sec > self.RankScale - 1 then sec = self.RankScale - 1 end
-		return count * self.RankScale + (self.RankScale - 1 - sec)
+		return round * self.RankScale + (self.RankScale - 1 - sec)
+	end
+
+	-- 라운드 round까지 잡은 마지막 보스 이름(순위표의 '최대 처치 보스' — 서버·클라 공용). 검은 마법사 3연전 앞 1페이즈(아이온·얄다바오트)부터는 'n페이즈'로. 없으면 ""
+	method string BossNameUpTo(number round)
+		local T = _RtsStageTableLogic
+		local n = math.min(math.floor(round + 0.5), T:GetStageCount())
+		local first = T:GetStageCount() - 3
+		while n >= 1 do
+			local s = T:GetStage(n)
+			if s ~= nil and s.kind == "boss" then
+				if n >= first then return "검은 마법사 " .. string.format("%d", n - first + 1) .. "페이즈" end
+				local mon = T:GetMonster(s.mobs[1])
+				if mon ~= nil and mon.name ~= nil then return mon.name end
+				return s.name
+			end
+			n = n - 1
+		end
+		return ""
 	end
 
 	@ExecSpace("ServerOnly")
@@ -250,53 +295,29 @@ script RtsRunResultLogic extends Logic
 		return userId
 	end
 
-	-- 클리어 기록: 그 난이도 클리어 횟수 +1 → 이번 순위(나보다 값이 큰 다른 유저 수 + 1 — 정렬 조회 첫 페이지까지만 센다) → 결과 창(ShowClearRank).
-	--   보통 이하·테스트 모드(DevTools — 타격마다 +DevExtraDamage)는 저장하지 않고 횟수 0으로 알린다
+	-- 도전모드 순위 기록(Finish — 탈락·클리어 때): 그 난이도에서 최대 클리어 라운드가 기존보다 높을 때만 갱신(같으면 먼저 도달한 기록 유지).
+	--   테스트 모드(DevTools — 타격마다 +DevExtraDamage)·0라운드는 저장하지 않는다. 결과 창엔 순위를 보이지 않는다(표시는 대기방 순위표 Phase 13)
 	@ExecSpace("ServerOnly")
-	method void SaveClear(string userId)
-		local diff = math.floor(_RtsDifficultyLogic:Of(userId) + 0.5)
-		_RtsConfigLogic:Log("RtsResult: clear " .. userId .. " [" .. _RtsDifficultyLogic:NameOf(userId) .. "] " .. self:ComboText(userId))
-		if _RtsUnitLogic.DevTools or diff < self.RankMinDiff then
-			self:ShowClearRank(diff, 0, 0, false, userId)
-			return
-		end
+	method void SaveBestRound(string userId, number diff, number round)
+		if _RtsUnitLogic.DevTools or round < 1 or diff < self.RankMinDiff or diff > 6 then return end
 		local rank = _DataStorageService:GetSortableDataStorage(self.RankStorage .. "_D" .. string.format("%d", diff))
-		if rank == nil then
-			self:ShowClearRank(diff, 0, 0, false, userId)
-			return
-		end
-		local names = _DataStorageService:GetGlobalDataStorage(self.RankNickStorage)
-		if names ~= nil then names:SetAsync(userId, self:NickOf(userId), function(c0, k0) end) end
+		if rank == nil then return end
 		rank:GetAsync(userId, function(code, key, value)
-			local count = 0
-			if code == 0 and value ~= nil then count = math.floor(value / self.RankScale) end
-			count = count + 1
-			local v = self:RankValue(count)
-			rank:SetAsync(userId, v, function(c2, k2)
-				rank:GetSortedAsync(SortDirection.Descending, v + 1, self.RankMax, function(c3, pages)
-					local above = 0
-					local more = false
-					if c3 == 0 and pages ~= nil then
-						local datas = pages:GetCurrentPageDatas()
-						for _, it in pairs(datas) do
-							if it.KeyInfo.Key ~= userId then above = above + 1 end
-						end
-						more = not pages.IsLastPage
-					end
-					_RtsConfigLogic:Log("RtsResult: rank D" .. string.format("%d", diff) .. " " .. userId .. " clears " .. string.format("%d", count) .. " rank " .. string.format("%d", above + 1))
-					self:ShowClearRank(diff, count, above + 1, more, userId)
-				end)
+			local old = 0
+			if code == 0 and value ~= nil then old = math.floor(value / self.RankScale) end
+			if round <= old then
+				_RtsConfigLogic:Log("RtsResult: best D" .. string.format("%d", diff) .. " " .. userId .. " keep " .. string.format("%d >= %d", old, round))
+				return
+			end
+			local names = _DataStorageService:GetGlobalDataStorage(self.RankNickStorage)
+			if names ~= nil then names:SetAsync(userId, self:NickOf(userId), function(c0, k0) end) end
+			rank:SetAsync(userId, self:RankValue(round), function(c2, k2)
+				_RtsConfigLogic:Log("RtsResult: best D" .. string.format("%d", diff) .. " " .. userId .. " round " .. string.format("%d", round) .. " (" .. self:BossNameUpTo(round) .. ") code=" .. tostring(c2))
 			end)
 		end)
 	end
 
-	-- 결과 창에 클리어 순위(그 유저에게만 — 마지막 인자 userId): 난이도 · 그 난이도 클리어 횟수(0 = 기록 안 함) · 순위(more = 첫 페이지보다 뒤)
-	@ExecSpace("Client")
-	method void ShowClearRank(number diff, number count, number rank, boolean more, string userId)
-		_RtsPopupLogic:SetClearRank(diff, count, rank, more)
-	end
-
-	-- 순위 창(탭 = 어려움·매우어려움·극악): 그 난이도 상위 RankShowTop명(닉네임·클리어 횟수) + 내 횟수·순위 → 요청한 유저에게만(ShowRanking).
+	-- 순위 창(탭 = 난이도 6단계): 그 난이도 상위 RankShowTop명(닉네임·최대 클리어 라운드) + 내 라운드·순위 → 요청한 유저에게만(ShowRanking).
 	--   같은 탭 조회는 3초에 한 번
 	@ExecSpace("Server")
 	method void RequestRanking(number diff)
@@ -353,7 +374,7 @@ script RtsRunResultLogic extends Logic
 			end
 			myRank = n + 1
 		end
-		-- 행 = "닉네임(탭)횟수" 줄바꿈 구분
+		-- 행 = "닉네임(탭)최대 클리어 라운드" 줄바꿈 구분(myCount = 내 최대 클리어 라운드, 0 = 기록 없음)
 		local rows = {}
 		for i = 1, #keys do
 			local nick = names[keys[i]] or "?"
@@ -399,6 +420,12 @@ script RtsRunResultLogic extends Logic
 	@ExecSpace("Client")
 	method void ShowResult(boolean cleared, string reason, number stageNo, number lastNo, number kills, number pct, number bestNo, boolean bestClear, string userId)
 		_RtsPopupLogic:OpenResult(cleared, reason, stageNo, lastNo, kills, pct, bestNo, bestClear)
+	end
+
+	-- 경주모드 결과 팝업(그 유저에게만): 걸린 시간(초, 게임 시계) · 등수 / 방 인원 · 처치 수
+	@ExecSpace("Client")
+	method void ShowRaceResult(number sec, number place, number total, number kills, string userId)
+		_RtsPopupLogic:OpenRaceResult(sec, place, total, kills)
 	end
 
 	-- '나가기'(여럿일 때 결과 팝업·탈락 뒤 우측 버튼) = 대기방으로(2026-09-23 사용자). 게임이 인스턴스 방에서 돌면 정적 방(대기방)으로 옮기고,

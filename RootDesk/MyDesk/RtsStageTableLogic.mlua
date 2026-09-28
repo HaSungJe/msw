@@ -18,6 +18,13 @@ script RtsStageTableLogic extends Logic
 
 	property number SpawnPerStage = 40
 
+	-- 경주모드 자동 입금(2026-09-28 사용자 "경주모드에선 주기적으로 메소 수금 — 유의미하게", 미리보기 M1 자동 입금): RaceIncomeSec초(게임 시계)마다
+	--   지금 라운드 몬스터 한 판 메소(라운드 총액)의 RaceIncomeRate(사용자 선택 "라운드 메소의 25%") — 초반 300 · 중반 1,000 · 후반 4,200.
+	--   보스·쉬는 라운드는 바로 앞 몬스터 라운드 값. 나중에 경주모드 어센트 스킬(Phase 17 — 내 필드 몬스터 체력 전체 깎기, 도전·경주 공통)·방해(Phase 16) 비용의 기준
+	property number RaceIncomeSec = 30
+
+	property number RaceIncomeRate = 0.25
+
 	method void Ensure()
 		if self.Loaded then return end
 		self.Loaded = true
@@ -44,6 +51,17 @@ script RtsStageTableLogic extends Logic
 		local s = self:GetStage(no)
 		if s == nil or s.kind ~= "mob" then return 0 end
 		return math.floor(s.meso / self.SpawnPerStage + 0.5)
+	end
+
+	-- 경주모드 자동 입금 1회 금액(RaceIncomeSec초마다): 라운드 no 이하에서 가장 가까운 몬스터 라운드 총액 × RaceIncomeRate, 10메소 단위
+	method number RaceIncomeAt(number no)
+		local n = math.floor(no + 0.5)
+		while n >= 1 do
+			local s = self:GetStage(n)
+			if s ~= nil and s.kind == "mob" and s.meso > 0 then return math.floor(s.meso * self.RaceIncomeRate / 10 + 0.5) * 10 end
+			n = n - 1
+		end
+		return 0
 	end
 
 	method boolean IsBossStage(number no)

@@ -12,7 +12,7 @@
 |---|---|---|
 | `RtsProfileLogic` | UserDataStorage의 `theme`, `icon`, `tomb`, `icons`, `themes`, `tombs`. 기존 키를 바꾸면 저장된 사용자 데이터와 호환되지 않는다. | `RootDesk/MyDesk/RtsProfileLogic.mlua:14-31,184-239` |
 | `RtsProfileLogic` 화면 설정 | 동일한 사용자 저장소의 `uiMode`: `light` / `dark`. 값 없음은 `light`; 신규 기본값 쓰기는 생략하며, 실제 변경 때만 저장한다. | `Load`, `RequestSetUiMode`, `ReceiveUiMode`; 검증 상태는 `docs/design/ui-dark-mode.md` |
-| `RtsRunResultLogic` | UserDataStorage의 `BestRun`, 난이도별 SortableDataStorage의 `RtsBm4Clear_D<n>`, GlobalDataStorage의 `RtsRankNick`. 순위 저장은 어려움 이상·비시험 판의 검은 마법사 4페이즈 클리어에 적용된다. | `RootDesk/MyDesk/RtsRunResultLogic.mlua:25-44,181-215,265-291` |
+| `RtsRunResultLogic` | UserDataStorage의 `BestRun`(도전모드 개인 최고), 난이도별 SortableDataStorage의 `RtsBestRound_D<n>`(n = 1~6, 값 = 최대 클리어 라운드 × 10^10 + 먼저 도달한 순 보정), GlobalDataStorage의 `RtsRankNick`. 순위 저장은 도전모드·비시험 판이 끝날 때(탈락·클리어) 기존보다 높을 때만 한다(`SaveBestRound`, 2026-09-28). 경주모드 판은 아무것도 저장하지 않는다. 옛 `RtsBm4Clear_D4~6`(클리어 횟수)은 지우지 않고 더 쓰지 않는다. | `RootDesk/MyDesk/RtsRunResultLogic.mlua` `Finish`·`SaveBestRound`·`RequestRanking` |
 
 프로필은 읽기 결과를 확인하고 기본값을 마련하며, 변경 요청에서 소유자·선택 가능 여부를 검증하고 `SetAsync` 콜백 결과를 확인한 뒤 상태를 보낸다 (`RootDesk/MyDesk/RtsProfileLogic.mlua:184-239,288-319`). 결과·순위 저장도 비동기이지만 일부 쓰기 콜백은 성공 코드를 검사하지 않는다 (`RootDesk/MyDesk/RtsRunResultLogic.mlua:213,271,277`). 모든 쓰기의 성공이 확인됐다고 가정하지 않는다.
 

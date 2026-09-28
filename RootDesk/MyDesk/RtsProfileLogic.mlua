@@ -50,6 +50,7 @@ script RtsProfileLogic extends Logic
 		return self.IconDropRates[difficulty] or 0
 	end
 
+	-- "도전모드 매우어려움 1% / 극악 2%"(획득처·확률 안내 — 서버 판정과 같은 표, 경주모드는 획득 없음)
 	method string IconDropText(boolean showRate)
 		local names = _RtsDifficultyLogic:GetNames()
 		local parts = {}
@@ -61,7 +62,7 @@ script RtsProfileLogic extends Logic
 				parts[#parts + 1] = label
 			end
 		end
-		return table.concat(parts, " / ")
+		return "도전모드 " .. table.concat(parts, " / ")
 	end
 
 	-- ===== 서버 상태(유저별) =====
@@ -501,6 +502,8 @@ script RtsProfileLogic extends Logic
 	@ExecSpace("ServerOnly")
 	method void OnMonsterKilled(number zone, string monsterId)
 		if _RtsUnitLogic.DevTools then return end
+		-- 아이콘은 도전모드에서만(2026-09-28 사용자 — 경주모드 판은 처치해도 획득 없음)
+		if _RtsStageLogic:IsRace() then return end
 		-- 구역·몬스터를 모르면 굴리지 않는다(2026-09-28 제보: 판 종료 무렵 [LEA-2001] 'zone' nil — 지워지는 중인 몬스터의 피격으로 보임)
 		if zone == nil or monsterId == nil then
 			_RtsConfigLogic:Log("RtsProfile: OnMonsterKilled without zone/monster -> skip")

@@ -17,6 +17,10 @@ script RtsBossLogic extends Logic
 	-- 서버: 구역 → 보스를 다 잡았는가
 	property table Down = {}
 
+	-- 구역별 이번 보스전에 남은 보스 수(진행 현황 '보스 · 남은 n' — 2026-09-28): key = 구역 번호 문자열
+	@Sync
+	property SyncTable<string, number> LeftByZone
+
 	-- 보스 크기: 그림(스프라이트 테두리)이 슬롯(상자 ÷ 보스 수 가로, 상자 세로)에 꽉 차는 배율. 상자 = 보스 영역 가운데 BossFitCells칸 정사각
 	--   (2026-09-23 "가로 4칸 세로 5줄에 다 채워지도록"(4×5 영역) → 2026-09-25 영역 2×2 + "3x3정도로 조금 넘치게"). 피격 박스 = 그림 × (0.7, 0.8)이라 그림 크기 = 박스 ÷ 그 비율
 	property number BossFitCells = 3
@@ -46,6 +50,7 @@ script RtsBossLogic extends Logic
 			local hp = math.max(1, math.floor(s.hp * _RtsDifficultyLogic:HpMul(zone, n) + 0.5))
 			self.MaxHpByZone[zone] = hp * #s.mobs
 			self.Down[zone] = false
+			self.LeftByZone[string.format("%d", math.floor(zone + 0.5))] = #s.mobs
 			for k = 1, #s.mobs do
 				local mobId = s.mobs[k]
 				if k == 1 then
@@ -137,6 +142,8 @@ script RtsBossLogic extends Logic
 		if list == nil or self.Down[z] then return end
 		local s = _RtsStageLogic:CurrentStage()
 		if s == nil then return end
+		-- 남은 보스 = 이 보스전 보스 수 − 이미 잡은 수(아직 안 나온 둘째 보스는 남은 것으로)
+		self.LeftByZone[string.format("%d", z)] = math.max(0, #s.mobs - (#list - self:AliveBossCount(z)))
 		if #list < #s.mobs or self:AliveBossCount(z) > 0 then return end
 		self.Down[z] = true
 		_RtsConfigLogic:Log("RtsBoss: zone " .. string.format("%d", z) .. " down " .. s.name)
@@ -204,6 +211,15 @@ script RtsBossLogic extends Logic
 		self.ByZone[z] = nil
 		self.MaxHpByZone[z] = nil
 		self.Down[z] = nil
+		self.LeftByZone[string.format("%d", z)] = 0
+	end
+
+	-- 구역의 남은 보스 수(진행 현황 — 서버·클라 공용)
+	method number LeftInZone(number zone)
+		if zone < 1 then return 0 end
+		local v = self.LeftByZone[string.format("%d", math.floor(zone + 0.5))]
+		if v == nil then return 0 end
+		return v
 	end
 
 	-- 전 구역 보스 제거(구역마다 ClearZone) + 표 초기화
