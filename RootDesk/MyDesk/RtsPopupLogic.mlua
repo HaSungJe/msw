@@ -2721,7 +2721,8 @@ script RtsPopupLogic extends Logic
 				RtsDrawTitle=26,RtsDrawDesc=20,RtsDrawRate=30,RtsDrawRateHint=18,RtsDrawBadgeText=18,RtsDrawReason=18,RtsPageNumber=22}
 			local size = sizes[root.Name] or 20
 			_RtsHudLogic:SetLabelSize(root,size)
-			tc.MinSize = math.max(16,size-2)
+			-- 최소 크기는 최대보다 작게(2026-09-28 칩 아랫줄 16 → 최소 16 = 최대 16이 되자 엔진이 최대를 기본 40으로 되돌려 글자가 칩 밖으로 크게 넘침)
+			tc.MinSize = math.min(size-1,math.max(16,size-2))
 		end
 		for _,child in ipairs(root.Children:ToTable()) do self:ApplyAugTypography(child) end
 	end
