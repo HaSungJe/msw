@@ -225,17 +225,19 @@ def defmul(defv, ign, guard=0, shred=0):
 # ---------------------------------------------------------------- 증강(augmentation.md)
 # 2026-09-27 효율 조정(사용자): 공격력% ×2.5 · 크확 ×2 · 크뎀 ×3(골드 I 크뎀 21) · 샤프아이즈 50/50
 # 2026-09-27 개편(augmentation.md — 게임 RtsAugmentTableLogic와 같은 값): 등급마다 단계 I/II/III(LEVEL_W 50/35/15%)만 무작위, 그 단계의 종류는 전부 보고 고른다.
-#   실버 '보스 사냥꾼' 삭제, 골드 '거인 학살자' 20/25/30. 뽑기 등급 = 브 50 · 실 35 · 골 10 · 프리즘 5(BUY_GRADE)
+#   실버 '보스 사냥꾼' 삭제. 2026-09-28 사용자: '거인 학살자'는 골드 III에만 +5% · 같은 유닛 중복 불가(전 I 20 · II 25 · III 30, 같은 날 III 10% → 30% → 5%).
+#   뽑기 등급 = 브 50 · 실 40 · 골 10(BUY_GRADE), 프리즘은 20·40번째 뽑기 확정(2026-09-28 — 전 프리즘 5% + 천장, 실 35)
 AUG = {   # 등급: [(이름, 능력치, 값, 단계)]
     "bronze": [(n, s, v, lv) for lv, vals in ((1, (6, 9, 20, 7.5)), (2, (7, 10.5, 22, 9)), (3, (8, 12, 25, 10)))
                for (n, s), v in zip((("약점 찾기", "crit"), ("급소 찌르기", "cd"), ("무기 연마", "flat"), ("전투 감각", "pct")), vals)],
     "silver": [(n, s, v, lv) for lv, vals in ((1, (10, 15, 40, 12.5)), (2, (11, 16.5, 45, 14)), (3, (12, 18, 50, 15)))
                for (n, s), v in zip((("약점 찾기", "crit"), ("급소 찌르기", "cd"), ("무기 연마", "flat"), ("전투 감각", "pct")), vals)],
-    "gold": [(n, s, v, lv) for lv, vals in ((1, (14, 21, 70, 17.5, 20)), (2, (15, 22.5, 75, 19, 25)), (3, (16, 24, 80, 20, 30)))
-             for (n, s), v in zip((("약점 찾기", "crit"), ("급소 찌르기", "cd"), ("무기 연마", "flat"), ("전투 감각", "pct"), ("거인 학살자", "boss")), vals)],
+    "gold": [(n, s, v, lv) for lv, vals in ((1, (14, 21, 70, 17.5)), (2, (15, 22.5, 75, 19)), (3, (16, 24, 80, 20)))
+             for (n, s), v in zip((("약점 찾기", "crit"), ("급소 찌르기", "cd"), ("무기 연마", "flat"), ("전투 감각", "pct")), vals)]
+            + [("거인 학살자", "boss", 5, 3)],   # 유닛당 1장(clear-sim give_card가 막는다)
 }
 LEVEL_W = {1: 50, 2: 35, 3: 15}
-BUY_GRADE = {"bronze": 50, "silver": 35, "gold": 10}   # + 프리즘 5(천장·판마다 최대 2)
+BUY_GRADE = {"bronze": 50, "silver": 40, "gold": 10}   # 프리즘은 20·40번째 뽑기 확정(BUY_PRISM_AT — clear-sim)
 def buy_grade(r):
     """뽑기 등급(프리즘 제외분 r ∈ [0, 1)) — 브·실·골 비율대로"""
     tot = sum(BUY_GRADE.values()); x = r * tot
@@ -314,7 +316,7 @@ def aug_table():
     out.append("")
     cards = [("브 무기 연마 II +22", "flat", 22), ("브 전투 감각 II +3.5%", "pct", 3.5), ("브 약점 찾기 II +3.5", "crit", 3.5), ("브 급소 찌르기 II +3.5", "cd", 3.5),
              ("실 무기 연마 II +45", "flat", 45), ("실 전투 감각 II +5.5%", "pct", 5.5), ("실 약점 찾기 II +5.5", "crit", 5.5), ("실 급소 찌르기 II +5.5", "cd", 5.5),
-             ("골 무기 연마 II +75", "flat", 75), ("골 전투 감각 II +7.5%", "pct", 7.5), ("골 거인 학살자 II +25%", "boss", 25), ("골 약점 찾기 II +7.5", "crit", 7.5), ("골 급소 찌르기 II +7.5", "cd", 7.5)]
+             ("골 무기 연마 II +75", "flat", 75), ("골 전투 감각 II +7.5%", "pct", 7.5), ("골 거인 학살자 III +5%", "boss", 5), ("골 약점 찾기 II +7.5", "crit", 7.5), ("골 급소 찌르기 II +7.5", "cd", 7.5)]
     out.append("| 직업(효율) | " + " | ".join(c[0] for c in cards) + " |")
     out.append("|---|" + "---|" * len(cards))
     for j in JOBS:
@@ -344,7 +346,8 @@ def load_stages():
     return G
 
 import random
-CARD_ROUNDS = {"bronze": [4, 17, 30, 38, 51, 63, 76, 84, 97, 110], "silver": [8, 21, 34, 42, 55, 68, 80, 89, 101, 114], "gold": [13, 25, 46, 59, 72, 93, 106]}   # augmentation.md
+CARD_ROUNDS = {"bronze": [7, 27, 40, 60, 74, 87, 107], "silver": [13, 34, 47, 67, 80, 94, 114], "gold": [20, 54, 101]}   # augmentation.md — 2026-09-28 브 7 · 실 7 · 골 3, 항상 III(ROUND_LEVEL)
+ROUND_LEVEL = 3
 PRISM_ROUNDS = [26, 56, 89]   # 자쿰·시그너스·루시드 처치 뒤
 
 def cards_before(no, G, buy_share=0.5):
@@ -369,12 +372,14 @@ def power(st):
     c = min(st["crit"], 100) / 100
     return st["atk"] * st["pct"] * (1 + st["boss"] / 100) * (1 + c * st["cd"] / 100)
 
-def draw3(grade, rng):
-    """선택지(2026-09-27 개편 — 이름은 옛 3택1 그대로): 단계를 LEVEL_W대로 굴려 그 단계의 종류 전부(브·실 4장, 골 5장)"""
-    tot = sum(LEVEL_W.values()); r = rng.random() * tot; lv = 3
-    for k, w in LEVEL_W.items():
-        r -= w
-        if r < 0: lv = k; break
+def draw3(grade, rng, level=0):
+    """선택지(2026-09-27 개편 — 이름은 옛 3택1 그대로): 단계를 LEVEL_W대로 굴려(level이 1~3이면 그 단계 고정 — 라운드 지급 = ROUND_LEVEL) 그 단계의 종류 전부(4장, 골드 III 5장)"""
+    lv = level
+    if lv not in (1, 2, 3):
+        tot = sum(LEVEL_W.values()); r = rng.random() * tot; lv = 3
+        for k, w in LEVEL_W.items():
+            r -= w
+            if r < 0: lv = k; break
     return [a for a in AUG[grade] if a[3] == lv]
 
 # 조합(보스 순번에 따라): 시그너스 전은 영입 순서(히어로 1 · 다크나이트 5 · 3번째 26 · 팔라딘 43 · 비숍 47 · 6번째 56), 스우부터는 후반 편성.

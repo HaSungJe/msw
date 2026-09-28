@@ -195,8 +195,8 @@ script RtsWaveLogic extends Logic
 		if s == nil then return end
 		self.Serial = self.Serial + 1
 		local name = "Mob" .. self:ZoneKey(zone) .. "_" .. string.format("%d", self.Serial)
-		-- 난이도 체력 배율(2026-09-24 — RtsDifficultyLogic: 그 구역 주인의 난이도 × 극악 곡선)
-		local hp = math.max(1, math.floor(s.hp * _RtsDifficultyLogic:HpMul(zone, self.SpawnStage) + 0.5))
+		-- 난이도 체력 배율(2026-09-24 — RtsDifficultyLogic: 그 구역 주인의 난이도 × 극악 곡선. 2026-09-28부터 일반 몬스터 곡선 MobHpMul — 상향 2.5배까지)
+		local hp = math.max(1, math.floor(s.hp * _RtsDifficultyLogic:MobHpMul(zone, self.SpawnStage) + 0.5))
 		local e = self:SpawnMonsterEntity(name, zone, mobId, hp, false)
 		if e == nil then return end
 		if e.RtsMonsterComponent ~= nil then

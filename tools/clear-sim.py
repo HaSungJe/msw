@@ -9,8 +9,8 @@
 한 판:
   조합 = 1티어 1 + 2티어 3 + 팔라딘(≤40) + 비숍(≤30). 영입 1·5·26·43·47·56라운드 = 1티어 · 2티어A · 2티어B · 팔라딘 · 비숍 · 2티어C
   레벨 = 그 보스의 표준 빌드 레벨(생성기 lv — 딜러가 높은 순, 서포터는 상한)
-  증강 = 라운드 지급 27장(augmentation.md) + 뽑기(여유 메소 — 딜러 4명 50 + 비숍 30 + 팔라딘 40, 2,400 + 32씩 · 41~50레벨 비용 20% 할인(2026-09-27), tier.md 3절 시점별 누적 횟수)
-         뽑기 등급 브 50 · 실 35 · 골 10 · 프리즘 5% + 천장(안 나오면 +2%p, 나오면 0 — 판마다 최대 2개) — 2026-09-27 개편: 단계만 무작위·종류는 선택(bc.draw3)
+  증강 = 라운드 지급 17장(브 7 · 실 7 · 골 3, 항상 III — 2026-09-28, augmentation.md) + 뽑기(여유 메소 — 딜러 4명 50 + 비숍 30 + 팔라딘 40, 3,000 + 200씩 · 상한 7,000 · 41~50레벨 비용 20% 할인, tier.md 3절 시점별 누적 횟수)
+         뽑기 등급 브 50 · 실 40 · 골 10, 20·40번째 뽑기는 프리즘 확정(2026-09-28 — 전: 2,400 + 32씩 · 프리즘 5% + 천장) — 단계만 무작위·종류는 선택(bc.draw3). 유닛당 증강 30개 상한(2026-09-28)
   프리즘 = 보장 3개(자쿰 26 · 시그너스 56 · 루시드 89 처치 뒤 3택1) + 뽑기 프리즘 — 조합에 맞는 것 우선, 없으면 특수 코어(보스 슬레이어 > 일격필살)는 1티어에
   분배 = 권장(1티어가 30장이 될 때까지 1티어 → 2티어 각 8장까지 → 남으면 1티어). 3택1은 받는 유닛에 가장 좋은 것
   보스전 = 60초, 방어율 − 가드 크러쉬 − 방어구 부수기(1티어 증강 수, 최대 30) − 방무 · 프레이 ×1.1 · 홀리 유니티(1티어 ×1.4) · 디바인 퍼니시먼트(받는 데미지 ×1.2) · 샤프아이즈(신궁 20레벨)
@@ -29,10 +29,14 @@ POOL = {"oneshot": 5, "slayer": 5, "phantom": 5, "dualblade": 5, "enrage": 7.5, 
 CORE = {"oneshot", "slayer"}
 GUAR_PRISM = [26, 56, 89]
 CARD_ROUNDS = bc.CARD_ROUNDS
-BUY_BY_BOSS = {10: 0, 26: 0, 29: 1, 43: 5, 47: 5, 56: 9, 60: 10, 64: 13, 89: 27, 110: 53, 114: 61, 121: 74, 127: 84, 129: 84, 130: 84, 131: 84, 132: 84}   # tier.md 3절
+# 2026-09-28 뽑기 가격 개편(3,000 + 200 × n, 상한 7,000 — RtsAugmentLogic.BuyPrice)으로 같은 여유 메소에서 산 횟수(전 2,400 + 32씩: … 89: 27, 110: 53, 127~: 84)
+BUY_BY_BOSS = {10: 0, 26: 0, 29: 1, 43: 3, 47: 3, 56: 6, 60: 7, 64: 8, 89: 16, 110: 29, 114: 34, 121: 43, 127: 50, 129: 50, 130: 50, 131: 50, 132: 50}   # tier.md 3절
+BUY_PRISM_AT = (20, 40)   # 이 번째 뽑기는 프리즘 확정(2026-09-28 사용자 "20/40번째에 확정" — 같은 날 10·20에서 바꿈. 전: 5% + 천장 +2%p, 판마다 최대 2)
 #   (2026-09-27 사용자 41~50레벨 비용 20% 할인 + 뽑기 2,400 + 32씩 — 전: 60 1 · 64 3 · 89 3 · 110 24 · 114 32 · 121 45 · 127~ 55)
 RECRUIT = [1, 5, 26, 43, 47, 56]
 T1_CAP, T2_CAP = 30, 8
+UNIT_CAP = 30   # 유닛 한 명의 증강 상한(2026-09-28 사용자 — 게임 RtsAugmentLogic.UnitAugMax, 직업 프리즘·특수 코어 포함)
+def aug_count(u): return len(u.augs) + (1 if u.prism else 0)
 # 극악 목표(2026-09-24 사용자 — 최적 조합을 아는 사람 기준): 시그너스까지는 그 보스에 온 판 중 통과율, 스우부터 누적 생존(4페 = 3~4%)
 EARLY = {10: 0.99, 26: 0.95, 29: 0.99, 43: 0.95, 47: 0.95, 56: 0.88}
 CUM = {60: 0.60, 64: 0.50, 89: 0.35, 110: 0.30, 114: 0.25, 121: 0.20, 127: 0.15, 129: 0.10, 130: 0.10, 131: 0.05, 132: 0.035}
@@ -55,8 +59,8 @@ def eff_stats(u, L):
     st, sk = bc.kit(u.job, L, u.prism)
     n = len(u.augs) + (1 if (u.prism and u.role == "t1") else 0)
     for stat, v in u.augs:
-        if stat == "slayer": st = bc.apply_aug(st, "boss", 60)
-        elif stat == "oneshot": st = bc.apply_aug(st, "fin", 15)
+        if stat == "slayer": st = bc.apply_aug(st, "boss", 15)     # 보스 슬레이어 +15%(2026-09-28, 전 60)
+        elif stat == "oneshot": st = bc.apply_aug(st, "fin", 10)   # 일격필살 최종 +10%(2026-09-28, 전 15)
         else: st = bc.apply_aug(st, stat, v, bc.aug_mul(u.job, u.prism, stat, n))
     return st, sk
 
@@ -67,7 +71,7 @@ class Run:
     def __init__(self, t1, t2s, rng):
         self.rng = rng
         self.units = [Unit(t1, "t1"), Unit(t2s[0], "t2"), Unit(t2s[1], "t2"), Unit("팔라딘", "pal"), Unit("비숍", "bis"), Unit(t2s[2], "t2")]
-        self.owned = set(); self.cores = []; self.buy_prisms = 0; self.pity = 0
+        self.owned = set(); self.cores = []; self.buy_prisms = 0
     def present(self, no): return [u for u, r in zip(self.units, RECRUIT) if r <= no]
     def need(self, no):
         need = []
@@ -84,21 +88,26 @@ class Run:
         pick = next((k for k in order if k in o and k in need), None)
         if pick is None:
             pick = next((k for k in ("slayer", "oneshot") if k in o and k not in self.cores), None)
-            if pick: self.cores.append(pick); self.units[0].augs.append((pick, 0))
+            if pick and aug_count(self.units[0]) < UNIT_CAP: self.cores.append(pick); self.units[0].augs.append((pick, 0))
             return
         self.owned.add(pick)
         for u in self.units:
             if PRISM_OF[u.job] == pick: u.prism = True
-    def give_card(self, grade, no, lv):
+    def give_card(self, grade, no, lv, level=0):
         pres = [u for u in self.present(no) if u.role in ("t1", "t2")]
         t1 = self.units[0]
         recv = t1
-        if len(t1.augs) >= T1_CAP:
+        if len(t1.augs) >= T1_CAP or aug_count(t1) >= UNIT_CAP:
             t2s = [u for u in pres if u.role == "t2" and len(u.augs) < T2_CAP]
+            # 2티어도 각 8장을 채웠으면 1티어 대신(30개 상한 — 2026-09-28) 아직 30개가 안 된 2티어에
+            if not t2s and aug_count(t1) >= UNIT_CAP: t2s = [u for u in pres if u.role == "t2" and aug_count(u) < UNIT_CAP]
             if t2s: recv = min(t2s, key=lambda u: len(u.augs))
-        opts = bc.draw3(grade, self.rng)
+            elif aug_count(t1) >= UNIT_CAP: return   # 모두 30개 — 받을 유닛 없음
+        opts = bc.draw3(grade, self.rng, level)
         L = lv.get(recv.role + str(id(recv)), 50)
         best = None
+        # 거인 학살자는 같은 유닛에 한 번만(2026-09-28 — 게임 RtsAugmentTableLogic unique)
+        if any(s == "boss" for s, v in recv.augs): opts = [a for a in opts if a[0] != "거인 학살자"] or opts   # 카드 중 보스 공격은 거인 학살자뿐
         for a in opts:
             recv.augs.append((a[1], a[2])); pw = power(recv, L); recv.augs.pop()
             if best is None or pw > best[0]: best = (pw, a)
@@ -148,17 +157,14 @@ def one_run(t1, t2s, G, rng):
         lv_role = {}
         for u in run.present(no): lv_role[u.role + str(id(u))] = lvs[id(u)]
         while ci < len(card_ev) and card_ev[ci][0] < no:
-            run.give_card(card_ev[ci][1], no, lv_role); ci += 1
+            run.give_card(card_ev[ci][1], no, lv_role, bc.ROUND_LEVEL); ci += 1   # 라운드 지급 = 항상 III(2026-09-28)
         while bought < BUY_BY_BOSS[no]:
-            # 프리즘 = 5% + 천장(프리즘 없이 뽑을 때마다 +2%p, 나오면 0 — 2026-09-24 사용자), 판마다 최대 2개. 나머지는 브 50 · 실 35 · 골 10 비율(bc.buy_grade — 2026-09-27)
-            pr = (5 + run.pity) if run.buy_prisms < 2 else 0
-            r = rng.random() * 100; bought += 1
-            if r < pr:
-                run.buy_prisms += 1; run.pity = 0; run.prism_event(no)
+            # 20·40번째 뽑기 = 프리즘 확정, 나머지는 브 50 · 실 40 · 골 10(bc.buy_grade — 2026-09-28 사용자 개편)
+            bought += 1
+            if bought in BUY_PRISM_AT:
+                run.buy_prisms += 1; run.prism_event(no)
             else:
-                g = bc.buy_grade((r - pr) / (100 - pr))
-                if run.buy_prisms < 2: run.pity += 2
-                run.give_card(g, no, lv_role)
+                run.give_card(bc.buy_grade(rng.random()), no, lv_role)
         caps[no] = capacity(run, s, G)
         if no in GUAR_PRISM: run.prism_event(no, no == GUAR_PRISM[0])   # 처치 뒤(다음 보스부터) — 자쿰은 전체에서 선택, 나머지 3택1
     return caps

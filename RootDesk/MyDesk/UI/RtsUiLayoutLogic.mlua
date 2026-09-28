@@ -183,6 +183,45 @@ script RtsUiLayoutLogic extends Logic
 		return math.max(0,math.min(_RtsStageTableLogic:RecruitLimit(_RtsStageLogic.StageNo),_RtsUnitLogic:GetMaxUnits())-owned)
 	end
 
+	-- 영입할 수 있으면(진행 중 · 생존 · 영입 칸 남음 — Refresh의 ready) 우측 '유닛' 버튼의 바탕·테두리·글자가 1.2초 주기로 연보라 ↔ 기본색을 오간다.
+	--   영입할 수 없게 되면 멈추고 기본색으로(2026-09-28 사용자 "유닛 영입이 가능할 때 우측의 유닛 버튼에 효과를 줘서 확인하기 편하도록")
+	@ExecSpace("ClientOnly")
+	method void SetUnitsPulse(boolean on)
+		if on == (self._T.UnitsPulse ~= nil) then return end
+		local H = _RtsHudLogic
+		local a = self._T.Actions[3]
+		local offBg = Color(0.95, 0.95, 0.98, 1)
+		local onBg = Color(0.87, 0.86, 0.96, 1)
+		local offInk = H:ColInk()
+		local onInk = Color(0.36, 0.27, 0.60, 1)
+		local function lerp(c1, c2, k)
+			return Color(c1.r + (c2.r - c1.r) * k, c1.g + (c2.g - c1.g) * k, c1.b + (c2.b - c1.b) * k, 1)
+		end
+		local function paint(k)
+			if a == nil or not isvalid(a.box) then return end
+			H:SetUiColor(a.box, lerp(offBg, onBg, k), "surface")
+			H:SetUiColor(a.box.Parent, lerp(H:ColBorder(), H:ColGold(), k), "border")
+			H:SetUiColor(a.label, lerp(offInk, onInk, k), "text")
+		end
+		if self._T.UnitsPulse ~= nil then
+			_TimerService:ClearTimer(self._T.UnitsPulse)
+			self._T.UnitsPulse = nil
+			paint(0)
+			return
+		end
+		_RtsConfigLogic:Log("RtsUiLayout: units pulse on")
+		local t = 0
+		self._T.UnitsPulse = _TimerService:SetTimerRepeat(function()
+			if a == nil or not isvalid(a.box) then
+				if self._T.UnitsPulse ~= nil then _TimerService:ClearTimer(self._T.UnitsPulse) end
+				self._T.UnitsPulse = nil
+				return
+			end
+			t = t + 0.05
+			paint(0.5 - 0.5 * math.cos(t * math.pi * 2 / 1.2))
+		end, 0.05)
+	end
+
 	@ExecSpace("ClientOnly")
 	method void OpenUnits()
 		-- 첫 영입을 ESC로 닫아도 유닛 진입점에서 다시 시작할 수 있다.
@@ -269,6 +308,7 @@ script RtsUiLayoutLogic extends Logic
 		local room = math.max(0, math.min(_RtsStageTableLogic:RecruitLimit(_RtsStageLogic.StageNo), _RtsUnitLogic:GetMaxUnits()) - owned)
 		local ready = _RtsStageLogic.RunState == "running" and _RtsRunResultLogic:IsMeAlive() and room > 0
 		H:SetUiText(self._T.Actions[3].label,(owned == 0 and ready) and "유닛 영입" or "유닛")
+		self:SetUnitsPulse(ready)
 		local recruit = H.RecruitText
 		if ready then recruit = "영입 가능 " .. H:Int(room) .. "명" end
 		if recruit == "" or recruit == "영입 불가" then recruit = "영입" end

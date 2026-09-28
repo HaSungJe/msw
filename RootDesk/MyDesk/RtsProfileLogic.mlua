@@ -501,6 +501,11 @@ script RtsProfileLogic extends Logic
 	@ExecSpace("ServerOnly")
 	method void OnMonsterKilled(number zone, string monsterId)
 		if _RtsUnitLogic.DevTools then return end
+		-- 구역·몬스터를 모르면 굴리지 않는다(2026-09-28 제보: 판 종료 무렵 [LEA-2001] 'zone' nil — 지워지는 중인 몬스터의 피격으로 보임)
+		if zone == nil or monsterId == nil then
+			_RtsConfigLogic:Log("RtsProfile: OnMonsterKilled without zone/monster -> skip")
+			return
+		end
 		local userId = self.OwnerByZone[math.floor(zone + 0.5)]
 		if userId == nil or userId == "" then return end
 		local dropRate = self:IconDropRateFor(_RtsDifficultyLogic:Of(userId))

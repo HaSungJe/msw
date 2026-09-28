@@ -349,7 +349,7 @@ script RtsUnitPopupLogic extends Logic
 			{ id = "info", text = "능력치", w = 220 },
 			{ id = "active", text = "액티브", w = 220 },
 			{ id = "passive", text = "패시브", w = 220 },
-			{ id = "aug", text = "증강 " .. H:Int(#augs), w = 220 },
+			{ id = "aug", text = "증강 " .. H:Int(#augs) .. "/" .. H:Int(_RtsAugmentLogic.UnitAugMax), w = 220 },
 			{ id = "buff", text = "버프 " .. H:Int(self:BuffCount(u, buffs)), w = 220 },
 		}
 		-- 탭은 제자리(켜짐·개수 글자만 바뀜 — RenderRight), 누르면 오른쪽 내용만 다시(2026-09-25 "필요한 부분만")
@@ -891,7 +891,7 @@ script RtsUnitPopupLogic extends Logic
 		local buffs = B:GetBuffsFor(u.Zone, u.No)
 		local augs = B:GetAugmentsFor(u.Zone, u.No)
 		if self.TabBar ~= nil then
-			P:SetTabText(self.TabBar.tabs["aug"], "증강 " .. H:Int(#augs))
+			P:SetTabText(self.TabBar.tabs["aug"], "증강 " .. H:Int(#augs) .. "/" .. H:Int(_RtsAugmentLogic.UnitAugMax))
 			P:SetTabText(self.TabBar.tabs["buff"], "버프 " .. H:Int(self:BuffCount(u, buffs)))
 			P:BarSelect(self.TabBar, self.Tab)
 		end

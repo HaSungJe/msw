@@ -1,14 +1,14 @@
 -- Phase 4 합류(2026-09-23, revision-1 §2): 증강 표 — 정의·지급 라운드·굴림·능력치 오버레이. 서버·클라 공용 읽기 전용.
---   원본 = .info/augmentation.md(사용자 확정 — 이름·효과·단계 확률). 브론즈~골드 = 능력치만(크리 확률·크리 데미지·공격력 +n·공격력 %·보스 공격시 데미지(골드만), 전부 합연산 — 방어율 무시 증강은 2026-09-24 삭제).
+--   원본 = .info/augmentation.md(사용자 확정 — 이름·효과·단계 확률). 브론즈~골드 = 능력치만(크리 확률·크리 데미지·공격력 +n·공격력 %·보스 공격시 데미지(골드 III '거인 학살자' +5%, 유닛당 1개), 전부 합연산 — 방어율 무시 증강은 2026-09-24 삭제).
 --   2026-09-27 개편: 단계(I 50 · II 35 · III 15%)만 무작위, 그 단계의 종류는 전부 보여 주고 선택(StatChoices). 프리즘은 가중치 무작위 3장(Roll) — 자쿰 처치 보상만 아직 없는 프리즘 전체(PrismChoices).
 --   프리즘 = 특수 코어 2(일격필살·보스 슬레이어 — 모든 직업, 중복 등장 가능·같은 유닛 중복 적용 불가) + 팬텀 잠금 해제 + 직업 전용 10(RtsJobTableLogic.GetPrisms의 id와 같다).
---   지급: 브~골 = 몬스터 스테이지 태그 표(라운드 시작 때), 프리즘 = 보스 순번(처치 직후). 한 판 30개(브 10·실 10·골 7·프리즘 3 — 자쿰·시그너스·루시드).
+--   지급: 브~골 = 몬스터 스테이지 태그 표(라운드 시작 때 — 항상 III 단계, RtsAugmentLogic.RoundLevel), 프리즘 = 보스 순번(처치 직후). 한 판 20개(브 7·실 7·골 3·프리즘 3 — 자쿰·시그너스·루시드, 2026-09-28. 전 30개: 브 10·실 10·골 7).
 @Logic
 script RtsAugmentTableLogic extends Logic
 
 	property boolean Loaded = false
 
-	-- id → 정의 { id, grade(bronze/silver/gold/prism), name, level(브~골 단계), w(프리즘 가중치), crit/critDmg/atk/pct/boss/fin(효과), job(직업 전용 프리즘), core(특수 코어), unlock(팬텀) }
+	-- id → 정의 { id, grade(bronze/silver/gold/prism), name, level(브~골 단계), w(프리즘 가중치), crit/critDmg/atk/pct/boss/fin(효과), job(직업 전용 프리즘), core(특수 코어), unique(브~골 중 같은 유닛 중복 불가 — 거인 학살자), unlock(팬텀) }
 	property table Defs = {}
 
 	-- 등급 → id 목록(표 순서)
@@ -32,7 +32,7 @@ script RtsAugmentTableLogic extends Logic
 		-- 2026-09-27 사용자 "증강 완전 개편 — 브론즈/실버/골드는 단계(I/II/III)까지만 무작위, 그 중 종류는 선택, 수치 조정":
 		--   크확(약점 찾기) 2배 · 크뎀(급소 찌르기) 3배 — 2026-09-27 사용자 "실버 I 기준 크확 10%, 크뎀 15%"(전 브 3/3.5/4 · 실 5/5.5/6 · 골 7/7.5/8, 골드 I 크뎀은 8 → 단계 순서대로 21). 샤프아이즈 50/50과 함께(RtsUnitBuffLogic).
 		--   공격력%(전투 감각)은 2026-09-27 사용자 "공격력 증강만 너무 좋다 — 다른 증강도 효율을 비슷하게"로 약 2.5배(0.5 단위: 전 브 3/3.5/4 · 실 5/5.5/6 · 골 7/7.5/8).
-		--   { id, 등급, 단계, 이름, 능력치, 값 }. 지급(라운드 보상·뽑기) = 등급 → 단계(LevelWeights 50/35/15) 굴림 → 그 단계의 종류 전부(4~5장)에서 하나 선택(RtsAugmentLogic.ActivatePending)
+		--   { id, 등급, 단계, 이름, 능력치, 값 }. 지급(라운드 보상·뽑기) = 등급 → 단계(LevelWeights 50/35/15) 굴림 → 그 단계의 종류 전부(4장, 골드 III만 5장)에서 하나 선택(RtsAugmentLogic.ActivatePending)
 		--   (전: 등급 안 가중치 [n/100]로 무작위 3장 — 실버 '보스 사냥꾼' 삭제, 골드 '거인 학살자' 10/12/15 → 20/25/30)
 		local list = {
 			-- 브론즈
@@ -66,17 +66,18 @@ script RtsAugmentTableLogic extends Logic
 			{ "g1_cdmg", "gold", 1, "완벽한 급소 찌르기 I", "critDmg", 21 },
 			{ "g1_atk", "gold", 1, "완벽한 무기 연마 I", "atk", 70 },
 			{ "g1_pct", "gold", 1, "완벽한 전투 감각 I", "pct", 17.5 },
-			{ "g1_boss", "gold", 1, "거인 학살자 I", "boss", 20 },
 			{ "g2_crit", "gold", 2, "완벽한 약점 찾기 II", "crit", 15 },
 			{ "g2_cdmg", "gold", 2, "완벽한 급소 찌르기 II", "critDmg", 22.5 },
 			{ "g2_atk", "gold", 2, "완벽한 무기 연마 II", "atk", 75 },
 			{ "g2_pct", "gold", 2, "완벽한 전투 감각 II", "pct", 19 },
-			{ "g2_boss", "gold", 2, "거인 학살자 II", "boss", 25 },
 			{ "g3_crit", "gold", 3, "완벽한 약점 찾기 III", "crit", 16 },
 			{ "g3_cdmg", "gold", 3, "완벽한 급소 찌르기 III", "critDmg", 24 },
 			{ "g3_atk", "gold", 3, "완벽한 무기 연마 III", "atk", 80 },
 			{ "g3_pct", "gold", 3, "완벽한 전투 감각 III", "pct", 20 },
-			{ "g3_boss", "gold", 3, "거인 학살자 III", "boss", 30 },
+			-- 거인 학살자는 골드 III에만(2026-09-28 사용자 "골드 III에만 보스 공격 시 데미지" — 전: I 20 · II 25 · III 30, 골드 I·II에서도 나왔다).
+			--   같은 날 "이름을 거인 학살자로, 보스 공격 시 데미지 30%, 중복 적용 불가"(전 10%) → "5%로 너프"(30 → 5 — 한 판 분석에서 극악 검마 통과가 거의 이 한 장으로 갈려서).
+			--   같은 유닛에 한 번만(unique, 아래). 증강 효과 배율(1티어 ×3 등)은 다른 골드처럼 곱한다
+			{ "g3_boss", "gold", 3, "거인 학살자", "boss", 5 },
 		}
 		self.Defs = {}
 		self.ByGrade = { bronze = {}, silver = {}, gold = {}, prism = {} }
@@ -91,9 +92,12 @@ script RtsAugmentTableLogic extends Logic
 			local lv = self.ByLevel[d.grade][d.level]
 			lv[#lv + 1] = d.id
 		end
+		-- 같은 유닛에 중복 적용 불가(브론즈~골드 — RtsAugmentLogic.CanAssignTo가 특수 코어와 같이 막는다)
+		self.Defs["g3_boss"].unique = true
 		-- 프리즘 — 특수 코어(모든 직업, 중복 등장 가능, 같은 유닛 중복 적용 불가)
-		self:AddPrism({ id = "core_final", name = "일격필살", w = 5, core = true, fin = 15, desc = "[모든 직업] 최종 데미지가 15% 증가한다. 같은 유닛에 중복 적용 불가" })
-		self:AddPrism({ id = "core_boss", name = "보스 슬레이어", w = 5, core = true, boss = 60, desc = "[모든 직업] 보스 공격 시 데미지가 60% 증가한다. 같은 유닛에 중복 적용 불가" }) -- 2026-09-23 사용자 "보공 60%로 너프"(전 100)
+		-- 2026-09-28 사용자 "일격필살 최종 데미지 10%, 보스 슬레이어 보스 공격 시 데미지 15%로"(전 15 · 60 — 거인 학살자 5% 너프와 함께)
+		self:AddPrism({ id = "core_final", name = "일격필살", w = 5, core = true, fin = 10, desc = "[모든 직업] 최종 데미지가 10% 증가한다. 같은 유닛에 중복 적용 불가" })
+		self:AddPrism({ id = "core_boss", name = "보스 슬레이어", w = 5, core = true, boss = 15, desc = "[모든 직업] 보스 공격 시 데미지가 15% 증가한다. 같은 유닛에 중복 적용 불가" }) -- 2026-09-23 사용자 "보공 60%로 너프"(전 100) → 2026-09-28 15%
 		-- 방어구 부수기(core_ign)·갑옷 꿰뚫기(방무 증강) 삭제(2026-09-24 사용자 "합연산 + 증강 방무 삭제" — 방무는 직업 킷·프리즘만)
 		-- 프리즘 — 직업(팬텀 잠금 해제·섀도어 전직) + 스킬(직업 전용) = RtsJobTableLogic.GetPrisms 정의를 그대로 쓴다
 		local jobW = { phantom = 5, dualblade = 5 }
@@ -107,10 +111,12 @@ script RtsAugmentTableLogic extends Logic
 				self:AddPrism({ id = p.id, name = p.name, w = w, job = p.job, desc = "[" .. _RtsJobTableLogic:GetJobName(p.job) .. " 전용] " .. p.desc })
 			end
 		end
-		-- 지급 라운드표(augmentation.md — 몬스터 스테이지 태그)
-		local br = { 4, 17, 30, 38, 51, 63, 76, 84, 97, 110 }
-		local sv = { 8, 21, 34, 42, 55, 68, 80, 89, 101, 114 }
-		local gd = { 13, 25, 46, 59, 72, 93, 106 }
+		-- 지급 라운드표(augmentation.md — 몬스터 스테이지 태그). 2026-09-28 사용자 "브론즈 7, 실버 7, 골드 3, 프리즘은 고정, 대신 항상 III 레벨":
+		--   몬스터 라운드 1~114에 17개를 등간격(n번째 = round(n × 114 ÷ 17)), 등급은 7 : 7 : 3 누적 비례로 섞음
+		--   (전: 27개 — 브 4·17·30·38·51·63·76·84·97·110 / 실 8·21·34·42·55·68·80·89·101·114 / 골 13·25·46·59·72·93·106)
+		local br = { 7, 27, 40, 60, 74, 87, 107 }
+		local sv = { 13, 34, 47, 67, 80, 94, 114 }
+		local gd = { 20, 54, 101 }
 		self.GradeByTag = {}
 		for i = 1, #br do self.GradeByTag[br[i]] = "bronze" end
 		for i = 1, #sv do self.GradeByTag[sv[i]] = "silver" end
@@ -167,7 +173,11 @@ script RtsAugmentTableLogic extends Logic
 		if d.critDmg ~= nil then return "크리티컬 데미지 +" .. I:Num(d.critDmg) .. "%" end
 		if d.atk ~= nil then return "공격력 +" .. I:Num(d.atk) end
 		if d.pct ~= nil then return "공격력 +" .. I:Num(d.pct) .. "%" end
-		if d.boss ~= nil then return "보스 공격 시 데미지 +" .. I:Num(d.boss) .. "%" end
+		if d.boss ~= nil then
+			local s = "보스 공격 시 데미지 +" .. I:Num(d.boss) .. "%"
+			if d.unique then s = s .. " · 같은 유닛에 중복 적용 불가" end
+			return s
+		end
 		return ""
 	end
 
@@ -192,7 +202,7 @@ script RtsAugmentTableLogic extends Logic
 		return #w
 	end
 
-	-- 브론즈~골드 선택지: 그 등급·단계의 종류 전부(브론즈·실버 4장, 골드 5장 — 표 순서). level이 0이면 단계를 굴린다
+	-- 브론즈~골드 선택지: 그 등급·단계의 종류 전부(브론즈·실버·골드 I·II 4장, 골드 III 5장 — 표 순서). level이 0이면 단계를 굴린다
 	method table StatChoices(string grade, number level)
 		self:Ensure()
 		local byGrade = self.ByLevel[grade]

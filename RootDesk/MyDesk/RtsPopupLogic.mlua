@@ -540,7 +540,7 @@ script RtsPopupLogic extends Logic
 		H:SpawnLabel("RtsDrawTitle", panel, Vector2(0, 1), Vector2(0, 1), Vector2(28, -16), Vector2(960, 44), "새로운 증강으로 더 강하게", self:Ink(), 30, TextAlignmentType.MiddleLeft, true)
 		H:SpawnLabel("RtsDrawDesc", panel, Vector2(0, 1), Vector2(0, 1), Vector2(28, -62), Vector2(960, 64), "메소로 증강을 뽑으면 등급과 단계(I·II·III)가 정해지고, 그 안에서 원하는 종류를 골라요.\n받은 증강은 보유 증강 탭에서 캐릭터에게 지정할 수 있어요.", self:Muted(), 20, TextAlignmentType.MiddleLeft, false)
 		local wallet = H:SpawnLabel("RtsDrawWallet", panel, Vector2(0, 0), Vector2(0, 0), Vector2(28, 8), Vector2(940, 32), "", self:AccentInk(), 21, TextAlignmentType.MiddleLeft, true)
-		self.DrawRefs = { wallet = wallet, rates = {}, key = "" }
+		self.DrawRefs = { wallet = wallet, rates = {}, hints = {}, key = "" }
 		local grades = {"bronze", "silver", "gold", "prism"}
 		for i = 1, #grades do
 			local g = grades[i]
@@ -549,7 +549,7 @@ script RtsPopupLogic extends Logic
 			badge.UITransformComponent.RectSize = Vector2(116,36)
 			badge:GetChildByName("RtsDrawBadgeText").UITransformComponent.RectSize = Vector2(108,32)
 			self.DrawRefs.rates[i] = H:SpawnLabel("RtsDrawRate", card, Vector2(0.5, 1), Vector2(0.5, 1), Vector2(0, -50), Vector2(276, 52), "", self:Ink(), 32, TextAlignmentType.MiddleCenter, true)
-			H:SpawnLabel("RtsDrawRateHint", card, Vector2(0.5, 0), Vector2(0.5, 0), Vector2(0, 10), Vector2(276, 28), "다음 뽑기 확률", self:Muted(), 16, TextAlignmentType.MiddleCenter, false)
+			self.DrawRefs.hints[i] = H:SpawnLabel("RtsDrawRateHint", card, Vector2(0.5, 0), Vector2(0.5, 0), Vector2(0, 10), Vector2(276, 28), "다음 뽑기 확률", self:Muted(), 16, TextAlignmentType.MiddleCenter, false)
 		end
 		self.DrawRefs.info = H:SpawnLabel("RtsDrawInfo", body, Vector2(0, 1), Vector2(0, 1), Vector2(30, -368), Vector2(self.PanelW - 60, 82), "", self:Muted(), 18, TextAlignmentType.UpperLeft, false)
 		local buy = H:SpawnRoundedPanel("RtsDrawBuy", body, Vector2(0.5, 0), Vector2(0.5, 0), Vector2(0, 52), Vector2(550, 104), H:ColGold(), self:Edge(), 2)
@@ -568,13 +568,13 @@ script RtsPopupLogic extends Logic
 		-- 탭 내용을 만드는 중에도 동기화 타이머가 들어올 수 있다.
 		local ready = self.DrawRefs
 		if not isvalid(ready.wallet) or not isvalid(ready.info) or not isvalid(ready.label) or not isvalid(ready.reason) or not isvalid(ready.buy) then return end
-		for i = 1, 4 do if not isvalid(ready.rates[i]) then return end end
+		for i = 1, 4 do if not isvalid(ready.rates[i]) or not isvalid(ready.hints[i]) then return end end
 		local H = _RtsHudLogic
 		local A = _RtsAugmentLogic
 		local me = _RtsUnitLogic:MyUserId()
 		local money = _RtsUnitLogic:GetMyMeso()
 		local pending = A.PendingByUser[me] or 0
-		local left = A:BuyPrismLeft(me)
+		local left = A:BuyPrismIn(me)
 		local rate = A:BuyPrismRate(me)
 		local paused = _RtsStageLogic.Paused
 		local key = tostring(price) .. ":" .. tostring(can) .. ":" .. tostring(money) .. ":" .. tostring(pending) .. ":" .. tostring(left) .. ":" .. tostring(rate) .. ":" .. tostring(paused)
@@ -585,8 +585,19 @@ script RtsPopupLogic extends Logic
 		local gr = A.BuyGradeRates
 		local gsum = gr.bronze + gr.silver + gr.gold
 		local rates = {(100 - rate) * gr.bronze / gsum, (100 - rate) * gr.silver / gsum, (100 - rate) * gr.gold / gsum, rate}
-		for i = 1, 4 do r.rates[i].TextComponent.Text = string.format("%.1f%%", rates[i]) end
-		r.info.TextComponent.Text = "뽑기로 획득 가능한 프리즘  " .. H:Int(left) .. " / " .. H:Int(A.BuyPrismMax) .. "\n프리즘을 얻지 못하면 다음 뽑기의 프리즘 확률이 " .. H:Int(A.BuyPrismPityStep) .. "%p 올라요.\n선택 대기  " .. H:Int(pending) .. "개"
+		for i = 1, 3 do r.rates[i].TextComponent.Text = string.format("%.1f%%", rates[i]) end
+		-- 프리즘 카드는 %가 아니라 확정까지 남은 횟수(2026-09-28 사용자 "프리즘 0%로 나타내지 말고" → "프리즘 확정까지 남은 횟수만 표시", 2번 다 지나면 "-")
+		if left <= 0 then
+			r.rates[4].TextComponent.Text = "-"
+			r.hints[4].TextComponent.Text = "확정 프리즘을 모두 받았어요"
+		else
+			r.rates[4].TextComponent.Text = H:Int(left) .. "회"
+			if left == 1 then r.hints[4].TextComponent.Text = "다음 뽑기가 프리즘 확정!" else r.hints[4].TextComponent.Text = "프리즘 확정까지 남은 횟수" end
+		end
+		-- 2026-09-28 개편: 20·40번째 뽑기 = 프리즘 확정, 가격은 10회마다 오름폭 두 배(RtsAugmentLogic.BuyPrice)
+		local prismLine = "20번째 · 40번째 뽑기는 프리즘 확정"
+		if left <= 0 then prismLine = prismLine .. "   ·   확정 프리즘을 모두 받았어요" end
+		r.info.TextComponent.Text = prismLine .. "\n가격 1회차 3,200메소부터 뽑을 때마다 +200 · 20회차부터 7,000메소 고정\n선택 대기  " .. H:Int(pending) .. "개"
 		r.label.TextComponent.Text = "증강 뽑기  ·  " .. H:FormatNumber(price) .. " 메소"
 		local reason = "등급·단계는 무작위 · 종류는 원하는 것을 선택"
 		if paused then reason = "일시정지를 해제한 뒤 뽑을 수 있어요"
@@ -2201,7 +2212,7 @@ script RtsPopupLogic extends Logic
 					self:AugStateText(item.no), self:Ink(), 17, TextAlignmentType.MiddleLeft, true)
 			else
 				H:SpawnLabel("RtsAugDetailHint", detail, Vector2(0, 1), Vector2(0, 1), Vector2(19, -300), Vector2(dw - 40, 48),
-					"유닛 선택 후 한 번만 지정할 수 있어요", Color(0.66, 0.26, 0.20, 1), 16, TextAlignmentType.MiddleLeft, false)
+					"유닛 선택 후 한 번만 지정할 수 있어요 · 유닛당 최대 " .. H:Int(A.UnitAugMax) .. "개", Color(0.66, 0.26, 0.20, 1), 16, TextAlignmentType.MiddleLeft, false)
 				-- 내 유닛 칩(2열). 지정 불가 유닛은 흐리게
 				local nos = _RtsUnitLogic:ListZoneUnits(_RtsUnitLogic:MyZone())
 				local chipW = 310
@@ -2233,8 +2244,10 @@ script RtsPopupLogic extends Logic
 						bar.SpriteGUIRendererComponent.Color = H:SeriesColor(_RtsJobTableLogic:GetSeries(u.JobId))
 						H:SpawnLabel("RtsAugChipText", chip, Vector2(0, 0.5), Vector2(0, 0.5), Vector2(12, 0), Vector2(chipW - 94, 30),
 							_RtsJobTableLogic:GetJobNameFor(u), ink, 16, TextAlignmentType.MiddleLeft, true)
+						local lvText = "Lv. " .. H:Int(u.Level)
+						if A:IsUnitFull(u) then lvText = "가득" end
 						H:SpawnLabel("RtsAugChipLevel", chip, Vector2(1, 0.5), Vector2(1, 0.5), Vector2(-12, 0), Vector2(62, 30),
-							"Lv. " .. H:Int(u.Level), ink, 16, TextAlignmentType.MiddleRight, true)
+							lvText, ink, 16, TextAlignmentType.MiddleRight, true)
 						if ok then
 							local pickNo = no
 							local c = H:SpawnClick("RtsAugChipClick", chip)
@@ -2389,12 +2402,12 @@ script RtsPopupLogic extends Logic
 	end
 
 	method string CodexInfoText()
-		local info = "라운드 지급 10장 · 기본 뽑기 확률 50%"
-		if self.CodexGrade == "silver" then info = "라운드 지급 10장 · 기본 뽑기 확률 35%" end
-		if self.CodexGrade == "gold" then info = "라운드 지급 7장 · 기본 뽑기 확률 10%" end
+		local info = "라운드 지급 7장(III) · 기본 뽑기 확률 50%"
+		if self.CodexGrade == "silver" then info = "라운드 지급 7장(III) · 기본 뽑기 확률 40%" end
+		if self.CodexGrade == "gold" then info = "라운드 지급 3장(III) · 기본 뽑기 확률 10%" end
 		-- 프리즘은 가중치 무작위 3장(오른쪽 % = 3택1에서 나올 확률), 자쿰 처치 보상만 전체에서 선택(2026-09-27 사용자 "자쿰 한정으로 자쿰이 준 프리즘만 선택 가능")
-		if self.CodexGrade == "prism" then return "자쿰 처치 뒤 원하는 것 선택 · 시그너스 · 루시드 처치 뒤 · 뽑기 5%(판마다 최대 2개)는 3택1   ·   오른쪽 % = 3택1 확률" end
-		return info .. "   ·   단계 I 50% · II 35% · III 15%, 종류는 선택"
+		if self.CodexGrade == "prism" then return "자쿰 처치 뒤 원하는 것 선택 · 시그너스 · 루시드 처치 뒤 · 뽑기 20 · 40번째(확정)는 3택1   ·   오른쪽 % = 3택1 확률" end
+		return info .. "   ·   뽑기 단계 I 50% · II 35% · III 15%(라운드 지급은 항상 III), 종류는 선택"
 	end
 
 	-- 도감 목록(선택 등급) — 컨테이너째 교체
@@ -2494,11 +2507,13 @@ script RtsPopupLogic extends Logic
 		if first ~= nil and first.level ~= nil then title = self:GradeName(offer.grade) .. " 증강 " .. AT:LevelName(first.level) .. " 선택" end
 		if offer.grade == "prism" then title = "프리즘 증강 선택" end
 		local pending = _RtsAugmentLogic.PendingByUser[_RtsUnitLogic:MyUserId()] or 0
-		local sub = title .. " · 원하는 증강을 하나 골라 주세요. 받은 증강은 보유 증강 탭에서 지정할 수 있어요."
-		if paged then sub = title .. " · 원하는 증강을 하나 골라 주세요(좌우로 넘겨 보기 · " .. H:Int(#offer.ids) .. "종). 받은 증강은 보유 증강 탭에서 지정할 수 있어요." end
+		-- 2026-09-28 사용자 "증강 종류 선택부분에서 직업 선택" — 아래 캐릭터 칩을 골라 두면 받는 즉시 지정(마지막 선택 유지), '지정 안 함'이면 보유 증강으로
+		local sub = title .. " · 캐릭터를 골라 두면 받는 즉시 지정돼요"
+		if paged then sub = title .. " · 좌우로 넘겨 보기 " .. H:Int(#offer.ids) .. "종 · 캐릭터를 골라 두면 받는 즉시 지정돼요" end
 		if pending > 1 then sub = sub .. "   ·   대기 중인 선택지 " .. H:Int(pending) .. "개" end
-		H:SpawnLabel("RtsPickSub", body, Vector2(0, 1), Vector2(0, 1), Vector2(27, -4), Vector2(self.PanelW - 54, 44),
+		H:SpawnLabel("RtsPickSub", body, Vector2(0, 1), Vector2(0, 1), Vector2(27, -4), Vector2(self.PanelW - 54, 36),
 			sub, self:Muted(), 15, TextAlignmentType.MiddleCenter, false)
+		self:BuildPickTargets(body)
 		-- [보유 증강으로](2026-09-23 사용자 '접기'에서 바뀜): 보유 탭으로 가고, 이 선택지는 보유 탭 맨 위의 선택 대기 행에서 다시 고른다. ESC도 같다(2026-09-27 사용자 "보유 증강으로 버튼 ESC 단축키" — 오른쪽 안에 [ESC] 키캡, HandleKeyDownEvent)
 		local fold = H:SpawnRoundedPanel("RtsPickFold", body, Vector2(0.5, 0), Vector2(0.5, 0), Vector2(0, 16), Vector2(320, 88),
 			self:Mix(Color.white, 0.06), self:Mix(Color.white, 0.3), 1.5)
@@ -2511,12 +2526,14 @@ script RtsPopupLogic extends Logic
 		end)
 		local cardW = 420
 		local gap = 22
-		-- 긴 효과 설명과 받기 버튼을 분리하고 페이지별 카드 크기를 유지한다.
-		local cardH = 530
-		local cardTop = -56
-		local contentTop = 48
-		local descH = 176
+		-- 긴 효과 설명과 받기 버튼을 분리하고 페이지별 카드 크기를 유지한다. 위에 캐릭터 칩 줄(-44, 높이 60)이 있어 카드는 -112부터(전: -56, 높이 530)
+		local cardH = 474
+		local cardTop = -112
+		local contentTop = 40
+		local iconSize = 88
+		local descH = 170
 		local slots = {}
+		self._T.PickTakeRefs = {}
 		_SoundService:PlaySound(self.PickSound, 1)
 		for ci = 1, #offer.ids do
 			local d = AT:GetDef(offer.ids[ci])
@@ -2539,22 +2556,24 @@ script RtsPopupLogic extends Logic
 				band.SpriteGUIRendererComponent.Color = self:GradeColor(d.grade)
 				-- 설명 길이와 관계없이 아이콘·제목의 시작 높이를 같은 위치에 고정한다.
 				local effectText = self:StripTags(AT:EffectText(d.id))
-				self:SpawnAugIcon(card, d, Vector2((cardW - 104) / 2, -contentTop), 104)
+				self:SpawnAugIcon(card, d, Vector2((cardW - iconSize) / 2, -contentTop), iconSize)
 				H:SpawnLabel("RtsPickGrade", card, Vector2(0, 1), Vector2(0, 1), Vector2(19, -12), Vector2(cardW - 38, 24), self:GradeLevelName(d), self:Muted(), 15, TextAlignmentType.MiddleCenter, true)
-				H:SpawnLabel("RtsPickT", card, Vector2(0, 1), Vector2(0, 1), Vector2(19, -(contentTop + 124)), Vector2(cardW - 38, 64),
+				H:SpawnLabel("RtsPickT", card, Vector2(0, 1), Vector2(0, 1), Vector2(19, -(contentTop + iconSize + 6)), Vector2(cardW - 38, 56),
 					d.name, self:Ink(), 21, TextAlignmentType.MiddleCenter, true)
-				H:SpawnLabel("RtsPickD", card, Vector2(0, 1), Vector2(0, 1), Vector2(19, -(contentTop + 196)), Vector2(cardW - 38, descH),
+				H:SpawnLabel("RtsPickD", card, Vector2(0, 1), Vector2(0, 1), Vector2(19, -(contentTop + iconSize + 66)), Vector2(cardW - 38, descH),
 					effectText, self:Ink(), 18, TextAlignmentType.UpperCenter, false)
 				local btn = H:SpawnRoundedPanel("RtsPickTake", card, Vector2(0.5, 0), Vector2(0.5, 0), Vector2(0, 12), Vector2(cardW - 38, 88),
 					self:Mix(H:ColGold(), 0.9), H:ColGold(), 1.5)
-				H:SpawnLabel("RtsPickTakeText", btn, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2(0, 0), Vector2(cardW - 50, 76),
-					"받기", H:ColGoldInk(), 18, TextAlignmentType.MiddleCenter, true)
+				-- 버튼 글자 = 받으면 어디로 가는지('아크메이지(썬·콜)에게 지정' / '받기' / '받기 · 보유 증강으로') — 칩을 바꾸면 이 글자만 바뀐다(RefreshPickTargets)
+				local takeText = H:SpawnLabel("RtsPickTakeText", btn, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2(0, 0), Vector2(cardW - 50, 76),
+					self:PickTakeText(d.id), H:ColGoldInk(), 18, TextAlignmentType.MiddleCenter, true)
+				self._T.PickTakeRefs[#self._T.PickTakeRefs + 1] = { id = d.id, label = takeText }
 				local idx = ci
 				local takeClick = H:SpawnClick("RtsPickTakeClick", btn)
 				takeClick:ConnectEvent(ButtonClickEvent, function(event)
 					if _RtsStageLogic.Paused then H:ShowHintFor("일시정지를 해제한 뒤 선택할 수 있어요", 2); return end
-					_RtsAugmentLogic:ChooseFromPopup(idx)
-					self:OpenHubTab("augment")
+					-- 바로 지정(또는 팬텀 해금)이면 선택 창에 남아 다음 선택지로 이어 가고(2026-09-28 "시간 너무 많이 소모"), 보유로 받으면 전처럼 보유 증강 탭으로
+					if not _RtsAugmentLogic:ChooseFromPopup(idx) then self:OpenHubTab("augment") end
 				end)
 			end
 		end
@@ -2562,6 +2581,92 @@ script RtsPopupLogic extends Logic
 		-- 보유 탭 복귀 버튼과 겹치지 않게 페이지 수를 그 왼쪽에 둔다.
 		self._T.PickPager.label.UITransformComponent.anchoredPosition = Vector2(-260,0)
 
+	end
+
+	-- 선택 창 캐릭터 칩 줄(-44, 높이 60): [지정 안 함] + 내 유닛(번호 순). 누르면 칩 색·받기 글자만 제자리에서 바뀐다(RefreshPickTargets).
+	--   고른 유닛은 RtsAugmentLogic.PickNo로 남아 다음 선택 창에서도 먼저 골라져 있다. 방출·교체·증강 가득이면 '지정 안 함'으로 돌아간다(PickTarget)
+	@ExecSpace("ClientOnly")
+	method void BuildPickTargets(Entity body)
+		local H = _RtsHudLogic
+		local A = _RtsAugmentLogic
+		local chips = { { no = 0 } }
+		local nos = _RtsUnitLogic:ListZoneUnits(_RtsUnitLogic:MyZone())
+		for i = 1, #nos do
+			local u = _RtsUnitLogic:GetMyUnit(nos[i])
+			if u ~= nil then chips[#chips + 1] = { no = nos[i], u = u } end
+		end
+		local gapX = 10
+		local w = math.min(200, math.floor((self.PanelW - 54 - gapX * (#chips - 1)) / #chips))
+		local x0 = (self.PanelW - (w * #chips + gapX * (#chips - 1))) / 2
+		self._T.PickChipRefs = {}
+		for i = 1, #chips do
+			local c = chips[i]
+			local full = c.u ~= nil and A:IsUnitFull(c.u)
+			local chip = H:SpawnRoundedPanel("RtsPickChip" .. H:Int(i), body, Vector2(0, 1), Vector2(0, 1), Vector2(x0 + (i - 1) * (w + gapX), -44), Vector2(w, 60),
+				self:Card(), self:Edge(), 1.5)
+			local name = "지정 안 함"
+			local subText = "보유 증강으로"
+			if c.u ~= nil then
+				local bar = H:SpawnStretch("model://uisprite", "RtsPickChipBar", chip, Vector2(0, 0), Vector2(0, 1), Vector2(0, 0), Vector2(4, 0))
+				bar.SpriteGUIRendererComponent.Color = H:SeriesColor(_RtsJobTableLogic:GetSeries(c.u.JobId))
+				name = _RtsJobTableLogic:GetJobNameFor(c.u)
+				subText = "Lv. " .. H:Int(c.u.Level) .. " · 증강 " .. H:Int(A:CountForUnit(c.u.Owner, c.no)) .. "/" .. H:Int(A.UnitAugMax)
+				if full then subText = "증강 " .. H:Int(A.UnitAugMax) .. "개 가득" end
+			end
+			local ink = self:Ink()
+			if full then ink = Color(0.5, 0.47, 0.42, 1) end
+			H:SpawnLabel("RtsPickChipName", chip, Vector2(0.5, 1), Vector2(0.5, 1), Vector2(2, -4), Vector2(w - 16, 28), name, ink, 16, TextAlignmentType.MiddleCenter, true)
+			H:SpawnLabel("RtsPickChipSub", chip, Vector2(0.5, 0), Vector2(0.5, 0), Vector2(2, 4), Vector2(w - 16, 24), subText, self:Muted(), 14, TextAlignmentType.MiddleCenter, false)
+			self._T.PickChipRefs[#self._T.PickChipRefs + 1] = { no = c.no, chip = chip, full = full }
+			if not full then
+				local pickNo = c.no
+				local click = H:SpawnClick("RtsPickChipClick", chip)
+				click:ConnectEvent(ButtonClickEvent, function(event)
+					if A:PickTarget() == pickNo then return end
+					A:SetPickTarget(pickNo)
+					_RtsConfigLogic:Log("RtsPopup: pick target -> " .. H:Int(pickNo))
+					self:RefreshPickTargets()
+				end)
+			end
+		end
+		self:RefreshPickTargets()
+	end
+
+	-- 칩 색(고른 칩 = 금색)과 카드 받기 버튼 글자만 제자리에서
+	@ExecSpace("ClientOnly")
+	method void RefreshPickTargets()
+		if self.Kind ~= "pick" then return end
+		local H = _RtsHudLogic
+		local cur = _RtsAugmentLogic:PickTarget()
+		for _, r in ipairs(self._T.PickChipRefs or {}) do
+			if isvalid(r.chip) then
+				local bg = self:Card()
+				local border = self:Edge()
+				if r.no == cur then
+					bg = self:Mix(H:ColGold(), 0.2)
+					border = H:ColGold()
+				elseif r.full then
+					bg = self:Mix(self:Edge(), 0.25)
+				end
+				H:SetUiColor(r.chip, bg, "surface")
+				if r.chip.Parent ~= nil then H:SetUiColor(r.chip.Parent, border, "border") end
+			end
+		end
+		for _, r in ipairs(self._T.PickTakeRefs or {}) do
+			if isvalid(r.label) then H:SetUiText(r.label, self:PickTakeText(r.id)) end
+		end
+	end
+
+	-- 받기 버튼 글자: 고른 캐릭터에 바로 지정되면 '<직업>에게 지정', 캐릭터를 안 골랐거나 팬텀 해금이면 '받기', 골랐는데 이 증강은 못 받으면(다른 직업 프리즘 등) '받기 · 보유 증강으로'
+	@ExecSpace("ClientOnly")
+	method string PickTakeText(string id)
+		local A = _RtsAugmentLogic
+		local no = A:PickTarget()
+		local d = _RtsAugmentTableLogic:GetDef(id)
+		if no <= 0 or d == nil or d.unlock ~= nil then return "받기" end
+		local u = _RtsUnitLogic:GetMyUnit(no)
+		if u ~= nil and A:CanAssignTo(id, u) then return _RtsJobTableLogic:GetJobNameFor(u) .. "에게 지정" end
+		return "받기 · 보유 증강으로"
 	end
 
 	method string AugStatKey(table d)
@@ -2610,7 +2715,7 @@ script RtsPopupLogic extends Logic
 		local tc = root.TextComponent
 		if tc ~= nil and string.find(root.Name,"Key",1,true) == nil then
 			local sizes = {RtsCodexName=22,RtsCodexJobText=18,RtsCodexMore=18,RtsCodexPct=18,RtsCodexDesc=20,RtsCodexInfo=18,
-				RtsPickT=23,RtsPickD=20,RtsPickGrade=18,RtsPickSub=17,RtsPickTakeText=22,RtsPickFoldText=20,
+				RtsPickT=23,RtsPickD=20,RtsPickGrade=18,RtsPickSub=17,RtsPickTakeText=22,RtsPickFoldText=20,RtsPickChipName=18,RtsPickChipSub=16,
 				RtsAugRowName=20,RtsAugPendingName=20,RtsAugPendingState=18,RtsAugRowNewText=17,RtsAugRowState=17,
 				RtsAugDetailT=24,RtsAugDetailGrade=18,RtsAugDetailD=20,RtsAugDetailHint=18,RtsAugHideText=18,
 				RtsDrawTitle=26,RtsDrawDesc=20,RtsDrawRate=30,RtsDrawRateHint=18,RtsDrawBadgeText=18,RtsDrawReason=18,RtsPageNumber=22}

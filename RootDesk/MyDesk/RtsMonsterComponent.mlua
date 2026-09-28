@@ -380,6 +380,8 @@ script RtsMonsterComponent extends Component
 	@ExecSpace("ServerOnly")
 	method void OnHitServer(number total)
 		if self.Dead or self.Stashed then return end
+		-- 지워지는 중인 몬스터(엔티티 무효·구역 값 없음)에 늦게 온 피격은 버린다(2026-09-28 제보 [LEA-2001] 'zone' nil — 처치 알림이 구역 없이 불려 오류)
+		if not isvalid(self.Entity) or self.Zone == nil or self.Hp == nil then return end
 		self.Hp = self.Hp - total
 		if self.Hp <= 0 then
 			self.Hp = 0

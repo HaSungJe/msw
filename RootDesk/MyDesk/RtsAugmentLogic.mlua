@@ -1,10 +1,11 @@
 -- Phase 4 합류(2026-09-23, revision-1 §2): 증강 지급·선택·지정(서버 권위) + 클라 조회.
---   지급: 브론즈~골드 = 지급 라운드 시작 때(RtsStageLogic.OnStageStarted), 프리즘 = 자쿰·시그너스·루시드 처치 직후(2026-09-23 5개 → 3개)(RtsBossLogic.OnBossKilled).
+--   지급: 브론즈~골드 = 지급 라운드 시작 때(RtsStageLogic.OnStageStarted — 브 7·실 7·골 3, 항상 III 단계 RoundLevel, 2026-09-28), 프리즘 = 자쿰·시그너스·루시드 처치 직후(2026-09-23 5개 → 3개)(RtsBossLogic.OnBossKilled).
 --   서버가 선택지를 OfferByUser에 올리면 클라가 증강 선택 팝업(닫기 없음)을 연다. 여러 개가 밀리면 줄을 세워 하나씩.
---   브론즈~골드는 단계(I/II/III)만 굴리고 그 단계의 종류 전부(브론즈·실버 4장, 골드 5장 — RtsAugmentTableLogic.StatChoices, 2026-09-27 사용자 개편. 전: 가중치 무작위 3장)를 올린다.
+--   브론즈~골드는 단계(I/II/III)만 굴리고 그 단계의 종류 전부(4장, 골드 III만 5장 — RtsAugmentTableLogic.StatChoices, 2026-09-27 사용자 개편. 전: 가중치 무작위 3장)를 올린다.
 --   프리즘: 자쿰 처치 보상만 아직 없는 프리즘 전체에서 선택(RtsAugmentTableLogic.PrismChoices, 클라 가로 스크롤 — 줄 항목 pickAll), 시그너스·루시드 보상과 증강 뽑기 프리즘은
 --   가중치 무작위 3장(RtsAugmentTableLogic.Roll) 중 선택(2026-09-27 사용자 "자쿰 한정으로 자쿰이 준 프리즘만 선택 가능").
---   고른 증강은 '대상 미지정'으로 보유(OwnedByUser) → 증강 창에서 유닛 1명에 1회 지정(RequestAssign). 지정 후 변경 불가.
+--   선택 창에서 지정할 캐릭터를 골라 두었으면 받는 즉시 그 유닛에 지정(RequestTake — 2026-09-28 사용자 "증강 줄 때 시간 너무 많이 소모"), 아니면 '대상 미지정'으로 보유(OwnedByUser)
+--     → 증강 창에서 유닛 1명에 1회 지정(RequestAssign). 지정 후 변경 불가. 유닛 한 명에 지정할 수 있는 증강은 UnitAugMax(30)개까지(2026-09-28 사용자).
 --     브~골·특수 코어 → 그 유닛 Augs(능력치 오버레이) / 직업 프리즘 → 그 직업 유닛에만, RtsUnitLogic.ApplyPrism / 팬텀 → 받는 즉시 영입 해금(지정 없음).
 --   방출된 유닛에 지정된 증강은 소멸, 탈락·새 판이면 보유 초기화.
 --   동기화 문자열: OwnedByUser[userId] = "id:유닛번호,…"(0 = 미지정, -1 = 지정 필요 없음) / OfferByUser[userId] = "등급|id,id,id|개별식별자" (없으면 "")
@@ -37,35 +38,41 @@ script RtsAugmentLogic extends Logic
 	property SyncTable<string, number> PendingByUser
 
 
-	-- 증강 뽑기(2026-09-23 사용자): 가격 = BuyBase + BuyStep × 이번 판에 뽑은 횟수. 등급 확률(%) 브론즈 50 / 실버 35 / 골드 10 / 프리즘 5(+ 천장 BuyPrismPity — 아래, 2026-09-27 개편 — BuyGradeRates)
-	--   (전: 2026-09-24 사용자 0.5 → 2 → "프리즘 확률은 5%로" — 브론즈 75.5 / 실버 15 / 골드 4.5 / 프리즘 5. .info/tier.md)
+	-- 증강 뽑기(2026-09-28 사용자 개편): 가격 = 1회차 3,200부터 200씩, 한 번에 최대 7,000(BuyPrice), 프리즘은 BuyPrismAt(20·40번째) 뽑기에서 확정,
+	--   그 밖의 뽑기는 브론즈 50 / 실버 40 / 골드 10(무작위 프리즘 5%를 실버로 옮김 — BuyGradeRates).
+	--   (전 2026-09-27: 2,400 + 32씩 · 브 50 / 실 35 / 골 10 / 프리즘 5% + 천장 +2%p · 판마다 최대 2개. 전 2026-09-24: 3,000 + 40씩, 브 75.5 / 실 15 / 골 4.5 / 프리즘 5. .info/tier.md)
 	@Sync
 	property SyncTable<string, number> BuyCountByUser
 
-	-- 2026-09-27 사용자 "증강도 20% 싸게"(41~50레벨 비용 20% 할인과 함께 — RtsJobTableLogic.LateLevelDiscount): 2,400 + 32씩.
-	--   딜러 4명 50 + 비숍 30 + 팔라딘 40 뒤 여유 314,500 → 84회 313,152(.info/tier.md 3절)
-	--   (전: 2026-09-24 사용자 "비숍 30·팔라딘 40 가성비 + 딜러 4명 50레벨 뒤 남는 돈으로 50~60회" 3,000 + 40씩 = 55회, 2026-09-23 3,000 + 800씩, 그 전 5,000 + 1,000)
-	property number BuyBase = 2400
+	-- n번째 뽑기 가격 = min(BuyPriceCap, BuyBase + BuyStep × n) — 1번째 3,200 · 10번째 5,000 · 20번째 7,000, 그 뒤 7,000 고정
+	--   (2026-09-28 사용자 "3000+200으로 변경, 7천원 상한" — 여유 314,500으로 50회. 같은 날 앞선 안: 4,000 + 300 · 상한 10,000(37회),
+	--   3,000 + 300에 10회마다 오름폭 ×2(1회차 3,300 · 20회차 12,000, 상한 없음 → 29회))
+	property number BuyBase = 3000
 
-	property number BuyStep = 32
+	property number BuyStep = 200
 
-	-- 뽑기에서 나오는 프리즘은 판마다 최대 BuyPrismMax개(2026-09-24 사용자 "증강 뽑기에서 최대 2개") — 넘으면 골드. HUD 뽑기 버튼에 '프리즘 남은/최대'
-	property number BuyPrismMax = 2
+	-- 뽑기 한 번 가격 상한(2026-09-28 사용자 "7천원 상한" — 앞선 안 10,000)
+	property number BuyPriceCap = 7000
 
-	@Sync
-	property SyncTable<string, number> BuyPrismByUser
+	-- 프리즘 확정 뽑기(몇 번째 뽑기인가 — 2026-09-28 사용자 "프리즘은 20/40번째에 확정으로", 같은 날 10·20에서 바꿈). 더 받을 프리즘이 없으면 골드
+	property table BuyPrismAt = { 20, 40 }
 
-	-- 프리즘 천장(2026-09-24 사용자 "뽑기에서 프리즘이 안 나오면 다음 뽑기 프리즘 확률 +2%, 나오면 0%에서 다시, 2개 다 뽑으면 끝"):
-	--   이번 판 뽑기 프리즘 확률 = BuyPrismBase + 추가분(BuyPrismPity — 프리즘 없이 뽑을 때마다 +BuyPrismPityStep, 프리즘이 나오면 0). 늘어난 만큼 브·실·골은 비율대로 줄어든다
-	@Sync
-	property SyncTable<string, number> BuyPrismPity
+	-- 프리즘 확정이 아닌 뽑기의 등급 확률(%) — 합 100(2026-09-28 사용자 "프리즘 확률은 그대로 실버로 이전, 골드 10% 유지")
+	property table BuyGradeRates = { bronze = 50, silver = 40, gold = 10 }
 
-	property number BuyPrismBase = 5
+	-- 라운드 지급 브론즈~골드의 단계(2026-09-28 사용자 "라운드에서 주는 건 항상 III 레벨" — 뽑기는 그대로 I 50 · II 35 · III 15% 굴림)
+	property number RoundLevel = 3
 
-	-- 뽑기 등급 기본 확률(%) — 프리즘 BuyPrismBase 5와 합 100. 프리즘 천장으로 프리즘 확률이 오르면 나머지는 이 비율대로 줄어든다(2026-09-27 사용자: 전 75.5/15/4.5)
-	property table BuyGradeRates = { bronze = 50, silver = 35, gold = 10 }
+	-- 유닛 한 명에 지정할 수 있는 증강 수 상한(브론즈~골드·특수 코어·직업 프리즘 모두 셈 — 유닛 상세 '증강 n' 탭 개수, 2026-09-28 사용자 "모든 캐릭터는 증강을 최대 30개까지만")
+	property number UnitAugMax = 30
 
-	property number BuyPrismPityStep = 2
+	-- 클라: 증강 선택 창에서 받자마자 지정할 유닛(마지막에 고른 것 — 다음 선택 창에도 그대로). 0 = 미지정. 방출·교체(엔티티 Id가 다름)·증강 가득이면 PickTarget이 0으로 돌린다
+	property number PickNo = 0
+
+	property string PickUnitId = ""
+
+	-- 클라: 방금 받은 것이 바로 지정(또는 팬텀 해금)이라 보유 탭으로 가지 않고 선택 창에 남는가 — 다음 선택지가 오면 이어서, 없으면 닫는다
+	property boolean ChosenStay = false
 
 	-- 클라: 3택1 창을 접어 둠 — 자동으로 다시 열지 않고 HUD '펼치기'로 연다(선택지가 모두 없어지면 풀림)
 	property boolean PickFolded = false
@@ -151,15 +158,32 @@ script RtsAugmentLogic extends Logic
 		return out
 	end
 
-	-- 증강을 이 유닛에 지정할 수 있는가(서버 검사·클라 칩 표시 공용): 직업 프리즘 = 같은 직업·아직 없는 프리즘, 특수 코어 = 같은 코어 없음
+	-- 유저 userId의 유닛 no에 지정된 증강 수(보유 목록 기준 — 유닛 상세 '증강 n' 탭과 같은 개수)
+	method number CountForUnit(string userId, number no)
+		local n = 0
+		local k = math.floor(no + 0.5)
+		for _, item in ipairs(self:GetOwned(userId or "")) do
+			if math.floor(item.no + 0.5) == k then n = n + 1 end
+		end
+		return n
+	end
+
+	-- 이 유닛의 증강이 상한(UnitAugMax)에 찼는가
+	method boolean IsUnitFull(any u)
+		if u == nil then return false end
+		return self:CountForUnit(u.Owner, u.No) >= self.UnitAugMax
+	end
+
+	-- 증강을 이 유닛에 지정할 수 있는가(서버 검사·클라 칩 표시 공용): 증강 UnitAugMax개 미만, 직업 프리즘 = 같은 직업·아직 없는 프리즘, 특수 코어·중복 불가 증강(거인 학살자) = 같은 것 없음
 	method boolean CanAssignTo(string id, any u)
 		if u == nil then return false end
 		local d = _RtsAugmentTableLogic:GetDef(id)
 		if d == nil or d.unlock ~= nil then return false end
+		if self:IsUnitFull(u) then return false end
 		if d.job ~= nil and d.job ~= "" then
 			return u.JobId == d.job and not _RtsJobTableLogic:HasPrism(u, id)
 		end
-		if d.core then
+		if d.core or d.unique then
 			for q in string.gmatch(u.Augs or "", "[^,]+") do
 				if q == id then return false end
 			end
@@ -175,7 +199,7 @@ script RtsAugmentLogic extends Logic
 		local grade = _RtsAugmentTableLogic:GradeForStage(n)
 		if grade == "" then return end
 		for userId, zone in pairs(_RtsZoneLogic.ZoneByUser) do
-			if _RtsRunResultLogic:IsAlive(userId) then self:Offer(userId, grade) end
+			if _RtsRunResultLogic:IsAlive(userId) then self:OfferEx(userId, grade, false, self.RoundLevel) end
 		end
 	end
 
@@ -184,22 +208,24 @@ script RtsAugmentLogic extends Logic
 	method void OnBossDown(string userId, number stageNo)
 		if userId == "" or not _RtsAugmentTableLogic:IsPrismStage(stageNo) then return end
 		-- 자쿰(첫 프리즘 보스)이 준 프리즘만 전체에서 선택, 나머지 보스는 무작위 3장(2026-09-27 사용자 "자쿰 한정으로 자쿰이 준 프리즘만 선택 가능")
-		self:OfferEx(userId, "prism", _RtsAugmentTableLogic:IsPrismPickStage(stageNo))
+		self:OfferEx(userId, "prism", _RtsAugmentTableLogic:IsPrismPickStage(stageNo), 0)
 	end
 
+	-- 뽑기(RequestBuy): 브론즈~골드는 단계를 굴린다
 	@ExecSpace("ServerOnly")
 	method void Offer(string userId, string grade)
-		self:OfferEx(userId, grade, false)
+		self:OfferEx(userId, grade, false, 0)
 	end
 
-	-- pickAll = true면 프리즘 선택지를 무작위 3장 대신 아직 없는 프리즘 전체로(자쿰 처치 보상 — OnBossDown, 2026-09-27)
+	-- pickAll = true면 프리즘 선택지를 무작위 3장 대신 아직 없는 프리즘 전체로(자쿰 처치 보상 — OnBossDown, 2026-09-27).
+	--   level = 브론즈~골드 단계(1~3 고정 — 라운드 지급은 RoundLevel 3), 0이면 처음 켤 때 굴림(뽑기)
 	@ExecSpace("ServerOnly")
-	method void OfferEx(string userId, string grade, boolean pickAll)
+	method void OfferEx(string userId, string grade, boolean pickAll, number level)
 		if self.Queue[userId] == nil then self.Queue[userId] = {} end
 		local q = self.Queue[userId]
 		local token = (self.NextPendingToken[userId] or 0) + 1
 		self.NextPendingToken[userId] = token
-		q[#q + 1] = { token = token, grade = grade, packed = "", pickAll = pickAll }
+		q[#q + 1] = { token = token, grade = grade, packed = "", pickAll = pickAll, level = level }
 		if (self.OfferByUser[userId] or "") == "" then self:PopNext(userId) end
 		self:SyncPending(userId)
 	end
@@ -256,7 +282,7 @@ script RtsAugmentLogic extends Logic
 		end
 		-- 브론즈~골드(2026-09-27 사용자 "단계까지만 무작위, 종류는 선택"): 처음 켤 때 단계(I/II/III)를 굴려 그 단계의 종류 전부를 선택지로. 다시 켜면 굴린 단계 그대로
 		local ids = self:ParseOffer(item.packed).ids
-		if #ids == 0 then ids = _RtsAugmentTableLogic:StatChoices(item.grade, 0) end
+		if #ids == 0 then ids = _RtsAugmentTableLogic:StatChoices(item.grade, item.level or 0) end
 		item.packed = item.grade .. "|" .. table.concat(ids, ",") .. "|" .. string.format("%d", item.token)
 		self.OfferByUser[userId] = item.packed
 	end
@@ -296,21 +322,67 @@ script RtsAugmentLogic extends Logic
 		self:RequestBrowsePending(token)
 	end
 
-	-- 클라: '받기' 누름 — 지금 보이는 제안을 '방금 고름'으로 적고 서버에 수령 요청
+	-- 클라: 선택 창에서 받자마자 지정할 유닛 번호 — 고른 유닛이 방출·교체(같은 번호에 다른 엔티티)됐거나 증강이 가득이면 미지정(0)으로 돌린다
 	@ExecSpace("ClientOnly")
-	method void ChooseFromPopup(number idx)
-		if _RtsStageLogic.Paused then
-			_RtsHudLogic:ShowHintFor("일시정지를 해제한 뒤 증강을 받을 수 있어요", 3)
-			return
+	method number PickTarget()
+		if self.PickNo <= 0 then return 0 end
+		local u = _RtsUnitLogic:GetMyUnit(self.PickNo)
+		if u == nil or u.Entity == nil or not isvalid(u.Entity) or u.Entity.Id ~= self.PickUnitId or self:IsUnitFull(u) then
+			_RtsConfigLogic:Log("RtsAugment: pick target " .. string.format("%d", math.floor(self.PickNo + 0.5)) .. " gone -> none")
+			self.PickNo = 0
+			self.PickUnitId = ""
+			return 0
 		end
-		self.ChosenOffer = self.ShownOffer
-		self.ChosenAt = _UtilLogic.ElapsedSeconds
-		self:RequestChoose(idx, self.ShownOffer)
+		return self.PickNo
 	end
 
-	-- 선택 수령(idx = 1~선택지 수 — 브론즈·실버 4, 골드 5, 프리즘 3, 자쿰 프리즘은 전체). 팬텀은 바로 해금(-1), 나머지는 미지정(0)
+	-- 클라: 선택 창의 캐릭터 칩을 누름(0 = 지정 안 함)
+	@ExecSpace("ClientOnly")
+	method void SetPickTarget(number no)
+		local u = nil
+		if no > 0 then u = _RtsUnitLogic:GetMyUnit(no) end
+		if u == nil or u.Entity == nil or not isvalid(u.Entity) then
+			self.PickNo = 0
+			self.PickUnitId = ""
+			return
+		end
+		self.PickNo = no
+		self.PickUnitId = u.Entity.Id
+	end
+
+	-- 클라: 이 증강을 받으면 고른 유닛에 바로 지정되는가(받기 버튼 글자·수령 요청 공용)
+	@ExecSpace("ClientOnly")
+	method boolean WillAssign(string id)
+		local no = self:PickTarget()
+		if no <= 0 then return false end
+		return self:CanAssignTo(id, _RtsUnitLogic:GetMyUnit(no))
+	end
+
+	-- 클라: '받기' 누름 — 지금 보이는 제안을 '방금 고름'으로 적고 서버에 수령 요청(고른 유닛에 지정할 수 있으면 그 번호도 함께).
+	--   돌려주는 값 = 받은 뒤 보유 탭에서 따로 지정할 일이 없는가(바로 지정·팬텀 해금) — 그러면 선택 창에 남아 다음 선택지로 이어 간다
+	@ExecSpace("ClientOnly")
+	method boolean ChooseFromPopup(number idx)
+		if _RtsStageLogic.Paused then
+			_RtsHudLogic:ShowHintFor("일시정지를 해제한 뒤 증강을 받을 수 있어요", 3)
+			return false
+		end
+		local id = self:ParseOffer(self.ShownOffer).ids[idx]
+		if id == nil then return false end
+		local no = 0
+		if self:WillAssign(id) then no = self:PickTarget() end
+		local d = _RtsAugmentTableLogic:GetDef(id)
+		local stay = no > 0 or (d ~= nil and d.unlock ~= nil)
+		self.ChosenOffer = self.ShownOffer
+		self.ChosenAt = _UtilLogic.ElapsedSeconds
+		self.ChosenStay = stay
+		self:RequestTake(idx, self.ShownOffer, no)
+		return stay
+	end
+
+	-- 선택 수령(idx = 1~선택지 수 — 브론즈~골드 4장(골드 III 5장), 프리즘 3, 자쿰 프리즘은 전체). 팬텀은 바로 해금(-1), no ≥ 1이면 그 유닛에 바로 지정(안 되면 미지정 0)
+	--   (2026-09-28 RequestChoose에 인자 no가 붙어 새 이름 — 분석기가 인자 수를 캐시한다, 메모리 msw-engine)
 	@ExecSpace("Server")
-	method void RequestChoose(number idx, string expectedOffer)
+	method void RequestTake(number idx, string expectedOffer, number no)
 		if _RtsStageLogic.Paused then return end  -- 일시정지 중 게임 조작 막기(2026-09-25 사용자 "전부 막기")
 		local userId = senderUserId
 		if userId == nil or userId == "" or not _RtsRunResultLogic:IsAlive(userId) then return end
@@ -324,11 +396,13 @@ script RtsAugmentLogic extends Logic
 		local d = _RtsAugmentTableLogic:GetDef(id)
 		if d == nil then return end
 		local list = self:GetOwned(userId)
-		local no = 0
-		if d.unlock ~= nil then no = -1 end
-		list[#list + 1] = { id = id, no = no }
+		local item = { id = id, no = 0 }
+		if d.unlock ~= nil then item.no = -1 end
+		list[#list + 1] = item
+		-- 바로 지정: 내 유닛이고 지정할 수 있으면(아니면 미지정으로 보유 — 클라가 본 뒤 그새 가득 찼거나 방출됐을 때)
+		if item.no == 0 and no ~= nil and no >= 1 and no == math.floor(no) then self:AssignItem(userId, item, no) end
 		self.OwnedByUser[userId] = self:PackOwned(list)
-		_RtsConfigLogic:Log("RtsAugment: " .. userId .. " took " .. id)
+		_RtsConfigLogic:Log("RtsAugment: " .. userId .. " took " .. id .. " -> " .. string.format("%d", math.floor(item.no + 0.5)))
 		local q = self.Queue[userId] or {}
 		for qi, item in ipairs(q) do
 			if item.token == offer.token then table.remove(q, qi) break end
@@ -344,13 +418,19 @@ script RtsAugmentLogic extends Logic
 		local userId = senderUserId
 		if userId == nil or userId == "" or not _RtsRunResultLogic:IsAlive(userId) then return end
 		local list = self:GetOwned(userId)
-		local i = math.floor(k + 0.5)
-		local item = list[i]
-		if item == nil or item.no ~= 0 then return end
+		local item = list[math.floor(k + 0.5)]
+		if not self:AssignItem(userId, item, no) then return end
+		self.OwnedByUser[userId] = self:PackOwned(list)
+	end
+
+	-- 보유 목록의 미지정 한 칸(item)을 유닛 no에 지정 — 되면 item.no = no(보유 문자열 저장은 부르는 쪽). 없는 유닛·다른 직업 프리즘·같은 코어·증강 가득이면 false
+	@ExecSpace("ServerOnly")
+	method boolean AssignItem(string userId, table item, number no)
+		if item == nil or item.no ~= 0 then return false end
 		local e = _RtsUnitLogic:GetUnit(userId, no)
-		if e == nil or not isvalid(e) then return end
+		if e == nil or not isvalid(e) then return false end
 		local u = e.RtsUnitComponent
-		if not self:CanAssignTo(item.id, u) then return end
+		if not self:CanAssignTo(item.id, u) then return false end
 		local d = _RtsAugmentTableLogic:GetDef(item.id)
 		if d.job ~= nil and d.job ~= "" then
 			_RtsUnitLogic:ApplyPrism(userId, no, item.id)
@@ -359,8 +439,8 @@ script RtsAugmentLogic extends Logic
 			_RtsUnitLogic:OnChanged(no, _RtsUnitLogic:GetMeso(userId), userId)
 		end
 		item.no = no
-		self.OwnedByUser[userId] = self:PackOwned(list)
 		_RtsConfigLogic:Log("RtsAugment: " .. userId .. " assigned " .. item.id .. " -> unit " .. string.format("%d", math.floor(no + 0.5)))
+		return true
 	end
 
 	-- 유닛 방출(RtsUnitLogic.RequestDismiss): 그 유닛에 지정된 증강 소멸
@@ -385,32 +465,52 @@ script RtsAugmentLogic extends Logic
 		self.NextPendingToken[userId] = 0
 		self.PendingByUser[userId] = 0
 		self.BuyCountByUser[userId] = 0
-		self.BuyPrismByUser[userId] = 0
-		self.BuyPrismPity[userId] = 0
 	end
 
-	-- 다음 뽑기의 프리즘 확률(%) — 더 얻을 프리즘이 없으면 0
-	method number BuyPrismRate(string userId)
-		if self:BuyPrismLeft(userId) <= 0 then return 0 end
-		local p = self.BuyPrismBase + (self.BuyPrismPity[userId] or 0)
-		if p > 100 then p = 100 end
-		return p
+	-- nth번째 뽑기가 프리즘 확정 뽑기인가(BuyPrismAt)
+	method boolean IsPrismDraw(number nth)
+		local n = math.floor(nth + 0.5)
+		for _, at in ipairs(self.BuyPrismAt) do
+			if at == n then return true end
+		end
+		return false
 	end
 
-	-- 이번 판에 뽑기로 더 얻을 수 있는 프리즘 수(서버·클라 공용)
-	method number BuyPrismLeft(string userId)
-		local left = self.BuyPrismMax - (self.BuyPrismByUser[userId] or 0)
-		if left < 0 then left = 0 end
-		return left
-	end
-
-	-- 다음 뽑기 가격(서버·클라 공용)
-	method number BuyPrice(string userId)
+	-- 다음 프리즘 확정 뽑기까지 남은 횟수(그 뽑기 포함 — 다음 뽑기가 확정이면 1). 확정 뽑기가 더 없으면 0(서버·클라 공용)
+	method number BuyPrismIn(string userId)
 		local n = self.BuyCountByUser[userId] or 0
-		return self.BuyBase + self.BuyStep * n
+		for _, at in ipairs(self.BuyPrismAt) do
+			if at > n then return at - n end
+		end
+		return 0
 	end
 
-	-- 서버: 증강 뽑기 — 살아 있고 판 진행 중(카운트다운·진행), 메소 ≥ 가격이면(고르지 않은 선택지 수 제한 없음 — 2026-09-27) 메소 차감 → 등급 굴림 → 그 등급 선택지(Offer — 브론즈~골드는 단계만 무작위·종류는 선택, 프리즘은 무작위 3장 중 선택)
+	-- 이 유저가 더 받을 프리즘이 있는가(직업 프리즘·팬텀을 다 가지면 없음 — 특수 코어는 늘 남는다)
+	method boolean HasPrismLeft(string userId)
+		local ex = {}
+		for _, item in ipairs(self:GetOwned(userId)) do
+			local d = _RtsAugmentTableLogic:GetDef(item.id)
+			if d ~= nil and not d.core then ex[d.id] = true end
+		end
+		return _RtsAugmentTableLogic:HasAny("prism", ex)
+	end
+
+	-- 다음 뽑기의 프리즘 확률(%) — 확정 뽑기이고 받을 프리즘이 남아 있으면 100, 아니면 0(서버 RequestBuy·클라 뽑기 화면 공용)
+	method number BuyPrismRate(string userId)
+		if not self:IsPrismDraw((self.BuyCountByUser[userId] or 0) + 1) then return 0 end
+		if not self:HasPrismLeft(userId) then return 0 end
+		return 100
+	end
+
+	-- 다음 뽑기 가격(서버·클라 공용) = min(BuyPriceCap, BuyBase + BuyStep × (이번 판에 뽑은 횟수 + 1))
+	method number BuyPrice(string userId)
+		local n = math.floor((self.BuyCountByUser[userId] or 0) + 0.5)
+		local price = self.BuyBase + self.BuyStep * (n + 1)
+		if price > self.BuyPriceCap then price = self.BuyPriceCap end
+		return math.floor(price + 0.5)
+	end
+
+	-- 서버: 증강 뽑기 — 살아 있고 판 진행 중(카운트다운·진행), 메소 ≥ 가격이면(고르지 않은 선택지 수 제한 없음 — 2026-09-27) 메소 차감 → 등급(확정 프리즘 또는 굴림) → 그 등급 선택지(Offer — 브론즈~골드는 단계만 무작위·종류는 선택, 프리즘은 무작위 3장 중 선택)
 	@ExecSpace("Server")
 	method void RequestBuy()
 		if _RtsStageLogic.Paused then return end  -- 일시정지 중 게임 조작 막기(2026-09-25 사용자 "전부 막기")
@@ -422,38 +522,19 @@ script RtsAugmentLogic extends Logic
 		local meso = _RtsUnitLogic:GetMeso(userId)
 		if meso < price then return end
 		_RtsUnitLogic.MesoByUser[userId] = meso - price
-		self.BuyCountByUser[userId] = (self.BuyCountByUser[userId] or 0) + 1
-		-- 등급: 먼저 프리즘(기본 5% + 천장 추가분), 아니면 나머지를 BuyGradeRates(브론즈 50 · 실버 35 · 골드 10 — 합 95) 비율로
-		local prismRate = self:BuyPrismRate(userId)
-		local r = _UtilLogic:RandomDouble() * 100
+		-- 등급: 프리즘 확정 뽑기(20·40번째 — 받을 프리즘이 없으면 골드)면 프리즘, 아니면 BuyGradeRates(브론즈 50 · 실버 40 · 골드 10)
+		local nth = (self.BuyCountByUser[userId] or 0) + 1
 		local grade = "bronze"
-		if r < prismRate then
-			grade = "prism"
+		if self:IsPrismDraw(nth) then
+			grade = "gold"
+			if self:BuyPrismRate(userId) >= 100 then grade = "prism" end
 		else
 			local g = self.BuyGradeRates
-			local sum = g.bronze + g.silver + g.gold
-			local rr = (r - prismRate) / (100 - prismRate) * sum
+			local rr = _UtilLogic:RandomDouble() * (g.bronze + g.silver + g.gold)
 			if rr >= g.bronze + g.silver then grade = "gold" elseif rr >= g.bronze then grade = "silver" end
 		end
-		-- 뽑기 프리즘 상한(BuyPrismMax)을 다 채웠으면 골드(BuyPrismRate가 0이라 사실상 안 옴)
-		if grade == "prism" and self:BuyPrismLeft(userId) <= 0 then grade = "gold" end
-		-- 프리즘인데 더 나올 게 없으면(직업 프리즘·팬텀을 다 가짐 — 특수 코어는 늘 남음) 골드로
-		if grade == "prism" then
-			local ex = {}
-			local owned = self:GetOwned(userId)
-			for i = 1, #owned do
-				local d = _RtsAugmentTableLogic:GetDef(owned[i].id)
-				if d ~= nil and not d.core then ex[d.id] = true end
-			end
-			if not _RtsAugmentTableLogic:HasAny("prism", ex) then grade = "gold" end
-		end
-		if grade == "prism" then
-			self.BuyPrismByUser[userId] = (self.BuyPrismByUser[userId] or 0) + 1
-			self.BuyPrismPity[userId] = 0
-		elseif self:BuyPrismLeft(userId) > 0 then
-			self.BuyPrismPity[userId] = (self.BuyPrismPity[userId] or 0) + self.BuyPrismPityStep
-		end
-		_RtsConfigLogic:Log("RtsAugment: " .. userId .. " bought " .. grade .. " for " .. string.format("%d", price))
+		self.BuyCountByUser[userId] = nth
+		_RtsConfigLogic:Log("RtsAugment: " .. userId .. " draw #" .. string.format("%d", nth) .. " " .. grade .. " for " .. string.format("%d", price))
 		self:Offer(userId, grade)
 	end
 
@@ -536,7 +617,8 @@ script RtsAugmentLogic extends Logic
 		if packed ~= self.ChosenOffer then self.ChosenOffer = "" end
 		if packed == "" then self.PickFolded = false end
 		if justChosen then
-			if _RtsPopupLogic.Kind == "pick" then _RtsPopupLogic:Close() end
+			-- 바로 지정했으면(ChosenStay) 선택 창을 그대로 두고 다음 선택지(없으면 닫힘)를 기다린다 — 서버가 옛 제안으로 온 요청은 거절해 두 번 받히지 않는다
+			if _RtsPopupLogic.Kind == "pick" and not self.ChosenStay then _RtsPopupLogic:Close() end
 		elseif packed ~= "" and (self.PickFolded or _RtsPopupLogic.Kind == "draw") then
 			-- 접어 둠: 자동으로 열지 않는다(HUD '펼치기')
 		elseif packed ~= "" and (packed ~= self.ShownOffer or _RtsPopupLogic.Kind ~= "pick") then
