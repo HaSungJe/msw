@@ -64,16 +64,16 @@ assets/design/characters/<character-id>/
 
 | 무엇 | 어디 |
 |---|---|
-| 적용 직업·액션 → 프레임 RUID 목록 | `RtsJobTableLogic.HasMageSkin(jobId)` · `GetMageSkinFrames(jobId)` |
-| 프레임별 재생 시간 | `RtsJobTableLogic.GetMageSkinFrameDurations(jobId)` (직업별 장수·시간은 `docs/design/unit-motion.md`) |
-| 흉상 | `RtsJobTableLogic.GetMagePortraitRUID(jobId)` → 상세정보 `RtsUnitPopupLogic.SpawnPreviewAt`(180×180) · 선택창 `RtsPopupLogic.BuildRecruitInfo`(140×140) |
+| 적용 직업·액션 → 프레임 RUID 목록 | `RtsJobTableLogic.JobDefs[jobId].frames` (읽기 `GetMageSkinFrames(jobId)`) — 2026-09-28 직업 정의 표로 통합 |
+| 프레임별 재생 시간 | `JobDefs[jobId].frameSec` (읽기 `GetMageSkinFrameDurations(jobId)`) (직업별 장수·시간은 `docs/design/unit-motion.md`) |
+| 흉상 | `JobDefs[jobId].portrait` (읽기 `GetMagePortraitRUID(jobId)`) → 상세정보 `RtsUnitPopupLogic.SpawnPreviewAt`(180×180) · 선택창 `RtsPopupLogic.BuildRecruitInfo`(140×140) |
 | 월드 표시 | `RtsUnitComponent.SetupMageSkin` · `PlayMageAction` · `DrawMageSkin` (대기도 시계를 돌리고 시간표를 반복한다) |
 | 시전·대기 복귀 | `RtsSkillFxLogic.PlayCast` · `ReturnStand` · `CheckLoops` (비숍 디바인 퍼니시먼트는 `PlayMageLoop`로 5장 반복, 매 공격마다 시계를 초기화하지 않음) |
-| 기본 아바타 빼기 | `RtsUnitLogic.SpawnUnit` (`HasMageSkin(jobId)`이면 AvatarRenderer·CostumeManager를 붙이지 않는다) |
+| 기본 아바타 | 없음 — 모든 유닛이 원화 프레임만 쓴다(아바타 대체 외형·`HasMageSkin`·`GetCostume`은 2026-09-28 삭제) |
 
 - 캔버스: 대기 576×576·발 (288,512), 기본 공격 704×704·발 (352,640). 다크나이트 스피어 버스터 승인본은 긴 창을 깊게 뻗기 위해 832×832·발 (416,768)을 사용한다. 픽셀당 로컬 0.002유닛 — 무기 때문에 캔버스가 커져도 캐릭터 배율은 같다.
 - 업로드는 msw-mcp 두 단계(`assets/textures/README.md` 절차). 같은 RUID에 덮어쓰지 않고 **새 RUID**로 올려 표를 바꾼다(Maker 캐시).
-- 다른 직업은 적용 직업·프레임·시간·흉상 표에 새 분기를 추가한다. 기존 직업의 표를 덮어쓰지 않는다.
+- 새 직업은 `JobDefs`에 항목(이름·능력치·frames·frameSec·portrait 등)을 하나 추가한다. 기존 직업의 표를 덮어쓰지 않는다.
 
 ## 5. 적용 확인 (Maker)
 

@@ -1,7 +1,7 @@
 # 코드베이스 교통정리 계획
 
 - 요청: 2026-09-28 사용자 "프로젝트 코드베이스 확인하고 불필요한 부분들 제거하고, 통합할 부분은 통합해서 교통정리좀하자"
-- 상태: **대기** — 사용자 결정 "모바일 작업 끝날 때까지 전부 대기". 모바일 보드 표시 작업(RtsBoardViewLogic·UI/RtsUiLayoutLogic 신규, 전투·유닛·팝업·HUD 등 15개 파일 수정)이 커밋된 뒤 시작한다.
+- 상태: **완료(2026-09-28, 커밋 전)** — 아래 '결과'. 처음엔 사용자 결정 "모바일 작업 끝날 때까지 전부 대기". 모바일 보드 표시 작업(RtsBoardViewLogic·UI/RtsUiLayoutLogic 신규, 전투·유닛·팝업·HUD 등 15개 파일 수정)이 커밋된 뒤 시작한다.
 - 시작 전: 이 문서의 줄 번호는 2026-09-28 분석 시점 기준이라 모바일 커밋 뒤 달라진다. 항목마다 이름으로 다시 찾고, 모바일 작업이 새로 쓰기 시작한 것은 없는지 호출처를 다시 확인한 뒤 지운다(`deadscan` 방식: 메서드·속성 이름을 주석 제외 전체 .mlua + .ui/.map/.model에서 검색).
 - 검증: 단계마다 Maker stop → refresh → save → build 로그(에러 0, 기존 경고 외 새 경고 없음) → Play → 전투·영입·증강·상세창·보스 한 판 확인. 데미지 공식 통합은 BossDps가 전과 같은 값을 내는지 11직업 × 프리즘 유무로 대조(balance-calc rotation_dps 0.3% 안 유지).
 
@@ -114,3 +114,18 @@
 - 깨진 참조: balance.md의 augment-prism-spec.md, assets/design/README(없는 260925-world-thumbnail, 빠진 characters·ui·effects), assets/textures/README의 빈 보관 폴더 경로, archive/design-cleanup-260925 README(하위 폴더 7개가 비어 있음)
 - 유지: `.claude/skills` ↔ `.agents/skills`(Claude·Codex 둘 다 사용), assets/theme-concepts(문서가 링크), promo mp4, dotorb 프레임, 타일셋의 안 쓰는 타일 6개(Maker에서만 — 인덱스로 칠해졌을 수 있음)
 - git 기록 크기(≈370MB)는 파일을 지워도 줄지 않는다 — 이력 재작성은 하지 않는다
+
+## 결과 (2026-09-28)
+
+- 코드 29개 파일 −2,008 / +1,019줄(게임 코드 .mlua 합계 약 18,000줄). 저장소 파일 약 280개 삭제(≈55MB), 도구 8개 삭제.
+- 검증: Maker build 에러 0(경고 12개 = 정리 전과 같은 종류). Play에서 웨이브가 끝까지 돌고 영입·영입 상세(오각형)·증강 뽑기·도감·프로필 창을 열어 오류 0.
+  상세창 보스 DPS는 정리 전 BossDps 코드를 그대로 Maker에서 같이 돌려 11직업 × 프리즘 유무 22경우 **차이 0**, tools/balance-calc.py rotation_dps와 0.5% 안(프리즘 잠금 반영).
+  직업 정의 표(JobDefs) 조회값 11직업 전부 정리 전 getter와 같음(원화 RUID 250개·시간표 35개 기계 대조).
+- 유닛을 쓰는 전투·스킬 연출·상세창은 시험 스폰 금지라 Maker에서 돌리지 못했다 — 사용자 플레이 확인 필요.
+- 의도한 동작 변화: ① 쿨타임 기록 미삭제 버그 수정(RtsCombatLogic.StopLoop) ② 원화 유닛이 돌아설 때 쉐도우 파트너 그림자·루프 클립이 따라 뒤집히게(RtsUnitComponent.ApplyFace — 아바타가 없어 일찍 끝나던 것) ③ 상세창 '증강으로 오른 수치'의 "보스 데미지" → "보스 공격 시 데미지"(StatLines로 통일) ④ 게임 끝 안내 "다시하기는 오른쪽 아래" → "왼쪽 아래"(실제 위치).
+- 계획과 다르게 한 것: 방어율 감소(shred) 장치는 유지(코드에 '일부러 남겨 둠', 몬스터 정보 창 디버프까지 연결 — 대비 코드 결정 목록에 없음). docs/theme-presets.md ↔ docs/design/theme-presets.md는 합치지 않음(절차 문서와 ChatGPT 디자인 가이드라인 — design-handoff 규칙상 따로). 디자인 문서 7곳의 상태 줄 중복은 캐릭터 원화 작업 문서라 손대지 않음.
+  하지 않은 것: 레벨 비용 블록 생성기 이전(생성 구역 변경 위험), 몬스터 icon 필드 생성기 삭제(효과 작음), 적중 적용 3벌 통합(쉐도우 파트너·지대의 차이가 의도일 수 있음), PlayHitFxAt의 안 쓰는 crit 인자(RPC 시그니처 캐시), 증강·버프 EffectText 통합(형식이 다름), Layout.ActionKey 키캡(모양이 다름).
+- 새 공용 함수: RtsJobTableLogic JobDefs·JobDef·PerHit·SkillBossRatio·BossMul·SkillOrder·CappedAugCount / RtsAugmentTableLogic StatLines·HasAny / RtsThemeLogic TabsOf·FindPreset / RtsConfigLogic ZoneColRow / RtsBootstrapLogic GroundTilemap·GroundBounds /
+  RtsBoardViewLogic BoardChild·AimPoint / RtsZoneLogic CellDistance(세계 좌표 ÷ 칸) / RtsUnitLogic UnitFootDy·UnitFootPos·GetZoneUnit(양쪽) / RtsSkillFxLogic SpawnOneShot·ProjectileSprite /
+  RtsHudLogic SpawnKeyCap·SpawnButtonKeyCap·AddVScroll·PaintButton·Atan2·SetSegment·SetRightTri·SplitTri·TextLines·TextLinesRough·ColGoldInk / RtsPopupLogic SpawnButton·TabColors·GradeIcon / RtsUnitSelectLogic SpawnPadMarkers.
+- 원래 있던 사소한 표시 문제(이번에 생긴 것 아님): 영입 상세 스킬 목록 오른쪽 위 [Tab] 키캡이 목록에 반쯤 가린다.

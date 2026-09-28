@@ -107,11 +107,6 @@ script RtsZoneLogic extends Logic
 		return Vector2(x, y)
 	end
 
-	method boolean IsRoadCell(number col, number row)
-		self:EnsurePath()
-		return self.RoadSet[self:CellKey(col, row)] == true
-	end
-
 	-- 발판 = 그리드 안의 트랙·보스 영역이 아닌 칸(트랙 인접 여부 무관 — 2026-09-23 사용자)
 	method boolean IsPadCell(number col, number row)
 		self:EnsurePath()
@@ -134,9 +129,9 @@ script RtsZoneLogic extends Logic
 		return self:GetCellCenter(zone, self.BossAreaCol + (self.BossAreaCols - 1) / 2, self.BossAreaRow + (self.BossAreaRows - 1) / 2)
 	end
 
-	-- 8방향 칸 거리 = 열·행 차이 중 큰 값 (사거리 판정의 기준)
-	method number CellDistance(number c1, number r1, number c2, number r2)
-		return math.max(math.abs(c1 - c2), math.abs(r1 - r2))
+	-- 8방향 칸 거리(체비쇼프) = 두 점(세계·보드 좌표)의 가로·세로 차이 중 큰 값 ÷ 칸 크기 — 사거리 판정(RtsCombatLogic)·투사체 포물선 높이(RtsSkillFxLogic) 공용
+	method number CellDistance(number x1, number y1, number x2, number y2)
+		return math.max(math.abs(x1 - x2), math.abs(y1 - y2)) / _RtsConfigLogic:GetGridCell()
 	end
 
 	-- ===== 트랙 =====
@@ -171,18 +166,6 @@ script RtsZoneLogic extends Logic
 		return Vector2(pa.x + (pb.x - pa.x) * frac, pa.y + (pb.y - pa.y) * frac)
 	end
 
-	method number GetSpawnT()
-		return 0
-	end
-
-	method Vector2 GetSpawnPoint(number zone)
-		return self:GetTrackPoint(zone, 0)
-	end
-
-	method Vector2 GetEndPoint(number zone)
-		return self:GetTrackPoint(zone, 1)
-	end
-
 	-- 비석 자리(RtsRunResultLogic.SpawnTomb): 구역 화면 중앙. 이름은 Phase 7 보스 자리 시절 그대로 — 보스는 이제 보스 영역(GetBossAreaCenter)
 	method Vector2 GetBossPoint(number zone)
 		return _RtsConfigLogic:GetZoneCenter(zone)
@@ -195,11 +178,6 @@ script RtsZoneLogic extends Logic
 		return #self.PadList
 	end
 
-	-- 이름 유지(로드맵 #14 참조) — 값은 발판 수
-	method number GetPlacementSlotCount()
-		return self:GetPadCount()
-	end
-
 	-- index번째 발판 칸 (1~81, 범위 밖은 양끝으로 고정). x=col, y=row
 	method Vector2 GetPadCell(number index)
 		self:EnsurePath()
@@ -208,11 +186,6 @@ script RtsZoneLogic extends Logic
 		if index > n then index = n end
 		local p = self.PadList[index]
 		return Vector2(p[1], p[2])
-	end
-
-	method Vector2 GetPlacementSlot(number zone, number index)
-		local p = self:GetPadCell(index)
-		return self:GetCellCenter(zone, p.x, p.y)
 	end
 
 	-- ===== 배정 (서버 권위) =====
@@ -272,7 +245,7 @@ script RtsZoneLogic extends Logic
 		if self.VisualsBuilt then return end
 		local mapRoot = _RtsBoardViewLogic:GetRoot()
 		if mapRoot == nil then return end
-		if _EntityService:GetEntityByPath("/maps/RtsMap/RtsBoard/ZoneGrid1") ~= nil then
+		if _RtsBoardViewLogic:BoardChild("ZoneGrid1") ~= nil then
 			self.VisualsBuilt = true
 			return
 		end
@@ -323,7 +296,7 @@ script RtsZoneLogic extends Logic
 		local old = self.DecorCountByZone[n] or 0
 		local i = 1
 		while true do
-			local e = _EntityService:GetEntityByPath("/maps/RtsMap/RtsBoard/ZoneDecor" .. string.format("%d_%d", n, i))
+			local e = _RtsBoardViewLogic:BoardChild("ZoneDecor" .. string.format("%d_%d", n, i))
 			if e == nil and i > old then break end
 			if e ~= nil then e:Destroy() end
 			i = i + 1
@@ -352,7 +325,7 @@ script RtsZoneLogic extends Logic
 		if ruid == nil or ruid == "" then return end
 		local n = math.floor(zone + 0.5)
 		local name = "ZoneBackground" .. string.format("%d", n)
-		local bg = _EntityService:GetEntityByPath("/maps/RtsMap/RtsBoard/" .. name)
+		local bg = _RtsBoardViewLogic:BoardChild(name)
 		if bg == nil then
 			local mapRoot = _RtsBoardViewLogic:GetRoot()
 			if mapRoot == nil then return end
@@ -371,7 +344,7 @@ script RtsZoneLogic extends Logic
 	-- 트랙 판(구역 하나): 이미 세워진 ZoneGrid{n}의 텍스처·색만 바꾼다(RtsThemeLogic.ApplyToZone)
 	@ExecSpace("ServerOnly")
 	method void SetZoneGrid(number zone, string ruid, Color tint)
-		local grid = _EntityService:GetEntityByPath("/maps/RtsMap/RtsBoard/ZoneGrid" .. string.format("%d", math.floor(zone + 0.5)))
+		local grid = _RtsBoardViewLogic:BoardChild("ZoneGrid" .. string.format("%d", math.floor(zone + 0.5)))
 		if grid == nil or grid.SpriteRendererComponent == nil then return end
 		grid.SpriteRendererComponent.SpriteRUID = ruid
 		grid.SpriteRendererComponent.Color = tint

@@ -70,7 +70,7 @@ MSW(Maker 26.7) 실측으로 확인한 엔진 동작. 다시 실측하면 30분�
 - Priority: takes precedence over defaults
 
 ## 이펙트에 무기가 그려진 스킬은 시전 중 캐릭터 무기를 숨긴다 (hideWeapon)
-- Rule: 원작 스킬 이펙트 중엔 검·창 같은 무기 그림이 이펙트 안에 들어 있는 것이 있다(레이징 블로우 1121008/effect — 금색 대검). 이런 스킬은 캐릭터의 실제 무기가 옆에 따로 튀어나와 어색하므로 fx에 `hideWeapon = true`(+ `hideWeaponSec`, 없으면 clipLife → 0.9)를 주면 `RtsSkillFxLogic.HideWeapon`이 `AvatarRendererComponent:SetAvatarPartColor(MapleAvatarItemCategory.TwoHandedWeapon/OneHandedWeapon, 1,1,1, 0)`로 무기 파츠를 투명하게 하고 `ShowDefaultWeaponEffects = false`로 무기 잔상(노란 궤적)도 끈다. 한손/두손 구분은 `GetCostume(jobId).weapon1h`. 연속 공격 중엔 복구 타이머를 매 시전마다 미뤄 깜빡이지 않고, 공격이 끊긴 뒤 hideWeaponSec 지나면 alpha 1·잔상 on으로 복구(`HideTimer[unit.Id]`).
+- Rule(2026-09-28 폐기 — 아바타 대체 외형과 `HideWeapon` 삭제, 원화엔 따로 그린 무기가 없다. 아래는 기록): 원작 스킬 이펙트 중엔 검·창 같은 무기 그림이 이펙트 안에 들어 있는 것이 있다(레이징 블로우 1121008/effect — 금색 대검). 이런 스킬은 캐릭터의 실제 무기가 옆에 따로 튀어나와 어색하므로 fx에 `hideWeapon = true`(+ `hideWeaponSec`, 없으면 clipLife → 0.9)를 주면 `RtsSkillFxLogic.HideWeapon`이 `AvatarRendererComponent:SetAvatarPartColor(MapleAvatarItemCategory.TwoHandedWeapon/OneHandedWeapon, 1,1,1, 0)`로 무기 파츠를 투명하게 하고 `ShowDefaultWeaponEffects = false`로 무기 잔상(노란 궤적)도 끈다. 한손/두손 구분은 `GetCostume(jobId).weapon1h`. 연속 공격 중엔 복구 타이머를 매 시전마다 미뤄 깜빡이지 않고, 공격이 끊긴 뒤 hideWeaponSec 지나면 alpha 1·잔상 on으로 복구(`HideTimer[unit.Id]`).
 - Scope: project
 - Rationale: User 2026-09-19 — "캐릭터의 기본 칼이 저 레이징 블로우 애니메이션에 가려지는 게 맞는 것 같아" → 적용 후 "지금 딱 좋아. 스킬 애니메이션 발동 시 무기 가림 처리 필요한 것도 나중에 있을 수 있겠네, 메모리에 적어놔". 새 스킬 이펙트를 등록할 때 클립 썸네일에 무기 그림이 있으면 hideWeapon 후보로 검토.
 - Priority: takes precedence over defaults

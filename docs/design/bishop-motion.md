@@ -47,7 +47,7 @@
 | frames/divine-punishment/motion05.png | `9345eeebfda54f2690c9849661bcd988` |
 | portrait.png | `778abb348ac2432eb2ca8916a0ce24b9` |
 
-`RtsJobTableLogic.HasMageSkin/GetMageSkinFrames/GetMageSkinFrameDurations/GetMagePortraitRUID`가 연결 기준이다. `RtsUnitComponent`는 대기 반복과 공격 시간표를 재생하고 좌우 방향을 맞춘다. `RtsSkillFxLogic.PlayCast/ReturnStand/CheckLoops`가 단발·반복 공격과 복귀를 제어한다.
+`RtsJobTableLogic.JobDefs`의 그 직업 항목(frames·frameSec·portrait — 2026-09-28 직업 정의 표로 통합, 전엔 HasMageSkin/GetMageSkinFrames/GetMageSkinFrameDurations/GetMagePortraitRUID 분기)이 연결 기준이다. `RtsUnitComponent`는 대기 반복과 공격 시간표를 재생하고 좌우 방향을 맞춘다. `RtsSkillFxLogic.PlayCast/ReturnStand/CheckLoops`가 단발·반복 공격과 복귀를 제어한다.
 
 ## 제작·확인
 

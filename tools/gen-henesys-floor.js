@@ -1,4 +1,4 @@
-// 헤네시스 풀밭 바닥 — 256px 무이음새, 연두 램프 (gen-snow-floor.js 노이즈 구조 재사용)
+// 헤네시스 풀밭 바닥 — 256px 무이음새, 연두 램프 (옛 gen-snow-floor.js 노이즈 구조 재사용 — 그 생성기는 2026-09-28 정리로 삭제)
 //   2026-09-14 사용자 지시: 트랙/타일 배경을 헤네시스로. 밝은 연두 잔디 + 미세 풀결 + 옅은 명암 덩어리
 // 사용: node gen-henesys-floor.js <out.png>
 const zlib = require('zlib');

@@ -139,7 +139,7 @@ script RtsUiLayoutLogic extends Logic
 				local dy = b[2] - a[2]
 				local k = size / 24
 				local line = H:SpawnUI("model://uisprite", "RtsIconStroke", root, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2((a[1] + b[1]) * k / 2, (a[2] + b[2]) * k / 2), Vector2(math.sqrt(dx * dx + dy * dy) * k + 1, 1.8 * k))
-				line.UITransformComponent.UIRotation = Vector3(0, 0, math.atan(dy, dx) * 180 / math.pi)
+				line.UITransformComponent.UIRotation = Vector3(0, 0, math.deg(H:Atan2(dy, dx)))
 				H:SetUiColor(line, H:ColGold(), "border")
 				line.SpriteGUIRendererComponent.RaycastTarget = false
 			end
@@ -228,10 +228,9 @@ script RtsUiLayoutLogic extends Logic
 		self._T.Rail = rail
 		for i, slot in ipairs(H.UnitSlots) do slot.box.Parent:AttachTo(rail) end
 		self._T.UnitPager = self:Pager(rail,"hudUnits",{},{size=3,cols=1,x=0,y=0,dy=124,navX=0,navY=0,w=300})
+		-- 숨김 보관 칸: 유저 카드 목록(PlayersBox)은 유저 목록 창(BuildPage "players")에서만 보이고, 창을 닫으면 여기로 돌아온다(ReleasePage)
 		self._T.Hidden = H:SpawnUI("model://uisprite", "RtsLegacyHudState", H.HudGroup, Vector2(0, 0), Vector2(0, 0), Vector2.zero, Vector2(1, 1))
 		self._T.Hidden:SetEnable(false)
-		H.RecruitBtn.Parent:AttachTo(self._T.Hidden)
-		H.AugBtn.Parent:AttachTo(self._T.Hidden)
 		H.PlayersBox:AttachTo(self._T.Hidden)
 		self._T.Shortcuts = H:SpawnUI("model://uisprite", "RtsProfileShortcuts", H.HudGroup, Vector2(0, 1), Vector2(0, 1), Vector2(28, -492), Vector2(300, 92))
 		H:Tint(self._T.Shortcuts, 1, 1, 1, 0)
@@ -270,7 +269,7 @@ script RtsUiLayoutLogic extends Logic
 		local room = math.max(0, math.min(_RtsStageTableLogic:RecruitLimit(_RtsStageLogic.StageNo), _RtsUnitLogic:GetMaxUnits()) - owned)
 		local ready = _RtsStageLogic.RunState == "running" and _RtsRunResultLogic:IsMeAlive() and room > 0
 		H:SetUiText(self._T.Actions[3].label,(owned == 0 and ready) and "유닛 영입" or "유닛")
-		local recruit = H.RecruitText.TextComponent.Text
+		local recruit = H.RecruitText
 		if ready then recruit = "영입 가능 " .. H:Int(room) .. "명" end
 		if recruit == "" or recruit == "영입 불가" then recruit = "영입" end
 		local recruitAction = self._T.Actions[1]
@@ -356,7 +355,6 @@ script RtsUiLayoutLogic extends Logic
 			self:Rect(self._T.PlayersAction.box.Parent,0,1,0,0,side.left,88)
 			self:RailAction(self._T.PlayersAction,side.left,88)
 			H:PlaceMobile(self._T.Rail,v,1,1,0,-488,side.right,440,1)
-			H:PlaceMobile(H.SpeedBox, v, 1, 0, 0, 94, 212, 92, 1.25)
 			H:PlaceMobile(H.HudGroup:GetChildByName("RtsUiModeSwitch"),v,1,0,0,0,212,64,1.4)
 			H:PlaceMobile(H.Hint,v,0.5,1,0,-12,760,64,1)
 			H:PlaceMobile(H.VotePanel.Parent, v, 0.5, 1, 0, -220, 420, 160, 1)
@@ -379,7 +377,6 @@ script RtsUiLayoutLogic extends Logic
 			_RtsPopupLogic:RefreshMobilePopup()
 		end
 		self._T.Rail:SetEnable(not mobile and S.MenuNo == 0 and not placing)
-		H.SpeedBox:SetEnable(false)
 		H.HudGroup:GetChildByName("RtsUiModeSwitch"):SetEnable(true)
 		if self._T.ModeLabels ~= nil then
 			for mode, label in pairs(self._T.ModeLabels) do

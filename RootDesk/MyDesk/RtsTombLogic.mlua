@@ -17,34 +17,18 @@ script RtsTombLogic extends Logic
 		}
 	end
 
+	-- 조회는 테마와 같은 공용 함수(RtsThemeLogic.TabsOf·FindPreset)
 	method table GetTabs()
-		local out = {}
-		local seen = {}
-		local list = self:GetPresets()
-		for i = 1, #list do
-			local t = list[i].tab or "기본"
-			if not seen[t] then
-				seen[t] = true
-				out[#out + 1] = t
-			end
-		end
-		return out
+		return _RtsThemeLogic:TabsOf(self:GetPresets())
 	end
 
 	method boolean HasKey(string key)
-		local list = self:GetPresets()
-		for i = 1, #list do
-			if list[i].key == key then return true end
-		end
-		return false
+		return _RtsThemeLogic:FindPreset(self:GetPresets(), key) ~= nil
 	end
 
 	-- 없는 키면 기본 비석
 	method table GetPreset(string key)
 		local list = self:GetPresets()
-		for i = 1, #list do
-			if list[i].key == key then return list[i] end
-		end
-		return list[1]
+		return _RtsThemeLogic:FindPreset(list, key) or list[1]
 	end
 end

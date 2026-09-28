@@ -78,11 +78,7 @@ script RtsBossLogic extends Logic
 		end
 		-- 제자리 고정: 트랙 걷기 멈춤(Paused) + 보스 영역. 영역 가운데 상자(BossFitCells칸 정사각)를 보스 수만큼 가로로 나눈 슬롯에 그림이 들어가게 맞추고, 몸 가운데(피격 박스 중심)를 슬롯 가운데에
 		local w = e.RtsTrackWalkerComponent
-		if w ~= nil then
-			w.BossMode = true
-			w.Loop = false
-			w.Paused = true
-		end
+		if w ~= nil then w.Paused = true end
 		local count = 1
 		local st = _RtsStageTableLogic:GetStage(stageNo)
 		if st ~= nil and st.mobs ~= nil then count = #st.mobs end
@@ -116,7 +112,6 @@ script RtsBossLogic extends Logic
 			-- 체력바 폭 = 슬롯 폭(2체면 서로 겹치지 않게)
 			m.BossBarFit = slotW - 0.12
 		end
-		if w ~= nil then w.YOffset = 0 - by end
 		e.TransformComponent.WorldPosition = Vector3(cx - bx, cy - by, 0)
 		list[#list + 1] = e
 	end
@@ -162,17 +157,6 @@ script RtsBossLogic extends Logic
 			if self.ByZone[z] ~= nil and not self.Down[z] then return end
 		end
 		_RtsStageLogic:ScheduleEarlyEnd()
-	end
-
-	-- 보스가 E에 닿음(RtsTrackWalkerComponent) → 그 구역 탈락. 2026-09-23부터 보스는 제자리 고정(Paused)이라 안 불린다 — 걷는 보스를 되살릴 때 쓰려고 남김
-	@ExecSpace("ServerOnly")
-	method void OnBossReachedEnd(number zone)
-		local z = math.floor(zone + 0.5)
-		if self.Down[z] then return end
-		local owner = _RtsRunResultLogic:OwnerOfZone(z)
-		if owner == "" or not _RtsRunResultLogic:IsAlive(owner) then return end
-		_RtsRunResultLogic:Eliminate(owner, "boss", self:DamagePct(z))
-		self:CheckAllDown()
 	end
 
 	-- 스테이지 시간이 끝났을 때 보스가 남은 구역 → 탈락
@@ -222,14 +206,12 @@ script RtsBossLogic extends Logic
 		self.Down[z] = nil
 	end
 
+	-- 전 구역 보스 제거(구역마다 ClearZone) + 표 초기화
 	@ExecSpace("ServerOnly")
 	method void ClearAll()
-		for z, list in pairs(self.ByZone) do
-			for i = 1, #list do
-				local e = list[i]
-				if e ~= nil and isvalid(e) then e:Destroy() end
-			end
-		end
+		local zones = {}
+		for z, list in pairs(self.ByZone) do zones[#zones + 1] = z end
+		for i = 1, #zones do self:ClearZone(zones[i]) end
 		self.ByZone = {}
 		self.MaxHpByZone = {}
 		self.Down = {}

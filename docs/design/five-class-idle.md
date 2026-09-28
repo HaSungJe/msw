@@ -22,6 +22,6 @@
 
 기준 비숍과 새 대기는 [동일 발 기준 비교](../../.beaver/output/five-class-idle/idle-comparison.jpg)로 확인한다. [전체 재생 미리보기](../../.beaver/output/five-class-motion/preview.html), [대기 재생 GIF](../../.beaver/output/five-class-idle/idle-preview.gif), [팬텀 투척 GIF](../../.beaver/output/five-class-idle/phantom-throw.gif).
 
-프롬프트·참조·생성 원본·정렬 기록은 `.beaver/output/five-class-idle/`과 `.beaver/output/phantom-joker-throw/`에 둔다. 반려된 기존 대기는 `five-class-idle/previous/`, 회전 컷은 `phantom-joker-throw/rejected-rotation/`에 보관했다. 이전 회전 모션과 첫 투척 시안은 현재 사용 자산이 아니다. 현재 파일 목록·해시·재생 정보는 각 직업의 `motion.json` 및 `.beaver/output/five-class-motion/manifest.json`을 따른다.
+프롬프트·참조·생성 원본·정렬 기록은 `.beaver/output/five-class-idle/`과 `.beaver/output/phantom-joker-throw/`에 둔다. 반려된 기존 대기(`five-class-idle/previous/`)와 회전 컷(`phantom-joker-throw/rejected-rotation/`)은 2026-09-28 저장소 정리로 삭제했다(git 이력 2817953 이전 커밋에 남음). 이전 회전 모션과 첫 투척 시안은 현재 사용 자산이 아니다. 현재 파일 목록·해시·재생 정보는 각 직업의 `motion.json` 및 `.beaver/output/five-class-motion/manifest.json`을 따른다.
 
 후속 적용: 팔라딘·다크나이트는 업로드·게임 연결·Maker 검증 완료(docs/design/paladin-dark-knight-motion.md). 나이트로드·섀도어도 전용 PNG에 연결했다(docs/design/night-lord-shadower-motion.md). 팬텀은 기존 아바타 동작을 유지한다.

@@ -1,171 +1,187 @@
 -- Phase 2 #6 (부분, 2026-09-15): 직업 정의 단일 소스 — .info/character.md의 히어로·팔라딘·다크나이트 그대로.
 --   비용 곡선은 .info/level.md, DPS 계산은 .info/balance-detail.md 규칙(방어율 제외)과 동일. 목업(hud-layout.html v27)의 JOBS/COST와 1:1.
---   궁수 이하 나머지 직업은 정의가 생기면 여기에 추가한다(외형 세트가 없는 직업은 스폰하지 않는다).
+--   11직업(모험가 10 + 히든 팬텀) — 직업 기본 정보·원화는 JobDefs, 스킬은 GetSkillsRaw, 능력치는 GetStatRaw, 프리즘은 GetPrisms·ApplyPrism*.
 @Logic
 script RtsJobTableLogic extends Logic
 
 	property number MaxLevel = 50
 
-	method boolean HasMageSkin(string jobId)
-		-- 원화 적용 직업: 서버 스폰과 클라이언트 표시가 같은 분기를 사용한다.
-		return jobId == "il" or jobId == "fp" or jobId == "bishop" or jobId == "hero" or jobId == "marks" or jobId == "bow" or jobId == "paladin" or jobId == "dk" or jobId == "nl" or jobId == "shad" or jobId == "phantom"
+	-- ===== 직업 정의 한 곳(2026-09-28 정리 — 전엔 이름·계열·공격력·속도·무기·흉상·원화 프레임·티어·오각형을 직업마다 if문 12벌로 나눠 적었다) =====
+	--   name 이름 / series 계열(war·arc·mag·thf — HUD 슬롯 색·영입 열, 해적 pir은 출시 때) / faction 소속(adv 모험가 · hero 영웅 — GetRecruitFactions)
+	--   atk 1레벨 공격력 · atkLv 레벨업당 공격력 · speed 공격속도 이름(character.md 능력치) / weapon 무기(.info/weapon.md — GetWeaponRange)
+	--   tier 직업 티어(.info/tier.md: 1 히어로·나이트로드·썬콜·보우마스터 / 2 섀도어·팬텀·불독·신궁·다크나이트 / 4 팔라딘·비숍 — 증강 효과 배율·방어구 부수기·오각형 증강 효율)
+	--   radar 오각형 보스·사냥 단계(GetRadar — tools/balance-calc.py --radar) / portrait 선택창·상세정보 공용 흉상 RUID
+	--   frames 원화 프레임(동작 → 스프라이트 RUID 목록 — 대기 stand1은 3장 호흡을 01→02→01→03으로) · frameSec 장마다 표시 초(기존 효과 시작·타격 시점과 시전 전체 길이를 유지)
+	--   원화가 없는 직업은 두지 않는다(2026-09-28 아바타 대체 외형 삭제 — 11직업 모두 전용 원화)
+	property table JobDefs = {}
+
+	method void EnsureJobs()
+		if self.JobDefs.hero ~= nil then return end
+		self.JobDefs = {
+			hero = {
+				name = "히어로", series = "war", faction = "adv", atk = 40, atkLv = 12, speed = "보통", weapon = "두손검", tier = 1,
+				radar = { boss = 4, hunt = 5 }, portrait = "01d1da2e721b4dd893e314ef3d64e2e1",
+				frames = {
+					stand1 = { "6142e6907e054a4c86bda1719698af21", "66beab16ed794e27b49a33ee52a82b18", "6142e6907e054a4c86bda1719698af21", "f5ce5824f3a24e069ec0a523028c7f79" },
+					swingO3 = { "aac52a1acd1f414d9aa9f68167aeb2d0", "a302b38cd51543059e46a3162b209b02", "1b789ed0b21f404297592ca1bd0666af", "29beedf569f7412483c02c99e0e5fe2e", "cdd8a42144c949979ef9a7d1b0fa9e51", "be37495f3da24fa1ba32404daeb1c998", "bfe48ef4838c4d16a3f86ee914cf9440", "b9daa2a09e874aeea2a82b15cfb328ca" },
+					enragedRagingBlow = { "b64a6805781448eb875ea1d4629f3bc5", "77faeca61b3e4bec80ec0a66faee52e6", "29bc48d64e1f4f78bb56cc0948dda058", "f8199840321d4eed9bfd3395afcc8a77", "591f6cf9adb34a099a3f435b2e40dbc4", "8ce4f50c18a04c93b060320e30f68858", "a992dea232544bdd972d0978a94b25fd" },
+				},
+				frameSec = { stand1 = { 0.65, 0.45, 0.65, 0.45 }, swingO3 = { 0.06, 0.18, 0.06, 0.12, 0.06, 0.12, 0.18, 0.12 }, enragedRagingBlow = { 0.18, 0.12, 0.12, 0.08, 0.12, 0.08, 0.20 } },
+			},
+			paladin = {
+				name = "팔라딘", series = "war", faction = "adv", atk = 80, atkLv = 10, speed = "느림", weapon = "양손둔기", tier = 4,
+				radar = { boss = 1, hunt = 2 }, portrait = "0e14a7ba1554474fb46cb13ab22bdbfb",
+				frames = {
+					stand1 = { "17e0e0811cd742bea27591ffbc9b723b", "019b667361c1459c819353dcc5a0ed8b", "17e0e0811cd742bea27591ffbc9b723b", "2838ebd8b5d044a693a4c43b0bf77879" },
+					paladinCharge = { "a5be5b20b9d8440ab5af38cc595ba2f8", "1db1a18d2bde472c88e72ab3d70d14bf", "6c9a71053f3a4f259dd41e270e4c94bd", "a17d41771324411b9d1b0b78ddb1bb74", "cc366fbe0bdb40a38b6efd846aaccb48", "af6ec8fb94ae40f4abb3002779fc8994" },
+					paladinSanctuary = { "cdcbfe6d6e9146a6a1920baa69b90751", "86cd9fda03684baabc4bfdfe050fac74", "ba408ac01fcd4974a5b9d15fb910cdf0", "16619a38e9104bd99c5bc0a0b59a3096", "0a9d251c2a494888a0f1ebc47927bb15", "371429c6ddab4a1cb26d06fa3149bea6" },
+				},
+				frameSec = {
+					stand1 = { 0.65, 0.45, 0.65, 0.45 },
+					paladinCharge = { 0.15, 0.15, 0.08, 0.1, 0.1, 0.17 },
+					paladinSanctuary = { 0.2, 0.2, 0.1, 0.12, 0.13, 0.15 },
+				},
+			},
+			dk = {
+				name = "다크나이트", series = "war", faction = "adv", atk = 50, atkLv = 10, speed = "느림", weapon = "창", tier = 2,
+				radar = { boss = 1, hunt = 3 }, portrait = "bc09a2f673ba42b6b5989e4ac39a0fc5",
+				frames = {
+					stand1 = { "8e918f5a58d84f0880f30802e53ec1cb", "a97d69b1da2244c3bbe72930a3215557", "8e918f5a58d84f0880f30802e53ec1cb", "469c0c8e7bab4319a830615eb520aa25" },
+					dkBuster = { "0e1c9aecd84f4c10984932aa52441481", "0e1c9aecd84f4c10984932aa52441481", "a1c730f53f0249449329a6c5751e3df3", "6fbf840e8da146fd8951de0e68f631c4", "5a4ae361c00240128dab626b00cd7ca7", "d05450084ea54dc7a22c4a61f1b3d42f", "2aac0b1ea953485085c7c0b53fc4dbf4", "d05450084ea54dc7a22c4a61f1b3d42f" },
+					dkRoar = { "ed125f0a1730494d95c759927e035556", "310c4f9feeb3407597dcce8138e66cd5", "7005c13026024b839785ebf274ca4ea9", "b95f492ef7bf43a2ab0243d81ea9bc20", "9c54e19b80b54384a2950c3f9905f560", "1374b63a6fe14ee2ab0d200b61bf0e97" },
+					dkGiantBuster = { "0e1c9aecd84f4c10984932aa52441481", "0e1c9aecd84f4c10984932aa52441481", "a1c730f53f0249449329a6c5751e3df3", "6fbf840e8da146fd8951de0e68f631c4", "5a4ae361c00240128dab626b00cd7ca7", "d05450084ea54dc7a22c4a61f1b3d42f", "2aac0b1ea953485085c7c0b53fc4dbf4", "0e1c9aecd84f4c10984932aa52441481", "a1c730f53f0249449329a6c5751e3df3", "6fbf840e8da146fd8951de0e68f631c4", "5a4ae361c00240128dab626b00cd7ca7", "d05450084ea54dc7a22c4a61f1b3d42f", "2aac0b1ea953485085c7c0b53fc4dbf4", "d05450084ea54dc7a22c4a61f1b3d42f" },
+				},
+				frameSec = {
+					stand1 = { 0.65, 0.45, 0.65, 0.45 },
+					dkBuster = { 0.6, 0.05, 0.08, 0.07, 0.08, 0.07, 0.1, 0.15 },
+					dkRoar = { 0.2, 0.2, 0.2, 0.2, 0.25, 0.35 },
+					dkGiantBuster = { 0.6, 0.05, 0.04, 0.035, 0.04, 0.035, 0.04, 0.035, 0.04, 0.035, 0.04, 0.035, 0.04, 0.135 },
+				},
+			},
+			-- 비숍 기준 비율, 수평 연사 / 한쪽 무릎 수직 발사
+			bow = {
+				name = "보우마스터", series = "arc", faction = "adv", atk = 30, atkLv = 10, speed = "매우빠름", weapon = "활", tier = 1,
+				radar = { boss = 5, hunt = 1 }, portrait = "0d124c8828044ba4b8d71180f2e2fca6",
+				frames = {
+					stand1 = { "20a3afc8702c4b478b70a5eb76bcd3a7", "013e5b1037874974935618356a372dee", "20a3afc8702c4b478b70a5eb76bcd3a7", "81223efd1c2847b19a2e8c92bcc93fce" },
+					bowHurricane = { "0b766b43e5f84d84abb7c9c031786b2a", "7bf344e5fbc5490088eafdac9b65aad1", "cd2aab758bb7458ca5003bfa49d6914e", "02b3c4cf488349e3b7f26a253b8a95e4", "1531464fb7ac46c1823c6f4359eb8bb5" },
+					bowArrowRain = { "cd51066174ca4ce7a6694df2a80c614c", "2a8ceb574fa6403c9a071969cbc08352", "f35b316092b542f28eea52ce90d989b9", "f00254a942224e439a7ac033c8df2a12", "2a8ceb574fa6403c9a071969cbc08352" },
+				},
+				frameSec = { stand1 = { 0.65, 0.45, 0.65, 0.45 }, bowHurricane = { 0.04, 0.04, 0.04, 0.04, 0.04 }, bowArrowRain = { 0.04, 0.04, 0.04, 0.04, 0.04 } },
+			},
+			-- 비숍 엔젤레이 기준으로 승인된 짧은 비율. 대기·피어싱·저격을 같은 발 원점으로 재생 — 저격은 첫 타격까지 조준하고 타격 간격에 맞춰 반동·조준을 반복
+			marks = {
+				name = "신궁", series = "arc", faction = "adv", atk = 30, atkLv = 9, speed = "느림", weapon = "석궁", tier = 2, -- 약점 = 공격력(2026-09-24 사용자 "신궁은 기본 공격력과 크뎀을 줘야") — 50 → 30, 레벨업 15 → 9(×0.6), 스킬 비율 ×5/3
+				radar = { boss = 1, hunt = 4 }, portrait = "bb8c6be33ae64a9f96d8a3f74ea7f459",
+				frames = {
+					stand1 = { "f3d13c1096a4466fa0154d8c0a032ca5", "73152d7bbf474ed08b8441ddf46d92e4", "f3d13c1096a4466fa0154d8c0a032ca5", "c25f3c31ebe04277bbad8010778e38b2" },
+					marksPiercing = { "34222457fabf49608e90f1680d79af32", "3f730e1b307447b2bf80927eb79844e5", "2bbbc8fe20664dbfaa6576011cf5c39c", "1a7cbdc7d002482d9f2144afb1347cd3", "7b0535e0a23e43d0a43a254ce0801f85", "610392408b3b42f4966e8b90b2fe4f8b" },
+					marksSniping = { "2772f8130f1a46daa41ccb0c3cf5646c", "c844fb0acc594a37b6ac4ea5f49b7eaa", "a53258bcb9d445e79bd1a32c888ee2ea", "c844fb0acc594a37b6ac4ea5f49b7eaa", "a53258bcb9d445e79bd1a32c888ee2ea", "c844fb0acc594a37b6ac4ea5f49b7eaa", "a53258bcb9d445e79bd1a32c888ee2ea", "c844fb0acc594a37b6ac4ea5f49b7eaa", "a53258bcb9d445e79bd1a32c888ee2ea", "c844fb0acc594a37b6ac4ea5f49b7eaa", "a53258bcb9d445e79bd1a32c888ee2ea", "c844fb0acc594a37b6ac4ea5f49b7eaa", "a53258bcb9d445e79bd1a32c888ee2ea", "c844fb0acc594a37b6ac4ea5f49b7eaa", "a53258bcb9d445e79bd1a32c888ee2ea", "c844fb0acc594a37b6ac4ea5f49b7eaa", "a53258bcb9d445e79bd1a32c888ee2ea", "c844fb0acc594a37b6ac4ea5f49b7eaa", "a53258bcb9d445e79bd1a32c888ee2ea", "c844fb0acc594a37b6ac4ea5f49b7eaa", "a53258bcb9d445e79bd1a32c888ee2ea", "c844fb0acc594a37b6ac4ea5f49b7eaa", "79efce895d6245978f315c4d7561e6aa", "49e0863243a44656ac715f8442e02fba" },
+					marksTrueSniping = { "2772f8130f1a46daa41ccb0c3cf5646c", "c844fb0acc594a37b6ac4ea5f49b7eaa", "a53258bcb9d445e79bd1a32c888ee2ea", "c844fb0acc594a37b6ac4ea5f49b7eaa", "a53258bcb9d445e79bd1a32c888ee2ea", "c844fb0acc594a37b6ac4ea5f49b7eaa", "a53258bcb9d445e79bd1a32c888ee2ea", "c844fb0acc594a37b6ac4ea5f49b7eaa", "a53258bcb9d445e79bd1a32c888ee2ea", "c844fb0acc594a37b6ac4ea5f49b7eaa", "a53258bcb9d445e79bd1a32c888ee2ea", "c844fb0acc594a37b6ac4ea5f49b7eaa", "a53258bcb9d445e79bd1a32c888ee2ea", "c844fb0acc594a37b6ac4ea5f49b7eaa", "a53258bcb9d445e79bd1a32c888ee2ea", "c844fb0acc594a37b6ac4ea5f49b7eaa", "a53258bcb9d445e79bd1a32c888ee2ea", "c844fb0acc594a37b6ac4ea5f49b7eaa", "a53258bcb9d445e79bd1a32c888ee2ea", "c844fb0acc594a37b6ac4ea5f49b7eaa", "a53258bcb9d445e79bd1a32c888ee2ea", "c844fb0acc594a37b6ac4ea5f49b7eaa", "79efce895d6245978f315c4d7561e6aa", "49e0863243a44656ac715f8442e02fba" },
+				},
+				frameSec = {
+					stand1 = { 0.65, 0.45, 0.65, 0.45 },
+					marksPiercing = { 0.08, 0.09, 0.18, 0.09, 0.1, 0.16 },
+					marksSniping = { 0.1, 0.3, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.1, 0.1 },
+					marksTrueSniping = { 0.08, 0.28, 0.025, 0.025, 0.025, 0.025, 0.025, 0.025, 0.025, 0.025, 0.025, 0.025, 0.025, 0.025, 0.025, 0.025, 0.025, 0.025, 0.025, 0.025, 0.025, 0.025, 0.08, 0.1 },
+				},
+			},
+			il = {
+				name = "아크메이지(썬·콜)", series = "mag", faction = "adv", atk = 50, atkLv = 3, speed = "보통", weapon = "스태프", tier = 1,
+				radar = { boss = 3, hunt = 3 }, portrait = "f93cfcc7a46d428cb6ed2bb3d71fc986",
+				frames = {
+					stand1 = { "31f7d3dc8bde42d6905eca8ca3d3d3aa", "7480c71e7fc7406a89e74930c407ad87", "31f7d3dc8bde42d6905eca8ca3d3d3aa", "440ab4519beb44f39a820aab4d2ef864" },
+					swingO1 = { "f986bf2671c04e11b2f6aaf708f0c2bb", "63a019d7ca084d78b084c29536c14999", "02cde524cf654ae8b6000e402cbd0a4f", "ebdb54d66e9042ffa2a2d35dd4732c89", "de4d62586d274d28a336adf401e8ecde" },
+					swingO3 = { "3166883e4dbb4fe68eade2f2605468f1", "7b663ea7d9da42bf8a497213cca04848", "24bee0fe7428442196ecb31813b6ba59", "f1f16a077dee4a718e7f52d73545d2ae", "0ca54631539d40e7b708b9f9609daa7e" },
+				},
+				frameSec = { stand1 = { 0.65, 0.45, 0.65, 0.45 }, swingO1 = { 0.18, 0.12, 0.08, 0.07, 0.35 }, swingO3 = { 0.21, 0.09, 0.93, 0.09, 0.48 } },
+			},
+			fp = {
+				name = "아크메이지(불·독)", series = "mag", faction = "adv", atk = 20, atkLv = 5, speed = "보통", weapon = "스태프", tier = 2,
+				radar = { boss = 1, hunt = 2 }, portrait = "81c1c00cd1aa4ff3b08f9894b42c819b",
+				frames = {
+					stand1 = { "762ba8485e584f60a94bc71631ee7881", "43f43917582b4fe6848b525f32d69652", "762ba8485e584f60a94bc71631ee7881", "49312816d1bb4c2d87f0452e8af0f89b" },
+					poisonRegion = { "3d29ef1ad55541d2a91af4400a0a22ed", "4669d925ba604b28852c02b0baa4a567", "413bb52e0b4f47cabe7600bab0a89919", "d3360cf51ebf48e1ba9d5b9f1d58425e", "b987d27c6aba4867abfd690cf7960cd8" },
+					dotPunisher = { "61f1428a7d9d4bd7aa94d7f57ceb3ab2", "dfd12d4d6d1e4ab28d76cbb4e7779264", "1f61ca3ebc5e46a381af77bdadf5e3d3", "16de092651e1436cb7bffb5ec142d6c0", "2581e6d505a2401aab26d85c57cca9df" },
+				},
+				frameSec = { stand1 = { 0.65, 0.45, 0.65, 0.45 }, poisonRegion = { 0.25, 0.15, 0.30, 0.15, 0.35 }, dotPunisher = { 0.20, 0.15, 0.25, 0.15, 0.45 } },
+			},
+			bishop = {
+				name = "비숍", series = "mag", faction = "adv", atk = 20, atkLv = 5, speed = "보통", weapon = "완드", tier = 4,
+				radar = { boss = 1, hunt = 1 }, portrait = "778abb348ac2432eb2ca8916a0ce24b9",
+				frames = {
+					stand1 = { "99dcc70fd0c04167aa3c7bebdd72bb5b", "049e7e1c48364faca8efbed9ddca1afc", "99dcc70fd0c04167aa3c7bebdd72bb5b", "7b64b5c05ae444f8baab5737fdcff112" },
+					swingO1 = { "074de3777cbb42839c997bd1f1f958ae", "72e53ccff7c74860b1cf984fa020720d", "a68dc71362dd47119b9477d261175de5", "9781d9083bac4ea786fd95228d147f92", "2246d2a21d1948c1b1b57d56f7776d63" },
+					swingO3 = { "55f8fb5d2d4f45ab9bae87a6a79837af", "8814b38104ea4eb1bd7e4ee22e88fa0b", "97aab06bc9c64d6faa2caee8105443cd", "485d02497a384434a91be5a7396cac8c", "23f7adea4a5246f2995c3c1593b382ae" },
+					divinePunishment = { "fa8ad8e0822a45368697bc884853d364", "a235e087ff374bec8f71c2453dc31bdc", "bdd116091aa447d9927b5f7ed0375fab", "e5df8c553e8b4870a0db442531e0057b", "9345eeebfda54f2690c9849661bcd988" },
+				},
+				frameSec = { stand1 = { 0.65, 0.45, 0.65, 0.45 }, swingO1 = { 0.09, 0.06, 0.18, 0.12, 0.35 }, swingO3 = { 0.35, 0.15, 0.30, 0.15, 0.55 }, divinePunishment = { 0.15, 0.10, 0.15, 0.10, 0.30 } },
+			},
+			nl = {
+				name = "나이트로드", series = "thf", faction = "adv", atk = 20, atkLv = 5, speed = "빠름", weapon = "아대", tier = 1,
+				radar = { boss = 5, hunt = 1 }, portrait = "ccb44d85f142402da6de7b5c7ed67d94",
+				frames = {
+					stand1 = { "0eb5a0560215452fba5d11fa5b0dbd16", "53e0a2cf0bb940bbb7ed86cd65562037", "0eb5a0560215452fba5d11fa5b0dbd16", "e7f8edd9c9ee4898baaacc1f38ff33db" },
+					nlThrow = { "866e55971d3b4ebf96a3dab124e32e00", "5370617f4c2e403691279d424471f2b5", "697245aeab1a4ce9abfa1f1a9234d463", "6599b1f88ea84d7baf53b840da59667d", "03eb6091d1bb419e9d0cbd00a7db2e45", "6d729205cc984689b50da0c5fccc7fe8", "03eb6091d1bb419e9d0cbd00a7db2e45", "6d729205cc984689b50da0c5fccc7fe8", "67da87ba78dc4e95a0d8787a84935080", "aec7d0e3b7ad427b8bc1fd1ab906cdcb" },
+				},
+				frameSec = {
+					stand1 = { 0.65, 0.45, 0.65, 0.45 },
+					nlThrow = { 0.1, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.1, 0.15 },
+				},
+			},
+			shad = {
+				name = "섀도어", series = "thf", faction = "adv", atk = 30, atkLv = 6, speed = "매우빠름", weapon = "단검", tier = 2, -- 약점 = 공격력(2026-09-24 사용자 "섀도어 기본 공격력 낮게") — 50 → 30, 레벨업 10 → 6(×0.6), 스킬 비율 ×5/3
+				radar = { boss = 1, hunt = 1 }, portrait = "69652c3bf48b457d86e649a540eefc1e",
+				frames = {
+					stand1 = { "2753c58c1aaf413681834dc5d70ecac2", "96ed758328834446b5d9f9e7adebf101", "2753c58c1aaf413681834dc5d70ecac2", "fb4ae0f6c16e49459d28f99139523bf7" },
+					shadSavage = { "e0f64485b5db4a95aa412399d5790b00", "fb2887c0d0b443bda8d7f6d7dc3aaf21", "10a908c265d64f5aabbff97de72821ae", "476197fafcaa47938c2c0d9bf011bd45", "6292265f10a2488bac1ad7258df7034d", "238fb780543747a085ac1107d7aa765c", "476197fafcaa47938c2c0d9bf011bd45", "6292265f10a2488bac1ad7258df7034d", "f74189314f454aa683a7febdd268f0ae", "bc760d3a8ba7430f899b11057c4ace73" },
+					shadMeso = { "fbef7d6900ee489eb870bb29f04f962f", "c5379c189d674cff98b310cca14cad50", "4dc51fe6f8554aa3ae727777235460d4", "cbdb8dd7ecdd4bc796e6bb2b96a24e01", "24ee1e2b9952414d936e483b8ece07ae" },
+					shadDualblade = { "7200f4b75d9d43a0af2a735e6cd0ba8f", "70f2e87473434a68bd3ceb1f56bb41b2", "6c6fb1dbd7584b1d8eee7d4bda13ee29", "a4b7ae6b436f483b912330a657ad88d4", "ef741c7fc3cc4fdeb1d06a71d74ccc14", "0a36ccef0202492788c4283d6c52f545", "fc0570f63b4945f390bf4e03508a3416", "91f0a6cfb7c04e729e1a788a40d283ba" },
+				},
+				frameSec = {
+					stand1 = { 0.65, 0.45, 0.65, 0.45 },
+					shadSavage = { 0.1, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.03, 0.02 },
+					shadMeso = { 0.12, 0.18, 0.07, 0.08, 0.05 },
+					shadDualblade = { 0.15, 0.15, 0.1, 0.15, 0.2, 2.1, 0.2, 0.15 },
+				},
+			},
+			-- 히든 직업 — 프리즘 '영웅 팬텀'으로 영입 해금, 레벨업당 공격력 0
+			phantom = {
+				name = "팬텀", series = "thf", faction = "hero", atk = 100, atkLv = 0, speed = "매우빠름", weapon = "케인", tier = 2,
+				radar = { boss = 2, hunt = 2 }, portrait = "844dc3e58c214cfc9aafaee9d12c33dd",
+				frames = {
+					stand1 = { "283726be0d0e4cf7baf54840aae336f6", "0bfd511879954157ba0dbd9bfb8003d9", "283726be0d0e4cf7baf54840aae336f6", "862241619fc444eba0449187c43732a6" },
+					phantomJoker = { "744518d46677462a9676c54bac715c39", "34c76f3cdddb430291dc1a8bf6592cf7", "06752f5a312949e9932d573333d650b0", "243362d8c268465ea112983c96074d66", "1095f84d2bc0495cb23aff6b99ad8028", "e671da47876b4393abc19798852b594d", "4d67e5ce5ae84a7c8d561ac4859e12fe", "a4720376ddb54f6c9f41a83af69174b7" },
+				},
+				frameSec = { stand1 = { 0.65, 0.45, 0.65, 0.45 }, phantomJoker = { 0.06, 0.05, 0.04, 0.06, 0.04, 0.05, 0.05, 0.05 } },
+			},
+		}
 	end
 
-	-- 대기는 3장의 호흡 동작, 공격은 스킬마다 그린 연결 프레임을 재생한다.
+	method any JobDef(string jobId)
+		self:EnsureJobs()
+		return self.JobDefs[jobId]
+	end
+
 	@ExecSpace("ClientOnly")
 	method table GetMageSkinFrames(string jobId)
-		if jobId == "phantom" then
-			return {
-				stand1 = { "283726be0d0e4cf7baf54840aae336f6", "0bfd511879954157ba0dbd9bfb8003d9", "283726be0d0e4cf7baf54840aae336f6", "862241619fc444eba0449187c43732a6" },
-				phantomJoker = { "744518d46677462a9676c54bac715c39", "34c76f3cdddb430291dc1a8bf6592cf7", "06752f5a312949e9932d573333d650b0", "243362d8c268465ea112983c96074d66", "1095f84d2bc0495cb23aff6b99ad8028", "e671da47876b4393abc19798852b594d", "4d67e5ce5ae84a7c8d561ac4859e12fe", "a4720376ddb54f6c9f41a83af69174b7" },
-			}
-		end
-		if jobId == "nl" then
-			return {
-				stand1 = { "0eb5a0560215452fba5d11fa5b0dbd16", "53e0a2cf0bb940bbb7ed86cd65562037", "0eb5a0560215452fba5d11fa5b0dbd16", "e7f8edd9c9ee4898baaacc1f38ff33db" },
-				nlThrow = { "866e55971d3b4ebf96a3dab124e32e00", "5370617f4c2e403691279d424471f2b5", "697245aeab1a4ce9abfa1f1a9234d463", "6599b1f88ea84d7baf53b840da59667d", "03eb6091d1bb419e9d0cbd00a7db2e45", "6d729205cc984689b50da0c5fccc7fe8", "03eb6091d1bb419e9d0cbd00a7db2e45", "6d729205cc984689b50da0c5fccc7fe8", "67da87ba78dc4e95a0d8787a84935080", "aec7d0e3b7ad427b8bc1fd1ab906cdcb" },
-			}
-		end
-		if jobId == "shad" then
-			return {
-				stand1 = { "2753c58c1aaf413681834dc5d70ecac2", "96ed758328834446b5d9f9e7adebf101", "2753c58c1aaf413681834dc5d70ecac2", "fb4ae0f6c16e49459d28f99139523bf7" },
-				shadSavage = { "e0f64485b5db4a95aa412399d5790b00", "fb2887c0d0b443bda8d7f6d7dc3aaf21", "10a908c265d64f5aabbff97de72821ae", "476197fafcaa47938c2c0d9bf011bd45", "6292265f10a2488bac1ad7258df7034d", "238fb780543747a085ac1107d7aa765c", "476197fafcaa47938c2c0d9bf011bd45", "6292265f10a2488bac1ad7258df7034d", "f74189314f454aa683a7febdd268f0ae", "bc760d3a8ba7430f899b11057c4ace73" },
-				shadMeso = { "fbef7d6900ee489eb870bb29f04f962f", "c5379c189d674cff98b310cca14cad50", "4dc51fe6f8554aa3ae727777235460d4", "cbdb8dd7ecdd4bc796e6bb2b96a24e01", "24ee1e2b9952414d936e483b8ece07ae" },
-				shadDualblade = { "7200f4b75d9d43a0af2a735e6cd0ba8f", "70f2e87473434a68bd3ceb1f56bb41b2", "6c6fb1dbd7584b1d8eee7d4bda13ee29", "a4b7ae6b436f483b912330a657ad88d4", "ef741c7fc3cc4fdeb1d06a71d74ccc14", "0a36ccef0202492788c4283d6c52f545", "fc0570f63b4945f390bf4e03508a3416", "91f0a6cfb7c04e729e1a788a40d283ba" },
-			}
-		end
-		if jobId == "paladin" then
-			return {
-				stand1 = { "17e0e0811cd742bea27591ffbc9b723b", "019b667361c1459c819353dcc5a0ed8b", "17e0e0811cd742bea27591ffbc9b723b", "2838ebd8b5d044a693a4c43b0bf77879" },
-				paladinCharge = { "a5be5b20b9d8440ab5af38cc595ba2f8", "1db1a18d2bde472c88e72ab3d70d14bf", "6c9a71053f3a4f259dd41e270e4c94bd", "a17d41771324411b9d1b0b78ddb1bb74", "cc366fbe0bdb40a38b6efd846aaccb48", "af6ec8fb94ae40f4abb3002779fc8994" },
-				paladinSanctuary = { "cdcbfe6d6e9146a6a1920baa69b90751", "86cd9fda03684baabc4bfdfe050fac74", "ba408ac01fcd4974a5b9d15fb910cdf0", "16619a38e9104bd99c5bc0a0b59a3096", "0a9d251c2a494888a0f1ebc47927bb15", "371429c6ddab4a1cb26d06fa3149bea6" },
-			}
-		end
-		if jobId == "dk" then
-			return {
-				stand1 = { "8e918f5a58d84f0880f30802e53ec1cb", "a97d69b1da2244c3bbe72930a3215557", "8e918f5a58d84f0880f30802e53ec1cb", "469c0c8e7bab4319a830615eb520aa25" },
-				dkBuster = { "0e1c9aecd84f4c10984932aa52441481", "0e1c9aecd84f4c10984932aa52441481", "a1c730f53f0249449329a6c5751e3df3", "6fbf840e8da146fd8951de0e68f631c4", "5a4ae361c00240128dab626b00cd7ca7", "d05450084ea54dc7a22c4a61f1b3d42f", "2aac0b1ea953485085c7c0b53fc4dbf4", "d05450084ea54dc7a22c4a61f1b3d42f" },
-				dkRoar = { "ed125f0a1730494d95c759927e035556", "310c4f9feeb3407597dcce8138e66cd5", "7005c13026024b839785ebf274ca4ea9", "b95f492ef7bf43a2ab0243d81ea9bc20", "9c54e19b80b54384a2950c3f9905f560", "1374b63a6fe14ee2ab0d200b61bf0e97" },
-				dkGiantBuster = { "0e1c9aecd84f4c10984932aa52441481", "0e1c9aecd84f4c10984932aa52441481", "a1c730f53f0249449329a6c5751e3df3", "6fbf840e8da146fd8951de0e68f631c4", "5a4ae361c00240128dab626b00cd7ca7", "d05450084ea54dc7a22c4a61f1b3d42f", "2aac0b1ea953485085c7c0b53fc4dbf4", "0e1c9aecd84f4c10984932aa52441481", "a1c730f53f0249449329a6c5751e3df3", "6fbf840e8da146fd8951de0e68f631c4", "5a4ae361c00240128dab626b00cd7ca7", "d05450084ea54dc7a22c4a61f1b3d42f", "2aac0b1ea953485085c7c0b53fc4dbf4", "d05450084ea54dc7a22c4a61f1b3d42f" },
-			}
-		end
-		-- 보우마스터: 비숍 기준 비율, 수평 연사 / 한쪽 무릎 수직 발사.
-		if jobId == "bow" then
-			return {
-				stand1 = { "20a3afc8702c4b478b70a5eb76bcd3a7", "013e5b1037874974935618356a372dee", "20a3afc8702c4b478b70a5eb76bcd3a7", "81223efd1c2847b19a2e8c92bcc93fce" },
-				bowHurricane = { "0b766b43e5f84d84abb7c9c031786b2a", "7bf344e5fbc5490088eafdac9b65aad1", "cd2aab758bb7458ca5003bfa49d6914e", "02b3c4cf488349e3b7f26a253b8a95e4", "1531464fb7ac46c1823c6f4359eb8bb5" },
-				bowArrowRain = { "cd51066174ca4ce7a6694df2a80c614c", "2a8ceb574fa6403c9a071969cbc08352", "f35b316092b542f28eea52ce90d989b9", "f00254a942224e439a7ac033c8df2a12", "2a8ceb574fa6403c9a071969cbc08352" },
-			}
-		end
-		-- 신궁: 비숍 엔젤레이 기준으로 승인된 짧은 비율. 대기·피어싱·저격을 같은 발 원점으로 재생한다.
-		if jobId == "marks" then
-			return {
-				stand1 = { "f3d13c1096a4466fa0154d8c0a032ca5", "73152d7bbf474ed08b8441ddf46d92e4", "f3d13c1096a4466fa0154d8c0a032ca5", "c25f3c31ebe04277bbad8010778e38b2" },
-				marksPiercing = { "34222457fabf49608e90f1680d79af32", "3f730e1b307447b2bf80927eb79844e5", "2bbbc8fe20664dbfaa6576011cf5c39c", "1a7cbdc7d002482d9f2144afb1347cd3", "7b0535e0a23e43d0a43a254ce0801f85", "610392408b3b42f4966e8b90b2fe4f8b" },
-				marksSniping = { "2772f8130f1a46daa41ccb0c3cf5646c", "c844fb0acc594a37b6ac4ea5f49b7eaa", "a53258bcb9d445e79bd1a32c888ee2ea", "c844fb0acc594a37b6ac4ea5f49b7eaa", "a53258bcb9d445e79bd1a32c888ee2ea", "c844fb0acc594a37b6ac4ea5f49b7eaa", "a53258bcb9d445e79bd1a32c888ee2ea", "c844fb0acc594a37b6ac4ea5f49b7eaa", "a53258bcb9d445e79bd1a32c888ee2ea", "c844fb0acc594a37b6ac4ea5f49b7eaa", "a53258bcb9d445e79bd1a32c888ee2ea", "c844fb0acc594a37b6ac4ea5f49b7eaa", "a53258bcb9d445e79bd1a32c888ee2ea", "c844fb0acc594a37b6ac4ea5f49b7eaa", "a53258bcb9d445e79bd1a32c888ee2ea", "c844fb0acc594a37b6ac4ea5f49b7eaa", "a53258bcb9d445e79bd1a32c888ee2ea", "c844fb0acc594a37b6ac4ea5f49b7eaa", "a53258bcb9d445e79bd1a32c888ee2ea", "c844fb0acc594a37b6ac4ea5f49b7eaa", "a53258bcb9d445e79bd1a32c888ee2ea", "c844fb0acc594a37b6ac4ea5f49b7eaa", "79efce895d6245978f315c4d7561e6aa", "49e0863243a44656ac715f8442e02fba" },
-				marksTrueSniping = { "2772f8130f1a46daa41ccb0c3cf5646c", "c844fb0acc594a37b6ac4ea5f49b7eaa", "a53258bcb9d445e79bd1a32c888ee2ea", "c844fb0acc594a37b6ac4ea5f49b7eaa", "a53258bcb9d445e79bd1a32c888ee2ea", "c844fb0acc594a37b6ac4ea5f49b7eaa", "a53258bcb9d445e79bd1a32c888ee2ea", "c844fb0acc594a37b6ac4ea5f49b7eaa", "a53258bcb9d445e79bd1a32c888ee2ea", "c844fb0acc594a37b6ac4ea5f49b7eaa", "a53258bcb9d445e79bd1a32c888ee2ea", "c844fb0acc594a37b6ac4ea5f49b7eaa", "a53258bcb9d445e79bd1a32c888ee2ea", "c844fb0acc594a37b6ac4ea5f49b7eaa", "a53258bcb9d445e79bd1a32c888ee2ea", "c844fb0acc594a37b6ac4ea5f49b7eaa", "a53258bcb9d445e79bd1a32c888ee2ea", "c844fb0acc594a37b6ac4ea5f49b7eaa", "a53258bcb9d445e79bd1a32c888ee2ea", "c844fb0acc594a37b6ac4ea5f49b7eaa", "a53258bcb9d445e79bd1a32c888ee2ea", "c844fb0acc594a37b6ac4ea5f49b7eaa", "79efce895d6245978f315c4d7561e6aa", "49e0863243a44656ac715f8442e02fba" },
-			}
-		end
-		if jobId == "il" then
-			return {
-				stand1 = { "31f7d3dc8bde42d6905eca8ca3d3d3aa", "7480c71e7fc7406a89e74930c407ad87", "31f7d3dc8bde42d6905eca8ca3d3d3aa", "440ab4519beb44f39a820aab4d2ef864" },
-				swingO1 = { "f986bf2671c04e11b2f6aaf708f0c2bb", "63a019d7ca084d78b084c29536c14999", "02cde524cf654ae8b6000e402cbd0a4f", "ebdb54d66e9042ffa2a2d35dd4732c89", "de4d62586d274d28a336adf401e8ecde" },
-				swingO3 = { "3166883e4dbb4fe68eade2f2605468f1", "7b663ea7d9da42bf8a497213cca04848", "24bee0fe7428442196ecb31813b6ba59", "f1f16a077dee4a718e7f52d73545d2ae", "0ca54631539d40e7b708b9f9609daa7e" },
-			}
-		end
-		if jobId == "fp" then
-			return {
-				stand1 = { "762ba8485e584f60a94bc71631ee7881", "43f43917582b4fe6848b525f32d69652", "762ba8485e584f60a94bc71631ee7881", "49312816d1bb4c2d87f0452e8af0f89b" },
-				poisonRegion = { "3d29ef1ad55541d2a91af4400a0a22ed", "4669d925ba604b28852c02b0baa4a567", "413bb52e0b4f47cabe7600bab0a89919", "d3360cf51ebf48e1ba9d5b9f1d58425e", "b987d27c6aba4867abfd690cf7960cd8" },
-				dotPunisher = { "61f1428a7d9d4bd7aa94d7f57ceb3ab2", "dfd12d4d6d1e4ab28d76cbb4e7779264", "1f61ca3ebc5e46a381af77bdadf5e3d3", "16de092651e1436cb7bffb5ec142d6c0", "2581e6d505a2401aab26d85c57cca9df" },
-			}
-		end
-		if jobId == "bishop" then
-			return {
-				stand1 = { "99dcc70fd0c04167aa3c7bebdd72bb5b", "049e7e1c48364faca8efbed9ddca1afc", "99dcc70fd0c04167aa3c7bebdd72bb5b", "7b64b5c05ae444f8baab5737fdcff112" },
-				swingO1 = { "074de3777cbb42839c997bd1f1f958ae", "72e53ccff7c74860b1cf984fa020720d", "a68dc71362dd47119b9477d261175de5", "9781d9083bac4ea786fd95228d147f92", "2246d2a21d1948c1b1b57d56f7776d63" },
-				swingO3 = { "55f8fb5d2d4f45ab9bae87a6a79837af", "8814b38104ea4eb1bd7e4ee22e88fa0b", "97aab06bc9c64d6faa2caee8105443cd", "485d02497a384434a91be5a7396cac8c", "23f7adea4a5246f2995c3c1593b382ae" },
-				divinePunishment = { "fa8ad8e0822a45368697bc884853d364", "a235e087ff374bec8f71c2453dc31bdc", "bdd116091aa447d9927b5f7ed0375fab", "e5df8c553e8b4870a0db442531e0057b", "9345eeebfda54f2690c9849661bcd988" },
-			}
-		end
-		if jobId == "hero" then
-			return {
-				stand1 = { "6142e6907e054a4c86bda1719698af21", "66beab16ed794e27b49a33ee52a82b18", "6142e6907e054a4c86bda1719698af21", "f5ce5824f3a24e069ec0a523028c7f79" },
-				swingO3 = { "aac52a1acd1f414d9aa9f68167aeb2d0", "a302b38cd51543059e46a3162b209b02", "1b789ed0b21f404297592ca1bd0666af", "29beedf569f7412483c02c99e0e5fe2e", "cdd8a42144c949979ef9a7d1b0fa9e51", "be37495f3da24fa1ba32404daeb1c998", "bfe48ef4838c4d16a3f86ee914cf9440", "b9daa2a09e874aeea2a82b15cfb328ca" },
-				enragedRagingBlow = { "b64a6805781448eb875ea1d4629f3bc5", "77faeca61b3e4bec80ec0a66faee52e6", "29bc48d64e1f4f78bb56cc0948dda058", "f8199840321d4eed9bfd3395afcc8a77", "591f6cf9adb34a099a3f435b2e40dbc4", "8ce4f50c18a04c93b060320e30f68858", "a992dea232544bdd972d0978a94b25fd" },
-			}
-		end
-		return {}
+		local d = self:JobDef(jobId)
+		if d == nil then return {} end
+		return d.frames
 	end
 
-	-- 선택창·상세정보 공용 흉상.
 	@ExecSpace("ClientOnly")
 	method string GetMagePortraitRUID(string jobId)
-		if jobId == "phantom" then return "844dc3e58c214cfc9aafaee9d12c33dd" end
-		if jobId == "nl" then return "ccb44d85f142402da6de7b5c7ed67d94" end
-		if jobId == "shad" then return "69652c3bf48b457d86e649a540eefc1e" end
-		-- 비숍 흉상과 승인 원화를 참조한 직업별 전용 흉상.
-		if jobId == "paladin" then return "0e14a7ba1554474fb46cb13ab22bdbfb" end
-		if jobId == "dk" then return "bc09a2f673ba42b6b5989e4ac39a0fc5" end
-		if jobId == "bow" then return "0d124c8828044ba4b8d71180f2e2fca6" end
-		if jobId == "marks" then return "bb8c6be33ae64a9f96d8a3f74ea7f459" end
-		if jobId == "il" then return "f93cfcc7a46d428cb6ed2bb3d71fc986" end
-		if jobId == "fp" then return "81c1c00cd1aa4ff3b08f9894b42c819b" end
-		if jobId == "bishop" then return "778abb348ac2432eb2ca8916a0ce24b9" end
-		if jobId == "hero" then return "01d1da2e721b4dd893e314ef3d64e2e1" end
-		return ""
+		local d = self:JobDef(jobId)
+		if d == nil then return "" end
+		return d.portrait
 	end
 
-	-- 기존 효과 시작·타격 시점과 시전 전체 길이를 유지하며 중간 자세만 추가한다.
 	@ExecSpace("ClientOnly")
 	method table GetMageSkinFrameDurations(string jobId)
-		if jobId == "phantom" then
-			return { stand1 = { 0.65, 0.45, 0.65, 0.45 }, phantomJoker = { 0.06, 0.05, 0.04, 0.06, 0.04, 0.05, 0.05, 0.05 } }
-		end
-		if jobId == "nl" then
-			return {
-				stand1 = { 0.65, 0.45, 0.65, 0.45 },
-				nlThrow = { 0.1, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.1, 0.15 },
-			}
-		end
-		if jobId == "shad" then
-			return {
-				stand1 = { 0.65, 0.45, 0.65, 0.45 },
-				shadSavage = { 0.1, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.03, 0.02 },
-				shadMeso = { 0.12, 0.18, 0.07, 0.08, 0.05 },
-				shadDualblade = { 0.15, 0.15, 0.1, 0.15, 0.2, 2.1, 0.2, 0.15 },
-			}
-		end
-		if jobId == "paladin" then
-			return {
-				stand1 = { 0.65, 0.45, 0.65, 0.45 },
-				paladinCharge = { 0.15, 0.15, 0.08, 0.1, 0.1, 0.17 },
-				paladinSanctuary = { 0.2, 0.2, 0.1, 0.12, 0.13, 0.15 },
-			}
-		end
-		if jobId == "dk" then
-			return {
-				stand1 = { 0.65, 0.45, 0.65, 0.45 },
-				dkBuster = { 0.6, 0.05, 0.08, 0.07, 0.08, 0.07, 0.1, 0.15 },
-				dkRoar = { 0.2, 0.2, 0.2, 0.2, 0.25, 0.35 },
-				dkGiantBuster = { 0.6, 0.05, 0.04, 0.035, 0.04, 0.035, 0.04, 0.035, 0.04, 0.035, 0.04, 0.035, 0.04, 0.135 },
-			}
-		end
-		if jobId == "bow" then return { stand1 = { 0.65, 0.45, 0.65, 0.45 }, bowHurricane = { 0.04, 0.04, 0.04, 0.04, 0.04 }, bowArrowRain = { 0.04, 0.04, 0.04, 0.04, 0.04 } } end
-		-- 저격은 첫 타격까지 조준하고, 타격 간격에 맞춰 반동·조준을 반복한다.
-		if jobId == "marks" then
-			return {
-				stand1 = { 0.65, 0.45, 0.65, 0.45 },
-				marksPiercing = { 0.08, 0.09, 0.18, 0.09, 0.1, 0.16 },
-				marksSniping = { 0.1, 0.3, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.1, 0.1 },
-				marksTrueSniping = { 0.08, 0.28, 0.025, 0.025, 0.025, 0.025, 0.025, 0.025, 0.025, 0.025, 0.025, 0.025, 0.025, 0.025, 0.025, 0.025, 0.025, 0.025, 0.025, 0.025, 0.025, 0.025, 0.08, 0.1 },
-			}
-		end
-		if jobId == "il" then return { stand1 = { 0.65, 0.45, 0.65, 0.45 }, swingO1 = { 0.18, 0.12, 0.08, 0.07, 0.35 }, swingO3 = { 0.21, 0.09, 0.93, 0.09, 0.48 } } end
-		if jobId == "fp" then return { stand1 = { 0.65, 0.45, 0.65, 0.45 }, poisonRegion = { 0.25, 0.15, 0.30, 0.15, 0.35 }, dotPunisher = { 0.20, 0.15, 0.25, 0.15, 0.45 } } end
-		if jobId == "bishop" then return { stand1 = { 0.65, 0.45, 0.65, 0.45 }, swingO1 = { 0.09, 0.06, 0.18, 0.12, 0.35 }, swingO3 = { 0.35, 0.15, 0.30, 0.15, 0.55 }, divinePunishment = { 0.15, 0.10, 0.15, 0.10, 0.30 } } end
-		if jobId == "hero" then return { stand1 = { 0.65, 0.45, 0.65, 0.45 }, swingO3 = { 0.06, 0.18, 0.06, 0.12, 0.06, 0.12, 0.18, 0.12 }, enragedRagingBlow = { 0.18, 0.12, 0.12, 0.08, 0.12, 0.08, 0.20 } } end
-		return {}
+		local d = self:JobDef(jobId)
+		if d == nil then return {} end
+		return d.frameSec
 	end
 
 	-- 크리티컬 기본값: 확률 0%, 크리티컬 데미지 20%(원작 메이플 기본). 스킬·증강의 크리 확률/데미지는 각각 합연산
@@ -200,19 +216,6 @@ script RtsJobTableLogic extends Logic
 		return v
 	end
 
-	-- 1레벨부터 level까지 누적 투자
-	method number GetCumCost(number level)
-		self:EnsureCosts()
-		local t = 0
-		for i = 2, level do t = t + self:GetLevelCost(i) end
-		return t
-	end
-
-	-- 10·20·30·40·50 = 벽(구간 마지막 칸이 비싸다)
-	method boolean IsWallLevel(number level)
-		return level % 10 == 0
-	end
-
 	method number GetMaxLevel()
 		return self.MaxLevel
 	end
@@ -239,22 +242,13 @@ script RtsJobTableLogic extends Logic
 	end
 
 	method boolean HasJob(string jobId)
-		return self:GetJobName(jobId) ~= jobId
+		return self:JobDef(jobId) ~= nil
 	end
 
 	method string GetJobName(string jobId)
-		if jobId == "hero" then return "히어로" end
-		if jobId == "paladin" then return "팔라딘" end
-		if jobId == "dk" then return "다크나이트" end
-		if jobId == "bow" then return "보우마스터" end
-		if jobId == "marks" then return "신궁" end
-		if jobId == "il" then return "아크메이지(썬·콜)" end
-		if jobId == "fp" then return "아크메이지(불·독)" end
-		if jobId == "bishop" then return "비숍" end
-		if jobId == "nl" then return "나이트로드" end
-		if jobId == "shad" then return "섀도어" end
-		if jobId == "phantom" then return "팬텀" end
-		return jobId
+		local d = self:JobDef(jobId)
+		if d == nil then return jobId end
+		return d.name
 	end
 
 	method string GetJobGroup(string jobId)
@@ -277,9 +271,9 @@ script RtsJobTableLogic extends Logic
 	end
 
 	method string GetJobFaction(string jobId)
-		-- 히어로 직업(hero)은 모험가, 팬텀은 영웅 소속이다.
-		if jobId == "phantom" then return "hero" end
-		return "adv"
+		local d = self:JobDef(jobId)
+		if d == nil then return "adv" end
+		return d.faction
 	end
 
 	method table GetRecruitGroups(string faction)
@@ -296,56 +290,37 @@ script RtsJobTableLogic extends Logic
 		return groups
 	end
 
-	-- 계열 키(HUD 슬롯 색): war/arc/mag/thf/pir(해적 출시 시 사용)
+	-- 계열 키(HUD 슬롯 색·영입 열): war/arc/mag/thf/pir(해적 출시 시 사용)
 	method string GetSeries(string jobId)
-		if jobId == "bow" or jobId == "marks" then return "arc" end
-		if jobId == "il" or jobId == "fp" or jobId == "bishop" then return "mag" end
-		if jobId == "nl" or jobId == "shad" or jobId == "phantom" then return "thf" end
-		return "war"
+		local d = self:JobDef(jobId)
+		if d == nil then return "war" end
+		return d.series
 	end
 
-	-- 1레벨 공격력 / 레벨업당 공격력 / 공격속도 이름 (character.md 능력치)
+	-- 1레벨 공격력 / 레벨업당 공격력 / 공격속도 이름 (character.md 능력치 — JobDefs)
 	method number GetBaseAttack(string jobId)
-		if jobId == "paladin" then return 80 end
-		-- 섀도어·신궁 약점 = 공격력(2026-09-24 사용자 "섀도어 기본 공격력 낮게 · 신궁은 기본 공격력과 크뎀을 줘야") — 50 → 30(×0.6), 스킬 비율은 ×5/3
-		if jobId == "shad" or jobId == "marks" then return 30 end
-		if jobId == "hero" then return 40 end
-		if jobId == "bow" then return 30 end
-		if jobId == "fp" or jobId == "bishop" or jobId == "nl" then return 20 end
-		if jobId == "phantom" then return 100 end
-		return 50
+		local d = self:JobDef(jobId)
+		if d == nil then return 50 end
+		return d.atk
 	end
 
 	method number GetAttackPerLevel(string jobId)
-		if jobId == "hero" then return 12 end
-		if jobId == "marks" then return 9 end -- 15 → 9(×0.6, 2026-09-24)
-		if jobId == "shad" then return 6 end -- 10 → 6(×0.6, 2026-09-24)
-		if jobId == "il" then return 3 end
-		if jobId == "fp" or jobId == "bishop" or jobId == "nl" then return 5 end
-		if jobId == "phantom" then return 0 end
-		return 10
+		local d = self:JobDef(jobId)
+		if d == nil then return 10 end
+		return d.atkLv
 	end
 
 	method string GetBaseSpeed(string jobId)
-		if jobId == "paladin" or jobId == "dk" or jobId == "marks" then return "느림" end
-		if jobId == "bow" or jobId == "phantom" or jobId == "shad" then return "매우빠름" end
-		if jobId == "nl" then return "빠름" end
-		return "보통"
+		local d = self:JobDef(jobId)
+		if d == nil then return "보통" end
+		return d.speed
 	end
 
 	-- 무기 종류(.info/weapon.md, 2026-09-19): 직업마다 무기가 정해져 있고, 타격마다 최종 데미지에 무기별 최소~최대 비율을 균등 난수로 곱한다(방어율 계산 전). 케인(팬텀) 0.85~1.2(사용자 2026-09-19)
 	method string GetWeaponType(string jobId)
-		if jobId == "hero" then return "두손검" end
-		if jobId == "paladin" then return "양손둔기" end
-		if jobId == "dk" then return "창" end
-		if jobId == "bow" then return "활" end
-		if jobId == "marks" then return "석궁" end
-		if jobId == "il" or jobId == "fp" then return "스태프" end
-		if jobId == "bishop" then return "완드" end
-		if jobId == "nl" then return "아대" end
-		if jobId == "shad" then return "단검" end
-		if jobId == "phantom" then return "케인" end
-		return ""
+		local d = self:JobDef(jobId)
+		if d == nil then return "" end
+		return d.weapon
 	end
 
 	-- 무기별 데미지 비율 {최소, 최대}
@@ -374,75 +349,9 @@ script RtsJobTableLogic extends Logic
 		return (r[1] + r[2]) / 2
 	end
 
-	-- 기본 외형 = 공식 "모험가 ○○" 세트(아바타 아이템 RUID). 없는 직업은 nil
-	--   슬롯: longcoat / weapon2h 또는 weapon1h / shoes / hair / face(얼굴, 없으면 기본) / cap(모자) / faceAcc(얼굴 장식). 세트의 캐시 무기는 잔상이 두손검(swordTS/swordOL)이라
-	--   무기 = 각 세트의 전용 무기(사용자 2026-09-17 최종 — 캐시 무기라 공격 모션에 두손검 계열 잔상(swordTS/swordOL)이 나오지만 의상과 색이 맞는 쪽을 택함).
-	--   마법사·섀도어·나이트로드는 **한손 판**(stand1, 한손으로 드는 모션), 활·석궁·전사 무기는 두손 판. 팬텀은 세트가 없어 팬텀 오리지날티(케인).
-	--   대안(잔상이 정상인 진짜 무기): 리버스 니플하임 5d0abb01… / 리버스 벨로체 6083bc6e… / 타임리스 알슈피스 164067c8… / 타임리스 엔가우 9e8fe977… / 리버스 블랙뷰티 676ca51a…
-	--   / 타임리스 엔릴 티어 9886e145… / 타임리스 람피온 11f2459e… / 타임리스 킬릭 f92581fa… / 타임리스 페르소나 b5150885…
-	--   성별(사용자 2026-09-17): 전사 3·나로·팬텀 = 남(롱코트 01050xxx/01054xxx, 헤어 65xxx, 기본 얼굴) / 보마·신궁·썬콜·불독·비숍·섀도어 = 여(롱코트 01051xxx, 부츠 01071xxx, 헤어 67xxx, 얼굴 = 청아한 얼굴 21259)
-	method table GetCostume(string jobId)
-		if jobId == "hero" then
-			return { longcoat = "c92ab70d7a064aafaa34298c2e9890e3", weapon2h = "c4f9b9c993754161816092e680584ce3",
-				shoes = "186a55d192d24b4da5201801422bebf7", hair = "931c0ed47c3e4df69734fe19247a7b33" }
-		end
-		if jobId == "paladin" then
-			return { longcoat = "3db1f00384854ab6aa9e6148efa942d9", weapon2h = "ba9a04c1dc1f42049f0ec88e95052c76",
-				shoes = "790ae27c0b30414eb369bda472df4799", hair = "9188a9716ae947b5a1e518bd0d1c0252" }
-		end
-		if jobId == "dk" then
-			-- 창 = 타임리스 알슈피스(진짜 창, afterImage spear — 2026-09-18 사용자 "다크나이트만 리버스로": 세트 캐시 창 acd581b7…의 빨간 두손검 참격이 스피어 버스터와 겹쳐서. 리버스 창(로렌티우스)은 라이브러리에 없어 자매 세트 타임리스로. 대안 레볼루션 스피어 44d92464…)
-			return { longcoat = "a529865cf7be417c97b7855eed344004", weapon2h = "164067c82a8347d681cf49a8be3db5df",
-				shoes = "f6f89e92db4f498e9b5fb6ec7ee81dda", hair = "e8d9dda3dfd34b68b62426838e951723" }
-		end
-		if jobId == "bow" then
-			-- 모험가 보우마스터 세트(여): 슈트(여 01051806) · 부츠 · 검은색 헤어(67060) · 깃털 모자 + 활 = 타임리스 엔가우(진짜 활, afterImage bow — 2026-09-18 사용자: 세트 캐시 활 37ad1f37…의 파란 폭발 잔상이 초당 5발 폭풍의 시와 겹쳐서 교체)
-			return { longcoat = "485c62e590af4b0b943a202ec9890252", weapon2h = "9e8fe977ff9540d180f3f08dc420d087",
-				shoes = "44f0f373baed42cc91d160b20d01fe7b", hair = "c97a920273e243a28a81772834cbba05", face = "9edd3b016f6b4afaa7973c7259d46c69", cap = "74aa2fe40c304ec7b91f5bf2ce1cc128" }
-		end
-		if jobId == "marks" then
-			-- 모험가 신궁 세트(여): 슈트(여 01051810) · 부츠 · 검은색 헤어(67070) · 모자 + 세트 석궁(두손 판)
-			return { longcoat = "05a8f762ba03471dbbded534436646c3", weapon2h = "2ae7ec2367cc45ecb6b49ec12ac4d05b",
-				shoes = "d79e6681a08c467fa69b37ab0e9023be", hair = "d944c2c9ac264e8ca0272f35e9f13fb6", face = "9edd3b016f6b4afaa7973c7259d46c69", cap = "9defd0fd49cd45629d1c8beefc10ebd9" }
-		end
-		if jobId == "il" then
-			-- 모험가 썬콜 세트(여): 로브(여 01051805) · 부츠(여 01071193) · 검은색 헤어(67050) · 머리띠 + 세트 스태프(한손 판)
-			return { longcoat = "8a6b5acc6a02447cb25ce366945d09e7", weapon1h = "3dcc26b9213d4b1193377a5c676bffdb",
-				shoes = "1a2b66f0496f4926bd9d6d7d1f77ccb4", hair = "9110ec2d96ba489cb958cad1132c0ab6", face = "9edd3b016f6b4afaa7973c7259d46c69", cap = "39f032dee08e47dc84fd6ab0019b12f9" }
-		end
-		if jobId == "fp" then
-			-- 모험가 불독 세트(여): 로브(여 01051803) · 부츠(여 01071191) · 검은색 헤어(67030), 모자 없음 + 세트 완드(한손 판)
-			return { longcoat = "c449931dbadc42d08b9386faf5c0fc62", weapon1h = "37d1f2f65ace4ff583e388243b756682",
-				shoes = "baeca0b68837465bbf1dead9755313c8", hair = "47575a7d509d4f6fa8878f20c372ebef", face = "9edd3b016f6b4afaa7973c7259d46c69" }
-		end
-		if jobId == "bishop" then
-			-- 모험가 비숍 세트(여): 로브(여 01051804) · 부츠(여 01071192) · 검은색 헤어(67040) · 모자 + 세트 완드(한손 판)
-			return { longcoat = "f6ded93c726f4974972392fdeecce574", weapon1h = "ffa0f813b710492088cbd93b3d4a7db6",
-				shoes = "2fecfe3a5d944e43825ca6ef73d816ab", hair = "2ae23cf95ae0413085f2534258771533", face = "9edd3b016f6b4afaa7973c7259d46c69", cap = "2d2c164b8cda45aaa0ca59cdff242e59" }
-		end
-		if jobId == "nl" then
-			-- 모험가 나이트로드 세트: 슈트(01054091) · 부츠 · 검은색 헤어(65080) · 헤어밴드(01001160) + 세트 표창(한손 판)
-			return { longcoat = "b2f43a0a2ce344d6a3eb7e5c5f288415", weapon1h = "37cdd4cecceb4315864f1e014711a8cc",
-				shoes = "4539394af12f41afa9f1a6e4736717a6", hair = "2c0ae06e45744e7fa4a8e986f8249b14", cap = "ed9795ce9c2348d58423f49b9e65eabf" }
-		end
-		if jobId == "shad" then
-			-- 모험가 섀도어 세트(여): 슈트(01054093) · 부츠 · 검은색 헤어(67100) · 마스크(얼굴 장식) + 세트 단검(한손 판)
-			return { longcoat = "57b8678927dd4f139ce0f333683379ea", weapon1h = "bbbede914dc44d2eb7cd2568c0156255",
-				shoes = "5da19bc56d624e5c9edd267f324e9c6d", hair = "cdb752c2a72c4e4799d0abca54f02944", face = "9edd3b016f6b4afaa7973c7259d46c69", faceAcc = "ddaed699a27c40c4a9be7b2339ca9a9d" }
-		end
-		if jobId == "phantom" then
-			-- 팬텀(히든, 원작 NPC 1540482 기준 — 금발 남성): 미스틱 팬텀 슈트 · 할로윈 팬텀 부츠 · 노란색 괴도 팬텀 헤어(40323) · 괴도 팬텀 얼굴 · Vampire Phantom Hat(팬텀 모자 실루엣 — 원작 흰 모자는 라이브러리에 없고 '팬텀 히어로즈 페더'는 깃털만) + 팬텀 오리지날티(팬텀 전용 케인, 1H)
-			--   (2026-09-17 사용자: 검은색 팬텀 뱅 헤어는 여자처럼 보임 → 원작 헤어·얼굴로)
-			return { longcoat = "d47ad12df0af43d9a901b44edbe8e1a4", weapon1h = "19c6b905f16141deb53f6ffe760045cc",
-				shoes = "8e39e34a94c74154be9d666693c4cc0f", hair = "e0c743eebb2b4856ab3b2682af8159ab", face = "92fc1e7650ad402da7a2a7bebcdd6c51", cap = "cf9ef0959fa143229d4bdcfd6e760246" }
-		end
-		return nil
-	end
-
 	-- 스킬 목록(획득 레벨 순). kind = 액티브/패시브, target = 대상 지정 스킬
-	--   fx(있으면) = 연출 정의: motion 아바타 액션 / frames 플립북 스프라이트 RUID(frameSec 간격, SpriteRUID 교체 재생) / scale 월드 스케일
-	--   / feetDx·feetDy 캔버스 중심→발 오프셋(×scale, 유닛 발에 맞춤) / sound 시전음 / hitSound 타격음. 전투(Phase 3)가 이걸 읽어 재생한다
-	--   motion 하나 또는 motions = {…} + motionGap(초)로 아바타 액션을 이어 재생, motionRate = 액션 재생 속도(1 원속, 0.56 = 0.44초 swing이 0.78초), motionLoop = 공격하는 동안 그 액션을 루프로 유지(폭풍의 시; motionFrame·motionFrameEnd = 그 프레임 구간만), motionCycle = motions를 motionGap 간격으로 공격이 이어지는 동안 차례로 반복(조커) / loopClip·loopScale·loopDx·loopDy·loopAlpha·loopOrder = 공격 중 유닛 위에 계속 도는 클립(시전이 0.6초 끊기면 정리, 유지 자세도 함께; loopOrder 190 = 아바타 뒤 — 조커) / loopIntro·loopIntroScale·loopIntroDy·loopIntroLife·loopIntroSound = 루프가 처음 생길 때 같은 자리에 1회 클립·소리(그동안 루프는 투명 — 애로우 레인 활 소환) / loopFrameA·loopFrameB = 루프 클립의 프레임 구간(0부터)만 반복 / loopSound·loopSoundVol = 루프 동안 반복 소리(끝나면 StopSound), loopEnd·loopEndLife·loopEndSound = 루프가 끊길 때 같은 자리 1회 클립·소리(디바인 퍼니시먼트), loopAt "target" = 루프(인트로·엔드 포함)를 유닛이 아니라 메인 대상 몬스터의 자식으로(피격 박스 중앙 + loopDy, loopAtTop이면 박스 윗변 기준, 대상 바뀌면 재생성) / 요소별 방향: clipFacesLeft·framesFacesLeft·bodyFacesLeft·loopFacesLeft·projFacesLeft가 있으면 assetFacesLeft보다 우선 / proj·projSec·projDy·projScale = 유닛에서 대상까지 날아가는 투사체 클립(비행 방향으로 회전, projNoRotate로 끔; projs = {…}면 발마다 차례로(라운드 로빈) 1개 — 조커 카드 4종) / markClip·markLife·markLoop = 시전 순간 대상 위 표식 클립(스나이핑 조준; 위치 = 피격 박스 중앙, 크기 = markFit × 박스 긴 쪽 — 없으면 markScale·markDy; markClips = {…} 무작위 1개, markAt = "feet"면 발 위치 + markDx·markDy, markDelay 초 뒤 + 대상마다 markStagger 초씩 늦게(서버 hitStagger와 짝), markPattern "alternate" = 같은 대상 반복 표식을 좌·우 번갈아 markAltDists 거리로(블리자드 템페스트), markScaleX = 가로만 추가 배율; marks = { {clip, clips, delay, life, scale, at, dx, dy, fit, pivotDy, loop, stagger, pattern, scaleX} … } = 표식 여러 벌(블레이드 토네이도 → 카르마 퓨리)) / sound2·sound2Delay·sound2Vol·sound2Pitch = 두 번째 시전음 / beam·beamDelay·beamScale·beamSeg·beamDx·beamDy·beamLife = 유닛 손→대상까지 클립 조각을 이어 붙인 빔(체인 라이트닝) / projCount·projStagger·projFrom("around" 유닛 주변 / "sky" 대상 머리 위 projSkyHeight에서 ±projSkySpread 흩어져 수직 낙하 — 애로우 레인)·projSpread(안쪽 고리 반지름)·projGap(구체 간격 = 고리 간격)·projLife = 구체 여러 개(도트 퍼니셔, 동심원 고리 채우기 OrbSpawnOffset), projHover = 생성 뒤 떠 있는 초, projSpeed = 유닛/초(있으면 비행 시간 = 거리÷속도, 판정도 그 시각), projFlySprites·projHitSprites·projFrameSec = 비행 중 돌릴 프레임 sprite 목록 / 닿은 뒤 한 번 돌릴 폭발 프레임 목록(클립 프레임 범위 지정은 안 먹음), projSpin = 자전 도/초, projArc = 포물선 높이(유닛; 비행 방향에 수직·항상 위로 4t(1−t) 튀어오름, 발마다 50~100% — projArcRandom=true면 위/아래 무작위; projArcByDist = { 1칸, 2칸, 3칸, 4칸+ } 있으면 대상까지 칸 거리로 고른 값 그대로) / zoneClips·zoneScale·zoneAlpha·zoneLife·zoneOrder = 구역 트랙 모든 칸 위 지대 클립(포이즌 리전) / backClip·backScale·backDx·backDy·backLife·backAlpha·backDelay = 캐릭터 뒤(190) 클립(블리자드 기둥; backDelay 초 뒤 — 카르마 퓨리) / 스킬 항목의 after = 후딜 초(다음 공격까지 쉼), dot = { pct, period, dur } 서버 지속 피해, freeze = 빙결 초, range = 사거리 칸(기본 공격은 st.range가 우선, 없으면 2), targets = 타겟 수(없으면 st.targets), aoe = 메인 대상(사거리 안 가장 가까운 적) 곁 몇 칸까지 나머지 대상을 잡는지(범위 공격 기본 1, 체인 라이트닝만 3 — 2026-09-19 사용자), area = 전체 광역기(제네시스·생츄어리·블리자드·드래곤 로어: 메인 대상 없이 사거리 안 적을 랜덤으로 n마리), 지대 dot·구체 spread(도트 퍼니셔)는 사거리 제한 없이 구역 전체가 후보, zoneWide = 사거리 제한 없이 구역 전체에서 targets마리(블리자드 템페스트) — RtsCombatLogic.PickTargets, spread = 타격을 대상들에 돌아가며 1회씩(도트 퍼니셔), projEach = 대상마다 투사체 1발(RtsCombatLogic) / clip(있으면) = 플립북 대신 애니메이션 클립 RUID 1회 재생(clipDelay 초 뒤), clips = { ruid 또는 {ruid, dx, dy, scale, delay, life} … } 같은 원점에 함께 띄우는 추가 클립들(스피어 버스터; life = 제거 시각 — 마지막 프레임이 긴 클립은 EndFrame 정리에 잘리므로 클립 총길이를 준다), clipHold = clip도 EndFrame 정리 대신 clipLife까지, clipOrder = 시전 클립 레이어(기본 300 앞, −10 = 아바타 뒤), motionDelay = 첫 모션 지연 초 / hideWeapon·hideWeaponSec = 스킬 동안 캐릭터 무기·무기 잔상 숨김(이펙트에 검이 들어 있는 레이징 블로우) / bodyClip·bodyScale·bodyDy·bodyLife = 아바타 위 몸 덧그림(원작 effect0, RtsSkillFxLogic.PlayBody) / assetFacesLeft = 원작(왼쪽 보기) 자산 — 유닛이 보는 방향(RtsUnitComponent.FaceDir)에 맞춰 반전, noFlip = 대칭 오라(반전 안 함) / sound·soundDelay·soundPitch = 시전음(soundDelay 초 뒤 재생, soundPitch = 재생 속도) / hitDelay 시전→첫 판정 초 / hitGap 타격 간격(타격마다 따로 판정·크리) / hitStagger 같은 타격 안에서 대상마다 늦추는 초(블리자드 템페스트 30개 낙하) / hitClip·hitScale·hitDy 몬스터 위 타격 클립(hitClips = {…}면 타격마다 무작위 1개 — 조커 3색) / hitSound·hitSoundPitch·hitSoundVol·hitSoundEvery 타격음(피치 = 재생 속도, RtsSkillFxLogic.PlaySfx; hitSoundEvery = n타마다 1번), hitPhases = { {upto, clips, scale, sound, vol} … } 타격 번호 구간별 타격 클립·타격음(sound "" = 무음; hitKinds = { 타격마다 phase 번호 } 가 있으면 구간 대신 그 번호) (RtsCombatLogic·RtsMonsterComponent)
+	--   fx(있으면) = 연출 정의: motion 원화 동작 / scale 월드 스케일 / feetDx·feetDy 캔버스 중심→발 오프셋 / sound 시전음 / hitSound 타격음 — RtsSkillFxLogic이 재생, RtsCombatLogic이 판정
+	--   필드별 설명(동작·루프·투사체·표식·빔·지대·타격 구간 등)은 docs/skill-fx.md
 	--   lock(액티브만, 없으면 0) = 잠금 설정 기본값: 0 사용 / 1 보스전 잠금 / 2 잠금 (드래곤 로어는 기본 보스전 잠금) / cd(초) = 쿨타임 — 있으면 준비됐을 때 기본 공격 대신 우선 사용(RtsCombatLogic)
 	-- 연출 미리보기용 덮어쓰기(클라 스크립트에서 FxOverrides["hero:1"] = {...}로 넣으면 GetSkills가 그 스킬의 fx를 바꿔 준다. 확정되면 표에 옮기고 비운다)
 	property table FxOverrides = {}
@@ -536,7 +445,7 @@ script RtsJobTableLogic extends Logic
 						hitDelay = 0.5, hitClip = "5df303c326dd488cbeb17028892b5238", hitScale = 1.6, hitDy = 0.6, hitSound = "2cc05078af454fa3a7856b9fb65ed61f" } },
 				{ lv = 30, kind = "패시브", name = "디바인 블레싱", desc = "최종 데미지가 50% 증가한다.", target = false },
 				{ lv = 40, kind = "패시브", name = "가드 크러쉬 강화", desc = "가드 크러쉬의 방어율 감소가 20%로 증가한다.", target = false },
-				-- 홀리 유니티(40 패시브 +20%)는 2026-09-20 삭제 → 프리즘 스킬 "홀리 유니티"(지정 유닛 최종 +40% — 2026-09-22, 처음 +100%)로 이동. 프리즘 스킬 표는 증강 시스템(Phase 6)에서 얹는다(target = true 항목이 그때 생김)
+				-- 홀리 유니티(40 패시브 +20%)는 2026-09-20 삭제 → 프리즘 스킬 "홀리 유니티"(지정 유닛 최종 +40% — 2026-09-22, 처음 +100%)로 이동. 프리즘 스킬 표(ApplyPrismSkills)가 대상 지정(target = true) 항목을 얹는다
 				{ lv = 50, kind = "패시브", name = "디바인 차지 강화", desc = "디바인 차지의 데미지가 70% 증가하고, 공격 대상이 최대 6마리, 공격 횟수가 2회로 늘어난다. 보스 공격 시 데미지가 40% 증가한다.", target = false },
 			}
 		end
@@ -632,7 +541,7 @@ script RtsJobTableLogic extends Logic
 				{ lv = 10, kind = "패시브", name = "메디테이션", desc = "공격력이 100 증가한다.", target = false },
 				{ lv = 20, kind = "패시브", name = "포이즌 리전 강화", desc = "포이즌 리전의 데미지가 30% 증가한다.", target = false },
 				-- 도트 퍼니셔 연출(사용자 2026-09-18 순서: "사운드 시작 → 불구슬이 캐릭터 주위에 넓게 생성 / 사운드 끝 → 주변 적을 탐색해 느리게 추적, 부딪히며 판정"): 시전 클립 2121052 effect(유닛 위 푸른 불꽃 해골, 0.99초, 왼쪽 보기 그림) + 시전음 400021001/use(1.18초).
-				--   구체 30개(사용자 2026-09-18 "30개로" — hits 30 = 구체마다 100% 1회, 표 설명도 2026-09-23 30개로 맞춤) = **RtsDotOrb01~03**(사용자 2026-09-18 지정: 도트 퍼니셔 400021001 스킬 아이콘 d998c591…/iconmouseover 20a64945…를 원형으로 잘라 테두리를 없앤 64px 자체 업로드 sprite, assets/textures/dotorb/) 01→02→03→02 0.12초 맥동 루프, 1.8배 ≈ 1.15유닛 둥근 불구슬, 240°/초 자전(구체마다 방향 엇갈림, projSpin — 사용자 "더 키우고 회전") — 30개가 한 번에(projStagger 0 — 2026-09-22 사용자 "구체가 한번에 모두 생성되어야 함", 전엔 0.03초 간격) 손 높이 주위 동심원 고리(반지름 2.0부터 1.2 간격, 고리마다 둘레÷1.2개 = 10·16·4개)에 생성돼(캐릭터·서로 간 최소 구체 크기 간격) 떠 있다가(projHover 1.2 = 사운드 길이) 각자 생성 지점에서 가장 가까운 적(보스가 사거리 안이면 보스만)의 피격 박스 중앙으로 4.4유닛/초로 날아가(projSpeed — 2.2에서 2배, 사용자 2026-09-18) 박치기하는 순간 사라짐 + 판정 + 400021001/use2 + 폭발 12121055 hit/0(9b8b4484…, 230×270px → 0.7배, 0.9초 — 사용자 "달라붙으면 폭발 이펙트"). 이전: 플레임 위자드 12121055/effect 프레임(0~4 불접시 / 5~11 불구슬)은 사용자 "불접시" → 아이콘 구슬로 교체
+				--   구체 30개(사용자 2026-09-18 "30개로" — hits 30 = 구체마다 1회 — 비율은 ratio(지금 290%), 표 설명도 2026-09-23 30개로 맞춤) = **RtsDotOrb01~03**(사용자 2026-09-18 지정: 도트 퍼니셔 400021001 스킬 아이콘 d998c591…/iconmouseover 20a64945…를 원형으로 잘라 테두리를 없앤 64px 자체 업로드 sprite, assets/textures/dotorb/) 01→02→03→02 0.12초 맥동 루프, 1.8배 ≈ 1.15유닛 둥근 불구슬, 240°/초 자전(구체마다 방향 엇갈림, projSpin — 사용자 "더 키우고 회전") — 30개가 한 번에(projStagger 0 — 2026-09-22 사용자 "구체가 한번에 모두 생성되어야 함", 전엔 0.03초 간격) 손 높이 주위 동심원 고리(반지름 2.0부터 1.2 간격, 고리마다 둘레÷1.2개 = 10·16·4개)에 생성돼(캐릭터·서로 간 최소 구체 크기 간격) 떠 있다가(projHover 1.2 = 사운드 길이) 각자 생성 지점에서 가장 가까운 적(보스가 사거리 안이면 보스만)의 피격 박스 중앙으로 4.4유닛/초로 날아가(projSpeed — 2.2에서 2배, 사용자 2026-09-18) 박치기하는 순간 사라짐 + 판정 + 400021001/use2 + 폭발 12121055 hit/0(9b8b4484…, 230×270px → 0.7배, 0.9초 — 사용자 "달라붙으면 폭발 이펙트"). 이전: 플레임 위자드 12121055/effect 프레임(0~4 불접시 / 5~11 불구슬)은 사용자 "불접시" → 아이콘 구슬로 교체
 				--   서버(RtsCombatLogic.DoAttack)가 같은 식(OrbSpawnOffset)으로 생성 지점·대상·도착 시각(stagger + hover + 거리÷속도)을 계산해 판정을 예약하고 대상 목록을 클라에 넘긴다. 400021001엔 사운드·아이콘만 있고 클립은 라이브러리에 없음
 				{ lv = 30, kind = "액티브", name = "도트 퍼니셔", desc = "화염 구체 30개를 소환한다. 각 구체는 가장 가까운 적에게 달라붙어 폭발하며 290%의 데미지를 준다. 일반 몬스터에게는 데미지가 50% 감소한다. 재사용 대기시간 15초", target = false, cd = 15, ratio = 290, mobMul = 0.5, hits = 30, targets = 10, range = 6, spread = true,
 					fx = { motion = "dotPunisher", projDelay = 0.35, clipDelay = 0.35, clip = "fce52ddb8a274e529790dc6264283f0a", scale = 1.2, feetDx = 0, feetDy = 0.8, assetFacesLeft = true, sound = "da2791e77cec477eb31dceb7b3c1961e",
@@ -714,10 +623,9 @@ script RtsJobTableLogic extends Logic
 		return { { lv = 1, kind = "액티브", name = "(미정)", desc = "스킬 정의는 character.md — 코드 등록 전", target = false } }
 	end
 
-	-- 대상 지정 스킬의 획득 레벨(없으면 0)
 	-- ===== 액티브 스킬 잠금 설정 (2026-09-16) =====
 	--   유닛의 RtsUnitComponent.SkillLocks = 스킬 목록 순서대로 한 글자씩("0"/"1"/"2"). 패시브 자리는 항상 "0".
-	--   0 사용 / 1 보스전 잠금(보스 라운드에만 안 씀) / 2 잠금(안 씀) / 3 영구 잠금(프리즘 증강의 "영구적 잠금" — 강제, 클라가 풀 수 없음. 서버 RtsUnitLogic.SetPermaLock으로만).
+	--   0 사용 / 1 보스전 잠금(보스 라운드에만 안 씀) / 2 잠금(안 씀) / 3 영구 잠금(프리즘 증강의 "영구적 잠금" — 강제, 클라가 풀 수 없음. 서버 RtsUnitLogic.SyncPrismLocks로만).
 	--   전투 루프(Phase 3)가 액티브를 고를 때 이 값을 본다(2·3은 안 씀).
 
 	method string DefaultLocks(string jobId)
@@ -759,16 +667,8 @@ script RtsJobTableLogic extends Logic
 		return "사용"
 	end
 
-	method number GetTargetSkillLevel(string jobId)
-		local list = self:GetSkills(jobId)
-		for i = 1, #list do
-			if list[i].target then return list[i].lv end
-		end
-		return 0
-	end
-
 	-- 레벨 L의 전투 계수: pct 공격력%(합연산 결과) / flat 추가 공격력 / ratio 기본 공격 데미지%(1회 타격) / hits 타격 수 / targets 타겟 수
-	--   bossAdd 보스 공격시 데미지 증가%(합연산 결과 — 킷 보스 티어(2026-09-19: 나로 0 / 불독·팬텀 10 / 히어로 15 / DK 25 / 보우·신궁·섀도어 30 / 팔라딘·썬콜·비숍 40)·증강·블스아이·프리즘, 3단계) / ign 방어율 무시% / fin 최종 데미지%(몬스터) / finBoss 최종 데미지%(보스)
+	--   bossAdd 보스 공격시 데미지 증가%(합연산 결과 — 킷 보스 티어(2026-09-19: 나로 0 / 불독·팬텀 10 / 히어로 15 / DK 25 / 보우·신궁·섀도어 30 / 팔라딘·썬콜·비숍 40)·증강·블스아이·프리즘, 3단계) / ign 방어율 무시% / fin 최종 데미지%(보스 전용 최종 finBoss는 늘 fin과 같아 2026-09-28 삭제)
 	--   / ignBoss 보스 방무%(-1 = 별도 없음) / speed 공격속도 이름 / halfHits 데미지 ½인 추가 타격 수(쉐도우 파트너 — 기본 공격에만)
 	--   crit 크리티컬 확률%(합연산) / critDmg 크리티컬 데미지%(합연산) — 크리 발생 시 최종 데미지에 ×(1 + critDmg)
 	--   파티 버프(모든 유닛 / 주변 n타일 / 지정 유닛)는 여기 넣지 않는다 — RtsUnitBuffLogic이 얹는다(샤프아이즈·조커·프레이는 구역 전체·자신 포함, 홀리 유니티는 지정 유닛·자신 제외)
@@ -787,12 +687,11 @@ script RtsJobTableLogic extends Logic
 			local ign = 0
 			if L >= 20 then ign = 10 elseif L >= 10 then ign = 5 end
 			-- 레이징 블로우 140%×2회(2026-09-19 킷 보스 티어 조정: 90 → 140, 강화 +100 → +150. 스킬 강화 증강은 1회당 비율에 더함)
-			local s = { pct = 100, flat = 0, ratio = 140, hits = 2, targets = 3, ign = ign, fin = 100, finBoss = 100, ignBoss = -1, speed = "보통" }
+			local s = { pct = 100, flat = 0, ratio = 140, hits = 2, targets = 3, ign = ign, fin = 100, ignBoss = -1, speed = "보통" }
 			-- 2026-09-24 사용자 "1티어는 기본 스킬을 손봐서 증강 효율을 높이게": 어드콤 강화 공격력 +100%·발할라 +30%(합연산 200 → 230%)와 킷 보공 15%를
 			--   최종 데미지(곱)로 옮긴다 — 레벨마다 기본 딜은 같고(×2.0 → ×2.3, 보스 ×1.15), 공격력%·보공이 100%·0%에서 시작해 증강 공격력%·보공이 희석되지 않는다
 			if L >= 40 then
 				s.fin = 200
-				s.finBoss = 200
 				s.ratio = 290
 				s.targets = 6
 				s.range = 2
@@ -800,7 +699,6 @@ script RtsJobTableLogic extends Logic
 			if L >= 50 then
 				s.ignBoss = 60 -- 2026-09-23 사용자 "발할라 방무 100 → 60%" — 보스 상대면 st.ign에 더한다(합연산, 2026-09-24): 50레벨 10 + 60 = 70
 				s.fin = 230
-				s.finBoss = 230
 				-- 1티어 보스 가산 = damage.md ⑤ 스킬 데미지 '보스 공격 시 +n%'(st.bossRatio — 보스를 칠 때만 기본 공격 비율에 더한다) (2026-09-24 티어 재설계 — .info/tier.md, 값 = tools/balance-calc.py TUNE): 발할라 레이징 블로우 +45%(전 보스 최종 ×1.15)
 				s.bossRatio = 45
 			end
@@ -808,10 +706,9 @@ script RtsJobTableLogic extends Logic
 		end
 		if jobId == "paladin" then
 			-- 2026-09-19 밸런스 패치(목표 DPS 조정): 디바인 차지 200%, 디바인 블레싱(30) 최종 +50%, 디바인 차지 강화(50) 데미지 +140%(→ 340%)·사거리 2·6마리·2회, 생츄어리 200%(스킬 표)
-			local s = { pct = 100, flat = 0, ratio = 120, hits = 1, targets = 4, ign = 0, fin = 100, finBoss = 100, ignBoss = -1, speed = "느림" }
+			local s = { pct = 100, flat = 0, ratio = 120, hits = 1, targets = 4, ign = 0, fin = 100, ignBoss = -1, speed = "느림" }
 			if L >= 30 then
 				s.fin = 150
-				s.finBoss = 150
 			end
 			if L >= 50 then
 				s.ratio = 190
@@ -825,7 +722,7 @@ script RtsJobTableLogic extends Logic
 			-- 2026-09-19 3차: 비홀더 강화(40, 공격속도 보통) 제거 → 스피어 버스터 강화(40) 데미지 +30%(70 → 100%). 공격속도는 끝까지 느림
 			-- 2026-09-23 사용자 "다크나이트 초반에 너무 세다 — 초반 너프, 후반 약상향": 스피어 버스터 120 → 80%, 30레벨 숙련 +50%(130%) 신설, 40레벨 강화 +50% 그대로(180%, 전 170%)
 			--   6타는 거대화 프리즘만(ApplyPrismStat "giant" — 2026-09-23 사용자 "거대화 때만 6회, 기존은 3회")
-			local s = { pct = 100, flat = 0, ratio = 80, hits = 3, targets = 3, ign = 0, fin = 100, finBoss = 100, ignBoss = -1, speed = "느림" }
+			local s = { pct = 100, flat = 0, ratio = 80, hits = 3, targets = 3, ign = 0, fin = 100, ignBoss = -1, speed = "느림" }
 			--   → 같은 날 "버서크(공격력 +100%)를 30으로, 숙련을 20으로": 20~29레벨 딜 ×0.81(80% × 공격력 2배 → 130% × 1배), 30레벨부터 그대로
 			if L >= 10 then s.flat = 100 end
 			if L >= 20 then s.ratio = 130 end
@@ -837,7 +734,6 @@ script RtsJobTableLogic extends Logic
 			end
 			if L >= 50 then
 				s.fin = 120
-				s.finBoss = 120
 				s.ign = 50 -- 2티어 킷 방무 50(2026-09-24 사용자 "팬텀 제외 2티어 방무 통일" — 섀도어와 같은 50, 팬텀 60) — 드래곤 로어 패시브
 			end
 			return s
@@ -845,7 +741,7 @@ script RtsJobTableLogic extends Logic
 		if jobId == "bow" then
 			-- 폭풍의 시 50%×1회×1마리, 공격속도와 무관하게 0.2초마다(period). 크리티컬 마스터리 +30%(L10), 보우 마스터리·액스퍼트 공격력 +5%씩(L20·L30), 강화 75%(L50). 샤프아이즈는 파티 버프(여기 안 넣음)
 			--   2026-09-19 밸런스 패치: 폭풍의 시 40%, 보우 마스터리·액스퍼트 +25%씩, 강화 +15%(→ 55%)
-			local s = { pct = 100, flat = 0, ratio = 70, hits = 1, targets = 1, ign = 0, fin = 100, finBoss = 100, ignBoss = -1, speed = "매우빠름", period = 0.2, crit = self.BaseCritRate, critDmg = self.BaseCritDamage }
+			local s = { pct = 100, flat = 0, ratio = 70, hits = 1, targets = 1, ign = 0, fin = 100, ignBoss = -1, speed = "매우빠름", period = 0.2, crit = self.BaseCritRate, critDmg = self.BaseCritDamage }
 			if L >= 10 then s.crit = s.crit + 30 end
 			if L >= 20 then s.pct = s.pct + 25 end
 			if L >= 30 then s.pct = s.pct + 25 end
@@ -860,7 +756,7 @@ script RtsJobTableLogic extends Logic
 		if jobId == "marks" then
 			-- 피어싱 30%×3회×6마리(느림 1.25초). 크리티컬 마스터리 +30%(L10), 크로스보우 액스퍼트 공격력 +20%(L40), 강화 50%×4회(L50). 샤프아이즈(L20)는 파티 버프
 			--   2026-09-19 밸런스 패치: 피어싱 2회(3회에서), 크로스보우 액스퍼트 +70%, 강화(50) = 데미지 +50%만(3차: 사거리 4 변경·타격 수 변경 모두 삭제 → 30 + 50 = 80%)
-			local s = { pct = 100, flat = 0, ratio = 183.3, hits = 2, targets = 6, ign = 0, fin = 100, finBoss = 100, ignBoss = -1, speed = "느림", crit = self.BaseCritRate, critDmg = self.BaseCritDamage }
+			local s = { pct = 100, flat = 0, ratio = 183.3, hits = 2, targets = 6, ign = 0, fin = 100, ignBoss = -1, speed = "느림", crit = self.BaseCritRate, critDmg = self.BaseCritDamage }
 			if L >= 10 then s.crit = s.crit + 30 end
 			if L >= 40 then s.pct = 170 end
 			if L >= 50 then
@@ -874,7 +770,7 @@ script RtsJobTableLogic extends Logic
 			-- 체인 라이트닝 100%×1회×10마리(보통). 메디테이션 +50(L10), 강화 2회(L20), 아케인 에임 공격력 +10%(L40), 인피니티 최종 +10%(L50)
 			--   2026-09-19 밸런스 패치: 메디테이션 +150, 강화(20) = 사거리 3·130%(타격 수 변경 제거), 아케인 에임 +50%, 인피니티(50) = 공격력 +50%(3차; 최종 데미지 항목 삭제), 블리자드 300%·빙결 5초(스킬 표)
 			--   2026-09-23 너프(사용자 "체인 라이트닝 초반 너무 사기"): 최대 10마리 → 6마리, 데미지 −20%(130% → 105%, 강화 170% → 135%)
-			local s = { pct = 100, flat = 0, ratio = 105, hits = 1, targets = 6, ign = 0, fin = 100, finBoss = 100, ignBoss = -1, speed = "보통", crit = self.BaseCritRate, critDmg = self.BaseCritDamage }
+			local s = { pct = 100, flat = 0, ratio = 105, hits = 1, targets = 6, ign = 0, fin = 100, ignBoss = -1, speed = "보통", crit = self.BaseCritRate, critDmg = self.BaseCritDamage }
 			if L >= 10 then s.flat = 150 end
 			-- 2026-09-23 사용자 "체인 라이트닝 강화(20) 데미지 더 — 30레벨 사냥 6천 초반까지": 135 → 355%(30레벨 사냥 2,325 → 약 6,100)
 			if L >= 20 then
@@ -884,18 +780,16 @@ script RtsJobTableLogic extends Logic
 			-- 2026-09-24 1티어 증강 효율: 아케인 에임·인피니티 공격력 +50%씩(합 150 → 200%)과 킷 보공 40%를 최종 데미지(곱)로 — 기본 딜은 같고 증강 공격력%·보공이 희석되지 않는다
 			if L >= 40 then
 				s.fin = 150
-				s.finBoss = 150
 			end
 			if L >= 50 then
 				s.fin = 200
-				s.finBoss = 200 -- 인피니티 보스 최종 +40% 삭제 (2026-09-24 티어 재설계 — .info/tier.md, 값 = tools/balance-calc.py TUNE) — 1티어 보스 딜은 템페스트
 			end
 			return s
 		end
 		if jobId == "fp" then
 			-- 기본 공격 없음 — 포이즌 리전(지속 피해 지대 dotPct%/2초 × 12초, 방무 100%, 쿨 15)·도트 퍼니셔(구체 100%, 쿨 15)만. 아래 2026-09-19 패치 값 참조
 			--   ratio·hits·targets 0 = 표의 기본 DPS 0(지속 피해는 팝업 DPS에 아직 안 넣음)
-			local s = { pct = 100, flat = 0, ratio = 0, hits = 0, targets = 0, ign = 0, fin = 100, finBoss = 100, ignBoss = -1, speed = "보통", crit = self.BaseCritRate, critDmg = self.BaseCritDamage, dotPct = 10, dotIgn = 0 }
+			local s = { pct = 100, flat = 0, ratio = 0, hits = 0, targets = 0, ign = 0, fin = 100, ignBoss = -1, speed = "보통", crit = self.BaseCritRate, critDmg = self.BaseCritDamage, dotPct = 10, dotIgn = 0 }
 			--   2026-09-19 밸런스 패치: 포이즌 리전 기본 15%·방무 100%, 메디테이션 +100, 강화(20) +15%(→ 30%), 아케인 에임 +50%, 인피니티 최종 +30%(3차)
 			--   2026-09-23 사용자 "포이즌 리전 데미지 2배, 너무 약하네": 기본 15 → 30%, 강화(20) 30 → 60%
 			s.dotPct = 50 -- 2026-09-26 사용자 "포이즌 리전 좀 많이 세게 — 50%, 강화 80%"(전 30 · 60)
@@ -907,7 +801,6 @@ script RtsJobTableLogic extends Logic
 			if L >= 40 then s.pct = 150 end
 			if L >= 50 then
 				s.fin = 130
-				s.finBoss = 130
 				s.bossAdd = 10 -- 킷 보스 티어(2026-09-19): 불독 10%
 				s.ign = 50 -- 2티어 킷 방무 50(2026-09-24 사용자 "팬텀 제외 2티어 방무 통일" — 섀도어와 같은 50, 팬텀 60) — 인피니티
 			end
@@ -916,12 +809,11 @@ script RtsJobTableLogic extends Logic
 		if jobId == "bishop" then
 			-- 엔젤레이 80%×1회×1마리(보통). 메디테이션 +50(L10), 아케인 에임 +20%(L40), 인피니티 최종 +30%(L50). 프레이(L30)는 파티 버프(여기 안 넣음)
 			--   2026-09-19 밸런스 패치: 엔젤레이 30%×3회, 메디테이션 +100, 아케인 에임 +50%, 인피니티 최종 +20%, 제네시스 300%(스킬 표), 프레이 = 모든 유닛 최종 +10%(RtsUnitBuffLogic)
-			local s = { pct = 100, flat = 0, ratio = 38, hits = 3, targets = 1, ign = 0, fin = 100, finBoss = 100, ignBoss = -1, speed = "보통", crit = self.BaseCritRate, critDmg = self.BaseCritDamage }
+			local s = { pct = 100, flat = 0, ratio = 38, hits = 3, targets = 1, ign = 0, fin = 100, ignBoss = -1, speed = "보통", crit = self.BaseCritRate, critDmg = self.BaseCritDamage }
 			if L >= 10 then s.flat = 100 end
 			if L >= 40 then s.pct = 150 end
 			if L >= 50 then
 				s.fin = 120
-				s.finBoss = 120
 				s.bossAdd = 40 -- 킷 보스 티어(2026-09-19): 비숍 40%
 			end
 			return s
@@ -929,7 +821,7 @@ script RtsJobTableLogic extends Logic
 		if jobId == "nl" then
 			-- 쿼드러플 스로우 110%×4회×1마리(빠름). 자벨린 마스터리(10) 최종 +10%, 크리티컬 마스터리(20) 크확 +30·크뎀 +25, 쉐도우 파트너(30) 표창 +4개 ½(halfHits), 자벨린 마스터리(40) 최종 +10%·+100, 레디 투 다이(50) 최종 +20%
 			--   킷 보스 티어 0%·공격력% 0(2026-09-19 사용자: 나이트로드는 증강 효율 최고). 최종 데미지는 곱(damage.md ⑥)
-			local s = { pct = 100, flat = 0, ratio = 110, hits = 4, targets = 1, ign = 0, fin = 100, finBoss = 100, ignBoss = -1, speed = "빠름", crit = self.BaseCritRate, critDmg = self.BaseCritDamage }
+			local s = { pct = 100, flat = 0, ratio = 110, hits = 4, targets = 1, ign = 0, fin = 100, ignBoss = -1, speed = "빠름", crit = self.BaseCritRate, critDmg = self.BaseCritDamage }
 			if L >= 10 then s.fin = s.fin * 1.10 end
 			if L >= 20 then
 				s.crit = s.crit + 30
@@ -941,12 +833,11 @@ script RtsJobTableLogic extends Logic
 				s.flat = 100
 			end
 			if L >= 50 then s.fin = s.fin * 1.20 end
-			s.finBoss = s.fin
 			return s
 		end
 		if jobId == "shad" then
 			-- 새비지 블로우 17.5%×8회×1마리(매우빠름). 대거 마스터리(10) 공격력 +30%, 크리티컬 마스터리(20) 크확 +30·크뎀 +20, 대거 익스퍼트(40) 공격력 +20%·최종 +5%, 레디 투 다이(50) 최종 +20%·보스 +30%(킷 티어 4)
-			local s = { pct = 100, flat = 0, ratio = 29.2, hits = 8, targets = 1, ign = 0, fin = 100, finBoss = 100, ignBoss = -1, speed = "매우빠름", crit = self.BaseCritRate, critDmg = self.BaseCritDamage }
+			local s = { pct = 100, flat = 0, ratio = 29.2, hits = 8, targets = 1, ign = 0, fin = 100, ignBoss = -1, speed = "매우빠름", crit = self.BaseCritRate, critDmg = self.BaseCritDamage }
 			if L >= 10 then s.pct = 130 end
 			if L >= 20 then
 				s.crit = s.crit + 30
@@ -963,13 +854,12 @@ script RtsJobTableLogic extends Logic
 				s.bossRatio = 88
 				s.ign = 50
 			end
-			s.finBoss = s.fin
 			return s
 		end
 		if jobId == "phantom" then
 			-- 조커 192.5%×1회×1마리, 공격속도 무관 0.1초(폭풍의 시처럼 period 고정; 2026-09-20 사용자 "0.1초당 1회, 데미지 반토막" — 385%·0.2초에서 DPS 동일). 문라이트(20)·프레이 오브 아리아(30) 각 +150·+10%, 케인 엑스퍼트(40) 최종 +10%,
 			--   블스아이(50) 크확 +50·크뎀 +30·방무 100·보스 +60%(킷 티어 1 +10 포함)·최종 +20%. 조커: 날카로운 검(10)은 파티 버프(RtsUnitBuffLogic joker, 자신 포함)라 여기 안 넣음. 레벨업당 공격력 0
-			local s = { pct = 100, flat = 0, ratio = 192.5, hits = 1, targets = 1, ign = 0, fin = 100, finBoss = 100, ignBoss = -1, speed = "매우빠름", period = 0.1, crit = self.BaseCritRate, critDmg = self.BaseCritDamage }
+			local s = { pct = 100, flat = 0, ratio = 192.5, hits = 1, targets = 1, ign = 0, fin = 100, ignBoss = -1, speed = "매우빠름", period = 0.1, crit = self.BaseCritRate, critDmg = self.BaseCritDamage }
 			if L >= 20 then
 				s.flat = s.flat + 150
 				s.pct = s.pct + 10
@@ -988,21 +878,16 @@ script RtsJobTableLogic extends Logic
 				s.bossRatio = 143 -- 2026-09-24 사용자 "1티어 30장 · 2티어 8장이 권장 — 편차 줄이기": 그 장수에서 1티어 50만 · 2티어 8만(팬텀 8.8만)
 				s.fin = s.fin * 1.20
 			end
-			s.finBoss = s.fin
 			return s
 		end
 		-- 나머지 직업: 스킬표 등록 전 임시 계수(기본 공격 100%·1마리·1회, 직업 공격속도만 반영)
-		local s = { pct = 100, flat = 0, ratio = 100, hits = 1, targets = 1, ign = 0, fin = 100, finBoss = 100, ignBoss = -1, speed = self:GetBaseSpeed(jobId), crit = self.BaseCritRate, critDmg = self.BaseCritDamage }
+		local s = { pct = 100, flat = 0, ratio = 100, hits = 1, targets = 1, ign = 0, fin = 100, ignBoss = -1, speed = self:GetBaseSpeed(jobId), crit = self.BaseCritRate, critDmg = self.BaseCritDamage }
 		return s
 	end
 
 	-- damage.md 7단계: ① 공격력(기본 + 성장 + 추가) → ② × 공격력%(합) → ③ × 보스 데미지 증가(합, 보스만) → ④ × 크리티컬(기대값 1 + 확률 × 크뎀)
 	--   → ⑤ × 스킬 비율(1회 타격) → ⑥ × 최종 데미지(곱) → ⑦ 방어(표·팝업엔 없음). 보스 DPS = 1타 × 타격 수 ÷ 주기, 몬스터 DPS = × 타겟 수
 	--   버프 없는 자기 능력치만. 파티 버프(홀리 유니티·샤프아이즈·프레이·조커)는 RtsUnitBuffLogic.ApplyToStat으로 st를 바꾼 뒤 CalcStat
-	method table Calc(string jobId, number L)
-		return self:CalcStat(jobId, L, self:GetStat(jobId, L))
-	end
-
 	method table CalcStat(string jobId, number L, table st)
 		local base = self:GetBaseAttack(jobId)
 		local per = self:GetAttackPerLevel(jobId)
@@ -1013,19 +898,47 @@ script RtsJobTableLogic extends Logic
 		local bossMul = 1 + (st.bossAdd or 0) / 100
 		-- halfHits = 데미지 ½인 추가 타격(쉐도우 파트너 표창) — 타격 수에 0.5개씩 얹는다
 		local hitsEff = st.hits + (st.halfHits or 0) * 0.5
-		-- 보스 최종 데미지(st.finBoss — 킷·프리즘의 '보스 공격 시 최종 데미지'까지 곱)
 		-- ⑤ 보스 공격 시 +n%(st.bossRatio — 1티어, 2026-09-24): 보스 1타 비율 = 비율 + n
 		local bossRatioMul = 1
 		if st.bossRatio ~= nil and st.bossRatio ~= 0 and st.ratio > 0 then bossRatioMul = (st.ratio + st.bossRatio) / st.ratio end
-		local boss = one * hitsEff * bossMul * bossRatioMul * (st.finBoss / 100) * critMul / period
+		local boss = one * hitsEff * bossMul * bossRatioMul * (st.fin / 100) * critMul / period
 		local mob = one * hitsEff * st.targets * (st.fin / 100) * critMul / period
 		return { st = st, base = base, per = per, atk = atk, one = one, period = period, critMul = critMul, boss = boss, mob = mob }
+	end
+
+	-- ===== 1타 데미지 공식 한 곳(2026-09-28 정리 — 전투 RtsCombatLogic.DoAttack과 상세창 BossDps가 같은 식을 따로 적어 한쪽만 고치면 어긋났다) =====
+	-- 1타 = 내림(공격력 × 공격력% × 비율 × 최종) — 보스 배율·크리·무기·방어 전. 실수 오차(340×2×0.7 = 475.999…)로 한 끗 깎이지 않게 아주 작은 값을 더해 내림, 최소 1
+	method number PerHit(number atk, table st, number ratio)
+		return math.max(1, math.floor(atk * (st.pct / 100) * (ratio / 100) * (st.fin / 100) + 0.0001))
+	end
+
+	-- 스킬 k의 '보스 공격 시 +n%p'(damage.md ⑤): 스킬 자기 값(k.bossRatio — 블리자드 템페스트 180 − 1001 등), 기본 공격(k.ratio 없음)은 능력치 st.bossRatio(발할라·폭풍의 시 강화·블스아이 등). 없으면 nil
+	method any SkillBossRatio(table st, table k)
+		if k.bossRatio ~= nil then return k.bossRatio end
+		if k.ratio == nil then return st.bossRatio end
+		return nil
+	end
+
+	-- 보스를 칠 때 1타에 곱하는 배율 = ③ 보스 공격 시 데미지 증가(st.bossAdd 합) × ⑤ (비율 + n) ÷ 비율 — 그 타격의 비율 ratio 기준(타격마다 비율이 다르면 그 타격 것)
+	method number BossMul(table st, any bossRatio, number ratio)
+		local base = 1 + (st.bossAdd or 0) / 100
+		if bossRatio == nil or bossRatio == 0 or ratio == nil or ratio <= 0 then return base end
+		return base * (ratio + bossRatio) / ratio
+	end
+
+	-- 공격 루프가 스킬을 보는 순서: 쿨타임 스킬(표 뒤에서부터 = 높은 레벨 먼저) → 쿨 없는 스킬(뒤에서부터).
+	--   프리즘 액티브(디바인 퍼니시먼트·애로우 레인)는 표 끝에 붙어 한 번에 돌면 늘 먼저 잡혀 쿨 스킬이 영영 안 나갔다(2026-09-22 사용자 "디바인 퍼니시먼트 중에 제네시스가 잠금이 아닌데 안 쓴다")
+	method table SkillOrder(table skills)
+		local order = {}
+		for i = #skills, 1, -1 do if skills[i].cd ~= nil then order[#order + 1] = i end end
+		for i = #skills, 1, -1 do if skills[i].cd == nil then order[#order + 1] = i end end
+		return order
 	end
 
 	-- 보스 1마리 상대 기대 DPS(방어율 제외 — 2026-09-27 사용자 "유닛별 상세보기에서 보스 기준 DPS, 방어율 없는 기준" · RtsUnitPopupLogic):
 	--   RtsCombatLogic.DoAttack과 같은 규칙으로 공격 루프를 돌린다 — 공격 주기(GetPeriod)마다, 후딜(after) 중엔 건너뛰고,
 	--   준비된 쿨타임 스킬(표 뒤에서부터) → 쿨 없는 액티브(뒤에서부터) 순으로 1개. 보스 라운드 기준이라 잠금 1(보스전 잠금)·2·3 스킬은 안 쓰고, 보스는 늘 사거리 안(보스전 사거리)으로 본다.
-	--   1타 = 내림(공격력 × 공격력% × 비율 × 최종) × 보스 배율(③ 보스 데미지 · ⑥ 보스 최종 · ⑤ 보스 공격 시 +n%p) × 무기 기대값 × 크리 기대값(1 + 확률 × 크뎀, 확정 크리면 1 + 크뎀).
+	--   1타 = PerHit(내림(공격력 × 공격력% × 비율 × 최종)) × BossMul(③ 보스 데미지 · ⑤ 보스 공격 시 +n%p) × 무기 기대값 × 크리 기대값(1 + 확률 × 크뎀, 확정 크리면 1 + 크뎀).
 	--   보스 집중(bossHits)·구체(spread — 전부 보스에게)·타격별 비율(hitRatios)·쉐도우 파트너(halfHits, ½)·지대(dot — 보스 배율·고정 데미지 없음)까지.
 	--   받는 데미지 증가(디바인 퍼니시먼트)·방어구 부수기·가드 크러쉬·방어율은 보스 쪽 효과라 뺀다. u = 유닛(JobId·Level·Prisms·SkillLocks만 읽음), st = GetStatFor(+ 파티 버프) 결과.
 	--   첫 쿨타임 몰림을 빼려고 처음 30초 뒤 300초 평균(tools/balance-calc.py rotation_dps와 같은 방식)
@@ -1038,30 +951,20 @@ script RtsJobTableLogic extends Logic
 		local critDmg = st.critDmg or 0
 		local critP = math.min(100, math.max(0, st.crit or 0)) / 100
 		local critExp = 1 + critP * critDmg / 100
-		local bossBaseSt = (1 + (st.bossAdd or 0) / 100) * ((st.finBoss or st.fin) / st.fin)
 		local order = {}
-		local function usable(i)
+		for _, i in ipairs(self:SkillOrder(skills)) do
 			local k = skills[i]
-			if k.kind ~= "액티브" or k.fx == nil or u.Level < k.lv then return false end
-			return self:GetLock(u.SkillLocks or "", i) == 0
+			if k.kind == "액티브" and k.fx ~= nil and u.Level >= k.lv and self:GetLock(u.SkillLocks or "", i) == 0 then order[#order + 1] = i end
 		end
-		for i = #skills, 1, -1 do if skills[i].cd ~= nil and usable(i) then order[#order + 1] = i end end
-		for i = #skills, 1, -1 do if skills[i].cd == nil and usable(i) then order[#order + 1] = i end end
 		if #order == 0 then return 0 end
 		-- 시전 1번이 보스에게 주는 기대 데미지(스킬마다 한 번)
 		local castDmg = {}
 		for _, i in ipairs(order) do
 			local k = skills[i]
 			local ratio = k.ratio or st.ratio
-			local perHit = math.max(1, math.floor(c.atk * (st.pct / 100) * (ratio / 100) * (st.fin / 100) + 0.0001))
+			local perHit = self:PerHit(c.atk, st, ratio)
 			local hits = k.hits or st.hits
-			local bossBase = bossBaseSt * (k.bossFinal or 1)
-			local bossRatio = k.bossRatio
-			if bossRatio == nil and k.ratio == nil then bossRatio = st.bossRatio end
-			local function bossMulFor(r)
-				if bossRatio == nil or bossRatio == 0 or r == nil or r <= 0 then return bossBase end
-				return bossBase * (r + bossRatio) / r
-			end
+			local bossRatio = self:SkillBossRatio(st, k)
 			local ce = critExp
 			if k.forceCrit == true then ce = 1 + critDmg / 100 end
 			local total = 0
@@ -1070,21 +973,21 @@ script RtsJobTableLogic extends Logic
 				local hitBase = perHit
 				if k.hitRatios ~= nil and k.hitRatios[h] ~= nil then
 					r = k.hitRatios[h]
-					hitBase = math.max(1, math.floor(c.atk * (st.pct / 100) * (r / 100) * (st.fin / 100) + 0.0001))
+					hitBase = self:PerHit(c.atk, st, r)
 				end
-				total = total + hitBase * bossMulFor(r)
+				total = total + hitBase * self:BossMul(st, bossRatio, r)
 			end
 			-- 보스 집중: 대상이 전부 보스면 bossHits번 반복(1체 기준)
 			if k.bossHits ~= nil then total = total * k.bossHits end
 			total = total * ce
 			-- 쉐도우 파트너: 기본 공격(쿨·자기 타격 수 없음) 뒤 ½ 데미지 halfHits회
 			if k.cd == nil and k.hits == nil and (st.halfHits or 0) > 0 then
-				total = total + st.halfHits * perHit * 0.5 * bossMulFor(ratio) * critExp
+				total = total + st.halfHits * perHit * 0.5 * self:BossMul(st, bossRatio, ratio) * critExp
 			end
 			-- 지속 피해 지대: dur ÷ period틱, 보스 배율 없음(고정 데미지는 일반 몬스터만)
 			if k.dot ~= nil then
 				local dotPct = st.dotPct or k.dot.pct
-				local perTick = math.max(1, math.floor(c.atk * (st.pct / 100) * (dotPct / 100) * (st.fin / 100) + 0.0001))
+				local perTick = self:PerHit(c.atk, st, dotPct)
 				total = total + perTick * math.floor(k.dot.dur / k.dot.period + 0.5) * critExp
 			end
 			castDmg[i] = total * weapon
@@ -1199,8 +1102,6 @@ script RtsJobTableLogic extends Logic
 		return false
 	end
 
-	-- 직업 티어(2026-09-24 사용자 — .info/tier.md): 1 히어로·나이트로드·썬콜·보우마스터(보우 = 같은 날 2 → 1) /
-	--   2 섀도어·팬텀·불독·신궁·다크나이트(불독·신궁·다크 = 같은 날 3 → 2, 3티어 없음) / 4 팔라딘·비숍(서포터)
 	-- ===== 영입 상세(2026-09-25 사용자 "유닛 기본 외형 + 강점·약점 오각형 + 스킬 목록" — 직업 설명 문구는 같은 날 빼기로) =====
 
 	-- 기본 공격 사거리(레벨 L): 전투와 같은 규칙(RtsCombatLogic — 획득한 쿨 없는 액티브 중 뒤의 것, 레벨 강화 st.range가 있으면 그것, 없으면 스킬 range, 그것도 없으면 2)
@@ -1219,22 +1120,11 @@ script RtsJobTableLogic extends Logic
 
 	-- 오각형 5축 단계(5 매우 높음 … 1 매우 낮음, 50레벨 · 증강 없음 · 전체 직업 중 비교 — 2026-09-25 사용자):
 	--   speed = 기본 공격 속도 이름 / range = 기본 공격 사거리 ÷ 전체 최댓값 → 80·60·40·20% / aug = 증강 효율(1티어 5 · 팬텀 4 · 2티어 3 · 서포터 1, '낮음'은 비움 — 화면엔 티어 말 금지)
-	--   boss·hunt = tools/balance-calc.py --radar(2026-09-27 증강 개편 반영: 보스 = 50레벨 + 자기 프리즘 + 마지막 보스 전 카드 43장을 한 장씩 단계별 최선 종류로 몰아준 보스 DPS, 사냥 = 50레벨·증강 없음 40마리 사냥 DPS, 샤프아이즈 없음 — 2026-09-27 크확·크뎀·공% 증강 상향으로 기본 크리가 있는 보우·나로가 앞선다) — 직업 수치가 바뀌면 다시 돌려 옮긴다
+	--   boss·hunt = tools/balance-calc.py --radar(2026-09-27 증강 개편 반영: 보스 = 50레벨 + 자기 프리즘 + 마지막 보스 전 카드 43장을 한 장씩 단계별 최선 종류로 몰아준 보스 DPS, 사냥 = 50레벨·증강 없음 40마리 사냥 DPS, 샤프아이즈 없음 — 2026-09-27 크확·크뎀·공% 증강 상향으로 기본 크리가 있는 보우·나로가 앞선다) — 직업 수치가 바뀌면 다시 돌려 JobDefs.radar로 옮긴다
 	method table GetRadar(string jobId)
-		local fixed = {
-			hero = { boss = 4, hunt = 5 },
-			paladin = { boss = 1, hunt = 2 },
-			dk = { boss = 1, hunt = 3 },
-			bow = { boss = 5, hunt = 1 },
-			marks = { boss = 1, hunt = 4 },
-			il = { boss = 3, hunt = 3 },
-			fp = { boss = 1, hunt = 2 },
-			bishop = { boss = 1, hunt = 1 },
-			nl = { boss = 5, hunt = 1 },
-			shad = { boss = 1, hunt = 1 },
-			phantom = { boss = 2, hunt = 2 },
-		}
-		local f = fixed[jobId] or { boss = 1, hunt = 1 }
+		local d = self:JobDef(jobId)
+		local f = { boss = 1, hunt = 1 }
+		if d ~= nil then f = d.radar end
 		local sp = self:GetStat(jobId, 50).speed or "보통"
 		local speed = 3
 		if sp == "매우빠름" then speed = 5 elseif sp == "빠름" then speed = 4 elseif sp == "느림" then speed = 2 elseif sp == "매우느림" then speed = 1 end
@@ -1257,10 +1147,11 @@ script RtsJobTableLogic extends Logic
 		return 1
 	end
 
+	-- 직업 티어(JobDefs.tier — .info/tier.md)
 	method number TierOf(string jobId)
-		if jobId == "hero" or jobId == "nl" or jobId == "il" or jobId == "bow" then return 1 end
-		if jobId == "shad" or jobId == "phantom" or jobId == "fp" or jobId == "marks" or jobId == "dk" then return 2 end
-		return 4
+		local d = self:JobDef(jobId)
+		if d == nil then return 4 end
+		return d.tier
 	end
 
 	-- 이 유닛에 적용된 증강 개수 = 브론즈~골드·특수 코어(Augs) + 직업 프리즘(Prisms). 팬텀 영입(잠금 해제)은 유닛에 안 붙어 빠진다 — 방어구 부수기(아래 ArmorBreakFor)
@@ -1286,13 +1177,16 @@ script RtsJobTableLogic extends Logic
 	-- 1티어 증강 효과 최대 배율(증강 ArmorBreakCap개 = 30개일 때) — AugMulFor
 	property number T1AugMulMax = 3
 
+	-- 방어구 부수기·1티어 증강 배율이 세는 증강 개수(AugCountOf, 최대 ArmorBreakCap)
+	method number CappedAugCount(any u)
+		return math.min(self:AugCountOf(u), self.ArmorBreakCap)
+	end
+
 	method number ArmorBreakFor(any u)
 		if u == nil or self:TierOf(u.JobId) ~= 1 then return 0 end
 		-- 자기 직업 프리즘이 있어야 켜진다(2026-09-24 사용자 "프리즘도 없는데 왜 자꾸 뜨냐" — 증강 배율 AugMulFor와 같은 조건, 전엔 빠져 있었다)
 		if not self:HasOwnPrism(u) then return 0 end
-		local n = self:AugCountOf(u)
-		if n > self.ArmorBreakCap then n = self.ArmorBreakCap end
-		return n * self.ArmorBreakPer
+		return self:CappedAugCount(u) * self.ArmorBreakPer
 	end
 
 	-- 프리즘 증강 효율 버프(2026-09-25 사용자 "프리즘 코어의 증강 효율 증가가 버프 창에 — 증강이 얼마나 오르는지, 증강으로 오른 수치 +얼마"):
@@ -1304,7 +1198,7 @@ script RtsJobTableLogic extends Logic
 		if u == nil then return nil end
 		local m = self:AugMulFor(u)
 		local keys = { "atk", "pct", "boss", "crit", "critDmg" }
-		local label = { atk = "공격력", pct = "공격력%", boss = "보스 공격 시 데미지", crit = "크리티컬 확률", critDmg = "크리티컬 데미지" }
+		local label = { atk = "공격력", pct = "공격력%", boss = "보스 공격 시 데미지", crit = "크리티컬 확률", critDmg = "크리티컬 데미지" } -- 배율이 켜진 능력치 이름(eff 문장)
 		local on = {}
 		local same = true
 		for i = 1, #keys do
@@ -1339,16 +1233,8 @@ script RtsJobTableLogic extends Logic
 		local A = _RtsAugmentTableLogic
 		local t1 = A:TotalsMul(u.Augs, m)
 		local t0 = A:TotalsMul(u.Augs, nil)
-		local parts = {}
-		local function add(text, v, unit)
-			if v >= 0.05 then parts[#parts + 1] = text .. " +" .. _RtsHudLogic:Num(v) .. unit end -- 소수 한 자리(2026-09-27 증강 3.5·5.5·7.5 단계)
-		end
-		add("공격력", t1.atk - t0.atk, "")
-		add("공격력", t1.pct - t0.pct, "%")
-		add("보스 공격 시 데미지", t1.boss - t0.boss, "%")
-		add("크리티컬 확률", t1.crit - t0.crit, "%")
-		add("크리티컬 데미지", t1.critDmg - t0.critDmg, "%")
-		return { name = name, eff = eff, gains = parts }
+		local gains = A:StatLines({ atk = t1.atk - t0.atk, pct = t1.pct - t0.pct, boss = t1.boss - t0.boss, crit = t1.crit - t0.crit, critDmg = t1.critDmg - t0.critDmg })
+		return { name = name, eff = eff, gains = gains }
 	end
 
 	-- 증강 효과 배율 (2026-09-24 티어 재설계 — .info/tier.md, 값 = tools/balance-calc.py TUNE):
@@ -1363,9 +1249,7 @@ script RtsJobTableLogic extends Logic
 		local all = 1
 		-- 1티어 배율은 자기 직업 프리즘이 있을 때만(2026-09-24 사용자 "1티어·2티어 증강 효과는 프리즘이 붙은 경우 — 프리즘 없이 증강 효과가 늘면 안 돼")
 		if self:TierOf(u.JobId) == 1 and self:HasOwnPrism(u) then
-			local n = self:AugCountOf(u)
-			if n > self.ArmorBreakCap then n = self.ArmorBreakCap end
-			all = 1 + (self.T1AugMulMax - 1) * n / self.ArmorBreakCap
+			all = 1 + (self.T1AugMulMax - 1) * self:CappedAugCount(u) / self.ArmorBreakCap
 		elseif u.JobId == "phantom" then
 			all = 1.75
 		end
@@ -1404,19 +1288,6 @@ script RtsJobTableLogic extends Logic
 		local c = {}
 		for k, v in pairs(t) do c[k] = v end
 		return c
-	end
-
-	-- 프리즘 id의 대체 스킬(prism = true)을 쓸 수 있는 레벨 — 그 레벨 전엔 프리즘의 영구 잠금(locks)을 걸지 않는다(RtsUnitLogic.SyncPrismLocks). 대체 스킬이 없으면 1
-	--   2026-09-23 사용자 "모든 프리즘에 레벨 제한 50 제거 — 트루 스나이핑 50이라 못 쓰는 게 너무 패널티": 대체 스킬·홀리 유니티 lv 50 → 1(받는 즉시). 블리자드·도트 퍼니셔를 바꾸는 템페스트·초월은 그 스킬(30레벨)을 따르다가 2026-09-24 사용자 "프리즘 레벨 제한 다 없애야" → 이것도 1
-	method number PrismLockLevel(string id, string jobId)
-		local list = self:GetSkills(jobId)
-		self:ApplyPrismSkills(id, list, jobId)
-		local lv = 0
-		for i = 1, #list do
-			if list[i].prism == true and (lv == 0 or list[i].lv < lv) then lv = list[i].lv end
-		end
-		if lv == 0 then lv = 1 end
-		return lv
 	end
 
 	-- 직업 표 + 이 유닛의 프리즘(전투·팝업·연출·잠금이 쓰는 표)
@@ -1631,6 +1502,7 @@ script RtsJobTableLogic extends Logic
 			--   2026-09-23 사용자 "초반 너무 셈 — 초월에 데미지를 몰아주고, 초월 없는 데미지를 1/3": 기본 965 → 322%, 초월 281%·쿨 3초는 그대로
 			--   → 같은 날 "기본 10% 더 낮추고 초월 10% 올리자": 기본 322 → 290%, 초월 281 → 309%(초당 딜 기본의 ×5.3)
 			--   → 같은 날 "도트 퍼니셔 30개, 초월 60개 — 초월 딜은 그만큼 낮춰": 초월 구체 30 → 60개, 1개 309 → 154.5%(시전당 총합 그대로)
+			--   → 2026-09-24 티어 재설계로 1개 314%(지금 값 — 아래 k.ratio)
 			local i = self:FindSkill(list, "도트 퍼니셔")
 			if i > 0 then
 				local k = self:CopyTable(list[i])
@@ -1724,7 +1596,6 @@ script RtsJobTableLogic extends Logic
 	method void ApplyPrismStat(string id, table st, string jobId)
 		-- 2026-09-24 사용자: 프리즘의 '보스 공격시 데미지 증가 +n%'(③)를 빼고 → 같은 날 '보스 최종 데미지는 없어, 스킬 데미지로': 보스 가산은 전부 ⑤ '보스 공격 시 +n%'(st.bossRatio / 스킬 k.bossRatio).
 		--   값 = 직업 티어 목표(50레벨·증강 없음 보스 원딜: 1티어 히어로·나로 3만 · 썬콜 2.5만 / 2티어 4만 / 3티어 2.8만 / 비숍 개미딜 약 2천)에 맞춘 것.
-		--   = damage.md ⑥ '보스 공격 시 최종 데미지 +n%'(곱): 유닛 능력치 st.finBoss(보스 최종 데미지)에 ×(1 + n%) — 스킬 하나에만 붙는 것은 스킬 bossFinal(보스에게 주는 최종 데미지)
 		if id == "enrage" then
 			st.hits = 3
 			st.range = 3

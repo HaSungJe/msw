@@ -1,5 +1,7 @@
 # 텍스처 레지스트리
 
+> 2026-09-28 저장소 정리: 게임이 쓰지 않는 보관 PNG(`cave-*`, `thumb-*`, `world-avatar*`, `crusher/`)와 그 생성기(`gen-cave-floor.js`·`gen-snow-floor.js`·`gen-hud-frame.js`)를 삭제했다. 아래 표의 RUID는 업로드된 그대로이고, 원본 파일은 git 이력(2817953 이전 커밋)에서 꺼낼 수 있다.
+
 ## 기본 비석 (2026-09-25)
 
 `assets/design/tombstone/basic-cartoon-source.png` — 1199×1312 투명 카툰 비석(단풍잎 문양·이끼·데이지). RUID `31d8e05805664acea73d37b04ca92f68` (`RtsTombCartoonBasic`, sprite/object). `RtsTombLogic.GetPresets().basic`에 월드 스케일 0.6으로 적용. 이전 원작 묘비 RUID `29e864c67e6c451d917b34519a4a9373`은 보관.
@@ -50,7 +52,7 @@
 
 ## 이전 테마 썸네일·마을 장식 (2026-09-25 — `docs/design/theme-presets.md`, ChatGPT 시안)
 
-장식 원본은 `assets/design/themes/decor/`. 아래 옛 썸네일 5장의 디자인 원본은 `.beaver/output/archive/design-cleanup-260925/old-theme-thumbnails/`로 분리했다. 이 표의 `assets/textures/thumb-*.png`와 기존 업로드 RUID는 유지하며, 프리셋은 위의 새 풍경 썸네일을 사용한다. 장식은 투명 컷아웃을 **반으로 줄여**(최대 변 ≤ 768) 올렸다 → 프리셋 `scale`은 가이드라인 값 × 2. 전부 sprite/etc, PPU 100.
+장식 원본은 `assets/design/themes/decor/`. 아래 옛 썸네일 5장의 디자인 원본은 2026-09-25 정리 때 커밋하지 않았고, PNG도 2026-09-28 정리로 삭제했다(RUID만 남음). 이 표의 `assets/textures/thumb-*.png`와 기존 업로드 RUID는 유지하며, 프리셋은 위의 새 풍경 썸네일을 사용한다. 장식은 투명 컷아웃을 **반으로 줄여**(최대 변 ≤ 768) 올렸다 → 프리셋 `scale`은 가이드라인 값 × 2. 전부 sprite/etc, PPU 100.
 
 | 파일 | 내용 | RUID | 쓰는 곳 |
 |---|---|---|---|
@@ -69,7 +71,7 @@
 247종(몬스터 M001~M229 · 보스 B01~B18) 256×256 투명 PNG(그림 최대 216, 가운데)를 **각각 새 스프라이트**(sprite/etc, 이름 `RtsThumb<ID>`)로 올렸다. ID → RUID 표 = `assets/textures/monster-thumbs.tsv`(ID · RUID · 이름) → `python tools/gen-monster-thumbs.py` → `RtsMonsterThumbLogic.mlua` GENERATED 구간. `RtsHudLogic.SpawnMonsterPortrait`가 이 표를 먼저 본다 — 아이콘 탭·프로필 상자·유저 카드·아이콘 정보·획득 팝업·몬스터 정보 창 초상 전부. 그림을 바꾸면 새 리소스로 올려 tsv만 고치고 생성기를 다시 돌린다.
 
 ## HUD 프레임 (폐기 — 화면 v2에서 미니맵/초상화/정보창 제거)
-`tools/gen-hud-frame.js` — 구 스타식 HUD 프레임. RUID `3c4c2394686a46cf86a34f520d31c3f0`(340) · `3c81e689753f4c0eb2a58418963fdf2f`(240) · `28511390f76c42c08a9105751ced4051`(info). 보관.
+`tools/gen-hud-frame.js`(삭제) — 구 스타식 HUD 프레임. RUID `3c4c2394686a46cf86a34f520d31c3f0`(340) · `3c81e689753f4c0eb2a58418963fdf2f`(240) · `28511390f76c42c08a9105751ced4051`(info). 보관.
 
 ## 발판 강조 틀 (2026-09-15 — 위치 이동 모드)
 

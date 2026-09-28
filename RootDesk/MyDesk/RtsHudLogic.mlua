@@ -1,7 +1,8 @@
 -- rts-base #2: HUD v2 (화면 v2 — 아티팩트 v16) + Phase 6 (2026-09-23)
 --   하단 바(미니맵·초상화·정보·스킬칸·부대지정) 전부 제거.
---   좌상단 정보 카드 한 장(라운드·스페셜·남은 시간 / 맵 이름 / 메소·필드 n / 110) / 좌측 플레이어 목록(n/8, 생존·탈락, 나, 클릭→그 구역) /
---   상단 가운데 큰 영입 버튼(한도 표시) + 오른쪽 '다시 하기' 투표(언제든) / 우측 유닛 슬롯 6 / 좌하단 증강 버튼. 팝업은 RtsPopupLogic. 스테이지·필드·영입 버튼은 RtsStageLogic.RefreshHud가 0.25초마다.
+--   좌상단 프로필·정보 상자(라운드·스페셜·남은 시간 / 맵 이름 / 메소·필드 n / 110) / 유저 카드 목록(PlayersBox — 유저 목록 창에서 보인다) /
+--   '다시하기' 투표·일시정지 버튼 + 투표 패널 / 유닛 슬롯 6 / 오른쪽 아래 화면 모드 스위치. 영입·증강·유닛·배속 진입과 실제 배치는 RtsUiLayoutLogic.
+--   팝업은 RtsPopupLogic. 스테이지·필드·영입 문구는 RtsStageLogic.RefreshHud가 0.25초마다.
 --   UI 좌표는 1920×1080 기준(목업 1cqw = 19.2px).
 @Logic
 script RtsHudLogic extends Logic
@@ -33,12 +34,8 @@ script RtsHudLogic extends Logic
 
 	property Entity FieldText = nil
 
-	-- 상단 가운데 영입 버튼(바깥 테두리·안쪽·글자)과 표시 상태
-	property Entity RecruitBtn = nil
-
-	property Entity RecruitText = nil
-
-	property string RecruitShown = ""
+	-- 영입 상태 문구(RefreshRecruitButton) — RtsUiLayoutLogic 오른쪽 메뉴의 영입 버튼이 읽는다
+	property string RecruitText = "영입"
 
 	property number RecruitRoomPrev = 0
 
@@ -48,11 +45,6 @@ script RtsHudLogic extends Logic
 	property number RecruitLimitPrev = 0
 
 	property string RecruitSound = "dbb38b4f04044499906bd7a2ca9c4d7c"
-
-	-- 영입 칸이 새로 열렸을 때 반짝임 끝 시각(ElapsedSeconds)·토글
-	property number RecruitFlashUntil = 0
-
-	property boolean RecruitFlashOn = false
 
 	property string StageShown = ""
 
@@ -98,9 +90,6 @@ script RtsHudLogic extends Logic
 
 	property number SelectedSlot = 0
 
-	-- HUD 생성 전에 유닛이 먼저 동기화된 경우 표시 예약
-	property boolean PendingUnits = false
-
 	-- 상단 중앙 안내(위치 이동 모드 등)
 	property Entity Hint = nil
 
@@ -108,16 +97,8 @@ script RtsHudLogic extends Logic
 
 	property number HintGen = 0
 
-	-- 좌하단 증강 버튼(안쪽·글자)과 표시 중인 미지정 수
-	property Entity AugBtn = nil
-
-	-- 증강 메뉴 한 곳에서 보유·뽑기·도감을 연다.
-	property Entity AugNotice = nil
+	-- 고르지 않은 증강 선택지 수(SetPendingOffers) — RtsUiLayoutLogic의 '증강 · n' 버튼이 읽는다
 	property number PendingShown = 0
-
-	property Entity AugLabel = nil
-
-	property number AugShown = -1
 
 	-- 스테이지 칩 오른쪽 '다시 하기' 투표 버튼(2026-09-23 사용자 "죽었을 때 말고 라운드 오른쪽에 기본으로 — 언제든 도중에 투표로 다시 하기")
 	property Entity RestartBtn = nil
@@ -126,7 +107,7 @@ script RtsHudLogic extends Logic
 
 	property string RestartShown = ""
 
-	-- 일시정지: 상단 다시하기 오른쪽 버튼 · 가운데 안내 · 지금 보이는 상태 키
+	-- 일시정지: 다시하기 오른쪽 버튼 · 가운데 안내 · 지금 보이는 상태 키
 	property Entity PauseBtn = nil
 
 	property Entity PauseText = nil
@@ -134,21 +115,6 @@ script RtsHudLogic extends Logic
 	property Entity PausePanel = nil
 
 	property string PauseShown = ""
-
-	-- 배속 스위치(2026-09-27 사용자 "좌/우 스위치 — 왼쪽 1배속(초록) · 오른쪽 2배속(빨강), 여럿이면 스위치 위에 배속마다 고른 사람 수, 솔로는 표시 없이"):
-	--   오른쪽 아래 화면 모드 스위치 위에 고정. SpeedBox = 스위치 + 인원 묶음, SpeedTrack = 트랙(안쪽), SpeedKnob = 손잡이, SpeedSide[1·2] = { label, count }
-	property Entity SpeedBox = nil
-
-	property Entity SpeedTrack = nil
-
-	property Entity SpeedKnob = nil
-
-	property table SpeedSide = {}
-
-	property string SpeedShown = ""
-
-	-- 진행 중 실수 방지: 첫 클릭 뒤 이 시각(ElapsedSeconds)까지 한 번 더 누르면 찬성
-	property number RestartConfirmUntil = 0
 
 	-- UI 효과음(2026-09-24 사용자 "버튼 클릭 · 창 오픈 때 다 효과음"): 원작 sound/ui — BtMouseClick · MenuUp · MenuDown
 	property string ClickSound = "972843e759204d3e9ad84e7d3fa94f83"
@@ -426,7 +392,7 @@ script RtsHudLogic extends Logic
 		return b
 	end
 
-	-- 클릭음 없는 버튼(누르면 자기 소리가 따로 나는 곳 — 예: '펼치기'는 3택1 등장음이 난다, 2026-09-24 사용자 "펼칠 때 소리 중복")
+	-- 클릭음 없는 버튼(누르면 자기 소리가 따로 나는 곳 — 예: 증강 선택 대기 행은 3택1 등장음이 난다, 2026-09-24 사용자 "펼칠 때 소리 중복" · 페이지 화살표 등)
 	@ExecSpace("ClientOnly")
 	method Entity SpawnClickQuiet(string name, Entity parent)
 		local b = self:SpawnStretch("model://uibutton", name, parent, Vector2(0, 0), Vector2(1, 1), Vector2(0, 0), Vector2(0, 0))
@@ -454,6 +420,11 @@ script RtsHudLogic extends Logic
 		return Color(0.533, 0.400, 0.863, 1)
 	end
 
+	-- 금색(ColGold) 바탕 위 어두운 글자 — 레벨업·받기·지정·계속하기 버튼 공용
+	method Color ColGoldInk()
+		return Color(0.133, 0.114, 0.09, 1)
+	end
+
 	method Color ColPanel()
 		return Color(0.988, 0.988, 1, 0.98)
 	end
@@ -479,6 +450,148 @@ script RtsHudLogic extends Logic
 		if series == "mag" then return Color(0.357, 0.525, 0.847, 1) end
 		if series == "thf" then return Color(0.557, 0.357, 0.847, 1) end
 		return Color(0.541, 0.498, 0.439, 1)
+	end
+
+	-- ===== 공용 조각(HUD·팝업·유닛 상세·메뉴가 같이 쓰는 모양·계산 — 2026-09-28 정리) =====
+
+	-- 단축키 키캡(연한 둥근 칸 + 가운데 키 글자): anchor = pivot, 글자 칸 = 크기 − 2. 안쪽 패널을 돌려준다(글자 이름 = name .. "Text")
+	@ExecSpace("ClientOnly")
+	method Entity SpawnKeyCap(string name, Entity parent, Vector2 anchor, Vector2 pos, Vector2 size, string key, number fontSize)
+		local cap = self:SpawnRoundedPanel(name, parent, anchor, anchor, pos, size, Color(0.92, 0.93, 0.98, 0.9), Color(0.72, 0.74, 0.84, 0.9), 1.2)
+		self:SpawnLabel(name .. "Text", cap, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2(0, 0), Vector2(size.x - 2, size.y - 2),
+			key, Color(0.38, 0.39, 0.50, 1), fontSize, TextAlignmentType.MiddleCenter, true)
+		return cap
+	end
+
+	-- 버튼 안 오른쪽 끝 작은 키캡("Space"·"ESC") — 유닛 상세 레벨업·증강 지정·'보유 증강으로' 버튼 공용. 모바일은 키보드가 없어 그리지 않는다
+	@ExecSpace("ClientOnly")
+	method void SpawnButtonKeyCap(Entity parent, string key)
+		if _RtsBoardViewLogic:IsMobileView() then return end
+		self:SpawnKeyCap("RtsKeyCap", parent, Vector2(1, 0.5), Vector2(-6, 0), Vector2(58, 24), key, 12)
+	end
+
+	-- 세로 스크롤 목록 설정(ScrollLayoutGroup — 자식 행을 위에서부터 spacing 간격으로 쌓는다. 스크롤바는 늘 보임 · 손잡이 금색 · 바탕 trackColor)
+	--   스크롤바 프로퍼티 이름은 d.mlua(Visible·Thickness…)와 달리 런타임엔 ScrollBar* (2026-09-16 실측: "cannot set Visible")
+	@ExecSpace("ClientOnly")
+	method void AddVScroll(Entity list, number spacing, Color trackColor)
+		local sg = list:AddComponent("ScrollLayoutGroupComponent")
+		if sg == nil then return end
+		sg.Type = LayoutGroupType.Vertical
+		sg.ChildAlignment = ChildAlignmentType.UpperLeft
+		sg.Spacing = spacing
+		sg.UseScroll = true
+		sg.ScrollBarVisible = ScrollBarVisibility.AlwaysShow
+		sg.ScrollBarThickness = 8
+		sg.ScrollBarHandleColor = self:ColGold()
+		sg.ScrollBarBackgroundColor = trackColor
+	end
+
+	-- HUD 버튼 색 한 벌(안쪽 면·바깥 테두리·글자): "active" 금색 강조(내 찬성·멈춤 중) / "on" 연보라 + 금 테두리 / "off" 기본 / "idle" 흐리게. label이 nil이면 면·테두리만
+	@ExecSpace("ClientOnly")
+	method void PaintButton(Entity inner, Entity label, string state)
+		local bg = self:ColPanel()
+		local border = self:ColBorder()
+		local ink = self:ColInk()
+		if state == "active" then
+			bg = Color(0.45, 0.37, 0.18, 0.96)
+			border = Color(1, 0.9, 0.55, 1)
+			ink = Color(1, 0.97, 0.85, 1)
+		elseif state == "on" then
+			bg = Color(0.87, 0.86, 0.96, 0.92)
+			border = self:ColGold()
+			ink = Color(0.26, 0.25, 0.39, 1)
+		elseif state == "idle" then
+			border = self:ColBorderSoft()
+			ink = self:ColMuted()
+		end
+		self:SetUiColor(inner, bg, "surface")
+		self:SetUiColor(inner.Parent, border, "border")
+		if label ~= nil then self:SetUiColor(label, ink, "text") end
+	end
+
+	-- 두 인자 아크탄젠트(라디안) — math.atan 두 인자판에 기대지 않는다
+	method number Atan2(number y, number x)
+		if x > 0 then return math.atan(y / x) end
+		if x < 0 then
+			if y >= 0 then return math.atan(y / x) + math.pi end
+			return math.atan(y / x) - math.pi
+		end
+		if y > 0 then return math.pi / 2 end
+		if y < 0 then return 0 - math.pi / 2 end
+		return 0
+	end
+
+	-- 선분: 흰 사각 e를 a에서 b까지 늘려 회전(피벗 왼쪽 가운데, 두께 thick, 길이 = |b − a| + extra, 최소 0.01) — 체크 표시·오각형 테두리·능력치 도형 공용
+	@ExecSpace("ClientOnly")
+	method void SetSegment(Entity e, Vector2 a, Vector2 b, number thick, number extra)
+		local dx = b.x - a.x
+		local dy = b.y - a.y
+		local t = e.UITransformComponent
+		t.Pivot = Vector2(0, 0.5)
+		t.anchoredPosition = a
+		t.RectSize = Vector2(math.max(0.01, math.sqrt(dx * dx + dy * dy) + extra), thick)
+		t.ZRotation = math.deg(self:Atan2(dy, dx))
+	end
+
+	-- 직각삼각형 스프라이트 e(RtsPopupLogic.RightTriRUID — 직각이 왼쪽 아래, 가로 다리 → 세로 다리가 반시계)를 직각 꼭짓점 f, 두 다리 끝 m·v에 맞춘다.
+	--   두 다리가 시계 방향이면 바꿔 끼운다(뒤집기 없이) — 회전·가로세로 크기만으로 어떤 직각삼각형이든 된다. 오각형·능력치 도형의 채움 공용
+	@ExecSpace("ClientOnly")
+	method void SetRightTri(Entity e, Vector2 f, Vector2 m, Vector2 v)
+		local ux = m.x - f.x
+		local uy = m.y - f.y
+		local vx = v.x - f.x
+		local vy = v.y - f.y
+		if ux * vy - uy * vx < 0 then ux, uy, vx, vy = vx, vy, ux, uy end
+		local t = e.UITransformComponent
+		t.Pivot = Vector2(0, 0)
+		t.anchoredPosition = f
+		t.RectSize = Vector2(math.max(0.01, math.sqrt(ux * ux + uy * uy)), math.max(0.01, math.sqrt(vx * vx + vy * vy)))
+		t.ZRotation = math.deg(self:Atan2(uy, ux))
+	end
+
+	-- 삼각형 (a, b, d)를 가장 긴 변에 내린 수선으로 둘로 나눈다: { f = 수선의 발, x·y = 가장 긴 변의 두 끝, o = 맞은편 꼭짓점, len2 = 가장 긴 변의 제곱 }
+	--   → 직각삼각형 (f, x, o)·(f, y, o) 두 장(SetRightTri)으로 채운다
+	method table SplitTri(Vector2 a, Vector2 b, Vector2 d)
+		local ps = { a, b, d }
+		local best = 1
+		local bestL = -1
+		for k = 1, 3 do
+			local p1 = ps[k]
+			local p2 = ps[k % 3 + 1]
+			local l = (p2.x - p1.x) * (p2.x - p1.x) + (p2.y - p1.y) * (p2.y - p1.y)
+			if l > bestL then
+				bestL = l
+				best = k
+			end
+		end
+		local x = ps[best]
+		local y = ps[best % 3 + 1]
+		local o = ps[(best + 1) % 3 + 1]
+		local tt = ((o.x - x.x) * (y.x - x.x) + (o.y - x.y) * (y.y - x.y)) / math.max(0.01, bestL)
+		return { f = Vector2(x.x + (y.x - x.x) * tt, x.y + (y.y - x.y) * tt), x = x, y = y, o = o, len2 = bestL }
+	end
+
+	-- 글이 폭 w(px)에서 몇 줄인지 어림(넓은 글자(한글 등) 18px · 그 밖 10px — UTF-8 이어붙임 바이트 0x80~0xBF 수로 넓은 글자 수를 센다). 1~12줄
+	@ExecSpace("ClientOnly")
+	method number TextLines(string text, number w)
+		if text == nil or text == "" then return 1 end
+		-- 한글(3바이트 = 이어붙임 2개) 글자 수 어림
+		local bytes = #text
+		local _, cont = string.gsub(text, "[\128-\191]", "")
+		local wide = math.floor(cont / 2)
+		local narrow = bytes - cont - wide
+		if narrow < 0 then narrow = 0 end
+		local px = wide * 18 + narrow * 10
+		local lines = math.ceil(px / math.max(60, w))
+		if lines < 1 then lines = 1 end
+		if lines > 12 then lines = 12 end
+		return lines
+	end
+
+	-- 글 줄 수 거친 어림: 글자 수 ≈ 바이트 ÷ 2.6(한글 3바이트·영숫자 1바이트가 섞였다고 보고), 한 줄 perLine자. 최소 1줄
+	@ExecSpace("ClientOnly")
+	method number TextLinesRough(string text, number perLine)
+		return math.max(1, math.ceil(math.ceil(string.len(text) / 2.6) / perLine))
 	end
 
 	-- ===== HUD 생성 =====
@@ -546,18 +659,7 @@ script RtsHudLogic extends Logic
 		self.PlayerHead = self:SpawnLabel("RtsPlayerHead", box, Vector2(0, 1), Vector2(0, 1), Vector2(6, 0), Vector2(200, 20),
 			"0 / 8", Color(0.49, 0.525, 0.584, 1), 13, TextAlignmentType.MiddleLeft, false)
 
-		-- 기본 설정 버튼을 피해 유닛 슬롯은 y −144부터 50 간격, 영입 버튼은 목록 바로 아래에 둔다.
-		--   영입이 가능할 때(진행 중 + 빈 칸)와 '나가기'(판 끝·탈락·클리어)일 때만 보인다 — RefreshRecruitButton
-		local recruit = self:SpawnRoundedPanel("RtsRecruitBtn", grp, Vector2(1, 1), Vector2(1, 1), Vector2(-16, -144 - 6 * 50), Vector2(130, 56),
-			self:ColPanel(), self:ColBorder(), 2)
-		self.RecruitText = self:SpawnLabel("RtsRecruitLabel", recruit, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2(0, 0), Vector2(126, 48),
-			"영입", self:ColInk(), 20, TextAlignmentType.MiddleCenter, true)
-		local recruitClick = self:SpawnClick("RtsRecruitClick", recruit)
-		recruitClick:ConnectEvent(ButtonClickEvent, function(event)
-			self:OnTopButton()
-		end)
-		self.RecruitBtn = recruit
-		-- 진행·종료 시 상단 난이도 선택 자리에 다시하기를 표시한다. 문구·색은 RefreshRestartButton에서 갱신한다.
+		-- 진행·종료 시 다시하기를 표시한다(실제 자리 = 왼쪽 아래, RtsUiLayoutLogic.Refresh). 문구·색은 RefreshRestartButton에서 갱신한다.
 		local restart = self:SpawnRoundedPanel("RtsRestartBtn", grp, Vector2(0.5, 1), Vector2(0.5, 1), Vector2(0, -12), Vector2(200, 48),
 			self:ColPanel(), self:ColBorder(), 2)
 		self.RestartText = self:SpawnLabel("RtsRestartLabel", restart, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2(0, 0), Vector2(192, 40),
@@ -581,25 +683,22 @@ script RtsHudLogic extends Logic
 		local resume = self:SpawnRoundedPanel("RtsPauseResume", pbox, Vector2(0.5, 0), Vector2(0.5, 0), Vector2(0, 24), Vector2(220, 52),
 			self:ColGold(), self:ColGold(), 1.5)
 		self:SpawnLabel("RtsPauseResumeText", resume, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2(0, 0), Vector2(210, 44),
-			"계속하기 (P)", Color(0.133, 0.114, 0.09, 1), 18, TextAlignmentType.MiddleCenter, true)
+			"계속하기 (P)", self:ColGoldInk(), 18, TextAlignmentType.MiddleCenter, true)
 		local resumeClick = self:SpawnClick("RtsPauseResumeClick", resume)
 		resumeClick:ConnectEvent(ButtonClickEvent, function(event)
 			self:TogglePause()
 		end)
 		self.PausePanel = dim
 		dim:SetEnable(false)
-		-- 다시하기 오른쪽 12px 간격, 동일한 200×48 크기. 표시 조건과 P 단축키는 유지한다.
+		-- 다시하기 오른쪽, 같은 크기(실제 자리·크기 = RtsUiLayoutLogic.Refresh — 왼쪽 아래 다시하기 오른쪽). 표시 조건과 P 단축키는 유지한다.
 		local pause = self:SpawnRoundedPanel("RtsPauseBtn", grp, Vector2(0.5, 1), Vector2(0.5, 1), Vector2(212, -12), Vector2(200, 48),
 			self:ColPanel(), self:ColBorder(), 2)
 		-- 글자는 왼쪽으로 조금(−16), 오른쪽 안에 단축키 [P](2026-09-27 사용자 "일시정지 버튼 옆에 단축키 P 보이도록" — 레벨업 [Space]와 같은 키캡 모양)
 		self.PauseText = self:SpawnLabel("RtsPauseLabel", pause, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2(-18, 0), Vector2(142, 40),
 			"일시정지", self:ColInk(), 19, TextAlignmentType.MiddleCenter, true)
-		local pcap = self:SpawnRoundedPanel("RtsPauseKey", pause, Vector2(1, 0.5), Vector2(1, 0.5), Vector2(-8, 0), Vector2(30, 26),
-			Color(0.92, 0.93, 0.98, 0.9), Color(0.72, 0.74, 0.84, 0.9), 1.2)
+		local pcap = self:SpawnKeyCap("RtsPauseKey", pause, Vector2(1, 0.5), Vector2(-8, 0), Vector2(30, 26), "P", 13)
 		pcap.SpriteGUIRendererComponent.RaycastTarget = false
 		pcap.Parent.SpriteGUIRendererComponent.RaycastTarget = false
-		self:SpawnLabel("RtsPauseKeyText", pcap, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2(0, 0), Vector2(28, 24),
-			"P", Color(0.38, 0.39, 0.50, 1), 13, TextAlignmentType.MiddleCenter, true)
 		local pauseClick = self:SpawnClick("RtsPauseClick", pause)
 		pauseClick:ConnectEvent(ButtonClickEvent, function(event)
 			self:TogglePause()
@@ -607,38 +706,6 @@ script RtsHudLogic extends Logic
 		self.PauseBtn = pause
 		pause.Parent:SetEnable(false)
 		self:BuildUiModeSwitch(grp)
-		-- 배속 스위치: 화면 모드 위 12px 간격, 오른쪽 16px·아래 92px. 묶음 212×92, 트랙 212×64.
-		--   손잡이 100×52(1배속 왼쪽 초록 · 2배속 오른쪽 빨강), 반쪽마다 글자 1배속·2배속과 누르는 칸(RtsStageLogic.RequestSpeedChoice). 위 = 여럿일 때 배속마다 고른 사람 수
-		local sbox = self:SpawnUI("model://uisprite", "RtsSpeedBox", grp, Vector2(1, 0), Vector2(1, 0), Vector2(-16, 92), Vector2(212, 92))
-		sbox:SetEnable(false)
-		self:SetUiColor(sbox, Color(1, 1, 1, 0), "surface")
-		sbox.SpriteGUIRendererComponent.RaycastTarget = false
-		local track = self:SpawnRoundedPanel("RtsSpeedTrack", sbox, Vector2(0, 0), Vector2(0, 0), Vector2(0, 0), Vector2(212, 64), self:ColPanel(), self:ColBorder(), 2)
-		local knob = self:SpawnRoundedPanel("RtsSpeedKnob", track, Vector2(0, 0.5), Vector2(0, 0.5), Vector2(4, 0), Vector2(100, 52),
-			Color(0.3, 0.66, 0.36, 1), Color(0.2, 0.5, 0.26, 1), 1.5)
-		knob.SpriteGUIRendererComponent.RaycastTarget = false
-		knob.Parent.SpriteGUIRendererComponent.RaycastTarget = false
-		self.SpeedBox = sbox
-		self.SpeedTrack = track
-		self.SpeedKnob = knob
-		self.SpeedSide = {}
-		for side = 1, 2 do
-			local half = self:SpawnUI("model://uisprite", "RtsSpeedHalf" .. tostring(side), track, Vector2(0, 0), Vector2(0, 0), Vector2((side - 1) * 104, 0), Vector2(104, 60))
-			self:SetUiColor(half, Color(1, 1, 1, 0), "surface")
-			local text = "1배속"
-			if side == 2 then text = "2배속" end
-			local label = self:SpawnLabel("RtsSpeedSideText", half, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2(0, 0), Vector2(100, 48),
-				text, self:ColMuted(), 18, TextAlignmentType.MiddleCenter, true)
-			local count = self:SpawnLabel("RtsSpeedCount", sbox, Vector2(0, 0), Vector2(0.5, 0), Vector2(2 + (side - 1) * 104 + 52, 66), Vector2(100, 24),
-				"", self:ColInk(), 15, TextAlignmentType.MiddleCenter, true)
-			local choice = side
-			local click = self:SpawnClick("RtsSpeedClick" .. tostring(side), half)
-			click:ConnectEvent(ButtonClickEvent, function(event)
-				self:ChooseSpeed(choice)
-			end)
-			self.SpeedSide[side] = { label = label, count = count }
-		end
-		sbox:SetEnable(false)
 		-- 다시 하기 투표 패널: 버튼 바로 위(투표 중에만)
 		local vp = self:SpawnRoundedPanel("RtsVotePanel", grp, Vector2(0.5, 1), Vector2(0.5, 1), Vector2(0, -68), Vector2(260, 76),
 			self:ColPanel(), self:ColGold(), 1.5)
@@ -684,19 +751,6 @@ script RtsHudLogic extends Logic
 			self.UnitSlots[i] = { box = slot, bar = bar, name = name, lv = lv, filled = false }
 			self:ApplySlotLook(i)
 		end
-
-		-- 증강 진입은 하나로 통합하고 미지정·대기 선택지는 버튼에 알린다.
-		local aug = self:SpawnRoundedPanel("RtsAugBtn", grp, Vector2(0, 0), Vector2(0, 0), Vector2(16, 16), Vector2(250, 78),
-			Color(1, 1, 1, 0.88), self:ColGold(), 2)
-		self.AugBtn = aug
-		self.AugLabel = self:SpawnLabel("RtsAugLabel", aug, Vector2(0, 1), Vector2(0, 1), Vector2(20, -9), Vector2(208, 30),
-			"증강", Color(0.20, 0.22, 0.30, 1), 23, TextAlignmentType.MiddleLeft, true)
-		self.AugNotice = self:SpawnLabel("RtsAugNotice", aug, Vector2(0, 0), Vector2(0, 0), Vector2(20, 10), Vector2(208, 24),
-			"보유 · 뽑기 · 도감", Color(0.46, 0.34, 0.22, 1), 16, TextAlignmentType.MiddleLeft, false)
-		local augClick = self:SpawnClick("RtsAugClick", aug)
-		augClick:ConnectEvent(ButtonClickEvent, function(event)
-			_RtsPopupLogic:OpenHubTab("augment")
-		end)
 
 		-- 우측 하단(다시 하기 왼쪽): 테스트 프리즘 버튼(개발 도구, 2026-09-22 사용자 "우측 하단에 테스트 프리즘 증강 버튼") → 프리즘 선택 팝업
 		if _RtsUnitLogic.DevTools then
@@ -783,40 +837,19 @@ script RtsHudLogic extends Logic
 		end
 	end
 
-	-- 좌하단 증강 버튼: 미지정이 있으면 '증강 (n)' + 붉은 테두리(2026-09-23 Phase 4 합류 — RtsAugmentLogic.ClientTick이 0.3초마다)
-	@ExecSpace("ClientOnly")
-	method void SetAugmentCount(number n)
-		-- 버튼의 한 줄 요약만 갱신한다.
-		if self.AugLabel == nil then return end
-		self.AugShown = n
-		self:RefreshAugEntry()
-	end
-
 	@ExecSpace("ClientOnly")
 	method void SetBuyButton(number price, boolean can)
 		-- 뽑기 화면이 열려 있을 때만 가격·가능 여부를 제자리에서 갱신한다.
 		_RtsPopupLogic:RefreshDraw(price, can)
 	end
 
-	-- 고르지 않은 선택지 수를 증강 진입 버튼에 표시한다.
+	-- 고르지 않은 선택지 수(RtsAugmentLogic.ClientTick) — RtsUiLayoutLogic.Refresh가 증강 진입 버튼('증강 · n')에 보여 준다
 	@ExecSpace("ClientOnly")
-	method void SetPendingOffers(number n, boolean visible)
-		-- 대기 선택지는 별도 버튼 대신 증강 진입 버튼에서 알린다.
+	method void SetPendingOffers(number n)
 		self.PendingShown = n
-		self:RefreshAugEntry()
 	end
 
-	@ExecSpace("ClientOnly")
-	method void RefreshAugEntry()
-		-- 알림 숫자와 테두리를 기존 버튼 안에서 바꾼다.
-		if self.AugNotice == nil then return end
-		local text = "보유 · 뽑기 · 도감"
-		if self.AugShown > 0 then text = "미지정 " .. self:Int(self.AugShown) .. "개" end
-		if self.PendingShown > 0 then text = "선택 대기 " .. self:Int(self.PendingShown) .. "개 · 미지정 " .. self:Int(math.max(0, self.AugShown)) .. "개" end
-		if self.AugNotice.TextComponent.Text ~= text then self.AugNotice.TextComponent.Text = text end
-	end
-
-	-- '다시 하기' 클릭: 찬성했으면 취소, 판이 끝났으면 바로 찬성, 진행 중이면 3초 안에 한 번 더 눌러야 찬성(실수로 판을 날리지 않게)
+	-- '다시 하기' 클릭: 찬성했으면 취소, 아니면 예/아니오 확인 팝업
 	@ExecSpace("ClientOnly")
 	method void OnRestartButton()
 		local st = _RtsStageLogic.RunState
@@ -824,7 +857,6 @@ script RtsHudLogic extends Logic
 		if st ~= "running" and st ~= "ended" then return end
 		-- 이미 찬성했으면 다시 누르기 = 찬성 취소(확인 없이 바로)
 		if _RtsStageLogic:IsMyVote() then
-			self.RestartConfirmUntil = 0
 			_RtsStageLogic:RequestRestartVote()
 			return
 		end
@@ -834,7 +866,7 @@ script RtsHudLogic extends Logic
 	end
 
 	-- '다시 하기' 버튼 문구·색(RtsStageLogic.RefreshHud가 0.25초마다): 표 없음 "다시 하기" / 누가 찬성 "다시 하기 1/2"(금색 테두리) /
-	--   내가 찬성 "다시 하기 ✓ 1/2"(밝은 금색) / 확인 대기 "한 번 더 누르면 찬성"(붉은 테두리) / 판 시작 전 흐리게
+	--   내가 찬성 "다시 하기 ✓ 1/2"(밝은 금색) / 판 시작 전 흐리게 — 색은 PaintButton 상태(active·on·off·idle)
 	@ExecSpace("ClientOnly")
 	method void RefreshRestartButton()
 		if self.RestartBtn == nil or self.RestartText == nil then return end
@@ -851,10 +883,7 @@ script RtsHudLogic extends Logic
 			mode = "idle"
 		elseif mine then
 			text = "다시하기 ✓ " .. count
-			mode = "mine"
-		elseif _UtilLogic.ElapsedSeconds < self.RestartConfirmUntil then
-			text = "한 번 더 누르면 찬성"
-			mode = "confirm"
+			mode = "active"
 		elseif S.VoteCount > 0 or st == "ended" then
 			text = "다시하기 " .. count
 			mode = "on"
@@ -864,28 +893,7 @@ script RtsHudLogic extends Logic
 		if key == self.RestartShown then return end
 		self.RestartShown = key
 		self.RestartText.TextComponent.Text = text
-		local outer = self.RestartBtn.Parent
-		if mode == "mine" then
-			self:SetUiColor(self.RestartBtn, Color(0.45, 0.37, 0.18, 0.96), "surface")
-			self:SetUiColor(outer, Color(1, 0.9, 0.55, 1), "border")
-			self:SetUiColor(self.RestartText, Color(1, 0.97, 0.85, 1), "text")
-		elseif mode == "confirm" then
-			self:SetUiColor(self.RestartBtn, Color(0.3, 0.13, 0.11, 0.94), "surface")
-			self:SetUiColor(outer, Color(0.8, 0.35, 0.3, 1), "border")
-			self:SetUiColor(self.RestartText, Color(0.98, 0.72, 0.66, 1), "text")
-		elseif mode == "on" then
-			self:SetUiColor(self.RestartBtn, Color(0.87, 0.86, 0.96, 0.92), "surface")
-			self:SetUiColor(outer, self:ColGold(), "border")
-			self:SetUiColor(self.RestartText, Color(0.26, 0.25, 0.39, 1), "text")
-		elseif mode == "off" then
-			self:SetUiColor(self.RestartBtn, self:ColPanel(), "surface")
-			self:SetUiColor(outer, self:ColBorder(), "border")
-			self:SetUiColor(self.RestartText, self:ColInk(), "text")
-		else
-			self:SetUiColor(self.RestartBtn, self:ColPanel(), "surface")
-			self:SetUiColor(outer, self:ColBorderSoft(), "border")
-			self:SetUiColor(self.RestartText, self:ColMuted(), "text")
-		end
+		self:PaintButton(self.RestartBtn, self.RestartText, mode)
 	end
 
 	-- 일시정지 버튼·안내(RtsStageLogic.RefreshHud가 0.25초마다): 솔로 모드 판(RtsStageLogic.SoloMode)·혼자·진행 중이면 버튼 "일시정지", 멈춘 동안은 버튼 "계속하기"(금색) + 가운데 안내
@@ -902,64 +910,18 @@ script RtsHudLogic extends Logic
 		self.PausePanel:SetEnable(paused)
 		if paused then
 			self.PauseText.TextComponent.Text = "계속하기"
-			self:SetUiColor(self.PauseBtn, Color(0.45, 0.37, 0.18, 0.96), "surface")
-			self:SetUiColor(self.PauseBtn.Parent, Color(1, 0.9, 0.55, 1), "border")
-			self:SetUiColor(self.PauseText, Color(1, 0.97, 0.85, 1), "text")
+			self:PaintButton(self.PauseBtn, self.PauseText, "active")
 		else
 			self.PauseText.TextComponent.Text = "일시정지"
-			self:SetUiColor(self.PauseBtn, self:ColPanel(), "surface")
-			self:SetUiColor(self.PauseBtn.Parent, self:ColBorder(), "border")
-			self:SetUiColor(self.PauseText, self:ColInk(), "text")
+			self:PaintButton(self.PauseBtn, self.PauseText, "off")
 		end
 	end
 
-	-- 배속 스위치(RtsStageLogic.RefreshHud가 0.25초마다): 카운트다운·진행 중에 보인다. 손잡이 = 내가 고른 배속(1배속 왼쪽 초록 · 2배속 오른쪽 빨강 — 솔로는 곧 지금 배속),
-	--   손잡이 쪽 글자는 흰색, 반대쪽은 흐리게. 여럿이면 스위치 위에 배속마다 고른 사람 수("n명" — 전원이 2배속을 고르면 2배). 바뀐 것이 있을 때만 고친다
-	@ExecSpace("ClientOnly")
-	method void RefreshSpeedUi()
-		if self.SpeedBox == nil or not isvalid(self.SpeedBox) then return end
-		local S = _RtsStageLogic
-		local show = S.RunState == "countdown" or S.RunState == "running"
-		local mine = S.SpeedVotes[_RtsUnitLogic:MyUserId()] ~= nil
-		local solo = S:IsSolo()
-		local fastN = S.SpeedVoteCount
-		local slowN = math.max(0, S.RoomCount - fastN)
-		local key = tostring(show) .. "|" .. tostring(mine) .. "|" .. tostring(solo) .. "|" .. self:Int(fastN) .. "|" .. self:Int(slowN)
-		if key == self.SpeedShown then return end
-		self.SpeedShown = key
-		-- 배속 조작은 왼쪽 버튼에서만 제공한다. 상태 변경 때 기존 스위치를 다시 켜지 않는다.
-		self.SpeedBox:SetEnable(false)
-		if not show then return end
-		-- 일시정지 표시 여부와 관계없이 화면 모드 위에 고정한다.
-		-- 화면 배치는 RtsUiLayoutLogic이 유지한다.
-		-- 손잡이: 1배속 왼쪽(4) 초록 / 2배속 오른쪽(104) 빨강
-		local knob = self.SpeedKnob
-		if mine then
-			knob.Parent.UITransformComponent.anchoredPosition = Vector2(104, 0)
-			self:SetUiColor(knob, Color(0.86, 0.32, 0.3, 1), "fixed")
-			self:SetUiColor(knob.Parent, Color(0.66, 0.2, 0.18, 1), "fixed")
-		else
-			knob.Parent.UITransformComponent.anchoredPosition = Vector2(4, 0)
-			self:SetUiColor(knob, Color(0.3, 0.66, 0.36, 1), "fixed")
-			self:SetUiColor(knob.Parent, Color(0.2, 0.5, 0.26, 1), "fixed")
-		end
-		for side = 1, 2 do
-			local sd = self.SpeedSide[side]
-			if sd ~= nil and isvalid(sd.label) then
-				local on = (side == 2) == mine
-				if on then self:SetUiColor(sd.label, Color(1, 1, 1, 1), "text") else self:SetUiColor(sd.label, self:ColMuted(), "text") end
-				local n = slowN
-				if side == 2 then n = fastN end
-				local txt = ""
-				if not solo then txt = self:Int(n) .. "명" end
-				sd.count.TextComponent.Text = txt
-			end
-		end
-	end
+	-- (배속 스위치 UI는 한 번도 보이지 않아 2026-09-28 정리로 삭제 — 배속은 RtsUiLayoutLogic의 배속 버튼·설정 창에서 고르고, 그 색은 RtsUiLayoutLogic.Refresh가 갱신한다)
 
 	@ExecSpace("ClientOnly")
 	method void BuildUiModeSwitch(Entity grp)
-		-- 화면 오른쪽 아래의 라이트·다크 선택기. 배속과 같은 크기의 좌우 스위치다.
+		-- 화면 오른쪽 아래의 라이트·다크 선택기(212×64 좌우 스위치).
 		local track = self:SpawnRoundedPanel("RtsUiModeSwitch", grp, Vector2(1, 0), Vector2(1, 0), Vector2(-16, 16), Vector2(212, 64), self:ColPanel(), self:ColBorder(), 2)
 		local knob = self:SpawnRoundedPanel("RtsUiModeKnob", track, Vector2(0, 0.5), Vector2(0, 0.5), Vector2(4, 0), Vector2(100, 52), self:ColGold(), self:ColGold(), 1.5)
 		knob.SpriteGUIRendererComponent.RaycastTarget = false
@@ -978,6 +940,16 @@ script RtsHudLogic extends Logic
 		self:RefreshUiModeSwitch()
 	end
 
+	-- 화면 배치가 가로로 차지하는 설계 폭(1080 높이 기준 단위): 왼쪽 정보 340 + 간격 20 + 가운데 난이도 줄 960 + 간격 20 + 오른쪽 버튼 300.
+	--   보이는 가로가 이보다 좁으면(폴더블 펼침·태블릿 — 2026-09-28 사용자 제보, 약 1.1:1에서 윗줄이 겹침) 배율을 가로에 맞춰 전체를 비율대로 줄인다.
+	--   휴대폰 가로(19.5:9 등)·PC 16:9는 높이 기준 그대로(가로가 충분해 이 값에 걸리지 않는다)
+	property number LayoutMinWidth = 1640
+
+	-- 모바일 태블릿·폴더블(16:9보다 좁은 화면): 버튼·패널이 화면 가로에서 차지하는 몫을 휴대폰 19.5:9(가로 1080 × 19.5 ÷ 9 = 2340)와 같게 줄인다 —
+	--   좌우 버튼 줄이 좁아지는 만큼 가운데 트랙이 커지고(RtsBoardViewLogic.Refresh), 버튼 실제 크기는 휴대폰과 비슷하다(폴더블 약 6mm).
+	--   2026-09-28 사용자 "폴더블/태블릿에서 버튼 UI 크기를 좀 더 작게 하고 트랙을 키우는 게 좋을 듯". 휴대폰 가로(16:9 이상)·PC는 해당 없음
+	property number TabletPhoneWidth = 2340
+
 	@ExecSpace("ClientOnly")
 	method table MobileViewport()
 		-- UI 캔버스의 고정 1920×1080과 기기의 실제 표시 범위를 구분한다.
@@ -995,6 +967,13 @@ script RtsHudLogic extends Logic
 		-- 화면 실측 경계에 붙이고 최소 여백만 둔다. 플랫폼 메뉴는 오른쪽 레일 상단에서 별도로 피한다.
 		local mobile = _RtsBoardViewLogic:IsMobileView()
 		local side = mobile and 32 or 28
+		-- 좁은 화면: 높이 기준 배율로는 설계 폭(LayoutMinWidth + 좌우 여백)이 안 들어가면 가로 기준으로 줄인다
+		local fitW = (x1 - x0) / (self.LayoutMinWidth + side * 2)
+		if fitW < unit then unit = fitW end
+		if mobile and (x1 - x0) / (y1 - y0) < 16 / 9 - 0.01 then
+			local phoneW = (x1 - x0) / self.TabletPhoneWidth
+			if phoneW < unit then unit = phoneW end
+		end
 		return { x0 = x0 + side * unit, x1 = x1 - side * unit,
 			y0 = y0 + (mobile and 20 or 24) * unit, y1 = y1 - (mobile and 20 or 24) * unit, unit = unit,
 			key = tostring(w) .. ":" .. tostring(h) .. ":" .. tostring(x1 - x0) .. ":" .. tostring(y1 - y0) }
@@ -1057,7 +1036,7 @@ script RtsHudLogic extends Logic
 		end
 	end
 
-	-- 배속 스위치 반쪽을 눌렀을 때: 그 배속을 고른다(서버가 전원 2배속이면 2배 — RtsStageLogic.RequestSpeedChoice). 이미 그쪽이면 아무것도 안 한다
+	-- 배속 버튼(RtsUiLayoutLogic 왼쪽 아래 1배속·2배속 · 설정 창 '게임 속도')을 눌렀을 때: 그 배속을 고른다(서버가 전원 2배속이면 2배 — RtsStageLogic.RequestSpeedChoice). 이미 그쪽이면 아무것도 안 한다
 	@ExecSpace("ClientOnly")
 	method void ChooseSpeed(number choice)
 		local S = _RtsStageLogic
@@ -1102,18 +1081,15 @@ script RtsHudLogic extends Logic
 		for i = 1, 2 do
 			local b = btns[i]
 			if b ~= nil then
-				if mine == i then
-					self:SetUiColor(b, Color(0.45, 0.37, 0.18, 0.96), "surface")
-					self:SetUiColor(b.Parent, Color(1, 0.9, 0.55, 1), "border")
-				else
-					self:SetUiColor(b, self:ColPanel(), "surface")
-					self:SetUiColor(b.Parent, self:ColBorder(), "border")
-				end
+				local state = "off"
+				if mine == i then state = "active" end
+				self:PaintButton(b, nil, state)
 			end
 		end
 	end
 
-	-- 상단 가운데 버튼 클릭: 판이 끝났거나 탈락·클리어한 뒤(관전 중)면 나가기, 아니면 영입 팝업. 다시 하기 투표는 오른쪽 아래 버튼(OnRestartButton)
+	-- 영입 버튼 클릭(RtsUiLayoutLogic 오른쪽 메뉴 '영입'·유닛 진입): 판이 끝났거나 탈락·클리어한 뒤(관전 중)면 나가기(솔로는 다시하기 확인), 아니면 영입 팝업.
+	--   다시 하기 투표는 왼쪽 아래 '다시하기' 버튼(OnRestartButton)
 	@ExecSpace("ClientOnly")
 	method void OnTopButton()
 		if _RtsStageLogic.RunState == "ended" or not _RtsRunResultLogic:IsMeAlive() then
@@ -1129,45 +1105,26 @@ script RtsHudLogic extends Logic
 		_RtsPopupLogic:Open("recruit")
 	end
 
-	-- 상단 가운데 버튼: '영입 가능 n'(금색) / '다음 영입 · n라운드'(흐리게) / '영입 완료' / '영입 불가'(판 시작 전·끝) / 탈락·클리어 뒤 '나가기'(붉은 테두리, 2026-09-23 사용자). 칸이 새로 열리면 1.5초 반짝
+	-- 영입 상태 문구 RecruitText(RtsStageLogic.RefreshHud가 0.25초마다 — RtsUiLayoutLogic 오른쪽 메뉴의 영입 버튼이 읽는다):
+	--   '영입 가능 n' / '다음 영입 · n라운드' / '영입 완료' / '영입 불가'(판 시작 전·끝) / 탈락·클리어 뒤 '나가기'(솔로는 '다시하기', 2026-09-23 사용자).
+	--   영입 칸이 새로 열리면 알림음, 영입 팝업이 열려 있으면 칸 수가 바뀔 때 카드를 다시 그린다. 빈 슬롯 문구도 여기서 갱신
 	@ExecSpace("ClientOnly")
 	method void RefreshRecruitButton()
-		if self.RecruitBtn == nil or self.RecruitText == nil then return end
+		if not self.Built then return end
 		self:RefreshEmptySlots()
 		local stageNo = _RtsStageLogic.StageNo
 		local state = _RtsStageLogic.RunState
 		local owned = #_RtsUnitLogic:ListZoneUnits(_RtsUnitLogic:MyZone())
 		local room = _RtsStageTableLogic:RecruitLimit(stageNo) - owned
 		if room < 0 then room = 0 end
-		local text = ""
-		local on = false
-		-- 보이기(2026-09-24 사용자 "영입 가능 버튼은 영입이 가능할 때만"): '나가기'(판 끝·탈락·클리어) 또는 진행 중 + 빈 칸이 있을 때만
-		local exitMode = state == "ended" or not _RtsRunResultLogic:IsMeAlive()
-		local canRecruit = state == "running" and room > 0 and owned < _RtsUnitLogic:GetMaxUnits()
-		self.RecruitBtn.Parent:SetEnable((exitMode and not _RtsStageLogic:IsSolo()) or canRecruit)
-		-- 판이 끝났거나 탈락·클리어했으면 '나가기'(다시 하기는 오른쪽 아래 버튼)
-		if exitMode then
+		-- 판이 끝났거나 탈락·클리어했으면 솔로(방 인원 1)는 '다시하기', 여럿이면 '나가기'(다시하기 투표는 왼쪽 아래 버튼)
+		if state == "ended" or not _RtsRunResultLogic:IsMeAlive() then
 			self.RecruitRoomPrev = 0
 			self.RecruitLimitPrev = 0
-			-- 솔로(방 인원 1)면 '다시 하기'(금색), 여럿이면 '나가기'(붉은 테두리)
-			local solo = _RtsStageLogic:IsSolo()
-			local key = "exit"
-			if solo then key = "exit_solo" end
-			if key == self.RecruitShown then return end
-			self.RecruitShown = key
-			if solo then
-				self.RecruitText.TextComponent.Text = "다시하기"
-				self:SetUiColor(self.RecruitBtn, Color(0.87, 0.86, 0.96, 0.92), "surface")
-				self:SetUiColor(self.RecruitBtn.Parent, self:ColGold(), "border")
-				self:SetUiColor(self.RecruitText, Color(1, 0.95, 0.8, 1), "text")
-			else
-				self.RecruitText.TextComponent.Text = "나가기"
-				self:SetUiColor(self.RecruitBtn, Color(0.3, 0.13, 0.11, 0.94), "surface")
-				self:SetUiColor(self.RecruitBtn.Parent, Color(0.8, 0.35, 0.3, 1), "border")
-				self:SetUiColor(self.RecruitText, Color(0.98, 0.72, 0.66, 1), "text")
-			end
+			if _RtsStageLogic:IsSolo() then self.RecruitText = "다시하기" else self.RecruitText = "나가기" end
 			return
 		end
+		local text = ""
 		if state ~= "running" then
 			text = "영입 불가"
 			room = 0
@@ -1176,13 +1133,10 @@ script RtsHudLogic extends Logic
 			text = "영입 완료"
 		elseif room > 0 then
 			text = "영입 가능 " .. self:Int(room)
-			on = true
 		else
 			local nextNo = _RtsStageTableLogic:NextRecruitStage(stageNo)
 			if nextNo > 0 then text = "다음 영입 · " .. self:Int(nextNo) .. "라운드" else text = "영입 완료" end
 		end
-		local now = _UtilLogic.ElapsedSeconds
-		if room > self.RecruitRoomPrev then self.RecruitFlashUntil = now + 1.5 end
 		if state == "running" then
 			local limit = _RtsStageTableLogic:RecruitLimit(stageNo)
 			if room > 0 and limit > self.RecruitLimitPrev then _SoundService:PlaySound(self.RecruitSound, 1) end
@@ -1191,29 +1145,7 @@ script RtsHudLogic extends Logic
 		-- 영입 팝업이 열려 있으면 칸 수가 바뀔 때 내용(카드 활성·하단 문구)을 다시 그린다
 		if room ~= self.RecruitRoomPrev and _RtsPopupLogic.Kind == "recruit" then _RtsPopupLogic:RefreshRecruit() end
 		self.RecruitRoomPrev = room
-		local flash = false
-		if now < self.RecruitFlashUntil then
-			self.RecruitFlashOn = not self.RecruitFlashOn
-			flash = self.RecruitFlashOn
-		end
-		local key = text .. tostring(on) .. tostring(flash)
-		if key == self.RecruitShown then return end
-		self.RecruitShown = key
-		self.RecruitText.TextComponent.Text = text
-		local outer = self.RecruitBtn.Parent
-		if flash then
-			self:SetUiColor(self.RecruitBtn, Color(0.45, 0.37, 0.18, 0.96), "surface")
-			self:SetUiColor(outer, Color(1, 0.9, 0.55, 1), "border")
-			self:SetUiColor(self.RecruitText, Color(1, 0.97, 0.85, 1), "text")
-		elseif on then
-			self:SetUiColor(self.RecruitBtn, Color(0.87, 0.86, 0.96, 0.92), "surface")
-			self:SetUiColor(outer, self:ColGold(), "border")
-			self:SetUiColor(self.RecruitText, Color(0.26, 0.25, 0.39, 1), "text")
-		else
-			self:SetUiColor(self.RecruitBtn, Color(0.094, 0.082, 0.071, 0.6), "surface")
-			self:SetUiColor(outer, self:ColBorderSoft(), "border")
-			self:SetUiColor(self.RecruitText, self:ColMuted(), "text")
-		end
+		self.RecruitText = text
 	end
 
 	-- 프로퍼티·동기화 값은 실수(1.0)로 오므로 표시용 정수 문자열은 이걸로
@@ -1522,14 +1454,6 @@ script RtsHudLogic extends Logic
 		end
 	end
 
-	@ExecSpace("ClientOnly")
-	method void SetPlayerAlive(string userId, boolean alive)
-		local p = self.Players[userId]
-		if p == nil then return end
-		p.alive = alive
-		self:ApplyPlayerLook(userId)
-	end
-
 	-- 지금 보고 있는 구역 (JumpToZone에서 호출)
 	@ExecSpace("ClientOnly")
 	method void SetWatchedZone(number n)
@@ -1548,14 +1472,10 @@ script RtsHudLogic extends Logic
 
 	-- ===== 유닛 슬롯 (표시 순서와 내부 유닛 번호를 분리한다) =====
 
-	-- 내 유닛 6칸을 다시 채운다. HUD가 아직 없으면 생성 뒤에 한 번
+	-- 내 유닛 6칸을 다시 채운다. HUD가 아직 없으면 넘긴다(BuildHud 끝에서 한 번 부른다)
 	@ExecSpace("ClientOnly")
 	method void RefreshMyUnits()
-		if not self.Built then
-			self.PendingUnits = true
-			return
-		end
-		self.PendingUnits = false
+		if not self.Built then return end
 		local selectedNo = 0
 		local selected = self.UnitSlots[self.SelectedSlot]
 		if selected ~= nil then selectedNo = selected.no or 0 end
@@ -1645,13 +1565,9 @@ script RtsHudLogic extends Logic
 			return
 		end
 		self:SetUiColor(s.name, self:ColInk(), "text")
-		if self.SelectedSlot == i then
-			self:SetUiColor(s.box, Color(0.87, 0.86, 0.96, 0.92), "surface")
-			self:SetUiColor(outer, self:ColGold(), "border")
-		else
-			self:SetUiColor(s.box, self:ColPanel(), "surface")
-			self:SetUiColor(outer, self:ColBorderSoft(), "border")
-		end
+		local state = "idle"
+		if self.SelectedSlot == i then state = "on" end
+		self:PaintButton(s.box, nil, state)
 	end
 
 	-- 슬롯 클릭 = 선택 표시 + 유닛 정보 팝업

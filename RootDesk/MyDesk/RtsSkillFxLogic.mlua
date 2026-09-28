@@ -1,6 +1,6 @@
 -- Phase 3 #15 선행 (2026-09-16): 스킬 연출 재생기(클라). RtsJobTableLogic.GetSkills(...)[i].fx 정의를 읽어
 --   아바타 모션 + 플립북 이펙트(스프라이트 RUID를 frameSec마다 교체 — 애니메이션 클립 리소스는 API로 못 만든다) + 시전음을 한 번 재생한다.
---   전투 루프(Phase 3)가 공격 타이밍마다 PlayCast를 부르면 되고, 그 전까진 DemoLoop로 눌러 볼 수 있다.
+--   전투 루프가 공격 타이밍마다 PlayCast를 부른다(RtsCombatLogic.CastFxFace).
 --   플립북 프레임은 처음 표시할 때 로딩이 걸리므로(첫 재생 1초+), Preload로 화면 밖에 한 번 올려 둔다.
 @Logic
 script RtsSkillFxLogic extends Logic
@@ -10,9 +10,6 @@ script RtsSkillFxLogic extends Logic
 
 	-- 유닛 번호별 진행 중인 이펙트 엔티티(다음 시전 때 정리)
 	property table Active = {}
-
-	-- 데모 반복 타이머(유닛 번호별)
-	property table DemoTimers = {}
 
 	-- 유닛 번호별 진행 중인 몸 덧그림(effect0) 엔티티
 	property table ActiveBody = {}
@@ -42,8 +39,6 @@ script RtsSkillFxLogic extends Logic
 
 	property table MotionUntil = {}
 
-	-- 유닛 엔티티 Id별 무기 복구 타이머(hideWeapon)
-	property table HideTimer = {}
 
 	-- projs 목록별 다음 순번(라운드 로빈)
 	property table ProjIdx = {}
@@ -204,14 +199,11 @@ script RtsSkillFxLogic extends Logic
 		end
 		-- 모션: motion 하나 또는 motions 여러 개를 motionGap 간격으로 이어 재생(레이징 블로우 = swingT3 → swingTF).
 		--   아바타 swing 액션은 마지막 프레임 진입까지 약 0.44~0.49초(2026-09-18 측정: T1 0.45 / T2 0.44 / T3 0.44 / TF 0.49)
-		local ar = unitEntity.AvatarRendererComponent
-		local body = nil
-		if ar ~= nil then body = ar:GetBodyEntity() end
+		-- 유닛은 모두 원화 프레임(RtsUnitComponent.PlayMageAction) — 아바타 대체 외형·무기 숨기기(hideWeapon)는 2026-09-28 정리로 삭제(원화엔 따로 그린 무기가 없다)
 		local unit = unitEntity.RtsUnitComponent
-		local hasSkin = unit ~= nil and _RtsJobTableLogic:HasMageSkin(unit.JobId)
+		local hasSkin = unit ~= nil
+		local body = nil
 		if hasSkin then body = unitEntity end
-		-- hideWeapon: 스킬 동안 캐릭터의 무기(와 무기 잔상)를 투명하게 — 원작 레이징 블로우 이펙트는 금색 대검을 포함해서 실제 검이 옆에 따로 튀어나오면 어색(사용자 2026-09-19 "기본 칼이 애니메이션에 가려지는 게 맞다"). hideWeaponSec(없으면 clipLife, 없으면 0.9초) 뒤 복구
-		if fx.hideWeapon and ar ~= nil then self:HideWeapon(unitEntity, fx.hideWeaponSec or fx.clipLife or 0.9) end
 		local motions = fx.motions
 		if motions == nil and fx.motion ~= nil then motions = { fx.motion } end
 		local stand = self:StandName(unitEntity)
@@ -574,7 +566,7 @@ script RtsSkillFxLogic extends Logic
 			local u = self.LoopUnit[no]
 			if isvalid(u) then
 				local unit = u.RtsUnitComponent
-				if unit ~= nil and _RtsJobTableLogic:HasMageSkin(unit.JobId) and now - (self.LoopLast[no] or 0) > self.LoopTimeout * 1000 then
+				if unit ~= nil and now - (self.LoopLast[no] or 0) > self.LoopTimeout * 1000 then
 					if unit.MageActionLoop and unit.MageSkinAction == motion then
 						unit:PlayMageAction("stand1")
 						self.LastMotion[u.Id] = "stand1"
@@ -613,18 +605,10 @@ script RtsSkillFxLogic extends Logic
 					local anchor = self.LoopAnchor[no]
 					if anchor == nil or not isvalid(anchor) then anchor = u end
 					if fx.loopEnd ~= nil and fx.loopEnd ~= "" and e ~= nil and isvalid(e) and anchor ~= nil and isvalid(anchor) then
-						local ee = _SpawnService:SpawnByModelId("model://MapObject", "RtsLoopEnd" .. _RtsHudLogic:Int(no), Vector3.zero, anchor)
-						if ee ~= nil then
-							local er = ee.SpriteRendererComponent
-							if er == nil then er = ee:AddComponent("SpriteRendererComponent") end
-							er.SortingLayer = "Default"
-							er.OrderInLayer = fx.loopOrder or 300
-							if e.SpriteRendererComponent ~= nil then er.FlipX = e.SpriteRendererComponent.FlipX end
-							er.SpriteRUID = fx.loopEnd
-							ee.TransformComponent.Position = e.TransformComponent.Position
-							ee.TransformComponent.Scale = e.TransformComponent.Scale
-							_TimerService:SetTimerOnce(function() if isvalid(ee) then ee:Destroy() end end, fx.loopEndLife or 0.75)
-						end
+						local flipEnd = e.SpriteRendererComponent ~= nil and e.SpriteRendererComponent.FlipX
+						local ee = self:SpawnOneShot("RtsLoopEnd" .. _RtsHudLogic:Int(no), Vector3.zero, anchor, fx.loopEnd, fx.loopOrder or 300, flipEnd,
+							1, e.TransformComponent.Scale, false, fx.loopEndLife or 0.75, nil)
+						if ee ~= nil then ee.TransformComponent.Position = e.TransformComponent.Position end
 					end
 				end
 				if e ~= nil and isvalid(e) then e:Destroy() end
@@ -666,16 +650,11 @@ script RtsSkillFxLogic extends Logic
 				if fx.projFrom == "around" then t = targets[((i - 1) % #targets) + 1] end
 				if t ~= nil and isvalid(t) then
 					local tp = _RtsBoardViewLogic:BoardPosition(t)
-					local to = Vector2(tp.x, tp.y + (fx.hitDy or 0.6))
 					-- 칸 거리(사거리 규칙과 같은 체비쇼프): projArcByDist(조커 — 거리별 포물선 높이)에 쓴다
-					local cellSz = _RtsConfigLogic:GetGridCell()
-					local cells = math.max(math.abs(tp.x - up.x), math.abs(tp.y - up.y)) / cellSz
+					local cells = _RtsZoneLogic:CellDistance(tp.x, tp.y, up.x, up.y)
 					-- 근거리 직선 여부는 반올림 전 실제 칸 거리로 판단한다.
-					-- 피격 박스가 있으면 그 정중앙으로(구체가 몬스터 중앙에 박치기)
-					if t.HitComponent ~= nil then
-						local sc = t.TransformComponent.Scale
-						to = Vector2(tp.x + t.HitComponent.ColliderOffset.x * math.abs(sc.x), tp.y + t.HitComponent.ColliderOffset.y * sc.y)
-					end
+					-- 피격 박스가 있으면 그 정중앙으로(구체가 몬스터 중앙에 박치기), 없으면 발 + hitDy
+					local to = _RtsBoardViewLogic:AimPoint(t, fx.hitDy or 0.6)
 					-- projDx: 대상 쪽으로 앞에서 출발(표창 = 배 앞). 기본 0 = 몸 중심선
 					local fdx = fx.projDx or 0
 					if tp.x < up.x then fdx = -fdx end
@@ -723,12 +702,7 @@ script RtsSkillFxLogic extends Logic
 		for key, v in pairs(fx) do f2[key] = v end
 		f2.projHover = 0
 		if fx.projMaxLife ~= nil and fx.projMaxLife <= 0 then return end
-		local tp = _RtsBoardViewLogic:BoardPosition(target)
-		local to = Vector2(tp.x, tp.y + (fx.hitDy or 0.6))
-		if target.HitComponent ~= nil then
-			local sc = target.TransformComponent.Scale
-			to = Vector2(tp.x + target.HitComponent.ColliderOffset.x * math.abs(sc.x), tp.y + target.HitComponent.ColliderOffset.y * sc.y)
-		end
+		local to = _RtsBoardViewLogic:AimPoint(target, fx.hitDy or 0.6)
 		self:SpawnProjectileEx(f2, Vector3(from.x, from.y, 0), to, mapRoot, false, 1, target)
 	end
 
@@ -736,6 +710,18 @@ script RtsSkillFxLogic extends Logic
 	@ExecSpace("ClientOnly")
 	method void SpawnProjectile(table fx, Vector3 from, Vector2 to, Entity mapRoot, boolean shadow, number cells)
 		self:SpawnProjectileEx(fx, from, to, mapRoot, shadow, cells, nil)
+	end
+
+	-- 투사체·고리 스프라이트(크기 계산용 Width·PixelPerUnit) — 불러오기가 끝난 것만 RUID별로 캐시한다(SpawnProjectileEx)
+	@ExecSpace("ClientOnly")
+	method any ProjectileSprite(string ruid)
+		if self._T.ProjectileSpriteMetrics == nil then self._T.ProjectileSpriteMetrics = {} end
+		local sprite = self._T.ProjectileSpriteMetrics[ruid]
+		if sprite == nil then
+			sprite = _ResourceService:LoadSpriteAndWait(ruid)
+			if sprite ~= nil and sprite.IsLoadComplete then self._T.ProjectileSpriteMetrics[ruid] = sprite end
+		end
+		return sprite
 	end
 
 	-- SpawnProjectile + homing(대상 엔티티): 있으면 날아가는 동안 그 대상의 지금 피격 박스 가운데를 따라간다(비행 시간 sec는 처음 거리로 정한 그대로 — 서버 판정 시각과 맞춤).
@@ -817,23 +803,13 @@ script RtsSkillFxLogic extends Logic
 		local s = fx.projScale or 1.5
 		-- PNG 캔버스의 승인 표시 폭을 월드 유닛으로 지정한다. PPU가 달라도 같은 크기를 유지한다.
 		if fx.projWidth ~= nil and fx.projWidth > 0 then
-			if self._T.ProjectileSpriteMetrics == nil then self._T.ProjectileSpriteMetrics = {} end
-			local sprite = self._T.ProjectileSpriteMetrics[sr.SpriteRUID]
-			if sprite == nil then
-				sprite = _ResourceService:LoadSpriteAndWait(sr.SpriteRUID)
-				if sprite ~= nil and sprite.IsLoadComplete then self._T.ProjectileSpriteMetrics[sr.SpriteRUID] = sprite end
-			end
+			local sprite = self:ProjectileSprite(sr.SpriteRUID)
 			if sprite ~= nil and sprite.IsLoadComplete and sprite.Width > 0 then s = fx.projWidth * sprite.PixelPerUnit / sprite.Width end
 		end
 		e.TransformComponent.Scale = Vector3(s, s, 1)
 		if not fx.projNoRotate then e.TransformComponent.ZRotation = rot end
 		if fx.projRing ~= nil and fx.projRing ~= "" then
-			if self._T.ProjectileSpriteMetrics == nil then self._T.ProjectileSpriteMetrics = {} end
-			local sprite = self._T.ProjectileSpriteMetrics[fx.projRing]
-			if sprite == nil then
-				sprite = _ResourceService:LoadSpriteAndWait(fx.projRing)
-				if sprite ~= nil and sprite.IsLoadComplete then self._T.ProjectileSpriteMetrics[fx.projRing] = sprite end
-			end
+			local sprite = self:ProjectileSprite(fx.projRing)
 			if isvalid(e) and sprite ~= nil and sprite.IsLoadComplete and sprite.Width > 0 then
 				ring = _SpawnService:SpawnByModelId("model://MapObject", "CardRing", Vector3.zero, e)
 				if ring ~= nil then
@@ -967,14 +943,9 @@ script RtsSkillFxLogic extends Logic
 						return
 					end
 					if isvalid(homing) and homing.TransformComponent ~= nil then
-						local hp = _RtsBoardViewLogic:BoardPosition(homing)
-						lastX = hp.x
-						lastY = hp.y + (fx.hitDy or 0.6)
-						if homing.HitComponent ~= nil then
-							local hsc = homing.TransformComponent.Scale
-							lastX = hp.x + homing.HitComponent.ColliderOffset.x * math.abs(hsc.x)
-							lastY = hp.y + homing.HitComponent.ColliderOffset.y * hsc.y
-						end
+						local ha = _RtsBoardViewLogic:AimPoint(homing, fx.hitDy or 0.6)
+						lastX = ha.x
+						lastY = ha.y
 					end
 					local k = (DateTime.UtcNow.Elapsed - t0) / (sec * 1000)
 					if k > 1 then k = 1 end
@@ -1034,15 +1005,9 @@ script RtsSkillFxLogic extends Logic
 		for j = 1, #targets do
 			local t = targets[j]
 			if t ~= nil and isvalid(t) then
-				local tp = _RtsBoardViewLogic:BoardPosition(t)
-				local tx = tp.x
-				local ty = tp.y + (fx.hitDy or 0.6)
-				local hit = t.HitComponent
-				if hit ~= nil then
-					local sc = t.TransformComponent.Scale
-					tx = tp.x + hit.ColliderOffset.x * math.abs(sc.x)
-					ty = tp.y + hit.ColliderOffset.y * sc.y
-				end
+				local a = _RtsBoardViewLogic:AimPoint(t, fx.hitDy or 0.6)
+				local tx = a.x
+				local ty = a.y
 				self:PlayBeamBetween(fx, fromX, fromY, tx, ty, mapRoot, j)
 				fromX = tx
 				fromY = ty
@@ -1068,23 +1033,8 @@ script RtsSkillFxLogic extends Logic
 			if i == n then len = dist - segLen * (n - 1) end
 			local along = segLen * (i - 1) + len / 2
 			local at = Vector3(fromX + ux * along, fromY + uy * along, 0)
-			local e = _SpawnService:SpawnByModelId("model://MapObject", "RtsBeam_" .. stamp .. "_" .. tostring(i), at, mapRoot)
-			if e ~= nil then
-				local sr = e.SpriteRendererComponent
-				if sr == nil then sr = e:AddComponent("SpriteRendererComponent") end
-				sr.SortingLayer = "Default"
-				sr.OrderInLayer = 320
-				sr.SpriteRUID = fx.beam
-				e.TransformComponent.Scale = Vector3(s * math.max(0.3, len / segLen), s, 1)
-				e.TransformComponent.ZRotation = ang
-				local function finish()
-					if isvalid(e) then e:Destroy() end
-				end
-				e:ConnectEvent(SpriteAnimPlayerEndFrameEvent, function(ev)
-					_TimerService:SetTimerOnce(finish, 0.03)
-				end)
-				_TimerService:SetTimerOnce(finish, fx.beamLife or 0.6)
-			end
+			local e = self:SpawnOneShot("RtsBeam_" .. stamp .. "_" .. tostring(i), at, mapRoot, fx.beam, 320, false, 1, Vector3(s * math.max(0.3, len / segLen), s, 1), true, fx.beamLife or 0.6, nil)
+			if e ~= nil then e.TransformComponent.ZRotation = ang end
 		end
 	end
 
@@ -1157,8 +1107,9 @@ script RtsSkillFxLogic extends Logic
 		if fx.markAt == "feet" then
 			cy = p.y + (fx.markDy or 0)
 		elseif hit ~= nil then
-			cx = p.x + hit.ColliderOffset.x * math.abs(sc.x)
-			cy = p.y + hit.ColliderOffset.y * sc.y
+			local a = _RtsBoardViewLogic:AimPoint(target, 0)
+			cx = a.x
+			cy = a.y
 			local w = hit.BoxSize.x * math.abs(sc.x)
 			local h = hit.BoxSize.y * sc.y
 			if fx.markFit ~= nil then s = math.max(w, h) * fx.markFit end
@@ -1181,26 +1132,9 @@ script RtsSkillFxLogic extends Logic
 			cx = cx + (math.random() * 2.4 - 1.2)
 			cy = cy + (math.random() * 0.6 - 0.3)
 		end
-		local e = _SpawnService:SpawnByModelId("model://MapObject", "RtsMark_" .. target.Name .. "_" .. tostring(math.floor(DateTime.UtcNow.Elapsed)) .. "_" .. tostring(dup or 1), Vector3(cx, cy, 0), mapRoot)
-		if e == nil then return end
-		local sr = e.SpriteRendererComponent
-		if sr == nil then sr = e:AddComponent("SpriteRendererComponent") end
-		sr.SortingLayer = "Default"
-		sr.OrderInLayer = 330
-		sr.FlipX = flipMark
-		sr.SpriteRUID = clip
-		-- markScaleX = 가로만 따로 배율(제네시스 빛기둥 넓이 2배 — 사용자 2026-09-19)
-		sr.PlayRate = fx.markPlayRate or 1
-		e.TransformComponent.Scale = Vector3(s * (fx.markScaleX or 1), s, 1)
-		local function finish()
-			if isvalid(e) then e:Destroy() end
-		end
-		if not fx.markLoop then
-			e:ConnectEvent(SpriteAnimPlayerEndFrameEvent, function(ev)
-				_TimerService:SetTimerOnce(finish, 0.03)
-			end)
-		end
-		_TimerService:SetTimerOnce(finish, fx.markLife or 1.5)
+		-- markScaleX = 가로만 따로 배율(제네시스 빛기둥 넓이 2배 — 사용자 2026-09-19). markLoop면 마지막 프레임 정리 없이 markLife까지
+		self:SpawnOneShot("RtsMark_" .. target.Name .. "_" .. tostring(math.floor(DateTime.UtcNow.Elapsed)) .. "_" .. tostring(dup or 1), Vector3(cx, cy, 0), mapRoot, clip, 330, flipMark,
+			fx.markPlayRate or 1, Vector3(s * (fx.markScaleX or 1), s, 1), not fx.markLoop, fx.markLife or 1.5, nil)
 	end
 
 	-- (dx, dy) 방향의 각도(도, 0 = +x, 반시계 양수). atan2 유무에 기대지 않고 직접 구한다
@@ -1263,7 +1197,7 @@ script RtsSkillFxLogic extends Logic
 	@ExecSpace("ClientOnly")
 	method void SendAction(Entity body, string name, any rate, any playType, any frameA, any frameB)
 		if body == nil or not isvalid(body) then return end
-		if body.RtsUnitComponent ~= nil and _RtsJobTableLogic:HasMageSkin(body.RtsUnitComponent.JobId) then
+		if body.RtsUnitComponent ~= nil then
 			body.RtsUnitComponent:PlayMageAction(name)
 		-- PNG 본체도 아래 쉐도우 파트너 지연 재생을 거친다.
 		elseif frameA ~= nil then
@@ -1346,43 +1280,10 @@ script RtsSkillFxLogic extends Logic
 		end
 	end
 
-	-- 무기 파츠를 sec초 동안 투명하게(무기 잔상도 끔). 두손/한손은 GetCostume(weapon1h)로 구분.
-	--   연속 공격 중엔 시전마다 복구 타이머를 미뤄 무기가 깜빡이지 않고, 공격이 sec초 끊겼을 때만 다시 보인다
-	@ExecSpace("ClientOnly")
-	method void HideWeapon(Entity unitEntity, number sec)
-		local ar = unitEntity.AvatarRendererComponent
-		if ar == nil then return end
-		local key = unitEntity.Id
-		local cat = MapleAvatarItemCategory.TwoHandedWeapon
-		if unitEntity.RtsUnitComponent ~= nil then
-			local c = _RtsJobTableLogic:GetCostume(unitEntity.RtsUnitComponent.JobId)
-			if c ~= nil and c.weapon1h ~= nil and c.weapon1h ~= "" then cat = MapleAvatarItemCategory.OneHandedWeapon end
-		end
-		if self.HideTimer[key] ~= nil then
-			_TimerService:ClearTimer(self.HideTimer[key])
-			self.HideTimer[key] = nil
-		else
-			ar:SetAvatarPartColor(cat, 1, 1, 1, 0)
-			ar.ShowDefaultWeaponEffects = false
-		end
-		self.HideTimer[key] = _TimerService:SetTimerOnce(function()
-			self.HideTimer[key] = nil
-			if not isvalid(unitEntity) then return end
-			local ar2 = unitEntity.AvatarRendererComponent
-			if ar2 == nil then return end
-			ar2:SetAvatarPartColor(cat, 1, 1, 1, 1)
-			ar2.ShowDefaultWeaponEffects = true
-		end, sec)
-	end
-
-	-- 직업의 대기 자세: 한손 무기(마법사·나이트로드·섀도어 — GetCostume weapon1h)는 stand1, 두손은 stand2. 사용자 2026-09-18 "썬콜이 스킬 뒤 두손 모션으로 돌아간다"
+	-- 대기 자세 이름: 유닛(원화)은 stand1(3장 호흡), 그 밖의 몸 엔티티는 아바타 기본 stand2
 	@ExecSpace("ClientOnly")
 	method string StandName(Entity unitEntity)
-		if unitEntity ~= nil and isvalid(unitEntity) and unitEntity.RtsUnitComponent ~= nil then
-			if _RtsJobTableLogic:HasMageSkin(unitEntity.RtsUnitComponent.JobId) then return "stand1" end
-			local c = _RtsJobTableLogic:GetCostume(unitEntity.RtsUnitComponent.JobId)
-			if c ~= nil and c.weapon1h ~= nil and c.weapon1h ~= "" then return "stand1" end
-		end
+		if unitEntity ~= nil and isvalid(unitEntity) and unitEntity.RtsUnitComponent ~= nil then return "stand1" end
 		return "stand2"
 	end
 
@@ -1398,24 +1299,9 @@ script RtsSkillFxLogic extends Logic
 		local dir = 1
 		if flip then dir = -1 end
 		local at = Vector3(pos.x + (fx.backDx or 0) * s * dir, pos.y + (fx.backDy or 0), 0)
-		local e = _SpawnService:SpawnByModelId("model://MapObject", "RtsBackFx" .. _RtsHudLogic:Int(no) .. "_" .. tostring(math.floor(DateTime.UtcNow.Elapsed)), at, mapRoot)
-		if e == nil then return end
-		local sr = e.SpriteRendererComponent
-		if sr == nil then sr = e:AddComponent("SpriteRendererComponent") end
-		sr.SortingLayer = "Default"
-		sr.OrderInLayer = -10
-		sr.FlipX = flip
-		sr.SpriteRUID = fx.backClip
-		sr.PlayRate = fx.backPlayRate or 1
-		if fx.backAlpha ~= nil then sr.Color = Color(1, 1, 1, fx.backAlpha) end
-		e.TransformComponent.Scale = Vector3(s, s, 1)
-		local function finish()
-			if isvalid(e) then e:Destroy() end
-		end
-		e:ConnectEvent(SpriteAnimPlayerEndFrameEvent, function(ev)
-			_TimerService:SetTimerOnce(finish, 0.03)
-		end)
-		_TimerService:SetTimerOnce(finish, fx.backLife or 1.5)
+		local e = self:SpawnOneShot("RtsBackFx" .. _RtsHudLogic:Int(no) .. "_" .. tostring(math.floor(DateTime.UtcNow.Elapsed)), at, mapRoot, fx.backClip, -10, flip,
+			fx.backPlayRate or 1, Vector3(s, s, 1), true, fx.backLife or 1.5, nil)
+		if e ~= nil and fx.backAlpha ~= nil then e.SpriteRendererComponent.Color = Color(1, 1, 1, fx.backAlpha) end
 	end
 
 	-- 추가 클립들(fx.clips): 각각 독립 엔티티로 같은 원점(발 + feetDx/feetDy, 항목별 dx/dy 추가)에 띄우고 마지막 프레임에서 지운다. 방향 반전은 clip과 같은 규칙. Active 슬롯·stand 복귀는 건드리지 않음
@@ -1448,27 +1334,9 @@ script RtsSkillFxLogic extends Logic
 			local function spawn()
 				if not isvalid(unitEntity) then return end
 				local at = Vector3(pos.x + ((fx.feetDx or 0) + dx) * sc * dir, pos.y + ((fx.feetDy or 0) + dy) * sc, 0)
-				local e = _SpawnService:SpawnByModelId("model://MapObject", "RtsFxX" .. _RtsHudLogic:Int(no) .. "_" .. tostring(i) .. "_" .. tostring(math.floor(DateTime.UtcNow.Elapsed)), at, mapRoot)
-				if e == nil then return end
-				local sr = e.SpriteRendererComponent
-				if sr == nil then sr = e:AddComponent("SpriteRendererComponent") end
-				sr.SortingLayer = "Default"
-				sr.OrderInLayer = 300 + i
-				sr.FlipX = flip
-				sr.SpriteRUID = ruid
-				e.TransformComponent.Scale = Vector3(sc, sc, 1)
-				local function finish()
-					if isvalid(e) then e:Destroy() end
-				end
-				-- life(초)가 있으면 그 시각에 제거(마지막 프레임이 긴 클립 — 80003291 용머리 0.2초·찌르기 0.12초는 EndFrame 정리로 잘림). 없으면 마지막 프레임 진입에서 제거
-				if life ~= nil then
-					_TimerService:SetTimerOnce(finish, life)
-				else
-					e:ConnectEvent(SpriteAnimPlayerEndFrameEvent, function(ev)
-						_TimerService:SetTimerOnce(finish, 0.03)
-					end)
-					_TimerService:SetTimerOnce(finish, fx.clipLife or 1.5)
-				end
+				-- life(초)가 있으면 그 시각에 제거(마지막 프레임이 긴 클립 — 80003291 용머리 0.2초·찌르기 0.12초는 EndFrame 정리로 잘림). 없으면 마지막 프레임 진입에서 제거(상한 clipLife)
+				self:SpawnOneShot("RtsFxX" .. _RtsHudLogic:Int(no) .. "_" .. tostring(i) .. "_" .. tostring(math.floor(DateTime.UtcNow.Elapsed)), at, mapRoot, ruid, 300 + i, flip,
+					1, Vector3(sc, sc, 1), life == nil, life or fx.clipLife or 1.5, nil)
 			end
 			if delay > 0 then
 				_TimerService:SetTimerOnce(spawn, delay)
@@ -1483,7 +1351,7 @@ script RtsSkillFxLogic extends Logic
 	method void PlayClip(Entity unitEntity, number no, table fx, Entity body)
 		-- 원화 히어로의 일반 레이징 블로우는 몸과 같은 시계로 검 이펙트를 직접 그린다.
 		local unit = unitEntity.RtsUnitComponent
-		if unit ~= nil and unit.JobId == "hero" and _RtsJobTableLogic:HasMageSkin("hero") and fx.clip == "fa2bfe8ff4f543fb815dd7ee5e02eac9" then return end
+		if unit ~= nil and unit.JobId == "hero" and fx.clip == "fa2bfe8ff4f543fb815dd7ee5e02eac9" then return end
 		local mapRoot = _RtsBoardViewLogic:GetRoot()
 		if mapRoot == nil then return end
 		local old = self.Active[no]
@@ -1496,31 +1364,16 @@ script RtsSkillFxLogic extends Logic
 		local dir = 1
 		if flip then dir = -1 end
 		local at = Vector3(pos.x + (fx.feetDx or 0) * s * dir, pos.y + (fx.feetDy or 0) * s, 0)
-		local e = _SpawnService:SpawnByModelId("model://MapObject", "RtsFx" .. _RtsHudLogic:Int(no) .. "_" .. tostring(math.floor(DateTime.UtcNow.Elapsed)), at, mapRoot)
-		if e == nil then return end
-		self.Active[no] = e
-		local sr = e.SpriteRendererComponent
-		if sr == nil then sr = e:AddComponent("SpriteRendererComponent") end
-		sr.SortingLayer = "Default"
-		-- clipOrder: 시전 클립을 아바타(0) 뒤에 두려면 −10(블리자드 템페스트 발밑 결정 — 2026-09-22 사용자 "캐릭터 뒤에 오도록"). 기본 300 = 앞
-		sr.OrderInLayer = fx.clipOrder or 300
-		sr.FlipX = flip
-		sr.SpriteRUID = fx.clip
-		sr.PlayRate = fx.clipPlayRate or 1
-		e.TransformComponent.Scale = Vector3(s, s, 1)
 		local stand = self:StandName(unitEntity)
-		local function finish()
-			if isvalid(e) then e:Destroy() end
-			if self.Active[no] == e then self.Active[no] = nil end
-			self:ReturnStand(body, stand)
-		end
-		-- clipHold = true: 마지막 프레임이 긴 클립은 EndFrame 정리를 끄고 clipLife까지 둔다
-		if not fx.clipHold then
-			e:ConnectEvent(SpriteAnimPlayerEndFrameEvent, function(ev)
-				_TimerService:SetTimerOnce(finish, 0.03)
+		local e = nil
+		-- clipOrder: 시전 클립을 아바타(0) 뒤에 두려면 −10(블리자드 템페스트 발밑 결정 — 2026-09-22 사용자 "캐릭터 뒤에 오도록"). 기본 300 = 앞
+		-- clipHold = true: 마지막 프레임이 긴 클립은 EndFrame 정리를 끄고 clipLife까지 둔다. 지운 뒤 Active 슬롯을 비우고 대기 자세로
+		e = self:SpawnOneShot("RtsFx" .. _RtsHudLogic:Int(no) .. "_" .. tostring(math.floor(DateTime.UtcNow.Elapsed)), at, mapRoot, fx.clip, fx.clipOrder or 300, flip,
+			fx.clipPlayRate or 1, Vector3(s, s, 1), not fx.clipHold, fx.clipLife or 1.5, function()
+				if self.Active[no] == e then self.Active[no] = nil end
+				self:ReturnStand(body, stand)
 			end)
-		end
-		_TimerService:SetTimerOnce(finish, fx.clipLife or 1.5)
+		if e ~= nil then self.Active[no] = e end
 	end
 
 	-- 몸 덧그림(원작 skill/<id>/effect0 — 캐릭터 실루엣이 빛나는 클립)을 아바타 위(200 < 250 < 이펙트 300)에 유닛과 같은 크기로 1회.
@@ -1537,60 +1390,40 @@ script RtsSkillFxLogic extends Logic
 		local flip = self:FlipFor(fx, facingRight, "body")
 		local pos = _RtsBoardViewLogic:BoardPosition(unitEntity)
 		local at = Vector3(pos.x, pos.y + (fx.bodyDy or 0), 0)
-		local e = _SpawnService:SpawnByModelId("model://MapObject", "RtsFxBody" .. _RtsHudLogic:Int(no) .. "_" .. tostring(math.floor(DateTime.UtcNow.Elapsed)), at, mapRoot)
-		if e == nil then return end
-		self.ActiveBody[no] = e
+		local e = nil
+		e = self:SpawnOneShot("RtsFxBody" .. _RtsHudLogic:Int(no) .. "_" .. tostring(math.floor(DateTime.UtcNow.Elapsed)), at, mapRoot, fx.bodyClip, 250, flip,
+			1, Vector3(s, s, 1), true, fx.bodyLife or 1.2, function()
+				if self.ActiveBody[no] == e then self.ActiveBody[no] = nil end
+			end)
+		if e ~= nil then self.ActiveBody[no] = e end
+	end
+
+	-- 1회 클립 엔티티(시전 clip·몸 덧그림·등 뒤·추가 clips·표식·빔 조각·루프 끝·몬스터 타격 공용): parent 아래 at에 세워 ruid를 한 번 재생하고 지운다.
+	--   order = Default 레이어 그리기 순서, flip = 좌우 반전, rate = 재생 속도, scale = 크기. 클립은 기본 Loop라 endFrame이면 마지막 프레임 진입 한 프레임(0.03초) 뒤,
+	--   그와 별개로 이벤트가 안 오는 경우(또는 endFrame = false — 마지막 프레임이 긴 클립·루프 표식) 상한 life초에 지운다. onFinish = 지울 때마다 이어서 할 일(nil 가능). 만든 엔티티(실패면 nil)
+	@ExecSpace("ClientOnly")
+	method Entity SpawnOneShot(string name, Vector3 at, Entity parent, string ruid, number order, boolean flip, number rate, Vector3 scale, boolean endFrame, number life, any onFinish)
+		local e = _SpawnService:SpawnByModelId("model://MapObject", name, at, parent)
+		if e == nil then return nil end
 		local sr = e.SpriteRendererComponent
 		if sr == nil then sr = e:AddComponent("SpriteRendererComponent") end
 		sr.SortingLayer = "Default"
-		sr.OrderInLayer = 250
+		sr.OrderInLayer = order
 		sr.FlipX = flip
-		sr.SpriteRUID = fx.bodyClip
-		e.TransformComponent.Scale = Vector3(s, s, 1)
+		sr.SpriteRUID = ruid
+		sr.PlayRate = rate
+		e.TransformComponent.Scale = scale
 		local function finish()
 			if isvalid(e) then e:Destroy() end
-			if self.ActiveBody[no] == e then self.ActiveBody[no] = nil end
+			if onFinish ~= nil then onFinish() end
 		end
-		e:ConnectEvent(SpriteAnimPlayerEndFrameEvent, function(ev)
-			_TimerService:SetTimerOnce(finish, 0.03)
-		end)
-		_TimerService:SetTimerOnce(finish, fx.bodyLife or 1.2)
-	end
-
-	-- 내 유닛 no의 1레벨 액티브(기본 공격)를 한 번 재생
-	@ExecSpace("ClientOnly")
-	method void PlayBasic(number no)
-		local u = _RtsUnitLogic:GetMyUnit(no)
-		if u == nil then return end
-		local skills = _RtsJobTableLogic:GetSkillsFor(u)
-		local fx = nil
-		for i = 1, #skills do
-			if skills[i].fx ~= nil then
-				fx = skills[i].fx
-				break
-			end
+		if endFrame then
+			e:ConnectEvent(SpriteAnimPlayerEndFrameEvent, function(ev)
+				_TimerService:SetTimerOnce(finish, 0.03)
+			end)
 		end
-		if fx == nil then return end
-		self:Preload(fx)
-		self:PlayCast(u.Entity, self:LoopKey(u.Zone, no), fx, nil, nil)
-	end
-
-	-- 데모: 유닛 no가 공격 주기마다 기본 공격을 반복 (on=false로 정지). 전투 루프가 생기기 전 눌러 보기용
-	@ExecSpace("ClientOnly")
-	method void DemoLoop(number no, boolean on)
-		local t = self.DemoTimers[no]
-		if t ~= nil then
-			_TimerService:ClearTimer(t)
-			self.DemoTimers[no] = nil
-		end
-		if not on then return end
-		local u = _RtsUnitLogic:GetMyUnit(no)
-		if u == nil then return end
-		local st = _RtsJobTableLogic:GetStatFor(u)
-		local period = _RtsJobTableLogic:GetPeriod(st)
-		self.DemoTimers[no] = _TimerService:SetTimerRepeat(function()
-			self:PlayBasic(no)
-		end, period, 0.5)
+		_TimerService:SetTimerOnce(finish, life)
+		return e
 	end
 
 end

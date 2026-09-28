@@ -61,19 +61,34 @@ script RtsBootstrapLogic extends Logic
 		_RtsHudLogic:RefreshPlayerList(packed)
 	end
 
-	-- 바닥 채우기 (멱등). 타일 크기는 RtsConfigLogic.FloorTileUnit, 사방 16유닛 여유
-	--   어떤 타일로 채울지는 테마 프리셋(RtsThemeLogic)이 정한다
+	-- 바닥 사방 여유(유닛) — 맵 밖으로 카메라가 조금 나가도 빈 곳이 안 보이게
+	property number GroundPad = 16
+
+	-- 바닥 타일맵(RectTileMapComponent) — 없으면 nil
 	@ExecSpace("ServerOnly")
-	method void EnsureGroundTiles()
+	method any GroundTilemap()
 		local tm = _EntityService:GetEntityByPath("/maps/RtsMap/RectTileMap")
-		if tm == nil then return end
-		local tilemap = tm.RectTileMapComponent
-		if tilemap == nil then return end
+		if tm == nil then return nil end
+		return tm.RectTileMapComponent
+	end
+
+	-- 바닥 전체 칸 범위(맵 + 사방 GroundPad, 타일 칸 좌표) { x0, y0, x1, y1 }
+	method table GroundBounds()
 		local tileUnit = _RtsConfigLogic:GetFloorTileUnit()
 		local tilesX = _RtsConfigLogic:GetMapCellsX() / tileUnit
 		local tilesY = _RtsConfigLogic:GetMapCellsY() / tileUnit
-		local pad = 16 / tileUnit
-		local need = (tilesX + pad * 2) * (tilesY + pad * 2)
+		local pad = self.GroundPad / tileUnit
+		return { x0 = 0 - pad, y0 = 0 - pad, x1 = tilesX - 1 + pad, y1 = tilesY - 1 + pad }
+	end
+
+	-- 바닥 채우기 (멱등). 타일 크기는 RtsConfigLogic.FloorTileUnit, 사방 GroundPad 여유
+	--   어떤 타일로 채울지는 테마 프리셋(RtsThemeLogic)이 정한다
+	@ExecSpace("ServerOnly")
+	method void EnsureGroundTiles()
+		local tilemap = self:GroundTilemap()
+		if tilemap == nil then return end
+		local b = self:GroundBounds()
+		local need = (b.x1 - b.x0 + 1) * (b.y1 - b.y0 + 1)
 		if tilemap.TileCount >= need then return end
 		local preset = _RtsThemeLogic:GetPreset(_RtsThemeLogic.DefaultKey)
 		self:FillGroundTiles(preset.floorTile, preset.floorVariants, preset.variantRatio)
@@ -83,38 +98,33 @@ script RtsBootstrapLogic extends Logic
 	--   variants가 있으면 ratio 비율만큼 무작위 칸을 변형 타일(꽃 등)로 바꿔 반복감을 줄인다(결정적 해시 → 매번 같은 자리)
 	@ExecSpace("ServerOnly")
 	method void FillGroundTiles(string tileName, table variants, number ratio)
-		local tm = _EntityService:GetEntityByPath("/maps/RtsMap/RectTileMap")
-		if tm == nil then return end
-		local tilemap = tm.RectTileMapComponent
+		local tilemap = self:GroundTilemap()
 		if tilemap == nil then return end
 		local tileUnit = _RtsConfigLogic:GetFloorTileUnit()
 		tilemap.GridSize = Vector2(tileUnit, tileUnit)
-		local tilesX = _RtsConfigLogic:GetMapCellsX() / tileUnit
-		local tilesY = _RtsConfigLogic:GetMapCellsY() / tileUnit
-		local pad = 16 / tileUnit
+		local b = self:GroundBounds()
 		tilemap:Clear()
-		tilemap:BoxFill(tileName, Vector2Int(0 - pad, 0 - pad), Vector2Int(tilesX - 1 + pad, tilesY - 1 + pad))
-		self:ScatterVariants(tilemap, variants, ratio, 0 - pad, 0 - pad, tilesX - 1 + pad, tilesY - 1 + pad)
+		tilemap:BoxFill(tileName, Vector2Int(b.x0, b.y0), Vector2Int(b.x1, b.y1))
+		self:ScatterVariants(tilemap, variants, ratio, b.x0, b.y0, b.x1, b.y1)
 	end
 
 	-- 구역 하나의 바닥만 다시 칠한다(테마 = 유저별, RtsThemeLogic.ApplyToZone — 2026-09-25).
 	--   맵은 (0,0)부터 구역 2열 × 4행, 구역 한 칸 = 구역 간격(48×32유닛) = 타일 12×8칸(FloorTileUnit 4)이라 경계가 타일에 딱 맞는다.
-	--   맨 바깥 구역은 EnsureGroundTiles의 사방 여유(16유닛)까지 같이 칠한다
+	--   맨 바깥 구역은 EnsureGroundTiles의 사방 여유(GroundPad)까지 같이 칠한다
 	@ExecSpace("ServerOnly")
 	method void FillZoneTiles(number zone, string tileName, table variants, number ratio)
-		local tm = _EntityService:GetEntityByPath("/maps/RtsMap/RectTileMap")
-		if tm == nil or tm.RectTileMapComponent == nil then return end
-		local tilemap = tm.RectTileMapComponent
+		local tilemap = self:GroundTilemap()
+		if tilemap == nil then return end
 		local C = _RtsConfigLogic
 		local tileUnit = C:GetFloorTileUnit()
 		local cols = C:GetZoneCols()
 		local rows = C:GetZoneRows()
-		local idx = math.floor(zone + 0.5) - 1
-		local col = idx % cols
-		local rowB = rows - 1 - math.floor(idx / cols)
+		local cr = C:ZoneColRow(zone)
+		local col = cr.col
+		local rowB = rows - 1 - cr.row
 		local perX = math.floor(C:GetZonePitchX() / tileUnit + 0.5)
 		local perY = math.floor(C:GetZonePitchY() / tileUnit + 0.5)
-		local pad = math.floor(16 / tileUnit + 0.5)
+		local pad = math.floor(self.GroundPad / tileUnit + 0.5)
 		local x0 = col * perX
 		local x1 = x0 + perX - 1
 		local y0 = rowB * perY

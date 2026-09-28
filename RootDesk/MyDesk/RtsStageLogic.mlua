@@ -234,9 +234,7 @@ script RtsStageLogic extends Logic
 		self.RestartVotes[userId] = nil
 		self.ReadyByUser[userId] = nil
 		self.SpeedVotes[userId] = nil
-		local anyone = false
-		for uid, z in pairs(_RtsZoneLogic.ZoneByUser) do anyone = true end
-		if not anyone then
+		if self:RoomUserCount() == 0 then
 			self:TallySpeed()
 			self:ResetRun()
 			return
@@ -355,9 +353,7 @@ script RtsStageLogic extends Logic
 		for userId, v in pairs(self.ReadyByUser) do keys[#keys + 1] = userId end
 		for i = 1, #keys do self.ReadyByUser[keys[i]] = nil end
 		self.ReadyCount = 0
-		local total = 0
-		for userId, zone in pairs(_RtsZoneLogic.ZoneByUser) do total = total + 1 end
-		self.RoomCount = total
+		self.RoomCount = self:RoomUserCount()
 	end
 
 	-- 클라: 혼자 하는 판인가(방 인원 1 — 솔로 출시 2026-09-24: '나가기' 대신 '다시 하기', 관전하기 대신 닫기, 다시 하기 안내 단순화)
@@ -627,7 +623,6 @@ script RtsStageLogic extends Logic
 		_RtsHudLogic:RefreshRecruitButton()
 		_RtsHudLogic:RefreshRestartButton()
 		_RtsHudLogic:RefreshPauseUi()
-		_RtsHudLogic:RefreshSpeedUi()
 		-- 배속(2026-09-27): 진행 중 2배면 클라 시간도 2배(엔진 SetClientTimeScale — 연출·데미지 숫자·클라 타이머·몬스터 걷기 그림, 소리는 그대로). 멈춤·그 밖은 1
 		local ts = 1
 		if self.RunState == "running" and not self.Paused then ts = self.GameSpeed end

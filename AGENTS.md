@@ -281,7 +281,7 @@ If none of the above resolves the issue, tell the user:
 
 ## 구조
 
-- MapleStory Worlds Maker(CoreVersion 26.7.0.0)의 ExtendedScriptFormat mlua 프로젝트다 (`Environment/config:1`, `Global/WorldConfig.config:16-21`). 현재 맵은 `map/RtsMap.map`, 게임 코드는 `RootDesk/MyDesk/Rts*.mlua` 30개와 대응 `.codeblock` 30개다 (`docs/architecture.md`).
+- MapleStory Worlds Maker(CoreVersion 26.7.0.0)의 ExtendedScriptFormat mlua 프로젝트다 (`Environment/config:1`, `Global/WorldConfig.config:16-21`). 현재 맵은 `map/RtsMap.map`, 게임 코드는 `RootDesk/MyDesk/Rts*.mlua` 33개(하위 폴더 `Themes/`·`UI/` 포함)와 대응 `.codeblock` 33개다 (`docs/architecture.md`).
 - 입장 이벤트 → `RtsBootstrapLogic` → 구역·카메라·스테이지·프로필 초기화 → HUD와 서버 스테이지 루프의 흐름을 따른다. 엔티티별 동작은 `Component`, 전역 게임 규칙·표·UI는 해당 `Logic`에 둔다 (`docs/architecture.md`).
 - 정의만 있는 기능을 활성 기능으로 취급하지 않는다. 진입점과 호출 지점까지 확인한다.
 

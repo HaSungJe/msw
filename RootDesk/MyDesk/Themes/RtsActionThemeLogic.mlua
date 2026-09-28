@@ -1,7 +1,11 @@
 @Logic
 script RtsActionThemeLogic extends Logic
 
-	property string BackgroundRUID = "be90451fd564466aafbade23743a3b03"
+	-- 움직이는 장식을 얹을 테마 키와 그 풍경 원본 크기(px) — 배경 RUID는 프리셋(RtsThemeLogic.GetPresets)의 backgroundRUID를 OnBeginPlay에서 읽는다(2026-09-28 정리 — 전엔 같은 RUID를 여기 따로 적었다)
+	property string SceneKey = "zakum_altar"
+	property number ImageW = 1672
+	property number ImageH = 941
+	property string BackgroundRUID = ""
 	property string ArmRUID = "4b7bc780f2ca47e0bfd8f6c4adb9a61f"
 	property string BodyRUID = "474d655219e146cd87452fa292bfc332"
 	property string FlameRUID = "905b59a732dd48abb8153f5f4650db75"
@@ -14,6 +18,7 @@ script RtsActionThemeLogic extends Logic
 	method void OnBeginPlay()
 		-- 월드 배경과 유저 카드가 같은 8초 위상을 사용한다.
 		self.Scenes = {}
+		self.BackgroundRUID = _RtsThemeLogic:GetPreset(self.SceneKey).backgroundRUID
 		self.Elapsed = 0
 		self.ScanClock = 0
 		self.DrawClock = 0
@@ -55,19 +60,19 @@ script RtsActionThemeLogic extends Logic
 		-- 배경 RUID를 관찰하므로 테마 변경·늦은 입장도 같은 경로로 처리한다.
 		local zone = _RtsHudLogic.WatchedZone
 		if zone < 1 then return end
-		local host = _EntityService:GetEntityByPath("/maps/RtsMap/RtsBoard/ZoneBackground" .. string.format("%d", zone))
+		local host = _RtsBoardViewLogic:BoardChild("ZoneBackground" .. string.format("%d", zone))
 		if not isvalid(host) or host.SpriteRendererComponent == nil then return end
 		if host.SpriteRendererComponent.SpriteRUID ~= self.BackgroundRUID then return end
 		for _, scene in ipairs(self.Scenes) do if scene.host == host then return end end
-		self:CreateScene(host, false, zone, 1672, 941)
+		self:CreateScene(host, false, zone, self.ImageW, self.ImageH)
 	end
 
 	@ExecSpace("ClientOnly")
 	method void RegisterCard(Entity photo, string key, number width)
 		-- 정지 썸네일 대신 원화 배경과 같은 레이어를 카드의 마스크 안에 구성한다.
-		if key ~= "zakum_altar" or not isvalid(photo) then return end
+		if key ~= self.SceneKey or not isvalid(photo) then return end
 		photo.SpriteGUIRendererComponent.ImageRUID = DataRef(self.BackgroundRUID)
-		local height = width * 941 / 1672
+		local height = width * self.ImageH / self.ImageW
 		photo.UITransformComponent.RectSize = Vector2(width, height)
 		photo.UITransformComponent.anchoredPosition = Vector2(0, -26)
 		self:CreateScene(photo, true, 0, width, height)
@@ -157,8 +162,8 @@ script RtsActionThemeLogic extends Logic
 			end
 			if scene.ui then
 				local t = part.entity.UITransformComponent
-				t.anchoredPosition = Vector2((x / 1672 - 0.5) * scene.width, (0.5 - y / 941) * scene.height)
-				t.RectSize = Vector2(w / 1672 * scene.width, h / 941 * scene.height)
+				t.anchoredPosition = Vector2((x / self.ImageW - 0.5) * scene.width, (0.5 - y / self.ImageH) * scene.height)
+				t.RectSize = Vector2(w / self.ImageW * scene.width, h / self.ImageH * scene.height)
 				t.ZRotation = rotation
 				part.entity.SpriteGUIRendererComponent.Color = Color(1, 1, 1, alpha)
 			else

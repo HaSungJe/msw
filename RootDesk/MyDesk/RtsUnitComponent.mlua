@@ -106,18 +106,11 @@ script RtsUnitComponent extends Component
 		self:SetupMageSkin()
 	end
 
-	-- 보는 방향을 아바타에 반영(클라). 메이플 아바타는 기본이 왼쪽 보기라 오른쪽을 볼 때 루트 스케일 x = -1
+	-- 보는 방향 반영(클라): 원화 프레임(DrawMageSkin — FlipX) · 쉐도우 파트너 그림자 · 루프 클립.
+	--   2026-09-28 정리: 아바타 대체 외형을 지우며 바로잡음 — 전엔 아바타가 없는 원화 유닛이 여기서 일찍 끝나 그림자·루프 클립이 돌아설 때 따라 뒤집히지 않았다
 	@ExecSpace("ClientOnly")
 	method void ApplyFace()
 		self:DrawMageSkin()
-		local ar = self.Entity.AvatarRendererComponent
-		if ar == nil then return end
-		local root = ar:GetAvatarRootEntity()
-		if root == nil or not isvalid(root) then return end
-		local sx = 1
-		if self:FaceNow() > 0 then sx = -1 end
-		local s = root.TransformComponent.Scale
-		if s.x ~= sx then root.TransformComponent.Scale = Vector3(sx, s.y, s.z) end
 		self:ApplyShadow()
 		-- 공격 중 도는 루프 클립(폭풍의 시 keydown·조커 리본)은 유닛 엔티티의 자식이라 아바타 루트 스케일을 안 타므로 따로 반전 — 2026-09-20 사용자 "모든 캐릭터 애니메이션은 보는 방향 따라가야"
 		_RtsSkillFxLogic:RefreshLoopFacing(_RtsSkillFxLogic:LoopKey(self.Zone, self.No))
@@ -128,7 +121,7 @@ script RtsUnitComponent extends Component
 		-- 직업별 원화 프레임을 읽어 같은 발 기준점으로 표시한다. 대기(stand1)를 먼저 받아 바로 유닛을 보이고, 나머지 동작·히어로 검은 이어서 받는다
 		--   (2026-09-26 사용자 "유닛 소환 시 1초 딜레이" — 전엔 모든 동작 프레임(히어로 18장)과 검 14장까지 다 받은 뒤에야 유닛이 보였다).
 		--   아직 안 받은 동작으로 시전하면 DrawMageSkin이 그 동작 표가 없어 직전 그림(대기)을 그대로 둔다
-		if not _RtsJobTableLogic:HasMageSkin(self.JobId) or self.MageSkinDone or self.MageSkinLoading then return end
+		if self.MageSkinDone or self.MageSkinLoading then return end
 		if self.MageSkinTries >= 10 then return end
 		self.MageSkinTries = self.MageSkinTries + 1
 		local frames = _RtsJobTableLogic:GetMageSkinFrames(self.JobId)
@@ -333,10 +326,6 @@ script RtsUnitComponent extends Component
 		end
 	end
 
-	method boolean IsFacingRight()
-		return self:FaceNow() > 0
-	end
-
 	-- 지금 그릴 방향: 클라에 시전 방향(LocalFace)이 있으면 그것, 아니면 동기화된 FaceDir
 	method number FaceNow()
 		if self.LocalFace ~= 0 then return self.LocalFace end
@@ -400,25 +389,6 @@ script RtsUnitComponent extends Component
 		return math.ceil(left)
 	end
 
-	-- 외형 적용: 직업 기본 세트만(UseCustomEquipOnly — 월드 아바타 스킨은 2026-09-25 삭제)
-	@ExecSpace("ServerOnly")
-	method void ApplyLook()
-		local cm = self.Entity.CostumeManagerComponent
-		if cm == nil then return end
-		local set = _RtsJobTableLogic:GetCostume(self.JobId)
-		if set == nil then return end
-		cm.UseCustomEquipOnly = true
-		cm.DefaultEquipUserId = ""
-		cm.CustomLongcoatEquip = set.longcoat
-		cm.CustomTwoHandedWeaponEquip = set.weapon2h or ""
-		cm.CustomOneHandedWeaponEquip = set.weapon1h or ""
-		cm.CustomShoesEquip = set.shoes
-		cm.CustomHairEquip = set.hair
-		cm.CustomCapEquip = set.cap or ""
-		cm.CustomFaceAccessoryEquip = set.faceAcc or ""
-		cm.CustomFaceEquip = set.face or ""
-	end
-
 	-- 메인 대상 쪽을 본다: dirX > 0 오른쪽, < 0 왼쪽. FaceDir 동기화 → 클라 ApplyFace. 이후 되돌리지 않는다
 	@ExecSpace("ServerOnly")
 	method void FaceTo(number dirX)
@@ -427,13 +397,12 @@ script RtsUnitComponent extends Component
 		if self.FaceDir ~= d then self.FaceDir = d end
 	end
 
-	-- 발판 칸에 세운다 (아바타 발 위치 = 칸 중앙 −0.75)
+	-- 발판 칸에 세운다 (발 위치 = 칸 중앙 − RtsUnitLogic.UnitFootDy)
 	@ExecSpace("ServerOnly")
 	method void PlaceAt(number col, number row)
 		self.Col = col
 		self.Row = row
-		local at = _RtsZoneLogic:GetCellCenter(self.Zone, col, row)
-		self.Entity.TransformComponent.WorldPosition = Vector3(at.x, at.y - 0.75, 0)
+		self.Entity.TransformComponent.WorldPosition = _RtsUnitLogic:UnitFootPos(self.Zone, col, row)
 	end
 
 end

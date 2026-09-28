@@ -8,7 +8,7 @@ script RtsAugmentTableLogic extends Logic
 
 	property boolean Loaded = false
 
-	-- id → 정의 { id, grade(bronze/silver/gold/prism), name, w(가중치), crit/critDmg/atk/pct/boss/fin/ign(효과), job(직업 전용 프리즘), core(특수 코어), unlock(팬텀) }
+	-- id → 정의 { id, grade(bronze/silver/gold/prism), name, level(브~골 단계), w(프리즘 가중치), crit/critDmg/atk/pct/boss/fin(효과), job(직업 전용 프리즘), core(특수 코어), unlock(팬텀) }
 	property table Defs = {}
 
 	-- 등급 → id 목록(표 순서)
@@ -83,7 +83,7 @@ script RtsAugmentTableLogic extends Logic
 		self.ByLevel = { bronze = { {}, {}, {} }, silver = { {}, {}, {} }, gold = { {}, {}, {} } }
 		for i = 1, #list do
 			local r = list[i]
-			local d = { id = r[1], grade = r[2], level = r[3], name = r[4], w = 1 }
+			local d = { id = r[1], grade = r[2], level = r[3], name = r[4] }
 			d[r[5]] = r[6]
 			self.Defs[d.id] = d
 			local g = self.ByGrade[d.grade]
@@ -236,14 +236,9 @@ script RtsAugmentTableLogic extends Logic
 		return out
 	end
 
-	-- 서로 다른 3개를 가중치대로(exclude[id] = true인 것 제외). 후보가 모자라면 있는 만큼
+	-- 서로 다른 3개를 가중치(w)대로(exclude[id] = true인 것 제외). 후보가 모자라면 있는 만큼 — 프리즘 3택1(뽑기·시그너스·루시드)
+	--   (전 RollShared의 고정 몫 shareOf는 엘릭서·템페스트 짝 확률용 — 2026-09-23 통합 뒤 넘기는 곳이 없어 2026-09-28 정리로 삭제)
 	method table Roll(string grade, table exclude)
-		return self:RollShared(grade, exclude, nil)
-	end
-
-	-- Roll + 고정 몫: shareOf[id] = 0~1이면 그 증강은 뽑을 때마다 후보 전체 중 그 몫의 확률로 나온다(나머지 후보는 남은 몫을 원래 가중치 비율로 나눔)
-	--   (엘릭서·템페스트 짝 확률에 쓰던 것 — 2026-09-23 둘을 통합해 지금은 넘기는 곳 없음)
-	method table RollShared(string grade, table exclude, table shareOf)
 		self:Ensure()
 		local pool = {}
 		local ids = self.ByGrade[grade] or {}
@@ -252,30 +247,12 @@ script RtsAugmentTableLogic extends Logic
 		end
 		local out = {}
 		while #out < 3 and #pool > 0 do
-			-- 이번 뽑기의 가중치: 몫이 없는 후보는 원래 w, 몫이 있는 후보는 (몫 ÷ 남은 몫) × 몫 없는 후보 w 합
-			local plain = 0
-			local shareSum = 0
-			for i = 1, #pool do
-				local sh = nil
-				if shareOf ~= nil then sh = shareOf[pool[i]] end
-				if sh ~= nil then shareSum = shareSum + sh else plain = plain + self.Defs[pool[i]].w end
-			end
-			local ws = {}
 			local total = 0
-			for i = 1, #pool do
-				local sh = nil
-				if shareOf ~= nil then sh = shareOf[pool[i]] end
-				local w = self.Defs[pool[i]].w
-				if sh ~= nil then
-					if plain > 0 and shareSum < 1 then w = sh / (1 - shareSum) * plain else w = 1 end
-				end
-				ws[i] = w
-				total = total + w
-			end
+			for i = 1, #pool do total = total + self.Defs[pool[i]].w end
 			local r = _UtilLogic:RandomDouble() * total
 			local pick = #pool
 			for i = 1, #pool do
-				r = r - ws[i]
+				r = r - self.Defs[pool[i]].w
 				if r <= 0 then
 					pick = i
 					break
@@ -287,12 +264,16 @@ script RtsAugmentTableLogic extends Logic
 		return out
 	end
 
-	-- 증강 합계(2026-09-24 사용자 "상세보기 증강 탭에서 증강으로 오른 공격력·공격력%·보스·크리 등을 합산"): 수치는 그대로(사냥 기준), 최종은 곱을 % 로
-	method table Totals(string augs)
-		return self:TotalsMul(augs, nil)
+	-- 이 등급에 exclude 말고 남은 증강이 있는가(난수를 쓰지 않는다 — 뽑기에서 프리즘이 더 나올 게 없으면 골드로 바꿀 때)
+	method boolean HasAny(string grade, table exclude)
+		self:Ensure()
+		for _, id in ipairs(self.ByGrade[grade] or {}) do
+			if exclude == nil or not exclude[id] then return true end
+		end
+		return false
 	end
 
-	-- 증강 합계에 효과 배율까지 곱한 값(팝업 증강 탭 — 실제 능력치에 들어가는 수치)
+	-- 증강 합계(2026-09-24 사용자 "상세보기 증강 탭에서 증강으로 오른 공격력·공격력%·보스·크리 등을 합산")에 효과 배율 mul까지 곱한 값(nil이면 배율 1 — 실제 능력치에 들어가는 수치). 최종은 곱을 %로
 	method table TotalsMul(string augs, table mul)
 		local t = { atk = 0, pct = 0, boss = 0, crit = 0, critDmg = 0, fin = 100, n = 0 }
 		if augs == nil or augs == "" then return t end
@@ -312,11 +293,6 @@ script RtsAugmentTableLogic extends Logic
 		return t
 	end
 
-	-- 능력치 오버레이(RtsJobTableLogic.GetStatFor — 프리즘 다음): augs = 유닛에 지정된 id를 쉼표로 이은 문자열(RtsUnitComponent.Augs). 전부 합연산, 일격필살만 최종 곱(방무 증강은 2026-09-24 삭제)
-	method void ApplyToStat(table st, string augs)
-		self:ApplyToStatMul(st, augs, nil)
-	end
-
 	-- 증강 효과 배율 mul = { crit, critDmg, atk, pct, boss }(RtsJobTableLogic.AugMulFor — 1티어 증강 수에 따라 최대 ×3 · 팬텀 ×1.75 · 2티어 약점 ×2, 2026-09-24 티어 재설계(.info/tier.md · tools/balance-calc.py TUNE)).
 	--   브론즈~골드만 곱한다(특수 코어 = 프리즘 등급은 그대로). nil이면 전부 1
 	method number MulOf(table mul, any d, string key)
@@ -324,6 +300,24 @@ script RtsAugmentTableLogic extends Logic
 		return mul[key]
 	end
 
+	-- 합계(TotalsMul 형식 { atk, pct, boss, crit, critDmg, fin })를 능력치마다 한 줄 "공격력 +40" · "크리티컬 확률 +10%"… — 상세창 증강 합계·증강으로 오른 수치·프리즘 버프 줄 공용
+	--   (2026-09-28 정리 — 전엔 세 곳이 따로 적어 "보스 데미지"/"보스 공격 시 데미지"로 어긋났다). 0.05 미만은 뺀다(소수 한 자리 — RtsHudLogic.Num), 최종은 곱을 %로
+	method table StatLines(table t)
+		local I = _RtsHudLogic
+		local out = {}
+		local function add(label, v, unit)
+			if v ~= nil and v >= 0.05 then out[#out + 1] = label .. " +" .. I:Num(v) .. unit end
+		end
+		add("공격력", t.atk, "")
+		add("공격력", t.pct, "%")
+		add("보스 공격 시 데미지", t.boss, "%")
+		add("크리티컬 확률", t.crit, "%")
+		add("크리티컬 데미지", t.critDmg, "%")
+		if t.fin ~= nil and t.fin > 100.01 then out[#out + 1] = "최종 데미지 +" .. I:Int(t.fin - 100) .. "%" end
+		return out
+	end
+
+	-- 능력치 오버레이(RtsJobTableLogic.GetStatFor — 프리즘 다음): augs = 유닛에 지정된 id를 쉼표로 이은 문자열(RtsUnitComponent.Augs). 전부 합연산, 일격필살만 최종 곱
 	method void ApplyToStatMul(table st, string augs, table mul)
 		if augs == nil or augs == "" then return end
 		self:Ensure()
@@ -335,11 +329,7 @@ script RtsAugmentTableLogic extends Logic
 				if d.atk ~= nil then st.flat = (st.flat or 0) + d.atk * self:MulOf(mul, d, "atk") end
 				if d.pct ~= nil then st.pct = (st.pct or 100) + d.pct * self:MulOf(mul, d, "pct") end
 				if d.boss ~= nil then st.bossAdd = (st.bossAdd or 0) + d.boss * self:MulOf(mul, d, "boss") end
-				if d.ign ~= nil then _RtsJobTableLogic:AddIgn(st, d.ign) end -- 방무는 곱연산(2026-09-24)
-				if d.fin ~= nil then
-					st.fin = st.fin * (100 + d.fin) / 100
-					st.finBoss = st.finBoss * (100 + d.fin) / 100
-				end
+				if d.fin ~= nil then st.fin = st.fin * (100 + d.fin) / 100 end
 			end
 		end
 		if st.crit ~= nil and st.crit > 100 then st.crit = 100 end

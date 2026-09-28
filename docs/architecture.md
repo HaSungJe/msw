@@ -6,7 +6,7 @@
 |---|---|
 | `map/RtsMap.map` | 현재 맵과 RectTileMap 직렬화 자산 (`map/RtsMap.map:4,18-42,109-164`). 맵 구조는 Maker에서 다룬다. |
 | `Global/` | 월드 설정과 공용 엔티티. `Global/WorldConfig.config:16-21`은 권한 검사와 ExtendedScriptFormat을 켠다. `Global/common.gamelogic:17-32`는 현재 비어 있다. |
-| `RootDesk/MyDesk/` | 게임 코드: `Rts*.mlua` 30개와 대응하는 `.codeblock` 30개. `Logic`은 게임 규칙·UI·테이블을, `Component`는 엔티티 수명주기·상태를 담당한다 (`RtsBootstrapLogic.mlua:2-3`, `RtsUnitComponent.mlua:1-58`). |
+| `RootDesk/MyDesk/` | 게임 코드: `Rts*.mlua` 33개(하위 폴더 `Themes/`·`UI/` 포함)와 대응하는 `.codeblock` 33개. `Logic`은 게임 규칙·UI·테이블을, `Component`는 엔티티 수명주기·상태를 담당한다 (`RtsBootstrapLogic.mlua:2-3`, `RtsUnitComponent.mlua:1-58`). |
 | `Environment/NativeScripts/` | 엔진이 제공하는 `.d.mlua` 선언과 API 서명. 프로젝트 코드가 아니므로 수정하지 않는다. |
 | `tools/`, `assets/`, `docs/` | 오프라인 생성·검산 도구, 게임 자산, 제작·검증 절차. `RtsStageTableLogic.mlua:1-8`은 표의 생성 원본을 `tools/gen-stage-table.py`로 지정한다. |
 
@@ -23,6 +23,6 @@
 ## 새 기능을 붙이는 순서
 
 1. 상태가 전역 게임 규칙인지 엔티티별 수명주기인지 결정한다. 전자는 `Rts…Logic`, 후자는 `Rts…Component`의 기존 책임을 확인한다 (`RtsStageLogic.mlua:5-18`; `RtsUnitComponent.mlua:1-58`).
-2. 게임 진입점과 실제 호출 지점을 연결한다. 파일 정의만으로 활성 기능으로 기록하지 않는다. 예를 들어 `RtsBossLogic:OnBossReachedEnd`의 호출은 존재하지만 현재 보스는 `Paused=true`로 생성되어 이동 종료 경로는 일반 플레이에서 닿지 않는다 (`RtsTrackWalkerComponent.mlua:65-67`; `RtsBossLogic.mlua:79-85`).
+2. 게임 진입점과 실제 호출 지점을 연결한다. 파일 정의만으로 활성 기능으로 기록하지 않는다. 예를 들어 랭킹 팝업(`RtsPopupLogic.BuildRank`·`RtsRunResultLogic.RequestRanking`)은 정의돼 있지만 여는 곳이 없어(Phase 13 예정으로 유지) 일반 플레이에서 닿지 않는다. 걷는 보스 경로(`OnBossReachedEnd`)처럼 닿지 않는 코드는 2026-09-28 정리로 지웠다.
 3. 클라이언트 입력·연출과 서버 판정·저장을 나누고, 서버 요청에서 사용자 소유권을 검증한다. [코딩 규약](conventions.md)과 [데이터](data-layer.md)를 따른다.
 4. 맵·모델·설정은 Maker 직렬화 자산이므로 Maker에서 연결하고 [Play Test 절차](testing.md)로 확인한다.

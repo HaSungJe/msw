@@ -1,6 +1,6 @@
 -- Phase 3 (2026-09-17) → Phase 6·7 (2026-09-23): 트랙 위 몬스터·보스 1기의 상태. 같은 엔티티에 SpriteRenderer(이동 클립) + HitComponent(피격 판정 박스)
 --   + DamageSkinSpawnerComponent(데미지 숫자) + RtsTrackWalkerComponent가 붙는다(생성 = RtsWaveLogic.SpawnMonsterEntity). HP는 서버가 깎고 동기화.
---   피격 연출(번쩍임·타격 이펙트·타격음)은 클라 PlayHitFx. HP 0 → Die(): 드랍 메소(구역 주인)·처치 수·필드 −1(일반) / 보스 처치 알림(보스),
+--   피격 연출(번쩍임·타격 이펙트·타격음)은 클라 PlayHitFxAt. HP 0 → Die(): 드랍 메소(구역 주인)·처치 수·필드 −1(일반) / 보스 처치 알림(보스),
 --   클라는 Dead 동기화로 사망 클립 + 사망음(보고 있는 구역만), 서버가 사망 클립 길이 뒤 제거.
 @Component
 script RtsMonsterComponent extends Component
@@ -476,14 +476,9 @@ script RtsMonsterComponent extends Component
 		return Color.white
 	end
 
-	-- 피격 연출(클라): 스프라이트를 흰빛으로 번쩍 → 0.12초 뒤 원색, 스킬 타격 클립을 몸 위에 1회, 타격음.
+	-- 피격 연출(클라, RtsCombatLogic.HitFx): 스프라이트를 흰빛으로 번쩍 → 0.12초 뒤 원색, 스킬 타격 클립을 몸 위에 1회, 타격음.
 	--   fx = RtsJobTableLogic 스킬 fx(hitClip / hitScale / hitSound / hitDy)
-	@ExecSpace("ClientOnly")
-	method void PlayHitFx(table fx, boolean crit)
-		self:PlayHitFxAt(fx, crit, 1)
-	end
-
-	-- hitNo = 이 시전 안의 타격 번호(1부터) — hitSoundEvery·hitPhases에 쓴다. (PlayHitFx에 인자를 추가하면 Maker 빌드 분석기가 옛 서명을 캐시해 오류를 내서 이름을 따로 둠, 2026-09-22)
+	--   hitNo = 이 시전 안의 타격 번호(1부터) — hitSoundEvery·hitPhases에 쓴다. (옛 PlayHitFx에 인자를 추가하면 Maker 빌드 분석기가 옛 서명을 캐시해 오류를 내서 이름을 따로 둠, 2026-09-22 — 옛 PlayHitFx는 2026-09-28 삭제)
 	@ExecSpace("ClientOnly")
 	method void PlayHitFxAt(table fx, boolean crit, number hitNo)
 		local e = self.Entity
@@ -542,31 +537,13 @@ script RtsMonsterComponent extends Component
 		if clip == nil or clip == "" then return end
 		local mapRoot = _RtsBoardViewLogic:GetRoot()
 		if mapRoot == nil then return end
+		local dy = fx.hitDy or 0.6
 		local p = _RtsBoardViewLogic:BoardPosition(e)
-		local at = Vector3(p.x, p.y + (fx.hitDy or 0.6), 0)
+		local a = Vector2(p.x, p.y + dy)
 		-- 보스(3배 크기)는 발밑이 아니라 몸 가운데(피격 박스 중심)에
-		if self.IsBoss and e.HitComponent ~= nil then
-			local sc = e.TransformComponent.Scale
-			at = Vector3(p.x + e.HitComponent.ColliderOffset.x * math.abs(sc.x), p.y + e.HitComponent.ColliderOffset.y * sc.y, 0)
-		end
-		local h = _SpawnService:SpawnByModelId("model://MapObject", "RtsHitFx_" .. e.Name .. "_" .. tostring(math.floor(DateTime.UtcNow.Elapsed)), at, mapRoot)
-		if h == nil then return end
-		local hs = h.SpriteRendererComponent
-		if hs == nil then hs = h:AddComponent("SpriteRendererComponent") end
-		hs.SortingLayer = "Default"
-		hs.OrderInLayer = 320
-		hs.SpriteRUID = clip
-		h.TransformComponent.Scale = Vector3(s, s, 1)
-		-- 클립은 기본 Loop라 마지막 프레임 진입 이벤트에서 한 프레임 뒤 제거 (msw-engine 메모)
-		h:ConnectEvent(SpriteAnimPlayerEndFrameEvent, function(ev)
-			_TimerService:SetTimerOnce(function()
-				if isvalid(h) then h:Destroy() end
-			end, 0.03)
-		end)
-		-- 이벤트가 안 오는 경우 대비 상한
-		_TimerService:SetTimerOnce(function()
-			if isvalid(h) then h:Destroy() end
-		end, fx.hitLife or 1.2)
+		if self.IsBoss then a = _RtsBoardViewLogic:AimPoint(e, dy) end
+		-- 클립은 마지막 프레임 진입 한 프레임 뒤 제거, 이벤트가 안 오면 hitLife 상한 (msw-engine 메모)
+		_RtsSkillFxLogic:SpawnOneShot("RtsHitFx_" .. e.Name .. "_" .. tostring(math.floor(DateTime.UtcNow.Elapsed)), Vector3(a.x, a.y, 0), mapRoot, clip, 320, false, 1, Vector3(s, s, 1), true, fx.hitLife or 1.2, nil)
 	end
 
 end

@@ -120,8 +120,9 @@ script RtsProfileLogic extends Logic
 
 	-- ===== 공용 =====
 
-	-- "M005:123,M131:456" → { M001 = 0, M005 = 123, M131 = 456 } (틀린 조각은 버린다)
-	method table ParseOwned(string packed)
+	-- 보유 아이콘(몬스터 id → 획득 UTC ms): "M005:123,M131:456" → { M001 = 0, M005 = 123, M131 = 456 } (틀린 조각은 버린다).
+	--   이름을 증강 보유 목록(RtsAugmentLogic.ParseOwned/PackOwned — { id, no } 순서 목록)과 구분하려고 2026-09-28 ParseIcons/PackIcons로 바꿨다
+	method table ParseIcons(string packed)
 		local out = {}
 		out[self.FreeIcon] = 0
 		if packed == nil or packed == "" then return out end
@@ -136,7 +137,7 @@ script RtsProfileLogic extends Logic
 	end
 
 	-- 보유 표 → 저장 문자열(M001 제외, id 순)
-	method string SerializeOwned(table owned)
+	method string SerializeIcons(table owned)
 		local ids = {}
 		for id, at in pairs(owned) do
 			if id ~= self.FreeIcon then ids[#ids + 1] = id end
@@ -151,8 +152,8 @@ script RtsProfileLogic extends Logic
 	end
 
 	-- 클라 전달용(M001 포함)
-	method string PackOwned(table owned)
-		local s = self:SerializeOwned(owned)
+	method string PackIcons(table owned)
+		local s = self:SerializeIcons(owned)
 		if s == "" then return self.FreeIcon .. ":0" end
 		return self.FreeIcon .. ":0," .. s
 	end
@@ -250,7 +251,7 @@ script RtsProfileLogic extends Logic
 			if c7 == 0 and v7 == "dark" then uiMode = "dark" end
 			_RtsConfigLogic:Log("RtsUiMode: load code=" .. tostring(c7) .. " mode=" .. uiMode)
 		end
-		local owned = self:ParseOwned(packed)
+		local owned = self:ParseIcons(packed)
 		local themeSet = self:ParseKeys(themes)
 		local tombSet = self:ParseKeys(tombs)
 		-- 선택 키가 없으면(처음 들어온 유저·새로 생긴 칸) 기본값을 저장 — 사용자 "설정값이 없으면 기본값으로 게임 시작 시 자동 설정"
@@ -316,8 +317,8 @@ script RtsProfileLogic extends Logic
 	@ExecSpace("ServerOnly")
 	method void SendState(string userId)
 		local owned = self.OwnedByUser[userId]
-		if owned == nil then owned = self:ParseOwned("") end
-		self:SendProfileState(self:ThemeOf(userId), self:IconOf(userId), self:TombOf(userId), self:PackOwned(owned),
+		if owned == nil then owned = self:ParseIcons("") end
+		self:SendProfileState(self:ThemeOf(userId), self:IconOf(userId), self:TombOf(userId), self:PackIcons(owned),
 			self:SerializeKeys(self.ThemesByUser[userId]), self:SerializeKeys(self.TombsByUser[userId]), userId)
 		self:ReceiveUiMode(self.UiModeByUser[userId] or "light", self.UiModeLoaded[userId] == true, "", userId)
 	end
@@ -519,7 +520,7 @@ script RtsProfileLogic extends Logic
 		local ds = _DataStorageService:GetUserDataStorage(userId)
 		if ds == nil then return end
 		owned[monsterId] = DateTime.UtcNow.Elapsed
-		ds:SetAsync(self.IconsKey, self:SerializeOwned(owned), function(code, k)
+		ds:SetAsync(self.IconsKey, self:SerializeIcons(owned), function(code, k)
 			if code ~= 0 then
 				owned[monsterId] = nil
 				_RtsConfigLogic:Log("RtsProfile: icons save failed code=" .. tostring(code))
@@ -551,7 +552,7 @@ script RtsProfileLogic extends Logic
 		self.MyTheme = theme
 		self.MyIcon = icon
 		self.MyTomb = tomb
-		self.MyOwned = self:ParseOwned(owned)
+		self.MyOwned = self:ParseIcons(owned)
 		self.MyOwnedCount = self:CountOwned(self.MyOwned)
 		self.MyThemes = self:ParseKeys(themes)
 		self.MyTombs = self:ParseKeys(tombs)

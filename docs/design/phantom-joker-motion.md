@@ -38,6 +38,6 @@
 
 후속 다리 간격·반동 수정은 기존 각 프레임을 편집 대상으로 built-in ImageGen에 전달했다. 프롬프트는 발 간격을 약 18% 줄이고 무릎·상체 반동만 보강하도록 지정하며, 캐릭터 정체성·비율·손 궤적·케인 목 그립·몸 회전 금지를 유지한다. 생성된 원본과 9개 완성 프롬프트(몸 8 + 고리 1)는 `.beaver/output/phantom-joker-refine/`의 `motion01.json`~`motion08.json`, `ring.json`에 있다. 기존 카드 그림은 고해상도 원본으로 다시 저장했다.
 
-이전 작업 원본·참조 경로와 현재 재생·검사 결과는 `.beaver/output/phantom-joker-video/`에 있다. 반려된 작은 제스처는 같은 폴더 `rejected-small-gesture/`에 보관했다. 이전 회전 컷과 작은 제스처는 현재 적용 파일이 아니다.
+이전 작업 원본·참조 경로와 현재 재생·검사 결과는 `.beaver/output/phantom-joker-video/`에 있다. 반려된 작은 제스처(`rejected-small-gesture/`)와 외부 참고 영상(`reference.mp4`)은 2026-09-28 저장소 정리로 삭제했다(git 이력 2817953 이전 커밋에 남음). 이전 회전 컷과 작은 제스처는 현재 적용 파일이 아니다.
 
 **로컬 자산 저장 완료. 게임 업로드·RUID 연결·Maker 실행 검증 전.** 새 대기와 원화는 변경하지 않았다.

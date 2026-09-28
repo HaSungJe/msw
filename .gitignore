@@ -9,3 +9,6 @@ __pycache__/
 
 # Codex(ChatGPT) 설정 — msw-mcp Bearer 토큰이 들어 있어 커밋 금지(.mcp.json과 같은 이유)
 .codex/
+
+# 서명 업로드 주소 등 로컬 비밀 — 커밋 금지(2026-09-28: 한 번 커밋됐으나 이미 만료된 주소였다)
+*.private.json

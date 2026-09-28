@@ -16,7 +16,7 @@ script RtsUnitBuffLogic extends Logic
 
 	-- ===== 정의 =====
 
-	-- id 같으면 중복 적용 안 함. scope: all(구역 전체, 자신 포함) / target(BondNo 지정 유닛) / near(주변 range칸, 대각선 포함, 자신 제외 — 지금은 안 씀; 프레이는 2026-09-19부터 all)
+	-- id 같으면 중복 적용 안 함. scope: all(구역 전체, 자신 포함) / target(BondNo 지정 유닛) (주변 n칸 범위 near는 쓰는 버프가 없어 2026-09-28 정리로 삭제; 프레이는 2026-09-19부터 all)
 	--   fin 최종 데미지 +% / crit 크리 확률 +% / critDmg 크리 데미지 +%. 아이콘은 메이플 원작 스킬 아이콘 RUID
 	method table GetDefs()
 		return {
@@ -40,36 +40,27 @@ script RtsUnitBuffLogic extends Logic
 		return table.concat(parts, " · ")
 	end
 
-	-- 범위 글자: "모든 유닛" / "지정 유닛 1개" / "주변 1타일"
+	-- 범위 글자: "모든 유닛" / "지정 유닛 1개"
 	method string ScopeText(table def)
 		if def.scope == "target" then return "지정 유닛 1개" end
-		if def.scope == "near" then return "주변 " .. _RtsHudLogic:Int(def.range) .. "타일" end
 		return "모든 유닛"
 	end
 
 	-- ===== 계산 =====
-
-	-- 구역 zone의 유닛 no의 상태 컴포넌트 — 서버·클라 어디서든(엔티티 경로 조회). 2026-09-19: 전투(서버)도 버프를 써야 해서 ClientOnly인 RtsUnitLogic.GetZoneUnit 대신
-	method any UnitAt(number zone, number no)
-		if zone < 1 then return nil end
-		local e = _EntityService:GetEntityByPath("/maps/RtsMap/RtsBoard/" .. _RtsUnitLogic:UnitName(zone, no))
-		if e == nil or not isvalid(e) then return nil end
-		return e.RtsUnitComponent
-	end
 
 	-- 구역 zone의 유닛 no에 걸린 버프 목록: { def, srcNo, srcJob, srcLevel }. 출처 유닛 번호 순, id 중복 제거(출처는 화면에 안 씀)
 	--   서버(RtsCombatLogic.DoAttack — 실제 크리·최종 데미지)와 클라(팝업·타일 버프 개수) 둘 다 부른다
 	method table GetBuffsFor(number zone, number no)
 		local out = {}
 		local seen = {}
-		local me = self:UnitAt(zone, no)
+		local me = _RtsUnitLogic:GetZoneUnit(zone, no)
 		if me == nil then return out end
 		local defs = self:GetDefs()
 		-- 2026-09-20: 1~6 고정 순회 → 구역의 실제 유닛(7·8번 불독·비숍이 출처·대상에서 빠져 있었다)
 		local nos = _RtsUnitLogic:ListZoneUnits(zone)
 		for i0 = 1, #nos do
 			local srcNo = nos[i0]
-			local src = self:UnitAt(zone, srcNo)
+			local src = _RtsUnitLogic:GetZoneUnit(zone, srcNo)
 			if src ~= nil then
 				for i = 1, #defs do
 					local d = defs[i]
@@ -93,10 +84,6 @@ script RtsUnitBuffLogic extends Logic
 
 	method boolean InScope(table def, any src, any me)
 		if def.scope == "target" then return src.BondNo == me.No end
-		if def.scope == "near" then
-			if src.No == me.No then return false end
-			return _RtsZoneLogic:CellDistance(src.Col, src.Row, me.Col, me.Row) <= def.range
-		end
 		return true
 	end
 
@@ -104,10 +91,7 @@ script RtsUnitBuffLogic extends Logic
 	method void ApplyToStat(table st, table buffs)
 		for i = 1, #buffs do
 			local d = buffs[i].def
-			if d.fin ~= nil then
-				st.fin = st.fin * (100 + d.fin) / 100
-				st.finBoss = st.finBoss * (100 + d.fin) / 100
-			end
+			if d.fin ~= nil then st.fin = st.fin * (100 + d.fin) / 100 end
 			if d.crit ~= nil then st.crit = st.crit + d.crit end
 			if d.critDmg ~= nil then st.critDmg = st.critDmg + d.critDmg end
 		end
@@ -117,7 +101,7 @@ script RtsUnitBuffLogic extends Logic
 	-- 이 유닛에 지정된 증강 목록 { g 등급(bronze/silver/gold/prism), t 이름, d 효과 } — RtsAugmentLogic 보유 목록 중 이 유닛에 지정된 것(2026-09-23)
 	@ExecSpace("ClientOnly")
 	method table GetAugmentsFor(number zone, number no)
-		local u = self:UnitAt(zone, no)
+		local u = _RtsUnitLogic:GetZoneUnit(zone, no)
 		if u == nil then return {} end
 		return _RtsAugmentLogic:ListForUnit(u.Owner, no)
 	end

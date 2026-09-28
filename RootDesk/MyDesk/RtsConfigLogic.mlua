@@ -25,8 +25,6 @@ script RtsConfigLogic extends Logic
 
 	property number ZoneGapY = 8
 
-	property number CellSize = 1
-
 	-- 이동 속도 수치: 속도 100 = 초당 3.5유닛(2026-09-14 사용자 확정 — 달팽이 시연 속도를 100으로). 실제 속도 = 수치/100 × 이 값
 	--   칸 1개 ≈ 0.5초, 트랙 한 바퀴(117.3유닛) ≈ 33.5초
 	property number SpeedUnitPerSec = 3.5
@@ -38,10 +36,6 @@ script RtsConfigLogic extends Logic
 	property number CameraZoomPercent = 30
 
 	property number CameraOffsetY = 0
-
-	property number CameraViewWidth = 42.66
-
-	property number CameraViewHeight = 24
 
 	-- 그리드 트랙 (아티팩트 v16 칸 크기 — 경로는 2026-09-25 M2, RtsZoneLogic.GetTurnPoints). 1유닛 = 45px(1920/42.66) → 칸 80px = 16/9 유닛
 	--   2026-09-20 사용자: 18×12 → **16×13**(우측 2열 삭제로 좌우 대칭, 아래 1행 추가). 그리드 폭 28.44 = 뷰 42.66 − 여백 7.11×2 → GridLeft = −14.22.
@@ -68,14 +62,6 @@ script RtsConfigLogic extends Logic
 		return self.ZoneRows
 	end
 
-	method number GetZoneWidth()
-		return self.ZoneWidth
-	end
-
-	method number GetZoneHeight()
-		return self.ZoneHeight
-	end
-
 	-- 구역 배치 간격(구역 크기 + 여백). 구역 중앙 좌표와 맵 크기의 기준
 	method number GetZonePitchX()
 		return self.ZoneWidth + self.ZoneGapX
@@ -91,14 +77,6 @@ script RtsConfigLogic extends Logic
 
 	method number GetMapCellsY()
 		return self.ZoneRows * self:GetZonePitchY()
-	end
-
-	method number GetCameraViewWidth()
-		return self.CameraViewWidth
-	end
-
-	method number GetCameraViewHeight()
-		return self.CameraViewHeight
 	end
 
 	method number GetCameraZoomPercent()
@@ -142,24 +120,20 @@ script RtsConfigLogic extends Logic
 		return self.GridTextureScale
 	end
 
-	-- 구역 n(1~8, 위에서부터 행 우선: 1·2 / 3·4 / 5·6 / 7·8) → 구역 중앙 월드 좌표
+	-- 구역 n(1~8, 위에서부터 행 우선: 1·2 / 3·4 / 5·6 / 7·8) → { col(왼쪽부터 0), row(위부터 0) } — 구역 중앙·구역 바닥 칠하기(RtsBootstrapLogic.FillZoneTiles) 공용
+	method table ZoneColRow(number n)
+		local idx = math.floor(n + 0.5) - 1
+		return { col = idx % self.ZoneCols, row = math.floor(idx / self.ZoneCols) }
+	end
+
+	-- 구역 n → 구역 중앙 월드 좌표
 	method Vector2 GetZoneCenter(number n)
-		local idx = n - 1
-		local col = idx % self.ZoneCols
-		local row = math.floor(idx / self.ZoneCols)
+		local cr = self:ZoneColRow(n)
 		local pitchX = self:GetZonePitchX()
 		local pitchY = self:GetZonePitchY()
-		local cx = col * pitchX + pitchX * 0.5
-		local cy = (self.ZoneRows - 1 - row) * pitchY + pitchY * 0.5
+		local cx = cr.col * pitchX + pitchX * 0.5
+		local cy = (self.ZoneRows - 1 - cr.row) * pitchY + pitchY * 0.5
 		return Vector2(cx, cy)
-	end
-
-	method Vector2 GetMapLeftBottom()
-		return Vector2(0, 0)
-	end
-
-	method Vector2 GetMapRightTop()
-		return Vector2(self:GetMapCellsX(), self:GetMapCellsY())
 	end
 
 end

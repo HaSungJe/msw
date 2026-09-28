@@ -21,7 +21,7 @@
 
 ## 게임 연결
 
-`RtsJobTableLogic.mlua`의 HasMageSkin, GetMageSkinFrames, GetMageSkinFrameDurations, GetMagePortraitRUID에 bow 분기를 추가했다. 폭풍의 시는 bowHurricane, 프리즘 애로우 레인은 bowArrowRain으로 연결한다. 기본 아바타는 생성하지 않는다.
+`RtsJobTableLogic.mlua`의 HasMageSkin, GetMageSkinFrames, GetMageSkinFrameDurations, GetMagePortraitRUID에 bow 분기를 추가했다(2026-09-28 지금은 `JobDefs.bow` 항목 하나). 폭풍의 시는 bowHurricane, 프리즘 애로우 레인은 bowArrowRain으로 연결한다. 기본 아바타는 생성하지 않는다.
 
 기존 PlayMageLoop를 사용하여 0.2초마다 공격 요청이 들어와도 프레임 시계를 리셋하지 않는다. 공격 요청이 0.6초 이상 끊기면 기존 CheckLoops 감시 주기에 따라 stand1으로 복귀한다. 피해·사거리·공격 주기·쿨타임·스킬 이펙트는 이번 작업에서 변경하지 않았다.
 

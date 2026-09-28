@@ -46,7 +46,7 @@
 공식 위에서 본 장식 자산은 `topview_henesys`뿐이다(2026-09-25 검색 — ellinia·perion·kerning·lith 탑뷰 없음). 다른 마을은 원작 옆모습 오브젝트(예 `maplestory/map/obj/partem/ruin_rock/perion`)를 쓰거나 새로 그려야 한다.
 
 ## 4. 새 테마 만들기 / 임시 모양 바꾸기
-1. **바닥 타일** — 256px 무이음새 PNG(생성기 예: `tools/gen-henesys-floor.js`, `gen-snow-floor.js`, 이미지 초안 보정은 `tools/gen-theme-floors.py`) → msw-mcp로 **새 리소스** 업로드 → `RootDesk/MyDesk/CaveFloorTileSet.tileset`에 타일 항목 추가(Name 새로) → 프리셋 `floorTile`.
+1. **바닥 타일** — 256px 무이음새 PNG(생성기 예: `tools/gen-henesys-floor.js`, 이미지 초안 보정은 `tools/gen-theme-floors.py`) → msw-mcp로 **새 리소스** 업로드 → `RootDesk/MyDesk/CaveFloorTileSet.tileset`에 타일 항목 추가(Name 새로) → 프리셋 `floorTile`.
    - 타일 한 장 = 4유닛(`RtsConfigLogic.FloorTileUnit`). 구역 경계가 타일 12×8칸에 딱 맞으니 크기는 그대로.
 2. **트랙 판** — `tools/gen-track-grid.js`(16×13, 칸 80px, 1280×1040 — 2026-09-25 M2 경로 77칸·매듭 3곳·보스 영역 가운데 2×2는 비움, S = 진행 방향 화살표 · E = 되돌리기 아이콘)의 포석·연석·발판·선 색을 바꿔 생성(테마 재료 프리셋 `TH` — `node tools/gen-track-grid.js <out.png> <key>`) → 업로드 → `gridRUID`, `gridTint`는 흰색. **경로(SEQ)·칸 수는 건드리지 않는다**(바꾸면 `RtsZoneLogic.GetTurnPoints`·`RtsConfigLogic`까지 바뀌어야 함).
 3. **장식** — 좌우 여백에만. 칸 좌표(1-기반, col 1 = 첫 열 가운데): 왼쪽 여백 `col −3.5 ~ −0.6`, 오른쪽 `col 16.6 ~ 19.4`, 행 `0 ~ 12.9`. **트랙·발판 칸(col 1~16) 금지**. 오른쪽 `row < 8`은 영입 HUD 밑이라 큰 건물 금지. 층 110(그리드 100 위, 유닛·몹 200 아래). 공식 스프라이트면 PPU 100(1칸 = 1.78유닛 = 178px).

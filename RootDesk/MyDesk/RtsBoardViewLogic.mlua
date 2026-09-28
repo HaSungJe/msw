@@ -32,6 +32,21 @@ script RtsBoardViewLogic extends Logic
 		return root.TransformComponent:ToLocalPoint(p)
 	end
 
+	-- 보드 루트 바로 아래 이름 name의 엔티티(없으면 nil) — 유닛·몬스터·구역 그림을 이름으로 찾는 곳 공용(서버·클라)
+	method Entity BoardChild(string name)
+		return _EntityService:GetEntityByPath("/maps/RtsMap/RtsBoard/" .. name)
+	end
+
+	-- 겨냥점(보드 좌표) = 피격 박스 가운데(ColliderOffset × 스케일). 피격 박스가 없으면 발 + fallbackDy.
+	--   서버 판정(RtsCombatLogic.AimPoint)·클라 연출(투사체·빔·표식·몬스터 타격 클립) 공용 — 서버는 BoardPosition = WorldPosition
+	method Vector2 AimPoint(Entity t, number fallbackDy)
+		local p = self:BoardPosition(t)
+		local hit = t.HitComponent
+		if hit == nil then return Vector2(p.x, p.y + fallbackDy) end
+		local sc = t.TransformComponent.Scale
+		return Vector2(p.x + hit.ColliderOffset.x * math.abs(sc.x), p.y + hit.ColliderOffset.y * sc.y)
+	end
+
 	@ExecSpace("ClientOnly")
 	method Vector2 ScreenToBoard(Vector2 screen)
 		local p = _UILogic:ScreenToWorldPosition(screen)

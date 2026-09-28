@@ -3,7 +3,7 @@
 --   서버가 선택지를 OfferByUser에 올리면 클라가 증강 선택 팝업(닫기 없음)을 연다. 여러 개가 밀리면 줄을 세워 하나씩.
 --   브론즈~골드는 단계(I/II/III)만 굴리고 그 단계의 종류 전부(브론즈·실버 4장, 골드 5장 — RtsAugmentTableLogic.StatChoices, 2026-09-27 사용자 개편. 전: 가중치 무작위 3장)를 올린다.
 --   프리즘: 자쿰 처치 보상만 아직 없는 프리즘 전체에서 선택(RtsAugmentTableLogic.PrismChoices, 클라 가로 스크롤 — 줄 항목 pickAll), 시그너스·루시드 보상과 증강 뽑기 프리즘은
---   가중치 무작위 3장(RtsAugmentTableLogic.RollShared) 중 선택(2026-09-27 사용자 "자쿰 한정으로 자쿰이 준 프리즘만 선택 가능").
+--   가중치 무작위 3장(RtsAugmentTableLogic.Roll) 중 선택(2026-09-27 사용자 "자쿰 한정으로 자쿰이 준 프리즘만 선택 가능").
 --   고른 증강은 '대상 미지정'으로 보유(OwnedByUser) → 증강 창에서 유닛 1명에 1회 지정(RequestAssign). 지정 후 변경 불가.
 --     브~골·특수 코어 → 그 유닛 Augs(능력치 오버레이) / 직업 프리즘 → 그 직업 유닛에만, RtsUnitLogic.ApplyPrism / 팬텀 → 받는 즉시 영입 해금(지정 없음).
 --   방출된 유닛에 지정된 증강은 소멸, 탈락·새 판이면 보유 초기화.
@@ -151,7 +151,7 @@ script RtsAugmentLogic extends Logic
 		return out
 	end
 
-	-- 증강을 이 유닛에 지정할 수 있는가(서버 검사·클라 칩 표시 공용): 직업 프리즘 = 같은 직업·아직 없는 프리즘, 특수 코어 = 같은 코어 없음(stack 코어 = 방어구 부수기는 겹쳐도 됨)
+	-- 증강을 이 유닛에 지정할 수 있는가(서버 검사·클라 칩 표시 공용): 직업 프리즘 = 같은 직업·아직 없는 프리즘, 특수 코어 = 같은 코어 없음
 	method boolean CanAssignTo(string id, any u)
 		if u == nil then return false end
 		local d = _RtsAugmentTableLogic:GetDef(id)
@@ -159,7 +159,7 @@ script RtsAugmentLogic extends Logic
 		if d.job ~= nil and d.job ~= "" then
 			return u.JobId == d.job and not _RtsJobTableLogic:HasPrism(u, id)
 		end
-		if d.core and not d.stack then
+		if d.core then
 			for q in string.gmatch(u.Augs or "", "[^,]+") do
 				if q == id then return false end
 			end
@@ -246,7 +246,7 @@ script RtsAugmentLogic extends Logic
 				end
 			end
 			if #pids < 3 then
-				for _, id in ipairs(_RtsAugmentTableLogic:RollShared(item.grade, exclude, nil)) do
+				for _, id in ipairs(_RtsAugmentTableLogic:Roll(item.grade, exclude)) do
 					if #pids < 3 then pids[#pids + 1] = id end
 				end
 			end
@@ -445,7 +445,7 @@ script RtsAugmentLogic extends Logic
 				local d = _RtsAugmentTableLogic:GetDef(owned[i].id)
 				if d ~= nil and not d.core then ex[d.id] = true end
 			end
-			if #_RtsAugmentTableLogic:Roll("prism", ex) == 0 then grade = "gold" end
+			if not _RtsAugmentTableLogic:HasAny("prism", ex) then grade = "gold" end
 		end
 		if grade == "prism" then
 			self.BuyPrismByUser[userId] = (self.BuyPrismByUser[userId] or 0) + 1
@@ -475,24 +475,6 @@ script RtsAugmentLogic extends Logic
 		self.AwaitBuy = (self.BuyCountByUser[me] or 0) + 1
 		self.AwaitBuyAt = _UtilLogic.ElapsedSeconds
 		self:RequestBuy()
-	end
-
-	-- 클라: 3택1 창 '접기' — 창을 닫고 자동으로 다시 열지 않는다(HUD '펼치기'로)
-	@ExecSpace("ClientOnly")
-	method void FoldPick()
-		self.PickFolded = true
-		if _RtsPopupLogic.Kind == "pick" then _RtsPopupLogic:Close() end
-	end
-
-	-- 클라: HUD '펼치기' — 고르지 않은 선택지 창을 다시 연다
-	@ExecSpace("ClientOnly")
-	method void ExpandPick()
-		self.PickFolded = false
-		local packed = self.OfferByUser[_RtsUnitLogic:MyUserId()] or ""
-		if packed == "" then return end
-		self.ShownOffer = packed
-		_RtsUnitSelectLogic:CloseMenu()
-		_RtsPopupLogic:Open("pick")
 	end
 
 	-- ===== 클라 =====
@@ -565,9 +547,8 @@ script RtsAugmentLogic extends Logic
 			self.ShownOffer = ""
 			if _RtsPopupLogic.Kind == "pick" then _RtsPopupLogic:Close() end
 		end
-		_RtsHudLogic:SetAugmentCount(self:MyUnassigned())
 		local pending = self.PendingByUser[_RtsUnitLogic:MyUserId()] or 0
-		_RtsHudLogic:SetPendingOffers(pending, packed ~= "" and _RtsPopupLogic.Kind ~= "pick" and not justChosen)
+		_RtsHudLogic:SetPendingOffers(pending)
 		local price = self:BuyPrice(_RtsUnitLogic:MyUserId())
 		local st = _RtsStageLogic.RunState
 		local can = _RtsRunResultLogic:IsMeAlive() and (st == "countdown" or st == "running") and _RtsUnitLogic:GetMyMeso() >= price

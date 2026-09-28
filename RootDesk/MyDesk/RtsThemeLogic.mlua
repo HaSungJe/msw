@@ -78,11 +78,11 @@ script RtsThemeLogic extends Logic
 		}
 	end
 
+	-- ===== 프리셋 표 공용 조회(테마·비석 RtsTombLogic이 같은 짜임 — 2026-09-28 정리로 한 곳) =====
 	-- 탭 이름(표 순서대로, 중복 없이)
-	method table GetTabs()
+	method table TabsOf(table list)
 		local out = {}
 		local seen = {}
-		local list = self:GetPresets()
 		for i = 1, #list do
 			local t = list[i].tab or "기본"
 			if not seen[t] then
@@ -93,21 +93,26 @@ script RtsThemeLogic extends Logic
 		return out
 	end
 
-	method boolean HasKey(string key)
-		local list = self:GetPresets()
+	-- 키 → 항목(없으면 nil)
+	method any FindPreset(table list, string key)
 		for i = 1, #list do
-			if list[i].key == key then return true end
+			if list[i].key == key then return list[i] end
 		end
-		return false
+		return nil
+	end
+
+	method table GetTabs()
+		return self:TabsOf(self:GetPresets())
+	end
+
+	method boolean HasKey(string key)
+		return self:FindPreset(self:GetPresets(), key) ~= nil
 	end
 
 	-- 없는 키면 기본(헤네시스)
 	method table GetPreset(string key)
 		local list = self:GetPresets()
-		for i = 1, #list do
-			if list[i].key == key then return list[i] end
-		end
-		return list[1]
+		return self:FindPreset(list, key) or list[1]
 	end
 
 	method string GetZoneTheme(number zone)

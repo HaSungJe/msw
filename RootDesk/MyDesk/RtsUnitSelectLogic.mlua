@@ -1,4 +1,4 @@
--- Phase 4 #14·#17 (부분, 2026-09-15): 트랙 위 캐릭터 선택 — 메이플 커서(평소 장갑, 누르는 동안 장갑 + 마우스 — 2026-09-23) / 클릭 → 캐릭터 우측 작은 메뉴(위치 이동·상세정보·방출) / 위치 이동 모드 / 영입 배치 모드
+-- Phase 4 #14·#17 (부분, 2026-09-15): 트랙 위 캐릭터 선택 — 메이플 커서(평소 장갑, 누르는 동안 장갑 + 마우스 — 2026-09-23) / 클릭 → 오른쪽 레일의 캐릭터 메뉴(뒤로·상세보기·레벨업·이동·방출 — RtsUiLayoutLogic.Selection) / 위치 이동 모드 / 영입 배치 모드
 --   클릭 판정은 전부 InputService의 ScreenTouchEvent + 자체 상자(UnitAtScreen·CellAtScreen). 유닛 엔티티의 TouchReceive는 쓰지 않는다(2026-09-22 TouchEvent 미발화로 교체)
 --   위치 이동 모드: 발판마다 틀 스프라이트(테두리+연한 채움)로 칸을 강조(빈 칸 금색, 내 유닛 자리 파랑 = 맞교환). 클릭한 발판으로 이동(서버 검증, 유닛마다 3분 쿨). ESC 취소.
 --   상세정보 = RtsUnitPopupLogic(유닛 정보 팝업). 전부 클라 전용. 좌표는 1920×1080 기준.
@@ -18,7 +18,7 @@ script RtsUnitSelectLogic extends Logic
 
 	property Entity Menu = nil
 
-	-- 열린 메뉴의 UI 좌표 사각형 {x0,y0,x1,y1} (중앙 원점) — 유닛 TouchEvent가 메뉴 위에서 났는지 판정용
+	-- 열린 메뉴의 UI 좌표 사각형 {x0,y0,x1,y1} (중앙 원점) — 화면 터치(HandleScreenTouchEvent)가 메뉴 위에서 났는지 판정용(RtsUiLayoutLogic.LayoutSelection이 채운다)
 	property table MenuRect = nil
 
 	-- 메뉴의 레벨업 줄(안쪽 패널·글자) — 제자리 갱신용
@@ -204,17 +204,6 @@ script RtsUnitSelectLogic extends Logic
 		_RtsUnitPopupLogic:OpenUnit(target)
 	end
 
-	-- 오른쪽 끝 작은 키캡("Space"·"L"·"S") — 단축키 표시(메뉴·유닛 팝업 공용)
-	@ExecSpace("ClientOnly")
-	method void SpawnKeyCap(Entity parent, string key)
-		if _RtsBoardViewLogic:IsMobileView() then return end
-		local H = _RtsHudLogic
-		local cap = H:SpawnRoundedPanel("RtsKeyCap", parent, Vector2(1, 0.5), Vector2(1, 0.5), Vector2(-6, 0), Vector2(58, 24),
-			Color(0.92, 0.93, 0.98, 0.9), Color(0.72, 0.74, 0.84, 0.9), 1.2)
-		H:SpawnLabel("RtsKeyCapText", cap, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2(0, 0), Vector2(56, 22),
-			key, Color(0.38, 0.39, 0.50, 1), 12, TextAlignmentType.MiddleCenter, true)
-	end
-
 	-- 메뉴의 레벨업 줄: "레벨업 → Lv 6 · 70" / 최대 레벨 / 메소 부족이면 흐리게
 	@ExecSpace("ClientOnly")
 	method void RefreshMenuLevel()
@@ -232,7 +221,7 @@ script RtsUnitSelectLogic extends Logic
 		if can then
 			_RtsHudLogic:SetUiColor(self.MenuLvBtn, H:MixPanel(H:ColGold(), 0.9), "surface")
 			_RtsHudLogic:SetUiColor(self.MenuLvBtn.Parent, H:ColGold(), "border")
-			self:ApplyLvRow(self.MenuLvRow, u, Color(0.133, 0.114, 0.09, 1))
+			self:ApplyLvRow(self.MenuLvRow, u, H:ColGoldInk())
 		else
 			_RtsHudLogic:SetUiColor(self.MenuLvBtn, H:MixPanel(H:ColGold(), 0.25), "surface")
 			_RtsHudLogic:SetUiColor(self.MenuLvBtn.Parent, H:MixPanel(H:ColGold(), 0.4), "border")
@@ -278,6 +267,13 @@ script RtsUnitSelectLogic extends Logic
 		self:EndPlace()
 		if _RtsPopupLogic:IsOpen() then _RtsPopupLogic:Close() end
 		self.MoveNo = no
+		self:SpawnPadMarkers(no)
+		_RtsHudLogic:ShowHint(_RtsHudLogic:Int(no) .. ". " .. _RtsJobTableLogic:GetJobName(u.JobId) .. " 위치 이동 — 발판을 클릭 (파란 발판 = 자리 맞교환) · ESC 취소")
+	end
+
+	-- 발판 틀을 새로 깐다(이동·영입 배치 공용): 빈 발판 금색. moveNo > 0(위치 이동)이면 내 다른 유닛이 선 발판도 파랑(= 맞교환), 그 유닛 자리는 뺀다
+	@ExecSpace("ClientOnly")
+	method void SpawnPadMarkers(number moveNo)
 		local zone = _RtsUnitLogic:MyZone()
 		local mapRoot = _RtsBoardViewLogic:GetRoot()
 		self:ClearMarkers()
@@ -286,14 +282,13 @@ script RtsUnitSelectLogic extends Logic
 		for i = 1, _RtsZoneLogic:GetPadCount() do
 			local p = _RtsZoneLogic:GetPadCell(i)
 			local occupant = _RtsUnitLogic:MyUnitAt(p.x, p.y)
-			if occupant ~= no then
+			if occupant == 0 or (moveNo > 0 and occupant ~= moveNo) then
 				local at = _RtsZoneLogic:GetCellCenter(zone, p.x, p.y)
 				local tint = Color(1, 0.82, 0.25, 1)
 				if occupant > 0 then tint = Color(0.4, 0.62, 1, 1) end
 				self:SpawnMarker("RtsPadFrame" .. gen .. "_" .. tostring(i), mapRoot, at, self.MarkerScale, 150, tint)
 			end
 		end
-		_RtsHudLogic:ShowHint(_RtsHudLogic:Int(no) .. ". " .. _RtsJobTableLogic:GetJobName(u.JobId) .. " 위치 이동 — 발판을 클릭 (파란 발판 = 자리 맞교환) · ESC 취소")
 	end
 
 	@ExecSpace("ClientOnly")
@@ -332,10 +327,6 @@ script RtsUnitSelectLogic extends Logic
 
 	property string PlaceJob = ""
 
-	method boolean IsPlaceMode()
-		return self.PlaceJob ~= ""
-	end
-
 	@ExecSpace("ClientOnly")
 	method void BeginPlace(string jobId)
 		if not _RtsJobTableLogic:HasJob(jobId) then return end
@@ -345,18 +336,7 @@ script RtsUnitSelectLogic extends Logic
 		self.PlaceJob = jobId
 		-- 발판을 고르는 동안 그 직업 원화 프레임을 미리 받는다(소환 직후 바로 보이게 — 2026-09-26)
 		_RtsUnitLogic:WarmMageSkin(jobId)
-		local zone = _RtsUnitLogic:MyZone()
-		local mapRoot = _RtsBoardViewLogic:GetRoot()
-		self:ClearMarkers()
-		self.MarkerGen = self.MarkerGen + 1
-		local gen = _RtsHudLogic:Int(self.MarkerGen)
-		for i = 1, _RtsZoneLogic:GetPadCount() do
-			local p = _RtsZoneLogic:GetPadCell(i)
-			if _RtsUnitLogic:MyUnitAt(p.x, p.y) == 0 then
-				local at = _RtsZoneLogic:GetCellCenter(zone, p.x, p.y)
-				self:SpawnMarker("RtsPadFrame" .. gen .. "_" .. tostring(i), mapRoot, at, self.MarkerScale, 150, Color(1, 0.82, 0.25, 1))
-			end
-		end
+		self:SpawnPadMarkers(0)
 		_RtsHudLogic:ShowHint(_RtsJobTableLogic:GetJobName(jobId) .. " 영입 — 세울 발판을 클릭 · ESC 영입 취소")
 	end
 
@@ -424,12 +404,12 @@ script RtsUnitSelectLogic extends Logic
 			_RtsHudLogic:TogglePause()
 			return
 		end
-		-- Tab = 유닛 상세 팝업의 우측 탭 순환(스킬 → 증강 → 적용 중인 버프, 2026-09-23 사용자)
+		-- Tab = 유닛 상세 팝업의 탭 순환(능력치 → 액티브 → 패시브 → 증강 → 버프, 2026-09-23 사용자)
 		if event.key == KeyboardKey.Tab then
 			if _RtsUnitPopupLogic:IsOpen() then
 				_RtsUnitPopupLogic:CycleTab()
-			elseif _RtsPopupLogic.Kind == "augment" or _RtsPopupLogic.Kind == "codex" or _RtsPopupLogic.Kind == "recruitinfo" then
-				-- 증강 창·증강 도감: 등급 탭 / 영입 상세: 액티브·패시브·프리즘 증강 탭 순환(2026-09-25 사용자)
+			elseif _RtsPopupLogic.Kind == "codex" or _RtsPopupLogic.Kind == "recruitinfo" then
+				-- 증강 도감: 등급 탭 / 영입 상세: 액티브·패시브·프리즘 증강 탭 순환(2026-09-25 사용자)
 				_RtsPopupLogic:CycleGradeTab()
 			end
 			return

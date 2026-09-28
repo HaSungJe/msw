@@ -9,7 +9,7 @@ script RtsMonsterInfoLogic extends Logic
 	-- 정보 창 안쪽(디버프 줄을 여기에 붙인다)
 	property Entity PanelIn = nil
 
-	-- 정보 창 높이(2026-09-24 사용자 "네모 박스 높이를 키워서 아래에 디버프" — 118 → 160, 아래 40px = 디버프 줄)
+	-- 정보 창 높이(2026-09-24 사용자 "네모 박스 높이를 키워서 아래에 디버프" — 아래 줄 = 디버프). 지금 PC 208 · 모바일 248(Open에서 정한다)
 	property number PanelH = 208
 
 	property Entity Target = nil
@@ -50,8 +50,6 @@ script RtsMonsterInfoLogic extends Logic
 	property Entity TipText = nil
 
 	property string TipId = ""
-
-	property number IconSize = 36
 
 	-- 디버프 설명 창 폭(칩에 마우스를 올리면 정보 창 바로 오른쪽에 뜬다)
 	property number DebuffBoxW = 340
@@ -225,7 +223,7 @@ script RtsMonsterInfoLogic extends Logic
 			local a = self:ArmorBreakOf(m.Zone)
 			if a > 0 then
 				-- 설명엔 '1티어' 대신 효과를 주는 유닛의 직업 이름(2026-09-24 사용자 "1티어/2티어는 개발 관점 — 유저는 몰라야 해")
-				out[#out + 1] = { id = "armorbreak", name = "방어구 부수기", desc = self:ArmorBreakJobOf(m.Zone) .. "의 증강 1개마다 보스 방어율이 1%p 감소한다(최대 " .. H:Int(_RtsJobTableLogic.ArmorBreakCap) .. "%p). 지금 " .. H:Int(a) .. "%p 감소.", short = "방어 −" .. H:Int(a) .. "%p", left = -1, ruid = "1f4eea783bbe4785b3ba82334f211aaa", color = Color(1, 1, 1, 1) }
+				out[#out + 1] = { id = "armorbreak", name = "방어구 부수기", desc = self:ArmorBreakJobOf(m.Zone) .. "의 증강 1개마다 보스 방어율이 " .. H:Int(_RtsJobTableLogic.ArmorBreakPer) .. "%p 감소한다(최대 " .. H:Int(_RtsJobTableLogic.ArmorBreakCap * _RtsJobTableLogic.ArmorBreakPer) .. "%p). 지금 " .. H:Int(a) .. "%p 감소.", short = "방어 −" .. H:Int(a) .. "%p", left = -1, ruid = "1f4eea783bbe4785b3ba82334f211aaa", color = Color(1, 1, 1, 1) }
 			end
 		end
 		return out
@@ -396,8 +394,7 @@ script RtsMonsterInfoLogic extends Logic
 		local H = _RtsHudLogic
 		local W = self.DebuffBoxW
 		-- 한 줄 약 18자(16pt, 폭 W−24) — 한글 3바이트 기준 어림, 넉넉히(글이 넘치면 라벨 BestFit이 줄인다)
-		local chars = math.ceil(string.len(d.desc) / 2.6)
-		local lines = math.max(1, math.ceil(chars / 18))
+		local lines = H:TextLinesRough(d.desc, 18)
 		local h = math.max(self.PanelH, 16 + 26 + lines * 23 + 26)
 		local tip = H:SpawnRoundedPanel("RtsMonInfoTip", self.Panel, Vector2(1, 0), Vector2(0, 0), Vector2(8, 0), Vector2(W, h), Color(0.98, 0.985, 1, 0.98), H:ColBorder(), 1.5)
 		self.Tip = tip.Parent
