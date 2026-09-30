@@ -163,7 +163,8 @@ script RtsHudLogic extends Logic
 		local hi = math.max(light.r, math.max(light.g, light.b))
 		local lo = math.min(light.r, math.min(light.g, light.b))
 		if role == "wave" then return Color(0.45, 0.53, 0.72, 0.10) end
-		if role == "text" then
+		-- "icon" = 흰 그림 아이콘을 물들이는 색(로비 아이콘) — 글자와 같은 짝 색으로 바꾸되 칠하는 곳은 스프라이트
+		if role == "text" or role == "icon" then
 			if math.abs(light.r - 0.20) < 0.005 and math.abs(light.g - 0.22) < 0.005 then return Color(0.92, 0.94, 0.98, light.a) end
 			if math.abs(light.r - 0.42) < 0.005 and math.abs(light.g - 0.44) < 0.005 then return Color(0.68, 0.73, 0.82, light.a) end
 			if math.abs(light.r - 0.43) < 0.005 and math.abs(light.g - 0.42) < 0.005 then return Color(0.79, 0.78, 1, light.a) end
@@ -753,8 +754,8 @@ script RtsHudLogic extends Logic
 		self.VoteNoBtn = no
 		vp.Parent:SetEnable(false)
 
-		-- 우측: 유닛 슬롯 6(맨 위는 엔진 시스템 버튼 자리라 비운다 — 예전 영입 버튼 높이부터)
-		for i = 1, 6 do
+		-- 우측: 유닛 슬롯(RtsUnitLogic.MaxUnits — 2026-09-29 9칸. 자리는 RtsUiLayoutLogic 레일 페이저가 3칸씩 넘긴다)
+		for i = 1, _RtsUnitLogic:GetMaxUnits() do
 			local y = -144 - (i - 1) * 50
 			local slot = self:SpawnRoundedPanel("RtsUnitSlot" .. tostring(i), grp, Vector2(1, 1), Vector2(1, 1), Vector2(-16, y), Vector2(130, 44),
 				self:ColPanel(), self:ColBorderSoft(), 1.5)
@@ -928,6 +929,9 @@ script RtsHudLogic extends Logic
 						text = "클리어"
 						key = 1
 					end
+				elseif S.RunState == "running" and S.StartPrep then
+					text = "시작 준비"
+					key = 2000000
 				elseif S.RunState ~= "running" or st == nil then
 					text = "대기"
 					key = 2000000
@@ -1010,6 +1014,8 @@ script RtsHudLogic extends Logic
 		local st = _RtsStageLogic.RunState
 		_RtsConfigLogic:Log("RtsHud: restart clicked state=" .. st)
 		if st ~= "running" and st ~= "ended" then return end
+		-- 방 게임은 다시하기 없음(끝나면 방으로 돌아가 다시 준비·시작 — 2026-09-29 사용자)
+		if _RtsStageLogic.RoomNo > 0 then return end
 		-- 이미 찬성했으면 다시 누르기 = 찬성 취소(확인 없이 바로)
 		if _RtsStageLogic:IsMyVote() then
 			_RtsStageLogic:RequestRestartVote()
@@ -1027,7 +1033,8 @@ script RtsHudLogic extends Logic
 		if self.RestartBtn == nil or self.RestartText == nil then return end
 		local S = _RtsStageLogic
 		local st = S.RunState
-		self.RestartBtn.Parent:SetEnable(st == "running" or st == "ended")
+		-- 방 게임(RoomNo > 0)은 다시하기 버튼이 없다 — 끝나면 방 대기실에서 다시 준비·시작(2026-09-29 사용자)
+		self.RestartBtn.Parent:SetEnable((st == "running" or st == "ended") and S.RoomNo <= 0)
 		local mine = S:IsMyVote()
 		local count = self:Int(S.VoteCount) .. "/" .. self:Int(S.VoteNeed)
 		-- 솔로(방 인원 1)는 표 수를 안 보인다(혼자 누르면 바로 새 판 — 2026-09-24 솔로 출시)
@@ -1249,8 +1256,11 @@ script RtsHudLogic extends Logic
 	method void OnTopButton()
 		if _RtsStageLogic.RunState == "ended" or not _RtsRunResultLogic:IsMeAlive() then
 			_RtsPopupLogic:Close()
+			-- 방 게임 = '방으로'(확인 창 'leave' → 방 대기실, 2026-09-29 사용자 "방 게임은 다시하기 불가")
 			-- 솔로(방 인원 1)면 '다시 하기' — 혼자 찬성 = 바로 새 판(2026-09-24 솔로 출시), 여럿이면 '나가기'
-			if _RtsStageLogic:IsSolo() then
+			if _RtsStageLogic.RoomNo > 0 then
+				_RtsPopupLogic:Open("leave")
+			elseif _RtsStageLogic:IsSolo() then
 				_RtsPopupLogic:OpenRestartConfirm()
 			else
 				_RtsRunResultLogic:RequestExit()
@@ -1276,7 +1286,8 @@ script RtsHudLogic extends Logic
 		if state == "ended" or not _RtsRunResultLogic:IsMeAlive() then
 			self.RecruitRoomPrev = 0
 			self.RecruitLimitPrev = 0
-			if _RtsStageLogic:IsSolo() then self.RecruitText = "다시하기" else self.RecruitText = "나가기" end
+			if _RtsStageLogic.RoomNo > 0 then self.RecruitText = "방으로"
+			elseif _RtsStageLogic:IsSolo() then self.RecruitText = "다시하기" else self.RecruitText = "나가기" end
 			return
 		end
 		local text = ""
@@ -1513,6 +1524,11 @@ script RtsHudLogic extends Logic
 			"", self:ColMuted(), 14, TextAlignmentType.MiddleLeft, false)
 		self:SpawnLabel("RtsProfileChange", row, Vector2(1, 0.5), Vector2(1, 0.5), Vector2(-14, 0), Vector2(80, 30),
 			"변경 ›", self:ColGold(), 16, TextAlignmentType.MiddleRight, true)
+		-- 오른쪽 연필 칸(2026-09-29 사용자 "우측에 연필 모양 추가해서 프로필 설정이라는 걸 강조"): 연보라 칸 + 연필 선 아이콘(로비 아이콘 RtsLobbyIcon_pencil).
+		--   누르기는 줄 전체 클릭(아래 RtsProfileClick)이 받는다
+		local edit = self:SpawnRoundedPanel("RtsProfileEdit", row, Vector2(1, 0.5), Vector2(1, 0.5), Vector2(-14, 0), Vector2(46, 46),
+			_RtsPopupLogic:Mix(self:ColGold(), 0.25), self:ColGold(), 2)
+		_RtsLobbyUiLogic:Icon(edit, "pencil", Vector2(0.5, 0.5), Vector2.zero, 24, self:ColInk(), "icon")
 		local click = self:SpawnClick("RtsProfileClick", row)
 		click:ConnectEvent(ButtonClickEvent, function(event)
 			_RtsPopupLogic:Open("profile")
@@ -1681,7 +1697,7 @@ script RtsHudLogic extends Logic
 	@ExecSpace("ClientOnly")
 	method void RefreshEmptySlots()
 		if self.UnitSlots == nil then return end
-		for i = 1, 6 do
+		for i = 1, #self.UnitSlots do
 			local s = self.UnitSlots[i]
 			if s ~= nil and not s.filled and s.name ~= nil and isvalid(s.name) then
 				local t = self:EmptySlotText(i)

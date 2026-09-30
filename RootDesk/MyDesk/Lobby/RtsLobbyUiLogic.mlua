@@ -1,0 +1,1462 @@
+-- Phase 8 ① (2026-09-28 사용자 — 카트라이더 매칭 느낌, .info/lobby.md): 로비 화면(클라). 정적 룸(LobbyMap)에서만 만든다.
+--   로비 = 윗줄(프로필 · 게임 이름 · 라이트/다크) + 왼쪽 [빠른 참가](빈자리 있는 공개 방에 바로 — 2026-09-29 매칭 대신) · [방 만들기] · [혼자 하기] · 방 규칙 + 오른쪽 방 목록(쪽 넘기기 · 새로고침 · 비공개 방은 비밀번호 창) /
+--   방 대기실 = 머리줄([나가기] · 번호 · 제목 · 모드 · 인원) · 자리 카드 4칸(얼굴 · 방장 왕관 · 나 · 준비 상태 · 방장 [강퇴]) · 채팅 · 준비 수 + [준비]/[준비 취소] 또는 방장 [시작].
+--   서버 판정은 RtsLobbyLogic. 서버가 보내는 것(ReceiveList · ReceiveRoom · ReceiveChat · ShowLobby · Toast)은 먼저 저장하고, 화면이 있으면 바로 그린다.
+--   모양 = Claude 시안(2026-09-28 사용자 승인 "시안 괜찮네" — Design 캔버스 "로비 · 방 대기실 시안"): HUD·팝업 조각(RtsHudLogic · RtsPopupLogic)과
+--   라이트 색 → 다크 변환(RtsHudLogic.UiModeColor)을 그대로 쓴다. 배경 = 내 테마 배경 그림 + 모드별 막. 1760×960 틀을 화면 안쪽에 맞춰 줄인다(Layout)
+@Logic
+script RtsLobbyUiLogic extends Logic
+
+	property boolean Built = false
+
+	property string MyUserId = ""
+
+	property string MyNick = ""
+
+	property Entity Group = nil
+
+	-- 배경: 테마 배경 그림(화면을 비율대로 덮는다) + 모드별 막
+	property Entity Backdrop = nil
+
+	property Entity Dim = nil
+
+	property Entity Frame = nil
+
+	property Entity LobbyPage = nil
+
+	property Entity RoomPage = nil
+
+	property Entity DialogLayer = nil
+
+	property Entity DialogPanel = nil
+
+	property Entity ToastBox = nil
+
+	property Entity ToastText = nil
+
+	property number ToastUntil = 0
+
+	property string LayoutKey = ""
+
+	-- 화면 모드·테마·프로필이 바뀌면 배경 막·입력 칸·프로필 상자만 다시 칠한다(RefreshLook)
+	property string ModeShown = ""
+
+	property string ThemeShown = ""
+
+	property string ProfileShown = ""
+
+	property Entity ProfileSlot = nil
+
+	property Entity ProfileFace = nil
+
+	property Entity ProfileSub = nil
+
+	-- 라이트/다크 선택: { light = { box, label }, dark = { … } }
+	property table ModeBtns = {}
+
+	-- "lobby" / "room"
+	property string Page = "lobby"
+
+	-- 방 목록: { { no, title, mode, count, state, pw } … }
+	property table List = {}
+
+	property number ListPage = 1
+
+	property number ListPerPage = 7
+
+	property table ListRows = {}
+
+	property Entity ListEmpty = nil
+
+	property Entity ListPageText = nil
+
+	property Entity ListCount = nil
+
+	-- 쪽 화살표: { { box, canvas } × 2 } — 넘길 수 없으면 흐리게
+	property table PageArrows = {}
+
+	-- 내 방: { no, title, mode, state, pw, host, members = { { uid, nick, ready, inGame, icon } … } } — 없으면 nil
+	property table Room = nil
+
+	property table ChatLines = {}
+
+	property number ChatShow = 8
+
+	property number ChatLimit = 60
+
+	property table Slots = {}
+
+	property Entity RoomNo = nil
+
+	property Entity RoomLock = nil
+
+	property Entity RoomTitle = nil
+
+	property Entity RoomModeChip = nil
+
+	property Entity RoomModeText = nil
+
+	property Entity RoomDesc = nil
+
+	property Entity RoomCount = nil
+
+	property Entity ReadyText = nil
+
+	property Entity RoomHint = nil
+
+	property Entity ActionBtn = nil
+
+	property Entity ActionText = nil
+
+	property Entity ChatLog = nil
+
+	property Entity ChatInput = nil
+
+	-- 방 만들기 창: 기본 = 도전(방은 도전·경주 둘 다, 2026-09-29 사용자). 한 번 고르면 다음에 열 때도 그대로
+	property string CreateMode = "challenge"
+
+	property table CreateModeBtns = {}
+
+	property Entity CreateTitle = nil
+
+	property Entity CreatePw = nil
+
+	property Entity JoinPw = nil
+
+	property number JoinNo = 0
+
+	-- 글자 입력 칸들(빈 칸 안내 글 색을 화면 모드에 맞춘다) — 닫힌 창의 칸은 PaintMode에서 걸러 낸다
+	property table Inputs = {}
+
+	-- 내가 보낸 채팅(오래된 순, 대기실 · 게임 채팅 공용 — 최근 ChatHistoryMax개). ↑로 불러온다(HandleKeyDownEvent · RecallHistory)
+	property table SentHistory = {}
+
+	property number ChatHistoryMax = 20
+
+	-- 지금 몇 번째 이전 글을 불러왔는지(1 = 바로 앞) · 불러온 글(그대로일 때만 ↑가 더 이전으로 간다)
+	property number HistoryIdx = 0
+
+	property string HistoryShown = ""
+
+	method void OnBeginPlay()
+		if self:IsClient() then
+			_TimerService:SetTimerRepeat(function() self:ClientTick() end, 0.25, 0.3)
+		end
+	end
+
+	@ExecSpace("ClientOnly")
+	method void ClientTick()
+		if _RoomService:IsInstanceRoom() then
+			-- 게임 방: 로비 화면이 남아 있으면 치운다
+			local old = _EntityService:GetEntityByPath("/ui/RtsLobbyGroup")
+			if old ~= nil and isvalid(old) then old:Destroy() end
+			self.Built = false
+			return
+		end
+		if not self.Built then
+			local lp = _UserService.LocalPlayer
+			if lp == nil or lp.PlayerComponent == nil then return end
+			if _EntityService:GetEntityByPath("/ui") == nil then return end
+			self.MyUserId = lp.PlayerComponent.UserId
+			self.MyNick = lp.PlayerComponent.Nickname
+			self:Build()
+			if not self.Built then return end
+			_RtsLobbyLogic:RequestList()
+		end
+		-- 로비: 게임 방 HUD·팝업이 남아 있으면 가린다
+		for _, path in ipairs({ "/ui/RtsHudGroup", "/ui/RtsPopupGroup" }) do
+			local e = _EntityService:GetEntityByPath(path)
+			if e ~= nil and isvalid(e) and e.Enable then e:SetEnable(false) end
+		end
+		self:Layout(false)
+		self:RefreshLook(false)
+		if self.ToastUntil > 0 and _UtilLogic.ElapsedSeconds > self.ToastUntil then
+			self.ToastUntil = 0
+			if isvalid(self.ToastBox) then self.ToastBox.Parent:SetEnable(false) end
+		end
+	end
+
+	-- 1760×960 틀을 실제 화면 안쪽(RtsHudLogic.MobileViewport)에 맞추고, 배경 그림은 비율대로 화면 전체를 덮는다 — 화면 크기가 바뀔 때만
+	@ExecSpace("ClientOnly")
+	method void Layout(boolean force)
+		if not isvalid(self.Frame) then return end
+		local v = _RtsHudLogic:MobileViewport()
+		if v == nil then return end
+		if not force and v.key == self.LayoutKey then return end
+		self.LayoutKey = v.key
+		local w = 1760
+		local h = 960
+		local scale = math.min((v.x1 - v.x0) / w, (v.y1 - v.y0) / h)
+		local t = self.Frame.UITransformComponent
+		t.AnchorsMin = Vector2(0.5, 0.5)
+		t.AnchorsMax = Vector2(0.5, 0.5)
+		t.Pivot = Vector2(0.5, 0.5)
+		t.anchoredPosition = Vector2((v.x0 + v.x1) / 2, (v.y0 + v.y1) / 2)
+		t.RectSize = Vector2(w, h)
+		t.UIScale = Vector3(scale, scale, 1)
+		if isvalid(self.Backdrop) then
+			local lo = _UILogic:ScreenToUIPosition(Vector2.zero)
+			local hi = _UILogic:ScreenToUIPosition(Vector2(_UILogic.ScreenWidth, _UILogic.ScreenHeight))
+			local cover = math.max(math.abs(hi.x - lo.x) / 1920, math.abs(hi.y - lo.y) / 1080)
+			local bt = self.Backdrop.UITransformComponent
+			bt.anchoredPosition = Vector2((lo.x + hi.x) / 2, (lo.y + hi.y) / 2)
+			bt.RectSize = Vector2(1920 * cover + 4, 1080 * cover + 4)
+		end
+	end
+
+	-- 화면 모드 · 내 테마 · 내 아이콘이 바뀐 것만 다시 칠한다(창을 다시 만들지 않는다)
+	@ExecSpace("ClientOnly")
+	method void RefreshLook(boolean force)
+		local P = _RtsProfileLogic
+		local mode = P.MyUiMode .. ":" .. tostring(P.MyUiModeSaving)
+		if force or mode ~= self.ModeShown then
+			self.ModeShown = mode
+			self:PaintMode()
+		end
+		if force or P.MyTheme ~= self.ThemeShown then
+			self.ThemeShown = P.MyTheme
+			self:PaintBackdrop()
+		end
+		local prof = P.MyIcon .. ":" .. P.MyTheme
+		if force or prof ~= self.ProfileShown then
+			self.ProfileShown = prof
+			self:PaintProfile()
+		end
+	end
+
+	-- 모드별: 배경 막 · 대화 창 막 · 입력 칸 안내 글 · 라이트/다크 버튼(나머지 면·글·테두리는 RtsHudLogic.ApplyUiMode가 칠한다)
+	@ExecSpace("ClientOnly")
+	method void PaintMode()
+		local H = _RtsHudLogic
+		local P = _RtsProfileLogic
+		local dark = P.MyUiMode == "dark"
+		if isvalid(self.Dim) then
+			if dark then H:Tint(self.Dim, 0.04, 0.055, 0.11, 0.62) else H:Tint(self.Dim, 0.95, 0.955, 0.985, 0.55) end
+		end
+		if isvalid(self.DialogLayer) then
+			if dark then H:Tint(self.DialogLayer, 0.02, 0.03, 0.07, 0.62) else H:Tint(self.DialogLayer, 0.12, 0.13, 0.2, 0.38) end
+		end
+		local keep = {}
+		for _, e in ipairs(self.Inputs) do
+			if e ~= nil and isvalid(e) then
+				self:PaintInput(e)
+				keep[#keep + 1] = e
+			end
+		end
+		self.Inputs = keep
+		for key, b in pairs(self.ModeBtns) do
+			local text = "라이트"
+			if key == "dark" then text = "다크" end
+			local state = "idle"
+			if key == P.MyUiMode then
+				state = "on"
+				if P.MyUiModeSaving then text = "저장 중…" end
+			end
+			H:SetUiText(b.label, text)
+			H:PaintButton(b.box, b.label, state)
+			if b.icon ~= nil and isvalid(b.icon) then H:SetUiColor(b.icon, state == "on" and H:ColInk() or H:ColMuted(), "icon") end
+		end
+	end
+
+	-- 로비 배경 = 내 테마의 배경 그림(RtsThemeLogic 프리셋 backgroundRUID — 게임 판과 같은 풍경). 없으면 옅은 단색
+	@ExecSpace("ClientOnly")
+	method void PaintBackdrop()
+		if not isvalid(self.Backdrop) then return end
+		local preset = _RtsThemeLogic:GetPreset(_RtsProfileLogic.MyTheme)
+		local sr = self.Backdrop.SpriteGUIRendererComponent
+		if preset ~= nil and preset.backgroundRUID ~= nil and preset.backgroundRUID ~= "" then
+			sr.ImageRUID = DataRef(preset.backgroundRUID)
+			sr.Color = Color(1, 1, 1, 1)
+		else
+			sr.ImageRUID = DataRef(_RtsHudLogic.WhiteRUID)
+			sr.Color = Color(0.3, 0.34, 0.45, 1)
+		end
+	end
+
+	-- 윗줄 프로필 상자: 내 아이콘(동그란 칸) · 테마 이름. 아이콘이 없으면 사람 모양
+	@ExecSpace("ClientOnly")
+	method void PaintProfile()
+		local H = _RtsHudLogic
+		local P = _RtsProfileLogic
+		if not isvalid(self.ProfileSlot) then return end
+		if self.ProfileFace ~= nil and isvalid(self.ProfileFace) then self.ProfileFace:Destroy() end
+		self.ProfileFace = H:SpawnMonsterPortrait(self.ProfileSlot, P.MyIcon, 56, false)
+		if self.ProfileFace == nil then self.ProfileFace = self:Icon(self.ProfileSlot, "user", Vector2(0.5, 0.5), Vector2.zero, 30, nil, "") end
+		local preset = _RtsThemeLogic:GetPreset(P.MyTheme)
+		local sub = ""
+		if preset ~= nil and preset.name ~= nil then sub = "테마 " .. preset.name end
+		H:SetUiText(self.ProfileSub, sub)
+	end
+
+	-- ===== 만들기 =====
+
+	@ExecSpace("ClientOnly")
+	method void Build()
+		local H = _RtsHudLogic
+		local ui = _EntityService:GetEntityByPath("/ui")
+		local grp = _SpawnService:SpawnByModelId("model://uigroup", "RtsLobbyGroup", Vector3.zero, ui)
+		if grp == nil then
+			_RtsConfigLogic:Log("RtsLobbyUi: group spawn failed")
+			return
+		end
+		if grp.UIGroupComponent ~= nil then grp.UIGroupComponent.DefaultShow = true end
+		H:StretchFull(grp)
+		grp:SetEnable(true)
+		self.Group = grp
+		-- 바닥색(배경 그림이 늦게 뜰 때) → 테마 배경 그림 → 모드별 막
+		local base = H:SpawnStretch("model://uisprite", "RtsLobbyBase", grp, Vector2(0, 0), Vector2(1, 1), Vector2(0, 0), Vector2(0, 0))
+		H:SetUiColor(base, Color(0.93, 0.94, 0.985, 1), "surface")
+		base.SpriteGUIRendererComponent.RaycastTarget = false
+		self.Backdrop = H:SpawnUI("model://uisprite", "RtsLobbyBackdrop", grp, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2.zero, Vector2(1920, 1080))
+		self.Backdrop.SpriteGUIRendererComponent.RaycastTarget = false
+		self.Dim = H:SpawnStretch("model://uisprite", "RtsLobbyDim", grp, Vector2(0, 0), Vector2(1, 1), Vector2(0, 0), Vector2(0, 0))
+		self.Dim.SpriteGUIRendererComponent.RaycastTarget = false
+		local frame = H:SpawnUI("model://uisprite", "RtsLobbyFrame", grp, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2.zero, Vector2(1760, 960))
+		H:Tint(frame, 1, 1, 1, 0)
+		frame.SpriteGUIRendererComponent.RaycastTarget = false
+		self.Frame = frame
+		self:BuildLobbyPage(frame)
+		self:BuildRoomPage(frame)
+		-- 대화 창 자리(방 만들기 · 비밀번호) — 화면 전체를 어둡게 덮어 뒤 클릭을 막는다(틀 밖까지 넉넉히)
+		self.DialogLayer = H:SpawnStretch("model://uisprite", "RtsLobbyDialog", frame, Vector2(0, 0), Vector2(1, 1), Vector2(-3000, -3000), Vector2(3000, 3000))
+		self.DialogLayer:SetEnable(false)
+		-- 알림(토스트) = 틀 위 가운데 — 로비 게임 이름 · 대기실 머리줄 위에 잠깐 겹친다(목록·버튼은 가리지 않게)
+		self.ToastBox = H:SpawnRoundedPanel("RtsLobbyToast", frame, Vector2(0.5, 1), Vector2(0.5, 1), Vector2(0, -16), Vector2(900, 64), Color(0.22, 0.19, 0.12, 0.94), H:ColGold(), 2)
+		self.ToastText = H:SpawnLabel("RtsLobbyToastText", self.ToastBox, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2(0, 0), Vector2(880, 56), "", Color(1, 0.97, 0.88, 1), 22, TextAlignmentType.MiddleCenter, true)
+		self.ToastBox.Parent:SetEnable(false)
+		self.Built = true
+		self:Layout(true)
+		self:RefreshLook(true)
+		self:ShowPage(self.Page)
+		self:RenderList()
+		self:RenderRoom()
+		self:RenderChat()
+		_RtsConfigLogic:Log("RtsLobbyUi: built")
+	end
+
+	@ExecSpace("ClientOnly")
+	method void BuildLobbyPage(Entity frame)
+		local H = _RtsHudLogic
+		local page = H:SpawnUI("model://uisprite", "RtsLobbyPage", frame, Vector2(0, 1), Vector2(0, 1), Vector2(0, 0), Vector2(1760, 960))
+		H:Tint(page, 1, 1, 1, 0)
+		page.SpriteGUIRendererComponent.RaycastTarget = false
+		self.LobbyPage = page
+		self:BuildTopBar(page)
+		self:BuildRail(page)
+		self:BuildList(page)
+	end
+
+	-- 윗줄(높이 96): 왼쪽 프로필(게임 HUD 프로필 상자와 같은 모양) · 가운데 게임 이름 · 오른쪽 라이트/다크
+	@ExecSpace("ClientOnly")
+	method void BuildTopBar(Entity page)
+		local H = _RtsHudLogic
+		local prof = H:SpawnRoundedPanel("RtsLobbyProfile", page, Vector2(0, 1), Vector2(0, 1), Vector2(0, 0), Vector2(400, 96), H:ColPanel(), H:ColBorder(), 1.5)
+		local ring = H:SpawnUI("model://uisprite", "RtsLobbyProfileRing", prof, Vector2(0, 0.5), Vector2(0, 0.5), Vector2(20, 0), Vector2(64, 64))
+		ring.SpriteGUIRendererComponent.ImageRUID = DataRef(H.CircleMaskRUID)
+		H:SetUiColor(ring, H:ColBorder(), "border")
+		ring.SpriteGUIRendererComponent.RaycastTarget = false
+		local slot = H:SpawnUI("model://uisprite", "RtsLobbyProfileSlot", ring, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2.zero, Vector2(60, 60))
+		slot.SpriteGUIRendererComponent.ImageRUID = DataRef(H.CircleMaskRUID)
+		H:SetUiColor(slot, self:ColSurface2(), "surface")
+		slot.SpriteGUIRendererComponent.RaycastTarget = false
+		self.ProfileSlot = slot
+		self.ProfileFace = nil
+		H:SpawnLabel("RtsLobbyProfileName", prof, Vector2(0, 0.5), Vector2(0, 0.5), Vector2(100, 14), Vector2(280, 36), self.MyNick, H:ColInk(), 26, TextAlignmentType.MiddleLeft, true)
+		self.ProfileSub = H:SpawnLabel("RtsLobbyProfileSub", prof, Vector2(0, 0.5), Vector2(0, 0.5), Vector2(100, -18), Vector2(280, 26), "", H:ColMuted(), 17, TextAlignmentType.MiddleLeft, false)
+		H:SpawnLabel("RtsLobbyTitle", page, Vector2(0.5, 1), Vector2(0.5, 1), Vector2(0, -6), Vector2(900, 58), "메이플 증강 디펜스", H:ColInk(), 44, TextAlignmentType.MiddleCenter, true)
+		H:SpawnLabel("RtsLobbyTitleSub", page, Vector2(0.5, 1), Vector2(0.5, 1), Vector2(0, -64), Vector2(300, 26), "로비", H:ColMuted(), 18, TextAlignmentType.MiddleCenter, true)
+		-- 라이트/다크(게임 HUD 오른쪽 아래 스위치와 같은 저장값 — RtsProfileLogic.ChooseUiMode)
+		local sw = H:SpawnRoundedPanel("RtsLobbyModeSwitch", page, Vector2(1, 1), Vector2(1, 1), Vector2(0, -6), Vector2(292, 84), H:ColPanel(), H:ColBorder(), 1.5)
+		self.ModeBtns = {}
+		for i, key in ipairs({ "light", "dark" }) do
+			local b = H:SpawnRoundedPanel("RtsLobbyMode" .. tostring(i), sw, Vector2(0, 0.5), Vector2(0, 0.5), Vector2(8 + (i - 1) * 140, 0), Vector2(132, 66), H:ColPanel(), H:ColBorder(), 1.5)
+			local iconKey = "sun"
+			if key == "dark" then iconKey = "moon" end
+			local icon = self:Icon(b, iconKey, Vector2(0, 0.5), Vector2(16, 0), 22, H:ColMuted(), "icon")
+			local label = H:SpawnLabel("RtsLobbyModeText", b, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2(14, 0), Vector2(90, 56), "", H:ColMuted(), 20, TextAlignmentType.MiddleCenter, true)
+			local mode = key
+			H:SpawnClick("RtsLobbyModeClick", b):ConnectEvent(ButtonClickEvent, function(event)
+				self:ChooseMode(mode)
+			end)
+			self.ModeBtns[key] = { box = b, label = label, icon = icon }
+		end
+	end
+
+	-- 왼쪽 큰 버튼 넷(400×128 — 2026-09-29 사용자 "높이를 조금씩 줄이고 맨 위에 채널 이동", 전 셋 400×168) + 방 규칙
+	@ExecSpace("ClientOnly")
+	method void BuildRail(Entity page)
+		local H = _RtsHudLogic
+		-- 채널 이동(2026-09-29): 다른 월드 인스턴스 목록 팝업 → [이동](서버 RtsLobbyLogic.RequestChannels · RequestChannelMove — 출시 월드에서만)
+		self:BigButton("RtsLobbyChannel", page, -128, 128, "users", "채널 이동", "다른 채널 목록 보고 옮기기", "plain", function()
+			self:OpenChannels()
+		end)
+		-- 빠른 참가(2026-09-29 사용자 — 매칭 대신): 대기 중 · 빈자리 · 공개 방 가운데 하나에 바로 들어간다(서버 RtsLobbyLogic.RequestQuickJoin)
+		self:BigButton("RtsLobbyQuick", page, -272, 128, "bolt", "빠른 참가", "빈자리 있는 방에 바로 입장", "plain", function()
+			_RtsLobbyLogic:RequestQuickJoin()
+		end)
+		self:BigButton("RtsLobbyCreate", page, -416, 128, "plus", "방 만들기", "최대 4명 · 도전 / 경주", "gold", function()
+			self:OpenCreate()
+		end)
+		self:BigButton("RtsLobbySolo", page, -560, 128, "user", "혼자 하기", "모드·난이도 골라 바로 시작", "plain", function()
+			self:ShowToast("혼자 하는 게임 방으로 이동해요…")
+			_RtsLobbyLogic:RequestSolo()
+		end)
+		local rules = H:SpawnRoundedPanel("RtsLobbyRules", page, Vector2(0, 1), Vector2(0, 1), Vector2(0, -704), Vector2(400, 256), H:ColPanel(), H:ColBorder(), 1.5)
+		H:SpawnWater(rules)
+		self:Icon(rules, "info", Vector2(0, 1), Vector2(24, -22), 26, nil, "")
+		H:SpawnLabel("RtsLobbyRulesTitle", rules, Vector2(0, 1), Vector2(0, 1), Vector2(60, -20), Vector2(300, 30), "방 규칙", H:ColInk(), 20, TextAlignmentType.MiddleLeft, true)
+		H:SpawnLabel("RtsLobbyRulesText", rules, Vector2(0, 1), Vector2(0, 1), Vector2(26, -64), Vector2(348, 130),
+			"게임 중인 방은 끝난 뒤 들어갈 수 있어요\n모두 준비하면 방장이 시작해요\n방장이 나가면 다음 사람이 이어받아요", H:ColMuted(), 17, TextAlignmentType.UpperLeft, false)
+	end
+
+	-- 큰 버튼(400×h — 2026-09-29 높이 128): 왼쪽 아이콘 칸 60 + 제목 26 + 설명 16.
+	--   style "gold" = 방 만들기(연보라 테두리·면, 아이콘 칸 보라) / "plain" = 기본 / "idle" = 준비 중(흐린 테두리·글 · 점선 — 지금은 쓰는 곳 없음)
+	@ExecSpace("ClientOnly")
+	method Entity BigButton(string name, Entity parent, number y, number h, string iconKey, string title, string sub, string style, any onClick)
+		local H = _RtsHudLogic
+		local bg = H:ColPanel()
+		local border = H:ColBorder()
+		local thick = 1.5
+		local ink = H:ColInk()
+		local subInk = H:ColMuted()
+		local iconCol = nil
+		if style == "gold" then
+			bg = _RtsPopupLogic:Mix(H:ColGold(), 0.25)
+			border = H:ColGold()
+			thick = 2
+			subInk = self:ColTag()
+		elseif style == "idle" then
+			ink = H:ColMuted()
+			iconCol = H:ColMuted()
+		end
+		local box = H:SpawnRoundedPanel(name, parent, Vector2(0, 1), Vector2(0, 1), Vector2(0, y), Vector2(400, h), bg, border, thick)
+		-- 준비 중 = 실선 대신 점선 테두리(시안)
+		if style == "idle" then
+			H:SetUiColor(box.Parent, Color(1, 1, 1, 0), "fixed")
+			self:Dash(box.Parent, "quick")
+		end
+		local tile = H:SpawnRoundedPanel(name .. "Tile", box, Vector2(0, 0.5), Vector2(0, 0.5), Vector2(26, 0), Vector2(60, 60), self:ColSurface2(), self:ColSurface2(), 1)
+		local role = "icon"
+		if style == "gold" then
+			H:Tint(tile, 0.533, 0.4, 0.863, 1)
+			H:Tint(tile.Parent, 0.533, 0.4, 0.863, 1)
+			iconCol = Color(1, 1, 1, 1)
+			role = "fixed"
+		end
+		self:Icon(tile, iconKey, Vector2(0.5, 0.5), Vector2.zero, 30, iconCol, role)
+		H:SpawnLabel(name .. "Title", box, Vector2(0, 0.5), Vector2(0, 0.5), Vector2(106, 15), Vector2(276, 36), title, ink, 26, TextAlignmentType.MiddleLeft, true)
+		H:SpawnLabel(name .. "Sub", box, Vector2(0, 0.5), Vector2(0, 0.5), Vector2(106, -19), Vector2(276, 26), sub, subInk, 16, TextAlignmentType.MiddleLeft, false)
+		H:SpawnClick(name .. "Click", box):ConnectEvent(ButtonClickEvent, function(event)
+			onClick()
+		end)
+		return box
+	end
+
+	-- 오른쪽 방 목록(1320×832): 제목 · 개수 · 새로고침 / 칸 머리 / 줄 7 / 쪽 넘기기
+	@ExecSpace("ClientOnly")
+	method void BuildList(Entity page)
+		local H = _RtsHudLogic
+		local box = H:SpawnRoundedPanel("RtsLobbyListBox", page, Vector2(0, 1), Vector2(0, 1), Vector2(440, -128), Vector2(1320, 832), H:ColPanel(), H:ColBorder(), 1.5)
+		H:SpawnLabel("RtsLobbyListTitle", box, Vector2(0, 1), Vector2(0, 1), Vector2(32, -26), Vector2(130, 56), "방 목록", H:ColInk(), 30, TextAlignmentType.MiddleLeft, true)
+		local chip = H:SpawnRoundedPanel("RtsLobbyListChip", box, Vector2(0, 1), Vector2(0, 1), Vector2(170, -36), Vector2(92, 36), self:ColSurface2(), H:ColBorder(), 1.5)
+		self.ListCount = H:SpawnLabel("RtsLobbyListCount", chip, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2.zero, Vector2(86, 32), "", H:ColMuted(), 17, TextAlignmentType.MiddleCenter, true)
+		self:SmallButton("RtsLobbyRefresh", box, Vector2(1, 1), Vector2(-32, -26), Vector2(180, 56), "refresh", "새로고침", "plain", 19, function()
+			_RtsLobbyLogic:RequestList()
+		end)
+		local cols = self:ListCols()
+		for i = 1, #cols do
+			local c = cols[i]
+			H:SpawnLabel("RtsLobbyListHead" .. tostring(i), box, Vector2(0, 1), Vector2(0, 1), Vector2(32 + c[2], -98), Vector2(c[3], 34), c[1], H:ColMuted(), 17, TextAlignmentType.MiddleLeft, true)
+		end
+		self.ListRows = {}
+		for i = 1, self.ListPerPage do
+			local row = H:SpawnRoundedPanel("RtsLobbyRow" .. tostring(i), box, Vector2(0, 1), Vector2(0, 1), Vector2(32, -146 - (i - 1) * 86), Vector2(1256, 76), self:ColSurface2(), H:ColBorder(), 1.5)
+			local r = { row = row, pips = {} }
+			r.no = H:SpawnLabel("RtsLobbyRowNo", row, Vector2(0, 0.5), Vector2(0, 0.5), Vector2(22, 0), Vector2(96, 50), "", H:ColMuted(), 21, TextAlignmentType.MiddleLeft, true)
+			r.lock = self:Icon(row, "lock", Vector2(0, 0.5), Vector2(130, 0), 24, self:ColLockGold(), "icon")
+			r.title = H:SpawnLabel("RtsLobbyRowTitle", row, Vector2(0, 0.5), Vector2(0, 0.5), Vector2(130, 0), Vector2(450, 56), "", H:ColInk(), 24, TextAlignmentType.MiddleLeft, true)
+			r.chip = H:SpawnRoundedPanel("RtsLobbyRowMode", row, Vector2(0, 0.5), Vector2(0, 0.5), Vector2(592, 0), Vector2(76, 36), self:ColSurface2(), H:ColGold(), 1.5)
+			r.chipText = H:SpawnLabel("RtsLobbyRowModeText", r.chip, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2.zero, Vector2(70, 32), "", H:ColInk(), 17, TextAlignmentType.MiddleCenter, true)
+			r.count = H:SpawnLabel("RtsLobbyRowCount", row, Vector2(0, 0.5), Vector2(0, 0.5), Vector2(744, 0), Vector2(76, 50), "", H:ColInk(), 22, TextAlignmentType.MiddleLeft, true)
+			for k = 1, 4 do
+				local pip = H:SpawnUI("model://uisprite", "RtsLobbyRowPip", row, Vector2(0, 0.5), Vector2(0, 0.5), Vector2(824 + (k - 1) * 18, 0), Vector2(12, 12))
+				pip.SpriteGUIRendererComponent.ImageRUID = DataRef(H.CircleMaskRUID)
+				pip.SpriteGUIRendererComponent.RaycastTarget = false
+				r.pips[k] = pip
+			end
+			r.dot = H:SpawnUI("model://uisprite", "RtsLobbyRowDot", row, Vector2(0, 0.5), Vector2(0, 0.5), Vector2(946, 0), Vector2(10, 10))
+			r.dot.SpriteGUIRendererComponent.ImageRUID = DataRef(H.CircleMaskRUID)
+			r.dot.SpriteGUIRendererComponent.RaycastTarget = false
+			r.state = H:SpawnLabel("RtsLobbyRowState", row, Vector2(0, 0.5), Vector2(0, 0.5), Vector2(964, 0), Vector2(122, 50), "", H:ColMuted(), 19, TextAlignmentType.MiddleLeft, true)
+			r.btn = H:SpawnRoundedPanel("RtsLobbyRowJoin", row, Vector2(0, 0.5), Vector2(0, 0.5), Vector2(1098, 0), Vector2(136, 52), H:ColPanel(), H:ColGold(), 1.5)
+			r.btnText = H:SpawnLabel("RtsLobbyRowJoinText", r.btn, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2.zero, Vector2(128, 44), "입장", H:ColInk(), 20, TextAlignmentType.MiddleCenter, true)
+			local idx = i
+			H:SpawnClick("RtsLobbyRowClick", row):ConnectEvent(ButtonClickEvent, function(event)
+				self:OnRowClick(idx)
+			end)
+			row.Parent:SetEnable(false)
+			self.ListRows[i] = r
+		end
+		self.ListEmpty = H:SpawnLabel("RtsLobbyListEmpty", box, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2(0, 20), Vector2(1100, 120),
+			"아직 열린 방이 없어요\n[방 만들기]로 첫 방을 열어 보세요", H:ColMuted(), 26, TextAlignmentType.MiddleCenter, false)
+		-- 쪽 넘기기(가운데 아래): [‹] 1 / 2 [›] — 넘길 수 없는 쪽 화살표는 흐리게
+		self.PageArrows = {}
+		for i, d in ipairs({ -1, 1 }) do
+			local step = d
+			local b = H:SpawnRoundedPanel("RtsLobbyPageArrow" .. tostring(i), box, Vector2(0.5, 0), Vector2(0.5, 0), Vector2(d * 110, 26), Vector2(56, 48), self:ColSurface2(), H:ColBorder(), 1.5)
+			local ic = self:Icon(b, "chevron", Vector2(0.5, 0.5), Vector2.zero, 24, H:ColInk(), "icon")
+			if d > 0 and ic ~= nil then ic.SpriteGUIRendererComponent.FlipX = true end
+			H:SpawnClickQuiet("RtsLobbyPageClick", b):ConnectEvent(ButtonClickEvent, function(event)
+				self:MoveListPage(step)
+			end)
+			self.PageArrows[i] = { box = b, canvas = b.Parent:AddComponent("CanvasGroupComponent") }
+		end
+		self.ListPageText = H:SpawnLabel("RtsLobbyPageText", box, Vector2(0.5, 0), Vector2(0.5, 0), Vector2(0, 26), Vector2(130, 48), "", H:ColInk(), 20, TextAlignmentType.MiddleCenter, true)
+	end
+
+	-- 방 목록 칸: { 머리 글, 줄 안 x, 폭 } — 시안의 줄 1256 = 여백 22 + 96 · 450 · 140 · 190 · 140 · 136 (칸 사이 12)
+	method table ListCols()
+		return { { "번호", 22, 96 }, { "방 제목", 130, 450 }, { "모드", 592, 140 }, { "인원", 744, 190 }, { "상태", 946, 140 }, { "", 1098, 136 } }
+	end
+
+	-- 버튼(RtsPopupLogic.SpawnButton) 가운데 글자를 크게(dy만큼 위로)
+	@ExecSpace("ClientOnly")
+	method void BigLabel(Entity button, string labelName, number size, number dy)
+		if button == nil or not isvalid(button) then return end
+		local label = button:GetChildByName(labelName)
+		if label == nil or not isvalid(label) then return end
+		_RtsHudLogic:SetLabelSize(label, size)
+		label.UITransformComponent.anchoredPosition = Vector2(0, dy)
+	end
+
+	-- 아이콘 + 글 버튼(anchor = pivot). style "gold" = 연보라 확인(팝업 SpawnButton gold와 같은 색) / "plain" = 옅은 면 + 기본 테두리. iconKey ""면 글만
+	@ExecSpace("ClientOnly")
+	method table SmallButton(string name, Entity parent, Vector2 anchor, Vector2 pos, Vector2 size, string iconKey, string text, string style, number fontSize, any onClick)
+		local H = _RtsHudLogic
+		local bg = self:ColSurface2()
+		local border = H:ColBorder()
+		local thick = 1.5
+		if style == "gold" then
+			bg = _RtsPopupLogic:Mix(H:ColGold(), 0.25)
+			border = H:ColGold()
+			thick = 2
+		end
+		local box = H:SpawnRoundedPanel(name, parent, anchor, anchor, pos, size, bg, border, thick)
+		local lx = 0
+		if iconKey ~= "" then
+			self:Icon(box, iconKey, Vector2(0, 0.5), Vector2(20, 0), 22, H:ColInk(), "icon")
+			lx = 16
+		end
+		local label = H:SpawnLabel(name .. "Text", box, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2(lx, 0), Vector2(size.x - 16 - lx * 2, size.y - 10), text, H:ColInk(), fontSize, TextAlignmentType.MiddleCenter, true)
+		H:SpawnClick(name .. "Click", box):ConnectEvent(ButtonClickEvent, function(event)
+			onClick()
+		end)
+		return { box = box, label = label }
+	end
+
+	-- 선 아이콘 그림(시안 SVG를 그대로 그린 흰 PNG — assets/design/lobby/icon-*.png, 2026-09-28 업로드)을 anchor 기준 자리에 size×size로.
+	--   색 = color(없으면 연보라 ColGold). role "icon" = 글자처럼 모드별 짝 색(다크에선 밝게) / "fixed" = 그대로(보라 칸 위 흰 선)
+	@ExecSpace("ClientOnly")
+	method Entity Icon(Entity parent, string key, Vector2 anchor, Vector2 pos, number size, any color, string role)
+		local H = _RtsHudLogic
+		local e = H:SpawnUI("model://uisprite", "RtsLobbyIcon_" .. key, parent, anchor, anchor, pos, Vector2(size, size))
+		if e == nil then return nil end
+		e.SpriteGUIRendererComponent.ImageRUID = DataRef(self:IconRUID(key))
+		e.SpriteGUIRendererComponent.RaycastTarget = false
+		if color == nil then color = H:ColGold() end
+		if role == nil or role == "" then role = "icon" end
+		H:SetUiColor(e, color, role)
+		return e
+	end
+
+	-- 로비 아이콘 그림 RUID(RtsLobbyIcon_* — 흰 선·투명 바탕 96px)
+	method string IconRUID(string key)
+		local ids = {
+			bolt = "99408bd738a847e4bc3ee6544547bd9f",
+			check = "0c147553e1c24b8d87f3d7d4c2a54e52",
+			chevron = "3de7b4a92a134cfdb9a05d8a655d7862",
+			close = "0fac201e6160498aa4b5e56742e92c73",
+			crown = "140231918c2048a8bf249b8425012801",
+			exit = "75a13ce015be4d129919fc9087b9cb86",
+			expand = "7d1c54b0e5d1416b8d3a0da052f63400",
+			info = "751fa00fd3c34bd0a4e3f20085863d2a",
+			lock = "9fc6d22e030245989e6f15c57c8f439d",
+			moon = "cba3e86f244b46bfba13071d08d1a22d",
+			pencil = "de14aaabca6f43f4a2c8c987daa1d100",
+			plus = "638f83a76b294bb7943f1ccdac3e17a4",
+			refresh = "6c79512e0b944ffead90248883597d07",
+			send = "8d41feea759047659bd9cb949b020502",
+			sun = "8089cae2daee4950ad29f154c5bce7a0",
+			user = "f380ae2d9bc14e52ab8048e567d54449",
+			users = "fe854c4c58804fa9838f5631d150c063"
+		}
+		return ids[key] or ids.info
+	end
+
+	-- 점선 테두리(흰 점선 PNG, 쓰는 칸과 같은 크기라 늘어나지 않는다 — RtsLobbyDash_*): parent 전체를 덮는다. 색 = 기본 테두리
+	@ExecSpace("ClientOnly")
+	method Entity Dash(Entity parent, string key)
+		local H = _RtsHudLogic
+		local ids = { quick = "799dbed19de94a4fa2568734527b2879", slot = "0fe9a02714c444a5a2933a3803b375a3", ring = "322bb181ab6a41979088e8f65d50234f" }
+		local e = H:SpawnStretch("model://uisprite", "RtsLobbyDash_" .. key, parent, Vector2(0, 0), Vector2(1, 1), Vector2(0, 0), Vector2(0, 0))
+		if e == nil then return nil end
+		local sr = e.SpriteGUIRendererComponent
+		sr.ImageRUID = DataRef(ids[key] or ids.slot)
+		if key ~= "ring" then sr.Type = ImageType.Sliced end
+		sr.RaycastTarget = false
+		H:SetUiColor(e, H:ColBorder(), "border")
+		return e
+	end
+
+	@ExecSpace("ClientOnly")
+	method void BuildRoomPage(Entity frame)
+		local H = _RtsHudLogic
+		local P = _RtsPopupLogic
+		local page = H:SpawnUI("model://uisprite", "RtsRoomPage", frame, Vector2(0, 1), Vector2(0, 1), Vector2(0, 0), Vector2(1760, 960))
+		H:Tint(page, 1, 1, 1, 0)
+		page.SpriteGUIRendererComponent.RaycastTarget = false
+		self.RoomPage = page
+		-- 머리줄(1760×112): [나가기] | 번호 · [자물쇠] 제목 · 모드 표 · 설명 …… 인원
+		local head = H:SpawnRoundedPanel("RtsRoomHead", page, Vector2(0, 1), Vector2(0, 1), Vector2(0, 0), Vector2(1760, 112), H:ColPanel(), H:ColBorder(), 1.5)
+		local leave = P:SpawnButton("RtsRoomLeave", head, Vector2(0, 0.5), Vector2(0, 0.5), Vector2(26, 0), Vector2(170, 64), "나가기", "red", function()
+			_RtsLobbyLogic:RequestLeaveRoom()
+		end)
+		self:BigLabel(leave, "RtsRoomLeaveText", 22, 0)
+		local leaveText = leave:GetChildByName("RtsRoomLeaveText")
+		if leaveText ~= nil then leaveText.UITransformComponent.anchoredPosition = Vector2(16, 0) end
+		self:Icon(leave, "exit", Vector2(0, 0.5), Vector2(22, 0), 24, Color(0.8, 0.35, 0.3, 1), "icon")
+		local div = H:SpawnUI("model://uisprite", "RtsRoomHeadLine", head, Vector2(0, 0.5), Vector2(0, 0.5), Vector2(218, 0), Vector2(1.5, 56))
+		H:SetUiColor(div, H:ColBorder(), "border")
+		div.SpriteGUIRendererComponent.RaycastTarget = false
+		local noChip = H:SpawnRoundedPanel("RtsRoomNoChip", head, Vector2(0, 0.5), Vector2(0, 0.5), Vector2(242, 0), Vector2(76, 42), self:ColSurface2(), H:ColBorder(), 1.5)
+		self.RoomNo = H:SpawnLabel("RtsRoomNo", noChip, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2.zero, Vector2(70, 36), "", H:ColMuted(), 20, TextAlignmentType.MiddleCenter, true)
+		self.RoomLock = self:Icon(head, "lock", Vector2(0, 0.5), Vector2(334, 0), 28, self:ColLockGold(), "icon")
+		self.RoomTitle = H:SpawnLabel("RtsRoomTitle", head, Vector2(0, 0.5), Vector2(0, 0.5), Vector2(334, 0), Vector2(560, 60), "", H:ColInk(), 34, TextAlignmentType.MiddleLeft, true)
+		self.RoomModeChip = H:SpawnRoundedPanel("RtsRoomModeChip", head, Vector2(0, 0.5), Vector2(0, 0.5), Vector2(910, 0), Vector2(84, 40), self:ColSurface2(), H:ColGold(), 1.5)
+		self.RoomModeText = H:SpawnLabel("RtsRoomModeText", self.RoomModeChip, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2.zero, Vector2(78, 34), "", H:ColInk(), 19, TextAlignmentType.MiddleCenter, true)
+		self.RoomDesc = H:SpawnLabel("RtsRoomDesc", head, Vector2(0, 0.5), Vector2(0, 0.5), Vector2(1012, 0), Vector2(520, 40), "", H:ColMuted(), 19, TextAlignmentType.MiddleLeft, false)
+		self:Icon(head, "users", Vector2(1, 0.5), Vector2(-150, 0), 30, nil, "")
+		self.RoomCount = H:SpawnLabel("RtsRoomCount", head, Vector2(1, 0.5), Vector2(1, 0.5), Vector2(-28, 0), Vector2(116, 50), "", H:ColInk(), 24, TextAlignmentType.MiddleRight, true)
+		-- 자리 카드 4칸(422×330): 얼굴 원 · [왕관] 이름 · 준비 상태 알약 / 빈 자리 = + · 안내. 오른쪽 위 = 나 표시 또는 방장의 [강퇴]
+		self.Slots = {}
+		for i = 1, 4 do
+			local card = H:SpawnRoundedPanel("RtsRoomSlot" .. tostring(i), page, Vector2(0, 1), Vector2(0, 1), Vector2((i - 1) * 446, -140), Vector2(422, 330), H:ColPanel(), H:ColBorder(), 2)
+			local s = { card = card, face = nil, faceId = "" }
+			local ring = H:SpawnUI("model://uisprite", "RtsRoomSlotRing", card, Vector2(0.5, 1), Vector2(0.5, 1), Vector2(0, -26), Vector2(124, 124))
+			ring.SpriteGUIRendererComponent.ImageRUID = DataRef(H.CircleMaskRUID)
+			H:SetUiColor(ring, H:ColBorder(), "border")
+			ring.SpriteGUIRendererComponent.RaycastTarget = false
+			local disc = H:SpawnUI("model://uisprite", "RtsRoomSlotDisc", ring, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2.zero, Vector2(120, 120))
+			disc.SpriteGUIRendererComponent.ImageRUID = DataRef(H.CircleMaskRUID)
+			H:SetUiColor(disc, self:ColSurface2(), "surface")
+			disc.SpriteGUIRendererComponent.RaycastTarget = false
+			s.ring = ring
+			s.disc = disc
+			-- 빈 자리 = 점선 카드 테두리 + 점선 얼굴 원(RenderRoom이 켜고 끈다)
+			s.dash = self:Dash(card.Parent, "slot")
+			s.dashRing = self:Dash(ring, "ring")
+			s.add = self:Icon(disc, "plus", Vector2(0.5, 0.5), Vector2.zero, 44, self:ColFaint(), "icon")
+			s.crown = self:Icon(card, "crown", Vector2(0.5, 1), Vector2(0, -176), 26, self:ColLockGold(), "icon")
+			s.name = H:SpawnLabel("RtsRoomSlotName", card, Vector2(0.5, 1), Vector2(0.5, 1), Vector2(0, -168), Vector2(360, 42), "", H:ColInk(), 28, TextAlignmentType.MiddleCenter, true)
+			s.sub = H:SpawnLabel("RtsRoomSlotSub", card, Vector2(0.5, 0), Vector2(0.5, 0), Vector2(0, 40), Vector2(360, 28), "", self:ColFaint(), 17, TextAlignmentType.MiddleCenter, false)
+			s.pill = H:SpawnRoundedPanel("RtsRoomSlotPill", card, Vector2(0.5, 0), Vector2(0.5, 0), Vector2(0, 30), Vector2(230, 50), H:ColPanel(), H:ColBorder(), 1.5)
+			s.check = self:Icon(s.pill, "check", Vector2(0.5, 0.5), Vector2(-64, 0), 20, nil, "")
+			s.state = H:SpawnLabel("RtsRoomSlotState", s.pill, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2.zero, Vector2(200, 44), "", H:ColInk(), 20, TextAlignmentType.MiddleCenter, true)
+			s.badge = H:SpawnRoundedPanel("RtsRoomSlotMe", card, Vector2(1, 1), Vector2(1, 1), Vector2(-14, -14), Vector2(52, 32), H:ColGold(), H:ColGold(), 1)
+			H:Tint(s.badge, 0.533, 0.4, 0.863, 1)
+			H:Tint(s.badge.Parent, 0.533, 0.4, 0.863, 1)
+			H:SpawnLabel("RtsRoomSlotMeText", s.badge, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2.zero, Vector2(48, 28), "나", Color(1, 1, 1, 1), 16, TextAlignmentType.MiddleCenter, true)
+			local idx = i
+			s.kick = P:SpawnButton("RtsRoomKick" .. tostring(i), card, Vector2(1, 1), Vector2(1, 1), Vector2(-12, -12), Vector2(96, 44), "강퇴", "red", function()
+				self:OnKick(idx)
+			end)
+			self:BigLabel(s.kick, "RtsRoomKick" .. tostring(i) .. "Text", 17, 0)
+			local kickText = s.kick:GetChildByName("RtsRoomKick" .. tostring(i) .. "Text")
+			if kickText ~= nil then kickText.UITransformComponent.anchoredPosition = Vector2(10, 0) end
+			self:Icon(s.kick, "close", Vector2(0, 0.5), Vector2(14, 0), 16, Color(0.8, 0.35, 0.3, 1), "icon")
+			self.Slots[i] = s
+		end
+		-- 채팅(1180×462): 제목 · 기록 칸(새 줄이 아래) · 입력 + [보내기]
+		local chat = H:SpawnRoundedPanel("RtsRoomChat", page, Vector2(0, 1), Vector2(0, 1), Vector2(0, -498), Vector2(1180, 462), H:ColPanel(), H:ColBorder(), 1.5)
+		H:SpawnLabel("RtsRoomChatTitle", chat, Vector2(0, 1), Vector2(0, 1), Vector2(28, -22), Vector2(80, 32), "채팅", H:ColInk(), 22, TextAlignmentType.MiddleLeft, true)
+		H:SpawnLabel("RtsRoomChatNote", chat, Vector2(0, 1), Vector2(0, 1), Vector2(96, -24), Vector2(400, 28), "최근 30개까지 보여요", self:ColFaint(), 16, TextAlignmentType.MiddleLeft, false)
+		local logBox = H:SpawnRoundedPanel("RtsRoomChatBox", chat, Vector2(0, 1), Vector2(0, 1), Vector2(28, -66), Vector2(1124, 292), self:ColSurface2(), H:ColBorderSoft(), 1.5)
+		self.ChatLog = H:SpawnLabel("RtsRoomChatLog", logBox, Vector2(0, 0), Vector2(0, 0), Vector2(20, 12), Vector2(1084, 266), "", H:ColInk(), 20, TextAlignmentType.LowerLeft, false)
+		-- 채팅 줄은 칸에 맞춰 줄이지 않는다(마지막 ChatShow줄만 아래부터 보여 준다)
+		self.ChatLog.TextComponent.BestFit = false
+		self.ChatLog.TextComponent.FontSize = 20
+		self.ChatLog.TextComponent.IsRichText = true
+		self.ChatInput = self:SpawnInput("RtsRoomChatInput", chat, Vector2(0, 0), Vector2(0, 0), Vector2(28, 24), Vector2(954, 64), "메시지 입력 · 최대 60자 (엔터로 보내기)", self.ChatLimit)
+		if self.ChatInput ~= nil then
+			self.ChatInput:ConnectEvent(TextInputSubmitEvent, function(event)
+				self:SendChat()
+			end)
+		end
+		self:SmallButton("RtsRoomChatSend", chat, Vector2(1, 0), Vector2(-28, 24), Vector2(156, 64), "send", "보내기", "gold", 21, function()
+			self:SendChat()
+		end)
+		-- 시작 칸(556×462): 준비 수 · 규칙 두 줄 · 안내 한 줄 · 큰 버튼
+		local act = H:SpawnRoundedPanel("RtsRoomAct", page, Vector2(1, 1), Vector2(1, 1), Vector2(0, -498), Vector2(556, 462), H:ColPanel(), H:ColBorder(), 1.5)
+		H:SpawnLabel("RtsRoomActTitle", act, Vector2(0, 1), Vector2(0, 1), Vector2(28, -22), Vector2(300, 32), "게임 시작", H:ColInk(), 22, TextAlignmentType.MiddleLeft, true)
+		H:SpawnLabel("RtsRoomReadyKey", act, Vector2(0, 1), Vector2(0, 1), Vector2(28, -84), Vector2(56, 40), "준비", H:ColMuted(), 18, TextAlignmentType.MiddleLeft, true)
+		self.ReadyText = H:SpawnLabel("RtsRoomReady", act, Vector2(0, 1), Vector2(0, 1), Vector2(84, -68), Vector2(300, 60), "", H:ColInk(), 44, TextAlignmentType.MiddleLeft, true)
+		H:SpawnLabel("RtsRoomActNote", act, Vector2(0, 1), Vector2(0, 1), Vector2(28, -144), Vector2(500, 64),
+			"배속은 모두 2배를 골라야 2배예요\n끝나면 결과를 보고 이 방으로 돌아와요", H:ColMuted(), 17, TextAlignmentType.UpperLeft, false)
+		self.RoomHint = H:SpawnLabel("RtsRoomHint", act, Vector2(0, 0), Vector2(0, 0), Vector2(28, 150), Vector2(500, 30), "", H:ColMuted(), 17, TextAlignmentType.MiddleLeft, true)
+		self.ActionBtn = P:SpawnButton("RtsRoomAction", act, Vector2(0.5, 0), Vector2(0.5, 0), Vector2(0, 26), Vector2(500, 116), "준비", "gold", function()
+			self:OnAction()
+		end)
+		self.ActionText = self.ActionBtn:GetChildByName("RtsRoomActionText")
+		if self.ActionText ~= nil then H:SetLabelSize(self.ActionText, 36) end
+		page:SetEnable(false)
+	end
+
+	-- 글자 입력 칸(옅은 둥근 칸 + 글자 + TextInputComponent — 한 줄, 글자 수 제한). 돌려준 엔티티의 TextInputComponent.Text가 입력값
+	@ExecSpace("ClientOnly")
+	method Entity SpawnInput(string name, Entity parent, Vector2 anchor, Vector2 pivot, Vector2 pos, Vector2 size, string placeholder, number limit)
+		local H = _RtsHudLogic
+		local box = H:SpawnRoundedPanel(name, parent, anchor, pivot, pos, size, self:ColSurface2(), H:ColBorder(), 1.5)
+		local e = H:SpawnText(name .. "Field", box, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2(0, 0), Vector2(size.x - 40, size.y - 8), "", H:ColInk())
+		if e == nil then return nil end
+		local tc = e.TextComponent
+		if tc ~= nil then
+			tc.FontSize = 22
+			tc.Alignment = TextAlignmentType.MiddleLeft
+		end
+		if e.SpriteGUIRendererComponent ~= nil then e.SpriteGUIRendererComponent.RaycastTarget = true end
+		local ti = e:AddComponent("TextInputComponent")
+		if ti ~= nil then
+			ti.PlaceHolder = placeholder
+			ti.CharacterLimit = math.floor(limit + 0.5)
+			ti.LineType = InputLineType.SingleLine
+			ti.Text = ""
+		end
+		self.Inputs[#self.Inputs + 1] = e
+		self:PaintInput(e)
+		return e
+	end
+
+	-- 빈 칸 안내 글 색을 화면 모드에 맞춘다(기본값은 어두운 회색이라 다크 모드에서 안 보인다)
+	@ExecSpace("ClientOnly")
+	method void PaintInput(Entity e)
+		if e == nil or not isvalid(e) or e.TextInputComponent == nil then return end
+		if _RtsProfileLogic.MyUiMode == "dark" then
+			e.TextInputComponent.PlaceHolderColor = Color(0.68, 0.73, 0.82, 0.6)
+		else
+			e.TextInputComponent.PlaceHolderColor = Color(0.42, 0.44, 0.52, 0.7)
+		end
+	end
+
+	@ExecSpace("ClientOnly")
+	method string InputText(Entity e)
+		if e == nil or not isvalid(e) or e.TextInputComponent == nil then return "" end
+		return e.TextInputComponent.Text
+	end
+
+	-- 입력 칸 글 바꾸기: 입력값(TextInputComponent.Text)과 보이는 글(TextComponent.Text)을 같이
+	@ExecSpace("ClientOnly")
+	method void SetInputText(Entity e, string text)
+		if e == nil or not isvalid(e) then return end
+		if e.TextInputComponent ~= nil then e.TextInputComponent.Text = text end
+		if e.TextComponent ~= nil then e.TextComponent.Text = text end
+	end
+
+	-- 보낸 뒤 입력 칸 비우기(대기실 · 게임 채팅 공용). 엔터·[보내기] 처리 안에서 비우면 입력 칸이 편집을 마치며 친 글을 다시 써 넣는다
+	--   (2026-09-29 사용자 "채팅쳤는데 이전 채팅이 입력창에 그대로" — Maker 실측: 처리 밖에서 비우면 바로 비워진다).
+	--   지금 한 번 비우고, 0.1 · 0.3초 뒤 보낸 글(또는 그 끝부분 — 조합 중이던 글자)이 되써져 있으면 한 번 더 비운다. 그 사이 새로 친 글은 건드리지 않는다
+	@ExecSpace("ClientOnly")
+	method void ClearAfterSend(Entity e, string sent)
+		if e == nil or not isvalid(e) then return end
+		self:SetInputText(e, "")
+		for _, sec in ipairs({ 0.1, 0.3 }) do
+			_TimerService:SetTimerOnce(function()
+				if not isvalid(e) or e.TextInputComponent == nil then return end
+				local t = e.TextInputComponent.Text
+				if t == nil or t == "" then
+					if e.TextComponent ~= nil and e.TextComponent.Text ~= "" then e.TextComponent.Text = "" end
+					return
+				end
+				if t == sent or (#t <= #sent and string.sub(sent, #sent - #t + 1) == t) then self:SetInputText(e, "") end
+			end, sec)
+		end
+	end
+
+	-- 보낸 채팅 기억(바로 앞과 같은 글은 한 번만) — ↑ 불러오기는 다시 가장 최근부터
+	@ExecSpace("ClientOnly")
+	method void AddHistory(string text)
+		if text == nil or text == "" then return end
+		if self.SentHistory[#self.SentHistory] ~= text then self.SentHistory[#self.SentHistory + 1] = text end
+		while #self.SentHistory > self.ChatHistoryMax do table.remove(self.SentHistory, 1) end
+		self.HistoryIdx = 0
+		self.HistoryShown = ""
+	end
+
+	-- ↑(2026-09-29 사용자 "채팅창 활성화 상태로 비워둔 상태로 윗방향키 누를 때마다 이전 채팅 입력"): 입력 중인 채팅 칸(대기실 · 게임 작은/큰 상자)이
+	--   비어 있으면 바로 앞에 보낸 글을, 방금 불러온 글 그대로면 그보다 하나 앞 글을 넣는다(가장 오래된 글에서 멈춘다). 쓰던 글이 있으면 덮지 않는다
+	@ExecSpace("ClientOnly")
+	@EventSender("Service", "InputService")
+	handler HandleKeyDownEvent(KeyDownEvent event)
+		if event.key ~= KeyboardKey.UpArrow then return end
+		local G = _RtsGameChatLogic
+		for _, e in ipairs({ self.ChatInput, G.Input }) do
+			if e ~= nil and isvalid(e) and e.TextInputComponent ~= nil and e.TextInputComponent.IsFocused then
+				self:RecallHistory(e)
+				return
+			end
+		end
+	end
+
+	@ExecSpace("ClientOnly")
+	method void RecallHistory(Entity e)
+		local n = #self.SentHistory
+		if n == 0 then return end
+		local cur = e.TextInputComponent.Text
+		if cur == nil then cur = "" end
+		if cur == "" then
+			self.HistoryIdx = 0
+		elseif cur ~= self.HistoryShown then
+			return
+		end
+		self.HistoryIdx = math.min(n, self.HistoryIdx + 1)
+		self.HistoryShown = self.SentHistory[n - self.HistoryIdx + 1]
+		self:SetInputText(e, self.HistoryShown)
+	end
+
+	-- ===== 서버 → 이 화면 =====
+
+	@ExecSpace("Client")
+	method void ReceiveList(string packed, string userId)
+		local list = {}
+		for _, line in ipairs(self:Split(packed, "\n")) do
+			local f = self:Split(line, "\t")
+			if #f >= 6 then
+				list[#list + 1] = { no = tonumber(f[1]) or 0, title = f[2], mode = f[3], count = tonumber(f[4]) or 0, state = f[5], pw = f[6] == "1" }
+			end
+		end
+		self.List = list
+		self:RenderList()
+	end
+
+	@ExecSpace("Client")
+	method void ReceiveRoom(string packed, string userId)
+		local lines = self:Split(packed, "\n")
+		if #lines == 0 then return end
+		local h = self:Split(lines[1], "\t")
+		if #h < 6 then return end
+		local room = { no = tonumber(h[1]) or 0, title = h[2], mode = h[3], state = h[4], pw = h[5] == "1", host = h[6], members = {} }
+		for i = 2, #lines do
+			local f = self:Split(lines[i], "\t")
+			if #f >= 4 then room.members[#room.members + 1] = { uid = f[1], nick = f[2], ready = f[3] == "1", inGame = f[4] == "1", icon = f[5] or "none" } end
+		end
+		self.Room = room
+		self.Page = "room"
+		if self.Built then
+			self:CloseDialog()
+			self:ShowPage("room")
+			self:RenderRoom()
+		end
+	end
+
+	@ExecSpace("Client")
+	method void ReceiveChat(string lines, boolean reset, string userId)
+		if reset then self.ChatLines = {} end
+		for _, line in ipairs(self:Split(lines, "\n")) do
+			if line ~= "" then self.ChatLines[#self.ChatLines + 1] = line end
+		end
+		while #self.ChatLines > 30 do table.remove(self.ChatLines, 1) end
+		self:RenderChat()
+	end
+
+	@ExecSpace("Client")
+	method void ShowLobby(string userId)
+		self.Room = nil
+		self.ChatLines = {}
+		self.Page = "lobby"
+		if self.Built then
+			self:CloseDialog()
+			self:ShowPage("lobby")
+			self:RenderChat()
+		end
+	end
+
+	@ExecSpace("Client")
+	method void Toast(string msg, string userId)
+		-- 게임 방(로비 화면 없음)에서는 게임 화면 안내로 보인다
+		if self.Built then self:ShowToast(msg) else _RtsHudLogic:ShowHintFor(msg, 3) end
+	end
+
+	-- ===== 그리기 =====
+
+	@ExecSpace("ClientOnly")
+	method void ShowPage(string page)
+		if isvalid(self.LobbyPage) then self.LobbyPage:SetEnable(page == "lobby") end
+		if isvalid(self.RoomPage) then self.RoomPage:SetEnable(page == "room") end
+	end
+
+	@ExecSpace("ClientOnly")
+	method void ShowToast(string msg)
+		if not self.Built or not isvalid(self.ToastBox) then return end
+		_RtsHudLogic:SetUiText(self.ToastText, msg)
+		self.ToastBox.Parent:SetEnable(true)
+		self.ToastUntil = _UtilLogic.ElapsedSeconds + 3
+	end
+
+	@ExecSpace("ClientOnly")
+	method void RenderList()
+		if not self.Built then return end
+		local H = _RtsHudLogic
+		local n = #self.List
+		local pages = math.max(1, math.ceil(n / self.ListPerPage))
+		if self.ListPage > pages then self.ListPage = pages end
+		if self.ListPage < 1 then self.ListPage = 1 end
+		for i = 1, #self.ListRows do
+			local r = self.ListRows[i]
+			local item = self.List[(self.ListPage - 1) * self.ListPerPage + i]
+			if item == nil then
+				r.row.Parent:SetEnable(false)
+			else
+				r.row.Parent:SetEnable(true)
+				local full = item.count >= 4
+				local open = item.state == "wait" and not full
+				-- 들어갈 수 없는 줄(게임 중 · 가득 참)은 흐린 테두리·글
+				H:SetUiColor(r.row.Parent, open and H:ColBorder() or H:ColBorderSoft(), "border")
+				H:SetUiText(r.no, string.format("%03d", math.floor(item.no + 0.5)))
+				H:SetUiColor(r.no, open and H:ColMuted() or self:ColFaint(), "text")
+				-- 비공개 방은 제목 앞에 자물쇠
+				r.lock:SetEnable(item.pw)
+				local tx = 130
+				if item.pw then tx = 164 end
+				r.title.UITransformComponent.anchoredPosition = Vector2(tx, 0)
+				r.title.UITransformComponent.RectSize = Vector2(580 - tx, 56)
+				H:SetUiText(r.title, item.title)
+				H:SetUiColor(r.title, open and H:ColInk() or H:ColMuted(), "text")
+				self:PaintModeChip(r.chip, r.chipText, item.mode)
+				H:SetUiText(r.count, H:Int(item.count) .. " / 4")
+				H:SetUiColor(r.count, open and H:ColInk() or H:ColMuted(), "text")
+				for k = 1, 4 do
+					H:SetUiColor(r.pips[k], k <= item.count and H:ColGold() or H:ColBorder(), "border")
+				end
+				local st = "대기 중"
+				local col = self:ColOpen()
+				local dot = self:ColOpen()
+				if item.state == "play" then
+					st = "게임 중"
+					col = self:ColBusy()
+					dot = H:SeriesColor("war")
+				elseif full then
+					st = "가득 참"
+					col = H:ColMuted()
+				end
+				r.dot:SetEnable(item.state == "play" or not full)
+				H:SetUiColor(r.dot, dot, "border")
+				H:SetUiText(r.state, st)
+				H:SetUiColor(r.state, col, "text")
+				H:PaintButton(r.btn, r.btnText, open and "on" or "idle")
+			end
+		end
+		if isvalid(self.ListEmpty) then self.ListEmpty:SetEnable(n == 0) end
+		H:SetUiText(self.ListPageText, H:Int(self.ListPage) .. " / " .. H:Int(pages))
+		H:SetUiText(self.ListCount, H:Int(n) .. "개")
+		for i, a in ipairs(self.PageArrows) do
+			local enabled = (i == 1 and self.ListPage > 1) or (i == 2 and self.ListPage < pages)
+			if a.canvas ~= nil then
+				a.canvas.GroupAlpha = enabled and 1 or 0.35
+				a.canvas.BlocksRaycasts = enabled
+			end
+		end
+	end
+
+	-- 모드 표: 도전 = 연보라, 경주 = 파랑(마법사 계열 색) — 라이트 색으로 넘기면 다크 변환이 시안 색을 만든다
+	@ExecSpace("ClientOnly")
+	method void PaintModeChip(Entity chip, Entity label, string mode)
+		local H = _RtsHudLogic
+		if mode == "race" then
+			H:SetUiColor(chip, Color(0.86, 0.9, 0.97, 1), "surface")
+			H:SetUiColor(chip.Parent, H:SeriesColor("mag"), "border")
+			H:SetUiColor(label, Color(0.2, 0.35, 0.6, 1), "text")
+		else
+			H:SetUiColor(chip, _RtsPopupLogic:Mix(H:ColGold(), 0.18), "surface")
+			H:SetUiColor(chip.Parent, H:ColGold(), "border")
+			H:SetUiColor(label, self:ColTag(), "text")
+		end
+		H:SetUiText(label, self:ModeName(mode))
+	end
+
+	@ExecSpace("ClientOnly")
+	method void RenderRoom()
+		if not self.Built or self.Room == nil then return end
+		local H = _RtsHudLogic
+		local R = self.Room
+		local amHost = R.host == self.MyUserId
+		H:SetUiText(self.RoomNo, string.format("%03d", math.floor(R.no + 0.5)))
+		-- 머리줄: [자물쇠] 제목 → 모드 표 → 설명(제목 길이만큼 옆으로)
+		local tx = 334
+		self.RoomLock:SetEnable(R.pw)
+		if R.pw then tx = 370 end
+		local tw = self:TextWidth(self.RoomTitle, R.title, 540)
+		self.RoomTitle.UITransformComponent.anchoredPosition = Vector2(tx, 0)
+		self.RoomTitle.UITransformComponent.RectSize = Vector2(tw + 8, 60)
+		H:SetUiText(self.RoomTitle, R.title)
+		local cx = tx + tw + 22
+		self.RoomModeChip.Parent.UITransformComponent.anchoredPosition = Vector2(cx, 0)
+		self:PaintModeChip(self.RoomModeChip, self.RoomModeText, R.mode)
+		local desc = "난이도 골라 최고 라운드 기록"
+		if R.mode == "race" then desc = "어려움 고정 · 검은 마법사까지 최단 시간" end
+		local dx = cx + 102
+		self.RoomDesc.UITransformComponent.anchoredPosition = Vector2(dx, 0)
+		self.RoomDesc.UITransformComponent.RectSize = Vector2(math.max(120, 1560 - dx), 40)
+		H:SetUiText(self.RoomDesc, desc)
+		H:SetUiText(self.RoomCount, H:Int(#R.members) .. " / 4명")
+		local others = 0
+		local readyCount = 0
+		local myReady = false
+		local waiting = {}
+		for i = 1, 4 do
+			local s = self.Slots[i]
+			local m = R.members[i]
+			if m == nil then
+				-- 빈 자리: 실선 테두리·얼굴 원을 감추고 점선으로
+				H:SetUiColor(s.card.Parent, Color(1, 1, 1, 0), "fixed")
+				H:SetUiColor(s.ring, Color(1, 1, 1, 0), "fixed")
+				H:SetUiColor(s.disc, Color(1, 1, 1, 0), "fixed")
+				if s.dash ~= nil then s.dash:SetEnable(true) end
+				if s.dashRing ~= nil then s.dashRing:SetEnable(true) end
+				self:SetFace(s, "")
+				s.crown:SetEnable(false)
+				s.name.UITransformComponent.anchoredPosition = Vector2(0, -168)
+				H:SetUiText(s.name, "빈 자리")
+				H:SetUiColor(s.name, H:ColMuted(), "text")
+				H:SetUiText(s.sub, "들어오기를 기다려요")
+				s.sub:SetEnable(true)
+				s.pill.Parent:SetEnable(false)
+				s.badge.Parent:SetEnable(false)
+				s.kick.Parent:SetEnable(false)
+			else
+				local me = m.uid == self.MyUserId
+				local isHost = m.uid == R.host
+				H:SetUiColor(s.card.Parent, me and H:ColGold() or H:ColBorder(), "border")
+				H:SetUiColor(s.ring, H:ColBorder(), "border")
+				H:SetUiColor(s.disc, self:ColSurface2(), "surface")
+				if s.dash ~= nil then s.dash:SetEnable(false) end
+				if s.dashRing ~= nil then s.dashRing:SetEnable(false) end
+				self:SetFace(s, m.icon)
+				H:SetUiText(s.name, m.nick)
+				H:SetUiColor(s.name, H:ColInk(), "text")
+				-- 방장은 이름 왼쪽에 왕관(이름과 함께 가운데)
+				s.crown:SetEnable(isHost)
+				if isHost then
+					local w = self:TextWidth(s.name, m.nick, 300)
+					s.name.UITransformComponent.anchoredPosition = Vector2(16, -168)
+					s.crown.UITransformComponent.anchoredPosition = Vector2(16 - w / 2 - 22, -176)
+				else
+					s.name.UITransformComponent.anchoredPosition = Vector2(0, -168)
+				end
+				s.sub:SetEnable(false)
+				s.pill.Parent:SetEnable(true)
+				local st = "준비 전"
+				local state = "idle"
+				if m.inGame then
+					st = "게임 중"
+				elseif isHost then
+					st = "방장"
+					state = "active"
+				elseif m.ready then
+					st = "준비 완료"
+					state = "on"
+				end
+				s.check:SetEnable(state == "on")
+				s.state.UITransformComponent.anchoredPosition = Vector2(state == "on" and 14 or 0, 0)
+				H:SetUiText(s.state, st)
+				H:PaintButton(s.pill, s.state, state)
+				if state == "on" then H:SetUiColor(s.state, self:ColTag(), "text") end
+				s.badge.Parent:SetEnable(me)
+				s.kick.Parent:SetEnable(amHost and not me and R.state == "wait")
+				if not isHost then
+					others = others + 1
+					if m.ready then readyCount = readyCount + 1 else waiting[#waiting + 1] = m.nick end
+				end
+				if me then myReady = m.ready end
+			end
+		end
+		if others == 0 then H:SetUiText(self.ReadyText, "혼자") else H:SetUiText(self.ReadyText, H:Int(readyCount) .. " / " .. H:Int(others)) end
+		-- 큰 버튼: 방장 = [시작](모두 준비면 금색) / 참가자 = [준비](금색) ↔ [준비 취소](연보라) / 게임 중 = 흐리게
+		local text = "준비"
+		local state = "active"
+		local hint = "준비를 누르고 방장이 시작하길 기다려요"
+		local hintCol = H:ColMuted()
+		if R.state == "play" then
+			text = "게임 중"
+			state = "idle"
+			hint = "게임이 끝나 모두 돌아오면 다시 시작할 수 있어요"
+		elseif amHost then
+			text = "시작"
+			if readyCount >= others then
+				hint = "모두 준비됐어요 · 시작을 누르세요"
+				hintCol = self:ColHintGold()
+			else
+				state = "idle"
+				if #waiting == 1 then hint = waiting[1] .. " 님 준비를 기다려요"
+				else hint = H:Int(#waiting) .. "명의 준비를 기다려요" end
+			end
+		elseif myReady then
+			text = "준비 취소"
+			state = "on"
+			hint = "방장이 시작하면 바로 넘어가요"
+			hintCol = self:ColTag()
+		end
+		H:SetUiText(self.ActionText, text)
+		H:PaintButton(self.ActionBtn, self.ActionText, state)
+		H:SetUiText(self.RoomHint, hint)
+		H:SetUiColor(self.RoomHint, hintCol, "text")
+	end
+
+	-- 자리 카드 얼굴: 프로필 아이콘(몬스터 초상) — 없으면 사람 모양, 빈 자리("")면 +. 바뀌었을 때만 다시 만든다
+	@ExecSpace("ClientOnly")
+	method void SetFace(table s, string iconId)
+		if s.faceId == iconId then return end
+		if s.face ~= nil and isvalid(s.face) then s.face:Destroy() end
+		s.face = nil
+		s.faceId = iconId
+		s.add:SetEnable(iconId == "")
+		if iconId == "" then return end
+		s.face = _RtsHudLogic:SpawnMonsterPortrait(s.disc, iconId, 104, false)
+		if s.face == nil then s.face = self:Icon(s.disc, "user", Vector2(0.5, 0.5), Vector2.zero, 56, nil, "") end
+	end
+
+	-- 글 폭(지금 글자 크기) — 못 재면 글자 수로 어림. maxW를 넘지 않는다
+	@ExecSpace("ClientOnly")
+	method number TextWidth(Entity label, string text, number maxW)
+		if label == nil or label.TextComponent == nil then return maxW end
+		local w = label.TextComponent:GetPreferredWidth(text)
+		if w == nil or w <= 0 then
+			local chars = (string.gsub(text, "[\128-\191]", ""))
+			w = #chars * label.TextComponent.FontSize
+		end
+		return math.min(maxW, w)
+	end
+
+	@ExecSpace("ClientOnly")
+	method void RenderChat()
+		if not self.Built or not isvalid(self.ChatLog) then return end
+		local from = math.max(1, #self.ChatLines - self.ChatShow + 1)
+		local out = {}
+		for i = from, #self.ChatLines do out[#out + 1] = self:ChatRich(self.ChatLines[i], self.MyNick) end
+		_RtsHudLogic:SetUiText(self.ChatLog, table.concat(out, "\n"))
+	end
+
+	-- 채팅 한 줄 → 서식: 알림("· …") = 연보라, 사람 말("닉네임 : 내용") = 굵은 이름 + 내용(내 이름은 보라).
+	--   사람이 친 '<'는 서식으로 읽히지 않게 바꾼다. 색 태그는 RtsHudLogic.UiModeRichText 짝 색(라이트 ↔ 다크 자동). 게임 채팅(RtsGameChatLogic)도 쓴다
+	method string ChatRich(string line, string myNick)
+		local safe = (string.gsub(line, "<", "‹"))
+		if (string.find(safe, "· ", 1, true)) == 1 then return "<color=#6E6B9E>" .. safe .. "</color>" end
+		local i = (string.find(safe, " : ", 1, true))
+		if i == nil then return safe end
+		local name = string.sub(safe, 1, i - 1)
+		local msg = string.sub(safe, i + 3)
+		if name == myNick then name = "<color=#784aa1>" .. name .. "</color>" end
+		return "<b>" .. name .. "</b>   " .. msg
+	end
+
+	-- ===== 누르기 =====
+
+	-- 라이트/다크: 로비에선 HUD 안내가 가려져 있으니 불러오는 중이면 알림으로 대신 알린다
+	@ExecSpace("ClientOnly")
+	method void ChooseMode(string mode)
+		local P = _RtsProfileLogic
+		if mode == P.MyUiMode or P.MyUiModeSaving then return end
+		if not P.MyUiModeReady then
+			local notice = P.MyUiModeNotice
+			if notice == "" then notice = "화면 설정을 불러오는 중이에요" end
+			self:ShowToast(notice)
+			return
+		end
+		P:ChooseUiMode(mode)
+		self:RefreshLook(false)
+	end
+
+	@ExecSpace("ClientOnly")
+	method void MoveListPage(number d)
+		self.ListPage = self.ListPage + d
+		self:RenderList()
+	end
+
+	@ExecSpace("ClientOnly")
+	method void OnRowClick(number idx)
+		local item = self.List[(self.ListPage - 1) * self.ListPerPage + idx]
+		if item == nil then return end
+		if item.state ~= "wait" then
+			self:ShowToast("게임 중인 방이에요 — 게임이 끝나면 들어갈 수 있어요")
+			return
+		end
+		if item.count >= 4 then
+			self:ShowToast("방이 가득 찼어요")
+			return
+		end
+		if item.pw then
+			self:OpenJoinPw(item.no)
+			return
+		end
+		_RtsLobbyLogic:RequestJoinRoom(item.no, "")
+	end
+
+	@ExecSpace("ClientOnly")
+	method void OnAction()
+		local R = self.Room
+		if R == nil or R.state ~= "wait" then return end
+		if R.host == self.MyUserId then
+			_RtsLobbyLogic:RequestStart()
+			return
+		end
+		local ready = false
+		for i = 1, #R.members do
+			if R.members[i].uid == self.MyUserId then ready = R.members[i].ready end
+		end
+		_RtsLobbyLogic:RequestReady(not ready)
+	end
+
+	@ExecSpace("ClientOnly")
+	method void OnKick(number idx)
+		local R = self.Room
+		if R == nil or R.host ~= self.MyUserId then return end
+		local m = R.members[idx]
+		if m == nil or m.uid == self.MyUserId then return end
+		_RtsLobbyLogic:RequestKick(m.uid)
+	end
+
+	@ExecSpace("ClientOnly")
+	method void SendChat()
+		local text = self:InputText(self.ChatInput)
+		if text == "" then return end
+		_RtsLobbyLogic:RequestChat(text)
+		self:AddHistory(text)
+		self:ClearAfterSend(self.ChatInput, text)
+	end
+
+	-- ===== 대화 창 =====
+
+	-- 가운데 창: 제목 32 + 오른쪽 위 [×]. 창 테두리는 기본 테두리(시안 — 강조색은 버튼에만)
+	@ExecSpace("ClientOnly")
+	method Entity OpenDialog(string title, number w, number h)
+		local H = _RtsHudLogic
+		self:CloseDialog()
+		self.DialogLayer:SetEnable(true)
+		local panel = H:SpawnRoundedPanel("RtsLobbyDialogPanel", self.DialogLayer, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2(0, 0), Vector2(w, h), H:ColPanel(), H:ColBorder(), 1.5)
+		H:SpawnLabel("RtsLobbyDialogTitle", panel, Vector2(0, 1), Vector2(0, 1), Vector2(40, -36), Vector2(w - 160, 56), title, H:ColInk(), 32, TextAlignmentType.MiddleLeft, true)
+		local close = H:SpawnRoundedPanel("RtsLobbyDialogClose", panel, Vector2(1, 1), Vector2(1, 1), Vector2(-36, -36), Vector2(56, 56), self:ColSurface2(), H:ColBorder(), 1.5)
+		self:Icon(close, "close", Vector2(0.5, 0.5), Vector2.zero, 26, H:ColMuted(), "icon")
+		H:SpawnClick("RtsLobbyDialogCloseClick", close):ConnectEvent(ButtonClickEvent, function(event)
+			self:CloseDialog()
+		end)
+		self.DialogPanel = panel
+		return panel
+	end
+
+	@ExecSpace("ClientOnly")
+	method void CloseDialog()
+		if self.DialogPanel ~= nil and isvalid(self.DialogPanel) and isvalid(self.DialogPanel.Parent) then self.DialogPanel.Parent:Destroy() end
+		self.DialogPanel = nil
+		self.CreateTitle = nil
+		self.CreatePw = nil
+		self.JoinPw = nil
+		self.CreateModeBtns = {}
+		self.ChannelBody = nil
+		if isvalid(self.DialogLayer) then self.DialogLayer:SetEnable(false) end
+	end
+
+	-- ===== 채널 이동 창(2026-09-29 사용자 "인스턴스 목록이 팝업으로 나오고 이동하기"): 760×640 — 줄마다 채널 코드 · 인원 n / 최대 · [이동] 또는 '현재' =====
+	property Entity ChannelBody = nil
+
+	property number ChannelRowH = 64
+
+	@ExecSpace("ClientOnly")
+	method void OpenChannels()
+		local H = _RtsHudLogic
+		local panel = self:OpenDialog("채널 이동", 760, 640)
+		H:SpawnLabel("RtsLobbyChannelHint", panel, Vector2(0, 1), Vector2(0, 1), Vector2(40, -104), Vector2(680, 28), "채널마다 방 목록이 따로예요 · 방에서 나온 뒤 옮길 수 있어요", H:ColMuted(), 16, TextAlignmentType.MiddleLeft, false)
+		local body = H:SpawnUI("model://uisprite", "RtsLobbyChannelBody", panel, Vector2(0, 1), Vector2(0, 1), Vector2(40, -140), Vector2(680, 460))
+		H:Tint(body, 1, 1, 1, 0)
+		body.SpriteGUIRendererComponent.RaycastTarget = false
+		self.ChannelBody = body
+		H:SpawnLabel("RtsLobbyChannelLoading", body, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2.zero, Vector2(600, 40), "채널 목록을 불러오는 중…", H:ColMuted(), 20, TextAlignmentType.MiddleCenter, false)
+		self:SmallButton("RtsLobbyChannelRefresh", panel, Vector2(1, 1), Vector2(-110, -100), Vector2(150, 44), "refresh", "새로고침", "plain", 17, function()
+			_RtsLobbyLogic:RequestChannels()
+		end)
+		_RtsLobbyLogic:RequestChannels()
+	end
+
+	-- 서버 → 채널 목록("id\t코드\t인원\t최대\t현재(1/0)" 줄들, "!maker" = 출시 전이라 못 봄). 창이 열려 있을 때만 그린다
+	@ExecSpace("Client")
+	method void ReceiveChannels(string packed, string userId)
+		local H = _RtsHudLogic
+		local body = self.ChannelBody
+		if body == nil or not isvalid(body) then return end
+		for _, c in ipairs(body.Children:ToTable()) do c:Destroy() end
+		if packed == "!maker" then
+			H:SpawnLabel("RtsLobbyChannelNone", body, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2.zero, Vector2(640, 60), "채널 목록은 출시된 월드에서만 볼 수 있어요", H:ColMuted(), 20, TextAlignmentType.MiddleCenter, false)
+			return
+		end
+		local rows = {}
+		for _, line in ipairs(self:Split(packed, "\n")) do
+			local f = self:Split(line, "\t")
+			if #f >= 5 then rows[#rows + 1] = { id = f[1], code = f[2], cur = tonumber(f[3]) or 0, max = tonumber(f[4]) or 0, mine = f[5] == "1" } end
+		end
+		if #rows == 0 then
+			H:SpawnLabel("RtsLobbyChannelNone", body, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2.zero, Vector2(640, 60), "다른 채널이 없어요", H:ColMuted(), 20, TextAlignmentType.MiddleCenter, false)
+			return
+		end
+		-- 최대 7줄(460 ÷ 64). 현재 채널을 맨 위로
+		table.sort(rows, function(a, b)
+			if a.mine ~= b.mine then return a.mine end
+			return a.code < b.code
+		end)
+		for i, r in ipairs(rows) do
+			if i > 7 then break end
+			local row = H:SpawnRoundedPanel("RtsLobbyChannelRow" .. H:Int(i), body, Vector2(0, 1), Vector2(0, 1), Vector2(0, -(i - 1) * (self.ChannelRowH + 2)), Vector2(680, self.ChannelRowH - 2), r.mine and _RtsPopupLogic:Mix(H:ColGold(), 0.18) or self:ColSurface2(), r.mine and H:ColGold() or H:ColBorderSoft(), 1.5)
+			H:SpawnLabel("RtsLobbyChannelCode", row, Vector2(0, 0.5), Vector2(0, 0.5), Vector2(24, 0), Vector2(260, 36), "채널 " .. r.code, H:ColInk(), 22, TextAlignmentType.MiddleLeft, true)
+			local full = r.max > 0 and r.cur >= r.max
+			H:SpawnLabel("RtsLobbyChannelCount", row, Vector2(0, 0.5), Vector2(0, 0.5), Vector2(300, 0), Vector2(200, 36), H:Int(r.cur) .. " / " .. H:Int(r.max) .. "명", full and self:ColFaint() or H:ColMuted(), 18, TextAlignmentType.MiddleLeft, false)
+			if r.mine then
+				H:SpawnLabel("RtsLobbyChannelMine", row, Vector2(1, 0.5), Vector2(1, 0.5), Vector2(-24, 0), Vector2(120, 36), "현재 채널", self:ColTag(), 17, TextAlignmentType.MiddleRight, true)
+			elseif full then
+				H:SpawnLabel("RtsLobbyChannelFull", row, Vector2(1, 0.5), Vector2(1, 0.5), Vector2(-24, 0), Vector2(120, 36), "가득 참", self:ColFaint(), 17, TextAlignmentType.MiddleRight, false)
+			else
+				local id = r.id
+				self:SmallButton("RtsLobbyChannelGo", row, Vector2(1, 0.5), Vector2(-14, 0), Vector2(120, 46), "", "이동", "gold", 18, function()
+					self:CloseDialog()
+					_RtsLobbyLogic:RequestChannelMove(id)
+				end)
+			end
+		end
+	end
+
+	-- 방 만들기(760×700): 방 제목 · 비밀번호(선택) · 모드 카드 둘 · 인원 안내 · [취소] [만들기]
+	@ExecSpace("ClientOnly")
+	method void OpenCreate()
+		local H = _RtsHudLogic
+		local L = _RtsLobbyLogic
+		local panel = self:OpenDialog("방 만들기", 760, 700)
+		H:SpawnLabel("RtsLobbyCreateTitleKey", panel, Vector2(0, 1), Vector2(0, 1), Vector2(40, -114), Vector2(300, 30), "방 제목", H:ColInk(), 20, TextAlignmentType.MiddleLeft, true)
+		H:SpawnLabel("RtsLobbyCreateTitleMax", panel, Vector2(1, 1), Vector2(1, 1), Vector2(-40, -114), Vector2(200, 30), "최대 " .. H:Int(L.TitleMax) .. "자", H:ColMuted(), 16, TextAlignmentType.MiddleRight, false)
+		self.CreateTitle = self:SpawnInput("RtsLobbyCreateTitle", panel, Vector2(0, 1), Vector2(0, 1), Vector2(40, -150), Vector2(680, 64), "비우면 '닉네임님의 방'", L.TitleMax)
+		H:SpawnLabel("RtsLobbyCreatePwKey", panel, Vector2(0, 1), Vector2(0, 1), Vector2(40, -236), Vector2(90, 30), "비밀번호", H:ColInk(), 20, TextAlignmentType.MiddleLeft, true)
+		H:SpawnLabel("RtsLobbyCreatePwOpt", panel, Vector2(0, 1), Vector2(0, 1), Vector2(136, -238), Vector2(200, 28), "선택", H:ColMuted(), 16, TextAlignmentType.MiddleLeft, false)
+		self.CreatePw = self:SpawnInput("RtsLobbyCreatePw", panel, Vector2(0, 1), Vector2(0, 1), Vector2(40, -272), Vector2(680, 64), "비워 두면 누구나 들어와요 · 최대 " .. H:Int(L.PwMax) .. "자", L.PwMax)
+		H:SpawnLabel("RtsLobbyCreateModeKey", panel, Vector2(0, 1), Vector2(0, 1), Vector2(40, -358), Vector2(300, 30), "모드", H:ColInk(), 20, TextAlignmentType.MiddleLeft, true)
+		self.CreateModeBtns = {}
+		local keys = { "challenge", "race" }
+		local descs = { "난이도 골라 최고 라운드 기록", "어려움 고정 · 최단 시간 경쟁" }
+		for i = 1, 2 do
+			local key = keys[i]
+			local b = H:SpawnRoundedPanel("RtsLobbyCreateMode" .. tostring(i), panel, Vector2(0, 1), Vector2(0, 1), Vector2(40 + (i - 1) * 348, -394), Vector2(332, 116), H:ColPanel(), H:ColBorder(), 2)
+			local label = H:SpawnLabel("RtsLobbyCreateModeText", b, Vector2(0, 0.5), Vector2(0, 0.5), Vector2(22, 18), Vector2(240, 38), self:ModeName(key), H:ColInk(), 26, TextAlignmentType.MiddleLeft, true)
+			local desc = H:SpawnLabel("RtsLobbyCreateModeDesc", b, Vector2(0, 0.5), Vector2(0, 0.5), Vector2(22, -20), Vector2(292, 28), descs[i], H:ColMuted(), 16, TextAlignmentType.MiddleLeft, false)
+			-- 고른 쪽 오른쪽 위 보라 동그라미 + 흰 체크
+			local mark = H:SpawnUI("model://uisprite", "RtsLobbyCreateModeMark", b, Vector2(1, 1), Vector2(1, 1), Vector2(-14, -14), Vector2(30, 30))
+			mark.SpriteGUIRendererComponent.ImageRUID = DataRef(H.CircleMaskRUID)
+			H:Tint(mark, 0.533, 0.4, 0.863, 1)
+			mark.SpriteGUIRendererComponent.RaycastTarget = false
+			self:Icon(mark, "check", Vector2(0.5, 0.5), Vector2.zero, 18, Color(1, 1, 1, 1), "fixed")
+			H:SpawnClick("RtsLobbyCreateModeClick", b):ConnectEvent(ButtonClickEvent, function(event)
+				self.CreateMode = key
+				self:PaintCreateMode()
+			end)
+			self.CreateModeBtns[#self.CreateModeBtns + 1] = { key = key, box = b, label = label, desc = desc, mark = mark }
+		end
+		self:PaintCreateMode()
+		self:Icon(panel, "users", Vector2(0, 1), Vector2(40, -532), 24, nil, "")
+		H:SpawnLabel("RtsLobbyCreateInfo", panel, Vector2(0, 1), Vector2(0, 1), Vector2(74, -530), Vector2(600, 28), "최대 4명 · 만든 사람이 방장이 돼요", H:ColMuted(), 17, TextAlignmentType.MiddleLeft, false)
+		self:SmallButton("RtsLobbyCreateOk", panel, Vector2(1, 0), Vector2(-40, 36), Vector2(260, 72), "", "만들기", "gold", 24, function()
+			local title = self:InputText(self.CreateTitle)
+			local pw = self:InputText(self.CreatePw)
+			self:CloseDialog()
+			_RtsLobbyLogic:RequestCreateRoom(title, pw, self.CreateMode)
+		end)
+		self:SmallButton("RtsLobbyCreateNo", panel, Vector2(1, 0), Vector2(-316, 36), Vector2(200, 72), "", "취소", "plain", 24, function()
+			self:CloseDialog()
+		end)
+	end
+
+	@ExecSpace("ClientOnly")
+	method void PaintCreateMode()
+		local H = _RtsHudLogic
+		for i = 1, #self.CreateModeBtns do
+			local b = self.CreateModeBtns[i]
+			local on = b.key == self.CreateMode
+			H:PaintButton(b.box, b.label, on and "on" or "off")
+			H:SetUiColor(b.desc, on and self:ColTag() or H:ColMuted(), "text")
+			if isvalid(b.mark) then b.mark:SetEnable(on) end
+		end
+	end
+
+	-- 비공개 방 입장(700×380): 비밀번호 칸 · [취소] [입장]
+	@ExecSpace("ClientOnly")
+	method void OpenJoinPw(number no)
+		local H = _RtsHudLogic
+		self.JoinNo = no
+		local panel = self:OpenDialog(string.format("%03d", math.floor(no + 0.5)) .. "번 방 · 비밀번호", 700, 380)
+		self.JoinPw = self:SpawnInput("RtsLobbyJoinPw", panel, Vector2(0, 1), Vector2(0, 1), Vector2(40, -130), Vector2(620, 64), "비밀번호를 입력하세요", _RtsLobbyLogic.PwMax)
+		self:SmallButton("RtsLobbyJoinOk", panel, Vector2(1, 0), Vector2(-40, 36), Vector2(220, 72), "", "입장", "gold", 24, function()
+			local pw = self:InputText(self.JoinPw)
+			local target = self.JoinNo
+			self:CloseDialog()
+			_RtsLobbyLogic:RequestJoinRoom(target, pw)
+		end)
+		self:SmallButton("RtsLobbyJoinNo", panel, Vector2(1, 0), Vector2(-276, 36), Vector2(180, 72), "", "취소", "plain", 24, function()
+			self:CloseDialog()
+		end)
+	end
+
+	-- ===== 공용 =====
+
+	-- 로비 전용 색(라이트 값 — 다크는 RtsHudLogic.UiModeColor가 변환): 옅은 면 = 다크 #242E44 · 연보라 글 = 다크 #C9C7FF · 흐린 글
+	method Color ColSurface2()
+		return Color(0.95, 0.955, 0.98, 1)
+	end
+
+	method Color ColTag()
+		return Color(0.43, 0.42, 0.66, 1)
+	end
+
+	method Color ColFaint()
+		return Color(0.42, 0.44, 0.52, 0.6)
+	end
+
+	-- 자물쇠·왕관(금색) · 대기 중(초록) · 게임 중(주황) · 시작 가능 안내(금색 글)
+	method Color ColLockGold()
+		return Color(0.93, 0.75, 0.3, 1)
+	end
+
+	method Color ColOpen()
+		return Color(0.30, 0.62, 0.36, 1)
+	end
+
+	method Color ColBusy()
+		return Color(0.75, 0.40, 0.28, 1)
+	end
+
+	method Color ColHintGold()
+		return Color(0.7, 0.52, 0.12, 1)
+	end
+
+	method string ModeName(string mode)
+		if mode == "race" then return "경주" end
+		return "도전"
+	end
+
+	method table Split(string s, string sep)
+		local out = {}
+		if s == nil or s == "" then return out end
+		local from = 1
+		while true do
+			local i = (string.find(s, sep, from, true))
+			if i == nil then
+				out[#out + 1] = string.sub(s, from)
+				break
+			end
+			out[#out + 1] = string.sub(s, from, i - 1)
+			from = i + #sep
+		end
+		return out
+	end
+
+end

@@ -19,7 +19,7 @@ script RtsJobTableLogic extends Logic
 		if self.JobDefs.hero ~= nil then return end
 		self.JobDefs = {
 			hero = {
-				name = "히어로", series = "war", faction = "adv", atk = 40, atkLv = 12, speed = "보통", weapon = "두손검", tier = 1,
+				name = "히어로", series = "war", faction = "adv", atk = 120, atkLv = 12, speed = "보통", weapon = "두손검", tier = 1,
 				radar = { boss = 4, hunt = 5 }, portrait = "01d1da2e721b4dd893e314ef3d64e2e1",
 				frames = {
 					stand1 = { "6142e6907e054a4c86bda1719698af21", "66beab16ed794e27b49a33ee52a82b18", "6142e6907e054a4c86bda1719698af21", "f5ce5824f3a24e069ec0a523028c7f79" },
@@ -29,7 +29,7 @@ script RtsJobTableLogic extends Logic
 				frameSec = { stand1 = { 0.65, 0.45, 0.65, 0.45 }, swingO3 = { 0.06, 0.18, 0.06, 0.12, 0.06, 0.12, 0.18, 0.12 }, enragedRagingBlow = { 0.18, 0.12, 0.12, 0.08, 0.12, 0.08, 0.20 } },
 			},
 			paladin = {
-				name = "팔라딘", series = "war", faction = "adv", atk = 80, atkLv = 10, speed = "느림", weapon = "양손둔기", tier = 4,
+				name = "팔라딘", series = "war", faction = "adv", atk = 160, atkLv = 15, speed = "느림", weapon = "양손둔기", tier = 4,
 				radar = { boss = 1, hunt = 2 }, portrait = "0e14a7ba1554474fb46cb13ab22bdbfb",
 				frames = {
 					stand1 = { "17e0e0811cd742bea27591ffbc9b723b", "019b667361c1459c819353dcc5a0ed8b", "17e0e0811cd742bea27591ffbc9b723b", "2838ebd8b5d044a693a4c43b0bf77879" },
@@ -43,7 +43,7 @@ script RtsJobTableLogic extends Logic
 				},
 			},
 			dk = {
-				name = "다크나이트", series = "war", faction = "adv", atk = 50, atkLv = 10, speed = "느림", weapon = "창", tier = 2,
+				name = "다크나이트", series = "war", faction = "adv", atk = 130, atkLv = 13, speed = "느림", weapon = "창", tier = 2,
 				radar = { boss = 1, hunt = 3 }, portrait = "bc09a2f673ba42b6b5989e4ac39a0fc5",
 				frames = {
 					stand1 = { "8e918f5a58d84f0880f30802e53ec1cb", "a97d69b1da2244c3bbe72930a3215557", "8e918f5a58d84f0880f30802e53ec1cb", "469c0c8e7bab4319a830615eb520aa25" },
@@ -60,7 +60,7 @@ script RtsJobTableLogic extends Logic
 			},
 			-- 비숍 기준 비율, 수평 연사 / 한쪽 무릎 수직 발사
 			bow = {
-				name = "보우마스터", series = "arc", faction = "adv", atk = 30, atkLv = 10, speed = "매우빠름", weapon = "활", tier = 1,
+				name = "보우마스터", series = "arc", faction = "adv", atk = 80, atkLv = 9, speed = "매우빠름", weapon = "활", tier = 1,
 				radar = { boss = 5, hunt = 1 }, portrait = "0d124c8828044ba4b8d71180f2e2fca6",
 				frames = {
 					stand1 = { "20a3afc8702c4b478b70a5eb76bcd3a7", "013e5b1037874974935618356a372dee", "20a3afc8702c4b478b70a5eb76bcd3a7", "81223efd1c2847b19a2e8c92bcc93fce" },
@@ -71,7 +71,7 @@ script RtsJobTableLogic extends Logic
 			},
 			-- 비숍 엔젤레이 기준으로 승인된 짧은 비율. 대기·피어싱·저격을 같은 발 원점으로 재생 — 저격은 첫 타격까지 조준하고 타격 간격에 맞춰 반동·조준을 반복
 			marks = {
-				name = "신궁", series = "arc", faction = "adv", atk = 30, atkLv = 9, speed = "느림", weapon = "석궁", tier = 2, -- 약점 = 공격력(2026-09-24 사용자 "신궁은 기본 공격력과 크뎀을 줘야") — 50 → 30, 레벨업 15 → 9(×0.6), 스킬 비율 ×5/3
+				name = "신궁", series = "arc", faction = "adv", atk = 100, atkLv = 11, speed = "느림", weapon = "석궁", tier = 2, -- 약점 = 공격력(2026-09-24 사용자 "신궁은 기본 공격력과 크뎀을 줘야") — 50 → 30, 레벨업 15 → 9(×0.6), 스킬 비율 ×5/3
 				radar = { boss = 1, hunt = 4 }, portrait = "bb8c6be33ae64a9f96d8a3f74ea7f459",
 				frames = {
 					stand1 = { "f3d13c1096a4466fa0154d8c0a032ca5", "73152d7bbf474ed08b8441ddf46d92e4", "f3d13c1096a4466fa0154d8c0a032ca5", "c25f3c31ebe04277bbad8010778e38b2" },
@@ -87,7 +87,7 @@ script RtsJobTableLogic extends Logic
 				},
 			},
 			il = {
-				name = "아크메이지(썬·콜)", series = "mag", faction = "adv", atk = 50, atkLv = 3, speed = "보통", weapon = "스태프", tier = 1,
+				name = "아크메이지(썬·콜)", series = "mag", faction = "adv", atk = 90, atkLv = 8, speed = "보통", weapon = "스태프", tier = 1,
 				radar = { boss = 3, hunt = 3 }, portrait = "f93cfcc7a46d428cb6ed2bb3d71fc986",
 				frames = {
 					stand1 = { "31f7d3dc8bde42d6905eca8ca3d3d3aa", "7480c71e7fc7406a89e74930c407ad87", "31f7d3dc8bde42d6905eca8ca3d3d3aa", "440ab4519beb44f39a820aab4d2ef864" },
@@ -97,7 +97,7 @@ script RtsJobTableLogic extends Logic
 				frameSec = { stand1 = { 0.65, 0.45, 0.65, 0.45 }, swingO1 = { 0.18, 0.12, 0.08, 0.07, 0.35 }, swingO3 = { 0.21, 0.09, 0.93, 0.09, 0.48 } },
 			},
 			fp = {
-				name = "아크메이지(불·독)", series = "mag", faction = "adv", atk = 20, atkLv = 5, speed = "보통", weapon = "스태프", tier = 2,
+				name = "아크메이지(불·독)", series = "mag", faction = "adv", atk = 90, atkLv = 8, speed = "보통", weapon = "스태프", tier = 2,
 				radar = { boss = 1, hunt = 2 }, portrait = "81c1c00cd1aa4ff3b08f9894b42c819b",
 				frames = {
 					stand1 = { "762ba8485e584f60a94bc71631ee7881", "43f43917582b4fe6848b525f32d69652", "762ba8485e584f60a94bc71631ee7881", "49312816d1bb4c2d87f0452e8af0f89b" },
@@ -107,7 +107,7 @@ script RtsJobTableLogic extends Logic
 				frameSec = { stand1 = { 0.65, 0.45, 0.65, 0.45 }, poisonRegion = { 0.25, 0.15, 0.30, 0.15, 0.35 }, dotPunisher = { 0.20, 0.15, 0.25, 0.15, 0.45 } },
 			},
 			bishop = {
-				name = "비숍", series = "mag", faction = "adv", atk = 20, atkLv = 5, speed = "보통", weapon = "완드", tier = 4,
+				name = "비숍", series = "mag", faction = "adv", atk = 90, atkLv = 8, speed = "보통", weapon = "완드", tier = 4,
 				radar = { boss = 1, hunt = 1 }, portrait = "778abb348ac2432eb2ca8916a0ce24b9",
 				frames = {
 					stand1 = { "99dcc70fd0c04167aa3c7bebdd72bb5b", "049e7e1c48364faca8efbed9ddca1afc", "99dcc70fd0c04167aa3c7bebdd72bb5b", "7b64b5c05ae444f8baab5737fdcff112" },
@@ -118,7 +118,7 @@ script RtsJobTableLogic extends Logic
 				frameSec = { stand1 = { 0.65, 0.45, 0.65, 0.45 }, swingO1 = { 0.09, 0.06, 0.18, 0.12, 0.35 }, swingO3 = { 0.35, 0.15, 0.30, 0.15, 0.55 }, divinePunishment = { 0.15, 0.10, 0.15, 0.10, 0.30 } },
 			},
 			nl = {
-				name = "나이트로드", series = "thf", faction = "adv", atk = 20, atkLv = 5, speed = "빠름", weapon = "아대", tier = 1,
+				name = "나이트로드", series = "thf", faction = "adv", atk = 75, atkLv = 10, speed = "빠름", weapon = "아대", tier = 1,
 				radar = { boss = 5, hunt = 1 }, portrait = "ccb44d85f142402da6de7b5c7ed67d94",
 				frames = {
 					stand1 = { "0eb5a0560215452fba5d11fa5b0dbd16", "53e0a2cf0bb940bbb7ed86cd65562037", "0eb5a0560215452fba5d11fa5b0dbd16", "e7f8edd9c9ee4898baaacc1f38ff33db" },
@@ -130,7 +130,7 @@ script RtsJobTableLogic extends Logic
 				},
 			},
 			shad = {
-				name = "섀도어", series = "thf", faction = "adv", atk = 30, atkLv = 6, speed = "매우빠름", weapon = "단검", tier = 2, -- 약점 = 공격력(2026-09-24 사용자 "섀도어 기본 공격력 낮게") — 50 → 30, 레벨업 10 → 6(×0.6), 스킬 비율 ×5/3
+				name = "섀도어", series = "thf", faction = "adv", atk = 85, atkLv = 12, speed = "매우빠름", weapon = "단검", tier = 2, -- 약점 = 공격력(2026-09-24 사용자 "섀도어 기본 공격력 낮게") — 50 → 30, 레벨업 10 → 6(×0.6), 스킬 비율 ×5/3
 				radar = { boss = 1, hunt = 1 }, portrait = "69652c3bf48b457d86e649a540eefc1e",
 				frames = {
 					stand1 = { "2753c58c1aaf413681834dc5d70ecac2", "96ed758328834446b5d9f9e7adebf101", "2753c58c1aaf413681834dc5d70ecac2", "fb4ae0f6c16e49459d28f99139523bf7" },
@@ -435,7 +435,7 @@ script RtsJobTableLogic extends Logic
 			return {
 				-- 디바인 차지 연출(2026-09-18 사용자 "지금 것 그대로, 원작 재탐색 ㄴㄴ" = character.md 값): paladinCharge PNG + 시전 클립 1221004/effect/1(cb9cff6c…, 0.65초) + 시전음 1221004/use(e2989dca…)
 				--   타격 0.3초 뒤 1회(200%). 타격 클립·타격음 미지정 → 몬스터 번쩍임만. 클립은 왼쪽 보기 자산(무기 빛 → 앞쪽에 문양 폭발)이라 assetFacesLeft, 스케일 1.4(2.0은 문양이 두 칸 크기)
-				{ lv = 1, kind = "액티브", name = "디바인 차지", desc = "사거리 1 안의 적을 최대 4마리까지 120%의 데미지로 공격한다.", target = false, range = 1,
+				{ lv = 1, kind = "액티브", name = "디바인 차지", desc = "사거리 1 안의 적을 최대 4마리까지 500%의 데미지로 공격한다.", target = false, range = 1,
 					fx = { motion = "paladinCharge", clip = "cb9cff6c57fd4cb18a05db3d47277031", scale = 1.4, feetDx = 0, feetDy = 0, assetFacesLeft = true, sound = "e2989dcac9054d689e379b9feff55f54",
 						hitDelay = 0.3 } },
 				{ lv = 10, kind = "패시브", name = "가드 크러쉬", desc = "같은 구역의 모든 적의 방어율을 10% 감소시킨다.", target = false },
@@ -446,7 +446,7 @@ script RtsJobTableLogic extends Logic
 				{ lv = 30, kind = "패시브", name = "디바인 블레싱", desc = "최종 데미지가 50% 증가한다.", target = false },
 				{ lv = 40, kind = "패시브", name = "가드 크러쉬 강화", desc = "가드 크러쉬의 방어율 감소가 20%로 증가한다.", target = false },
 				-- 홀리 유니티(40 패시브 +20%)는 2026-09-20 삭제 → 프리즘 스킬 "홀리 유니티"(지정 유닛 최종 +40% — 2026-09-22, 처음 +100%)로 이동. 프리즘 스킬 표(ApplyPrismSkills)가 대상 지정(target = true) 항목을 얹는다
-				{ lv = 50, kind = "패시브", name = "디바인 차지 강화", desc = "디바인 차지의 데미지가 70% 증가하고, 공격 대상이 최대 6마리, 공격 횟수가 2회로 늘어난다. 보스 공격 시 데미지가 40% 증가한다.", target = false },
+				{ lv = 50, kind = "패시브", name = "디바인 차지 강화", desc = "디바인 차지의 데미지가 800%가 되고, 공격 대상이 최대 6마리, 공격 횟수가 2회로 늘어난다. 보스 공격 시 데미지가 40% 증가한다.", target = false },
 			}
 		end
 		if jobId == "dk" then
@@ -533,7 +533,7 @@ script RtsJobTableLogic extends Logic
 			return {
 				-- 포이즌 리전 연출(2026-09-18): 원작 포이즌 리전(2121055) 클립은 라이브러리에 사운드만 있어 3차 포이즌 미스트(2111003)로 — 시전 클립 effect(독 폭발, 1.62초, 대칭) + 트랙 모든 칸에 독안개 tile/0~8(zoneClips, 12초 루프, 반투명 — 2026-09-26 10 → 12초) + 틱마다 몬스터 위 mob(초록 고리), 사운드 use/hit.
 				--   피해 = dot(2초마다 × 12초 = 6틱 — 2026-09-26 사용자 "지속시간 12초로"(전 10초 5틱), 직접 타격 없음 hits 0). 비율(기본 50% · 강화(L20) 80%)·방무 100%는 GetStatRaw dotPct·dotIgn이 우선(dot.pct는 예비값)
-				{ lv = 1, kind = "액티브", name = "포이즌 리전", desc = "모든 타일에 12초 동안 맹독지대를 설치한다. 맹독지대 위의 적은 2초마다 50%의 데미지를 입으며 방어율을 무시한다. 일반 몬스터는 추가로 20 + 레벨×3의 고정 데미지를 입는다. 중첩되지 않는다. 재사용 대기시간 15초", target = false, cd = 15, ratio = 0, hits = 0, dot = { pct = 50, period = 2, dur = 12 },
+				{ lv = 1, kind = "액티브", name = "포이즌 리전", desc = "모든 타일에 12초 동안 맹독지대를 설치한다. 맹독지대 위의 적은 2초마다 50%의 데미지를 입는다. 일반 몬스터는 추가로 20 + 레벨×1의 고정 데미지를 입는다. 중첩되지 않는다. 재사용 대기시간 15초", target = false, cd = 15, ratio = 0, hits = 0, dot = { pct = 50, period = 2, dur = 12 },
 					fx = { motion = "poisonRegion", zoneDelay = 0.40, clipDelay = 0.40, soundDelay = 0.40, clip = "b0d47a8948314a5ea04a00690d921fc3", scale = 1.2, feetDx = 0, feetDy = 0.6, noFlip = true, clipLife = 1.7, sound = "eb7f504670a14802a48cc94f4eb66848",
 						zoneClips = { "eaed7d6a19f0483aa51dc5ff151f7acf", "7f743e56d7cd43c7a3baf9f7061abd3d", "302b1c7f241b400b8544f3b7378eacce", "550d34dd449242c9b3df7daebac8f259", "8bfddf0644494979ba02ef5a59b5a336", "53f3500a48814dd0b97b2825d781583c", "ce9db043ed324af5865e8fa21ce41dc1", "92f82ee141f24246b462856f3ecd1493", "3a6509634ee24b789f5446afb10fe357" },
 						zoneScale = 1.6, zoneAlpha = 0.7, zoneLife = 12,
@@ -555,7 +555,7 @@ script RtsJobTableLogic extends Logic
 		if jobId == "bishop" then
 			return {
 				-- 엔젤레이 연출(2026-09-18): 원작 2321007 — 시전 클립 effect(금빛 날개, 0.9초, 왼쪽 보기 그림) + 빛살 투사체 ball(281px, 왼쪽 촉) 0.2초 + 타격 hit/0, 타격음 hit(use 사운드는 라이브러리에 없음). 한손 완드 swingO1
-				{ lv = 1, kind = "액티브", name = "엔젤레이", desc = "사거리 3 안의 적 1마리를 38%의 데미지로 3회 공격한다.", target = false, range = 3,
+				{ lv = 1, kind = "액티브", name = "엔젤레이", desc = "사거리 3 안의 적 1마리를 180%의 데미지로 3회 공격한다.", target = false, range = 3,
 					fx = { motion = "swingO1", clip = "e86eef7f960146fea646300653347c2e", scale = 1.2, feetDx = 0.2, feetDy = 0.9, assetFacesLeft = true,
 						proj = "77bc39d2bd9e455b8b2ce07555a90455", projSec = 0.2, projDy = 0.9, projScale = 0.8,
 						hitDelay = 0.3, hitClip = "341a2fd02d0343cfa64da45970aa7cf2", hitScale = 1.4, hitDy = 0.6, hitSound = "c2ca06323f67485e9355ff4d097ae77b" } },
@@ -592,7 +592,7 @@ script RtsJobTableLogic extends Logic
 		if jobId == "shad" then
 			return {
 				-- 새비지 블로우 연출(2026-09-20): 시전 클립 = 신형 4201012/effect(사용자 지정 — 붉은 참격 선, 4201005 폴더엔 타격음뿐) + 빠른 단검 베기 PNG(shadSavage) + 타격마다 4221007(부메랑 스텝)/hit/0 분홍 참격 폭발 ×8(0.05초 간격) + 타격마다 새비지 타격음(사용자 2026-09-20 "8번 파파박")
-				{ lv = 1, kind = "액티브", name = "새비지 블로우", desc = "사거리 1 안의 적 1마리를 29.2%의 데미지로 8회 공격한다.", target = false, range = 1,
+				{ lv = 1, kind = "액티브", name = "새비지 블로우", desc = "사거리 1 안의 적 1마리를 70%의 데미지로 8회 공격한다.", target = false, range = 1,
 					fx = { motion = "shadSavage", clip = "895ac1e384ea42ca8dd084f54ff3346b", scale = 1.6, feetDx = 0, feetDy = 0, assetFacesLeft = true,
 						hitDelay = 0.1, hitGap = 0.05, hitClip = "6614245a414645089d41ec1f60df1fab", hitScale = 1.3, hitDy = 0.6, hitSound = "23250468023a4767b32611f2fd8ec49b" } },
 				{ lv = 10, kind = "패시브", name = "대거 마스터리", desc = "공격력이 30% 증가한다.", target = false },
@@ -706,12 +706,12 @@ script RtsJobTableLogic extends Logic
 		end
 		if jobId == "paladin" then
 			-- 2026-09-19 밸런스 패치(목표 DPS 조정): 디바인 차지 200%, 디바인 블레싱(30) 최종 +50%, 디바인 차지 강화(50) 데미지 +140%(→ 340%)·사거리 2·6마리·2회, 생츄어리 200%(스킬 표)
-			local s = { pct = 100, flat = 0, ratio = 120, hits = 1, targets = 4, ign = 0, fin = 100, ignBoss = -1, speed = "느림" }
+			local s = { pct = 100, flat = 0, ratio = 500, hits = 1, targets = 4, ign = 0, fin = 100, ignBoss = -1, speed = "느림" } -- 2026-09-29 사용자 120 → 500
 			if L >= 30 then
 				s.fin = 150
 			end
 			if L >= 50 then
-				s.ratio = 190
+				s.ratio = 800 -- 2026-09-29 사용자 강화 500 → 800(전 190)
 				s.hits = 2
 				s.bossAdd = 40 -- 킷 보스 티어(2026-09-19): 팔라딘 40%
 				s.targets = 6
@@ -793,9 +793,9 @@ script RtsJobTableLogic extends Logic
 			--   2026-09-19 밸런스 패치: 포이즌 리전 기본 15%·방무 100%, 메디테이션 +100, 강화(20) +15%(→ 30%), 아케인 에임 +50%, 인피니티 최종 +30%(3차)
 			--   2026-09-23 사용자 "포이즌 리전 데미지 2배, 너무 약하네": 기본 15 → 30%, 강화(20) 30 → 60%
 			s.dotPct = 50 -- 2026-09-26 사용자 "포이즌 리전 좀 많이 세게 — 50%, 강화 80%"(전 30 · 60)
-			s.dotIgn = 100
+			s.dotIgn = 0 -- 2026-09-29 사용자 "포이즌 리전 방어율 무시 삭제"(전 100)
 			-- 일반 몬스터(보스 제외)에 틱마다 고정 데미지(RtsCombatLogic 지대 피해): 2026-09-26 사용자 "상향 — 20 + 레벨×2" → 같은 날 "레벨업 증가량 3배로" 20 + 레벨×3(전 5 + 레벨×1.5 버림 · 그 전 10 + 레벨×3 → "너무 쎄다")
-			s.dotFlat = 20 + 3 * L
+			s.dotFlat = 20 + 1 * L -- 2026-09-29 사용자 "레벨당 3 → 1"
 			if L >= 10 then s.flat = 100 end
 			if L >= 20 then s.dotPct = 80 end
 			if L >= 40 then s.pct = 150 end
@@ -809,7 +809,7 @@ script RtsJobTableLogic extends Logic
 		if jobId == "bishop" then
 			-- 엔젤레이 80%×1회×1마리(보통). 메디테이션 +50(L10), 아케인 에임 +20%(L40), 인피니티 최종 +30%(L50). 프레이(L30)는 파티 버프(여기 안 넣음)
 			--   2026-09-19 밸런스 패치: 엔젤레이 30%×3회, 메디테이션 +100, 아케인 에임 +50%, 인피니티 최종 +20%, 제네시스 300%(스킬 표), 프레이 = 모든 유닛 최종 +10%(RtsUnitBuffLogic)
-			local s = { pct = 100, flat = 0, ratio = 38, hits = 3, targets = 1, ign = 0, fin = 100, ignBoss = -1, speed = "보통", crit = self.BaseCritRate, critDmg = self.BaseCritDamage }
+			local s = { pct = 100, flat = 0, ratio = 180, hits = 3, targets = 1, ign = 0, fin = 100, ignBoss = -1, speed = "보통", crit = self.BaseCritRate, critDmg = self.BaseCritDamage }
 			if L >= 10 then s.flat = 100 end
 			if L >= 40 then s.pct = 150 end
 			if L >= 50 then
@@ -837,7 +837,7 @@ script RtsJobTableLogic extends Logic
 		end
 		if jobId == "shad" then
 			-- 새비지 블로우 17.5%×8회×1마리(매우빠름). 대거 마스터리(10) 공격력 +30%, 크리티컬 마스터리(20) 크확 +30·크뎀 +20, 대거 익스퍼트(40) 공격력 +20%·최종 +5%, 레디 투 다이(50) 최종 +20%·보스 +30%(킷 티어 4)
-			local s = { pct = 100, flat = 0, ratio = 29.2, hits = 8, targets = 1, ign = 0, fin = 100, ignBoss = -1, speed = "매우빠름", crit = self.BaseCritRate, critDmg = self.BaseCritDamage }
+			local s = { pct = 100, flat = 0, ratio = 70, hits = 8, targets = 1, ign = 0, fin = 100, ignBoss = -1, speed = "매우빠름", crit = self.BaseCritRate, critDmg = self.BaseCritDamage }
 			if L >= 10 then s.pct = 130 end
 			if L >= 20 then
 				s.crit = s.crit + 30
@@ -1062,13 +1062,13 @@ script RtsJobTableLogic extends Logic
 	method table GetPrisms()
 		return {
 			{ id = "enrage", job = "hero", name = "인레이지", desc = "[프리즘] 레이징 블로우가 인레이지로 강화된다. 레이징 블로우의 데미지가 422% 증가하고, 사거리가 3으로, 공격 횟수가 3회로 늘어난다. 증강의 효율을 높이고, 방어구 부수기 효과를 얻는다." },
-			{ id = "holyunity", job = "paladin", name = "홀리 유니티", desc = "[프리즘] 아군 유닛 1명을 지정해 그 유닛의 최종 데미지를 40% 증가시킨다. 자신에게는 사용할 수 없다." },
+			{ id = "holyunity", job = "paladin", name = "홀리 유니티", desc = "[프리즘] 아군 유닛 1명을 지정해 그 유닛과 자신의 최종 데미지를 40% 증가시킨다. 대상을 지정해야 효과가 있다." },
 			{ id = "giant", job = "dk", name = "거대화", desc = "[프리즘] 스피어 버스터가 거대해진다. 사거리가 6으로 늘고 데미지가 29% 증가하는 대신 6회로 나눠 찌른다(1회 데미지 = 절반 + 654%). 일부 증강의 효율을 높인다." },
 			{ id = "arrowrain", job = "bow", name = "애로우 레인", desc = "[프리즘] 폭풍의 시 대신 애로우 레인을 사용한다. 하늘에서 화살비를 내려 사거리 6 안의 적 1마리를 395%의 데미지로 2회 공격하며, 공격속도와 관계없이 0.2초마다 발사한다. 증강의 효율을 높이고, 방어구 부수기 효과를 얻는다.", locks = { "폭풍의 시" } },
 			{ id = "truesnipe", job = "marks", name = "트루 스나이핑", desc = "[프리즘] 스나이핑 대신 트루 스나이핑을 사용한다. 사거리 6 안의 적 1마리를 719.7%의 데미지로 10회 공격하며, 반드시 크리티컬로 적중한다. 재사용 대기시간 2초. 일부 증강의 효율을 높인다.", locks = { "스나이핑" } }, -- 피어싱 영구 잠금 뺌(2026-09-23 사용자 "트루 스나이핑 → 피어싱 영구 잠금 빼자")
 			{ id = "tempest", job = "il", name = "블리자드 템페스트", desc = "[프리즘] 블리자드의 재사용 대기시간이 2초로 줄고, 사거리 제한이 없어지며 공격 대상이 최대 30마리로 늘고 데미지가 1001%가 된다. 보스는 180%의 데미지로 30회 공격한다. 방어율 무시가 70% 증가한다. 증강의 효율을 높이고, 방어구 부수기 효과를 얻는다." }, -- 2026-09-23 엘릭서와 통합 · 2026-09-24 사용자 "1티어가 시너지화 → 썬콜 자체 시너지 없애고 방무로 쌔게": 방어율 감소·보스 최종 −47% 삭제, 방무 15 → 70
 			{ id = "transcend", job = "fp", name = "초월", desc = "[프리즘] 도트 퍼니셔가 초월한다. 구체가 60개로 늘고 구체와 폭발이 2배로 커지며, 재사용 대기시간이 3초로 줄어든다. 구체의 데미지는 314%가 된다. 일부 증강의 효율을 높인다." },
-			{ id = "divinepunish", job = "bishop", name = "디바인 퍼니시먼트", desc = "[프리즘] 엔젤레이 대신 디바인 퍼니시먼트를 사용한다. 빛의 검을 내려 사거리 3 안의 적을 최대 6마리까지 49%의 데미지로 공격하며, 공격속도와 관계없이 0.2초마다 발동한다. 맞은 적은 3초 동안 받는 데미지가 20% 증가한다.", locks = { "엔젤레이" } },
+			{ id = "divinepunish", job = "bishop", name = "디바인 퍼니시먼트", desc = "[프리즘] 엔젤레이 대신 디바인 퍼니시먼트를 사용한다. 빛의 검을 내려 사거리 3 안의 적을 최대 6마리까지 120%의 데미지로 공격하며, 공격속도와 관계없이 0.2초마다 발동한다. 맞은 적은 3초 동안 받는 데미지가 20% 증가한다.", locks = { "엔젤레이" } },
 			{ id = "fuma", job = "nl", name = "풍마수리검", desc = "[프리즘] 쿼드러플 스로우 대신 거대한 풍마수리검을 던진다. 사거리 3 안의 적 1마리를 377%의 데미지로 4회 공격하며, 30레벨부터는 쉐도우 파트너도 함께 던진다. 방어율 무시가 70% 증가한다. 증강의 효율을 높이고, 방어구 부수기 효과를 얻는다.", locks = { "쿼드러플 스로우" } },
 			{ id = "dualblade", job = "shad", name = "자유전직 - 듀얼블레이더", desc = "[프리즘] 듀얼블레이더로 전직한다. 새비지 블로우와 메소 익스플로전 대신 블레이드 토네이도와 카르마 퓨리를 함께 사용한다. 크리티컬 확률이 40%, 크리티컬 데미지가 80% 증가하며, 일부 증강의 효율을 높인다.", locks = { "새비지 블로우", "메소 익스플로전" } },
 			{ id = "phantom", job = "", name = "영웅 팬텀", desc = "팬텀 영입 해금. 팬텀은 증강의 효율이 높다." }, -- 2026-09-24 사용자(RtsJobTableLogic.AugMulFor)
@@ -1174,8 +1174,8 @@ script RtsJobTableLogic extends Logic
 
 	property number ArmorBreakPer = 1
 
-	-- 1티어 증강 효과 최대 배율(증강 ArmorBreakCap개 = 30개일 때) — AugMulFor
-	property number T1AugMulMax = 3
+	-- 1티어 증강 효과 최대 배율(증강 ArmorBreakCap개일 때) — AugMulFor. 2026-09-29 사용자 "3배까지 → 2배로 고정"(전 3)
+	property number T1AugMulMax = 2
 
 	-- 방어구 부수기·1티어 증강 배율이 세는 증강 개수(AugCountOf, 최대 ArmorBreakCap)
 	method number CappedAugCount(any u)
@@ -1292,11 +1292,20 @@ script RtsJobTableLogic extends Logic
 
 	-- 직업 표 + 이 유닛의 프리즘(전투·팝업·연출·잠금이 쓰는 표)
 	method table GetSkillsFor(any u)
-		local list = self:GetSkills(u.JobId)
+		-- 캐시(2026-09-29 — 초월 도트 퍼니셔 구체 60개가 타격마다 HitFx·CastFxFace·RedirectOrbFx에서 이 표를 통째로 다시 만들어 렉): 직업 + 프리즘 조합마다 한 번만 만든다.
+		--   돌려주는 표는 읽기 전용(고치는 곳은 ApplyPrismSkills뿐 — 만들 때). 연출 미리보기(FxOverrides)가 켜져 있으면 캐시를 쓰지 않는다
 		local ids = self:PrismIds(u)
+		local key = u.JobId .. "|" .. table.concat(ids, ",")
+		local useCache = next(self.FxOverrides) == nil
+		if useCache and self.SkillsCache[key] ~= nil then return self.SkillsCache[key] end
+		local list = self:GetSkills(u.JobId)
 		for i = 1, #ids do self:ApplyPrismSkills(ids[i], list, u.JobId) end
+		if useCache then self.SkillsCache[key] = list end
 		return list
 	end
+
+	-- GetSkillsFor 캐시: "직업|프리즘,프리즘" → 스킬 표
+	property table SkillsCache = {}
 
 	-- 클라: 이 직업의 스킬 연출을 프리즘 변형까지 전부 미리 올린다(유닛이 생길 때). 프리즘을 켠 뒤 첫 시전이 자산 다운로드 중이라 표식·클립이 빈 채로 나오던 문제
 	--   (2026-09-22 사용자 "엘릭서+템페스트 동시에 켰는데 계속 적용 안 되다가 껐다 켜니 정상" — 서버 표는 맞았고 tile 9종×21프레임이 아직 안 내려온 것)
@@ -1354,7 +1363,7 @@ script RtsJobTableLogic extends Logic
 				list[i] = k
 			end
 		elseif id == "holyunity" then
-			list[#list + 1] = { lv = 1, kind = "패시브", name = "홀리 유니티", desc = "프리즘. 유닛 1개 지정 — 그 유닛의 최종 데미지 +40%", target = true }
+			list[#list + 1] = { lv = 1, kind = "패시브", name = "홀리 유니티", desc = "프리즘. 유닛 1개 지정 — 그 유닛과 자신의 최종 데미지 +40%", target = true }
 		elseif id == "giant" then
 			local i = self:FindSkill(list, "스피어 버스터")
 			if i > 0 then
@@ -1539,7 +1548,7 @@ script RtsJobTableLogic extends Logic
 				loopSound = "ac773384396f4be284fd079db65e2e3d", loopSoundVol = 0.8,
 				loopEnd = "b4134c0268974cbcbc780d46541ecbde", loopEndLife = 0.75, loopEndSound = "8ee2522b12cd45469a92d38da6872834",
 				hitDelay = 0.1, hitClip = "2655e0dcb9c14bb8a1f37c7fbaa117c0", hitScale = 1.6, hitDy = 0.6, hitSound = "7d2e6a9885554615bb61e1bdfd12e411", hitSoundVol = 0.7 }
-			list[#list + 1] = { lv = 1, kind = "액티브", prism = true, name = "디바인 퍼니시먼트", desc = "엔젤레이 대신 디바인 퍼니시먼트를 사용한다. 빛의 검을 내려 사거리 3 안의 적을 최대 6마리까지 49%의 데미지로 공격하며, 공격속도와 관계없이 0.2초마다 발동한다. 맞은 적은 3초 동안 받는 데미지가 20% 증가한다.", target = false, range = 3, targets = 6, vuln = { pct = 20, sec = 3 }, fx = fx }
+			list[#list + 1] = { lv = 1, kind = "액티브", prism = true, name = "디바인 퍼니시먼트", desc = "엔젤레이 대신 디바인 퍼니시먼트를 사용한다. 빛의 검을 내려 사거리 3 안의 적을 최대 6마리까지 120%의 데미지로 공격하며, 공격속도와 관계없이 0.2초마다 발동한다. 맞은 적은 3초 동안 받는 데미지가 20% 증가한다.", target = false, range = 3, targets = 6, vuln = { pct = 20, sec = 3 }, fx = fx }
 		elseif id == "fuma" then
 			-- 풍마수리검 연출(2026-09-22 사용자 "skillname#400041020 — 투사체·피격 이펙트·사운드 교체. 투사체는 shootobj/layerlist/c1 6214486b…, 사운드 special bdb2a84f…, 피격 f05a290c…"):
 			--   쿼드러플 스로우 fx 복사 후 표창 → 회전하는 큰 풍마수리검(456px 6프레임 0.24초 루프, 1.6배 ≈ 7.3유닛 — 사용자 "졸라 커" → "2배 더", 대칭이라 회전 안 함), 타격 클립 → 400041020/hit/0(보라 별 파열 248px, 0.8배), 시전음 special(1.75초), 타격음 hit(0.55초 ×4, 0.6). 시전 클립·모션·쉐도우 파트너는 그대로
@@ -1618,7 +1627,7 @@ script RtsJobTableLogic extends Logic
 		elseif id == "transcend" then
 			-- 능력치 변화 없음(보스 전용 가산 없음 — 초월 도트 퍼니셔 구체 비율 314%만). 프리즘 방무 +15는 2026-09-24 삭제 — 2티어 킷 방무 50으로 통일
 		elseif id == "divinepunish" then
-			st.ratio = 49 -- 27 + 22(2026-09-24 사용자 "프리즘 증강의 보스 +n%를 빼고 스킬 데미지로 통합 — 일반 라운드도 밀게"(보스 딜 같음))
+			st.ratio = 120 -- 2026-09-29 사용자 49 → 120(전 27 + 22(2026-09-24 사용자 "프리즘 증강의 보스 +n%를 빼고 스킬 데미지로 통합 — 일반 라운드도 밀게"(보스 딜 같음))
 			st.hits = 1
 			st.period = 0.2
 			st.range = 3

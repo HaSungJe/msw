@@ -1,6 +1,6 @@
 -- Phase 6·7 (2026-09-23): 유저별 한 판 결과 — 진행 중 / 탈락 / 클리어, 처치 수, 마지막으로 버틴 스테이지, 보스 HP 깎은 비율.
 --   탈락(필드 110 또는 보스 시간 초과) → 그 구역 몹·보스 정리, 유닛 전멸, 구역 가운데 비석, 플레이어 목록 탈락, 개인 최고 기록 저장, 결과 팝업.
---   클리어(검은 마법사 4페이즈 처치) → 결과 팝업. 솔로(방 인원 1)면 '다시 하기', 여럿이면 '나가기' = 대기방으로(RequestExit — 인스턴스 방이면 정적 방으로, 지금은 안내).
+--   클리어(검은 마법사 4페이즈 처치) → 결과 팝업. 솔로(방 인원 1)면 '다시 하기', 여럿(방 게임)이면 '나가기' = 방 대기실로(RequestExit → RtsLobbyLogic.RequestLeaveGame, Phase 8).
 --   점수 = 마지막으로 버틴 스테이지 순번 × 100,000 + 탈락한 보스전의 보스 HP 깎은 비율(0~10,000) — 개인 최고(BestRun, 도전모드만).
 --   순위 기록(2026-09-28 사용자 — Phase 15 #52): 도전모드 판이 끝날 때(탈락·클리어) 난이도별 최대 클리어 라운드를 저장(SaveBestRound — 옛 검은 마법사 클리어 횟수 기준 폐기). 표시는 대기방 순위표(Phase 13).
 --   경주모드(RtsStageLogic.GameMode = "race"): 탈락 없음, 검은 마법사 4페이즈를 잡으면 걸린 시간(게임 시계)·등수(방에서 잡은 순서)를 결과 창에 — 기록 저장 없음.
@@ -428,23 +428,11 @@ script RtsRunResultLogic extends Logic
 		_RtsPopupLogic:OpenRaceResult(sec, place, total, kills)
 	end
 
-	-- '나가기'(여럿일 때 결과 팝업·탈락 뒤 우측 버튼) = 대기방으로(2026-09-23 사용자). 게임이 인스턴스 방에서 돌면 정적 방(대기방)으로 옮기고,
-	--   대기방이 없는 지금(멀티 업데이트 Phase 8 전)은 안내만. 솔로(방 인원 1)면 버튼이 '다시 하기'라 여기 오지 않는다.
-	--   KickUser는 사유와 상관없이 '추방됐습니다' 창이 떠서 쓰지 않는다
-	@ExecSpace("Server")
+	-- '나가기'(여럿일 때 탈락·완주 뒤 오른쪽 영입 버튼 자리) = 방 대기실로(Phase 8 — RtsLobbyLogic.RequestLeaveGame "back").
+	--   KickUser는 사유와 상관없이 '추방됐습니다' 창이 떠서 쓰지 않는다. 클라에서 바로 RtsLobbyLogic.RequestLeaveGame을 불러도 같다
+	@ExecSpace("ClientOnly")
 	method void RequestExit()
-		local userId = senderUserId
-		if userId == nil or userId == "" then return end
-		if _RoomService:IsInstanceRoom() then
-			_RoomService:MoveUserToStaticRoom(userId)
-			return
-		end
-		self:NotifyNoMatching(userId)
-	end
-
-	@ExecSpace("Client")
-	method void NotifyNoMatching(string userId)
-		_RtsHudLogic:ShowHintFor("대기방(매칭 · 방 목록)은 멀티 업데이트 때 열려요 — 지금은 관전하거나 왼쪽 아래 '다시하기'로 투표해요", 4)
+		_RtsLobbyLogic:RequestLeaveGame("back")
 	end
 
 end

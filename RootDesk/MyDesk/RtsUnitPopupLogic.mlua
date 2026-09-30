@@ -4,7 +4,7 @@
 --   탭 5개 — 능력치(증강으로 오른 수치 · 보스 DPS·증강 효율 — RtsUiLayoutLogic.UnitInfo 페이지) / 액티브 · 패시브(미획득 흐림) / 증강 n(이 유닛에 지정된 증강) /
 --   버프 n(RtsUnitBuffLogic). 스킬·증강·버프는 ScrollLayoutGroup 스크롤 목록. Tab 키로 순환(CycleTab).
 --   대상 지정 스킬(홀리 유니티) 행에는 셀렉트 박스(미지정 / 내 다른 유닛). 하단: [레벨업] 버튼만(2026-09-16 — 누적 투자·다음 벽·보유 메소·'(벽)' 문구는 유저에게 필요 없는 내부 정보라 삭제. 메소는 HUD 좌상단).
---   위치 이동은 여기 없음 — 캐릭터 클릭 메뉴(RtsUnitSelectLogic)에서. 대상 변경·위치 이동은 유닛마다 3분 쿨.
+--   위치 이동은 여기 없음 — 캐릭터 클릭 메뉴(RtsUnitSelectLogic)에서. 대상 변경은 유닛마다 3분 · 위치 이동은 20초 쿨.
 --   좌표는 1920×1080 기준(목업 1cqw = 19.2px). 값은 서버가 바꾸고(RtsUnitLogic) 동기화가 오면 다시 그린다.
 @Logic
 script RtsUnitPopupLogic extends Logic

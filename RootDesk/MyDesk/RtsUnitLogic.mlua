@@ -1,7 +1,7 @@
 -- Phase 4 #14 / Phase 5 #19 (2026-09-15) → Phase 6 (2026-09-23): 유닛 보유·조작의 서버 권위.
 --   유저별 유닛 6기(번호 1~6 = HUD 슬롯), 메소, 영입·레벨업·대상 지정·스킨·위치 이동·방출 요청 처리.
 --   판 시작 = 유닛 없음·메소 0(InitUser). 영입은 Lv1·무료, 보유 수 < 영입 한도(1·5·자쿰·혼테일·핑크빈·시그너스에서 1칸씩, RtsStageTableLogic.RecruitLimit)일 때만. 메소는 몹 처치 드랍(AddMeso).
---   위치 이동과 대상 변경은 유닛마다 3분 쿨타임(고정). 탈락하면 유닛 전멸(WipeUnits), 새 판이면 초기화(ResetUser).
+--   위치 이동은 유닛마다 20초 · 대상 변경은 3분 쿨타임(모든 모드 고정). 탈락하면 유닛 전멸(WipeUnits), 새 판이면 초기화(ResetUser).
 --   유닛 엔티티 이름 = "Unit<구역>_<번호>" (/maps/RtsMap/RtsBoard 아래) — 클라는 이 이름으로 내 유닛을 찾는다.
 @Logic
 script RtsUnitLogic extends Logic
@@ -13,10 +13,14 @@ script RtsUnitLogic extends Logic
 	-- 개발 도구(테스트 프리즘 버튼·프리즘 켜고 끄기 요청). 2026-09-23 사용자 "테스트 프리즘 버튼 숨기고 시작" → false(다시 쓸 땐 true)
 	property boolean DevTools = false
 
-	-- 위치 이동·대상 변경 쿨타임(초) — 유닛마다 3분 고정
+	-- 대상 변경 쿨타임(초) — 유닛마다 3분 고정
 	property number CooldownSec = 180
 
-	property number MaxUnits = 6
+	-- 위치 이동 쿨타임(초) — 유닛마다 20초, 도전·경주·혼자·방 모든 모드 같다(2026-09-29 사용자 "이동 쿨타임 20초로 — 모든 모드 고정", 전: 대상 변경과 같은 3분)
+	property number MoveCooldownSec = 20
+
+	-- 보유 유닛 상한(2026-09-29 사용자 "최대 9마리" — 같은 날 앞선 안 12, 전 6). 영입 칸이 열리는 순번은 RtsStageTableLogic.RecruitAt(생성기 RECRUIT_AT)
+	property number MaxUnits = 9
 
 	-- 서버: userId → { [no] = entity }
 	property table UnitsByUser = {}
@@ -314,7 +318,7 @@ script RtsUnitLogic extends Logic
 	-- ===== 영입 =====
 	--   영입 팝업의 직업 카드 → 클라 배치 모드(RtsUnitSelectLogic.BeginPlace)에서 고른 빈 발판 (col,row)에 빈 번호(1~MaxUnits)로 세운다(2026-09-22 사용자 "중앙에 생성하지 말고 위치 선택, 취소하면 영입도 취소").
 	--   본편(2026-09-23 사용자 "항상 Lv1 + 메소 레벨업", "5라운드당 1명"): 무료·Lv1, 보유 수 < 영입 한도일 때만(방출로 빈 칸은 다시 영입 가능).
-	--   거부: 판 진행 중(카운트다운·진행)이 아님 / 탈락·클리어한 유저 / 한도 초과 / 발판 아님 / 내 유닛이 서 있음 / 같은 직업 보유
+	--   거부: 판 진행 중(카운트다운·진행)이 아님 / 탈락·클리어한 유저 / 한도 초과 / 발판 아님 / 내 유닛이 서 있음 (같은 직업 중복은 2026-09-29부터 허용)
 	@ExecSpace("Server")
 	method void RequestRecruitAt(string jobId, number col, number row)
 		if _RtsStageLogic.Paused then return end  -- 일시정지 중 게임 조작 막기(2026-09-25 사용자 "전부 막기")
@@ -334,11 +338,7 @@ script RtsUnitLogic extends Logic
 		if not _RtsZoneLogic:IsPadCell(col, row) then return end
 		if self.UnitsByUser[userId] == nil then self.UnitsByUser[userId] = {} end
 		local list = self.UnitsByUser[userId]
-		-- 동일 직업 중복 영입 불가(character.md 헤더 규칙; 2026-09-22 사용자 "듀얼블레이더로 전직했어도 섀도어 영입 추가 안 되어야 하는 건 당연" — 프리즘으로 이름이 바뀌어도 JobId는 그대로라 막힌다). 개발모드도 같음
-		if self:HasJobUnit(userId, jobId) then
-			_RtsConfigLogic:Log("RtsUnit: recruit " .. jobId .. " refused — already owned")
-			return
-		end
+		-- 동일 직업 중복 영입 허용(2026-09-29 사용자 "동일한 유닛 중복 영입 가능 — 썬콜 여러 마리도" · 전 2026-09-19~ 중복 불가). 같은 직업 프리즘도 유닛마다 따로 받는다
 		local no = 0
 		for i = 1, self.MaxUnits do
 			local e = list[i]
@@ -620,7 +620,7 @@ script RtsUnitLogic extends Logic
 		self:OnChanged(no, self:GetMeso(userId), userId)
 	end
 
-	-- 위치 이동: 발판 칸이어야 하고, 내 다른 유닛이 있으면 자리를 맞바꾼다(둘 다 3분 쿨)
+	-- 위치 이동: 발판 칸이어야 하고, 내 다른 유닛이 있으면 자리를 맞바꾼다(둘 다 이동 쿨 MoveCooldownSec 20초)
 	@ExecSpace("Server")
 	method void RequestMove(number no, number col, number row)
 		if _RtsStageLogic.Paused then return end  -- 일시정지 중 게임 조작 막기(2026-09-25 사용자 "전부 막기")
@@ -632,7 +632,7 @@ script RtsUnitLogic extends Logic
 		if not _RtsZoneLogic:IsPadCell(col, row) then return end
 		if u.Col == col and u.Row == row then return end
 		local now = _RtsStageLogic:GameNow()
-		local cool = self.CooldownSec
+		local cool = self.MoveCooldownSec
 		local list = self.UnitsByUser[userId]
 		for otherNo, oe in pairs(list) do
 			local o = oe.RtsUnitComponent

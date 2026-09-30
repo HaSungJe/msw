@@ -1,0 +1,17 @@
+-- Phase 8 (2026-09-28): 게임 방(인스턴스 룸) ↔ 로비(정적 룸) 알림. RtsLobbyLogic.NoticeLobby(게임 → 로비) · SendToGame(로비 → 게임)이 보내고
+--   RtsLobbyLogic.HandleRtsRoomNoticeEvent가 받는다(로비·게임 방 양쪽).
+--   게임 → 로비 Kind: "back" 판을 마치고 방 대기실로 · "left" 도중에 나감(방에서도 빠짐) · "quit" 접속 종료 · "chat" 게임 안에서 한 말(Text = 한 줄) ·
+--     "chatsync" 방 채팅 기록 요청(게임 방 첫 입장)
+--   로비 → 게임 Kind: "chat" 대기실 쪽에서 한 말(Text = 한 줄) · "chatlog" 방 채팅 기록 전체(Text = 줄바꿈으로 이은 줄들) — 방 채팅 한 줄기(2026-09-29)
+@Event
+script RtsRoomNoticeEvent extends EventType
+
+	property string Kind = ""
+
+	property string UserId = ""
+
+	property string RoomKey = ""
+
+	property string Text = ""
+
+end

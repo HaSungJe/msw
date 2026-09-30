@@ -1,6 +1,6 @@
 -- Phase 4 #14·#17 (부분, 2026-09-15): 트랙 위 캐릭터 선택 — 메이플 커서(평소 장갑, 누르는 동안 장갑 + 마우스 — 2026-09-23) / 클릭 → 오른쪽 레일의 캐릭터 메뉴(뒤로·상세보기·레벨업·이동·방출 — RtsUiLayoutLogic.Selection) / 위치 이동 모드 / 영입 배치 모드
 --   클릭 판정은 전부 InputService의 ScreenTouchEvent + 자체 상자(UnitAtScreen·CellAtScreen). 유닛 엔티티의 TouchReceive는 쓰지 않는다(2026-09-22 TouchEvent 미발화로 교체)
---   위치 이동 모드: 발판마다 틀 스프라이트(테두리+연한 채움)로 칸을 강조(빈 칸 금색, 내 유닛 자리 파랑 = 맞교환). 클릭한 발판으로 이동(서버 검증, 유닛마다 3분 쿨). ESC 취소.
+--   위치 이동 모드: 발판마다 틀 스프라이트(테두리+연한 채움)로 칸을 강조(빈 칸 금색, 내 유닛 자리 파랑 = 맞교환). 클릭한 발판으로 이동(서버 검증, 유닛마다 20초 쿨 — RtsUnitLogic.MoveCooldownSec). ESC 취소.
 --   상세정보 = RtsUnitPopupLogic(유닛 정보 팝업). 전부 클라 전용. 좌표는 1920×1080 기준.
 @Logic
 script RtsUnitSelectLogic extends Logic
@@ -399,6 +399,8 @@ script RtsUnitSelectLogic extends Logic
 	@ExecSpace("ClientOnly")
 	@EventSender("Service", "InputService")
 	handler HandleKeyDownEvent(KeyDownEvent event)
+		-- 방 채팅 입력 중이면 게임 단축키를 쓰지 않는다(글자로 친 P·S·L·스페이스 — RtsGameChatLogic)
+		if _RtsGameChatLogic:IsTyping() then return end
 		-- P = 일시정지 / 계속하기(솔로·진행 중 — 2026-09-25 사용자, RtsHudLogic.TogglePause)
 		if event.key == KeyboardKey.P then
 			_RtsHudLogic:TogglePause()

@@ -111,6 +111,18 @@ MSW(Maker 26.7) 실측으로 확인한 엔진 동작. 다시 실측하면 30분�
 - Rationale: 2026-09-20 조커 카드 — 썸네일로는 카드 구분이 안 돼 원본을 받아 400041009/screen/3(104×176 카드 덱)을 찾고 분홍 변형을 만들어 올렸다.
 - Priority: takes precedence over defaults
 
+## Maker 시험에서 로비(정적 룸)부터 보려면 시작 맵 LobbyMap + 에디터에서 LobbyMap을 연 채 Play
+- Rule: 게임 맵(RtsMap, 인스턴스 맵)을 연 채/시작 맵으로 Play하면 Maker가 `TestPlayInstance` 인스턴스 룸만 띄우고 정적 룸(server_main)이 없다 → `MoveUserToStaticRoom(userId, "LobbyMap")`이 false(로비로 못 감). Hierarchy에서 LobbyMap을 Set Starting Map + `maker_move_map("LobbyMap")` 뒤 Play하면 server_main(로비) → [혼자 하기] `S_n` · 방 게임 `R<no>_<gen>_<mode>` 인스턴스가 생긴다(`maker_get_context_keys`로 확인). 로비 UI 버튼은 `maker_mouse_input`이 못 누르므로 `maker_execute_script`(client)로 `_RtsLobbyUiLogic:OpenCreate()` · `_RtsLobbyLogic:RequestCreateRoom/RequestStart/RequestLeaveGame` 등을 직접 불러 확인한다. `maker_play`가 edit_to_play에서 멈추면 사용자가 ▶를 누르면 된다.
+- Scope: project
+- Rationale: 2026-09-28 Phase 8 ① Maker 확인 — 처음엔 RtsMap이 열려 있어 바로 게임이 시작됐고 로비로 옮기기가 false였다.
+- Priority: takes precedence over defaults
+
+## asset_update_resource_storage_info는 빠진 name·description·subcategory를 빈값으로 덮는다 — 속성만 넣을 때도 셋을 같이 보낸다
+- Rule: 업로드 직후 `filter_mode`·`pivot`·`border_*`를 넣으려고 `asset_update_resource_storage_info(guid, properties)`만 부르면 이름·설명·분류가 ""로 지워진다(검색 `searchWord`에도 안 걸린다). 항상 `name`·`description`·`subcategory`·`properties`를 한 번에 보낸다. 여러 개 올리기는 1단계 요청 병렬 → curl `-K` 설정 파일 하나에 `upload-file`/`url`/`next`로 묶어 PUT(주소가 argv에 안 남게, 끝나면 파일 삭제) → 완료 요청 병렬 → 속성 병렬.
+- Scope: project
+- Rationale: 2026-09-28 로비 아이콘 18장 업로드 때 속성 요청 뒤 목록에서 이름이 전부 비어 있어 다시 넣었다. UI 선 아이콘(흰 PNG, 물들여 씀)은 `filter_mode=Bilinear`(Point면 줄여 그릴 때 선이 깨진다).
+- Priority: takes precedence over defaults
+
 ## 유닛에 붙는 지속 연출(loopClip 등)은 유닛 엔티티의 자식으로 스폰한다 — 월드 좌표에 두면 위치 이동 때 남는다
 - Rule: 공격 중 캐릭터에 계속 붙어 있는 연출(`RtsSkillFxLogic.EnsureLoopFx`의 loopClip, 버프 아이콘, 그림자)은 `SpawnByModelId(…, unitEntity)`로 유닛의 자식에 두고 로컬 값은 절반(부모 스케일 2)으로 준다. 유닛의 보는 방향은 아바타 루트 자식의 스케일만 뒤집으므로 유닛 엔티티 자식은 영향 없음 — 반전은 `FlipX`로 직접, 방향이 바뀌면 기존 루프 엔티티의 FlipX·Position만 갱신(`RefreshLoopFacing(key)` — 시전마다 + `RtsUnitComponent.ApplyFace`(FaceDir 동기화)에서도 호출: 시전 RPC가 FaceDir 동기화보다 먼저 올 수 있어 시전 때만 맞추면 한 주기 어긋난다). 루프·모션 상태 표의 키는 `LoopKey(zone, no)` = 구역×100+번호(시전 연출은 전 클라에 오므로 유닛 번호만으론 다른 구역과 겹침). 1회성 연출(clip·투사체·타격)은 월드(mapRoot)에 둬도 된다. 클립 방향 플래그는 반드시 원본 PNG로 정한다(폭풍의 시 keydown = 왼쪽 보기 → loopFacesLeft true; 09-18엔 동기화 타이밍 버그를 플래그로 덮어 반대로 넣었었다).
 - Scope: project
@@ -188,3 +200,8 @@ MSW(Maker 26.7) 실측으로 확인한 엔진 동작. 다시 실측하면 30분�
 - How to apply: 스크립트로 연 팝업에서 난 오류는 먼저 이 경우인지 본다(스크립트 보낸 시각과 오류 시각의 차이, 그 사이 다른 창이 떴는지). 팝업 화면 확인은 사용자 클릭이나 게임 자체 흐름으로, 스크립트는 값 계산·상태 읽기에 쓴다. 긴 계산 스크립트는 로그를 기다려 읽는다.
 - AGENTS.md application: not needed(검증 요령)
 - Priority: takes precedence over defaults
+
+## 입력 칸(TextInputComponent)은 엔터·클릭 처리 안에서 비우면 친 글이 되살아난다 (2026-09-29 Maker 실측)
+- Rule: `TextInputSubmitEvent`(엔터)·[보내기] 클릭 처리 안에서 `TextInputComponent.Text = ""`를 해도, 입력 칸이 편집을 마치며 친 글을 다시 써 넣어 보낸 글이 칸에 그대로 남는다(한글·영문 모두). 처리 밖(타이머 등)에서 비우면 바로 비워지고, 보이는 글(`TextComponent.Text`)도 곧 따라 비워진다. 비울 땐 `RtsLobbyUiLogic.ClearAfterSend(e, sent)` — 지금 한 번 + 0.1·0.3초 뒤 보낸 글이 되써져 있으면 다시(입력값·보이는 글 둘 다).
+- How to apply: 새 입력 칸에서 보낸 뒤 비우기가 필요하면 이 함수를 쓴다. `AutoClear`는 편집만 끝나도(다른 곳 클릭) 비워 [보내기] 클릭이 빈 글을 읽을 수 있어 쓰지 않았다.
+- AGENTS.md application: not needed

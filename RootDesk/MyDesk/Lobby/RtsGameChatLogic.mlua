@@ -1,0 +1,334 @@
+-- 게임 방 채팅(2026-09-29 사용자 — 방에서 시작한 게임에서도 방 채팅이 이어진다 · 방 안 사람끼리만 · 혼자 하기엔 없음).
+--   서버(인스턴스 룸) = 방 채팅 기록(Lines). 로비가 보낸 줄(RtsLobbyLogic.HandleRtsRoomNoticeEvent "chat" · "chatlog")과 게임 안에서 한 말(RequestSend)을
+--   모아 구역 유저들에게 보낸다. 게임 안에서 한 말은 로비(방 대기실 · 방 기록)에도 알린다(NoticeLobby "chat"). 첫 입장 때 로비에 기록 전체를 한 번 청한다("chatsync").
+--   화면(클라) = 왼쪽 아래 고정 상자 340×390(진행 현황 아래 · 화면 맨 아래까지 — 2026-09-29 사용자 "1배속/2배속/로비로 나가기 자리를 채팅창이 다 먹자":
+--   배속은 설정 창, [나가기]는 오른쪽 아래 모서리로 옮겨 이 자리에 다른 버튼이 없다. 전엔 340×206 + [크게] 토글).
+--   입력 중에는 게임 단축키를 막는다(IsTyping — RtsUnitSelectLogic).
+@Logic
+script RtsGameChatLogic extends Logic
+
+	-- 남겨 두는 줄 수(로비 RtsLobbyLogic.ChatKeep과 같게)
+	property number KeepLines = 30
+
+	-- 서버(인스턴스 룸): 방 채팅 줄들(오래된 순)
+	property table Lines = {}
+
+	-- 서버(인스턴스 룸): 로비에 기록 전체를 청했는가(첫 입장 때 한 번)
+	property boolean Synced = false
+
+	-- 클라: 받은 줄들 · 화면
+	property table MyLines = {}
+
+	property boolean Built = false
+
+	property Entity Box = nil
+
+	property Entity Log = nil
+
+	property Entity Input = nil
+
+	-- 확대(2026-09-29 사용자 "우측으로 조금 늘어나서 트랙 조금 가릴 정도" → "진행 현황 줄도 가리면서 더 높게"): 340×390 → WideW×WideH. 상자가 덮는 곳의 클릭(유닛 선택·이동)은 막힌다
+	property boolean Expanded = false
+
+	property number NormalW = 340
+
+	property number NormalH = 390
+
+	property number WideW = 640
+
+	-- 600 = 화면 아래(여백 24)부터 유저 목록 버튼 바로 아래(진행 현황 줄 −428)까지 — 진행 현황(1 부르미 · 시작 준비 …)을 덮는다
+	property number WideH = 600
+
+	-- 글자 크기(2026-09-29 사용자 — 맵 이름 24보다 "조금 줄이기")
+	property number FontSize = 20
+
+	-- 확대/축소 아이콘(둘 중 하나만 켠다)
+	property Entity ExpandIcon = nil
+
+	property Entity ShrinkIcon = nil
+
+	property string LayoutKey = ""
+
+	property string ModeShown = ""
+
+	method void OnBeginPlay()
+		if self:IsClient() then
+			_TimerService:SetTimerRepeat(function() self:ClientTick() end, 0.25, 0.4)
+		end
+	end
+
+	-- ===== 서버(인스턴스 룸) =====
+
+	-- 구역 배정 뒤(RtsBootstrapLogic): 방 게임이면 지금 기록을 그 유저에게, 첫 입장이면 로비에 기록 전체를 청한다
+	@ExecSpace("ServerOnly")
+	method void OnUserEnter(string userId)
+		if _RtsStageLogic.RoomNo <= 0 then return end
+		self:Receive(table.concat(self.Lines, "\n"), true, userId)
+		if not self.Synced then
+			self.Synced = true
+			_RtsLobbyLogic:NoticeLobby("chatsync", userId, "")
+		end
+	end
+
+	-- 게임 안에서 채팅 보내기: 방 게임 · 구역 주인만. "닉네임 : 말" 한 줄 → 게임 방 모두 + 로비의 방 기록
+	@ExecSpace("Server")
+	method void RequestSend(string text)
+		local userId = senderUserId
+		if userId == nil or userId == "" or not _RoomService:IsInstanceRoom() then return end
+		if _RtsStageLogic.RoomNo <= 0 then return end
+		if _RtsZoneLogic:GetZoneOfUser(userId) < 1 then return end
+		local t = _RtsLobbyLogic:Clean(text, _RtsLobbyLogic.ChatMax)
+		if t == "" then return end
+		local nick = userId
+		local e = _UserService:GetUserEntityByUserId(userId)
+		if e ~= nil and e.PlayerComponent ~= nil and e.PlayerComponent.Nickname ~= "" then nick = e.PlayerComponent.Nickname end
+		local line = nick .. " : " .. t
+		self:AddLine(line)
+		_RtsLobbyLogic:NoticeLobby("chat", userId, line)
+	end
+
+	-- 한 줄 더하기(게임 안에서 한 말 · 로비에서 온 말) → 게임 방 모두에게
+	@ExecSpace("ServerOnly")
+	method void AddLine(string line)
+		if line == nil or line == "" then return end
+		self.Lines[#self.Lines + 1] = line
+		while #self.Lines > self.KeepLines do table.remove(self.Lines, 1) end
+		for uid, zone in pairs(_RtsZoneLogic.ZoneByUser) do self:Receive(line, false, uid) end
+	end
+
+	-- 로비가 보낸 방 채팅 기록 전체(줄바꿈으로 이은 줄들)로 바꾸고 게임 방 모두에게 다시 보낸다
+	@ExecSpace("ServerOnly")
+	method void SetLog(string packed)
+		self.Lines = {}
+		if packed ~= nil and packed ~= "" then
+			for line in string.gmatch(packed, "[^\n]+") do self.Lines[#self.Lines + 1] = line end
+		end
+		while #self.Lines > self.KeepLines do table.remove(self.Lines, 1) end
+		local all = table.concat(self.Lines, "\n")
+		for uid, zone in pairs(_RtsZoneLogic.ZoneByUser) do self:Receive(all, true, uid) end
+		_RtsConfigLogic:Log("RtsGameChat: log " .. string.format("%d", #self.Lines))
+	end
+
+	-- ===== 서버 → 화면 =====
+
+	@ExecSpace("Client")
+	method void Receive(string lines, boolean reset, string userId)
+		if reset then self.MyLines = {} end
+		for line in string.gmatch(lines, "[^\n]+") do self.MyLines[#self.MyLines + 1] = line end
+		while #self.MyLines > self.KeepLines do table.remove(self.MyLines, 1) end
+		self:Render()
+	end
+
+	-- ===== 화면(클라) =====
+
+	-- 0.25초마다: 방 게임(RtsStageLogic.RoomNo > 0)이고 HUD가 있으면 만들고, 화면 크기·모드가 바뀐 것만 고친다. 혼자 하기 판이면 숨긴다
+	@ExecSpace("ClientOnly")
+	method void ClientTick()
+		if not _RoomService:IsInstanceRoom() then return end
+		local H = _RtsHudLogic
+		if _RtsStageLogic.RoomNo <= 0 or not H.Built then
+			if self.Built then
+				self:Show(false)
+				self:SyncProgress()
+			end
+			return
+		end
+		if not self.Built or not isvalid(self.Box) then self:Build() end
+		if not self.Built then return end
+		self:Show(true)
+		self:Layout(false)
+		self:SyncProgress()
+		if _RtsProfileLogic.MyUiMode ~= self.ModeShown then
+			self.ModeShown = _RtsProfileLogic.MyUiMode
+			_RtsLobbyUiLogic:PaintInput(self.Input)
+			self:Render()
+		end
+	end
+
+	@ExecSpace("ClientOnly")
+	method void Show(boolean on)
+		if isvalid(self.Box) and self.Box.Enable ~= on then self.Box:SetEnable(on) end
+	end
+
+	@ExecSpace("ClientOnly")
+	method void Build()
+		local H = _RtsHudLogic
+		local L = _RtsLobbyUiLogic
+		local grp = H.HudGroup
+		if grp == nil or not isvalid(grp) then return end
+		-- 왼쪽 아래 상자 340×390(확대 640×390): 제목 · [확대/축소] / 기록(새 줄이 아래) / 입력 + 보내기
+		local box = H:SpawnRoundedPanel("RtsGameChat", grp, Vector2(0, 0), Vector2(0, 0), Vector2.zero, Vector2(self.NormalW, self.NormalH), H:ColPanel(), H:ColBorder(), 1.5)
+		self.Box = box.Parent
+		H:SpawnLabel("RtsGameChatTitle", box, Vector2(0, 1), Vector2(0, 1), Vector2(14, -8), Vector2(160, 30), "채팅", H:ColInk(), 18, TextAlignmentType.MiddleLeft, true)
+		local ex = H:SpawnRoundedPanel("RtsGameChatExpand", box, Vector2(1, 1), Vector2(1, 1), Vector2(-8, -6), Vector2(44, 34), L:ColSurface2(), H:ColBorder(), 1.5)
+		self.ExpandIcon = L:Icon(ex, "expand", Vector2(0.5, 0.5), Vector2.zero, 18, H:ColMuted(), "icon")
+		self.ShrinkIcon = L:Icon(ex, "close", Vector2(0.5, 0.5), Vector2.zero, 18, H:ColMuted(), "icon")
+		H:SpawnClick("RtsGameChatExpandClick", ex):ConnectEvent(ButtonClickEvent, function(event)
+			self:SetExpanded(not self.Expanded)
+		end)
+		self.Log = self:SpawnLog("RtsGameChatLog", box, Vector2(14, 62), Vector2(self.NormalW - 28, self.NormalH - 108), self.FontSize)
+		self.Input = self:SpawnChatInput("RtsGameChatInput", box, Vector2(10, 10), Vector2(self.NormalW - 70, 44), "메시지 입력", self.FontSize)
+		self:SpawnSend("RtsGameChatSend", box, Vector2(-10, 10), Vector2(44, 44), "", 16, self.Input)
+		self.Built = true
+		self.Expanded = false
+		self.LayoutKey = ""
+		self.ModeShown = _RtsProfileLogic.MyUiMode
+		self:Show(true)
+		self:ApplyWidth()
+		self:Layout(true)
+		self:Render()
+		_RtsConfigLogic:Log("RtsGameChat: built")
+	end
+
+	-- 기록 글(아래부터 새 줄 · 서식 글 · 칸에 맞춰 줄이지 않음 — 넘칠 만큼은 Render가 덜 보낸다)
+	@ExecSpace("ClientOnly")
+	method Entity SpawnLog(string name, Entity parent, Vector2 pos, Vector2 size, number fontSize)
+		local H = _RtsHudLogic
+		local e = H:SpawnLabel(name, parent, Vector2(0, 0), Vector2(0, 0), pos, size, "", H:ColInk(), fontSize, TextAlignmentType.LowerLeft, false)
+		e.TextComponent.BestFit = false
+		e.TextComponent.FontSize = fontSize
+		e.TextComponent.IsRichText = true
+		return e
+	end
+
+	-- 입력 칸(로비 입력 칸과 같은 모양 — RtsLobbyUiLogic.SpawnInput). 엔터 = 보내기
+	@ExecSpace("ClientOnly")
+	method Entity SpawnChatInput(string name, Entity parent, Vector2 pos, Vector2 size, string placeholder, number fontSize)
+		local e = _RtsLobbyUiLogic:SpawnInput(name, parent, Vector2(0, 0), Vector2(0, 0), pos, size, placeholder, _RtsLobbyLogic.ChatMax)
+		if e == nil then return nil end
+		if e.TextComponent ~= nil then e.TextComponent.FontSize = fontSize end
+		local input = e
+		e:ConnectEvent(TextInputSubmitEvent, function(event)
+			self:Send(input)
+		end)
+		return e
+	end
+
+	-- [보내기](연보라 확인 버튼 — 오른쪽 아래 기준). text ""면 가운데 보내기 그림만
+	@ExecSpace("ClientOnly")
+	method void SpawnSend(string name, Entity parent, Vector2 pos, Vector2 size, string text, number fontSize, Entity input)
+		local H = _RtsHudLogic
+		local L = _RtsLobbyUiLogic
+		if text ~= "" then
+			L:SmallButton(name, parent, Vector2(1, 0), pos, size, "send", text, "gold", fontSize, function()
+				self:Send(input)
+			end)
+			return
+		end
+		local b = H:SpawnRoundedPanel(name, parent, Vector2(1, 0), Vector2(1, 0), pos, size, _RtsPopupLogic:Mix(H:ColGold(), 0.25), H:ColGold(), 2)
+		L:Icon(b, "send", Vector2(0.5, 0.5), Vector2.zero, 20, H:ColInk(), "icon")
+		H:SpawnClick(name .. "Click", b):ConnectEvent(ButtonClickEvent, function(event)
+			self:Send(input)
+		end)
+	end
+
+	-- 왼쪽 아래 모서리(0,0 · 폭 340/640 × 390 — 위 끝은 진행 현황 아래). 화면 크기·확대가 바뀔 때만
+	@ExecSpace("ClientOnly")
+	method void Layout(boolean force)
+		local H = _RtsHudLogic
+		local v = H:MobileViewport()
+		if v == nil then return end
+		local key = v.key .. tostring(self.Expanded)
+		if not force and key == self.LayoutKey then return end
+		self.LayoutKey = key
+		H:PlaceMobile(self.Box, v, 0, 0, 0, 0, self:Width(), self:Height(), 1)
+	end
+
+	@ExecSpace("ClientOnly")
+	method number Width()
+		if self.Expanded then return self.WideW end
+		return self.NormalW
+	end
+
+	@ExecSpace("ClientOnly")
+	method number Height()
+		if self.Expanded then return self.WideH end
+		return self.NormalH
+	end
+
+	-- 기록 칸 높이 = 상자 높이 − 제목 줄 62 − 입력 줄 46
+	@ExecSpace("ClientOnly")
+	method number LogHeight()
+		return self:Height() - 108
+	end
+
+	-- 크기에 따라 기록·입력 칸(바깥 상자 + 안쪽 글 칸)과 확대/축소 아이콘을 맞춘다(보내기 버튼은 오른쪽 아래 기준이라 따라온다)
+	@ExecSpace("ClientOnly")
+	method void ApplyWidth()
+		local w = self:Width()
+		if isvalid(self.Log) then self.Log.UITransformComponent.RectSize = Vector2(w - 28, self:LogHeight()) end
+		if isvalid(self.Input) then
+			-- RtsLobbyUiLogic.SpawnInput: 입력 글 칸(Input) → 안쪽 판 → 바깥 상자(둥근 테두리). 글 칸은 상자보다 40·8 작다
+			self.Input.UITransformComponent.RectSize = Vector2(w - 110, 36)
+			local inner = self.Input.Parent
+			if isvalid(inner) and isvalid(inner.Parent) then inner.Parent.UITransformComponent.RectSize = Vector2(w - 70, 44) end
+		end
+		if isvalid(self.ExpandIcon) then self.ExpandIcon:SetEnable(not self.Expanded) end
+		if isvalid(self.ShrinkIcon) then self.ShrinkIcon:SetEnable(self.Expanded) end
+	end
+
+	@ExecSpace("ClientOnly")
+	method void SetExpanded(boolean on)
+		if not self.Built or self.Expanded == on then return end
+		self.Expanded = on
+		self:ApplyWidth()
+		self:Layout(true)
+		self:SyncProgress()
+		self:Render()
+	end
+
+	-- 확대 중엔 유저 진행 현황(라운드·남은 수·순위 줄, RtsHudLogic.ProgressBox)을 숨기고 그 자리까지 채팅이 쓴다(2026-09-29 사용자). 축소·혼자 하기 판이면 다시 보인다
+	@ExecSpace("ClientOnly")
+	method void SyncProgress()
+		local box = _RtsHudLogic.ProgressBox
+		if box == nil or not isvalid(box) then return end
+		local show = not (self.Expanded and self.Built and isvalid(self.Box) and self.Box.Enable)
+		if box.Enable ~= show then box:SetEnable(show) end
+	end
+
+	@ExecSpace("ClientOnly")
+	method void Send(Entity input)
+		if input == nil or not isvalid(input) or input.TextInputComponent == nil then return end
+		local text = input.TextInputComponent.Text
+		if text == nil or text == "" then return end
+		self:RequestSend(text)
+		_RtsLobbyUiLogic:AddHistory(text)
+		_RtsLobbyUiLogic:ClearAfterSend(input, text)
+	end
+
+	-- 채팅 입력 중인가(게임 단축키를 막는다 — RtsUnitSelectLogic.HandleKeyDownEvent)
+	@ExecSpace("ClientOnly")
+	method boolean IsTyping()
+		local e = self.Input
+		return e ~= nil and isvalid(e) and e.TextInputComponent ~= nil and e.TextInputComponent.IsFocused
+	end
+
+	-- 기록 칸을 칸에 들어갈 만큼(새 줄부터 거꾸로, 줄바꿈 어림) 다시 쓴다.
+	--   한 줄 글자 수 ≈ 칸 폭 ÷ 글자 크기(한글 기준), 줄 수 = 칸 높이 ÷ (글자 크기 × 1.3)
+	@ExecSpace("ClientOnly")
+	method void Render()
+		if not self.Built then return end
+		local perLine = math.max(6, math.floor((self:Width() - 28) / self.FontSize))
+		local maxLines = math.max(3, math.floor(self:LogHeight() / (self.FontSize * 1.3)))
+		self:RenderInto(self.Log, perLine, maxLines)
+	end
+
+	@ExecSpace("ClientOnly")
+	method void RenderInto(Entity label, number perLine, number maxLines)
+		local H = _RtsHudLogic
+		if label == nil or not isvalid(label) then return end
+		local nick = ""
+		local lp = _UserService.LocalPlayer
+		if lp ~= nil and lp.PlayerComponent ~= nil then nick = lp.PlayerComponent.Nickname end
+		local out = {}
+		local used = 0
+		for i = #self.MyLines, 1, -1 do
+			local n = H:TextLinesRough(self.MyLines[i], perLine)
+			if used > 0 and used + n > maxLines then break end
+			used = used + n
+			table.insert(out, 1, _RtsLobbyUiLogic:ChatRich(self.MyLines[i], nick))
+		end
+		H:SetUiText(label, table.concat(out, "\n"))
+	end
+
+end

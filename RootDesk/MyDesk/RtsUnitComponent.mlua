@@ -29,7 +29,7 @@ script RtsUnitComponent extends Component
 	@Sync
 	property number BondNo = 0
 
-	-- 위치 이동 / 대상 변경이 다시 가능해지는 시각(서버 경과 초). 유닛마다 3분 고정(RtsUnitLogic.CooldownSec)
+	-- 위치 이동 / 대상 변경이 다시 가능해지는 시각(게임 시계 GameNow). 이동 20초(RtsUnitLogic.MoveCooldownSec) · 대상 변경 3분(RtsUnitLogic.CooldownSec)
 	@Sync
 	property number MoveReadyAt = 0
 

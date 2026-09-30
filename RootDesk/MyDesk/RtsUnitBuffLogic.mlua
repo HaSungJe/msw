@@ -83,7 +83,8 @@ script RtsUnitBuffLogic extends Logic
 	end
 
 	method boolean InScope(table def, any src, any me)
-		if def.scope == "target" then return src.BondNo == me.No end
+		-- 대상 지정 버프(홀리 유니티): 지정한 유닛 + 시전자 자신(2026-09-29 사용자 "대상 지정 시 자신도 최종 데미지 같이 증가" — 대상을 지정했을 때만, 전엔 지정 유닛만)
+		if def.scope == "target" then return src.BondNo == me.No or (src.BondNo > 0 and src.No == me.No) end
 		return true
 	end
 

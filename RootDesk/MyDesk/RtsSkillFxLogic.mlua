@@ -765,17 +765,18 @@ script RtsSkillFxLogic extends Logic
 		if fx.projSpin ~= nil and fx.projSpin ~= 0 then
 			local dirSpin = 1
 			if math.random(0, 1) == 1 then dirSpin = -1 end
+			-- 회전 갱신 20Hz(2026-09-29 — 전 33Hz. 초월 구체 60개 × 회전·추적 타이머가 겹쳐 렉, 회전 각속도는 그대로)
 			spinTimer = _TimerService:SetTimerRepeat(function()
 				if not isvalid(e) then
 					stopFly()
 					return
 				end
-				e.TransformComponent.ZRotation = e.TransformComponent.ZRotation + fx.projSpin * dirSpin * 0.03
+				e.TransformComponent.ZRotation = e.TransformComponent.ZRotation + fx.projSpin * dirSpin * 0.05
 				if isvalid(ring) then
-					ringAngle = ringAngle + (fx.projRingSpin or 286.48) * 0.03
+					ringAngle = ringAngle + (fx.projRingSpin or 286.48) * 0.05
 					ring.TransformComponent.ZRotation = ringAngle - e.TransformComponent.ZRotation
 				end
-			end, 0.03)
+			end, 0.05)
 		end
 		if fx.projFlySprites ~= nil and #fx.projFlySprites > 0 then
 			sr.SpriteRUID = fx.projFlySprites[1]
@@ -957,7 +958,7 @@ script RtsSkillFxLogic extends Logic
 						_TimerService:ClearTimer(arcTimer)
 						arcTimer = nil
 					end
-				end, 0.03)
+				end, 0.05) -- 추적 갱신 20Hz(2026-09-29 — 전 33Hz, 구체 60개 렉 완화. 도착 시각은 그대로 arrivalTimer)
 			else
 				_TweenLogic:MoveTo(e, to, sec, EaseType.Linear)
 			end

@@ -182,10 +182,15 @@ script RtsCombatLogic extends Logic
 		end
 		local remain = m.Defense - self:GuardCrush(m.Zone) - self:ArmorBreak(m.Zone) - m:ShredNow() - ign
 		if remain < 0 then remain = 0 end
+		-- 남은 방어율 상한 MaxDefenseCut(97%) — 데미지가 3% 미만으로 깎이지 않는다(2026-09-29 사용자 "방어율 차이는 최대 97%까지")
+		if remain > self.MaxDefenseCut then remain = self.MaxDefenseCut end
 		local mul = 1 - remain / 100
 		if mul < 0 then mul = 0 end
 		return mul * vuln
 	end
+
+	-- 방어율이 데미지를 깎는 상한(%) — 남은 방어율이 이보다 커도 여기서 멈춘다(2026-09-29 사용자)
+	property number MaxDefenseCut = 97
 
 	-- 구역 zone의 방어구 부수기(%p, 2026-09-24): 그 구역 주인의 1티어 유닛 중 가장 큰 값(RtsJobTableLogic.ArmorBreakFor — 증강 개수 × 1, 최대 30)
 	-- 테스트 모드면 타격마다 더할 데미지(DevExtraDamage), 아니면 0

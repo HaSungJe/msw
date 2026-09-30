@@ -100,7 +100,7 @@ script RtsStageTableLogic extends Logic
 	-- BEGIN GENERATED
 	-- tools/gen-stage-table.py가 생성 — 손으로 고치지 않는다
 	method void LoadGenerated()
-		self.RecruitAt = { 1, 5, 26, 43, 47, 56 }
+		self.RecruitAt = { 1, 5, 12, 20, 26, 36, 47, 56, 70 }
 		self.Stages = {
 			{ no = 1, tag = "1", name = "달팽이 동산", kind = "mob", theme = "빅토리아", bgm = "3926b48759d246dc8464a876ff7fa5ce", sec = 20, hp = 106, meso = 1200, special = false, def = 0, mobs = { "M001", "M002", "M003" } },
 			{ no = 2, tag = "2", name = "오솔길", kind = "mob", theme = "빅토리아", bgm = "3926b48759d246dc8464a876ff7fa5ce", sec = 20, hp = 472, meso = 1600, special = false, def = 0, mobs = { "M004" } },

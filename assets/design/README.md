@@ -11,5 +11,6 @@
 | `themes/` | 풍경·현재 트랙·바닥 제작 원본·마을 장식 | 게임 적용 중 |
 | `tombstone/` | 기본 비석 | 게임 적용 중 |
 | `monster-thumbnails/` | 몬스터·보스 아이콘과 ID 대응표 | 게임 적용 중 |
+| `lobby/` | 로비·방 대기실·게임 채팅·HUD 프로필 줄 선 아이콘 17종(확대 `expand` · 연필 `pencil` 포함)·점선 테두리 3종(흰 PNG, `tools/gen-lobby-icons.py`로 생성, RUID = `RtsLobbyUiLogic.IconRUID`) | 게임 적용 중 |
 
 2026-09-25 정리: Sol 썬콜 시안, 반려된 모션 시트, 일반 아바타 조사 자료, 옛 테마 썸네일·v2 트랙은 `.beaver/output/archive/design-cleanup-260925/`로 분리했다. 업로드된 리소스나 게임 코드는 변경하지 않았다.
