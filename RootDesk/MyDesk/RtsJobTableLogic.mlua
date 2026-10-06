@@ -943,6 +943,11 @@ script RtsJobTableLogic extends Logic
 	--   받는 데미지 증가(디바인 퍼니시먼트)·방어구 부수기·가드 크러쉬·방어율은 보스 쪽 효과라 뺀다. u = 유닛(JobId·Level·Prisms·SkillLocks만 읽음), st = GetStatFor(+ 파티 버프) 결과.
 	--   첫 쿨타임 몰림을 빼려고 처음 30초 뒤 300초 평균(tools/balance-calc.py rotation_dps와 같은 방식)
 	method number BossDps(any u, table st)
+		return self:RotationDps(u, st, true, 1)
+	end
+
+	method number RotationDps(any u, table st, boolean boss, number targetCount)
+		-- 공통 로테이션: 보스 1체 또는 충분히 밀집한 일반 몬스터의 총 피해. 실제 스킬 표를 읽으며 전투 상태는 바꾸지 않는다.
 		local skills = self:GetSkillsFor(u)
 		local c = self:CalcStat(u.JobId, u.Level, st)
 		local period = self:GetPeriod(st)
@@ -954,10 +959,11 @@ script RtsJobTableLogic extends Logic
 		local order = {}
 		for _, i in ipairs(self:SkillOrder(skills)) do
 			local k = skills[i]
-			if k.kind == "액티브" and k.fx ~= nil and u.Level >= k.lv and self:GetLock(u.SkillLocks or "", i) == 0 then order[#order + 1] = i end
+			local lock = self:GetLock(u.SkillLocks or "", i)
+			if k.kind == "액티브" and k.fx ~= nil and u.Level >= k.lv and (lock == 0 or (not boss and lock == 1)) then order[#order + 1] = i end
 		end
 		if #order == 0 then return 0 end
-		-- 시전 1번이 보스에게 주는 기대 데미지(스킬마다 한 번)
+		-- 시전 1번의 기대 피해. 구체는 총 타격을 분배하므로 타겟 수를 다시 곱하지 않는다.
 		local castDmg = {}
 		for _, i in ipairs(order) do
 			local k = skills[i]
@@ -975,22 +981,34 @@ script RtsJobTableLogic extends Logic
 					r = k.hitRatios[h]
 					hitBase = self:PerHit(c.atk, st, r)
 				end
-				total = total + hitBase * self:BossMul(st, bossRatio, r)
+				local mul = k.mobMul or 1
+				if boss then mul = self:BossMul(st, bossRatio, r) end
+				total = total + hitBase * mul
 			end
 			-- 보스 집중: 대상이 전부 보스면 bossHits번 반복(1체 기준)
-			if k.bossHits ~= nil then total = total * k.bossHits end
+			if boss and k.bossHits ~= nil then total = total * k.bossHits end
 			total = total * ce
 			-- 쉐도우 파트너: 기본 공격(쿨·자기 타격 수 없음) 뒤 ½ 데미지 halfHits회
 			if k.cd == nil and k.hits == nil and (st.halfHits or 0) > 0 then
-				total = total + st.halfHits * perHit * 0.5 * self:BossMul(st, bossRatio, ratio) * critExp
+				local mul = k.mobMul or 1
+				if boss then mul = self:BossMul(st, bossRatio, ratio) end
+				total = total + st.halfHits * perHit * 0.5 * mul * critExp
 			end
+			if not boss and not k.spread then total = total * math.min(targetCount, k.targets or st.targets or 1) end
 			-- 지속 피해 지대: dur ÷ period틱, 보스 배율 없음(고정 데미지는 일반 몬스터만)
+			local fixed = 0
 			if k.dot ~= nil then
 				local dotPct = st.dotPct or k.dot.pct
 				local perTick = self:PerHit(c.atk, st, dotPct)
-				total = total + perTick * math.floor(k.dot.dur / k.dot.period + 0.5) * critExp
+				local ticks = math.floor(k.dot.dur / k.dot.period + 0.5)
+				local count = 1
+				if not boss then
+					count = targetCount
+					fixed = (st.dotFlat or 0) * ticks * count * critExp
+				end
+				total = total + perTick * ticks * critExp * count
 			end
-			castDmg[i] = total * weapon
+			castDmg[i] = total * weapon + fixed
 		end
 		-- 공격 틱 i의 시각 = 1 + i × 주기. 쿨 스킬 시전만 하나씩 따라가고, 그 사이 기본 공격은 다음 쿨 준비 틱까지 한 번에 센다(틱마다 돌면 0.1초 주기 팬텀이 3천 번 — 느림)
 		local eps = 0.000001
@@ -1053,6 +1071,69 @@ script RtsJobTableLogic extends Logic
 		local secs = (iEnd - iStart) * period
 		if secs <= 0 then return 0 end
 		return sum / secs
+	end
+
+	@ExecSpace("ClientOnly")
+	method table RecruitDpsUnit(string jobId, number level, boolean prism)
+		-- 영입 비교용 가상 유닛. 일반 증강·보유 유닛·사용자 잠금을 섞지 않고 프리즘의 강제 잠금만 적용한다.
+		local u = { JobId = jobId, Level = level, Prisms = "", Augs = "", SkillLocks = self:DefaultLocks(jobId) }
+		if prism then
+			local ids = {}
+			for _, p in ipairs(self:GetPrisms()) do
+				if p.job == jobId then ids[#ids + 1] = p.id end
+			end
+			u.Prisms = table.concat(ids, ",")
+			local skills = self:GetSkillsFor(u)
+			for _, p in ipairs(self:GetPrisms()) do
+				if p.job == jobId and p.locks ~= nil then
+					for _, name in ipairs(p.locks) do
+						local i = self:FindSkill(skills, name)
+						if i > 0 then u.SkillLocks = self:SetLock(u.SkillLocks, i, 3) end
+					end
+				end
+			end
+		end
+		return u
+	end
+
+	@ExecSpace("ClientOnly")
+	method table RecruitDpsComparison(string mode)
+		-- 같은 레벨·같은 증강 조건의 전 직업 중 최댓값이 척도. 처음 열 때만 계산하고 탭·직업 전환에서 재사용한다.
+		if self._T.RecruitDpsVersion ~= 2 then
+			self._T.RecruitDps = {}
+			self._T.RecruitDpsVersion = 2
+		end
+		if self._T.RecruitDps[mode] ~= nil then return self._T.RecruitDps[mode] end
+		local data = { levels = { 1, 10, 20, 30, 40, 50 }, jobs = {}, maxima = {} }
+		local boss = mode ~= "hunt"
+		local count = 40
+		if boss then count = 1 end
+		for _, jobId in ipairs(self:GetJobIds()) do
+			local rows = {}
+			data.jobs[jobId] = rows
+			-- 팬텀은 프리즘 영입 직업: 일반 비교의 값과 최대치 산정에서 모두 제외한다.
+			local firstVariant = 1
+			if jobId == "phantom" then firstVariant = 2 end
+			for i, level in ipairs(data.levels) do
+				local values = {}
+				rows[i] = values
+				for variant = firstVariant, 2 do
+					local u = self:RecruitDpsUnit(jobId, level, variant == 2)
+					local st = self:GetStatFor(u)
+					local buffs = {}
+					for _, d in ipairs(_RtsUnitBuffLogic:GetDefs()) do
+						-- 자신의 샤프아이즈·프레이·조커 포함. 홀리 유니티는 대상 지정 완료 상태의 자신만 포함.
+						if d.job == jobId and level >= d.lv and (d.prism == nil or self:HasPrism(u, d.prism)) then buffs[#buffs + 1] = { def = d } end
+					end
+					_RtsUnitBuffLogic:ApplyToStat(st, buffs)
+					values[variant] = self:RotationDps(u, st, boss, count)
+					if data.maxima[i] == nil then data.maxima[i] = { 0, 0 } end
+					data.maxima[i][variant] = math.max(data.maxima[i][variant], values[variant])
+				end
+			end
+		end
+		self._T.RecruitDps[mode] = data
+		return data
 	end
 
 	-- ===== 프리즘 증강(2026-09-22 개발모드 선행 — 정의·수치는 .info/character.md '종류: 프리즘', 규칙은 .beaver/memory/balance.md) =====

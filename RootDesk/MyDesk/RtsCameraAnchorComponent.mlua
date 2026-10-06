@@ -43,15 +43,16 @@ script RtsCameraAnchorComponent extends Component
 
 		_CameraService.TransitionBlendTime = 0
 
-		_RtsHudLogic:BuildHud(self.Entity)
-		self:JumpToZone(self.MyZone)
-
 		-- 구역 시각화용으로 스폰한 프롭(defaultplayer 복제)이 활성 카메라를 가져가는 경우가 있어
 		--   내 카메라를 명시적으로 되찾은 뒤 줌을 건다(2026-08-18 실측: 되찾지 않으면 ZoomTo가 무시됨)
 		-- 플레이 시작 직후엔 엔진이 뒤늦게 기본 줌을 덮어써서 첫 ZoomTo가 사라지는 경우가 있다(2026-09-15 실측)
 		--   → 실제 ZoomRatio가 목표에 도달할 때까지 0.3초 간격으로 다시 건다(최대 10회)
 		self:ClaimCamera()
 		self:EnsureZoom(0)
+
+		-- HUD 생성 오류가 카메라 줌 초기화까지 중단시키지 않도록 화면보다 먼저 설정한다.
+		_RtsHudLogic:BuildHud(self.Entity)
+		self:JumpToZone(self.MyZone)
 	end
 
 	-- 줌이 목표(30%)에 도달했는지 확인하고 아니면 다시 건다

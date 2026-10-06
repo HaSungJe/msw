@@ -1046,9 +1046,22 @@ script RtsUnitPopupLogic extends Logic
 		local ends = {}
 		local function line(name, color)
 			local e = H:SpawnUI("model://uisprite", name, parent, Vector2(0, 1), Vector2(0, 0.5), c, Vector2(1, 1))
+			e.SpriteGUIRendererComponent.ImageRUID = DataRef(H.WhiteRUID)
 			e.SpriteGUIRendererComponent.Color = color
 			e.SpriteGUIRendererComponent.RaycastTarget = false
 			return e
+		end
+		local function gridSegment(name, a, b, color, thick)
+			local e = line(name, color)
+			-- 축소 화면에서 1px 선을 90도 회전하면 한쪽 변이 픽셀 사이로 빠질 수 있다.
+			if math.abs(b.x - a.x) < 0.001 then
+				local t = e.UITransformComponent
+				t.Pivot = Vector2(0.5, 0.5)
+				t.anchoredPosition = (a + b) * 0.5
+				t.RectSize = Vector2(thick, math.abs(b.y - a.y))
+			else
+				H:SetSegment(e, a, b, thick, 0)
+			end
 		end
 		for i = 1, 6 do
 			local a = math.rad((i - 1) * 60)
@@ -1059,10 +1072,10 @@ script RtsUnitPopupLogic extends Logic
 				local v = ends[i]
 				local w = ends[i % 6 + 1]
 				local scale = level / 4
-				H:SetSegment(line("RtsStatGrid", Color(0.64, 0.64, 0.76, 0.30)), c + (v - c) * scale, c + (w - c) * scale, 1, 0)
+				gridSegment("RtsStatGrid", c + (v - c) * scale, c + (w - c) * scale, Color(0.64, 0.64, 0.76, 0.40), 2)
 			end
 		end
-		for i = 1, 6 do H:SetSegment(line("RtsStatAxis", Color(0.64, 0.64, 0.76, 0.23)), c, ends[i], 1, 0) end
+		for i = 1, 6 do gridSegment("RtsStatAxis", c, ends[i], Color(0.64, 0.64, 0.76, 0.30), 1.5) end
 		self._T.ChartLines = {}
 		self._T.ChartDots = {}
 		self._T.ChartFill = {}

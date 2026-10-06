@@ -406,6 +406,149 @@ script RtsAugmentLogic extends Logic
 		self:SyncPending(userId)
 	end
 
+	method boolean IsStatGrade(string grade)
+		-- 일괄 지정은 능력치 등급만 허용한다. 특수 코어도 프리즘이므로 제외한다.
+		return grade == "bronze" or grade == "silver" or grade == "gold"
+	end
+
+	method boolean IsBatchStat(string id)
+		-- 종류를 이미 고른 증강은 다시 굴리지 않고 그대로 지정한다.
+		local d = _RtsAugmentTableLogic:GetDef(id)
+		return d ~= nil and self:IsStatGrade(d.grade) and not d.core and d.unlock == nil and (d.job == nil or d.job == "")
+	end
+
+	method boolean CanStackStat(string id, string augs)
+		-- 아직 반영하지 않은 가상 목록에서도 거인 학살자의 중복을 검사한다.
+		if not self:IsBatchStat(id) then return false end
+		local d = _RtsAugmentTableLogic:GetDef(id)
+		if d.unique then
+			for q in string.gmatch(augs or "", "[^,]+") do if q == id then return false end end
+		end
+		return true
+	end
+
+	method string BestStatChoice(any u, string augs, table ids, table buffs)
+		-- 한 장 적용 후의 보스 DPS를 비교한다. 크확 상한·직업별 증강 배율·현재 버프와 스킬 잠금을 반영한다.
+		local best = ""
+		local bestDps = -1
+		local T = _RtsJobTableLogic
+		for _, id in ipairs(ids) do
+			if self:CanStackStat(id, augs) then
+				local nextAugs = id
+				if augs ~= "" then nextAugs = augs .. "," .. id end
+				local v = { JobId = u.JobId, Level = u.Level, Prisms = u.Prisms or "", SkillLocks = u.SkillLocks or "", Augs = nextAugs }
+				local st = T:GetStatFor(v)
+				_RtsUnitBuffLogic:ApplyToStat(st, buffs)
+				local dps = T:BossDps(v, st)
+				if dps > bestDps + 0.000001 then bestDps = dps best = id end
+			end
+		end
+		return best
+	end
+
+	method table BuildBatchPlan(table owned, table queue, any u, string selection, boolean optimize, table buffs)
+		-- 검증과 계획만 수행한다. 실제 보유/유닛은 바꾸지 않으며 처음 굴린 미선택 단계만 queue에 보존한다.
+		local fail = { ok = false, reason = "목록이 바뀌었어요. 증강을 다시 선택해 주세요" }
+		if u == nil or selection == "" or #selection > 240 then return fail end
+		local entries = {}
+		local seen = {}
+		local parts = {}
+		for key in string.gmatch(selection, "[^,]+") do
+			local kind = string.sub(key, 1, 1)
+			local digits = string.match(key, "^[po]([1-9][0-9]*)$")
+			if digits == nil or seen[key] then return fail end
+			seen[key] = true
+			parts[#parts + 1] = key
+			local n = tonumber(digits)
+			local source = nil
+			if kind == "o" then
+				source = owned[n]
+				if source == nil or source.no ~= 0 or not self:IsBatchStat(source.id) then return fail end
+			else
+				for _, pending in ipairs(queue) do if pending.token == n then source = pending break end end
+				if source == nil or not self:IsStatGrade(source.grade) or not optimize then return fail end
+			end
+			entries[#entries + 1] = { kind = kind, n = n, source = source }
+			if #entries > self.UnitAugMax then return fail end
+		end
+		if #entries == 0 or table.concat(parts, ",") ~= selection then return fail end
+		local used = 0
+		for _, item in ipairs(owned) do
+			local d = _RtsAugmentTableLogic:GetDef(item.id)
+			if item.no == u.No and (d == nil or d.grade ~= "prism" or d.core) then used = used + 1 end
+		end
+		if used + #entries > self.UnitAugMax then
+			return { ok = false, reason = "남은 증강 칸은 " .. string.format("%d", math.max(0, self.UnitAugMax - used)) .. "개예요" }
+		end
+		-- 이미 종류가 정해진 증강부터 반영한 뒤, 미선택 건은 발급 순서대로 최적화한다.
+		table.sort(entries, function(a, b)
+			if a.kind ~= b.kind then return a.kind == "o" end
+			return a.n < b.n
+		end)
+		local result = { ok = true, owned = {}, augs = u.Augs or "", tokens = {}, count = #entries }
+		for i, item in ipairs(owned) do result.owned[i] = { id = item.id, no = item.no } end
+		for _, entry in ipairs(entries) do
+			local id = entry.source.id or ""
+			if entry.kind == "p" then
+				local ids = self:ParseOffer(entry.source.packed or "").ids
+				if #ids == 0 then
+					ids = _RtsAugmentTableLogic:StatChoices(entry.source.grade, entry.source.level or 0)
+					entry.source.packed = entry.source.grade .. "|" .. table.concat(ids, ",") .. "|" .. string.format("%d", entry.n)
+				end
+				id = self:BestStatChoice(u, result.augs, ids, buffs)
+			end
+			if not self:CanStackStat(id, result.augs) then
+				return { ok = false, reason = "같은 유닛에 중복 적용할 수 없는 증강이 있어요" }
+			end
+			if result.augs == "" then result.augs = id else result.augs = result.augs .. "," .. id end
+			if entry.kind == "o" then result.owned[entry.n].no = u.No
+			else
+				result.owned[#result.owned + 1] = { id = id, no = u.No }
+				result.tokens[entry.n] = true
+			end
+		end
+		return result
+	end
+
+	@ExecSpace("Server")
+	method void RequestAssignBatch(string selection, number no, string unitId, string expectedOwned, boolean optimize, number requestId)
+		-- 클라의 점수/종류를 신뢰하지 않는다. 전체 계획을 검증한 뒤 한 번에 반영한다.
+		local userId = senderUserId
+		if userId == nil or userId == "" then return end
+		local reason = ""
+		local e = nil
+		if _RtsStageLogic.Paused then reason = "일시정지를 해제한 뒤 지정해 주세요"
+		elseif not _RtsRunResultLogic:IsAlive(userId) then reason = "진행 중인 판에서 지정할 수 있어요"
+		elseif no < 1 or no ~= math.floor(no) then reason = "받을 캐릭터를 다시 선택해 주세요"
+		else e = _RtsUnitLogic:GetUnit(userId, no) end
+		if reason == "" and (not isvalid(e) or e.Id ~= unitId) then reason = "캐릭터가 바뀌었어요. 다시 선택해 주세요" end
+		if reason == "" and expectedOwned ~= (self.OwnedByUser[userId] or "") then reason = "보유 증강이 바뀌었어요. 다시 선택해 주세요" end
+		if reason ~= "" then self:BatchResult(requestId, false, reason, userId) return end
+		local u = e.RtsUnitComponent
+		if u == nil or u.Owner ~= userId then self:BatchResult(requestId, false, "내 캐릭터를 선택해 주세요", userId) return end
+		local q = self.Queue[userId] or {}
+		local plan = self:BuildBatchPlan(self:GetOwned(userId), q, u, selection, optimize, _RtsUnitBuffLogic:GetBuffsFor(u.Zone, u.No))
+		if not plan.ok then self:BatchResult(requestId, false, plan.reason, userId) return end
+		local keep = {}
+		for _, item in ipairs(q) do if not plan.tokens[item.token] then keep[#keep + 1] = item end end
+		-- 대기/타이머/RPC 없이 서버의 현재 상태를 일괄 교체한다. 중복 요청은 expectedOwned에서 거부된다.
+		u.Augs = plan.augs
+		self.OwnedByUser[userId] = self:PackOwned(plan.owned)
+		self.Queue[userId] = keep
+		local active = self:ParseOffer(self.OfferByUser[userId] or "")
+		if plan.tokens[active.token] then self:PopNext(userId) end
+		self:SyncPending(userId)
+		_RtsUnitLogic:OnChanged(no, _RtsUnitLogic:GetMeso(userId), userId)
+		_RtsConfigLogic:Log("RtsAugment: batch " .. string.format("%d", plan.count) .. " -> unit " .. string.format("%d", no))
+		self:BatchResult(requestId, true, string.format("%d", plan.count) .. "개 증강을 부여했어요", userId)
+	end
+
+	@ExecSpace("Client")
+	method void BatchResult(number requestId, boolean ok, string message)
+		-- 요청한 클라이언트에만 결과를 알리고 부분 화면을 갱신한다.
+		_RtsPopupLogic:OnAugBatchResult(requestId, ok, message)
+	end
+
 	-- 보유 증강 k번째를 유닛 no에 지정(1회, 변경 불가)
 	@ExecSpace("Server")
 	method void RequestAssign(number k, number no)
@@ -565,6 +708,7 @@ script RtsAugmentLogic extends Logic
 	@ExecSpace("ClientOnly")
 	method void ClientTick()
 		if not _RtsHudLogic.Built or not _RtsPopupLogic.Built then return end
+		_RtsPopupLogic:TickAugBatch()
 		local packed = self.OfferByUser[_RtsUnitLogic:MyUserId()] or ""
 		-- 뽑기 직후: 뽑기 횟수가 올라가면(서버가 받아 처리함) 획득음 + 보유 증강 탭 반짝임. 3초 안에 안 오르면(서버 거절) 기다림을 푼다
 		if self.AwaitBuy > 0 then
@@ -599,7 +743,7 @@ script RtsAugmentLogic extends Logic
 		if justChosen then
 			-- 바로 지정했으면(ChosenStay) 선택 창을 그대로 두고 다음 선택지(없으면 닫힘)를 기다린다 — 서버가 옛 제안으로 온 요청은 거절해 두 번 받히지 않는다
 			if _RtsPopupLogic.Kind == "pick" and not self.ChosenStay then _RtsPopupLogic:Close() end
-		elseif packed ~= "" and (self.PickFolded or _RtsPopupLogic.Kind == "draw") then
+		elseif packed ~= "" and (self.PickFolded or _RtsPopupLogic.Kind == "draw" or _RtsPopupLogic.Kind == "augment") then
 			-- 접어 둠: 자동으로 열지 않는다(HUD '펼치기')
 		elseif packed ~= "" and (packed ~= self.ShownOffer or _RtsPopupLogic.Kind ~= "pick") then
 			self.ShownOffer = packed

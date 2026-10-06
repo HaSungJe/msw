@@ -122,8 +122,17 @@ script RtsPopupLogic extends Logic
 
 	property number AugPickNo = 0
 
-	-- 이미 적용된(유닛에 지정된·해금된) 증강 숨기기(2026-09-24 사용자 "증강 팝업 우측 하단에 체크박스, 기본 체크")
-	property boolean AugHideAssigned = true
+	-- 능력치 일괄 지정: p=미선택 토큰, o=보유 목록 인덱스. 대상은 엔티티 ID까지 고정한다.
+	property table AugBatch = {}
+	property boolean AugBatchMode = true
+	property boolean AugAuto = false
+	property number AugBatchNo = 0
+	property string AugBatchUnitId = ""
+	property string AugBatchOwned = ""
+	property number AugBatchBusy = 0
+	property number AugBatchSerial = 0
+	property number AugBatchAt = 0
+
 
 	-- 3택1 등장음은 유지하고 카드의 지속 반짝임은 사용하지 않는다.
 	property string PickSound = "dbb38b4f04044499906bd7a2ca9c4d7c"
@@ -293,9 +302,9 @@ script RtsPopupLogic extends Logic
 			height = 400
 			title = "난이도"
 		elseif kind == "recruitinfo" then
-			-- 2026-09-25 사용자 "가로 넓이 줄이고 캐릭터 모습 창 줄이고 설명 제거 — 스킬만" → "가로가 너무 넓어, 불필요하게 넓음" 760 → 600
-			width = 1320
-			height = 740
+			-- 도형과 레벨별 DPS를 읽기 쉽게 전체 셸 확대(2026-10-06).
+			width = 1560
+			height = 940
 			title = _RtsJobTableLogic:GetJobName(self.PendingJob)
 		elseif kind == "profile" then
 			-- 높이 780 = 머리 70 + 위 탭·종류 탭·안내 182 + 카드 목록 508(카드 줄 270 — 넘치면 세로 스크롤) + 아래 20
@@ -1019,12 +1028,13 @@ script RtsPopupLogic extends Logic
 			T:GetJobGroup(jid), self:Muted(), 15, TextAlignmentType.MiddleCenter, false)
 		-- 오른쪽 위: 오각형 — 축 = 위부터 시계 방향 공격 속도 · 사거리 · 증강 효율 · 보스 · 사냥
 		local rd = T:GetRadar(jid)
-		self:SpawnRadar(body, 475, -210, 118, { rd.speed, rd.range, rd.aug, rd.boss, rd.hunt },
+		self:SpawnRadar(body, 548, -180, 125, { rd.speed, rd.range, rd.aug, rd.boss, rd.hunt },
 			{ "공격 속도", "사거리", "증강 효율", "보스", "사냥" })
+		self:BuildRiDps(body, jid)
 		-- 아래: 스킬 탭(제자리) + [Tab] 키캡 + 목록(탭을 바꾸면 목록만 다시 — BuildRiSkills)
 		local items = { { "active", "액티브" }, { "passive", "패시브" }, { "prism", "프리즘 증강" } }
 		if self.RiSkillTab ~= "passive" and self.RiSkillTab ~= "prism" then self.RiSkillTab = "active" end
-		self.RiBar = self:SpawnTabBar(body, "RtsRiSkillTab", items, self.RiSkillTab, 680, -10, 180, 80, 12, 24, function(key)
+		self.RiBar = self:SpawnTabBar(body, "RtsRiSkillTab", items, self.RiSkillTab, 800, -10, 220, 80, 12, 24, function(key)
 			self.RiSkillTab = key
 			self:BuildRiSkills(body, W)
 		end)
@@ -1062,10 +1072,10 @@ script RtsPopupLogic extends Logic
 		local box = self:SpawnBox(body, "RtsRiSkills")
 		self.RiSkillBox = box
 		self:DropLater(old)
-		local list = H:SpawnStretch("model://uisprite", "RtsRiSkillList", box, Vector2(0, 0), Vector2(1, 1), Vector2(680, 132), Vector2(-27, -108))
+		local list = H:SpawnStretch("model://uisprite", "RtsRiSkillList", box, Vector2(0, 0), Vector2(1, 1), Vector2(800, 132), Vector2(-27, -108))
 		_RtsHudLogic:SetUiColor(list, self:Mix(Color.white, 0.02), "surface")
 		H:AddVScroll(list, 6, Color(1, 1, 1, 0.06))
-		local rowW = W - 680 - 27 - 16
+		local rowW = W - 800 - 27 - 16
 		local textW = rowW - 28
 		local n = 0
 		-- 설명 줄 수 어림: 한글(3바이트 글자) 14px · 그 밖 7.5px 폭의 합 × 1.06(줄바꿈 여유) ÷ 칸 폭
@@ -1150,6 +1160,101 @@ script RtsPopupLogic extends Logic
 		end
 	end
 
+	@ExecSpace("ClientOnly")
+	method void BuildRiDps(Entity body, string jobId)
+		-- 레벨별 상대 DPS 선 그래프. 일반은 회색, 프리즘은 보라색이며 팬텀은 프리즘 선만 생성한다.
+		local H = _RtsHudLogic
+		local mode = self._T.RiDpsMode or "boss"
+		local refs = { jobId = jobId, points = {}, lines = {} }
+		local firstVariant = 1
+		if jobId == "phantom" then firstVariant = 2 end
+		self._T.RiDpsRefs = refs
+		refs.tabs = self:SpawnTabBar(body, "RtsRiDpsTab", { { "boss", "보스 DPS" }, { "hunt", "사냥 DPS" } }, mode,
+			332, -365, 212, 48, 12, 22, function(key)
+				self._T.RiDpsMode = key
+				self:RefreshRiDps()
+			end)
+		if firstVariant == 1 then
+			H:SpawnLabel("RtsRiDpsBase", body, Vector2(0, 1), Vector2(0, 1), Vector2(390, -420), Vector2(178, 30),
+				"증강 없음", self:Muted(), 19, TextAlignmentType.MiddleCenter, false)
+		end
+		local prismX = 590
+		if firstVariant == 2 then prismX = 460 end
+		H:SpawnLabel("RtsRiDpsPrism", body, Vector2(0, 1), Vector2(0, 1), Vector2(prismX, -420), Vector2(178, 30),
+			"프리즘만", Color(0.62, 0.36, 0.92, 1), 19, TextAlignmentType.MiddleCenter, true)
+		for i = 0, 5 do
+			local y = -640 + i * 36
+			H:SpawnLabel("RtsRiDpsScale" .. H:Int(i), body, Vector2(0, 1), Vector2(1, 0.5), Vector2(342, y), Vector2(24, 20),
+				H:Int(i), self:Muted(), 16, TextAlignmentType.MiddleRight, false)
+			local grid = H:SpawnUI("model://uisprite", "RtsRiDpsGrid" .. H:Int(i), body, Vector2(0, 1), Vector2(0, 0.5),
+				Vector2(350, y), Vector2(400, 1))
+			H:SetUiColor(grid, self:Edge(), "border")
+			grid.SpriteGUIRendererComponent.RaycastTarget = false
+		end
+		local levels = { 1, 10, 20, 30, 40, 50 }
+		for i, level in ipairs(levels) do
+			local x = 332 + (i - 1) * 74
+			H:SpawnLabel("RtsRiDpsLevel" .. H:Int(i), body, Vector2(0, 1), Vector2(0, 1), Vector2(x, -650), Vector2(66, 28),
+				"Lv." .. H:Int(level), self:Muted(), 18, TextAlignmentType.MiddleCenter, false)
+		end
+		for variant = firstVariant, 2 do
+			refs.points[variant] = {}
+			refs.lines[variant] = {}
+			local color = Color(0.48, 0.54, 0.62, 1)
+			if variant == 2 then color = Color(0.62, 0.36, 0.92, 1) end
+			-- chart 역할은 화면 모드와 관계없이 선의 구분 색을 유지한다.
+			for i = 1, 5 do
+				local name = "RtsRiDps" .. H:Int(i) .. "V" .. H:Int(variant)
+				local line = H:SpawnUI("model://uisprite", name .. "Line", body, Vector2(0, 1), Vector2(0, 0.5), Vector2.zero, Vector2(1, 4))
+				H:SetUiColor(line, color, "chart")
+				line.SpriteGUIRendererComponent.RaycastTarget = false
+				refs.lines[variant][i] = line
+			end
+			for i = 1, 6 do
+				local name = "RtsRiDps" .. H:Int(i) .. "V" .. H:Int(variant)
+				local point = H:SpawnUI("model://uisprite", name .. "Point", body, Vector2(0, 1), Vector2(0.5, 0.5), Vector2.zero, Vector2(8, 8))
+				H:SetUiColor(point, color, "chart")
+				point.SpriteGUIRendererComponent.RaycastTarget = false
+				refs.points[variant][i] = point
+			end
+		end
+		refs.note = H:SpawnLabel("RtsRiDpsNote", body, Vector2(0, 1), Vector2(0, 1), Vector2(320, -686), Vector2(460, 48),
+			"", self:Muted(), 15, TextAlignmentType.MiddleCenter, false)
+		if jobId == "paladin" or jobId == "phantom" then
+			local note = "홀리 유니티 대상 지정 기준"
+			if jobId == "phantom" then note = "팬텀은 프리즘 비교에만 포함" end
+			H:SpawnLabel("RtsRiDpsPrismNote", body, Vector2(0, 1), Vector2(0, 1), Vector2(27, -492), Vector2(260, 34),
+				note, self:Muted(), 13, TextAlignmentType.MiddleCenter, false)
+		end
+		self:RefreshRiDps()
+	end
+
+	@ExecSpace("ClientOnly")
+	method void RefreshRiDps()
+		-- 같은 레벨·조건의 최댓값 대비 높이만 표시하고 이웃 레벨을 선으로 연결한다. 팬텀 일반 계열은 없다.
+		local refs = self._T.RiDpsRefs
+		if refs == nil or not isvalid(refs.note) then return end
+		local mode = self._T.RiDpsMode or "boss"
+		local data = _RtsJobTableLogic:RecruitDpsComparison(mode)
+		local rows = data.jobs[refs.jobId]
+		if rows == nil then return end
+		for variant, points in pairs(refs.points) do
+			local previous = nil
+			for i, point in ipairs(points) do
+				local ratio = 0
+				if data.maxima[i][variant] > 0 then ratio = math.max(0, math.min(1, rows[i][variant] / data.maxima[i][variant])) end
+				local step = math.floor(ratio * 5 + 0.5)
+				local position = Vector2(365 + (i - 1) * 74, -640 + 36 * step)
+				point.UITransformComponent.anchoredPosition = position
+				if previous ~= nil then _RtsHudLogic:SetSegment(refs.lines[variant][i - 1], previous, position, 4, 0) end
+				previous = position
+			end
+		end
+		local target = "보스 1마리"
+		if mode == "hunt" then target = "일반 몬스터 40마리" end
+		_RtsHudLogic:SetUiText(refs.note, target .. " · 같은 레벨·증강 조건끼리 비교\n방어·외부 버프 제외 / 본인 버프 포함")
+	end
+
 	-- 오각형(레이더) 한 장: parent 왼쪽 위 기준 가운데 (cx, cy)(UI 좌표 — y 위가 +), 반지름 r(5단계 꼭짓점), levels(1~5)·names 5개(위부터 시계 방향). 단계 글자 없이 모양으로만.
 	--   바탕 그물 = RadarWebRUID 한 장(5겹 + 축), 값 다각형 = 삼각형 5개(가운데·꼭짓점 i·i+1)를 높이선으로 둘씩 나눈 직각삼각형 10장(RightTriRUID — RtsHudLogic.SplitTri·SetRightTri),
 	--   테두리 선 5개(흰 사각 늘려 회전 — RtsHudLogic.SetSegment) + 꼭짓점 점 + 축 이름
@@ -1217,7 +1322,7 @@ script RtsPopupLogic extends Logic
 			local lx = cx + (r + 46) * math.sin(a)
 			local ly = cy + (r + 22) * math.cos(a)
 			local lb = H:SpawnLabel("RtsRadarLabel" .. H:Int(i), parent, Vector2(0, 1), Vector2(0, 1), Vector2(0, 0), Vector2(120, 26),
-				names[i], self:Ink(), 15, TextAlignmentType.MiddleCenter, true)
+				names[i], self:Ink(), 18, TextAlignmentType.MiddleCenter, true)
 			lb.UITransformComponent.Pivot = Vector2(0.5, 0.5)
 			lb.UITransformComponent.anchoredPosition = Vector2(lx, ly)
 		end
@@ -2159,20 +2264,32 @@ script RtsPopupLogic extends Logic
 	--   보유 = RtsAugmentLogic.MyOwned(). 미지정 증강은 오른쪽에서 내 유닛 칩을 골라 [직업에게 지정](1회, 변경 불가). 직업 프리즘은 그 직업 유닛만, 특수 코어는 같은 코어가 없는 유닛만(방어구 부수기는 겹쳐 붙일 수 있음)
 	@ExecSpace("ClientOnly")
 	method void BuildAugment(Entity body)
-		-- 모든 등급을 한 목록에 표시하고 필터는 기존 행만 켜고 끈다.
+		-- 모든 등급의 미지정 증강과 미선택 건만 표시한다.
+		self.AugBatch = {}
+		self.AugBatchMode = true
+		self.AugBatchNo = 0
+		self.AugBatchUnitId = ""
+		local no = _RtsAugmentLogic:PickTarget()
+		local u = nil
+		if no > 0 then u = _RtsUnitLogic:GetMyUnit(no) end
+		if u ~= nil and u.Entity ~= nil and isvalid(u.Entity) then
+			self.AugBatchNo = no
+			self.AugBatchUnitId = u.Entity.Id
+		end
 		self.AugBody = body
 		self.AugContent = nil
 		self.AugDetail = nil
 		self:RefreshAugment()
 	end
 
-	-- 증강 창 내용(목록·상세·숨기기 체크·요약 줄) — 보유가 바뀌면(RefreshAugment)
+	-- 증강 창 내용(미지정 목록·상세·요약 줄) — 보유가 바뀌면(RefreshAugment)
 	@ExecSpace("ClientOnly")
 	method void BuildAugContent(Entity box, table owned)
 		local H = _RtsHudLogic
 		local A = _RtsAugmentLogic
 		local AT = _RtsAugmentTableLogic
-		-- 왼쪽 목록(모든 등급 — 숨기기는 ApplyAugFilter가 행만 켜고 끈다). 행 = 등급 띠·아이콘·이름·지정 상태
+		-- 왼쪽 목록은 no=0인 미지정 증강만 생성한다. k는 원본 보유 목록의 인덱스를 유지한다.
+		self:ReconcileAugBatch()
 		local listW = 440
 		local top = -70
 		local pendingItems = A:MyPendingItems()
@@ -2181,9 +2298,9 @@ script RtsPopupLogic extends Logic
 		self.AugRowRefs = {}
 		for i = 1, #owned do
 			local d = AT:GetDef(owned[i].id)
-			if d ~= nil then rows[#rows + 1] = { k = i, id = owned[i].id, no = owned[i].no, d = d } end
+			if d ~= nil and owned[i].no == 0 then rows[#rows + 1] = { k = i, id = owned[i].id, no = owned[i].no, d = d } end
 		end
-		-- 숨긴 증강이 선택돼 있으면 선택 풀기(아래에서 첫 미지정으로)
+		-- 지정 완료된 증강이 선택돼 있으면 첫 미지정 항목으로 이동한다.
 		if self.AugSel > 0 then
 			local vis = false
 			for i = 1, #rows do
@@ -2191,31 +2308,18 @@ script RtsPopupLogic extends Logic
 			end
 			if not vis then self.AugSel = 0 end
 		end
-		-- 미지정(no = 0) 증강을 항상 위로(2026-09-23 사용자), 같은 묶음 안은 받은 순서
-		table.sort(rows, function(a, b)
-			local an = a.no == 0
-			local bn = b.no == 0
-			if an ~= bn then return an end
-			return a.k < b.k
-		end)
+		-- 미지정 증강끼리는 받은 순서를 유지한다.
 		if self.AugSel > #owned then self.AugSel = 0 end
 		if self.AugSel == 0 and #rows > 0 then
-			-- 기본 선택 = 첫 미지정(없으면 첫 행)
+			-- 기본 선택 = 첫 미지정
 			self.AugSel = rows[1].k
-			for i = 1, #rows do
-				if rows[i].no == 0 then
-					self.AugSel = rows[i].k
-					break
-				end
-			end
 		end
 		local list = H:SpawnStretch("model://uisprite", "RtsAugList", box, Vector2(0, 0), Vector2(0, 1), Vector2(27, 42), Vector2(27 + listW, top))
 		_RtsHudLogic:SetUiColor(list, Color(1, 1, 1, 0), "surface")
-		self._T.AugEmpty = H:SpawnLabel("RtsAugFilteredEmpty", box, Vector2(0, 1), Vector2(0, 1), Vector2(47, -230), Vector2(390, 110), "미지정 증강이 없어요\n숨기기를 해제하면 적용된 증강을 볼 수 있어요", self:Muted(), 17, TextAlignmentType.MiddleCenter, false)
 
 		if #rows == 0 and pending == 0 then
 			local emptyText = "아직 얻은 증강이 없어요 — 지급 라운드가 시작되면 원하는 증강을 하나 고릅니다"
-			if #owned > 0 and self.AugHideAssigned then emptyText = "미지정 증강이 없어요 — 적용된 증강은 숨겨져 있어요(위의 숨기기 체크 해제)" end
+			if #owned > 0 then emptyText = "적용하지 않은 증강이 없어요" end
 			H:SpawnLabel("RtsAugEmpty", list, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2(0, 0), Vector2(listW - 32, 100),
 				emptyText, self:Muted(), 16, TextAlignmentType.MiddleCenter, false)
 		else
@@ -2230,14 +2334,22 @@ script RtsPopupLogic extends Logic
 				local gradeName = self:GradeName(item.grade)
 				if self.GradeIcons[item.grade] == nil then gradeName = "미선택" end
 				H:SpawnLabel("RtsAugPendingName", row, Vector2(0, 0.5), Vector2(0, 0.5), Vector2(86, 0), Vector2(listW - 214, 60), gradeName .. " 증강", self:Ink(), 18, TextAlignmentType.MiddleLeft, true)
-				H:SpawnLabel("RtsAugPendingState", row, Vector2(1, 0.5), Vector2(1, 0.5), Vector2(-12, 0), Vector2(96, 40), "미선택 ›", self:AccentInk(), 16, TextAlignmentType.MiddleRight, true)
-				self.AugRowRefs[#self.AugRowRefs + 1] = { k = 0, row = row, un = true, pending = true }
+				local stat = A:IsStatGrade(item.grade)
+				if not stat then H:SpawnLabel("RtsAugPendingState", row, Vector2(1, 0.5), Vector2(1, 0.5), Vector2(-12, 0), Vector2(96, 40), "미선택 ›", self:AccentInk(), 16, TextAlignmentType.MiddleRight, true) end
+				local key = "p" .. H:Int(token)
+				local ref = { k = 0, key = key, row = row, un = true, pending = true, stat = stat }
+				self.AugRowRefs[#self.AugRowRefs + 1] = ref
 				local click = H:SpawnClickQuiet("RtsAugPendingClick", row)
-				click:ConnectEvent(ButtonClickEvent, function(event) A:BrowsePending(token) end)
+				click:ConnectEvent(ButtonClickEvent, function(event)
+					if self.AugBatchBusy > 0 then return end
+					if stat and (self.AugAuto or #self.AugBatch > 0) then self:ToggleAugBatch(key)
+					else self.AugBatch = {} A:BrowsePending(token) end
+				end)
+				if stat then ref.check = self:SpawnAugBatchCheck(row, key) end
 			end
 			for i = 1, #rows do
 				local r = rows[i]
-				local on = r.k == self.AugSel
+				local on = (not self.AugBatchMode and r.k == self.AugSel) or self:AugBatchHas("o" .. H:Int(r.k))
 				local bg = self:Card()
 				local border = self:Edge()
 				-- 미지정은 작은 배지로, 현재 선택은 금색 테두리로 구분한다.
@@ -2252,47 +2364,325 @@ script RtsPopupLogic extends Logic
 				self:SpawnAugIcon(row, r.d, Vector2(10, -11), 64)
 				H:SpawnLabel("RtsAugRowName", row, Vector2(0, 0.5), Vector2(0, 0.5), Vector2(86, 0), Vector2(listW - 214, 60),
 					r.d.name, self:Ink(), 18, TextAlignmentType.MiddleLeft, true)
-				if unassigned then
+				local stat = A:IsBatchStat(r.id)
+				if unassigned and not stat then
 					local pill = H:SpawnRoundedPanel("RtsAugRowNew", row, Vector2(1, 0.5), Vector2(1, 0.5), Vector2(-12, 0), Vector2(86, 36),
 						Color(0.78, 0.25, 0.22, 1), Color(1, 0.62, 0.55, 1), 1.5)
 					H:SpawnLabel("RtsAugRowNewText", pill, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2(0, 0), Vector2(80, 32),
 						"미지정", Color(1, 0.97, 0.94, 1), 14, TextAlignmentType.MiddleCenter, true)
-				else
+				elseif not unassigned then
 					H:SpawnLabel("RtsAugRowState", row, Vector2(1, 0.5), Vector2(1, 0.5), Vector2(-12, 0), Vector2(96, 64),
 						self:AugStateText(r.no), self:Muted(), 13, TextAlignmentType.MiddleRight, false)
 				end
 				local kk = r.k
-				self.AugRowRefs[#self.AugRowRefs + 1] = { k = kk, row = row, un = unassigned }
+				local key = "o" .. H:Int(kk)
+				local ref = { k = kk, key = key, row = row, un = unassigned, stat = stat }
+				self.AugRowRefs[#self.AugRowRefs + 1] = ref
 				local click = H:SpawnClick("RtsAugRowClick", row)
 				click:ConnectEvent(ButtonClickEvent, function(event)
-					if self.AugSel == kk then return end
+					if self.AugBatchBusy > 0 then return end
+					if stat and #self.AugBatch > 0 then self:ToggleAugBatch(key) return end
+					self.AugBatchMode = false
+					self.AugBatch = {}
 					self.AugSel = kk
 					self.AugPickNo = 0
 					self:RestyleAugRows()
 					self:RefreshAugDetail()
 				end)
+				if stat then ref.check = self:SpawnAugBatchCheck(row, key) end
 			end
 		end
 
 		self._T.AugPager = _RtsUiLayoutLogic:Pager(list,"ownedAugments",{},{size=5,cols=1,x=0,y=0,dy=92,navX=0,navY=0,w=listW-16})
 		self:BuildAugDetail(box, owned)
 
-		-- 우측 하단: [v] 적용된 증강 숨기기(기본 체크) — 누르면 켜고 끄기
-		local cb = H:SpawnUI("model://uisprite", "RtsAugHideBox", box, Vector2(1, 1), Vector2(1, 1), Vector2(-27, -4), Vector2(280, 64))
-		_RtsHudLogic:SetUiColor(cb, Color(1, 1, 1, 0), "surface")
-		local sq = H:SpawnRoundedPanel("RtsAugHideSq", cb, Vector2(0, 0.5), Vector2(0, 0.5), Vector2(0, 0), Vector2(20, 20), Color(0.92, 0.93, 0.98, 0.9), H:ColGold(), 1.5)
-		do
-			local mark = H:SpawnUI("model://uisprite", "RtsAugHideMark", sq, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2(0, 0), Vector2(10, 10))
-			_RtsHudLogic:SetUiColor(mark, H:ColGold(), "surface")
-			self._T.AugHideMark = mark
+		H:SpawnLabel("RtsAugSummary", box, Vector2(0, 1), Vector2(0, 1), Vector2(27, -17), Vector2(620, 34), "미지정 증강 " .. H:Int(#rows) .. "개 · 미선택 " .. H:Int(pending) .. "개", self:Ink(), 21, TextAlignmentType.MiddleLeft, true)
+		local all = H:SpawnRoundedPanel("RtsAugSelectAll", box, Vector2(0, 1), Vector2(0, 1), Vector2(665, -6), Vector2(180, 54), self:Card(), self:Edge(), 1.5)
+		H:SpawnLabel("RtsAugSelectAllText", all, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2.zero, Vector2(164, 44), "전체선택", self:Ink(), 20, TextAlignmentType.MiddleCenter, true)
+		H:SpawnClick("RtsAugSelectAllClick", all):ConnectEvent(ButtonClickEvent, function(event) self:SelectAllAugBatch() end)
+		self:BuildAugAutoCheck(box)
+		self:UpdateAugBatchControls()
+	end
+
+	@ExecSpace("ClientOnly")
+	method boolean AugBatchHas(string key)
+		-- 페이지를 넘겨도 체크 목록은 유지한다.
+		for _, value in ipairs(self.AugBatch) do if value == key then return true end end
+		return false
+	end
+
+	@ExecSpace("ClientOnly")
+	method any AugBatchTarget()
+		-- 방출 후 같은 슬롯에 영입한 다른 유닛으로 대상이 바뀌지 않게 한다.
+		local u = _RtsUnitLogic:GetMyUnit(self.AugBatchNo)
+		if u == nil or not isvalid(u.Entity) or u.Entity.Id ~= self.AugBatchUnitId then return nil end
+		return u
+	end
+
+	@ExecSpace("ClientOnly")
+	method number AugBatchRoom()
+		-- 프리즘 전용 증강을 제외하는 기존 20개 집계와 같은 기준이다.
+		local u = self:AugBatchTarget()
+		if u == nil then return 0 end
+		return math.max(0, _RtsAugmentLogic.UnitAugMax - _RtsAugmentLogic:CountForUnit(u.Owner, u.No))
+	end
+
+	@ExecSpace("ClientOnly")
+	method void ReconcileAugBatch()
+		-- 동기화로 보유 인덱스가 이동하면 체크를 해제한다. 미선택 토큰도 현재 목록과 대조한다.
+		local A = _RtsAugmentLogic
+		local packed = A.OwnedByUser[_RtsUnitLogic:MyUserId()] or ""
+		if self:AugBatchTarget() == nil then
+			self.AugBatchNo = 0
+			self.AugBatchUnitId = ""
+			self.AugBatch = {}
 		end
-		H:SpawnLabel("RtsAugHideText", cb, Vector2(0, 0.5), Vector2(0, 0.5), Vector2(28, 0), Vector2(244, 48), "적용된 증강 숨기기", self:Ink(), 16, TextAlignmentType.MiddleLeft, false)
-		local cbClick = H:SpawnClick("RtsAugHideClick", cb)
-		cbClick:ConnectEvent(ButtonClickEvent, function(event)
-			self.AugHideAssigned = not self.AugHideAssigned
-			self:ApplyAugFilter()
+		if self.AugBatchOwned ~= packed then self.AugBatch = {} end
+		self.AugBatchOwned = packed
+		local available = {}
+		for _, item in ipairs(A:MyPendingItems()) do if A:IsStatGrade(item.grade) then available["p" .. _RtsHudLogic:Int(item.token)] = true end end
+		for i, item in ipairs(A:MyOwned()) do if item.no == 0 and A:IsBatchStat(item.id) then available["o" .. _RtsHudLogic:Int(i)] = true end end
+		local keep = {}
+		local room = self:AugBatchRoom()
+		for _, key in ipairs(self.AugBatch) do if available[key] and #keep < room then keep[#keep + 1] = key end end
+		self.AugBatch = keep
+	end
+
+	@ExecSpace("ClientOnly")
+	method table FirstAugBatchKeys(number room)
+		local A = _RtsAugmentLogic
+		local H = _RtsHudLogic
+		local selected = {}
+		-- 페이지와 무관하게 화면 목록 순서(미선택 → 미지정)를 따라 앞에서부터 고른다.
+		for _, item in ipairs(A:MyPendingItems()) do
+			if #selected >= room then break end
+			if A:IsStatGrade(item.grade) then selected[#selected + 1] = "p" .. H:Int(item.token) end
+		end
+		for i, item in ipairs(A:MyOwned()) do
+			if #selected >= room then break end
+			if item.no == 0 and A:IsBatchStat(item.id) then selected[#selected + 1] = "o" .. H:Int(i) end
+		end
+		return selected
+	end
+
+	@ExecSpace("ClientOnly")
+	method void SelectAllAugBatch()
+		if self.AugBatchBusy > 0 then return end
+		self:ReconcileAugBatch()
+		self.AugBatchMode = true
+		local H = _RtsHudLogic
+		local A = _RtsAugmentLogic
+		self.AugBatch = {}
+		if self:AugBatchTarget() == nil then
+			H:ShowHintFor("먼저 오른쪽에서 받을 캐릭터를 선택해 주세요", 3)
+		else
+			local room = self:AugBatchRoom()
+			self.AugBatch = self:FirstAugBatchKeys(room)
+			if room == 0 then H:ShowHintFor("이 캐릭터는 증강을 더 받을 수 없어요", 3) end
+		end
+		if #self.AugBatch > 1 then self.AugAuto = true end
+		A.PickFolded = true
+		self:RestyleAugRows()
+		self:RefreshAugDetail()
+	end
+
+	@ExecSpace("ClientOnly")
+	method void ToggleAugBatch(string key)
+		-- 대상의 남은 칸까지만 체크한다. 두 장부터 자동 최적화를 강제한다.
+		if self.AugBatchBusy > 0 then return end
+		self:ReconcileAugBatch()
+		self.AugBatchMode = true
+		local found = 0
+		for i, value in ipairs(self.AugBatch) do if value == key then found = i break end end
+		if found > 0 then table.remove(self.AugBatch, found)
+		elseif self:AugBatchTarget() == nil then
+			_RtsHudLogic:ShowHintFor("먼저 오른쪽에서 받을 캐릭터를 선택해 주세요", 3)
+		elseif #self.AugBatch >= self:AugBatchRoom() then
+			_RtsHudLogic:ShowHintFor("이 캐릭터는 " .. _RtsHudLogic:Int(self:AugBatchRoom()) .. "개까지만 더 받을 수 있어요", 3)
+		else
+			local valid = false
+			for _, ref in ipairs(self.AugRowRefs) do if ref.key == key and ref.stat then valid = true break end end
+			if valid then self.AugBatch[#self.AugBatch + 1] = key end
+		end
+		if #self.AugBatch > 1 then self.AugAuto = true end
+		_RtsAugmentLogic.PickFolded = true
+		self:RestyleAugRows()
+		self:RefreshAugDetail()
+	end
+
+	@ExecSpace("ClientOnly")
+	method table SpawnAugBatchCheck(Entity row, string key)
+		-- 전체 행 클릭 영역보다 앞에 별도 체크 영역을 둔다.
+		local H = _RtsHudLogic
+		local box = H:SpawnRoundedPanel("RtsAugBatchCheck", row, Vector2(1, 0.5), Vector2(1, 0.5), Vector2(-12, 0), Vector2(60, 60), self:Card(), self:Edge(), 2)
+		local mark = H:SpawnLabel("RtsAugBatchMark", box, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2.zero, Vector2(48, 48), "", self:AccentInk(), 26, TextAlignmentType.MiddleCenter, true)
+		local click = H:SpawnClick("RtsAugBatchCheckClick", box)
+		click:ConnectEvent(ButtonClickEvent, function(event) self:ToggleAugBatch(key) end)
+		return { box = box, mark = mark, click = click }
+	end
+
+	@ExecSpace("ClientOnly")
+	method void BuildAugAutoCheck(Entity parent)
+		-- 이전 숨기기 체크 위치를 최적화 선택에 사용한다.
+		local H = _RtsHudLogic
+		local area = H:SpawnUI("model://uisprite", "RtsAugAuto", parent, Vector2(1, 1), Vector2(1, 1), Vector2(-27, -2), Vector2(385, 64))
+		H:Tint(area, 1, 1, 1, 0)
+		local box = H:SpawnRoundedPanel("RtsAugAutoBox", area, Vector2(0, 0.5), Vector2(0, 0.5), Vector2(0, 0), Vector2(36, 36), self:Card(), self:Edge(), 2)
+		self._T.AugAutoMark = H:SpawnLabel("RtsAugAutoMark", box, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2.zero, Vector2(30, 30), "", self:AccentInk(), 22, TextAlignmentType.MiddleCenter, true)
+		H:SpawnLabel("RtsAugAutoText", area, Vector2(0, 0.5), Vector2(0, 0.5), Vector2(48, 0), Vector2(332, 44), "최적화 증강 자동선택", self:Ink(), 21, TextAlignmentType.MiddleLeft, true)
+		local click = H:SpawnClick("RtsAugAutoClick", area)
+		click:ConnectEvent(ButtonClickEvent, function(event)
+			if self.AugBatchBusy > 0 then return end
+			if #self.AugBatch > 1 then
+				H:ShowHintFor("여러 개를 부여할 때는 자동선택을 사용해요", 3)
+			else self.AugAuto = not self.AugAuto end
+			self.AugBatchMode = true
+			self:RestyleAugRows()
+			self:RefreshAugDetail()
 		end)
-		H:SpawnLabel("RtsAugSummary", box, Vector2(0, 1), Vector2(0, 1), Vector2(27, -17), Vector2(620, 34), "보유 증강 " .. H:Int(#owned) .. "개 · 미지정 " .. H:Int(A:MyUnassigned()) .. "개", self:Ink(), 21, TextAlignmentType.MiddleLeft, true)
+	end
+
+	@ExecSpace("ClientOnly")
+	method void UpdateAugBatchControls()
+		-- 체크 표시와 한도 도달 색상만 제자리에서 바꾼다.
+		local H = _RtsHudLogic
+		if isvalid(self._T.AugAutoMark) then H:SetUiText(self._T.AugAutoMark, self.AugAuto and "✓" or "") end
+		local room = self:AugBatchRoom()
+		for _, ref in ipairs(self.AugRowRefs) do
+			local c = ref.check
+			if c ~= nil and isvalid(c.box) then
+				local on = self:AugBatchHas(ref.key)
+				local enabled = self.AugBatchBusy == 0 and (on or #self.AugBatch < room)
+				local edge = self:Edge()
+				if enabled or on then edge = H:ColGold() end
+				H:SetUiColor(c.box.Parent, edge, "border")
+				H:SetUiColor(c.box, on and self:Mix(H:ColGold(), 0.22) or self:Card(), "surface")
+				H:SetUiText(c.mark, on and "✓" or "")
+			end
+		end
+	end
+
+	@ExecSpace("ClientOnly")
+	method void BuildAugBatchDetail(Entity detail, number width)
+		-- 먼저 받을 유닛을 고른 뒤 남은 칸만큼 증강을 체크하는 화면이다.
+		local H = _RtsHudLogic
+		local A = _RtsAugmentLogic
+		local count = #self.AugBatch
+		local u = self:AugBatchTarget()
+		local title = "한 번에 증강 부여"
+		if count > 0 then title = "증강 " .. H:Int(count) .. "개 선택" end
+		H:SpawnLabel("RtsAugBatchTitle", detail, Vector2(0, 1), Vector2(0, 1), Vector2(22, -20), Vector2(width - 190, 42), title, self:Ink(), 24, TextAlignmentType.MiddleLeft, true)
+		local desc = "1. 받을 캐릭터를 선택하세요\n2. 왼쪽에서 능력치 증강을 체크하세요"
+		if self.AugAuto then desc = "미선택 증강은 보스 DPS가 가장 많이 오르는 종류를 자동으로 골라요.\n한 장씩 적용 후 다시 계산해요 · 프리즘 제외"
+		else desc = desc .. "\n한 장은 직접 고를 수 있고, 여러 장은 자동선택이 켜져요" end
+		H:SpawnLabel("RtsAugBatchDesc", detail, Vector2(0, 1), Vector2(0, 1), Vector2(22, -76), Vector2(width - 44, 108), desc, self:Muted(), 19, TextAlignmentType.UpperLeft, false)
+		if count > 0 then
+			local clear = H:SpawnRoundedPanel("RtsAugBatchClear", detail, Vector2(1, 1), Vector2(1, 1), Vector2(-22, -20), Vector2(140, 48), self:Card(), self:Edge(), 1.5)
+			H:SpawnLabel("RtsAugBatchClearText", clear, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2.zero, Vector2(130, 40), "선택 해제", self:Muted(), 18, TextAlignmentType.MiddleCenter, false)
+			H:SpawnClick("RtsAugBatchClearClick", clear):ConnectEvent(ButtonClickEvent, function(event)
+				if self.AugBatchBusy > 0 then return end
+				self.AugBatch = {} self:RestyleAugRows() self:RefreshAugDetail()
+			end)
+		end
+		local targets = H:SpawnUI("model://uisprite", "RtsAugBatchTargets", detail, Vector2(0, 1), Vector2(0, 1), Vector2(22, -202), Vector2(width - 44, 210))
+		H:Tint(targets, 1, 1, 1, 0)
+		local cards = {}
+		local chipW = math.floor((width - 56) / 2)
+		for _, no in ipairs(_RtsUnitLogic:ListZoneUnits(_RtsUnitLogic:MyZone())) do
+			local candidate = _RtsUnitLogic:GetMyUnit(no)
+			if candidate ~= nil then
+				local used = A:CountForUnit(candidate.Owner, no)
+				local room = math.max(0, A.UnitAugMax - used)
+				local ok = room > 0 and count <= room
+				local on = u ~= nil and u.No == no
+				local chip = H:SpawnRoundedPanel("RtsAugBatchTarget" .. H:Int(no), targets, Vector2(0, 1), Vector2(0, 1), Vector2.zero, Vector2(chipW, 70), on and self:Mix(H:ColGold(), 0.18) or self:Card(), on and H:ColGold() or self:Edge(), 1.5)
+				cards[#cards + 1] = chip.Parent
+				local ink = ok and self:Ink() or self:Muted()
+				H:SpawnLabel("RtsAugBatchTargetName", chip, Vector2(0, 1), Vector2(0, 1), Vector2(12, -8), Vector2(chipW - 24, 28), H:Int(no) .. ". " .. _RtsJobTableLogic:GetJobNameFor(candidate) .. "  Lv." .. H:Int(candidate.Level), ink, 19, TextAlignmentType.MiddleLeft, true)
+				H:SpawnLabel("RtsAugBatchTargetRoom", chip, Vector2(0, 0), Vector2(0, 0), Vector2(12, 6), Vector2(chipW - 24, 24), H:Int(used) .. "/" .. H:Int(A.UnitAugMax) .. "개 · " .. H:Int(room) .. "칸 남음", ink, 17, TextAlignmentType.MiddleLeft, false)
+				local pickNo = no
+				local pickId = candidate.Entity.Id
+				H:SpawnClick("RtsAugBatchTargetClick", chip):ConnectEvent(ButtonClickEvent, function(event)
+					if self.AugBatchBusy > 0 then return end
+					local current = _RtsUnitLogic:GetMyUnit(pickNo)
+					if current == nil or current.Entity.Id ~= pickId then return end
+					local left = A.UnitAugMax - A:CountForUnit(current.Owner, pickNo)
+					if left < 1 or count > left then H:ShowHintFor("이 캐릭터의 남은 칸에 맞춰 선택을 줄여 주세요", 3) return end
+					self.AugBatchNo = pickNo self.AugBatchUnitId = pickId
+					A:SetPickTarget(pickNo)
+					self:RestyleAugRows() self:RefreshAugDetail()
+				end)
+			end
+		end
+		self._T.TargetPager = _RtsUiLayoutLogic:Pager(targets, "augmentBatchTargets", cards, {size=4,cols=2,x=0,y=0,dx=chipW+12,dy=78,navX=0,navY=0,w=width-44})
+		local status = "받을 캐릭터를 먼저 선택해 주세요"
+		if #cards == 0 then status = "먼저 캐릭터를 영입해 주세요"
+		elseif u ~= nil then status = _RtsJobTableLogic:GetJobNameFor(u) .. " · " .. H:Int(count) .. "/" .. H:Int(self:AugBatchRoom()) .. "개 선택 가능" end
+		H:SpawnLabel("RtsAugBatchStatus", detail, Vector2(0, 1), Vector2(0, 1), Vector2(22, -430), Vector2(width - 44, 44), status, self:AccentInk(), 20, TextAlignmentType.MiddleLeft, true)
+		local canGo = u ~= nil and count > 0 and count <= self:AugBatchRoom() and self.AugBatchBusy == 0
+		local go = H:SpawnRoundedPanel("RtsAugBatchAssign", detail, Vector2(0, 0), Vector2(0, 0), Vector2(22, 19), Vector2(width - 44, 88), canGo and self:Mix(H:ColGold(), 0.9) or self:Card(), canGo and H:ColGold() or self:Edge(), 1.5)
+		local label = "증강을 체크해 주세요"
+		if self.AugBatchBusy > 0 then label = "부여 중…"
+		elseif canGo then
+			label = H:Int(count) .. "개 한 번에 부여"
+			if count == 1 and string.sub(self.AugBatch[1], 1, 1) == "p" and not self.AugAuto then label = "종류 직접 선택" end
+		end
+		H:SpawnLabel("RtsAugBatchAssignText", go, Vector2(0.5, 0.5), Vector2(0.5, 0.5), Vector2.zero, Vector2(width - 70, 68), label, canGo and H:ColGoldInk() or self:Muted(), 22, TextAlignmentType.MiddleCenter, true)
+		if canGo then H:SpawnButtonKeyCap(go, "Space") H:SpawnClick("RtsAugBatchAssignClick", go):ConnectEvent(ButtonClickEvent, function(event) self:AssignAugBatch() end) end
+	end
+
+	@ExecSpace("ClientOnly")
+	method void AssignAugBatch()
+		-- 한 장 수동 선택은 기존 선택 창으로, 나머지는 서버 일괄 지급으로 보낸다.
+		if self.Kind ~= "augment" or self.AugBatchBusy > 0 then return end
+		self:ReconcileAugBatch()
+		local u = self:AugBatchTarget()
+		if u == nil or #self.AugBatch == 0 then self:RefreshAugDetail() return end
+		if _RtsStageLogic.Paused then _RtsHudLogic:ShowHintFor("일시정지를 해제한 뒤 지정해 주세요", 3) return end
+		local A = _RtsAugmentLogic
+		if #self.AugBatch == 1 and not self.AugAuto and string.sub(self.AugBatch[1], 1, 1) == "p" then
+			local token = tonumber(string.sub(self.AugBatch[1], 2))
+			A:SetPickTarget(u.No)
+			self.AugBatch = {}
+			A:BrowsePending(token)
+			return
+		end
+		self.AugBatchSerial = self.AugBatchSerial + 1
+		self.AugBatchBusy = self.AugBatchSerial
+		self.AugBatchAt = _UtilLogic.ElapsedSeconds
+		A.PickFolded = true
+		A:RequestAssignBatch(table.concat(self.AugBatch, ","), u.No, u.Entity.Id, self.AugBatchOwned, self.AugAuto or #self.AugBatch > 1, self.AugBatchBusy)
+		self:UpdateAugBatchControls()
+		self:RefreshAugDetail()
+	end
+
+	@ExecSpace("ClientOnly")
+	method void OnAugBatchResult(number requestId, boolean ok, string message)
+		-- 늦게 도착한 이전 요청 결과는 현재 체크 상태에 영향을 주지 않는다.
+		if requestId ~= self.AugBatchBusy then return end
+		self.AugBatchBusy = 0
+		self.AugBatch = {}
+		_RtsHudLogic:ShowHintFor(message, 3)
+		self:RefreshAugment()
+	end
+
+	@ExecSpace("ClientOnly")
+	method void TickAugBatch()
+		-- 대상 방출·칸 변화만 감지한다. 체크 도중에는 자동 선택 팝업이 끼어들지 않는다.
+		if self.Kind ~= "augment" or not self.AugBatchMode then return end
+		local sig = tostring(self.AugBatchNo) .. "|" .. tostring(self:AugBatchRoom())
+		if self:AugBatchTarget() == nil then sig = "none" end
+		if self.AugBatchBusy > 0 and _UtilLogic.ElapsedSeconds - self.AugBatchAt > 10 then
+			self.AugBatchBusy = 0 self.AugBatch = {}
+			_RtsHudLogic:ShowHintFor("처리 결과를 확인하지 못했어요. 현재 목록을 확인해 주세요", 3)
+			sig = "refresh"
+		end
+		if self._T.AugBatchSig ~= sig then
+			self._T.AugBatchSig = sig
+			self:ReconcileAugBatch()
+			self:RestyleAugRows()
+			self:RefreshAugDetail()
+		end
 	end
 
 	-- 증강 창 오른쪽 상세(선택·유닛 칩이 바뀌면 이것만 다시 — RefreshAugDetail)
@@ -2309,6 +2699,7 @@ script RtsPopupLogic extends Logic
 		local detail = H:SpawnRoundedPanel("RtsAugDetail", parent, Vector2(0, 1), Vector2(0, 1), Vector2(dx, top), Vector2(dw, 600),
 			self:Card(), self:Mix(H:ColGold(), 0.25), 1.5)
 		self.AugDetail = detail.Parent
+		if self.AugBatchMode then self:BuildAugBatchDetail(detail, dw) return end
 		local item = owned[self.AugSel]
 		if item == nil then
 			H:SpawnLabel("RtsAugDetailNone", detail, Vector2(0, 1), Vector2(0, 1), Vector2(19, -20), Vector2(dw - 40, 60),
@@ -2413,7 +2804,7 @@ script RtsPopupLogic extends Logic
 			if r.row ~= nil and isvalid(r.row) then
 				local bg = self:Card()
 				local border = self:Edge()
-				if r.k > 0 and r.k == self.AugSel then
+				if (not self.AugBatchMode and r.k > 0 and r.k == self.AugSel) or self:AugBatchHas(r.key or "") then
 					bg = self:Mix(H:ColGold(), 0.14)
 					border = H:ColGold()
 				end
@@ -2421,6 +2812,7 @@ script RtsPopupLogic extends Logic
 				if r.row.Parent ~= nil then _RtsHudLogic:SetUiColor(r.row.Parent, border, "border") end
 			end
 		end
+		self:UpdateAugBatchControls()
 	end
 
 	-- 오른쪽 상세만 다시
@@ -2436,6 +2828,7 @@ script RtsPopupLogic extends Logic
 	-- 증강 창에서 고른 보유 증강(AugSel)을 고른 유닛(AugPickNo)에 지정 — 버튼·스페이스 공용
 	@ExecSpace("ClientOnly")
 	method void AssignPicked()
+		if self.Kind == "augment" and self.AugBatchMode then self:AssignAugBatch() return end
 		if self.Kind ~= "augment" or self.AugSel == 0 or self.AugPickNo == 0 then return end
 		local k = self.AugSel
 		local target = self.AugPickNo
@@ -2453,7 +2846,7 @@ script RtsPopupLogic extends Logic
 		return "→ " .. _RtsHudLogic:Int(no) .. ". " .. _RtsJobTableLogic:GetJobNameFor(u)
 	end
 
-	-- 보유 목록이 바뀌면: 목록·상세·아래 줄만 다시(창·위 탭은 그대로 — 2026-09-25). 숨기기 체크는 ApplyAugFilter가 행만 켜고 끈다
+	-- 보유 목록이 바뀌면 미지정 목록·상세·요약만 갱신하고 창·위 탭은 유지한다.
 	@ExecSpace("ClientOnly")
 	method void RefreshAugment()
 		if self.Kind ~= "augment" or self.AugBody == nil or not isvalid(self.AugBody) then return end
@@ -2793,23 +3186,19 @@ script RtsPopupLogic extends Logic
 
 	@ExecSpace("ClientOnly")
 	method void ApplyAugFilter()
-		-- 체크박스와 목록은 재생성하지 않는다. 선택 항목이 숨겨질 때만 상세를 바꾼다.
+		-- 미지정·미선택 항목만 페이지에 연결한다. 지정 완료로 선택 항목이 사라지면 상세도 보정한다.
 		local first = 0
-		local count = 0
 		local selectedVisible = false
 		local pageItems = {}
 		for _, ref in ipairs(self.AugRowRefs) do
-			local show = not self.AugHideAssigned or ref.un
+			local show = ref.un
 			ref.row.Parent:SetEnable(show)
 			if show then
-				count = count + 1
 				pageItems[#pageItems+1] = ref.row.Parent
 				if first == 0 and ref.k > 0 then first = ref.k end
 				if ref.k == self.AugSel then selectedVisible = true end
 			end
 		end
-		if isvalid(self._T.AugHideMark) then self._T.AugHideMark:SetEnable(self.AugHideAssigned) end
-		if isvalid(self._T.AugEmpty) then self._T.AugEmpty:SetEnable(count == 0 and #self.AugRowRefs > 0) end
 		if self._T.AugPager ~= nil then
 			self._T.AugPager.items = pageItems
 			_RtsUiLayoutLogic:ApplyPager(self._T.AugPager,0)
@@ -2831,7 +3220,7 @@ script RtsPopupLogic extends Logic
 			local sizes = {RtsCodexName=22,RtsCodexJobText=18,RtsCodexMore=18,RtsCodexPct=18,RtsCodexDesc=20,RtsCodexInfo=18,
 				RtsPickT=23,RtsPickD=20,RtsPickGrade=18,RtsPickSub=17,RtsPickTakeText=22,RtsPickFoldText=20,RtsPickChipName=18,RtsPickChipSub=16,
 				RtsAugRowName=20,RtsAugPendingName=20,RtsAugPendingState=18,RtsAugRowNewText=17,RtsAugRowState=17,
-				RtsAugDetailT=24,RtsAugDetailGrade=18,RtsAugDetailD=20,RtsAugDetailHint=18,RtsAugHideText=18,
+				RtsAugDetailT=24,RtsAugDetailGrade=18,RtsAugDetailD=20,RtsAugDetailHint=18,
 				RtsDrawTitle=26,RtsDrawDesc=20,RtsDrawRate=30,RtsDrawRateHint=18,RtsDrawBadgeText=18,RtsDrawReason=18,RtsPageNumber=22}
 			local size = sizes[root.Name] or 20
 			_RtsHudLogic:SetLabelSize(root,size)
