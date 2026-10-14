@@ -1,0 +1,16 @@
+{
+  "version": 1,
+  "status": "superseded",
+  "canvas": [
+    1672,
+    941
+  ],
+  "bossTarget": [
+    0.5,
+    0.5
+  ],
+  "runtimeIntegrated": false,
+  "scope": "일반5종+액션15종. 중앙 보스 구역 표시 없는 재제작. 전체 제작 후 사용자 검수.",
+  "replacement": "../native-boss-scenes/",
+  "reason": "사용자 인게임 배경 및 MSW 원본 보스 사용 지시로 재해석 원화 제외"
+}

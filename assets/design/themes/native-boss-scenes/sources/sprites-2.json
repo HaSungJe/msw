@@ -1,0 +1,37 @@
+{
+  "query": "피아누스 동굴",
+  "results": [
+    {
+      "id": "52cedb4579154626973f5243a974cece",
+      "type": "sprite",
+      "category": "background",
+      "dname": "sprite-9092411",
+      "payload": {
+        "width": 144,
+        "height": 196
+      }
+    },
+    {
+      "id": "c043ac8859fb4596bd907a2c1352cf84",
+      "type": "sprite",
+      "category": "background",
+      "dname": "sprite-9096322",
+      "payload": {
+        "width": 252,
+        "height": 196
+      }
+    },
+    {
+      "id": "a3b29960090c45d79d31b4d2daf470e8",
+      "type": "sprite",
+      "category": "background",
+      "dname": "sprite-9095271",
+      "payload": {
+        "width": 144,
+        "height": 196
+      }
+    }
+  ],
+  "nextOffset": 3,
+  "exactMatch": false
+}

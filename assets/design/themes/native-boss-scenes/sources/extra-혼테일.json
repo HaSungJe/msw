@@ -1,0 +1,263 @@
+{
+  "query": "혼테일",
+  "results": [
+    {
+      "id": "mob/9390302.img",
+      "type": "resource_pack",
+      "category": "mob",
+      "names": {
+        "ko": [
+          "혼테일"
+        ],
+        "en": [
+          "Horntail"
+        ],
+        "zh-hans": [
+          "黑暗龙王"
+        ],
+        "zh-hant": [
+          "闇黑龍王"
+        ]
+      },
+      "assetGuid": "de6ebb0314cc4e8f863e44f53e899c47",
+      "payload": {
+        "elements": [
+          {
+            "resource_type": "animationclip",
+            "ruid": "2ba50f7757094fa882afe0bea873c52a",
+            "rel_path": "attack1"
+          },
+          {
+            "resource_type": "animationclip",
+            "ruid": "7d6ece551cc5407b923b34ff11df9f39",
+            "rel_path": "die1"
+          },
+          {
+            "resource_type": "animationclip",
+            "ruid": "53df2e1e8da94654a85d69bd0a943f31",
+            "rel_path": "hit1"
+          },
+          {
+            "resource_type": "animationclip",
+            "ruid": "13d52b4932314eb4bb7f726f1ae8a31d",
+            "rel_path": "stand"
+          }
+        ]
+      }
+    },
+    {
+      "id": "mob/8810000.img",
+      "type": "resource_pack",
+      "category": "mob",
+      "names": {
+        "ko": [
+          "혼테일의 왼쪽 머리",
+          "꿈속의 혼테일",
+          "이지 혼테일의 왼쪽 머리",
+          "혼테일"
+        ],
+        "en": [
+          "Horntail's Left Head"
+        ],
+        "zh-hans": [
+          "暗黑龙王的左侧头颅",
+          "梦之暗黑龙王",
+          "简单暗黑龙王的左侧头颅",
+          "暗黑龙王"
+        ],
+        "zh-hant": [
+          "闇黑龍王的左側頭顱",
+          "夢幻的闇黑龍王",
+          "簡單 闇黑龍王的左側頭顱",
+          "闇黑龍王"
+        ]
+      },
+      "assetGuid": "da3d381d3a7c43ddab1165612cbd6eb1",
+      "payload": {
+        "elements": [
+          {
+            "resource_type": "animationclip",
+            "ruid": "02f1d02693b44e79926db6bcab09ad70",
+            "rel_path": "attack1"
+          },
+          {
+            "resource_type": "animationclip",
+            "ruid": "e39c6176694341969db2b53197d5142b",
+            "rel_path": "attack2"
+          },
+          {
+            "resource_type": "animationclip",
+            "ruid": "4a17382bc4ac4eb898ced664c1e3debf",
+            "rel_path": "attack3"
+          },
+          {
+            "resource_type": "animationclip",
+            "ruid": "7d488315008f45bb9e18c62990f91f5a",
+            "rel_path": "die1"
+          },
+          {
+            "resource_type": "animationclip",
+            "ruid": "e0eba90bf96a4a6ea60255225d6e8403",
+            "rel_path": "hit1"
+          },
+          {
+            "resource_type": "animationclip",
+            "ruid": "a52f3f02a3d54c0c9a2efa74c0030f2b",
+            "rel_path": "regen"
+          },
+          {
+            "resource_type": "animationclip",
+            "ruid": "dc142f90f17a418bbab16db355f192d9",
+            "rel_path": "skill1"
+          },
+          {
+            "resource_type": "animationclip",
+            "ruid": "e2d8cea59467462e95f53cf644a8b8e6",
+            "rel_path": "skill2"
+          },
+          {
+            "resource_type": "animationclip",
+            "ruid": "0d4312e6290542f68f0e8782e9aace9a",
+            "rel_path": "skill3"
+          },
+          {
+            "resource_type": "animationclip",
+            "ruid": "eaee85aad30d456183e34151ca071402",
+            "rel_path": "stand"
+          },
+          {
+            "resource_type": "effect",
+            "ruid": "e82a141e03a64a3aa435aa436e2f8778",
+            "rel_path": "_audio/Attack1"
+          },
+          {
+            "resource_type": "effect",
+            "ruid": "6dfb6e7b79ce4fe0894149da0ff080a0",
+            "rel_path": "_audio/Attack2"
+          },
+          {
+            "resource_type": "effect",
+            "ruid": "a0cda3bb612a454bb115f3fa1f7c8ecb",
+            "rel_path": "_audio/Attack3"
+          },
+          {
+            "resource_type": "effect",
+            "ruid": "340727d0eb1b4fa19f2467aad22aaa88",
+            "rel_path": "_audio/CharDam1"
+          },
+          {
+            "resource_type": "effect",
+            "ruid": "85d8d1c88ba542ba95b63e7aa65a02e5",
+            "rel_path": "_audio/CharDam2"
+          },
+          {
+            "resource_type": "effect",
+            "ruid": "ff0b09aea3e44e46af28ad1a61ce78d0",
+            "rel_path": "_audio/CharDam3"
+          },
+          {
+            "resource_type": "effect",
+            "ruid": "b0513adf3c9240aba4bb65312c776127",
+            "rel_path": "_audio/Damage"
+          },
+          {
+            "resource_type": "effect",
+            "ruid": "a38344c9fff9422ea94c2159fbf5c292",
+            "rel_path": "_audio/Die"
+          },
+          {
+            "resource_type": "effect",
+            "ruid": "6ecfc12265544c9d86c4cfcefaf8dee5",
+            "rel_path": "_audio/Skill1"
+          },
+          {
+            "resource_type": "animationclip",
+            "ruid": "aadc7d6769464b2ca76248fc749c65d1",
+            "rel_path": "attack1/info/hit"
+          },
+          {
+            "resource_type": "animationclip",
+            "ruid": "4120ccee98504d709ea34d342f42ad6b",
+            "rel_path": "attack2/info/areaWarning"
+          },
+          {
+            "resource_type": "animationclip",
+            "ruid": "103be19fc63945f68b4ea4f2902bf658",
+            "rel_path": "attack2/info/hit"
+          },
+          {
+            "resource_type": "animationclip",
+            "ruid": "a94e959726354a10b02c5cab331d89f1",
+            "rel_path": "attack3/info/areaWarning"
+          },
+          {
+            "resource_type": "animationclip",
+            "ruid": "a4ab0425dd5449a6a70b981eb16c5349",
+            "rel_path": "attack1/info/effect0/0"
+          },
+          {
+            "resource_type": "animationclip",
+            "ruid": "4cd3195614bc455d8cf0b870ffe061ec",
+            "rel_path": "attack1/info/effect0/1"
+          },
+          {
+            "resource_type": "sprite",
+            "ruid": "66bce2ec7cfe4c81a5cb35e5a1ce3736",
+            "rel_path": "attack3/info/hit/0"
+          },
+          {
+            "resource_type": "sprite",
+            "ruid": "44b5a33dea6e4d439785fe7bd4c218e3",
+            "rel_path": "attack3/info/hit/1"
+          }
+        ]
+      }
+    },
+    {
+      "id": "mob/8810018.img",
+      "type": "resource_pack",
+      "category": "mob",
+      "names": {
+        "ko": [
+          "카오스 혼테일",
+          "미스틱 혼테일의 영혼",
+          "혼테일",
+          "이지 혼테일"
+        ],
+        "zh-hans": [
+          "进阶暗黑龙王",
+          "神秘暗黑龙王的灵魂",
+          "暗黑龙王的灵魂",
+          "简单暗黑龙王"
+        ],
+        "zh-hant": [
+          "混沌闇黑龍王",
+          "神秘闇黑龍王的靈魂",
+          "闇黑龍王",
+          "簡單 闇黑龍王"
+        ]
+      },
+      "payload": {
+        "elements": [
+          {
+            "resource_type": "effect",
+            "ruid": "21fafd45d0d546c9b06a7284e55c0335",
+            "rel_path": "_audio/Die"
+          },
+          {
+            "resource_type": "animationclip",
+            "ruid": "add148db3a344de9ab8a30dc67b953a3",
+            "rel_path": "info/default"
+          },
+          {
+            "resource_type": "sprite",
+            "ruid": "741f6fdaecb34fa08289bb78c551188d",
+            "rel_path": "info/thumbnail"
+          }
+        ]
+      }
+    }
+  ],
+  "nextOffset": 3,
+  "exactMatch": false
+}

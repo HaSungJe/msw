@@ -1298,7 +1298,9 @@ script RtsHudLogic extends Logic
 		elseif owned >= _RtsUnitLogic:GetMaxUnits() then
 			text = "영입 완료"
 		elseif room > 0 then
-			text = "영입 가능 " .. self:Int(room)
+			-- 다음 영입 비용(2026-10-14 — 1,000 × 지금 유닛 수, 첫 영입 무료)
+			local cost = _RtsUnitLogic:RecruitCost(owned)
+			if cost <= 0 then text = "영입 · 무료" else text = "영입 · " .. self:FormatNumber(cost) end
 		else
 			local nextNo = _RtsStageTableLogic:NextRecruitStage(stageNo)
 			if nextNo > 0 then text = "다음 영입 · " .. self:Int(nextNo) .. "라운드" else text = "영입 완료" end

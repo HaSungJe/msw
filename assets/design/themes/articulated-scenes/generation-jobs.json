@@ -1,0 +1,92 @@
+[
+  {
+    "key": "forbidden_altar",
+    "folder": "forbidden-altar",
+    "subject": "Junior Balrog brown muscular horned demon with bat wings",
+    "parts": "body with both legs but NO head NO arms NO wings; separate horned head with neck; separate left arm with hand; separate right arm with hand; separate left bat wing; separate right bat wing"
+  },
+  {
+    "key": "pianus_cave",
+    "folder": "pianus-cave",
+    "subject": "Pianus giant orange fish facing left",
+    "parts": "main fish body including face but NO fins; separate upper dorsal fin; separate lower belly fin; separate side pectoral fin; separate tail fin; small transparent water bubble cluster"
+  },
+  {
+    "key": "twilight_of_gods",
+    "folder": "twilight-of-gods",
+    "subject": "Pink Bean pink round creature with purple horns and white belly",
+    "parts": "body with head and feet but NO arms and NO tail; separate left arm; separate right arm; separate long curved tail with purple ball tip; small purple musical sparkle; small pink musical sparkle"
+  },
+  {
+    "key": "cygnus_garden",
+    "folder": "cygnus-garden",
+    "subject": "Cygnus floating white-haired empress in purple gold gown",
+    "parts": "main complete character head torso arms and legs with short central gown, but NO long hair tails NO long flowing dress side panels and NO halo; separate long trailing hair lock; separate left flowing purple gold dress panel; separate right flowing purple gold dress panel; separate dark ornate halo; separate curved purple magic wisp"
+  },
+  {
+    "key": "black_heaven_core",
+    "folder": "black-heaven-core",
+    "subject": "the small white-haired boy Lotus floating inside the cyan central core (remove only the boy, preserve the whole machine and glowing ring)",
+    "parts": "complete small white-haired boy in blue coat, no long rear hair locks; separate left trailing white hair lock; separate right trailing white hair lock; bright cyan circular soft core glow; small orange electrical flame; small cyan electrical arc"
+  },
+  {
+    "key": "world_tree_summit",
+    "folder": "world-tree-summit",
+    "subject": "Damien the dark masked sword-wielding boy with purple black flame wings",
+    "parts": "complete small masked dark boy with sword but NO wings; separate left black magenta flame wing; separate right black magenta flame wing; separate flowing red scarf tail; small bright magenta flame tuft; another curved magenta flame tuft"
+  },
+  {
+    "key": "collapsing_clocktower",
+    "folder": "collapsing-clocktower",
+    "subject": "Lucid the pink-haired girl with large glowing butterfly wings in the center",
+    "parts": "complete pink-haired girl with black dress and hat but NO wings; separate left full butterfly wing; separate right full butterfly wing; small golden butterfly; small pink petal; small glowing purple butterfly"
+  },
+  {
+    "key": "diffraction_hall",
+    "folder": "diffraction-hall",
+    "subject": "Will the white-haired bespectacled man and his hovering magic book",
+    "parts": "main man head torso legs with short coat but NO arms NO long coat tails NO book; separate raised left arm with hand; separate right arm; separate complete open floating red magic book; separate left long white gold coat tail; separate right long white gold coat tail"
+  },
+  {
+    "key": "eye_of_void",
+    "folder": "eye-of-void",
+    "subject": "the entire huge Dusk stone monster including central stone ring, four petal arms, floating chained rocks and purple core (leave ONLY dark cloudy sky and foreground walkway)",
+    "parts": "large circular ancient stone ring and tapered lower body with glowing purple opening but NO petal claws; separate upper-left huge stone petal claw; separate upper-right huge stone petal claw; separate lower-left huge stone petal claw; separate lower-right huge stone petal claw; separate floating cracked rock with short chain"
+  },
+  {
+    "key": "altar_of_desire",
+    "folder": "altar-of-desire",
+    "subject": "red-haired Verus Hilla with scythe and green personal aura",
+    "parts": "main woman with face torso arms and short dress but NO long hair tails NO scythe NO aura; separate long red trailing hair; separate large complete scythe; separate left black dress tail; separate right black dress tail; green ghostly flame"
+  },
+  {
+    "key": "near_the_end",
+    "folder": "near-the-end",
+    "subject": "Dunkel black armored horned knight with large sword (preserve huge red sphere in background)",
+    "parts": "main complete armored knight with helmet and legs but NO arms NO cape NO sword; separate sword-holding left arm INCLUDING entire huge sword; separate right armored arm; separate trailing black cape; small red eye glow; small black wisps"
+  },
+  {
+    "key": "dark_temple",
+    "folder": "dark-temple",
+    "subject": "both white and black sword-bearing spectral guardians with their body chains and attached flame effects (preserve temple architecture chains)",
+    "parts": "complete white hooded sword guardian with hands and sword but NO chain halo; complete black hooded sword guardian with hands and sword but NO chain halo; separate white glowing chain halo ring; separate red glowing chain halo ring; separate pink ground flame; separate purple ground flame"
+  },
+  {
+    "key": "dark_throne",
+    "folder": "dark-throne",
+    "subject": "the central Black Mage hooded figure and all its red black personal aura",
+    "parts": "hooded main black gold robe torso with hood but NO sleeves and NO lower robe tails NO aura; separate left sleeve; separate right sleeve; separate lower flowing black gold robe skirt; separate sweeping red black energy crescent; separate black smoke puff"
+  },
+  {
+    "key": "boundary_of_beginning_and_end",
+    "folder": "boundary-of-beginning-and-end",
+    "subject": "central vertical white light pillar figure and its oval personal halo and orbs (preserve far background horizontal purple rings)",
+    "parts": "central tall narrow white violet luminous pillar figure; separate translucent blue violet flame mantle; separate small white luminous oval orb; separate white violet light streak; separate violet energy crescent; separate small floating purple rock"
+  },
+  {
+    "key": "nonexistent_space",
+    "folder": "nonexistent-space",
+    "subject": "central vertical white light pillar figure and all its dark oval smoke aura and nearby orbiting dots (preserve white void and floor lines)",
+    "parts": "central tall narrow white light pillar figure; separate soft dark gray oval smoke ring with transparent center; separate small dark gray orb; separate small white radiant orb; separate gray curved smoke wisp; separate narrow white luminous streak"
+  }
+]

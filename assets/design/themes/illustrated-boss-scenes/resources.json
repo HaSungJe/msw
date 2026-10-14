@@ -1,0 +1,308 @@
+[
+  {
+    "id": "altar-of-desire",
+    "kind": "concept",
+    "path": "C:/workspace/msw/assets/design/themes/illustrated-boss-scenes/altar-of-desire/concept.png",
+    "size": 1879453,
+    "w": 1672,
+    "h": 941,
+    "ruid": "6665a5101e074dc3bbc4ef5c0e293949"
+  },
+  {
+    "id": "altar-of-desire",
+    "kind": "thumb",
+    "path": "C:/workspace/msw/assets/design/themes/illustrated-boss-scenes/altar-of-desire/thumb.png",
+    "size": 218450,
+    "w": 1672,
+    "h": 941,
+    "ruid": "12ba56e5ed604cfb81781594917290d3"
+  },
+  {
+    "id": "black-heaven-core",
+    "kind": "concept",
+    "path": "C:/workspace/msw/assets/design/themes/illustrated-boss-scenes/black-heaven-core/concept.png",
+    "size": 1998149,
+    "w": 1676,
+    "h": 938,
+    "ruid": "b4e7f0aedcb14990a884b11d8dd49fab"
+  },
+  {
+    "id": "black-heaven-core",
+    "kind": "thumb",
+    "path": "C:/workspace/msw/assets/design/themes/illustrated-boss-scenes/black-heaven-core/thumb.png",
+    "size": 235857,
+    "w": 1676,
+    "h": 938,
+    "ruid": "4c253ac3e0ad48fa82555be9a7b5919d"
+  },
+  {
+    "id": "boundary-of-beginning-and-end",
+    "kind": "concept",
+    "path": "C:/workspace/msw/assets/design/themes/illustrated-boss-scenes/boundary-of-beginning-and-end/concept.png",
+    "size": 1958160,
+    "w": 1672,
+    "h": 941,
+    "ruid": "35286e61aed64a8a9889bb42d7567a66"
+  },
+  {
+    "id": "boundary-of-beginning-and-end",
+    "kind": "thumb",
+    "path": "C:/workspace/msw/assets/design/themes/illustrated-boss-scenes/boundary-of-beginning-and-end/thumb.png",
+    "size": 251037,
+    "w": 1672,
+    "h": 941,
+    "ruid": "114ec3ed67d94f9bac051d7e489f0981"
+  },
+  {
+    "id": "cave-of-life",
+    "kind": "concept",
+    "path": "C:/workspace/msw/assets/design/themes/illustrated-boss-scenes/cave-of-life/concept.png",
+    "size": 2315823,
+    "w": 1672,
+    "h": 941,
+    "ruid": "d01636d943e54154a657b1115a4f5908"
+  },
+  {
+    "id": "cave-of-life",
+    "kind": "thumb",
+    "path": "C:/workspace/msw/assets/design/themes/illustrated-boss-scenes/cave-of-life/thumb.png",
+    "size": 258126,
+    "w": 1672,
+    "h": 941,
+    "ruid": "2181a12bd9f543e1b8642b785b62af6d"
+  },
+  {
+    "id": "collapsing-clocktower",
+    "kind": "concept",
+    "path": "C:/workspace/msw/assets/design/themes/illustrated-boss-scenes/collapsing-clocktower/concept.png",
+    "size": 2231978,
+    "w": 1672,
+    "h": 941,
+    "ruid": "273f40bf3d3d4342958ebe2ec54a9a87"
+  },
+  {
+    "id": "collapsing-clocktower",
+    "kind": "thumb",
+    "path": "C:/workspace/msw/assets/design/themes/illustrated-boss-scenes/collapsing-clocktower/thumb.png",
+    "size": 256646,
+    "w": 1672,
+    "h": 941,
+    "ruid": "e79c245c9f434d4d9c4209dc7d0cd785"
+  },
+  {
+    "id": "dark-temple",
+    "kind": "concept",
+    "path": "C:/workspace/msw/assets/design/themes/illustrated-boss-scenes/dark-temple/concept.png",
+    "size": 2140236,
+    "w": 1672,
+    "h": 941,
+    "ruid": "6056ce6c32264a18a7e281afa9da6b96"
+  },
+  {
+    "id": "dark-temple",
+    "kind": "thumb",
+    "path": "C:/workspace/msw/assets/design/themes/illustrated-boss-scenes/dark-temple/thumb.png",
+    "size": 241731,
+    "w": 1672,
+    "h": 941,
+    "ruid": "56360f40d2ee49398db88ef6582b80e3"
+  },
+  {
+    "id": "dark-throne",
+    "kind": "concept",
+    "path": "C:/workspace/msw/assets/design/themes/illustrated-boss-scenes/dark-throne/concept.png",
+    "size": 1952722,
+    "w": 1672,
+    "h": 941,
+    "ruid": "e387f0c3afa34a76a8ac60fe62451116"
+  },
+  {
+    "id": "dark-throne",
+    "kind": "thumb",
+    "path": "C:/workspace/msw/assets/design/themes/illustrated-boss-scenes/dark-throne/thumb.png",
+    "size": 219700,
+    "w": 1672,
+    "h": 941,
+    "ruid": "4389181b9ee641a6b072ea5c82b86ebf"
+  },
+  {
+    "id": "diffraction-hall",
+    "kind": "concept",
+    "path": "C:/workspace/msw/assets/design/themes/illustrated-boss-scenes/diffraction-hall/concept.png",
+    "size": 1851258,
+    "w": 1672,
+    "h": 941,
+    "ruid": "8d696e512c694f92bdd0971c7c41cdf8"
+  },
+  {
+    "id": "diffraction-hall",
+    "kind": "thumb",
+    "path": "C:/workspace/msw/assets/design/themes/illustrated-boss-scenes/diffraction-hall/thumb.png",
+    "size": 249134,
+    "w": 1672,
+    "h": 941,
+    "ruid": "8e782d3c42d543729e2bc376e287c085"
+  },
+  {
+    "id": "eye-of-void",
+    "kind": "concept",
+    "path": "C:/workspace/msw/assets/design/themes/illustrated-boss-scenes/eye-of-void/concept.png",
+    "size": 2078581,
+    "w": 1672,
+    "h": 941,
+    "ruid": "09cd7648647d4b52b7f395486076c052"
+  },
+  {
+    "id": "eye-of-void",
+    "kind": "thumb",
+    "path": "C:/workspace/msw/assets/design/themes/illustrated-boss-scenes/eye-of-void/thumb.png",
+    "size": 239900,
+    "w": 1672,
+    "h": 941,
+    "ruid": "6632902b152e400798e2b8b16184113f"
+  },
+  {
+    "id": "forbidden-altar",
+    "kind": "concept",
+    "path": "C:/workspace/msw/assets/design/themes/illustrated-boss-scenes/forbidden-altar/concept.png",
+    "size": 2040916,
+    "w": 1672,
+    "h": 941,
+    "ruid": "f00585c403fa47b182d39057618fd91d"
+  },
+  {
+    "id": "forbidden-altar",
+    "kind": "thumb",
+    "path": "C:/workspace/msw/assets/design/themes/illustrated-boss-scenes/forbidden-altar/thumb.png",
+    "size": 235830,
+    "w": 1672,
+    "h": 941,
+    "ruid": "48944a06ae9546f4888355eff8993e25"
+  },
+  {
+    "id": "near-the-end",
+    "kind": "concept",
+    "path": "C:/workspace/msw/assets/design/themes/illustrated-boss-scenes/near-the-end/concept.png",
+    "size": 2007358,
+    "w": 1672,
+    "h": 941,
+    "ruid": "a7c737f38aa34dddaad8870f243f85a4"
+  },
+  {
+    "id": "near-the-end",
+    "kind": "thumb",
+    "path": "C:/workspace/msw/assets/design/themes/illustrated-boss-scenes/near-the-end/thumb.png",
+    "size": 248870,
+    "w": 1672,
+    "h": 941,
+    "ruid": "e155ac5daa4b47b4b0aec55209e105ff"
+  },
+  {
+    "id": "nonexistent-space",
+    "kind": "concept",
+    "path": "C:/workspace/msw/assets/design/themes/illustrated-boss-scenes/nonexistent-space/concept.png",
+    "size": 1549496,
+    "w": 1672,
+    "h": 941,
+    "ruid": "c1aefc311010419fbb9096bd607adef2"
+  },
+  {
+    "id": "nonexistent-space",
+    "kind": "thumb",
+    "path": "C:/workspace/msw/assets/design/themes/illustrated-boss-scenes/nonexistent-space/thumb.png",
+    "size": 116403,
+    "w": 1672,
+    "h": 941,
+    "ruid": "daa3a989057744a5ba67471718a1f934"
+  },
+  {
+    "id": "pianus-cave",
+    "kind": "concept",
+    "path": "C:/workspace/msw/assets/design/themes/illustrated-boss-scenes/pianus-cave/concept.png",
+    "size": 2067547,
+    "w": 1672,
+    "h": 941,
+    "ruid": "af67b1b52e1c46628d6cd119c309d813"
+  },
+  {
+    "id": "pianus-cave",
+    "kind": "thumb",
+    "path": "C:/workspace/msw/assets/design/themes/illustrated-boss-scenes/pianus-cave/thumb.png",
+    "size": 229713,
+    "w": 1672,
+    "h": 941,
+    "ruid": "1abb7dcff16e407faf3793f466cafb66"
+  },
+  {
+    "id": "world-tree-summit",
+    "kind": "concept",
+    "path": "C:/workspace/msw/assets/design/themes/illustrated-boss-scenes/world-tree-summit/concept.png",
+    "size": 1887851,
+    "w": 1672,
+    "h": 941,
+    "ruid": "3f1a7ff58f9e497690f7cbf6fdb390c8"
+  },
+  {
+    "id": "world-tree-summit",
+    "kind": "thumb",
+    "path": "C:/workspace/msw/assets/design/themes/illustrated-boss-scenes/world-tree-summit/thumb.png",
+    "size": 228879,
+    "w": 1672,
+    "h": 941,
+    "ruid": "d2ce70343c874830aafd3b1870883bb5"
+  },
+  {
+    "id": "zakum-altar",
+    "kind": "concept",
+    "path": "C:/workspace/msw/assets/design/themes/illustrated-boss-scenes/zakum-altar/concept.png",
+    "size": 2193813,
+    "w": 1672,
+    "h": 941,
+    "ruid": "dd0c9a63f44c4be2adc89ad8ccb2ef8b"
+  },
+  {
+    "id": "zakum-altar",
+    "kind": "thumb",
+    "path": "C:/workspace/msw/assets/design/themes/illustrated-boss-scenes/zakum-altar/thumb.png",
+    "size": 264586,
+    "w": 1672,
+    "h": 941,
+    "ruid": "a8f35b2a5e804d34a66713c83a9746ce"
+  },
+  {
+    "id": "cygnus-garden",
+    "kind": "concept",
+    "path": "C:/workspace/msw/assets/design/themes/illustrated-boss-scenes/cygnus-garden/concept.png",
+    "size": 2427277,
+    "w": 1672,
+    "h": 941,
+    "ruid": "104a99c45ca246618797845ffe4d9c67"
+  },
+  {
+    "id": "cygnus-garden",
+    "kind": "thumb",
+    "path": "C:/workspace/msw/assets/design/themes/illustrated-boss-scenes/cygnus-garden/thumb.png",
+    "size": 269815,
+    "w": 1672,
+    "h": 941,
+    "ruid": "fcaaad7c294b4c72843d65237b9eb9b1"
+  },
+  {
+    "id": "twilight-of-gods",
+    "kind": "concept",
+    "path": "C:/workspace/msw/assets/design/themes/illustrated-boss-scenes/twilight-of-gods/concept.png",
+    "size": 2151469,
+    "w": 1672,
+    "h": 941,
+    "ruid": "0773fcf5a9174673aaf5c9813cc788c8"
+  },
+  {
+    "id": "twilight-of-gods",
+    "kind": "thumb",
+    "path": "C:/workspace/msw/assets/design/themes/illustrated-boss-scenes/twilight-of-gods/thumb.png",
+    "size": 235647,
+    "w": 1672,
+    "h": 941,
+    "ruid": "472bf1c8ca8448458cead5b9505759df"
+  }
+]

@@ -1,0 +1,27 @@
+{
+  "id": "1aa22824331f433a89553d187688bf59",
+  "type": "sprite",
+  "category": "mob",
+  "names": {
+    "ko": [
+      "혼테일"
+    ]
+  },
+  "dname": "sprite-195240",
+  "assetGuid": null,
+  "hasEmbedding": false,
+  "payload": {
+    "width": 284,
+    "height": 308,
+    "pivot": {
+      "x": 151,
+      "y": 24,
+      "nx": 0.5317,
+      "ny": 0.0779
+    },
+    "image_hash": "83ce80b83d1d32a684800ecb783a1b3cb45ad8efe291cc3b11b390455e90e494",
+    "perceptual_hash": "817e3d68ce4337b0",
+    "thumbnail": "https://mod-resource-search-images.dn.nexoncdn.co.kr/maplestory_world/1aa22824331f433a89553d187688bf59.png",
+    "in_animationclip": "13d52b4932314eb4bb7f726f1ae8a31d"
+  }
+}

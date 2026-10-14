@@ -1,0 +1,37 @@
+{
+  "query": "듄켈 리멘 끝에 가까운 곳 배경",
+  "results": [
+    {
+      "id": "b284fca2536b4104a2979f7e85f40b90",
+      "type": "sprite",
+      "category": "background",
+      "dname": "sprite-9095906",
+      "payload": {
+        "width": 800,
+        "height": 1000
+      }
+    },
+    {
+      "id": "ba7182ef6cc8489b98d8969e97d193d4",
+      "type": "sprite",
+      "category": "background",
+      "dname": "sprite-9096276",
+      "payload": {
+        "width": 1300,
+        "height": 1108
+      }
+    },
+    {
+      "id": "cd18c405d3b04a199599f0d91778d9e0",
+      "type": "sprite",
+      "category": "background",
+      "dname": "sprite-9096779",
+      "payload": {
+        "width": 836,
+        "height": 328
+      }
+    }
+  ],
+  "nextOffset": 3,
+  "exactMatch": false
+}

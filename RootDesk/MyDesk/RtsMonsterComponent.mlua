@@ -125,6 +125,26 @@ script RtsMonsterComponent extends Component
 	@Sync
 	property number PoisonUntil = 0
 
+	-- 전투 엔티티·HitComponent는 활성 상태로 두고 본체 그림만 테마에 맡긴다.
+	@ExecSpace("ClientOnly")
+	method void OnUpdate(number delta)
+		if not self.IsBoss then return end
+		local key = _RtsActionThemeLogic:GetBossThemeKey(self.MonsterId)
+		local hide = key ~= "" and _RtsThemeLogic:GetBossTheme(self.Zone) == key
+		local sr = self.Entity.SpriteRendererComponent
+		if sr ~= nil then
+			if hide then sr.Enable = false
+			elseif self._T.ThemeBodyHidden and not self.Dead then sr.Enable = true end
+		end
+		for _, part in ipairs(self.PartFx) do
+			if isvalid(part) and part.SpriteRendererComponent ~= nil then
+				if hide then part.SpriteRendererComponent.Enable = false
+				elseif self._T.ThemeBodyHidden and not self.Dead then part.SpriteRendererComponent.Enable = true end
+			end
+		end
+		self._T.ThemeBodyHidden = hide
+	end
+
 	method void OnBeginPlay()
 		if self:IsServer() then
 			self.Entity:ConnectEvent(HitEvent, function(event)

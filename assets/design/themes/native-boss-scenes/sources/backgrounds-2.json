@@ -1,0 +1,37 @@
+{
+  "query": "피아누스 동굴 배경 암벽",
+  "results": [
+    {
+      "id": "52cedb4579154626973f5243a974cece",
+      "type": "sprite",
+      "category": "background",
+      "dname": "sprite-9092411",
+      "payload": {
+        "width": 144,
+        "height": 196
+      }
+    },
+    {
+      "id": "66be53b3e602404bbb3960df8628e846",
+      "type": "sprite",
+      "category": "background",
+      "dname": "sprite-12844314",
+      "payload": {
+        "width": 476,
+        "height": 984
+      }
+    },
+    {
+      "id": "c043ac8859fb4596bd907a2c1352cf84",
+      "type": "sprite",
+      "category": "background",
+      "dname": "sprite-9096322",
+      "payload": {
+        "width": 252,
+        "height": 196
+      }
+    }
+  ],
+  "nextOffset": 3,
+  "exactMatch": false
+}

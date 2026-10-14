@@ -265,7 +265,7 @@ script RtsZoneLogic extends Logic
 			if grid ~= nil then
 				grid.TransformComponent.Scale = Vector3(scale, scale, 1)
 			end
-			self:SpawnBossArea(n, mapRoot)
+			-- 중앙 보스 영역의 붉은 판은 표시하지 않는다(전투 좌표·배치 제한 유지).
 		end
 		for n = 1, self:GetZoneCount() do self:SetZoneDecor(n, preset.decor) end
 		self.VisualsBuilt = true
@@ -334,8 +334,9 @@ script RtsZoneLogic extends Logic
 		end
 		local scale = _RtsConfigLogic:GetGridTextureScale()
 		bg.TransformComponent.Scale = Vector3(scale, scale, 1)
-		if ruid == _RtsActionThemeLogic.BackgroundRUID then
-			bg.TransformComponent.Scale = Vector3(scale * 1920 / 1672, scale * 1080 / 941, 1)
+		local action = _RtsActionThemeLogic:GetByBackground(ruid)
+		if action ~= nil then
+			bg.TransformComponent.Scale = Vector3(scale * 1920 / action.w, scale * 1080 / action.h, 1)
 		end
 		bg.SpriteRendererComponent.SpriteRUID = ruid
 		bg.SpriteRendererComponent.Color = Color(1, 1, 1, alpha or 1)

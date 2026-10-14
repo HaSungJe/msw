@@ -1,0 +1,335 @@
+{
+  "date": "2026-10-15",
+  "status": "PASS",
+  "scope": "boss-only action themes",
+  "buildErrors": 0,
+  "runtimeErrors": 0,
+  "checks": {
+    "personalCards": 5,
+    "personalTabs": [
+      "기본"
+    ],
+    "disabledActionThemes": 17,
+    "bossTransitions": 17,
+    "clearAfterAllBosses": true,
+    "eliminationCleanup": true,
+    "changePersonalDuringBoss": true,
+    "worldBackgroundAndTrackReturn": true,
+    "migration": {
+      "storage": "in-memory mock; production MigrateActionTheme/SaveDefault",
+      "legacyThemes": 17,
+      "normalThemesUnchanged": 5,
+      "failedReadNoWrite": true,
+      "nilStorageNoWrite": true,
+      "liveAccountFixture": "not executed; auto-review rejected reversible account setting overwrite"
+    }
+  },
+  "logs": [
+    {
+      "logType": "Info",
+      "dateTime": "2026-10-15T02:27:45",
+      "isGeneratedFromServer": true,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "[THEMEPOLICY] profile=henesys stored=henesys read=0 zone=1.0",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 6,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-10-15T02:27:58",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "[THEMEPOLICY] UI tabs=0 cards=0 actionLabels=0 selectedTab=기본",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 16,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-10-15T02:27:58",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "[THEMEPOLICY] UI complete=false error=[string \"MakerScript\"]:18: UI mismatch",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 20,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-10-15T02:28:57",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "[THEMEPOLICY] cards=5 labels=",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 9,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-10-15T02:28:57",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "[THEMEPOLICY] UI PASS=true",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 12,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-10-15T02:29:10",
+      "isGeneratedFromServer": true,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "[THEMEPOLICY] bossMappings=17 returnPersonal=ellinia PASS",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 21,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-10-15T02:29:11",
+      "isGeneratedFromServer": true,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "[THEMEPOLICY] changePersonalDuringBoss PASS",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 27,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-10-15T02:29:12",
+      "isGeneratedFromServer": true,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "[THEMEPOLICY] twoBossWait and killCallbackReturn PASS",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 46,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-10-15T02:29:12",
+      "isGeneratedFromServer": true,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "[THEMEPOLICY] eliminationCleanupReturn PASS",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 51,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-10-15T02:29:13",
+      "isGeneratedFromServer": true,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "[THEMEPOLICY] server complete=true error=nil",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 58,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-10-15T02:30:22",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "[THEMEPOLICY] theme UI labels=",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 6,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-10-15T02:30:23",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "[THEMEPOLICY] bossVisual=false trackHidden=false",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 12,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-10-15T02:31:02",
+      "isGeneratedFromServer": true,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "[THEMEPOLICY] visual boss begin",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 1,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-10-15T02:31:37",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "[THEMEPOLICY] bossVisual=true trackHidden=true forbiddenRpcTheme=henesys",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 2,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-10-15T02:31:44",
+      "isGeneratedFromServer": true,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "[THEMEPOLICY] visual boss end",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 1,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-10-15T02:32:13",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "[THEMEPOLICY] personalVisual=true trackRestored=true",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 2,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-10-15T02:33:37",
+      "isGeneratedFromServer": true,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "[THEMEPOLICY] migration17 PASS; normal5 unchanged; readFailure/nil noWrite; inMemoryStorageOnly",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 18,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-10-15T02:33:37",
+      "isGeneratedFromServer": true,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "[THEMEPOLICY] migration complete=true error=nil",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 20,
+          "codeBlockFileId": null
+        }
+      ]
+    }
+  ]
+}

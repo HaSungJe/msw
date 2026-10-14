@@ -1,0 +1,26 @@
+{
+  "date": "2026-10-14",
+  "count": 16,
+  "allConceptsReadable": true,
+  "nativeBossCopiesByteIdentical": true,
+  "visualReview": "overview inspected: 16 scenes, no missing boss; single Pianus; five PinkBean statues; two phase1 knights",
+  "runtimeTested": false,
+  "scenes": [
+    "zakum-altar",
+    "forbidden-altar",
+    "pianus-cave",
+    "cave-of-life",
+    "twilight-of-gods",
+    "black-heaven-core",
+    "world-tree-summit",
+    "collapsing-clocktower",
+    "diffraction-hall",
+    "eye-of-void",
+    "altar-of-desire",
+    "near-the-end",
+    "dark-temple",
+    "dark-throne",
+    "boundary-of-beginning-and-end",
+    "nonexistent-space"
+  ]
+}

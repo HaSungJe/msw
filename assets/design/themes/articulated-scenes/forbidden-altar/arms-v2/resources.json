@@ -1,0 +1,24 @@
+[
+  {
+    "id": "forbidden_altar:arm-l",
+    "name": "Action forbidden altar natural arm-l v2",
+    "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/forbidden-altar/arms-v2/arm-l.png",
+    "w": 400,
+    "h": 600,
+    "size": 166711,
+    "category": "sprite",
+    "subcategory": "object",
+    "ruid": "36045f82765b4042879cda0e7498909e"
+  },
+  {
+    "id": "forbidden_altar:arm-r",
+    "name": "Action forbidden altar natural arm-r v2",
+    "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/forbidden-altar/arms-v2/arm-r.png",
+    "w": 400,
+    "h": 600,
+    "size": 166557,
+    "category": "sprite",
+    "subcategory": "object",
+    "ruid": "1e3d4f3be36f4fba85988d6e40a65b6b"
+  }
+]

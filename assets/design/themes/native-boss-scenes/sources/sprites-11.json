@@ -1,0 +1,67 @@
+{
+  "query": "검은마법사 신전",
+  "results": [
+    {
+      "id": "c7d548d8ba664e469b4904e555883d66",
+      "type": "animationclip",
+      "category": "object",
+      "dname": "animationclip-2676",
+      "payload": {
+        "frames": [
+          "dec691ca0ec143a783834442678e5000",
+          "8c5a91c8561f4b71b340b2f92c558920",
+          "a8568e7113c74eb1a5560325ad21c26b",
+          "ba73c8fa2adb4299bc6a113868149be3",
+          "51d1b271260d4d4e9bbc1edb556aa871",
+          "a187c59b77f04f78bc88e4efd06c1035"
+        ],
+        "width": 80,
+        "height": 108
+      }
+    },
+    {
+      "id": "ad13a510f3914854ba5d58a63571c5c1",
+      "type": "animationclip",
+      "category": "object",
+      "dname": "animationclip-2566",
+      "payload": {
+        "frames": [
+          "053b0ff5f65a4b51844906ff28fe8643",
+          "7b22ed62ed4848b2abf3dfdb410b4f8b",
+          "cd0e12ee9f3d4b4783650cdef95a6e69",
+          "cf346657cfc04e218e3909747b99d9d8",
+          "49598598a2514291bd1a70d466b3a0a2",
+          "1e39e34927d4492c934e5fdf0727b1f4"
+        ],
+        "width": 95,
+        "height": 108
+      }
+    },
+    {
+      "id": "bc8f5372f16e43269d8f0bf18d2bc75e",
+      "type": "animationclip",
+      "category": "object",
+      "dname": "animationclip-2625",
+      "payload": {
+        "frames": [
+          "ed2d037a61f14fc28b89314871c8045c",
+          "5c14bb09d72e45f5b387c67997445b1d",
+          "f7cbe2c2dd0045b58e5217f44c25a10c",
+          "026adca173a84d88ba2586a84cced249",
+          "435cee8b6ace4860b1d806afb106425f",
+          "c03474e702c94375a78724d0b7e04dfc",
+          "c1ea4613ecc74ebd93a455b198dba7e1",
+          "c6d61958957a42bca39c59fdad65ebff",
+          "547ed7db537a406eb0bf26b284703f8c",
+          "de9d7e1fab334dd8b997abf5e3a62658",
+          "ae54a69bf1f24483a1d3d1dc1e09ad2a",
+          "8973625681654de6bd7c6c7cc8c3252b"
+        ],
+        "width": 196,
+        "height": 196
+      }
+    }
+  ],
+  "nextOffset": 3,
+  "exactMatch": false
+}

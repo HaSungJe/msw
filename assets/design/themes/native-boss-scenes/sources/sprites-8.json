@@ -1,0 +1,71 @@
+{
+  "query": "윌 회절 회랑",
+  "results": [
+    {
+      "id": "ccb67073dde74980a09b1943bc859b06",
+      "type": "animationclip",
+      "category": "background",
+      "dname": "animationclip-771645",
+      "payload": {
+        "frames": [
+          "749fc5ed14614ec99ec0431539f08800",
+          "641c95d70ace4679a67018d2cdf9b037",
+          "4aeec13ddeb84e8fa9a5203a3aa3333b",
+          "38b57b3fd5234ba2b6a32be72c226ac8",
+          "02c4287b70a74b7485105338e74cdf79",
+          "4228067f27fe4292ac2c165965687231",
+          "d5276fc626c74840a2fbde9e68a9dc0c",
+          "10e37b9aa49b444fa250a74fb22e6cd2",
+          "73c59f49a16740b38263a3aa369eab31",
+          "21cb113ea6984b8e83a436979d7a125c",
+          "620a657d491d46f685da092bbae06ba8",
+          "e2be7ffa020448c9adc02cbd509a8a62",
+          "d9c94055ce934e38b872a87ddb74bf75",
+          "27e96241e8564bda80ea2cbe1cdb83bd"
+        ],
+        "width": 140,
+        "height": 262
+      }
+    },
+    {
+      "id": "43345b96ec9f499bb1041c3da64d9415",
+      "type": "animationclip",
+      "category": "object",
+      "dname": "animationclip-202",
+      "payload": {
+        "frames": [
+          "972cb0350d4d47048c2b54852622e9ec",
+          "c917f17d3451401294be8c68d1bf7e28",
+          "fb807cc67c814e81a2eeb16155a6d736",
+          "935ea4bbfdd043d19e8a58add993252e",
+          "4f9eb96ec8064c818e141224624a1cc8",
+          "14e95666b7734089b27b5b4c2f357742",
+          "5c91371672834fe882869f12273a4daa",
+          "49cb8663f0364836b7ccd646eac42540",
+          "a2286f854f67444cb8ed04d7e9c28092",
+          "699a9179e5ba458299170356d80f8fd5",
+          "efaaee35c35b479f8629b660b5ea5692",
+          "6aa34af733d1464c91a55007f98927de",
+          "0a4c4c89d66d46f899415313c3c76170",
+          "c3287f6c3aef450fb3e2232c7ccb35fc",
+          "75d8320d39cc4ba4ac7e6555a8d2b1e5",
+          "3ddc3938b891412a80c96c4006ed7bd6"
+        ],
+        "width": 148,
+        "height": 386
+      }
+    },
+    {
+      "id": "281292aa26504d03b89613ba0d5e9cc4",
+      "type": "sprite",
+      "category": "object",
+      "dname": "sprite-1520",
+      "payload": {
+        "width": 584,
+        "height": 500
+      }
+    }
+  ],
+  "nextOffset": 3,
+  "exactMatch": false
+}

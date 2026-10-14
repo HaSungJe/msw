@@ -1,0 +1,65 @@
+{
+  "query": "세계수 정상",
+  "results": [
+    {
+      "id": "7f74c9006d5044dab5fa1771a72cf42e",
+      "type": "animationclip",
+      "category": "object",
+      "dname": "animationclip-2381",
+      "payload": {
+        "frames": [
+          "72ad60f742984113abd5ef92cca09724",
+          "75d1d3e48bf84aa9adcd17e5423af30b",
+          "0ccebee423a541ee8328bd2646cc03ef",
+          "d0e8d58f38da49fa8a9f2a2f8f114d0a",
+          "ffb11acf20e6435b83b69b561b28566b",
+          "ebfa0249c780481aa3b3375e4cd00afa",
+          "d19cc1e422134a40a29713f5094823bb",
+          "b94913f09ed54727b3fa07eefd24de28",
+          "c2d3830daad04b7c94a6e1d4942ecaab",
+          "c4fa202d193a46299bd1f08bef18a3e3"
+        ],
+        "width": 108,
+        "height": 68
+      }
+    },
+    {
+      "id": "b9c64597b3cc4a5695b12f8c56c68605",
+      "type": "animationclip",
+      "category": "object",
+      "dname": "animationclip-2610",
+      "payload": {
+        "frames": [
+          "c44d3925cb5b485d95bd40261119e2db",
+          "57d649e1d4c644c5a9f43a6c86a36c09"
+        ],
+        "width": 104,
+        "height": 80
+      }
+    },
+    {
+      "id": "b229cc0b139245cbbad509192acef491",
+      "type": "animationclip",
+      "category": "object",
+      "dname": "animationclip-2576",
+      "payload": {
+        "frames": [
+          "3fed359c1fb2490a9d5cf29ba61be3e5",
+          "b029f3879a4146f1b80c3a2d39db0440",
+          "9f7f639d6b7240c08224bda71459adb1",
+          "b7d21a6f19f7444e9e79c5d418a282b6",
+          "1cde12d0e39c4ec8a50cb94090b09c8b",
+          "dd17bcc8f1cb4e98b495d4c4ba531f36",
+          "9a23be0596c24498bae1d735ecf95740",
+          "674c0a34bcd744908e73186369598337",
+          "d60409bcd5b64823b583ffcbd58b6b20",
+          "8a63c34d4d3641e4a8d109114fde2e59"
+        ],
+        "width": 104,
+        "height": 121
+      }
+    }
+  ],
+  "nextOffset": 3,
+  "exactMatch": false
+}

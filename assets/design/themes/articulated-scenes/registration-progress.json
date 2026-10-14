@@ -1,0 +1,19 @@
+{
+  "status": "applied-verified",
+  "registered": 116,
+  "total": 116,
+  "combinedResources": 142,
+  "themes": 17,
+  "userApproval": "업로드·등록·게임 적용 승인",
+  "missing": [],
+  "partInstances": 187,
+  "runtimeVerifiedThemes": 17,
+  "buildErrors": 0,
+  "runtimeErrors": 0,
+  "hillaBodyRuid": "4e44ba4e320f4d7a87989198c0741cfa",
+  "willSpider": {
+    "registered": 12,
+    "verified": true,
+    "bgm": "bd23d2f87d734f8ca52ca8824d1b6ff4"
+  }
+}

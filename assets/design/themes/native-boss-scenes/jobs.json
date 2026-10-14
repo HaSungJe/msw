@@ -1,0 +1,114 @@
+[
+  {
+    "id": "zakum-altar",
+    "name": "자쿰의 제단",
+    "boss": "B02",
+    "instruction": "Keep chained dead tree, columns, lava, temple floor. No boss present in screenshot.",
+    "ref": "C:/Users/timec/AppData/Local/Temp/codex-clipboard-a8c8e0cb-4b69-4e75-a884-3d029bf5a4c2.png"
+  },
+  {
+    "id": "forbidden-altar",
+    "name": "금지된 제단",
+    "boss": "B01",
+    "instruction": "Keep white broken columns, broken arches, bright cyan rock platforms and ropes, dark cave. Remove green text, rune portal and players.",
+    "ref": "C:/Users/timec/AppData/Local/Temp/codex-clipboard-513b2785-95ea-4870-b864-910030c68373.png"
+  },
+  {
+    "id": "pianus-cave",
+    "name": "피아누스의 동굴",
+    "boss": "B03",
+    "instruction": "Remove BOTH orange fish bosses at far left/right, all players and bright explosion. Restore cave rock where fish were. Keep stalactites and lower fossil rock floor.",
+    "ref": "C:/Users/timec/AppData/Local/Temp/codex-clipboard-c5c56c1a-c1d5-4cef-9220-521cfc494c5d.png"
+  },
+  {
+    "id": "cave-of-life",
+    "name": "생명의 동굴",
+    "boss": "B04",
+    "instruction": "Keep blue icy cave edges, floating rock platforms, ropes, planets, and right organic structure with purple crystal. No boss present. Remove players.",
+    "ref": "C:/Users/timec/AppData/Local/Temp/codex-clipboard-ad0ffdcc-c79b-4824-bc0e-61b9647ed1d0.png"
+  },
+  {
+    "id": "twilight-of-gods",
+    "name": "신들의 황혼",
+    "boss": "B05",
+    "instruction": "PRESERVE ALL FIVE statues exactly in their existing arrangement: tall human at each extreme edge, two bird statues inside them, large elevated central winged female statue. Preserve tan temple arches, platforms/chains, distant planets. Remove players, NPCs, pink smoke and effects hiding middle/lower scene. Do not replace statues.",
+    "ref": "C:/Users/timec/AppData/Local/Temp/codex-clipboard-f654683a-eb39-4b7d-b618-09569058eb3e.png"
+  },
+  {
+    "id": "black-heaven-core",
+    "name": "블랙헤븐 코어",
+    "boss": null,
+    "instruction": "KEEP the small WHITE HAIRED boss in dark clothes floating INSIDE cyan circular machine at center, keep the boss pixel-perfect as much as possible. Preserve entire mechanical chamber, gold/cyan core, monitors, pipes, side turbines, pink tanks, steel floor. Remove ONLY player cluster at bottom, weapon effects and all interface incl guide character bottom right. Do NOT remove white-haired boss in core. This is background plus boss art.",
+    "ref": "C:/Users/timec/AppData/Local/Temp/codex-clipboard-93a0feae-2ea4-4c2e-a3e8-a4fd6dbadc97.png"
+  },
+  {
+    "id": "world-tree-summit",
+    "name": "세계수 정상",
+    "boss": "B08",
+    "instruction": "Keep huge circular bright opening in dark clouds, purple lightning, layered mountains, foreground thick purple tree branch. Remove all players, their huge red black axe, pets, purple portal, interface. No boss visible.",
+    "ref": "C:/Users/timec/AppData/Local/Temp/codex-clipboard-76349cf8-09c7-42e1-badc-134a77c076e3.png"
+  },
+  {
+    "id": "collapsing-clocktower",
+    "name": "무너지는 시계탑",
+    "boss": "B09",
+    "instruction": "Keep dark blue starry clocktower backdrop, colorful floating clock platforms, gold angel statues, LARGE GOLD decorative butterflies. REMOVE pink-haired butterfly-winged boss at right so only scenery remains; remove small cyan/purple combat butterflies and all players. Preserve platform positions.",
+    "ref": "C:/Users/timec/AppData/Local/Temp/codex-clipboard-2f0bc5ff-6166-482f-8ed3-7bc4c642709b.png"
+  },
+  {
+    "id": "diffraction-hall",
+    "name": "회절의 회랑",
+    "boss": "B10",
+    "instruction": "Remove ALL red black attack beams/sigils/eye symbols, purple/white magic explosions, damage numbers, players, gray-haired man boss near lower left. Preserve pale blue purple vertical crystalline architecture, reflective floor and gold-trimmed tall mirror at far right. Empty scene.",
+    "ref": "C:/Users/timec/AppData/Local/Temp/codex-clipboard-54611882-fe46-4a2d-a41c-061728dcaf4d.png"
+  },
+  {
+    "id": "eye-of-void",
+    "name": "공허의 눈",
+    "boss": null,
+    "instruction": "KEEP the ENORMOUS gray segmented central mass with purple cosmic core, red cracks, chained floating stones: this is the DUSK BOSS itself and must stay unchanged dominating entire frame. Remove blue black star projectile at upper right, thin purple targeting line hanging at center, portal lower left, all players pets and interface. Preserve boss's actual texture and scale, gray foreground platform.",
+    "ref": "C:/Users/timec/AppData/Local/Temp/codex-clipboard-7b4f9c99-3b17-420c-9cf0-663ded6b71af.png"
+  },
+  {
+    "id": "altar-of-desire",
+    "name": "욕망의 제단",
+    "boss": "B12",
+    "instruction": "Keep green-black temple, TWO enormous hanging hourglasses on sides, stacked black stone altar with candles. Remove huge cyan ghost spell cloud, all characters players pets and center obscured boss if present, green combat lines and HUD. Restore lower altar and stone floor in original muted green style.",
+    "ref": "C:/Users/timec/AppData/Local/Temp/codex-clipboard-a0869e11-4b50-40c9-a90f-b24ee1f36067.png"
+  },
+  {
+    "id": "near-the-end",
+    "name": "끝에 가까운 곳",
+    "boss": "B13",
+    "instruction": "Keep gigantic hot magenta red sphere, purple shell plates, red downward energy fall, floating dark rocks and dark mechanical platform. Remove black armored knight and sword currently center-left, players at right and HUD. Do NOT remove sphere or base.",
+    "ref": "C:/Users/timec/AppData/Local/Temp/codex-clipboard-3cd1cc13-87f8-4161-adf3-129184d87022.png"
+  },
+  {
+    "id": "dark-temple",
+    "name": "어둠의 신전",
+    "boss": "B14+B15",
+    "instruction": "Remove white sword-bearing knight at left AND black red sword-bearing knight at right (both will be overlaid separately), remove players pets, portals, gold circular combat gauge, guide illustration and all HUD. Keep black/red tall temple, heavy hanging chains, distant central throne, cracked dark floor.",
+    "ref": "C:/Users/timec/AppData/Local/Temp/codex-clipboard-944f6caa-99b2-4196-aa06-27078136a748.png"
+  },
+  {
+    "id": "dark-throne",
+    "name": "어둠의 왕좌",
+    "boss": "B16",
+    "instruction": "Remove central hooded black mage and personal red circle, all HUGE diagonal black/red chain and splatter attack effects, players pets, guide illustration, HUD. Preserve original red-black temple wall, chains in distant architecture, side broken stone blades and cracked dark floor. Restore occluded area without redesign.",
+    "ref": "C:/Users/timec/AppData/Local/Temp/codex-clipboard-6fa884c8-37d3-4914-a02d-0728cd9a51fa.png"
+  },
+  {
+    "id": "boundary-of-beginning-and-end",
+    "name": "시작과 끝의 경계",
+    "boss": "B17",
+    "instruction": "Remove central white vertical glowing character/boss, all blue attack lines and blue circular shield, ALL characters incl small blond floating character on right, players pets, number text, UI, purple portal. Preserve dark cosmos and broad purple horizontal rings from original environment. White dotted dome may be combat barrier: remove this spherical shield as well. Do not add architecture/floor absent in reference.",
+    "ref": "C:/Users/timec/AppData/Local/Temp/codex-clipboard-ee0fab7b-0efe-4c40-9e63-e0123ca1a496.png"
+  },
+  {
+    "id": "nonexistent-space",
+    "name": "존재하지 않는 공간",
+    "boss": "B18",
+    "instruction": "Remove central luminous white vertical boss and its oval rings (will overlay native sprite), all players pets damage numbers UI guide illustration, circular gauge and black portal at lower left. Keep original almost pure white void, fine gray/black horizontal undulating lines across lower fifth, sparse gray dots. Do NOT add ruins, trees, pillars, clouds or ornate scene.",
+    "ref": "C:/Users/timec/AppData/Local/Temp/codex-clipboard-9e795d72-31eb-46af-876f-8dd9e3330f35.png"
+  }
+]

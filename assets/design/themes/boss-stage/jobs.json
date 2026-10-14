@@ -1,0 +1,193 @@
+[
+  {
+    "id": "henesys",
+    "name": "헤네시스",
+    "kind": "basic",
+    "scene": "Preserve orange mushroom houses, sunny rolling green hills, flowers, wooden fences. Recompose buildings onto the left and right margins, with a continuous calm grassy village ground through the center. No central giant house obstructing the middle.",
+    "refs": [
+      "C:/workspace/msw/assets/design/themes/scenery/henesys-scene-source.png"
+    ],
+    "style": "C:/workspace/msw/assets/design/themes/action/zakum-altar/keyframe-center-v2.png"
+  },
+  {
+    "id": "ellinia",
+    "name": "엘리니아",
+    "kind": "basic",
+    "scene": "Preserve the lush enchanted forest village, enormous tree houses with warm glowing oval doors, hanging vines, rope bridges, distant waterfalls. Move the biggest trunks toward the flanks, leave a calm softly lit forest clearing through center. No enormous central trunk blocking the view.",
+    "refs": [
+      "C:/workspace/msw/assets/design/themes/scenery/ellinia-scene-source.png"
+    ],
+    "style": "C:/workspace/msw/assets/design/themes/action/zakum-altar/keyframe-center-v2.png"
+  },
+  {
+    "id": "perion",
+    "name": "페리온",
+    "kind": "basic",
+    "scene": "Preserve warm terracotta desert canyon village, stepped mesas, hide tents, rope bridges, ochre shrubs, blue sky. Move tall rock towers and tents to flanks and background, center is continuous calm canyon ground, not an isolated raised arena.",
+    "refs": [
+      "C:/workspace/msw/assets/design/themes/scenery/perion-scene-source.png"
+    ],
+    "style": "C:/workspace/msw/assets/design/themes/action/zakum-altar/keyframe-center-v2.png"
+  },
+  {
+    "id": "kerning",
+    "name": "커닝시티",
+    "kind": "basic",
+    "scene": "Preserve the recognizable compact urban brick city, rooftop water tanks, steel beams, street lamps, pipes and industrial buildings. Place major architecture at the sides with a calm continuous worn-pavement midground, no central fenced boss area. MapleStory cartoon city, soft blue gray and warm amber windows, no readable writing.",
+    "refs": [
+      "C:/workspace/msw/assets/design/themes/scenery/kerning-scene-source.png"
+    ],
+    "style": "C:/workspace/msw/assets/design/themes/action/zakum-altar/keyframe-center-v2.png"
+  },
+  {
+    "id": "lith",
+    "name": "리스항구",
+    "kind": "basic",
+    "scene": "Preserve sunny coastal harbor, turquoise sea, small wooden ships, red roof port houses, sails, ropes and pier details. Place large landmarks along edges, calm continuous coastal stone and wooden dock foreground, no enclosed boss pad or central barrier. Bright but gentle seaside colors.",
+    "refs": [
+      "C:/workspace/msw/assets/design/themes/scenery/lith-scene-source.png"
+    ],
+    "style": "C:/workspace/msw/assets/design/themes/action/zakum-altar/keyframe-center-v2.png"
+  },
+  {
+    "id": "forbidden-altar",
+    "name": "금지된 제단",
+    "kind": "action",
+    "scene": "Junior Balrog / 주니어 발록 in an ancient subterranean forbidden stone temple: hulking brown bull-like winged demon, pale muzzle and chest, pointed horns, thick limbs, claws and leathery wings. Match supplied boss sprite rather than generic red demon. Full boss in central attack focus, mossy ruined pillars, dim green-brown dungeon, warm small braziers.",
+    "refs": [
+      "C:/workspace/msw/assets/design/monster-thumbnails/boss/B01.png"
+    ],
+    "style": "C:/workspace/msw/assets/design/themes/action/zakum-altar/keyframe-center-v2.png"
+  },
+  {
+    "id": "cave-of-life",
+    "name": "생명의 동굴",
+    "kind": "action",
+    "scene": "Horntail / 혼테일: complete colossal three-headed charcoal-brown dragon with horned heads, orange-red horn accents, huge leathery wings, clawed body and curled tail. Supplied sprite shows head design only; extend to recognizable THREE-HEADED full boss, not three disconnected heads. Ancient vast violet/teal cavern with mineral pillars and faint waterfalls. All heads readable, center torso the target.",
+    "refs": [
+      "C:/workspace/msw/assets/design/monster-thumbnails/boss/B04.png"
+    ],
+    "style": "C:/workspace/msw/assets/design/themes/action/zakum-altar/keyframe-center-v2.png"
+  },
+  {
+    "id": "forgotten-twilight",
+    "name": "잊혀진 황혼",
+    "kind": "action",
+    "scene": "Pink Bean / 핑크빈, match round rosy pink body, white belly, purple curled horns and ball-ended tail from reference. Centered full boss, expressive alert idle pose. Forgotten Temple of Time at twilight, cream stone classical pillars, weathered statues at far sides, lavender clouds and faint gold light, continuous old stone ground.",
+    "refs": [
+      "C:/workspace/msw/assets/design/monster-thumbnails/boss/B05.png"
+    ],
+    "style": "C:/workspace/msw/assets/design/themes/action/zakum-altar/keyframe-center-v2.png"
+  },
+  {
+    "id": "black-heaven-core",
+    "name": "블랙헤븐 코어",
+    "kind": "action",
+    "scene": "Lotus / 스우, faithfully match pale youthful face, long white/blond hair and black gold-trimmed outfit in sprite. Floating centered with arms relaxed out slightly, electrical core chamber of Black Heaven, large steel machinery, cables, broken metal fragments at edges, muted blue-gray and cyan electric glow. Full body central, no machinery obscuring torso.",
+    "refs": [
+      "C:/workspace/msw/assets/design/monster-thumbnails/boss/B07.png"
+    ],
+    "style": "C:/workspace/msw/assets/design/themes/action/zakum-altar/keyframe-center-v2.png"
+  },
+  {
+    "id": "world-tree-summit",
+    "name": "세계수 정상",
+    "kind": "action",
+    "scene": "Damien / 데미안, match reference dark horned demonic armor, dark wings, magenta-red blade and cursed red aura, recognizable warrior in full form. Summit of corrupted World Tree: immense tangled roots, fractured timber and stone, dusky crimson and purple skies, small floating cinders. Torso central, wings readable, blade visible.",
+    "refs": [
+      "C:/workspace/msw/assets/design/monster-thumbnails/boss/B08.png"
+    ],
+    "style": "C:/workspace/msw/assets/design/themes/action/zakum-altar/keyframe-center-v2.png"
+  },
+  {
+    "id": "dreaming-forest",
+    "name": "몽환의 숲",
+    "kind": "action",
+    "scene": "Lucid / 루시드 boss fairy, match reference pink hair, black-purple dress and large luminous butterfly wings with pale lavender patterns. Full central figure floating, dreamy lush forest with twisted rounded trees, soft blue lavender mist, roses and a few butterflies at edges. Elegant magical mood, not realistic horror. Body centered at attack focus.",
+    "refs": [
+      "C:/workspace/msw/assets/design/monster-thumbnails/boss/B09.png"
+    ],
+    "style": "C:/workspace/msw/assets/design/themes/action/zakum-altar/keyframe-center-v2.png"
+  },
+  {
+    "id": "mirror-throne",
+    "name": "거울에 비친 빛의 신좌",
+    "kind": "action",
+    "scene": "Will / 윌, match reference silver-white hair, dark red and black elegant clothing, floating golden oval halo-like crown and shadowy spider limbs behind. Centered full figure. Moonlit ruined mirror palace, ornate tall mirrored frames at edges, cool blue and lavender marble, silver moonlight, delicate spider webs in corners. Keep boss unobscured.",
+    "refs": [
+      "C:/workspace/msw/assets/design/monster-thumbnails/boss/B10.png"
+    ],
+    "style": "C:/workspace/msw/assets/design/themes/action/zakum-altar/keyframe-center-v2.png"
+  },
+  {
+    "id": "eye-of-void",
+    "name": "공허의 눈",
+    "kind": "action",
+    "scene": "Dusk / Gloom / 더스크 as a gigantic dark tentacled void creature with ONE enormous luminous violet central eye, mass of shadow rock and several thick curled tentacles framing the eye, not a humanoid and not just a small purple ball. Supplied sprite is only a color/energy reference. Deep blue-black void clouds, shattered floating stones, subdued indigo purple glow, readable cartoon forms. Main huge eye is exactly central.",
+    "refs": [
+      "C:/workspace/msw/assets/design/monster-thumbnails/boss/B11.png"
+    ],
+    "style": "C:/workspace/msw/assets/design/themes/action/zakum-altar/keyframe-center-v2.png"
+  },
+  {
+    "id": "altar-of-desire",
+    "name": "욕망의 제단",
+    "kind": "action",
+    "scene": "Verus Hilla / 진 힐라, match long flowing crimson hair, pale greenish face, black and green robes, massive green crescent scythe. Full figure central; scythe readable to side. Sinister ancient altar with tangled thorn roots, green soul lanterns, hanging crimson threads, dark green and burgundy mist. Charming clean MapleStory art, no gore.",
+    "refs": [
+      "C:/workspace/msw/assets/design/monster-thumbnails/boss/B12.png"
+    ],
+    "style": "C:/workspace/msw/assets/design/themes/action/zakum-altar/keyframe-center-v2.png"
+  },
+  {
+    "id": "near-the-end",
+    "name": "끝에 가까운 곳",
+    "kind": "action",
+    "scene": "Dunkel / 친위대장 듄켈, match huge dark plated helmet and black heavy armor, flowing dark cape, enormous broad sword with silver edge. Full boss central, apocalyptic ruined stone outpost and crumbling cathedral-like walls, floating rubble at edges, desaturated blue black dusk with faint purple lights. Broad sword must fit entirely inside frame.",
+    "refs": [
+      "C:/workspace/msw/assets/design/monster-thumbnails/boss/B13.png"
+    ],
+    "style": "C:/workspace/msw/assets/design/themes/action/zakum-altar/keyframe-center-v2.png"
+  },
+  {
+    "id": "dark-temple",
+    "name": "어둠의 신전",
+    "kind": "action",
+    "scene": "Two bosses together: Aion and Yaldabaoth / 아이온과 얄다바오르. Faithfully use both references: tall radiant white-pink armored knight with long blade and geometric halo on left of center, contrasting dark crimson-purple armored knight with blade and halo on right of center. Pair straddles canvas center, equal importance, no third character. Ruined tall gothic dark temple, broken arches, pale rose vs crimson energy. Both entire silhouettes visible.",
+    "refs": [
+      "C:/workspace/msw/assets/design/monster-thumbnails/boss/B14.png",
+      "C:/workspace/msw/assets/design/monster-thumbnails/boss/B15.png"
+    ],
+    "style": "C:/workspace/msw/assets/design/themes/action/zakum-altar/keyframe-center-v2.png"
+  },
+  {
+    "id": "dark-throne",
+    "name": "어둠의 왕좌",
+    "kind": "action",
+    "scene": "Black Mage phase 2 / 검은마법사 2페이즈, preserve reference hooded face hidden in shadow, voluminous dark robes, throne and red-black aura. Centered seated imposing mage on dark throne, immense shadow cathedral, dangling chains framing edges, cracked black stone, restrained red ring glow behind. Do not add a visible human face. Central torso is target.",
+    "refs": [
+      "C:/workspace/msw/assets/design/monster-thumbnails/boss/B16.png"
+    ],
+    "style": "C:/workspace/msw/assets/design/themes/action/zakum-altar/keyframe-center-v2.png"
+  },
+  {
+    "id": "boundary-of-beginning-and-end",
+    "name": "시작과 끝의 경계",
+    "kind": "action",
+    "scene": "Black Mage phase 3 setting at the boundary of beginning and end: use provided phase-3 sprite as luminous abstract robed mage silhouette, not invent visible face. Centered figure suspended between black and white space, blue-white vertical radiance, fragmented ancient stone and surreal folded light, balanced light/dark background. Body silhouette remains visible against the contrasting background; full form central.",
+    "refs": [
+      "C:/workspace/msw/assets/design/monster-thumbnails/boss/B17.png"
+    ],
+    "style": "C:/workspace/msw/assets/design/themes/action/zakum-altar/keyframe-center-v2.png"
+  },
+  {
+    "id": "nonexistent-space",
+    "name": "존재하지 않는 공간",
+    "kind": "action",
+    "scene": "Black Mage phase 4 / 검은마법사 4페이즈: match supplied almost white spectral hooded silhouette and radiating white crystalline light, full figure centered, no visible face. An impossible empty space of pale white gray and black void edges, floating thin shards, minimal pearlescent light and long soft shadows. Strong readable dark-versus-white contrast around central luminous boss, different from blue phase 3.",
+    "refs": [
+      "C:/workspace/msw/assets/design/monster-thumbnails/boss/B18.png"
+    ],
+    "style": "C:/workspace/msw/assets/design/themes/action/zakum-altar/keyframe-center-v2.png"
+  }
+]

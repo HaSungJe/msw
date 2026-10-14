@@ -659,12 +659,11 @@ script RtsStageLogic extends Logic
 		self:OnStageStarted(n)
 	end
 
-	-- 훅: 스테이지 시작 — 브론즈~골드 증강 지급 라운드면 증강 선택(RtsAugmentLogic — 단계만 무작위, 종류는 선택). 배경음은 클라 RefreshBgm
+	-- 훅: 스테이지 시작(로그만 — 라운드 증강 지급은 2026-10-14 삭제, 일반 증강은 뽑기로만). 배경음은 클라 RefreshBgm
 	@ExecSpace("ServerOnly")
 	method void OnStageStarted(number n)
 		local s = _RtsStageTableLogic:GetStage(n)
 		_RtsConfigLogic:Log("RtsStage: start " .. string.format("%d", n) .. " " .. s.kind .. " " .. s.name)
-		_RtsAugmentLogic:OnStageStarted(n)
 	end
 
 	@ExecSpace("ServerOnly")

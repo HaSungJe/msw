@@ -1,0 +1,61 @@
+{
+  "query": "블랙헤븐 코어",
+  "results": [
+    {
+      "id": "f61435ada2e443b09d0780688895715b",
+      "type": "animationclip",
+      "category": "object",
+      "dname": "animationclip-52682",
+      "payload": {
+        "frames": [
+          "7e4818e9401e4f2d83d546df95b17b54",
+          "5c1f5740b7d84ef68093b60bb840b746",
+          "3a59860ede88463292f222be0809ade3",
+          "f83b1cd2ddf24699b012c9a21a622bfd",
+          "ccf2850129b549f88ac9f411159496c3",
+          "533a6393242e4deabf47fb9777b2d385"
+        ],
+        "width": 49,
+        "height": 37
+      }
+    },
+    {
+      "id": "14b7e0fa120c4f31847d016d960f17f1",
+      "type": "animationclip",
+      "category": "object",
+      "dname": "animationclip-50857",
+      "payload": {
+        "frames": [
+          "acbc7f892e6e485b8479d23bda3ae02a",
+          "143dd6294e924e028973aad456e2b6a3",
+          "747217204d2d4ab7b4b6a0f2288ed2f3",
+          "8e94cd875200438fab39f7f7e1be8ead",
+          "8462d417cc254cc28aed70dc3ed3909d",
+          "9c263f64fdf54e6da3323c22b263c090"
+        ],
+        "width": 48,
+        "height": 55
+      }
+    },
+    {
+      "id": "901ac66142b740a6bcd8b8da1cef4281",
+      "type": "animationclip",
+      "category": "object",
+      "dname": "animationclip-51893",
+      "payload": {
+        "frames": [
+          "cd4076e948cf425ab086bf328402facb",
+          "7a19257a26f64afbbc60a13f7c3d4745",
+          "30968f5424544d58810f1df2b2b4958a",
+          "f14707b0eb834c0e8e9ecc401c9f9a90",
+          "74af7d5751fa456da7941c08a4f98935",
+          "6d57100d979740978b7bdb66702cfb9b"
+        ],
+        "width": 71,
+        "height": 33
+      }
+    }
+  ],
+  "nextOffset": 3,
+  "exactMatch": false
+}

@@ -25,9 +25,6 @@ script RtsCombatLogic extends Logic
 	-- 테스트 모드 추가 데미지(2026-09-24 사용자 "테스트 모드로 시작할 때 추가 데미지 100만"): RtsUnitLogic.DevTools가 켜져 있으면 타격마다 이만큼 더한다(방어·난수 뒤)
 	property number DevExtraDamage = 1000000
 
-	-- 방어구 부수기 캐시(구역별 0.5초 — GuardCache와 같은 방식)
-	property table ArmorCache = {}
-
 	-- 유닛 엔티티는 칸 가운데보다 RtsUnitLogic.UnitFootDy(0.75) 아래(발이 발판에 닿게)에 서 있다. 사거리는 칸 가운데 기준이라 이만큼 올려 잰다
 	--   (2026-09-23 사용자 "위쪽 타일에 오면 안 때리고 아래쪽에 와야 때린다" — 전엔 발 기준이라 위 칸은 1.3칸, 아래 칸은 0.7칸으로 쟀다)
 
@@ -180,7 +177,8 @@ script RtsCombatLogic extends Logic
 		elseif m.IsBoss and st.ignBoss ~= nil and st.ignBoss > 0 then
 			ign = ign + st.ignBoss
 		end
-		local remain = m.Defense - self:GuardCrush(m.Zone) - self:ArmorBreak(m.Zone) - m:ShredNow() - ign
+		-- 방어구 부수기(1티어 증강 개수만큼 보스 방어율 감소)는 2026-10-14 삭제
+		local remain = m.Defense - self:GuardCrush(m.Zone) - m:ShredNow() - ign
 		if remain < 0 then remain = 0 end
 		-- 남은 방어율 상한 MaxDefenseCut(97%) — 데미지가 3% 미만으로 깎이지 않는다(2026-09-29 사용자 "방어율 차이는 최대 97%까지")
 		if remain > self.MaxDefenseCut then remain = self.MaxDefenseCut end
@@ -192,33 +190,11 @@ script RtsCombatLogic extends Logic
 	-- 방어율이 데미지를 깎는 상한(%) — 남은 방어율이 이보다 커도 여기서 멈춘다(2026-09-29 사용자)
 	property number MaxDefenseCut = 97
 
-	-- 구역 zone의 방어구 부수기(%p, 2026-09-24): 그 구역 주인의 1티어 유닛 중 가장 큰 값(RtsJobTableLogic.ArmorBreakFor — 증강 개수 × 1, 최대 30)
 	-- 테스트 모드면 타격마다 더할 데미지(DevExtraDamage), 아니면 0
 	@ExecSpace("ServerOnly")
 	method number DevExtra()
 		if _RtsUnitLogic.DevTools then return self.DevExtraDamage end
 		return 0
-	end
-
-	@ExecSpace("ServerOnly")
-	method number ArmorBreak(number zone)
-		local z = math.floor(zone + 0.5)
-		local now = _UtilLogic.ServerElapsedSeconds
-		local c = self.ArmorCache[z]
-		if c ~= nil and now - c.at < 0.5 then return c.v end
-		local v = 0
-		local owner = _RtsRunResultLogic:OwnerOfZone(z)
-		local list = _RtsUnitLogic.UnitsByUser[owner]
-		if list ~= nil then
-			for no, e in pairs(list) do
-				if e ~= nil and isvalid(e) and e.RtsUnitComponent ~= nil then
-					local a = _RtsJobTableLogic:ArmorBreakFor(e.RtsUnitComponent)
-					if a > v then v = a end
-				end
-			end
-		end
-		self.ArmorCache[z] = { at = now, v = v }
-		return v
 	end
 
 	-- 구역 zone의 가드 크러쉬 방어율 감소(%p): 그 구역 주인의 팔라딘 중 가장 높은 레벨 기준 — 40레벨 20, 10레벨 10, 없으면 0
@@ -432,7 +408,8 @@ script RtsCombatLogic extends Logic
 				if ready then
 					local range = k.range or 2
 					if k.cd == nil and st.range ~= nil then range = st.range end
-					local count = k.targets or st.targets
+					-- 최대 대상 수(블리자드 투사체 증강이면 그만큼 더 — RtsJobTableLogic.SkillTargets, 2026-10-14)
+					local count = _RtsJobTableLogic:SkillTargets(st, k)
 					-- 지대(dot)와 구체 스킬(spread = 도트 퍼니셔)은 사거리 제한 없음 — 구역의 몬스터 전부가 후보(도트 퍼니셔는 구체마다 자기 자리에서 가장 가까운 적을 따라간다, 2026-09-19 사용자 "예외")
 					if k.dot ~= nil or k.spread then
 						range = 999
@@ -467,7 +444,9 @@ script RtsCombatLogic extends Logic
 		local k = skills[idx]
 		local fx = k.fx
 		-- 보스 집중(썬콜 프리즘 블리자드 템페스트, 2026-09-22 → 2026-09-26 30회): 대상이 전부 보스면 bossHits번을 보스들에게 번갈아 반복 타격(낙하 얼음 30개 — 1체면 30회, 2체면 15회씩). attack.md §3 예외
-		if k.bossHits ~= nil and #targets >= 1 then
+		-- 블리자드 투사체 증강은 보스 타격 횟수도 1개당 1회 더(RtsJobTableLogic.SkillBossHits — 기본 블리자드는 1 + 개수, 2026-10-14)
+		local bossHits = _RtsJobTableLogic:SkillBossHits(st, k)
+		if bossHits ~= nil and #targets >= 1 then
 			local allBoss = true
 			for j = 1, #targets do
 				local tm = targets[j].RtsMonsterComponent
@@ -479,17 +458,20 @@ script RtsCombatLogic extends Logic
 			if allBoss then
 				local bs = targets
 				targets = {}
-				for h = 1, k.bossHits do targets[h] = bs[((h - 1) % #bs) + 1] end
+				for h = 1, bossHits do targets[h] = bs[((h - 1) % #bs) + 1] end
 			end
 		end
 		local target = targets[1]
 		-- 후딜: 이 스킬 뒤 k.after초 동안은 다음 공격을 건너뛴다(공격 주기 타이머는 그대로 돈다)
 		if k.after ~= nil then self.BusyUntil[bkey] = now + k.after end
-		-- 쿨타임 스킬은 자기 비율·타격 수(k.ratio / hits, 없으면 기본 공격 값)
-		local ratio = k.ratio or st.ratio
-		-- 1타(RtsJobTableLogic.PerHit — 상세창 BossDps와 같은 식)
-		local perHit = _RtsJobTableLogic:PerHit(c.atk, st, ratio)
-		local hits = k.hits or st.hits
+		-- 쿨타임 스킬은 자기 비율·타격 수(k.ratio / hits, 없으면 기본 공격 값) + 직업 증강(주력 스킬 강화 SkillRatioAdd · 도트 퍼니셔 구체 SkillHits — 2026-10-14, 상세창 BossDps와 같은 식)
+		local ratioAdd = _RtsJobTableLogic:SkillRatioAdd(st, k)
+		local ratio = (k.ratio or st.ratio) + ratioAdd
+		-- 스킬 하나의 최종 데미지(직업 증강 '○○의 최종 데미지' — SkillFinMul, 2026-10-14). 쉐도우 파트너 표창도 같은 스킬이라 함께 받는다
+		local skMul = _RtsJobTableLogic:SkillFinMul(st, k)
+		-- 1타(RtsJobTableLogic.PerHitMul — 상세창 BossDps와 같은 식)
+		local perHit = _RtsJobTableLogic:PerHitMul(c.atk, st, ratio, skMul)
+		local hits = _RtsJobTableLogic:SkillHits(st, k)
 		-- 보스(IsBoss)를 칠 때만 곱하는 배율(RtsJobTableLogic.BossMul — ③ 보스 공격 시 데미지 증가 × ⑤ 스킬 데미지 '보스 공격 시 +n%p', 2026-09-24 사용자 "보스 최종 데미지는 없어, 스킬 데미지로").
 		--   n = 스킬 k.bossRatio(블리자드 템페스트 180 − 1001 = 보스 1회 180%), 기본 공격(k.ratio 없음)은 st.bossRatio(발할라·인레이지·폭풍의 시 강화·애로우 레인·풍마수리검·레디 투 다이·블스아이·거대화·디바인 퍼니시먼트)
 		local bossRatio = _RtsJobTableLogic:SkillBossRatio(st, k)
@@ -497,7 +479,7 @@ script RtsCombatLogic extends Logic
 		-- 타격마다 비율이 다른 스킬(hitRatios — 듀얼블레이더 21.7 / 28.3)은 그 타격의 비율에 n을 더한다
 		local function bossMulAt(h)
 			if k.hitRatios == nil or h == nil or k.hitRatios[h] == nil or k.hitRatios[h] <= 0 then return bossMul end
-			return _RtsJobTableLogic:BossMul(st, bossRatio, k.hitRatios[h])
+			return _RtsJobTableLogic:BossMul(st, bossRatio, k.hitRatios[h] + ratioAdd)
 		end
 		local atk = e.RtsUnitAttackComponent
 		if atk == nil then return end
@@ -638,7 +620,7 @@ script RtsCombatLogic extends Logic
 			-- hitRatios(프리즘 블레이드 토네이도 + 카르마 퓨리): 타격마다 비율이 다르면 그 타격의 비율로 1타를 다시 계산
 			local hitBase = perHit
 			if k.hitRatios ~= nil and k.hitRatios[h] ~= nil then
-				hitBase = _RtsJobTableLogic:PerHit(c.atk, st, k.hitRatios[h])
+				hitBase = _RtsJobTableLogic:PerHitMul(c.atk, st, k.hitRatios[h] + ratioAdd, skMul)
 			end
 			local hh = h
 			if stagger > 0 and not k.spread then
@@ -701,7 +683,7 @@ script RtsCombatLogic extends Logic
 				end, when)
 			end
 		end
-		-- 쉐도우 파트너(나이트로드 30): 기본 공격 뒤에 st.halfHits회를 데미지 ½로 이어서(같은 간격, 대상 같음). 쿨타임 스킬엔 없음
+		-- 쉐도우 파트너(나이트로드 30): 기본 공격 뒤에 st.halfHits회를 데미지 st.spRate(기본 ½ · 증강으로 최대 1)로 이어서(같은 간격, 대상 같음). 쿨타임 스킬엔 없음
 		local halfHits = 0
 		if k.cd == nil and k.hits == nil then halfHits = st.halfHits or 0 end
 		for h = 1, halfHits do
@@ -714,7 +696,7 @@ script RtsCombatLogic extends Logic
 					if t ~= nil then defMul = self:DefenseMul(st, t, false) end
 					if defMul > 0 then
 						local crit = (_UtilLogic:RandomDouble() * 100) < st.crit
-						local dmgBase = perHit * 0.5
+						local dmgBase = perHit * (st.spRate or 0.5)
 						if t.RtsMonsterComponent ~= nil and t.RtsMonsterComponent.IsBoss then dmgBase = dmgBase * bossMul end
 						atk.Dmg = math.max(1, math.floor(dmgBase * _RtsJobTableLogic:RollWeapon(u.JobId) * defMul + 0.0001)) + self:DevExtra()
 						atk.Crit = crit

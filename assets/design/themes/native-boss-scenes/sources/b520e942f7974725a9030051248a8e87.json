@@ -1,0 +1,28 @@
+{
+  "id": "b520e942f7974725a9030051248a8e87",
+  "type": "sprite",
+  "category": "mob",
+  "names": {
+    "ko": [
+      "거울에 비친 윌",
+      "윌"
+    ]
+  },
+  "dname": "sprite-325734",
+  "assetGuid": null,
+  "hasEmbedding": false,
+  "payload": {
+    "width": 148,
+    "height": 196,
+    "pivot": {
+      "x": 99,
+      "y": 23,
+      "nx": 0.6689,
+      "ny": 0.1173
+    },
+    "image_hash": "bb3cdcb038eed45ee2bc5f9085bc82e944df8ca15edf50775f423bca7a8ed78d",
+    "perceptual_hash": "91d2622c166b6f75",
+    "thumbnail": "https://mod-resource-search-images.dn.nexoncdn.co.kr/maplestory_world/b520e942f7974725a9030051248a8e87.png",
+    "in_animationclip": "949ed99bbc7543dcb54f223099996d86"
+  }
+}

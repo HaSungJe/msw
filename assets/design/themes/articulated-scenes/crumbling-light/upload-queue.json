@@ -1,0 +1,122 @@
+[
+  {
+    "id": "diffraction_hall:background",
+    "name": "Action Will spider background",
+    "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/crumbling-light/background.png",
+    "w": 1672,
+    "h": 941,
+    "size": 2325337,
+    "category": "sprite",
+    "subcategory": "background"
+  },
+  {
+    "id": "diffraction_hall:body",
+    "name": "Action Will spider body",
+    "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/crumbling-light/body.png",
+    "w": 550,
+    "h": 420,
+    "size": 233478,
+    "category": "sprite",
+    "subcategory": "object"
+  },
+  {
+    "id": "diffraction_hall:leg-1",
+    "name": "Action Will spider leg-1",
+    "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/crumbling-light/leg-1.png",
+    "w": 310,
+    "h": 415,
+    "size": 92158,
+    "category": "sprite",
+    "subcategory": "object"
+  },
+  {
+    "id": "diffraction_hall:leg-2",
+    "name": "Action Will spider leg-2",
+    "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/crumbling-light/leg-2.png",
+    "w": 304,
+    "h": 415,
+    "size": 87119,
+    "category": "sprite",
+    "subcategory": "object"
+  },
+  {
+    "id": "diffraction_hall:leg-3",
+    "name": "Action Will spider leg-3",
+    "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/crumbling-light/leg-3.png",
+    "w": 290,
+    "h": 390,
+    "size": 78721,
+    "category": "sprite",
+    "subcategory": "object"
+  },
+  {
+    "id": "diffraction_hall:leg-4",
+    "name": "Action Will spider leg-4",
+    "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/crumbling-light/leg-4.png",
+    "w": 255,
+    "h": 390,
+    "size": 82043,
+    "category": "sprite",
+    "subcategory": "object"
+  },
+  {
+    "id": "diffraction_hall:leg-5",
+    "name": "Action Will spider leg-5",
+    "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/crumbling-light/leg-5.png",
+    "w": 340,
+    "h": 395,
+    "size": 107274,
+    "category": "sprite",
+    "subcategory": "object"
+  },
+  {
+    "id": "diffraction_hall:leg-6",
+    "name": "Action Will spider leg-6",
+    "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/crumbling-light/leg-6.png",
+    "w": 350,
+    "h": 405,
+    "size": 94398,
+    "category": "sprite",
+    "subcategory": "object"
+  },
+  {
+    "id": "diffraction_hall:leg-7",
+    "name": "Action Will spider leg-7",
+    "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/crumbling-light/leg-7.png",
+    "w": 335,
+    "h": 405,
+    "size": 88555,
+    "category": "sprite",
+    "subcategory": "object"
+  },
+  {
+    "id": "diffraction_hall:leg-8",
+    "name": "Action Will spider leg-8",
+    "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/crumbling-light/leg-8.png",
+    "w": 285,
+    "h": 405,
+    "size": 84754,
+    "category": "sprite",
+    "subcategory": "object"
+  },
+  {
+    "id": "diffraction_hall:eye-sigil",
+    "name": "Action Will spider eye-sigil",
+    "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/crumbling-light/eye-sigil.png",
+    "w": 512,
+    "h": 512,
+    "size": 305520,
+    "category": "sprite",
+    "subcategory": "object"
+  },
+  {
+    "id": "diffraction_hall:thumbnail",
+    "name": "Action Will spider thumbnail",
+    "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/crumbling-light/thumbnail.png",
+    "w": 400,
+    "h": 225,
+    "size": 259020,
+    "category": "sprite",
+    "subcategory": "object"
+  }
+]

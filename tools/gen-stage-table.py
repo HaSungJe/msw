@@ -31,7 +31,8 @@ CHECK_ONLY = "--check" in sys.argv
 TOTAL = 768000
 SPAWN = 40
 # 영입 칸이 열리는 순번(2026-09-29 사용자 "시작 1마리, 최대 9마리, 라운드 분포는 네가": 1 · 5 · 12 · 20 · 자쿰 26 · 36 · 핑크빈 47 · 시그너스 56 · 70 — 초반 촘촘, 뒤는 보스 처치 뒤·긴 구간 중간. 같은 날 앞선 안 12칸(1·1·1·5·10·20·26·33·43·47·56·70), 전 2026-09-23: 1·5·26·43·47·56 = 6칸)
-RECRUIT_AT = [1, 5, 12, 20, 26, 36, 47, 56, 70]
+# → 2026-10-14 사용자 "영입 제한 12 · 언제든 비용만 내면(1,000 × 지금 유닛 수)": 칸 12개가 판 시작부터 전부 열린다(전 1·5·12·20·26·36·47·56·70)
+RECRUIT_AT = [1] * 12
 # 메소·체력 모델이 세는 영입 일정(TARGETS 목표 레벨 6칸 · 총 메소 768,000 = 6 × 128,000 전제) — 12칸 확장은 모델 재설계 전까지 일정(위 RECRUIT_AT)에만 반영
 MODEL_RECRUIT_AT = [1, 5, 26, 43, 47, 56]
 ARCANE = 65                       # 아케인리버 첫 라운드(풍화된 기쁨의 땅)
@@ -92,6 +93,8 @@ BOSS_DEF, BM4, BM4_DEF, BUSU_IGN = 50, 132, 120, 50   # 방어구 부수기 30 �
 #     직업 방무(50레벨, 보스) 히어로 70 · 나로(풍마) 70 · 썬콜(템페스트) 15 · 보우·섀도어 50 · 팬텀 60 · 3티어 20(프리즘 35) → 보스 방어율을 스우 100 ~ 검마 4페이즈 150으로
 BM4_DEF = 150
 BOSS_DEF_AT = {60: 100, 64: 100, 89: 120, 110: 120, 114: 130, 121: 130, 127: 130, 129: 140, 130: 140, 131: 145, 132: BM4_DEF}
+# 2026-10-14 사용자 "50레벨/프리즘의 방어율 감소·방무 삭제, 보스 방어율 대폭 감소": 게임에 쓰는 보스 방어율(표 def). 위 BOSS_DEF_AT·BOSS_DEF는 옛 체력 모델(고점·검산)용으로만 남긴다
+GAME_BOSS_DEF = {10: 10, 26: 20, 29: 20, 43: 20, 47: 20, 56: 20, 60: 30, 64: 30, 89: 35, 110: 35, 114: 40, 121: 40, 127: 40, 129: 40, 130: 40, 131: 50, 132: 40}
 # 2026-09-24 사용자 난이도 표(주니어 발록 쉬움 · 자쿰 보통 · 피아누스 쉬움 · 혼테일·핑크빈 보통 · 시그너스 어려움(50레벨 프리즘 딜러 필수) · 스우·데미안 보통 ·
 #   루시드·윌 어려움 · 더스크 보통 · 진 힐라 어려움 · 듄켈 매우 어려움 · 검마 1~3 매우 어려움 · 4페이즈 극악) → 보스 17개 전부 tools/difficulty-sim.py 6천 판 보정.
 #   기준(같은 날 사용자 "최적 조합을 아는 사람 기준"): 최적 플레이. 시그너스까지 = 그 보스까지 온 판 중 통과율 쉬움 99 · 보통 95 · 어려움 88%(시그너스는 50레벨 프리즘 딜러 — 팬텀 포함 — 있는 판 기준),
@@ -133,7 +136,8 @@ MOB_HP_UP_FROM, MOB_HP_UP = 11, 1.2
 #   → 2026-09-24 사용자 "일반 몬스터에서 방어율 다 빼자. 방무는 이제 보스 옵션이야": 전부 0(체력 모델엔 원래 안 넣었으니 체력은 그대로)
 #   → 2026-09-26 사용자 "아케인리버 지역의 모든 몬스터 체력 3배 / 방어율 50%"(일반 몬스터 기준): 아케인리버(ARCANE~, 소멸의 여로~리멘) 일반 몬스터만 ARCANE_MOB_DEF
 #     (보스는 BOSS_DEF_AT 120~145 그대로 — 50으로 내리지 않는다). 체력은 같은 날 "3배 보류 — 지역별로" → 아래 ARCANE_THEME_HP
-ARCANE_MOB_DEF = 50
+# → 2026-10-14 사용자 "아케인리버 일반 몬스터 방어율 모두 20%"(전 50)
+ARCANE_MOB_DEF = 20
 def mob_def(no): return ARCANE_MOB_DEF if no >= ARCANE else 0
 # 아케인리버 일반 몬스터 지역별 체력 배율(2026-09-26 사용자 — 두 번째 '아르카나 2.7'은 에스페라로 정정)
 ARCANE_THEME_HP = {"소멸의 여로": 2.2, "츄츄 아일랜드": 2.2, "레헬른": 2.5, "아르카나": 2.5, "모라스": 2.7, "에스페라": 2.7,
@@ -162,6 +166,7 @@ PRISM_MUL = {"히어로": [4.1], "팔라딘": [1.0], "다크나이트": [2.9], "
 FIELD_MOBS = 20   # 불독 포이즌(몹 1마리당) → 트랙 위 20마리 환산
 # 배경음 이름(monster-wave.md '배경음: [sound-N]' = 공식 자산 표시 이름) → 오디오 RUID (2026-09-23 자산 검색으로 매칭 — 원작 경로 주석)
 BGM_RUID = {
+    "sound-434": "bd23d2f87d734f8ca52ca8824d1b6ff4",  # Will: 바스러지는 빛
     "sound-1": "003396fbfcc44e00be0ac34fbaf77635",   # bgm46/wierldforestinthegirlsdream
     "sound-6": "02301b8112894626a78f8d517aada78a",   # bgm04/shinin'harbor
     "sound-7": "022d0be8aacf4cb19851c11eeebccb96",   # bgm25/cygnusgarden
@@ -485,11 +490,30 @@ MID_BOSS_FROM, MID_BOSS_TO, MID_BOSS_MUL = 26, 56, 1.25
 def mid_hp_mul(no, kind="mob"):
     if kind == "mob": return MID_MOB_MUL if MID_MOB_FROM <= no <= MID_MOB_TO else 1.0
     return MID_BOSS_MUL if MID_BOSS_FROM <= no <= MID_BOSS_TO else 1.0
-# 구간 보너스 전체 = 위 구간 × 아케인리버 일반 몬스터 지역별 ARCANE_THEME_HP(2026-09-26 — mob_def 옆 주석)
+# 2026-10-14 증강·경제·방어율 개편(.beaver/output/plan/rts-balance/augment-economy-overhaul-plan.md 5절) 체력 배율:
+#   보스 = 새 규칙 12명(팔라딘 + 비숍 + 딜러 10명) 모의실험 팀 딜 ÷ 지금 체력 기준 팀(6명 모델) 팀 딜 × 0.8(사용자 "현재 밸런스 기준 20% 너프").
+#   사용자 "초반 보스 체력 계산할 필요가 없어" → 주니어 발록~시그너스는 ×0.8 일괄, 스우·데미안은 같은 배율(둘 다 방어율 30 — 계산상 데미안이 낮게 나온 건 옛 표준 빌드의 40레벨 시점 차이)
+#   일반 몬스터 = 그 구간 보스(바로 다음에 나오는 보스)와 같은 배율(사용자 "구간 보스에 맞춰서 체력도 변화")
+#   → 같은 날 사용자 플레이(주니어 발록까지) "레벨업이 쉬워져서 체력이 너무 낮다, 몬스터·보스 3배" → 시그너스까지(계산 없이 ×0.8로 뒀던 구간)만 ×3 = ×2.4.
+#     스우·데미안 구간 일반 몬스터(57~63)도 ×2.4 — 보스는 그대로 두되, 55 → 57에서 1마리 체력이 줄지 않게(GetMobCurve 규칙: 앞 라운드보다 줄지 않음 — 개편 전처럼 57 ≈ 55 × 1.26)
+#   → 같은 날 사용자 '증강 목록 (2026.10.14)'(직업 증강 24종 — RtsAugmentTableLogic, "수치 그대로 + 보스 체력 재계산", 최종 데미지 증강은 합연산):
+#     스우부터 같은 모의실험(12명 16판, 새 직업 증강)으로 다시 셈. 스우·데미안 = 두 배율의 기하평균(1.2595 × 0.8925 → 1.0603).
+#     같은 날 등급 수정(비홀더·버서크·도트 퍼니셔 (1)(2)·쿼드러플 스로우/풍마수리검·쉐도우 파트너 강화 → 브론즈) 뒤 값.
+#     전 값(옛 직업 증강): 60·64 1.0427 · 89 1.5348 · 110 2.3873 · 114 2.9044 · 121 3.5298 · 127 4.3657 · 129·130 5.1568 · 131 4.9538 · 132 6.2714
+#     (등급 수정 전 새 증강: 60·64 1.0598 · 89 1.6065 · 110 2.8053 · 114 3.5179 · 121 4.5637 · 127 6.2105 · 129·130 7.3359 · 131 7.0469 · 132 8.9214)
+PATCH_BOSS_HP = {10: 2.4, 26: 2.4, 29: 2.4, 43: 2.4, 47: 2.4, 56: 2.4, 60: 1.0603, 64: 1.0603, 89: 1.5844, 110: 2.7561, 114: 3.4495,
+                 121: 4.4777, 127: 6.0702, 129: 7.1702, 130: 7.1702, 131: 6.8877, 132: 8.72}
+PATCH_MOB_HP = {**PATCH_BOSS_HP, 60: 2.4, 64: 2.4}
+_BOSS_NOS = sorted(PATCH_BOSS_HP)
+def patch_hp_mul(no, kind="mob"):
+    if kind == "boss": return PATCH_BOSS_HP.get(no, 1.0)
+    nxt = next((b for b in _BOSS_NOS if b >= no), _BOSS_NOS[-1])
+    return PATCH_MOB_HP[nxt]
+# 구간 보너스 전체 = 위 구간 × 아케인리버 일반 몬스터 지역별 ARCANE_THEME_HP(2026-09-26 — mob_def 옆 주석) × 2026-10-14 패치 배율
 STAGE_THEME = {s["no"]: s["theme"] for s in ST}
 def bonus_hp_mul(no, kind="mob"):
     arc = ARCANE_THEME_HP.get(STAGE_THEME.get(no, ""), 1.0) if kind == "mob" and no >= ARCANE else 1.0
-    return mid_hp_mul(no, kind) * arc
+    return mid_hp_mul(no, kind) * arc * patch_hp_mul(no, kind)
 for s in ST:
     if s["kind"] in ("mob", "boss"):
         s["hp"] = int(round(s["hp"] * bonus_hp_mul(s["no"], s["kind"])))
@@ -500,6 +524,83 @@ SWOO_NO, DAMIEN_NO, SWOO_VS_DAMIEN = 60, 64, 0.76
 CURVE_AT = {60: 4.7, 64: 7.51}   # 2026-09-28 피아누스~더스크 상향(45초 처치) — 전 0.56 · 0.72
 _swoo = next(x for x in ST if x["no"] == SWOO_NO); _damien = next(x for x in ST if x["no"] == DAMIEN_NO)
 _swoo["hp"] = int(round(_damien["hp"] * CURVE_AT[DAMIEN_NO] / CURVE_AT[SWOO_NO] * SWOO_VS_DAMIEN))
+
+# 2026-10-14 사용자 "스우 → 시그너스로 넘어갈 때 체력이 확 뛰는 건 문제, 2배로 편차를 줄이고 주니어 발록~시그너스를 점진적으로" — 게임 안 체력(표 × 극악 곡선) 기준 경사로:
+#   보스 = 피아누스(그대로) → 혼테일 → 핑크빈 → 시그너스 → 스우(그대로)를 같은 배수로 잇는다(시그너스 = 스우 ÷ RAMP_BOSS_LAST, 그 사이는 로그 등분 — 약 ×2.12씩).
+#     주니어 발록·자쿰·피아누스는 같은 날 ×3 그대로(사용자가 주니어 발록까지 해 보고 정한 값)
+#   일반 몬스터 = RAMP_MOB_FROM(그대로) ~ RAMP_MOB_TO(그대로) 사이를 라운드로 로그 직선(약 +3.4%/라운드). 구간 보스 배율을 그대로 곱하면 55 → 57에서 체력이 크게 줄어
+#     (시그너스만 ×5.9) 보스 경사로를 따라 오르는 한 줄로 잡았다. 지금 값보다 낮아지는 라운드는 지금 값 그대로(max)
+#   두 곡선(GetCurve·GetMobCurve)이 바뀌면 이 경사로 배율도 따라 다시 셈 — 표 체력 배율 RAMP_MUL(검산 base_hp도 이걸 나눈다)
+RAMP_BOSS_FROM, RAMP_BOSS_TO, RAMP_BOSS_LAST = 29, 60, 2.0
+RAMP_MOB_FROM, RAMP_MOB_TO = 30, 61
+def _dl_curve(name):
+    _src = io.open(os.path.join(ROOT, "RootDesk", "MyDesk", "RtsDifficultyLogic.mlua"), encoding="utf-8").read()
+    _a = _src.index("method table " + name); _b = _src.index("\tend", _a)
+    return [(int(x), float(y)) for x, y in re.findall(r"\{ (\d+), ([\d.]+) \}", _src[_a:_b])]
+def _curve_at(c, no):
+    if no <= c[0][0]: return c[0][1]
+    for (a0, a1), (b0, b1) in zip(c, c[1:]):
+        if no <= b0:
+            return b1 if no == b0 else math.exp(math.log(a1) + (math.log(b1) - math.log(a1)) * (no - a0) / (b0 - a0))
+    return c[-1][1]
+BOSS_CURVE, MOB_CURVE = _dl_curve("GetCurve"), _dl_curve("GetMobCurve")
+def game_hp(s): return s["hp"] * _curve_at(BOSS_CURVE if s["kind"] == "boss" else MOB_CURVE, s["no"])
+RAMP_MUL = {}
+_by = {s["no"]: s for s in ST}
+_rb = [s for s in ST if s["kind"] == "boss" and RAMP_BOSS_FROM < s["no"] < RAMP_BOSS_TO]
+_lo, _hi = game_hp(_by[RAMP_BOSS_FROM]), game_hp(_by[RAMP_BOSS_TO]) / RAMP_BOSS_LAST
+for _k, s in enumerate(_rb, 1):
+    RAMP_MUL[(s["no"], "boss")] = max(1.0, _lo * (_hi / _lo) ** (_k / len(_rb)) / game_hp(s))
+_lo, _hi = game_hp(_by[RAMP_MOB_FROM]), game_hp(_by[RAMP_MOB_TO])
+for s in ST:
+    if s["kind"] == "mob" and RAMP_MOB_FROM < s["no"] < RAMP_MOB_TO:
+        RAMP_MUL[(s["no"], "mob")] = max(1.0, _lo * (_hi / _lo) ** ((s["no"] - RAMP_MOB_FROM) / (RAMP_MOB_TO - RAMP_MOB_FROM)) / game_hp(s))
+for s in ST:
+    _m = RAMP_MUL.get((s["no"], s["kind"]))
+    if _m is not None: s["hp"] = int(round(s["hp"] * _m))
+_bonus0 = bonus_hp_mul
+def bonus_hp_mul(no, kind="mob"): return _bonus0(no, kind) * RAMP_MUL.get((no, kind), 1.0) * ALL_HP_MUL
+
+# 2026-10-14 사용자 "모든 몬스터/보스 체력 −20%" · "모든 라운드 포함": 1~132라운드 일반 몬스터·보스 전부 마지막에 ×0.8(경사로·보스끼리 비율은 그대로)
+ALL_HP_MUL = 0.8
+for s in ST:
+    if s["kind"] in ("mob", "boss"): s["hp"] = int(round(s["hp"] * ALL_HP_MUL))
+
+# 2026-10-15 사용자 "핑크빈 이후부터 난이도가 급격히 오른다 — 프리즘·증강 뽑기를 많이 안 하게 돼서 많은 유닛을 뽑아 레벨업하는 게 중요해졌는데 체력 비율이 너무 높다"
+#   → "체력은 시그너스 유지, 나머지는 적당히 증가" → (모의실험 목표값으로 루시드 2억 1,400만이 되자) "루시드부터 체력이 너무 높다, 적당히 완만하게 — 이건 깨지 말란 거잖아"
+#   → 메소는 "48라운드부터 +30%를 하지 마, 그냥 전 구간 +10%하고 끝내" (같은 날 증강 뽑기 6,000 → 3,000):
+#   메소 = 전 라운드 ×PATCH_MESO_MUL(모델 분배 뒤 마리당 기본에 곱해 10메소 단위 → 스페셜 배수 — 모델 체력·표준 빌드는 그대로)
+#   체력 = 시그너스(LATE_ANCHOR_BOSS, 그대로)부터 보스 전체 체력이 라운드마다 ×LATE_PER_ROUND(검은 마법사 1페이즈 2체는 나눠 가짐),
+#     일반 몬스터는 57라운드(LATE_ANCHOR_MOB, 그대로)부터 라운드마다 ×LATE_PER_ROUND — 게임 안 체력(극악 = 표 × 극악 곡선) 기준이라 곡선의 들쭉날쭉도 펴진다.
+#     1.027 = 검마4(132)가 시그너스의 약 7.6배(극악 약 9,200만): 모의실험(12명 영입 + 고르게 레벨업, 뽑기 없음, 16판 중앙값)에서 처치 시간이 핑크빈의 약 1.5배 이내.
+#     주니어 발록~시그너스 · 1~57라운드 일반 몬스터는 그대로
+PATCH_MESO_FROM, PATCH_MESO_MUL = 1, 1.1
+LATE_ANCHOR_BOSS, LATE_ANCHOR_MOB, LATE_PER_ROUND = 56, 57, 1.027
+_by = {s["no"]: s for s in ST}
+_late_b0 = game_hp(_by[LATE_ANCHOR_BOSS]) * len(_by[LATE_ANCHOR_BOSS]["mobs"])
+_late_m0 = game_hp(_by[LATE_ANCHOR_MOB])
+LATE_MUL = {}
+for s in ST:
+    if s["kind"] == "boss" and s["no"] > LATE_ANCHOR_BOSS:
+        _t = _late_b0 * LATE_PER_ROUND ** (s["no"] - LATE_ANCHOR_BOSS) / len(s["mobs"])
+    elif s["kind"] == "mob" and s["no"] > LATE_ANCHOR_MOB:
+        _t = _late_m0 * LATE_PER_ROUND ** (s["no"] - LATE_ANCHOR_MOB)
+    else:
+        continue
+    LATE_MUL[(s["no"], s["kind"])] = _t / game_hp(s)
+    s["hp"] = max(1, int(round(s["hp"] * LATE_MUL[(s["no"], s["kind"])])))
+_bonus1 = bonus_hp_mul
+def bonus_hp_mul(no, kind="mob"): return _bonus1(no, kind) * LATE_MUL.get((no, kind), 1.0)
+# 메소: 모델 값(mesoModel — 총 768,000 검산용)을 남기고 게임 값에 배율 · 누적(cumGame)도 다시 셈
+_cum = 0
+for s in ST:
+    s["mesoModel"] = s["meso"]
+    if s["kind"] == "mob" and s["no"] >= PATCH_MESO_FROM and s["meso"] > 0:
+        # 마리당 기본(스페셜 배수 전)에 곱하고 10메소 단위 → 스페셜 배수(income과 같은 순서 — 기본 곡선 오름세 유지)
+        _mult = (SPECIAL_MUL_AT.get(s["no"], SPECIAL_MUL) if s["special"] else 1.0)
+        _pm = s["meso"] / SPAWN / _mult
+        s["meso"] = int(int(round(_pm * PATCH_MESO_MUL / 10)) * 10 * _mult) * SPAWN
+    s["cumGame"] = _cum; _cum += s["meso"]
 
 # ======================================================================== 몬스터 크기(CDN 클립 파일)
 CDN = "https://mod-resource.dn.nexoncdn.co.kr/"
@@ -643,7 +744,7 @@ check(len(next(s for s in ST if s["tag"] == "73")["mobs"]) == 8, "[73] 풀 8종 
 check(len(next(s for s in ST if s["name"] == "어둠의 신전")["mobs"]) == 2, "어둠의 신전 2체 아님")
 check(all(mid in MON for s in ST for mid in s["mobs"]), "monster.md에 없는 몹 id")
 check(all(MON[mid]["die"] for s in ST for mid in s["mobs"]), "사망 애니메이션 빈 몹")
-check(TOTAL <= sum(s["meso"] for s in ST) <= TOTAL + 8000, "메소 합이 768,000 ~ 776,000 밖: %d" % sum(s["meso"] for s in ST))
+check(TOTAL <= sum(s["mesoModel"] for s in ST) <= TOTAL + 8000, "모델 메소 합이 768,000 ~ 776,000 밖: %d" % sum(s["mesoModel"] for s in ST))
 check(all(s["meso"] % 400 == 0 for s in ST), "라운드 메소가 400 단위(마리당 10) 아님")
 check(all(s["meso"] == 0 for s in ST if s["kind"] != "mob" or s["no"] >= 127), "보스·쉬는·듄켈 뒤 메소 ≠ 0")
 for name, no, tgt in TARGETS:
@@ -676,17 +777,18 @@ for s in ST:
     if s["kind"] != "boss": continue
     if s["no"] in LATE_HP:
         if s["no"] < 127: continue
-        # 증강 없이는 못 깬다: 인레이지 히어로 + 홀리 유니티(×1.4) + 프레이(×1.1) + 가드 크러쉬 20, 방무·딜 증강 0 → 60초 딜 < 체력(곱연산 방무)
-        dps0 = job_boss("히어로", 50) * PRISM_MUL["히어로"][0] * 1.1 * 1.4 * max(0.0, 1 - max(0, BOSS_DEF_AT[s["no"]] - 20 - JOB_IGN50["히어로"]) / 100)
-        if s["no"] >= 127: check(dps0 * 60 < s["hp"] * len(s["mobs"]), f"보스 {s['no']}: 증강 없이(인레이지 + 홀리 + 프레이) 깨짐")
+        # (옛 '증강 없이 인레이지 + 홀리 + 프레이로는 못 깬다' 검산은 2026-10-14 개편 — 방무·프리즘 배율이 바뀌어 옛 모델로 판단할 수 없어 뺐다. 체력 근거는 PATCH_BOSS_HP 주석)
+        pass
     else:
         check(abs(s["peak"] * 60 * s["ratio"] / len(s["mobs"]) - s["hp"]) <= 1, f"보스 {s['no']} 체력 ≠ 고점×60×기준")
 jl = io.open(JOBLUA, encoding="utf-8").read()
-blocks_lua = "{ " + ", ".join("{ %d, %d, %d }" % b for b in LEVEL_COST_BLOCKS) + " }"
-check(blocks_lua in jl, "RtsJobTableLogic.EnsureCosts 구간 표가 LEVEL_COST_BLOCKS와 다름: " + blocks_lua)
+# 레벨업 비용: LEVEL_COST_BLOCKS는 옛 메소·체력 모델(표준 빌드)용으로만 남긴다 — 게임은 2026-10-14부터 1~100레벨 일정 비율 곡선(RtsJobTableLogic.EnsureCosts).
+#   게임 표가 사용자 확정 누적(1→50 18,320 · 1→100 106,060)인지만 본다
+_costs = [int(x) for x in re.findall(r"\d+", jl[jl.index("self.Costs = { 0,"):jl.index("}", jl.index("self.Costs = { 0,"))])][1:]
+check(len(_costs) == 99 and sum(_costs[:49]) == 18320 and sum(_costs) == 106060, "RtsJobTableLogic.EnsureCosts 누적이 1→50 18,320 · 1→100 106,060이 아님")
 if errs:
     print("검산 실패 — 아무것도 쓰지 않음:"); [print("  -", e) for e in errs]; sys.exit(1)
-print("검산 통과: 132 스테이지 · 몬스터 %d종 · 메소 %s · 보스 17" % (len(MON), f"{sum(s['meso'] for s in ST):,}"))
+print("검산 통과: 132 스테이지 · 몬스터 %d종 · 메소 %s(모델 %s × 전 라운드 %g) · 보스 17" % (len(MON), f"{sum(s['meso'] for s in ST):,}", f"{sum(s['mesoModel'] for s in ST):,}", PATCH_MESO_MUL))
 if CHECK_ONLY: sys.exit(0)
 
 # ======================================================================== 출력 1) RtsStageTableLogic
@@ -695,7 +797,7 @@ def lnum(x): return ("%d" % x) if float(x).is_integer() else ("%g" % x)
 L = ["\t-- BEGIN GENERATED", "\t-- tools/gen-stage-table.py가 생성 — 손으로 고치지 않는다", "\tmethod void LoadGenerated()",
      "\t\tself.RecruitAt = { " + ", ".join(str(x) for x in RECRUIT_AT) + " }", "\t\tself.Stages = {"]
 for s in ST:
-    d = BOSS_DEF_AT.get(s["no"], BOSS_DEF) if s["kind"] == "boss" else (mob_def(s["no"]) if s["kind"] == "mob" else 0)
+    d = GAME_BOSS_DEF[s["no"]] if s["kind"] == "boss" else (mob_def(s["no"]) if s["kind"] == "mob" else 0)
     L.append("\t\t\t{ no = %d, tag = %s, name = %s, kind = %s, theme = %s, bgm = %s, sec = %d, hp = %d, meso = %d, special = %s, def = %d, mobs = { %s } }," % (
         s["no"], lstr(s["tag"]), lstr(s["name"]), lstr(s["kind"]), lstr(DISPLAY_THEME.get(s["no"], s["theme"])), lstr(BGM_RUID.get(s["bgm"], "")), s["sec"], s["hp"], s["meso"],
         "true" if s["special"] else "false", d, ", ".join(lstr(x) for x in s["mobs"])))
@@ -730,15 +832,16 @@ def fill(block):
 parts = re.split(r"(?=\n- \[)", head)
 head = parts[0] + "".join(fill(p) for p in parts[1:])
 T = ["", "# ── 라운드별 체력·메소 (tools/gen-stage-table.py 생성 — Phase 6·7. 위 몬스터별 체력·메소 칸 = 처음 나오는 라운드 값. 모델은 spec stage-wave-boss / level.md)",
-     f"# 메소: 총 768,000 · 체력^{ALPHA} 오름세 · 아케인리버 ×{ARCANE_MUL} · 스페셜(보스 바로 앞 라운드) ×2 · 마리당 10메소. 레벨업 비용표 = level.md",
+     f"# 메소: 모델 총 768,000(게임 = 전 라운드 ×{PATCH_MESO_MUL:g} → {sum(s['meso'] for s in ST):,}) · 체력^{ALPHA} 오름세 · 아케인리버 ×{ARCANE_MUL} · 스페셜(보스 바로 앞 라운드) ×2 · 마리당 10메소. 레벨업 비용표 = level.md",
      "# 일반 체력 = 라운드별 표준 빌드 라인 클리어 한계 × 테마 압박 × 일반 체력 배율(한계 대비 열) / 보스 체력 = 레벨대 조합 최적 보스딜 고점 × 60초 × 보스별 기준(방어율 50%, 검은 마법사 4페이즈 100% — 가장 약한 클리어 경로 기준)",
+     "# 2026-10-14·15 개편 뒤: 아래 '체력'은 위 모델 값 × 개편 배율(보스 기준 열 '개편 ×n', 일반 '×n' — PATCH_BOSS_HP · PATCH_MOB_HP · RAMP_MUL · 전체 ALL_HP_MUL 0.8 · 시그너스·57라운드 뒤 라운드마다 ×LATE_PER_ROUND 포함). 메소 = 모델 × 전 라운드 ×1.1(PATCH_MESO_MUL — 총 768,000은 모델 값), 누적 메소 열은 게임 값. 게임 방어율 = GAME_BOSS_DEF(괄호 안) · 아케인리버 일반 ARCANE_MOB_DEF. 게임 체력 = 표 체력 × 극악 곡선 × 난이도 배율(맨 위 '체력' 줄)",
      "", "| 순번 | 태그 | 맵 | 테마 | 종류 | 유닛 | 체력 | 기준 | 마리당 메소 | 라운드 메소 | 누적 메소(시작 시) | 표준 빌드 레벨 |", "|---|---|---|---|---|---|---|---|---|---|---|---|"]
 KIND = {"mob": "몬스터", "boss": "보스", "rest": "쉬는"}
 for s in ST:
     kind = "**스페셜**" if s["special"] else KIND[s["kind"]]
     if s["kind"] == "boss" and len(s["mobs"]) > 1: kind = f'보스 ×{len(s["mobs"])}'
-    basis = f'한계 {s["hp"] / s["cap"] / (mob_hp_mul(s["no"]) * bonus_hp_mul(s["no"])):.0%} ×{mob_hp_mul(s["no"]) * bonus_hp_mul(s["no"]):g}' if s["kind"] == "mob" else ((f'몬테카를로 보정(방어 {BOSS_DEF_AT.get(s["no"], BOSS_DEF)})' if s.get("late") else f'고점 {s["peak"]:,.0f}의 {s["ratio"]:.0%}') if s["kind"] == "boss" else "-")
+    basis = f'한계 {s["hp"] / s["cap"] / (mob_hp_mul(s["no"]) * bonus_hp_mul(s["no"])):.0%} ×{mob_hp_mul(s["no"]) * bonus_hp_mul(s["no"]):g}' if s["kind"] == "mob" else ((f'몬테카를로 보정 × 개편 {bonus_hp_mul(s["no"], "boss") / mid_hp_mul(s["no"], "boss"):.2f}(방어 {GAME_BOSS_DEF[s["no"]]})' if s.get("late") else f'고점 {s["peak"]:,.0f}의 {s["ratio"]:.0%}') if s["kind"] == "boss" else "-")
     T.append(f'| {s["no"]} | {s["tag"]} | {s["name"]} | {DISPLAY_THEME.get(s["no"], s["theme"])} | {kind} | {s["units"]} | {"-" if s["kind"] == "rest" else format(s["hp"], ",")} | {basis} | '
-             f'{format(s["meso"] // SPAWN, ",") if s["kind"] == "mob" else "-"} | {s["meso"]:,} | {s["cum"]:,} | {"·".join(str(v) for v in sorted(s["lv"], reverse=True))} |')
+             f'{format(s["meso"] // SPAWN, ",") if s["kind"] == "mob" else "-"} | {s["meso"]:,} | {s["cumGame"]:,} | {"·".join(str(v) for v in sorted(s["lv"], reverse=True))} |')
 io.open(path, "w", encoding="utf-8", newline="\n").write(head + "\n".join(T) + "\n")
 print("썼음:", os.path.relpath(LUA, ROOT), "· .info/monster.md")

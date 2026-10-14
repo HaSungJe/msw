@@ -1,0 +1,105 @@
+{
+  "query": "듄켈 리멘",
+  "results": [
+    {
+      "id": "29bedd2eec094d22978bafbf518512b8",
+      "type": "animationclip",
+      "category": "object",
+      "dname": "animationclip-876",
+      "payload": {
+        "frames": [
+          "d269cc010b824a7c9dab3b58483e710e",
+          "6ab6d30eb84f41009f54d803c2b2f1a7",
+          "fac921f9de954579a525764fcd3335b8",
+          "1affd0402e5646a483e8ebe72c1fb126",
+          "34211d5e560242b1a3b35d5fc2e27f8f",
+          "37951d67a449497e8366685fcf71b98b",
+          "ac800876c9054d83ac25b0b184bb62ea",
+          "19de55a11218413e8c47c1dd5259ed14",
+          "bf78b97c0d8a41ab8c570a385d240e61",
+          "4f1f0e345b5d4c1594c4428759f4483a",
+          "325b464941be41d9af879a6ff1917a65",
+          "2aac9b89037a498b809b80c1de9f1b24",
+          "481dcc95fece4a8faa285aaf325a0415",
+          "0a962575d2dc4bfc9b18ea3b449032a7",
+          "d99f22962c9e49a48439fd84055819d2",
+          "dc500a1d138247fba3fa72db47a7fc19",
+          "d736a385386b488f8c181733df6366e3",
+          "0628e3a3dbb047d8b4b77a217dc66eb9",
+          "b85400f0c74d41a6b4cacdfde7614759",
+          "d2839773c8a94dddad918fe462c1d287",
+          "004d1214dfdf4e71ba3dd8ec88af0492",
+          "0e4806c6b79c4430b25ee351d2948c5e",
+          "8e4949fd20604f07ad6489a59a519899",
+          "2e2822a0e53b4fff96672db371610b0d",
+          "1b6b88d764454670864ee30b963c3679",
+          "77f792b0787b4a3db5e7339191ceff88",
+          "cc3919739e954afbba0f38fb022dcf43",
+          "2354273930dd4c928f623b2a1f4c03b3",
+          "b65201e31c97466f9fee4623d20468de",
+          "c48730bb04ee4b59a24a8a5576fde124",
+          "8a74500c57fb469bbbd037077c8ed7f3",
+          "34dcc155b59342eaa9bd04d9e31c99a6"
+        ],
+        "width": 1104,
+        "height": 891
+      }
+    },
+    {
+      "id": "46871f36d5834a96ba516c6518440940",
+      "type": "animationclip",
+      "category": "object",
+      "dname": "animationclip-51270",
+      "payload": {
+        "frames": [
+          "2a3a5a83432d4d34b66d91d640371d41",
+          "54eef38c97964f378377a902ff89fee7",
+          "bc0572a064a248ff94603cbccb97b297",
+          "c1ea27b253db4c35b1a5ebefa9a5a7ef",
+          "15408942221047ccb6bb987fd661fb7a",
+          "f332c0349a4b48d29a8f72d76735ceff",
+          "287ed49eede24fc799e6bcb3d6e9697b",
+          "9f22d618ae4f4a6483c8880bc0a0de3f",
+          "3711d38d7a424b46bdbfda560ab4bdc6",
+          "1694369096394b10a92c2b8b49710b6c",
+          "f7b1c599163f4c618d9bccaf0b4dfbbd",
+          "428eccc61ec84f6ba01355f259acc4e2",
+          "c0d0c33680794e2992eb66f926ee1ed9",
+          "ad07ba1ce9b24a2685b35dc834318e67"
+        ],
+        "width": 908,
+        "height": 964
+      }
+    },
+    {
+      "id": "ff8fa31ab7ef4638b077dbdf73be6f67",
+      "type": "animationclip",
+      "category": "object",
+      "dname": "animationclip-52769",
+      "payload": {
+        "frames": [
+          "dc714fd748754ad2a8b2d7432e17fa25",
+          "1c543353b8344149913f84f0e1c94192",
+          "6e68b4f7063b4802b77af0d4be9638aa",
+          "357b85303d4c4fd09e38da42d10fdfdd",
+          "9d3bd16ce2c04e0abae689a6b29a0b4d",
+          "a0324a2c7b1f4588bdff2a0e95e186e6",
+          "f4fa7b38a1d1495583e5884383f0e4f3",
+          "3dad73b162ea45169151d964ce71c0bc",
+          "628fb83fa58b44cc8d22c063df6a25af",
+          "cc0b9bdab49a453c88599ca745b06b99",
+          "f9be9ba2decf4824a354c0343e3f9397",
+          "f57ef5621f8c4274bfc195981f606a73",
+          "24d51ac17ed548fea8e8f19235484b89",
+          "9fafd6f0bd414b5985c16d61fb0c2549",
+          "b5ce587d2d69430c917a3c7dd17e8d8f",
+          "a4a4e6889475444fba532209389b9062"
+        ],
+        "width": 792,
+        "height": 788
+      }
+    }
+  ],
+  "nextOffset": 3,
+  "exactMatch": false
+}

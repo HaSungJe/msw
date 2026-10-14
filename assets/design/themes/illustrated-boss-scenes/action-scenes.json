@@ -1,0 +1,257 @@
+[
+  {
+    "key": "zakum_altar",
+    "name": "자쿰의 제단",
+    "w": 1672,
+    "h": 941,
+    "background": "dd0c9a63f44c4be2adc89ad8ccb2ef8b",
+    "thumb": "a8f35b2a5e804d34a66713c83a9746ce",
+    "color": [
+      1,
+      0.42,
+      0.1
+    ],
+    "bosses": [],
+    "photo": false
+  },
+  {
+    "key": "forbidden_altar",
+    "name": "금지된 제단",
+    "w": 1672,
+    "h": 941,
+    "background": "f00585c403fa47b182d39057618fd91d",
+    "thumb": "48944a06ae9546f4888355eff8993e25",
+    "color": [
+      0.35,
+      0.8,
+      1
+    ],
+    "bosses": [],
+    "photo": false
+  },
+  {
+    "key": "pianus_cave",
+    "name": "피아누스의 동굴",
+    "w": 1672,
+    "h": 941,
+    "background": "af67b1b52e1c46628d6cd119c309d813",
+    "thumb": "1abb7dcff16e407faf3793f466cafb66",
+    "color": [
+      0.5,
+      0.8,
+      1
+    ],
+    "bosses": [],
+    "photo": false
+  },
+  {
+    "key": "cave_of_life",
+    "name": "생명의 동굴",
+    "w": 1672,
+    "h": 941,
+    "background": "d01636d943e54154a657b1115a4f5908",
+    "thumb": "2181a12bd9f543e1b8642b785b62af6d",
+    "color": [
+      0.5,
+      0.7,
+      1
+    ],
+    "bosses": [],
+    "photo": false
+  },
+  {
+    "key": "twilight_of_gods",
+    "name": "신들의 황혼",
+    "w": 1672,
+    "h": 941,
+    "background": "0773fcf5a9174673aaf5c9813cc788c8",
+    "thumb": "472bf1c8ca8448458cead5b9505759df",
+    "color": [
+      1,
+      0.85,
+      0.5
+    ],
+    "bosses": [],
+    "photo": false
+  },
+  {
+    "key": "cygnus_garden",
+    "name": "시그너스의 정원",
+    "w": 1672,
+    "h": 941,
+    "background": "104a99c45ca246618797845ffe4d9c67",
+    "thumb": "fcaaad7c294b4c72843d65237b9eb9b1",
+    "color": [
+      0.7,
+      0.4,
+      1
+    ],
+    "bosses": [],
+    "photo": false
+  },
+  {
+    "key": "black_heaven_core",
+    "name": "블랙헤븐 코어",
+    "w": 1676,
+    "h": 938,
+    "background": "b4e7f0aedcb14990a884b11d8dd49fab",
+    "thumb": "4c253ac3e0ad48fa82555be9a7b5919d",
+    "color": [
+      0.2,
+      0.9,
+      1
+    ],
+    "bosses": [],
+    "photo": false
+  },
+  {
+    "key": "world_tree_summit",
+    "name": "세계수 정상",
+    "w": 1672,
+    "h": 941,
+    "background": "3f1a7ff58f9e497690f7cbf6fdb390c8",
+    "thumb": "d2ce70343c874830aafd3b1870883bb5",
+    "color": [
+      0.7,
+      0.4,
+      1
+    ],
+    "bosses": [],
+    "photo": false
+  },
+  {
+    "key": "collapsing_clocktower",
+    "name": "무너지는 시계탑",
+    "w": 1672,
+    "h": 941,
+    "background": "273f40bf3d3d4342958ebe2ec54a9a87",
+    "thumb": "e79c245c9f434d4d9c4209dc7d0cd785",
+    "color": [
+      1,
+      0.65,
+      1
+    ],
+    "bosses": [],
+    "photo": false
+  },
+  {
+    "key": "diffraction_hall",
+    "name": "회절의 회랑",
+    "w": 1672,
+    "h": 941,
+    "background": "8d696e512c694f92bdd0971c7c41cdf8",
+    "thumb": "8e782d3c42d543729e2bc376e287c085",
+    "color": [
+      0.8,
+      0.85,
+      1
+    ],
+    "bosses": [],
+    "photo": false
+  },
+  {
+    "key": "eye_of_void",
+    "name": "공허의 눈",
+    "w": 1672,
+    "h": 941,
+    "background": "09cd7648647d4b52b7f395486076c052",
+    "thumb": "6632902b152e400798e2b8b16184113f",
+    "color": [
+      0.75,
+      0.2,
+      1
+    ],
+    "bosses": [],
+    "photo": false
+  },
+  {
+    "key": "altar_of_desire",
+    "name": "욕망의 제단",
+    "w": 1672,
+    "h": 941,
+    "background": "6665a5101e074dc3bbc4ef5c0e293949",
+    "thumb": "12ba56e5ed604cfb81781594917290d3",
+    "color": [
+      0.65,
+      0.85,
+      0.15
+    ],
+    "bosses": [],
+    "photo": false
+  },
+  {
+    "key": "near_the_end",
+    "name": "끝에 가까운 곳",
+    "w": 1672,
+    "h": 941,
+    "background": "a7c737f38aa34dddaad8870f243f85a4",
+    "thumb": "e155ac5daa4b47b4b0aec55209e105ff",
+    "color": [
+      1,
+      0.2,
+      0.55
+    ],
+    "bosses": [],
+    "photo": false
+  },
+  {
+    "key": "dark_temple",
+    "name": "어둠의 신전",
+    "w": 1672,
+    "h": 941,
+    "background": "6056ce6c32264a18a7e281afa9da6b96",
+    "thumb": "56360f40d2ee49398db88ef6582b80e3",
+    "color": [
+      1,
+      0.3,
+      0.5
+    ],
+    "bosses": [],
+    "photo": false
+  },
+  {
+    "key": "dark_throne",
+    "name": "어둠의 왕좌",
+    "w": 1672,
+    "h": 941,
+    "background": "e387f0c3afa34a76a8ac60fe62451116",
+    "thumb": "4389181b9ee641a6b072ea5c82b86ebf",
+    "color": [
+      1,
+      0.1,
+      0.2
+    ],
+    "bosses": [],
+    "photo": false
+  },
+  {
+    "key": "boundary_of_beginning_and_end",
+    "name": "시작과 끝의 경계",
+    "w": 1672,
+    "h": 941,
+    "background": "35286e61aed64a8a9889bb42d7567a66",
+    "thumb": "114ec3ed67d94f9bac051d7e489f0981",
+    "color": [
+      0.35,
+      0.85,
+      1
+    ],
+    "bosses": [],
+    "photo": false
+  },
+  {
+    "key": "nonexistent_space",
+    "name": "존재하지 않는 공간",
+    "w": 1672,
+    "h": 941,
+    "background": "c1aefc311010419fbb9096bd607adef2",
+    "thumb": "daa3a989057744a5ba67471718a1f934",
+    "color": [
+      0.45,
+      0.45,
+      0.55
+    ],
+    "bosses": [],
+    "photo": false
+  }
+]

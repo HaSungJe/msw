@@ -1,0 +1,37 @@
+{
+  "query": "진 힐라 모래시계 배경",
+  "results": [
+    {
+      "id": "4f38974ecf9f4af3a5b9e62f1ab99a6e",
+      "type": "sprite",
+      "category": "background",
+      "dname": "sprite-9092309",
+      "payload": {
+        "width": 804,
+        "height": 152
+      }
+    },
+    {
+      "id": "31e08a15fcce4b4086cfe818b99a201a",
+      "type": "sprite",
+      "category": "background",
+      "dname": "sprite-9091292",
+      "payload": {
+        "width": 656,
+        "height": 148
+      }
+    },
+    {
+      "id": "61c681c250784516891ea50004160a14",
+      "type": "sprite",
+      "category": "background",
+      "dname": "sprite-9092970",
+      "payload": {
+        "width": 312,
+        "height": 572
+      }
+    }
+  ],
+  "nextOffset": 3,
+  "exactMatch": false
+}

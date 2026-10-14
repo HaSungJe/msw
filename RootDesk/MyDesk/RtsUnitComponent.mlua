@@ -48,7 +48,7 @@ script RtsUnitComponent extends Component
 	@Sync
 	property string Prisms = ""
 
-	-- 이 유닛에 지정된 브론즈~골드·특수 코어 증강 id(쉼표 목록 — RtsAugmentTableLogic). 서버 RtsAugmentLogic.RequestAssign이 채우고, GetStatFor가 프리즘 다음에 능력치로 얹는다(2026-09-23)
+	-- 이 유닛에 지정된 일반 증강 id(2026-10-14 등급 삭제 — 공통·직업 증강)(쉼표 목록 — RtsAugmentTableLogic). 서버 RtsAugmentLogic.RequestAssign이 채우고, GetStatFor가 프리즘 다음에 능력치로 얹는다(2026-09-23)
 	@Sync
 	property string Augs = ""
 

@@ -1,0 +1,37 @@
+{
+  "query": "핑크빈 시간의 신전 행성 배경",
+  "results": [
+    {
+      "id": "4d3993a06480499190ecafcdb48471f1",
+      "type": "sprite",
+      "category": "background",
+      "dname": "sprite-9092298",
+      "payload": {
+        "width": 560,
+        "height": 820
+      }
+    },
+    {
+      "id": "3ba12cdca42546f5aff0cce23dde53b2",
+      "type": "sprite",
+      "category": "background",
+      "dname": "sprite-9091635",
+      "payload": {
+        "width": 548,
+        "height": 132
+      }
+    },
+    {
+      "id": "b8bcdd58b19341499f8c9ac65ecfa2e7",
+      "type": "sprite",
+      "category": "background",
+      "dname": "sprite-9096053",
+      "payload": {
+        "width": 800,
+        "height": 152
+      }
+    }
+  ],
+  "nextOffset": 3,
+  "exactMatch": false
+}

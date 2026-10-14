@@ -1,0 +1,92 @@
+[
+  {
+    "id": "diffraction_hall:leg-l1",
+    "name": "Will grounded leg-l1",
+    "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/crumbling-light/grounded/leg-l1.png",
+    "w": 627,
+    "h": 627,
+    "size": 146488,
+    "category": "sprite",
+    "subcategory": "object"
+  },
+  {
+    "id": "diffraction_hall:leg-r1",
+    "name": "Will grounded leg-r1",
+    "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/crumbling-light/grounded/leg-r1.png",
+    "w": 627,
+    "h": 627,
+    "size": 146542,
+    "category": "sprite",
+    "subcategory": "object"
+  },
+  {
+    "id": "diffraction_hall:leg-l2",
+    "name": "Will grounded leg-l2",
+    "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/crumbling-light/grounded/leg-l2.png",
+    "w": 627,
+    "h": 627,
+    "size": 166251,
+    "category": "sprite",
+    "subcategory": "object"
+  },
+  {
+    "id": "diffraction_hall:leg-r2",
+    "name": "Will grounded leg-r2",
+    "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/crumbling-light/grounded/leg-r2.png",
+    "w": 627,
+    "h": 627,
+    "size": 166208,
+    "category": "sprite",
+    "subcategory": "object"
+  },
+  {
+    "id": "diffraction_hall:leg-l3",
+    "name": "Will grounded leg-l3",
+    "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/crumbling-light/grounded/leg-l3.png",
+    "w": 627,
+    "h": 627,
+    "size": 150015,
+    "category": "sprite",
+    "subcategory": "object"
+  },
+  {
+    "id": "diffraction_hall:leg-r3",
+    "name": "Will grounded leg-r3",
+    "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/crumbling-light/grounded/leg-r3.png",
+    "w": 627,
+    "h": 627,
+    "size": 149859,
+    "category": "sprite",
+    "subcategory": "object"
+  },
+  {
+    "id": "diffraction_hall:leg-l4",
+    "name": "Will grounded leg-l4",
+    "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/crumbling-light/grounded/leg-l4.png",
+    "w": 627,
+    "h": 627,
+    "size": 169193,
+    "category": "sprite",
+    "subcategory": "object"
+  },
+  {
+    "id": "diffraction_hall:leg-r4",
+    "name": "Will grounded leg-r4",
+    "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/crumbling-light/grounded/leg-r4.png",
+    "w": 627,
+    "h": 627,
+    "size": 168884,
+    "category": "sprite",
+    "subcategory": "object"
+  },
+  {
+    "id": "diffraction_hall:thumbnail",
+    "name": "Will grounded thumbnail",
+    "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/crumbling-light/grounded/thumbnail.png",
+    "w": 400,
+    "h": 225,
+    "size": 255375,
+    "category": "sprite",
+    "subcategory": "object"
+  }
+]

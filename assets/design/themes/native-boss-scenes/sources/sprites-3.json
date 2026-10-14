@@ -1,0 +1,37 @@
+{
+  "query": "혼테일 동굴",
+  "results": [
+    {
+      "id": "54bc98c7bac14ce2b1533f26a6ba44f2",
+      "type": "sprite",
+      "category": "background",
+      "dname": "sprite-9092485",
+      "payload": {
+        "width": 248,
+        "height": 196
+      }
+    },
+    {
+      "id": "5fceb01105414784a116dc88f2348d6a",
+      "type": "sprite",
+      "category": "background",
+      "dname": "sprite-9092911",
+      "payload": {
+        "width": 800,
+        "height": 220
+      }
+    },
+    {
+      "id": "264b643bd3eb4bae931709a60d1a27f0",
+      "type": "sprite",
+      "category": "object",
+      "dname": "sprite-30853",
+      "payload": {
+        "width": 144,
+        "height": 80
+      }
+    }
+  ],
+  "nextOffset": 3,
+  "exactMatch": false
+}

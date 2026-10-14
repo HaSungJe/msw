@@ -1,0 +1,65 @@
+{
+  "query": "진힐라 욕망 제단",
+  "results": [
+    {
+      "id": "b778370029044ad98c27326ac394a915",
+      "type": "animationclip",
+      "category": "object",
+      "dname": "animationclip-2612",
+      "payload": {
+        "frames": [
+          "8dc590f30c8744c886dd073d69a3cf0c",
+          "2fd6dc69a04a442487a3265b55f0ede3"
+        ],
+        "width": 32,
+        "height": 16
+      }
+    },
+    {
+      "id": "10e95fc8d1e44ff388760c0861a8cc31",
+      "type": "animationclip",
+      "category": "object",
+      "dname": "animationclip-1926",
+      "payload": {
+        "frames": [
+          "2e2c87d03e8c4bc9932aac8010b3e14e",
+          "1b733cca68e64c0ea398811bae8f6bb6",
+          "fe0d165bd48b47a4b077df48701ac13c",
+          "47f2c493a3ae4c3390093bae2f25fa24",
+          "71f23cea93a74832bfda8c57ec51da21",
+          "a065c9a6f3ee4ccd9c7ae38f5ed782c2",
+          "ea5f3a208ad342169afa5e0b91381bf4",
+          "a6d85e151c0e4d348d70de4fe894a1f8",
+          "f0a3dde51a4d4ce4bea7787097b0192a",
+          "4aba64eb37b04f3a930f8cd788b2c975",
+          "f1f30065be094afcb2c2f9fe572f60a2",
+          "07aa3f19ecae4cad9b86cf961339a278",
+          "2d38778b6604407f8c007098e79998ba",
+          "1845284ce24e4517af33ad6650065fed"
+        ],
+        "width": 392,
+        "height": 72
+      }
+    },
+    {
+      "id": "a144966862f643efade9db641233a87a",
+      "type": "animationclip",
+      "category": "object",
+      "dname": "animationclip-2506",
+      "payload": {
+        "frames": [
+          "c9a29c386a304f5e8786356f02c5477b",
+          "808afcb85b6e4f5d80f9af3f00df8bba",
+          "41264e67c2e542be8d0a4291a2833ded",
+          "9a76d45f0e8c4ef0977df3a90c76205d",
+          "bdca309ba0394d309bc436c7ba126230",
+          "52098ba3d61842c0bf0da8d212a44423"
+        ],
+        "width": 268,
+        "height": 113
+      }
+    }
+  ],
+  "nextOffset": 3,
+  "exactMatch": false
+}

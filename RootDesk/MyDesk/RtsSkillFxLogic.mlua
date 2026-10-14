@@ -642,6 +642,8 @@ script RtsSkillFxLogic extends Logic
 		if targets == nil or #targets == 0 then targets = { target } end
 		local up = _RtsBoardViewLogic:BoardPosition(unitEntity)
 		local count = fx.projCount or 1
+		-- 구체(projFrom "around")는 서버가 구체마다 대상 1개씩 보내므로 그 수만큼(직업 증강 '도트 퍼니셔 강화(1)' — 투사체 +1으로 표 값보다 늘 수 있다 — 2026-10-14)
+		if fx.projFrom == "around" and #targets > 1 then count = #targets end
 		local list = { target }
 		if fx.projEach then list = targets end
 		for j = 1, #list do

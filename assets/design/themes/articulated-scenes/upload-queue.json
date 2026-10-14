@@ -1,0 +1,1098 @@
+{
+  "assets": [
+    {
+      "id": "forbidden_altar:body",
+      "name": "Action forbidden_altar body",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/forbidden-altar/body.png",
+      "w": 470,
+      "h": 510,
+      "size": 408756,
+      "category": "sprite",
+      "subcategory": "object"
+    },
+    {
+      "id": "forbidden_altar:head",
+      "name": "Action forbidden_altar head",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/forbidden-altar/head.png",
+      "w": 470,
+      "h": 425,
+      "size": 349922,
+      "category": "sprite",
+      "subcategory": "object"
+    },
+    {
+      "id": "forbidden_altar:arm-l",
+      "name": "Action forbidden_altar arm-l",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/forbidden-altar/arm-l.png",
+      "w": 380,
+      "h": 445,
+      "size": 277559,
+      "category": "sprite",
+      "subcategory": "object"
+    },
+    {
+      "id": "forbidden_altar:arm-r",
+      "name": "Action forbidden_altar arm-r",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/forbidden-altar/arm-r.png",
+      "w": 315,
+      "h": 440,
+      "size": 244041,
+      "category": "sprite",
+      "subcategory": "object"
+    },
+    {
+      "id": "forbidden_altar:wing-l",
+      "name": "Action forbidden_altar wing-l",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/forbidden-altar/wing-l.png",
+      "w": 485,
+      "h": 470,
+      "size": 311030,
+      "category": "sprite",
+      "subcategory": "object"
+    },
+    {
+      "id": "forbidden_altar:wing-r",
+      "name": "Action forbidden_altar wing-r",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/forbidden-altar/wing-r.png",
+      "w": 480,
+      "h": 470,
+      "size": 314125,
+      "category": "sprite",
+      "subcategory": "object"
+    },
+    {
+      "id": "forbidden_altar:background",
+      "name": "Action forbidden_altar clean background",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/forbidden-altar/background.png",
+      "w": 1672,
+      "h": 941,
+      "size": 1854007,
+      "category": "sprite",
+      "subcategory": "background"
+    },
+    {
+      "id": "pianus_cave:body",
+      "name": "Action pianus_cave body",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/pianus-cave/body.png",
+      "w": 700,
+      "h": 465,
+      "size": 614628,
+      "category": "sprite",
+      "subcategory": "object"
+    },
+    {
+      "id": "pianus_cave:dorsal",
+      "name": "Action pianus_cave dorsal",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/pianus-cave/dorsal.png",
+      "w": 390,
+      "h": 390,
+      "size": 316366,
+      "category": "sprite",
+      "subcategory": "object"
+    },
+    {
+      "id": "pianus_cave:belly",
+      "name": "Action pianus_cave belly",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/pianus-cave/belly.png",
+      "w": 345,
+      "h": 240,
+      "size": 172746,
+      "category": "sprite",
+      "subcategory": "object"
+    },
+    {
+      "id": "pianus_cave:pectoral",
+      "name": "Action pianus_cave pectoral",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/pianus-cave/pectoral.png",
+      "w": 300,
+      "h": 300,
+      "size": 200791,
+      "category": "sprite",
+      "subcategory": "object"
+    },
+    {
+      "id": "pianus_cave:tail",
+      "name": "Action pianus_cave tail",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/pianus-cave/tail.png",
+      "w": 345,
+      "h": 450,
+      "size": 328769,
+      "category": "sprite",
+      "subcategory": "object"
+    },
+    {
+      "id": "pianus_cave:bubbles",
+      "name": "Action pianus_cave bubbles",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/pianus-cave/bubbles.png",
+      "w": 345,
+      "h": 385,
+      "size": 304226,
+      "category": "sprite",
+      "subcategory": "object"
+    },
+    {
+      "id": "pianus_cave:background",
+      "name": "Action pianus_cave clean background",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/pianus-cave/background.png",
+      "w": 1672,
+      "h": 941,
+      "size": 2062665,
+      "category": "sprite",
+      "subcategory": "background"
+    },
+    {
+      "id": "twilight_of_gods:note-purple",
+      "name": "Action twilight_of_gods note-purple",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/twilight-of-gods/note-purple.png",
+      "w": 245,
+      "h": 285,
+      "size": 130815,
+      "category": "sprite",
+      "subcategory": "object"
+    },
+    {
+      "id": "twilight_of_gods:note-pink",
+      "name": "Action twilight_of_gods note-pink",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/twilight-of-gods/note-pink.png",
+      "w": 260,
+      "h": 285,
+      "size": 135988,
+      "category": "sprite",
+      "subcategory": "object"
+    },
+    {
+      "id": "twilight_of_gods:background",
+      "name": "Action twilight_of_gods clean background",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/twilight-of-gods/background.png",
+      "w": 1672,
+      "h": 941,
+      "size": 2208156,
+      "category": "sprite",
+      "subcategory": "background"
+    },
+    {
+      "id": "cygnus_garden:body",
+      "name": "Action cygnus_garden body",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/cygnus-garden/body.png",
+      "w": 365,
+      "h": 535,
+      "size": 433114,
+      "category": "sprite",
+      "subcategory": "object"
+    },
+    {
+      "id": "cygnus_garden:hair",
+      "name": "Action cygnus_garden hair",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/cygnus-garden/hair.png",
+      "w": 435,
+      "h": 400,
+      "size": 317130,
+      "category": "sprite",
+      "subcategory": "object"
+    },
+    {
+      "id": "cygnus_garden:dress-r",
+      "name": "Action cygnus_garden dress-r",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/cygnus-garden/dress-r.png",
+      "w": 410,
+      "h": 480,
+      "size": 320149,
+      "category": "sprite",
+      "subcategory": "object"
+    },
+    {
+      "id": "cygnus_garden:dress-l",
+      "name": "Action cygnus_garden dress-l",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/cygnus-garden/dress-l.png",
+      "w": 355,
+      "h": 455,
+      "size": 264663,
+      "category": "sprite",
+      "subcategory": "object"
+    },
+    {
+      "id": "cygnus_garden:halo",
+      "name": "Action cygnus_garden halo",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/cygnus-garden/halo.png",
+      "w": 515,
+      "h": 465,
+      "size": 495263,
+      "category": "sprite",
+      "subcategory": "object"
+    },
+    {
+      "id": "cygnus_garden:wisp",
+      "name": "Action cygnus_garden wisp",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/cygnus-garden/wisp.png",
+      "w": 280,
+      "h": 480,
+      "size": 320930,
+      "category": "sprite",
+      "subcategory": "object"
+    },
+    {
+      "id": "cygnus_garden:background",
+      "name": "Action cygnus_garden clean background",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/cygnus-garden/background.png",
+      "w": 1672,
+      "h": 941,
+      "size": 2278911,
+      "category": "sprite",
+      "subcategory": "background"
+    },
+    {
+      "id": "black_heaven_core:body",
+      "name": "Action black_heaven_core body",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/black-heaven-core/body.png",
+      "w": 320,
+      "h": 505,
+      "size": 367354,
+      "category": "sprite",
+      "subcategory": "object"
+    },
+    {
+      "id": "black_heaven_core:hair-l",
+      "name": "Action black_heaven_core hair-l",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/black-heaven-core/hair-l.png",
+      "w": 280,
+      "h": 405,
+      "size": 226428,
+      "category": "sprite",
+      "subcategory": "object"
+    },
+    {
+      "id": "black_heaven_core:hair-r",
+      "name": "Action black_heaven_core hair-r",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/black-heaven-core/hair-r.png",
+      "w": 325,
+      "h": 405,
+      "size": 250470,
+      "category": "sprite",
+      "subcategory": "object"
+    },
+    {
+      "id": "black_heaven_core:core-glow",
+      "name": "Action black_heaven_core core-glow",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/black-heaven-core/core-glow.png",
+      "w": 440,
+      "h": 460,
+      "size": 491136,
+      "category": "sprite",
+      "subcategory": "object"
+    },
+    {
+      "id": "black_heaven_core:flame",
+      "name": "Action black_heaven_core flame",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/black-heaven-core/flame.png",
+      "w": 270,
+      "h": 440,
+      "size": 303482,
+      "category": "sprite",
+      "subcategory": "object"
+    },
+    {
+      "id": "black_heaven_core:arc",
+      "name": "Action black_heaven_core arc",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/black-heaven-core/arc.png",
+      "w": 335,
+      "h": 450,
+      "size": 323362,
+      "category": "sprite",
+      "subcategory": "object"
+    },
+    {
+      "id": "black_heaven_core:background",
+      "name": "Action black_heaven_core clean background",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/black-heaven-core/background.png",
+      "w": 1676,
+      "h": 938,
+      "size": 3130548,
+      "category": "sprite",
+      "subcategory": "background"
+    },
+    {
+      "id": "world_tree_summit:body",
+      "name": "Action world_tree_summit body",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/world-tree-summit/body.png",
+      "w": 497,
+      "h": 535,
+      "size": 550767,
+      "category": "sprite",
+      "subcategory": "object"
+    },
+    {
+      "id": "world_tree_summit:wing-l",
+      "name": "Action world_tree_summit wing-l",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/world-tree-summit/wing-l.png",
+      "w": 490,
+      "h": 540,
+      "size": 579308,
+      "category": "sprite",
+      "subcategory": "object"
+    },
+    {
+      "id": "world_tree_summit:wing-r",
+      "name": "Action world_tree_summit wing-r",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/world-tree-summit/wing-r.png",
+      "w": 500,
+      "h": 540,
+      "size": 563317,
+      "category": "sprite",
+      "subcategory": "object"
+    },
+    {
+      "id": "world_tree_summit:scarf",
+      "name": "Action world_tree_summit scarf",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/world-tree-summit/scarf.png",
+      "w": 497,
+      "h": 425,
+      "size": 373967,
+      "category": "sprite",
+      "subcategory": "object"
+    },
+    {
+      "id": "world_tree_summit:flame-l",
+      "name": "Action world_tree_summit flame-l",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/world-tree-summit/flame-l.png",
+      "w": 390,
+      "h": 430,
+      "size": 348959,
+      "category": "sprite",
+      "subcategory": "object"
+    },
+    {
+      "id": "world_tree_summit:flame-r",
+      "name": "Action world_tree_summit flame-r",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/world-tree-summit/flame-r.png",
+      "w": 480,
+      "h": 430,
+      "size": 378939,
+      "category": "sprite",
+      "subcategory": "object"
+    },
+    {
+      "id": "world_tree_summit:background",
+      "name": "Action world_tree_summit clean background",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/world-tree-summit/background.png",
+      "w": 1672,
+      "h": 941,
+      "size": 1869063,
+      "category": "sprite",
+      "subcategory": "background"
+    },
+    {
+      "id": "collapsing_clocktower:body",
+      "name": "Action collapsing_clocktower body",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/collapsing-clocktower/body.png",
+      "w": 405,
+      "h": 530,
+      "size": 450222,
+      "category": "sprite",
+      "subcategory": "object"
+    },
+    {
+      "id": "twilight_of_gods:body",
+      "name": "Action Pink Bean natural body",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/twilight-of-gods/body-natural.png",
+      "w": 430,
+      "h": 470,
+      "size": 329000,
+      "category": "sprite",
+      "subcategory": "object"
+    },
+    {
+      "id": "twilight_of_gods:arm-l",
+      "name": "Action Pink Bean natural arm-l",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/twilight-of-gods/arm-l-natural.png",
+      "w": 200,
+      "h": 245,
+      "size": 82713,
+      "category": "sprite",
+      "subcategory": "object"
+    },
+    {
+      "id": "twilight_of_gods:arm-r",
+      "name": "Action Pink Bean natural arm-r",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/twilight-of-gods/arm-r-natural.png",
+      "w": 210,
+      "h": 245,
+      "size": 82720,
+      "category": "sprite",
+      "subcategory": "object"
+    },
+    {
+      "id": "twilight_of_gods:tail",
+      "name": "Action Pink Bean natural tail",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/twilight-of-gods/tail-natural.png",
+      "w": 285,
+      "h": 450,
+      "size": 216561,
+      "category": "sprite",
+      "subcategory": "object"
+    },
+    {
+      "id": "collapsing_clocktower:wing-l",
+      "name": "Action collapsing_clocktower wing-l",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/collapsing-clocktower/wing-l.png",
+      "w": 450,
+      "h": 610,
+      "size": 603079,
+      "category": "sprite",
+      "subcategory": "object"
+    },
+    {
+      "id": "collapsing_clocktower:wing-r",
+      "name": "Action collapsing_clocktower wing-r",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/collapsing-clocktower/wing-r.png",
+      "w": 440,
+      "h": 610,
+      "size": 573183,
+      "category": "sprite",
+      "subcategory": "object"
+    },
+    {
+      "id": "collapsing_clocktower:butterfly-gold",
+      "name": "Action collapsing_clocktower butterfly-gold",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/collapsing-clocktower/butterfly-gold.png",
+      "w": 475,
+      "h": 390,
+      "size": 462623,
+      "category": "sprite",
+      "subcategory": "object"
+    },
+    {
+      "id": "collapsing_clocktower:petal",
+      "name": "Action collapsing_clocktower petal",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/collapsing-clocktower/petal.png",
+      "w": 285,
+      "h": 335,
+      "size": 199525,
+      "category": "sprite",
+      "subcategory": "object"
+    },
+    {
+      "id": "collapsing_clocktower:butterfly-purple",
+      "name": "Action collapsing_clocktower butterfly-purple",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/collapsing-clocktower/butterfly-purple.png",
+      "w": 350,
+      "h": 335,
+      "size": 282207,
+      "category": "sprite",
+      "subcategory": "object"
+    },
+    {
+      "id": "collapsing_clocktower:background",
+      "name": "Action collapsing_clocktower clean background",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/collapsing-clocktower/background.png",
+      "w": 1672,
+      "h": 941,
+      "size": 2168862,
+      "category": "sprite",
+      "subcategory": "background"
+    },
+    {
+      "id": "diffraction_hall:body",
+      "name": "Action diffraction_hall body",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/diffraction-hall/body.png",
+      "w": 295,
+      "h": 545,
+      "size": 353777,
+      "category": "sprite",
+      "subcategory": "object"
+    },
+    {
+      "id": "diffraction_hall:arm-l",
+      "name": "Action diffraction_hall arm-l",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/diffraction-hall/arm-l.png",
+      "w": 275,
+      "h": 210,
+      "size": 113280,
+      "category": "sprite",
+      "subcategory": "object"
+    },
+    {
+      "id": "diffraction_hall:arm-r",
+      "name": "Action diffraction_hall arm-r",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/diffraction-hall/arm-r.png",
+      "w": 235,
+      "h": 290,
+      "size": 115483,
+      "category": "sprite",
+      "subcategory": "object"
+    },
+    {
+      "id": "diffraction_hall:book",
+      "name": "Action diffraction_hall book",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/diffraction-hall/book.png",
+      "w": 405,
+      "h": 455,
+      "size": 420526,
+      "category": "sprite",
+      "subcategory": "object"
+    },
+    {
+      "id": "diffraction_hall:coat-l",
+      "name": "Action diffraction_hall coat-l",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/diffraction-hall/coat-l.png",
+      "w": 325,
+      "h": 460,
+      "size": 218720,
+      "category": "sprite",
+      "subcategory": "object"
+    },
+    {
+      "id": "diffraction_hall:coat-r",
+      "name": "Action diffraction_hall coat-r",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/diffraction-hall/coat-r.png",
+      "w": 335,
+      "h": 460,
+      "size": 241425,
+      "category": "sprite",
+      "subcategory": "object"
+    },
+    {
+      "id": "diffraction_hall:background",
+      "name": "Action diffraction_hall clean background",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/diffraction-hall/background.png",
+      "w": 1672,
+      "h": 941,
+      "size": 1732300,
+      "category": "sprite",
+      "subcategory": "background"
+    },
+    {
+      "id": "eye_of_void:body",
+      "name": "Action eye_of_void body",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/eye-of-void/body.png",
+      "w": 630,
+      "h": 522,
+      "size": 744126,
+      "category": "sprite",
+      "subcategory": "object"
+    },
+    {
+      "id": "eye_of_void:claw-ul",
+      "name": "Action eye_of_void claw-ul",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/eye-of-void/claw-ul.png",
+      "w": 438,
+      "h": 499,
+      "size": 448841,
+      "category": "sprite",
+      "subcategory": "object"
+    },
+    {
+      "id": "eye_of_void:claw-ur",
+      "name": "Action eye_of_void claw-ur",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/eye-of-void/claw-ur.png",
+      "w": 453,
+      "h": 499,
+      "size": 473659,
+      "category": "sprite",
+      "subcategory": "object"
+    },
+    {
+      "id": "eye_of_void:claw-ll",
+      "name": "Action eye_of_void claw-ll",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/eye-of-void/claw-ll.png",
+      "w": 538,
+      "h": 492,
+      "size": 555842,
+      "category": "sprite",
+      "subcategory": "object"
+    },
+    {
+      "id": "eye_of_void:claw-lr",
+      "name": "Action eye_of_void claw-lr",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/eye-of-void/claw-lr.png",
+      "w": 522,
+      "h": 484,
+      "size": 526206,
+      "category": "sprite",
+      "subcategory": "object"
+    },
+    {
+      "id": "eye_of_void:chain-rock",
+      "name": "Action eye_of_void chain-rock",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/eye-of-void/chain-rock.png",
+      "w": 353,
+      "h": 499,
+      "size": 324406,
+      "category": "sprite",
+      "subcategory": "object"
+    },
+    {
+      "id": "eye_of_void:background",
+      "name": "Action eye_of_void clean background",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/eye-of-void/background.png",
+      "w": 1672,
+      "h": 941,
+      "size": 1605657,
+      "category": "sprite",
+      "subcategory": "background"
+    },
+    {
+      "id": "altar_of_desire:hair",
+      "name": "Action altar_of_desire hair",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/altar-of-desire/hair.png",
+      "w": 515,
+      "h": 545,
+      "size": 609454,
+      "category": "sprite",
+      "subcategory": "object"
+    },
+    {
+      "id": "altar_of_desire:scythe",
+      "name": "Action altar_of_desire scythe",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/altar-of-desire/scythe.png",
+      "w": 515,
+      "h": 614,
+      "size": 516200,
+      "category": "sprite",
+      "subcategory": "object"
+    },
+    {
+      "id": "altar_of_desire:dress-l",
+      "name": "Action altar_of_desire dress-l",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/altar-of-desire/dress-l.png",
+      "w": 307,
+      "h": 407,
+      "size": 167437,
+      "category": "sprite",
+      "subcategory": "object"
+    },
+    {
+      "id": "altar_of_desire:dress-r",
+      "name": "Action altar_of_desire dress-r",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/altar-of-desire/dress-r.png",
+      "w": 284,
+      "h": 407,
+      "size": 169294,
+      "category": "sprite",
+      "subcategory": "object"
+    },
+    {
+      "id": "altar_of_desire:flame",
+      "name": "Action altar_of_desire flame",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/altar-of-desire/flame.png",
+      "w": 438,
+      "h": 425,
+      "size": 451328,
+      "category": "sprite",
+      "subcategory": "object"
+    },
+    {
+      "id": "altar_of_desire:background",
+      "name": "Action altar_of_desire clean background",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/altar-of-desire/background.png",
+      "w": 1672,
+      "h": 941,
+      "size": 1807585,
+      "category": "sprite",
+      "subcategory": "background"
+    },
+    {
+      "id": "near_the_end:body",
+      "name": "Action near_the_end body",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/near-the-end/body.png",
+      "w": 430,
+      "h": 630,
+      "size": 474073,
+      "category": "sprite",
+      "subcategory": "object"
+    },
+    {
+      "id": "near_the_end:sword-arm",
+      "name": "Action near_the_end sword-arm",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/near-the-end/sword-arm.png",
+      "w": 645,
+      "h": 445,
+      "size": 422003,
+      "category": "sprite",
+      "subcategory": "object"
+    },
+    {
+      "id": "near_the_end:arm-r",
+      "name": "Action near_the_end arm-r",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/near-the-end/arm-r.png",
+      "w": 253,
+      "h": 384,
+      "size": 168360,
+      "category": "sprite",
+      "subcategory": "object"
+    },
+    {
+      "id": "near_the_end:cape",
+      "name": "Action near_the_end cape",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/near-the-end/cape.png",
+      "w": 538,
+      "h": 376,
+      "size": 262476,
+      "category": "sprite",
+      "subcategory": "object"
+    },
+    {
+      "id": "near_the_end:eyes",
+      "name": "Action near_the_end eyes",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/near-the-end/eyes.png",
+      "w": 284,
+      "h": 154,
+      "size": 94241,
+      "category": "sprite",
+      "subcategory": "object"
+    },
+    {
+      "id": "near_the_end:smoke",
+      "name": "Action near_the_end smoke",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/near-the-end/smoke.png",
+      "w": 376,
+      "h": 330,
+      "size": 98490,
+      "category": "sprite",
+      "subcategory": "object"
+    },
+    {
+      "id": "near_the_end:background",
+      "name": "Action near_the_end clean background",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/near-the-end/background.png",
+      "w": 1672,
+      "h": 941,
+      "size": 1945361,
+      "category": "sprite",
+      "subcategory": "background"
+    },
+    {
+      "id": "dark_temple:white-guardian",
+      "name": "Action dark_temple white-guardian",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/dark-temple/white-guardian.png",
+      "w": 430,
+      "h": 684,
+      "size": 730555,
+      "category": "sprite",
+      "subcategory": "object"
+    },
+    {
+      "id": "dark_temple:black-guardian",
+      "name": "Action dark_temple black-guardian",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/dark-temple/black-guardian.png",
+      "w": 430,
+      "h": 684,
+      "size": 701873,
+      "category": "sprite",
+      "subcategory": "object"
+    },
+    {
+      "id": "dark_temple:white-chain",
+      "name": "Action dark_temple white-chain",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/dark-temple/white-chain.png",
+      "w": 530,
+      "h": 422,
+      "size": 521866,
+      "category": "sprite",
+      "subcategory": "object"
+    },
+    {
+      "id": "dark_temple:red-chain",
+      "name": "Action dark_temple red-chain",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/dark-temple/red-chain.png",
+      "w": 499,
+      "h": 348,
+      "size": 423448,
+      "category": "sprite",
+      "subcategory": "object"
+    },
+    {
+      "id": "dark_temple:pink-flame",
+      "name": "Action dark_temple pink-flame",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/dark-temple/pink-flame.png",
+      "w": 499,
+      "h": 292,
+      "size": 346546,
+      "category": "sprite",
+      "subcategory": "object"
+    },
+    {
+      "id": "dark_temple:purple-flame",
+      "name": "Action dark_temple purple-flame",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/dark-temple/purple-flame.png",
+      "w": 507,
+      "h": 284,
+      "size": 305581,
+      "category": "sprite",
+      "subcategory": "object"
+    },
+    {
+      "id": "dark_temple:background",
+      "name": "Action dark_temple clean background",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/dark-temple/background.png",
+      "w": 1672,
+      "h": 941,
+      "size": 2034821,
+      "category": "sprite",
+      "subcategory": "background"
+    },
+    {
+      "id": "dark_throne:body",
+      "name": "Action dark_throne body",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/dark-throne/body.png",
+      "w": 369,
+      "h": 515,
+      "size": 312123,
+      "category": "sprite",
+      "subcategory": "object"
+    },
+    {
+      "id": "dark_throne:sleeve-l",
+      "name": "Action dark_throne sleeve-l",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/dark-throne/sleeve-l.png",
+      "w": 346,
+      "h": 468,
+      "size": 252415,
+      "category": "sprite",
+      "subcategory": "object"
+    },
+    {
+      "id": "dark_throne:sleeve-r",
+      "name": "Action dark_throne sleeve-r",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/dark-throne/sleeve-r.png",
+      "w": 330,
+      "h": 468,
+      "size": 245548,
+      "category": "sprite",
+      "subcategory": "object"
+    },
+    {
+      "id": "dark_throne:robe",
+      "name": "Action dark_throne robe",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/dark-throne/robe.png",
+      "w": 538,
+      "h": 445,
+      "size": 407826,
+      "category": "sprite",
+      "subcategory": "object"
+    },
+    {
+      "id": "dark_throne:aura",
+      "name": "Action dark_throne aura",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/dark-throne/aura.png",
+      "w": 515,
+      "h": 476,
+      "size": 463455,
+      "category": "sprite",
+      "subcategory": "object"
+    },
+    {
+      "id": "dark_throne:smoke",
+      "name": "Action dark_throne smoke",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/dark-throne/smoke.png",
+      "w": 507,
+      "h": 468,
+      "size": 346007,
+      "category": "sprite",
+      "subcategory": "object"
+    },
+    {
+      "id": "dark_throne:background",
+      "name": "Action dark_throne clean background",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/dark-throne/background.png",
+      "w": 1672,
+      "h": 941,
+      "size": 1966456,
+      "category": "sprite",
+      "subcategory": "background"
+    },
+    {
+      "id": "boundary_of_beginning_and_end:pillar",
+      "name": "Action boundary_of_beginning_and_end pillar",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/boundary-of-beginning-and-end/pillar.png",
+      "w": 253,
+      "h": 538,
+      "size": 288504,
+      "category": "sprite",
+      "subcategory": "object"
+    },
+    {
+      "id": "boundary_of_beginning_and_end:mantle",
+      "name": "Action boundary_of_beginning_and_end mantle",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/boundary-of-beginning-and-end/mantle.png",
+      "w": 453,
+      "h": 538,
+      "size": 653133,
+      "category": "sprite",
+      "subcategory": "object"
+    },
+    {
+      "id": "boundary_of_beginning_and_end:orb",
+      "name": "Action boundary_of_beginning_and_end orb",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/boundary-of-beginning-and-end/orb.png",
+      "w": 184,
+      "h": 261,
+      "size": 95020,
+      "category": "sprite",
+      "subcategory": "object"
+    },
+    {
+      "id": "boundary_of_beginning_and_end:streak",
+      "name": "Action boundary_of_beginning_and_end streak",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/boundary-of-beginning-and-end/streak.png",
+      "w": 215,
+      "h": 484,
+      "size": 214453,
+      "category": "sprite",
+      "subcategory": "object"
+    },
+    {
+      "id": "boundary_of_beginning_and_end:crescent",
+      "name": "Action boundary_of_beginning_and_end crescent",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/boundary-of-beginning-and-end/crescent.png",
+      "w": 407,
+      "h": 453,
+      "size": 399671,
+      "category": "sprite",
+      "subcategory": "object"
+    },
+    {
+      "id": "boundary_of_beginning_and_end:rock",
+      "name": "Action boundary_of_beginning_and_end rock",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/boundary-of-beginning-and-end/rock.png",
+      "w": 253,
+      "h": 323,
+      "size": 140921,
+      "category": "sprite",
+      "subcategory": "object"
+    },
+    {
+      "id": "nonexistent_space:pillar",
+      "name": "Action nonexistent_space pillar",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/nonexistent-space/pillar.png",
+      "w": 276,
+      "h": 591,
+      "size": 288417,
+      "category": "sprite",
+      "subcategory": "object"
+    },
+    {
+      "id": "boundary_of_beginning_and_end:background",
+      "name": "Action Black Mage phase 3 background",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/boundary-of-beginning-and-end/background.png",
+      "w": 1672,
+      "h": 941,
+      "size": 1938148,
+      "category": "sprite",
+      "subcategory": "background"
+    },
+    {
+      "id": "nonexistent_space:halo",
+      "name": "Action nonexistent_space halo",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/nonexistent-space/halo.png",
+      "w": 515,
+      "h": 568,
+      "size": 640621,
+      "category": "sprite",
+      "subcategory": "object"
+    },
+    {
+      "id": "nonexistent_space:orb-gray",
+      "name": "Action nonexistent_space orb-gray",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/nonexistent-space/orb-gray.png",
+      "w": 161,
+      "h": 177,
+      "size": 42541,
+      "category": "sprite",
+      "subcategory": "object"
+    },
+    {
+      "id": "nonexistent_space:orb-white",
+      "name": "Action nonexistent_space orb-white",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/nonexistent-space/orb-white.png",
+      "w": 292,
+      "h": 276,
+      "size": 126704,
+      "category": "sprite",
+      "subcategory": "object"
+    },
+    {
+      "id": "nonexistent_space:wisp",
+      "name": "Action nonexistent_space wisp",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/nonexistent-space/wisp.png",
+      "w": 307,
+      "h": 445,
+      "size": 254749,
+      "category": "sprite",
+      "subcategory": "object"
+    },
+    {
+      "id": "nonexistent_space:streak",
+      "name": "Action nonexistent_space streak",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/nonexistent-space/streak.png",
+      "w": 123,
+      "h": 438,
+      "size": 108103,
+      "category": "sprite",
+      "subcategory": "object"
+    },
+    {
+      "id": "nonexistent_space:background",
+      "name": "Action nonexistent_space clean background",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/nonexistent-space/background.png",
+      "w": 1672,
+      "h": 941,
+      "size": 1560393,
+      "category": "sprite",
+      "subcategory": "background"
+    },
+    {
+      "id": "altar_of_desire:body",
+      "name": "Action Hilla body with red hair",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/altar-of-desire/body-fixed.png",
+      "w": 1142,
+      "h": 1378,
+      "size": 1575409,
+      "category": "sprite",
+      "subcategory": "object"
+    }
+  ],
+  "pinkReplacements": [
+    {
+      "id": "twilight_of_gods:body",
+      "name": "Action Pink Bean natural body",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/twilight-of-gods/body-natural.png",
+      "w": 430,
+      "h": 470,
+      "size": 329000,
+      "category": "sprite",
+      "subcategory": "object"
+    },
+    {
+      "id": "twilight_of_gods:arm-l",
+      "name": "Action Pink Bean natural arm-l",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/twilight-of-gods/arm-l-natural.png",
+      "w": 200,
+      "h": 245,
+      "size": 82713,
+      "category": "sprite",
+      "subcategory": "object"
+    },
+    {
+      "id": "twilight_of_gods:arm-r",
+      "name": "Action Pink Bean natural arm-r",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/twilight-of-gods/arm-r-natural.png",
+      "w": 210,
+      "h": 245,
+      "size": 82720,
+      "category": "sprite",
+      "subcategory": "object"
+    },
+    {
+      "id": "twilight_of_gods:tail",
+      "name": "Action Pink Bean natural tail",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/twilight-of-gods/tail-natural.png",
+      "w": 285,
+      "h": 450,
+      "size": 216561,
+      "category": "sprite",
+      "subcategory": "object"
+    }
+  ],
+  "status": "registered",
+  "registered": 105
+}

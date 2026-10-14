@@ -1,0 +1,53 @@
+{
+  "query": "검은마법사 우주",
+  "results": [
+    {
+      "id": "185f93e95989443c9079a423fb7ba0d5",
+      "type": "animationclip",
+      "category": "object",
+      "dname": "animationclip-50885",
+      "payload": {
+        "frames": [
+          "115ecf6accbd4e27b10876588a20d515",
+          "a0c1ded2b2b043989e63450d46400ab4",
+          "3d4cc1a30fd448ddaee22e5366470275",
+          "3cfdf66363a74f038ce464f70c3141b4"
+        ],
+        "width": 124,
+        "height": 21
+      }
+    },
+    {
+      "id": "6d132bd9cee6472ab5de9e2578e17999",
+      "type": "animationclip",
+      "category": "object",
+      "dname": "animationclip-51600",
+      "payload": {
+        "frames": [
+          "79f00b49e49c481dbecef1a8eeda5591",
+          "0238d7d608644459819e20635e6a3811",
+          "3070499a2d9e4dbbb893e7eb7856c8a4",
+          "e921e2205cf84b019e320ab265c09c10"
+        ],
+        "width": 40,
+        "height": 21
+      }
+    },
+    {
+      "id": "0dfe92cd33044b0d88a30c8d0ef6df08",
+      "type": "animationclip",
+      "category": "object",
+      "dname": "animationclip-39",
+      "payload": {
+        "frames": [
+          "c78884be862045239f63ee8ac82c769c",
+          "a921a496db5b4398a20858e829660e52"
+        ],
+        "width": 72,
+        "height": 44
+      }
+    }
+  ],
+  "nextOffset": 3,
+  "exactMatch": false
+}

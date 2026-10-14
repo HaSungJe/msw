@@ -18,26 +18,42 @@ script RtsUnitBuffLogic extends Logic
 
 	-- id 같으면 중복 적용 안 함. scope: all(구역 전체, 자신 포함) / target(BondNo 지정 유닛) (주변 n칸 범위 near는 쓰는 버프가 없어 2026-09-28 정리로 삭제; 프레이는 2026-09-19부터 all)
 	--   fin 최종 데미지 +% / crit 크리 확률 +% / critDmg 크리 데미지 +%. 아이콘은 메이플 원작 스킬 아이콘 RUID
+	--   bonus = 출처 유닛의 직업 증강이 더하는 값(2026-10-14 — "pray" 프레이 강화는 fin에, "se" 샤프아이즈 강화는 crit·critDmg에 각각 더한다. RtsAugmentTableLogic.Totals)
 	method table GetDefs()
 		return {
 			-- 홀리 유니티 = 프리즘 스킬(2026-09-20: 40레벨 패시브 +20% 삭제, 지정 유닛 최종 +100% → 2026-09-22 +40%). prism = 이 프리즘을 가진 유닛만 출처(RtsUnitComponent.Prisms)
 			{ id = "bond", name = "홀리 유니티", job = "paladin", lv = 1, prism = "holyunity", scope = "target", icon = "53a38855164a4b64accf68785761c283", fin = 40 },
 			-- 샤프아이즈 크확·크뎀 20 → 50(2026-09-27 사용자 "샤프아이즈 효과를 크확 50% 크뎀 50%로 상향" — 크리 증강이 쓸모 있게, 기본 크뎀 20%는 그대로)
-			{ id = "sharpeyes", name = "샤프아이즈", job = "bow", lv = 40, scope = "all", icon = "4cd1961bc55b47cb80e1a7f8843e225e", crit = 50, critDmg = 50 },
-			{ id = "sharpeyes", name = "샤프아이즈", job = "marks", lv = 20, scope = "all", icon = "4cd1961bc55b47cb80e1a7f8843e225e", crit = 50, critDmg = 50 },
-			{ id = "pray", name = "프레이", job = "bishop", lv = 30, scope = "all", icon = "39b3159efcc74334b875c94c64a74243", fin = 10 }, -- 2026-09-19: 주변 1타일·자신 미적용 → 구역 전체(자신 포함)·+10%
+			{ id = "sharpeyes", name = "샤프아이즈", job = "bow", lv = 40, scope = "all", icon = "4cd1961bc55b47cb80e1a7f8843e225e", crit = 50, critDmg = 50, bonus = "se" },
+			-- 신궁 샤프아이즈도 직업 증강 '샤프아이즈 강화'(보우마스터·신궁 공용 — 2026-10-14 사용자 목록)를 받는다
+			{ id = "sharpeyes", name = "샤프아이즈", job = "marks", lv = 20, scope = "all", icon = "4cd1961bc55b47cb80e1a7f8843e225e", crit = 50, critDmg = 50, bonus = "se" },
+			{ id = "pray", name = "프레이", job = "bishop", lv = 30, scope = "all", icon = "39b3159efcc74334b875c94c64a74243", fin = 30, bonus = "pray" }, -- 2026-10-14 사용자 "프레이 최종데미지 증가량 30%"(전 10) / 2026-09-19: 주변 1타일·자신 미적용 → 구역 전체(자신 포함)
 			{ id = "joker", name = "조커: 날카로운 검", job = "phantom", lv = 10, scope = "all", icon = "f1575f7842c740a49f9e19c2514de64e", fin = 5 }, -- 2026-09-24 사용자 "조커 최종 5% — 커트라인 낮추게"(2026-09-19 3차 5 → 3에서 되돌림)
 		}
 	end
 
-	-- 효과 글자: "최종 데미지 +20%" / "크리티컬 확률 +20% · 크리티컬 데미지 +20%"
+	-- 효과 글자: "최종 데미지 +20%" / "크리티컬 확률 +20% · 크리티컬 데미지 +20%" — 걸린 버프 b(GetBuffsFor 항목)면 출처 증강 보너스까지
 	method string EffectText(table def)
+		return self:EffectTextWith(def, 0)
+	end
+
+	method string BuffEffectText(table b)
+		return self:EffectTextWith(b.def, b.bonus or 0)
+	end
+
+	method string EffectTextWith(table def, number bonus)
 		local parts = {}
 		local I = _RtsHudLogic
-		if def.fin ~= nil then parts[#parts + 1] = "최종 데미지 +" .. I:Int(def.fin) .. "%" end
-		if def.crit ~= nil then parts[#parts + 1] = "크리티컬 확률 +" .. I:Int(def.crit) .. "%" end
-		if def.critDmg ~= nil then parts[#parts + 1] = "크리티컬 데미지 +" .. I:Int(def.critDmg) .. "%" end
+		if def.fin ~= nil then parts[#parts + 1] = "최종 데미지 +" .. I:Num(def.fin + bonus) .. "%" end
+		if def.crit ~= nil then parts[#parts + 1] = "크리티컬 확률 +" .. I:Num(def.crit + bonus) .. "%" end
+		if def.critDmg ~= nil then parts[#parts + 1] = "크리티컬 데미지 +" .. I:Num(def.critDmg + bonus) .. "%" end
 		return table.concat(parts, " · ")
+	end
+
+	-- 출처 유닛 src의 직업 증강이 이 버프에 더하는 값(없으면 0)
+	method number BonusOf(table def, any src)
+		if def.bonus == nil or src == nil or src.Augs == nil or src.Augs == "" then return 0 end
+		return _RtsAugmentTableLogic:Totals(src.Augs)[def.bonus] or 0
 	end
 
 	-- 범위 글자: "모든 유닛" / "지정 유닛 1개"
@@ -48,7 +64,7 @@ script RtsUnitBuffLogic extends Logic
 
 	-- ===== 계산 =====
 
-	-- 구역 zone의 유닛 no에 걸린 버프 목록: { def, srcNo, srcJob, srcLevel }. 출처 유닛 번호 순, id 중복 제거(출처는 화면에 안 씀)
+	-- 구역 zone의 유닛 no에 걸린 버프 목록: { def, srcNo, srcJob, srcLevel, bonus }. 출처 유닛 번호 순, id 중복 제거 — 같은 버프를 주는 유닛이 여럿이면 증강 보너스가 가장 큰 쪽(출처는 화면에 안 씀)
 	--   서버(RtsCombatLogic.DoAttack — 실제 크리·최종 데미지)와 클라(팝업·타일 버프 개수) 둘 다 부른다
 	method table GetBuffsFor(number zone, number no)
 		local out = {}
@@ -64,9 +80,15 @@ script RtsUnitBuffLogic extends Logic
 			if src ~= nil then
 				for i = 1, #defs do
 					local d = defs[i]
-					if d.job == src.JobId and src.Level >= d.lv and seen[d.id] == nil and (d.prism == nil or _RtsJobTableLogic:HasPrism(src, d.prism)) and self:InScope(d, src, me) then
-						seen[d.id] = true
-						out[#out + 1] = { def = d, srcNo = srcNo, srcJob = src.JobId, srcLevel = src.Level }
+					if d.job == src.JobId and src.Level >= d.lv and (d.prism == nil or _RtsJobTableLogic:HasPrism(src, d.prism)) and self:InScope(d, src, me) then
+						local item = { def = d, srcNo = srcNo, srcJob = src.JobId, srcLevel = src.Level, bonus = self:BonusOf(d, src) }
+						local at = seen[d.id]
+						if at == nil then
+							out[#out + 1] = item
+							seen[d.id] = #out
+						elseif item.bonus > (out[at].bonus or 0) then
+							out[at] = item
+						end
 					end
 				end
 			end
@@ -78,7 +100,7 @@ script RtsUnitBuffLogic extends Logic
 	method string BuffSig(number zone, number no)
 		local buffs = self:GetBuffsFor(zone, no)
 		local parts = {}
-		for i = 1, #buffs do parts[#parts + 1] = buffs[i].def.id .. ":" .. tostring(buffs[i].def.fin or 0) end
+		for i = 1, #buffs do parts[#parts + 1] = buffs[i].def.id .. ":" .. tostring(buffs[i].def.fin or 0) .. "+" .. tostring(buffs[i].bonus or 0) end
 		return table.concat(parts, ",")
 	end
 
@@ -92,14 +114,15 @@ script RtsUnitBuffLogic extends Logic
 	method void ApplyToStat(table st, table buffs)
 		for i = 1, #buffs do
 			local d = buffs[i].def
-			if d.fin ~= nil then st.fin = st.fin * (100 + d.fin) / 100 end
-			if d.crit ~= nil then st.crit = st.crit + d.crit end
-			if d.critDmg ~= nil then st.critDmg = st.critDmg + d.critDmg end
+			local bonus = buffs[i].bonus or 0
+			if d.fin ~= nil then st.fin = st.fin * (100 + d.fin + bonus) / 100 end
+			if d.crit ~= nil then st.crit = st.crit + d.crit + bonus end
+			if d.critDmg ~= nil then st.critDmg = st.critDmg + d.critDmg + bonus end
 		end
 		if st.crit > 100 then st.crit = 100 end
 	end
 
-	-- 이 유닛에 지정된 증강 목록 { g 등급(bronze/silver/gold/prism), t 이름, d 효과 } — RtsAugmentLogic 보유 목록 중 이 유닛에 지정된 것(2026-09-23)
+	-- 이 유닛에 지정된 증강 목록 { g 등급(normal 일반 / prism — 2026-10-14 브론즈·실버·골드 삭제), t 이름, d 효과 } — RtsAugmentLogic 보유 목록 중 이 유닛에 지정된 것(2026-09-23)
 	@ExecSpace("ClientOnly")
 	method table GetAugmentsFor(number zone, number no)
 		local u = _RtsUnitLogic:GetZoneUnit(zone, no)

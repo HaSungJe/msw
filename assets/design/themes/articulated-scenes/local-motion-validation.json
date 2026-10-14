@@ -1,0 +1,81 @@
+{
+  "type": "local-composition-only",
+  "runtimeVerified": false,
+  "themes": [
+    {
+      "key": "forbidden_altar",
+      "parts": 6,
+      "moving": 5
+    },
+    {
+      "key": "pianus_cave",
+      "parts": 8,
+      "moving": 8
+    },
+    {
+      "key": "twilight_of_gods",
+      "parts": 6,
+      "moving": 6
+    },
+    {
+      "key": "cygnus_garden",
+      "parts": 6,
+      "moving": 6
+    },
+    {
+      "key": "black_heaven_core",
+      "parts": 10,
+      "moving": 10
+    },
+    {
+      "key": "world_tree_summit",
+      "parts": 6,
+      "moving": 6
+    },
+    {
+      "key": "collapsing_clocktower",
+      "parts": 9,
+      "moving": 9
+    },
+    {
+      "key": "diffraction_hall",
+      "parts": 6,
+      "moving": 6
+    },
+    {
+      "key": "eye_of_void",
+      "parts": 9,
+      "moving": 9
+    },
+    {
+      "key": "altar_of_desire",
+      "parts": 8,
+      "moving": 8
+    },
+    {
+      "key": "near_the_end",
+      "parts": 8,
+      "moving": 8
+    },
+    {
+      "key": "dark_temple",
+      "parts": 6,
+      "moving": 6
+    },
+    {
+      "key": "dark_throne",
+      "parts": 6,
+      "moving": 6
+    },
+    {
+      "key": "boundary_of_beginning_and_end",
+      "parts": 22,
+      "moving": 22
+    },
+    {
+      "key": "nonexistent_space",
+      "parts": 22,
+      "moving": 22
+    }
+  ]
+}

@@ -189,7 +189,7 @@ script RtsProfileLogic extends Logic
 
 	method string ThemeOf(string userId)
 		local k = self.ThemeByUser[userId]
-		if k == nil or k == "" then return _RtsThemeLogic.DefaultKey end
+		if k == nil or not _RtsThemeLogic:HasKey(k) then return _RtsThemeLogic.DefaultKey end
 		return k
 	end
 
@@ -252,6 +252,7 @@ script RtsProfileLogic extends Logic
 			if c7 == 0 and v7 == "dark" then uiMode = "dark" end
 			_RtsConfigLogic:Log("RtsUiMode: load code=" .. tostring(c7) .. " mode=" .. uiMode)
 		end
+		theme = self:MigrateActionTheme(ds, readTheme, theme)
 		local owned = self:ParseIcons(packed)
 		local themeSet = self:ParseKeys(themes)
 		local tombSet = self:ParseKeys(tombs)
@@ -273,6 +274,15 @@ script RtsProfileLogic extends Logic
 		self.TombsByUser[userId] = tombSet
 		self.UiModeByUser[userId] = uiMode
 		_RtsConfigLogic:Log("RtsProfile: load " .. userId .. " theme=" .. theme .. " icon=" .. icon .. " tomb=" .. tomb .. " owned=" .. string.format("%d", self:CountOwned(owned)))
+	end
+
+	-- 읽기 성공한 과거 액션 선택만 이관한다. 실패한 읽기·일반 선택은 저장하지 않는다.
+	@ExecSpace("ServerOnly")
+	method string MigrateActionTheme(any ds, boolean loaded, string theme)
+		if ds == nil or not loaded or _RtsActionThemeLogic:GetDefinition(theme) == nil then return theme end
+		local fallback = _RtsThemeLogic.DefaultKey
+		self:SaveDefault(ds, self.ThemeKey, fallback)
+		return fallback
 	end
 
 	-- 기본값 저장(입장 때 빈 선택 키) — 실패는 로그만(다음 입장 때 다시)

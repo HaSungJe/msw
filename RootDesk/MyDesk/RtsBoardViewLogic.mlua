@@ -86,6 +86,10 @@ script RtsBoardViewLogic extends Logic
 		local halfH = _RtsConfigLogic:GetZonePitchY() / 2
 		if self._T.Hidden == nil then self._T.Hidden = {} end
 		local hidden = self._T.Hidden
+		local bossRound = _RtsThemeLogic:GetBossTheme(zone) ~= ""
+		local background = self:BoardChild("ZoneBackground" .. string.format("%d", zone))
+		local actionTheme = isvalid(background) and background.SpriteRendererComponent ~= nil
+			and _RtsActionThemeLogic:GetByBackground(background.SpriteRendererComponent.SpriteRUID) ~= nil
 		for entity, visible in pairs(hidden) do
 			if not isvalid(entity) then hidden[entity] = nil end
 		end
@@ -95,6 +99,9 @@ script RtsBoardViewLogic extends Logic
 				local p = entity.TransformComponent.Position
 				local show = math.abs(p.x - center.x) < halfW and math.abs(p.y - center.y) < halfH
 				if backgroundZone ~= nil then show = backgroundZone == zone end
+				-- 액션 테마는 라운드/탈락 상태와 관계없이 트랙·격자를 숨긴다. 설치 마커는 별도다.
+				local gridZone = tonumber(string.match(entity.Name, "^ZoneGrid(%d+)$"))
+				if gridZone ~= nil and (bossRound or actionTheme) then show = false end
 				if not show then
 					if hidden[entity] == nil then hidden[entity] = entity.Visible end
 					entity.Visible = false
@@ -102,20 +109,7 @@ script RtsBoardViewLogic extends Logic
 					entity.Visible = hidden[entity]
 					hidden[entity] = nil
 				end
-				if backgroundZone == zone then
-					local low = _UILogic:ScreenToWorldPosition(Vector2.zero)
-					local high = _UILogic:ScreenToWorldPosition(Vector2(_UILogic.ScreenWidth, _UILogic.ScreenHeight))
-					local cover = math.max(math.abs(high.x - low.x) / (1920 / 100), math.abs(high.y - low.y) / (1080 / 100))
-					local scale = cover / root.TransformComponent.Scale.x
-					local sx = scale
-					local sy = scale
-					if entity.SpriteRendererComponent.SpriteRUID == _RtsActionThemeLogic.BackgroundRUID then
-						sx = sx * 1920 / 1672
-						sy = sy * 1080 / 941
-					end
-					entity.TransformComponent.Scale = Vector3(sx, sy, 1)
-					entity.TransformComponent.Position = root.TransformComponent:ToLocalPoint(Vector3((low.x + high.x) / 2, (low.y + high.y) / 2, 0))
-				end
+				if backgroundZone == zone then self:PositionBackground(entity) end
 			end
 		end
 	end
@@ -159,6 +153,28 @@ script RtsBoardViewLogic extends Logic
 		t.Position = Vector3((lo.x + hi.x) / 2 - center.x * scale, (lo.y + hi.y) / 2 - (center.y + 0.6) * scale, 0)
 		self._T.LayoutKey = signature
 		_RtsConfigLogic:Log("RtsBoardView: scale=" .. tostring(scale) .. " zone=" .. tostring(zone))
+	end
+
+	@ExecSpace("ClientOnly")
+	method void PositionBackground(Entity entity)
+		local root = self:GetRoot()
+		if root == nil or not isvalid(entity) then return end
+		local low = _UILogic:ScreenToWorldPosition(Vector2.zero)
+		local high = _UILogic:ScreenToWorldPosition(Vector2(_UILogic.ScreenWidth, _UILogic.ScreenHeight))
+		local cover = math.max(math.abs(high.x-low.x)/19.2, math.abs(high.y-low.y)/10.8)
+		local scale = cover / root.TransformComponent.Scale.x
+		local sx, sy = scale, scale
+		local x, y = (low.x+high.x)/2, (low.y+high.y)/2
+		local action = _RtsActionThemeLogic:GetByBackground(entity.SpriteRendererComponent.SpriteRUID)
+		if action ~= nil then
+			local motion = _RtsActionThemeLogic:GetSceneMotion()
+			sx = sx * 1920 / action.w * motion.zoom
+			sy = sy * 1080 / action.h * motion.zoom
+			x = x + (high.x-low.x) * motion.x
+			y = y + (high.y-low.y) * motion.y
+		end
+		entity.TransformComponent.Scale = Vector3(sx, sy, 1)
+		entity.TransformComponent.Position = root.TransformComponent:ToLocalPoint(Vector3(x,y,0))
 	end
 
 end

@@ -1,0 +1,37 @@
+{
+  "query": "혼테일 몸통",
+  "results": [
+    {
+      "id": "15d9d8d595644e96bb5d3739cb83b809",
+      "type": "sprite",
+      "category": "npc",
+      "dname": "sprite-9026544",
+      "payload": {
+        "width": 124,
+        "height": 136
+      }
+    },
+    {
+      "id": "b3f7d393da4d42fdb0de0d9acbd4661f",
+      "type": "sprite",
+      "category": "mob",
+      "dname": "sprite-12934748",
+      "payload": {
+        "width": 296,
+        "height": 436
+      }
+    },
+    {
+      "id": "441be2cede5946b5bfb8bf460c1cd17e",
+      "type": "sprite",
+      "category": "mob",
+      "dname": "sprite-12985146",
+      "payload": {
+        "width": 60,
+        "height": 96
+      }
+    }
+  ],
+  "nextOffset": 3,
+  "exactMatch": false
+}

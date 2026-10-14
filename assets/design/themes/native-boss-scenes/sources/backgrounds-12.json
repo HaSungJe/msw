@@ -1,0 +1,37 @@
+{
+  "query": "검은마법사 어둠의 왕좌 배경",
+  "results": [
+    {
+      "id": "c99d88cfa9ad4ddc987a9f8602f35491",
+      "type": "sprite",
+      "category": "background",
+      "dname": "sprite-9096625",
+      "payload": {
+        "width": 100,
+        "height": 100
+      }
+    },
+    {
+      "id": "f5d2d625aa2549609dd6faef6331b19e",
+      "type": "sprite",
+      "category": "background",
+      "dname": "sprite-9098266",
+      "payload": {
+        "width": 800,
+        "height": 756
+      }
+    },
+    {
+      "id": "89fcdf76b8a0426a903f5a465d8a5676",
+      "type": "sprite",
+      "category": "background",
+      "dname": "sprite-9094367",
+      "payload": {
+        "width": 508,
+        "height": 108
+      }
+    }
+  ],
+  "nextOffset": 3,
+  "exactMatch": false
+}

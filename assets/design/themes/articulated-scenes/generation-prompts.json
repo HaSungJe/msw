@@ -1,0 +1,212 @@
+[
+  {
+    "key": "forbidden_altar",
+    "folder": "forbidden-altar",
+    "kind": "bg",
+    "source": "C:\\Users\\timec\\.codex\\generated_images\\01a0dbf3-5094-7520-bfc7-f24b6496f5e5\\exec-fcc0515a-9787-4217-9ed4-0e02156795a9.png",
+    "prompt": "Edit target: attached approved MapleStory-style boss scene. Remove ONLY Junior Balrog brown muscular horned demon with bat wings and its attached aura/shadow from the center. Reconstruct the background hidden by the boss naturally. Preserve exact environment, camera framing, perspective, clean line art, palette and all architecture. For Pink Bean preserve ALL FIVE stone statues and the central platform. No characters, no monsters, no text, no UI. Full landscape background, same aspect ratio."
+  },
+  {
+    "key": "forbidden_altar",
+    "folder": "forbidden-altar",
+    "kind": "atlas",
+    "source": "C:\\Users\\timec\\.codex\\generated_images\\01a0dbf3-5094-7520-bfc7-f24b6496f5e5\\exec-3bc6955e-d23d-4b97-b280-111706ed85e4.png",
+    "prompt": "Use case: background-extraction. Reference: approved boss scene attached, preserve EXACT boss identity, face, costume, colors and clean cartoon linework. Make a production puppet SPRITE ATLAS for Junior Balrog brown muscular horned demon with bat wings, on genuinely transparent background. EXACTLY SIX separated objects in a strict equal 3 columns by 2 rows grid. Read left to right top to bottom: body with both legs but NO head NO arms NO wings; separate horned head with neck; separate left arm with hand; separate right arm with hand; separate left bat wing; separate right bat wing. Each object completely inside its own cell with 8% transparent padding. NO object overlaps or touches other cells. Draw complete hidden joint ends for overlap when assembled. No scenery, no shadows on a floor, no labels, no lines/grid, no text. Parts are disassembled, never a full character duplicated. Large 1536x1024 landscape atlas. Keep anatomical sides consistent with reference."
+  },
+  {
+    "key": "pianus_cave",
+    "folder": "pianus-cave",
+    "kind": "bg",
+    "source": "C:\\Users\\timec\\.codex\\generated_images\\01a0dbf3-5094-7520-bfc7-f24b6496f5e5\\exec-6eb1e65a-0f70-46fa-94e6-d7a1aab9edc1.png",
+    "prompt": "Edit target: attached approved MapleStory-style boss scene. Remove ONLY Pianus giant orange fish facing left and its attached aura/shadow from the center. Reconstruct the background hidden by the boss naturally. Preserve exact environment, camera framing, perspective, clean line art, palette and all architecture. For Pink Bean preserve ALL FIVE stone statues and the central platform. No characters, no monsters, no text, no UI. Full landscape background, same aspect ratio."
+  },
+  {
+    "key": "pianus_cave",
+    "folder": "pianus-cave",
+    "kind": "atlas",
+    "source": "C:\\Users\\timec\\.codex\\generated_images\\01a0dbf3-5094-7520-bfc7-f24b6496f5e5\\exec-e449606a-2b1b-4c49-acfc-62ad3597786a.png",
+    "prompt": "Use case: background-extraction. Reference: approved boss scene attached, preserve EXACT boss identity, face, costume, colors and clean cartoon linework. Make a production puppet SPRITE ATLAS for Pianus giant orange fish facing left, on genuinely transparent background. EXACTLY SIX separated objects in a strict equal 3 columns by 2 rows grid. Read left to right top to bottom: main fish body including face but NO fins; separate upper dorsal fin; separate lower belly fin; separate side pectoral fin; separate tail fin; small transparent water bubble cluster. Each object completely inside its own cell with 8% transparent padding. NO object overlaps or touches other cells. Draw complete hidden joint ends for overlap when assembled. No scenery, no shadows on a floor, no labels, no lines/grid, no text. Parts are disassembled, never a full character duplicated. Large 1536x1024 landscape atlas. Keep anatomical sides consistent with reference."
+  },
+  {
+    "key": "twilight_of_gods",
+    "folder": "twilight-of-gods",
+    "kind": "bg",
+    "source": "C:\\Users\\timec\\.codex\\generated_images\\01a0dbf3-5094-7520-bfc7-f24b6496f5e5\\exec-1cf479bf-e96f-47a7-b61c-e16042715843.png",
+    "prompt": "Edit target: attached approved MapleStory-style boss scene. Remove ONLY Pink Bean pink round creature with purple horns and white belly and its attached aura/shadow from the center. Reconstruct the background hidden by the boss naturally. Preserve exact environment, camera framing, perspective, clean line art, palette and all architecture. For Pink Bean preserve ALL FIVE stone statues and the central platform. No characters, no monsters, no text, no UI. Full landscape background, same aspect ratio."
+  },
+  {
+    "key": "twilight_of_gods",
+    "folder": "twilight-of-gods",
+    "kind": "atlas",
+    "source": "C:\\Users\\timec\\.codex\\generated_images\\01a0dbf3-5094-7520-bfc7-f24b6496f5e5\\exec-e5a5d2d9-fb68-4e37-b14e-d97f9170c1f5.png",
+    "prompt": "Use case: background-extraction. Reference: approved boss scene attached, preserve EXACT boss identity, face, costume, colors and clean cartoon linework. Make a production puppet SPRITE ATLAS for Pink Bean pink round creature with purple horns and white belly, on genuinely transparent background. EXACTLY SIX separated objects in a strict equal 3 columns by 2 rows grid. Read left to right top to bottom: body with head and feet but NO arms and NO tail; separate left arm; separate right arm; separate long curved tail with purple ball tip; small purple musical sparkle; small pink musical sparkle. Each object completely inside its own cell with 8% transparent padding. NO object overlaps or touches other cells. Draw complete hidden joint ends for overlap when assembled. No scenery, no shadows on a floor, no labels, no lines/grid, no text. Parts are disassembled, never a full character duplicated. Large 1536x1024 landscape atlas. Keep anatomical sides consistent with reference."
+  },
+  {
+    "key": "cygnus_garden",
+    "folder": "cygnus-garden",
+    "kind": "bg",
+    "source": "C:\\Users\\timec\\.codex\\generated_images\\01a0dbf3-5094-7520-bfc7-f24b6496f5e5\\exec-e9440431-9102-4891-bb59-bfbb679a53e9.png",
+    "prompt": "Edit target: attached approved MapleStory-style boss scene. Remove ONLY Cygnus floating white-haired empress in purple gold gown and its attached aura/shadow from the center. Reconstruct the background hidden by the boss naturally. Preserve exact environment, camera framing, perspective, clean line art, palette and all architecture. For Pink Bean preserve ALL FIVE stone statues and the central platform. No characters, no monsters, no text, no UI. Full landscape background, same aspect ratio."
+  },
+  {
+    "key": "cygnus_garden",
+    "folder": "cygnus-garden",
+    "kind": "atlas",
+    "source": "C:\\Users\\timec\\.codex\\generated_images\\01a0dbf3-5094-7520-bfc7-f24b6496f5e5\\exec-57d9f2f7-5aca-419c-acea-d62cbef34002.png",
+    "prompt": "Use case: background-extraction. Reference: approved boss scene attached, preserve EXACT boss identity, face, costume, colors and clean cartoon linework. Make a production puppet SPRITE ATLAS for Cygnus floating white-haired empress in purple gold gown, on genuinely transparent background. EXACTLY SIX separated objects in a strict equal 3 columns by 2 rows grid. Read left to right top to bottom: main complete character head torso arms and legs with short central gown, but NO long hair tails NO long flowing dress side panels and NO halo; separate long trailing hair lock; separate left flowing purple gold dress panel; separate right flowing purple gold dress panel; separate dark ornate halo; separate curved purple magic wisp. Each object completely inside its own cell with 8% transparent padding. NO object overlaps or touches other cells. Draw complete hidden joint ends for overlap when assembled. No scenery, no shadows on a floor, no labels, no lines/grid, no text. Parts are disassembled, never a full character duplicated. Large 1536x1024 landscape atlas. Keep anatomical sides consistent with reference."
+  },
+  {
+    "key": "black_heaven_core",
+    "folder": "black-heaven-core",
+    "kind": "bg",
+    "source": "C:\\Users\\timec\\.codex\\generated_images\\01a0dbf3-5094-7520-bfc7-f24b6496f5e5\\exec-5bfa099c-c83d-43c2-8676-f93de9035a0e.png",
+    "prompt": "Edit target: attached approved boss scene. Remove ONLY the small white-haired boy Lotus floating inside the cyan central core (remove only the boy, preserve the whole machine and glowing ring) and attached character aura/shadow. Reconstruct hidden background. Preserve architecture, machinery, camera, palette, clean cartoon style, framing and all environment objects. Empty boss arena, no characters, no UI/text, same landscape ratio."
+  },
+  {
+    "key": "black_heaven_core",
+    "folder": "black-heaven-core",
+    "kind": "atlas",
+    "source": "C:\\Users\\timec\\.codex\\generated_images\\01a0dbf3-5094-7520-bfc7-f24b6496f5e5\\exec-63d6855c-eba6-40bf-829f-966b84c7d13e.png",
+    "prompt": "Use case: background-extraction. Attached image is approved identity reference. Make a production puppet SPRITE ATLAS of the small white-haired boy Lotus floating inside the cyan central core (remove only the boy, preserve the whole machine and glowing ring). Preserve exact face/costume/colors/clean cartoon line art. Genuine transparent alpha. EXACT SIX separated objects in equal 3 columns by 2 rows, left-to-right then next row: complete small white-haired boy in blue coat, no long rear hair locks; separate left trailing white hair lock; separate right trailing white hair lock; bright cyan circular soft core glow; small orange electrical flame; small cyan electrical arc. Each object fully in its own cell with 8% clear padding. No overlap, no grid/labels/text/scenery. Complete joint ends so separated parts can overlap for rig animation. 1536x1024 landscape. Do not add any limb to body when listed separately."
+  },
+  {
+    "key": "world_tree_summit",
+    "folder": "world-tree-summit",
+    "kind": "bg",
+    "source": "C:\\Users\\timec\\.codex\\generated_images\\01a0dbf3-5094-7520-bfc7-f24b6496f5e5\\exec-6c2de844-2dc3-43ec-912e-54b495d2c89e.png",
+    "prompt": "Edit target: attached approved boss scene. Remove ONLY Damien the dark masked sword-wielding boy with purple black flame wings and attached character aura/shadow. Reconstruct hidden background. Preserve architecture, machinery, camera, palette, clean cartoon style, framing and all environment objects. Empty boss arena, no characters, no UI/text, same landscape ratio."
+  },
+  {
+    "key": "world_tree_summit",
+    "folder": "world-tree-summit",
+    "kind": "atlas",
+    "source": "C:\\Users\\timec\\.codex\\generated_images\\01a0dbf3-5094-7520-bfc7-f24b6496f5e5\\exec-6147ed19-1415-412e-8219-cac74f205449.png",
+    "prompt": "Use case: background-extraction. Attached image is approved identity reference. Make a production puppet SPRITE ATLAS of Damien the dark masked sword-wielding boy with purple black flame wings. Preserve exact face/costume/colors/clean cartoon line art. Genuine transparent alpha. EXACT SIX separated objects in equal 3 columns by 2 rows, left-to-right then next row: complete small masked dark boy with sword but NO wings; separate left black magenta flame wing; separate right black magenta flame wing; separate flowing red scarf tail; small bright magenta flame tuft; another curved magenta flame tuft. Each object fully in its own cell with 8% clear padding. No overlap, no grid/labels/text/scenery. Complete joint ends so separated parts can overlap for rig animation. 1536x1024 landscape. Do not add any limb to body when listed separately."
+  },
+  {
+    "key": "collapsing_clocktower",
+    "folder": "collapsing-clocktower",
+    "kind": "bg",
+    "source": "C:\\Users\\timec\\.codex\\generated_images\\01a0dbf3-5094-7520-bfc7-f24b6496f5e5\\exec-01e49085-a501-455f-81db-09dddf7e75ac.png",
+    "prompt": "Edit target: attached approved boss scene. Remove ONLY Lucid the pink-haired girl with large glowing butterfly wings in the center and attached character aura/shadow. Reconstruct hidden background. Preserve architecture, machinery, camera, palette, clean cartoon style, framing and all environment objects. Empty boss arena, no characters, no UI/text, same landscape ratio."
+  },
+  {
+    "key": "collapsing_clocktower",
+    "folder": "collapsing-clocktower",
+    "kind": "atlas",
+    "source": "C:\\Users\\timec\\.codex\\generated_images\\01a0dbf3-5094-7520-bfc7-f24b6496f5e5\\exec-439836e4-2e1c-438b-b368-c1f736338972.png",
+    "prompt": "Use case: background-extraction. Attached image is approved identity reference. Make a production puppet SPRITE ATLAS of Lucid the pink-haired girl with large glowing butterfly wings in the center. Preserve exact face/costume/colors/clean cartoon line art. Genuine transparent alpha. EXACT SIX separated objects in equal 3 columns by 2 rows, left-to-right then next row: complete pink-haired girl with black dress and hat but NO wings; separate left full butterfly wing; separate right full butterfly wing; small golden butterfly; small pink petal; small glowing purple butterfly. Each object fully in its own cell with 8% clear padding. No overlap, no grid/labels/text/scenery. Complete joint ends so separated parts can overlap for rig animation. 1536x1024 landscape. Do not add any limb to body when listed separately."
+  },
+  {
+    "key": "diffraction_hall",
+    "folder": "diffraction-hall",
+    "kind": "bg",
+    "source": "C:\\Users\\timec\\.codex\\generated_images\\01a0dbf3-5094-7520-bfc7-f24b6496f5e5\\exec-a1351387-41fe-4446-b3e2-f90e5409c9bf.png",
+    "prompt": "Edit target: attached approved boss scene. Remove ONLY Will the white-haired bespectacled man and his hovering magic book and attached character aura/shadow. Reconstruct hidden background. Preserve architecture, machinery, camera, palette, clean cartoon style, framing and all environment objects. Empty boss arena, no characters, no UI/text, same landscape ratio."
+  },
+  {
+    "key": "diffraction_hall",
+    "folder": "diffraction-hall",
+    "kind": "atlas",
+    "source": "C:\\Users\\timec\\.codex\\generated_images\\01a0dbf3-5094-7520-bfc7-f24b6496f5e5\\exec-8f5206ec-ef64-48df-a57e-d53a5aa1dd5d.png",
+    "prompt": "Use case: background-extraction. Attached image is approved identity reference. Make a production puppet SPRITE ATLAS of Will the white-haired bespectacled man and his hovering magic book. Preserve exact face/costume/colors/clean cartoon line art. Genuine transparent alpha. EXACT SIX separated objects in equal 3 columns by 2 rows, left-to-right then next row: main man head torso legs with short coat but NO arms NO long coat tails NO book; separate raised left arm with hand; separate right arm; separate complete open floating red magic book; separate left long white gold coat tail; separate right long white gold coat tail. Each object fully in its own cell with 8% clear padding. No overlap, no grid/labels/text/scenery. Complete joint ends so separated parts can overlap for rig animation. 1536x1024 landscape. Do not add any limb to body when listed separately."
+  },
+  {
+    "key": "eye_of_void",
+    "folder": "eye-of-void",
+    "kind": "bg",
+    "source": "C:\\Users\\timec\\.codex\\generated_images\\01a0dbf3-5094-7520-bfc7-f24b6496f5e5\\exec-75d87321-0dd3-4483-8f7d-b4c6235e6626.png",
+    "prompt": "Edit target: approved scene attached. Remove ONLY the entire huge Dusk stone monster including central stone ring, four petal arms, floating chained rocks and purple core (leave ONLY dark cloudy sky and foreground walkway). Reconstruct hidden environment naturally; preserve exact camera, framing, clean cartoon style, colors, perspective and all other environment details. Full empty boss arena landscape. No monsters, people, UI or text."
+  },
+  {
+    "key": "altar_of_desire",
+    "folder": "altar-of-desire",
+    "kind": "bg",
+    "source": "C:\\Users\\timec\\.codex\\generated_images\\01a0dbf3-5094-7520-bfc7-f24b6496f5e5\\exec-0e5cc951-a240-4781-ae10-54b67435fa69.png",
+    "prompt": "Edit target: approved scene attached. Remove ONLY red-haired Verus Hilla with scythe and green personal aura. Reconstruct hidden environment naturally; preserve exact camera, framing, clean cartoon style, colors, perspective and all other environment details. Full empty boss arena landscape. No monsters, people, UI or text."
+  },
+  {
+    "key": "near_the_end",
+    "folder": "near-the-end",
+    "kind": "bg",
+    "source": "C:\\Users\\timec\\.codex\\generated_images\\01a0dbf3-5094-7520-bfc7-f24b6496f5e5\\exec-37f440c0-cd8f-4f88-bc0d-82a4ab58a738.png",
+    "prompt": "Edit target: approved scene attached. Remove ONLY Dunkel black armored horned knight with large sword (preserve huge red sphere in background). Reconstruct hidden environment naturally; preserve exact camera, framing, clean cartoon style, colors, perspective and all other environment details. Full empty boss arena landscape. No monsters, people, UI or text."
+  },
+  {
+    "key": "dark_temple",
+    "folder": "dark-temple",
+    "kind": "bg",
+    "source": "C:\\Users\\timec\\.codex\\generated_images\\01a0dbf3-5094-7520-bfc7-f24b6496f5e5\\exec-d15476d6-3317-46a5-b574-1ff4e6938a97.png",
+    "prompt": "Edit target: approved scene attached. Remove ONLY both white and black sword-bearing spectral guardians with their body chains and attached flame effects (preserve temple architecture chains). Reconstruct hidden environment naturally; preserve exact camera, framing, clean cartoon style, colors, perspective and all other environment details. Full empty boss arena landscape. No monsters, people, UI or text."
+  },
+  {
+    "key": "dark_throne",
+    "folder": "dark-throne",
+    "kind": "bg",
+    "source": "C:\\Users\\timec\\.codex\\generated_images\\01a0dbf3-5094-7520-bfc7-f24b6496f5e5\\exec-fc5bcb0f-f65c-488d-87e1-81ad74558e57.png",
+    "prompt": "Edit target: approved scene attached. Remove ONLY the central Black Mage hooded figure and all its red black personal aura. Reconstruct hidden environment naturally; preserve exact camera, framing, clean cartoon style, colors, perspective and all other environment details. Full empty boss arena landscape. No monsters, people, UI or text."
+  },
+  {
+    "key": "boundary_of_beginning_and_end",
+    "folder": "boundary-of-beginning-and-end",
+    "kind": "bg",
+    "source": "C:\\Users\\timec\\.codex\\generated_images\\01a0dbf3-5094-7520-bfc7-f24b6496f5e5\\exec-1a1cd195-5366-4897-93d7-e6ad99241fb4.png",
+    "prompt": "Edit target: approved scene attached. Remove ONLY central vertical white light pillar figure and its oval personal halo and orbs (preserve far background horizontal purple rings). Reconstruct hidden environment naturally; preserve exact camera, framing, clean cartoon style, colors, perspective and all other environment details. Full empty boss arena landscape. No monsters, people, UI or text."
+  },
+  {
+    "key": "nonexistent_space",
+    "folder": "nonexistent-space",
+    "kind": "bg",
+    "source": "C:\\Users\\timec\\.codex\\generated_images\\01a0dbf3-5094-7520-bfc7-f24b6496f5e5\\exec-d6283e85-d0a9-4c4e-80fd-0c74799ceab9.png",
+    "prompt": "Edit target: approved scene attached. Remove ONLY central vertical white light pillar figure and all its dark oval smoke aura and nearby orbiting dots (preserve white void and floor lines). Reconstruct hidden environment naturally; preserve exact camera, framing, clean cartoon style, colors, perspective and all other environment details. Full empty boss arena landscape. No monsters, people, UI or text."
+  },
+  {
+    "key": "eye_of_void",
+    "folder": "eye-of-void",
+    "kind": "atlas",
+    "source": "C:\\Users\\timec\\.codex\\generated_images\\01a0dbf3-5094-7520-bfc7-f24b6496f5e5\\exec-fb311896-d278-42d8-83e5-2f3eb14d9d1a.png",
+    "prompt": "Use case: background-extraction. Approved boss identity reference attached. Make one production puppet SPRITE ATLAS of the entire huge Dusk stone monster including central stone ring, four petal arms, floating chained rocks and purple core (leave ONLY dark cloudy sky and foreground walkway). Preserve exact design, color, proportions and clean cartoon style. Genuine transparent alpha canvas. EXACT SIX separated objects in a strict equal 3 columns by 2 rows grid, in this order: large circular ancient stone ring and tapered lower body with glowing purple opening but NO petal claws; separate upper-left huge stone petal claw; separate upper-right huge stone petal claw; separate lower-left huge stone petal claw; separate lower-right huge stone petal claw; separate floating cracked rock with short chain. All six entire objects fit own cells with 8% clear padding. No overlaps, no labels/text/grid/scenery. Keep complete hidden joint ends for overlap at assembly. 1536x1024 landscape. The body MUST NOT contain the parts listed separately."
+  },
+  {
+    "key": "altar_of_desire",
+    "folder": "altar-of-desire",
+    "kind": "atlas",
+    "source": "C:\\Users\\timec\\.codex\\generated_images\\01a0dbf3-5094-7520-bfc7-f24b6496f5e5\\exec-c455fa54-5dc3-4d04-9c8a-a8027ef4f139.png",
+    "prompt": "Use case: background-extraction. Approved boss identity reference attached. Make one production puppet SPRITE ATLAS of red-haired Verus Hilla with scythe and green personal aura. Preserve exact design, color, proportions and clean cartoon style. Genuine transparent alpha canvas. EXACT SIX separated objects in a strict equal 3 columns by 2 rows grid, in this order: main woman with face torso arms and short dress but NO long hair tails NO scythe NO aura; separate long red trailing hair; separate large complete scythe; separate left black dress tail; separate right black dress tail; green ghostly flame. All six entire objects fit own cells with 8% clear padding. No overlaps, no labels/text/grid/scenery. Keep complete hidden joint ends for overlap at assembly. 1536x1024 landscape. The body MUST NOT contain the parts listed separately."
+  },
+  {
+    "key": "near_the_end",
+    "folder": "near-the-end",
+    "kind": "atlas",
+    "source": "C:\\Users\\timec\\.codex\\generated_images\\01a0dbf3-5094-7520-bfc7-f24b6496f5e5\\exec-ee06fa73-f236-4f50-b112-731800d6fb24.png",
+    "prompt": "Use case: background-extraction. Approved boss identity reference attached. Make one production puppet SPRITE ATLAS of Dunkel black armored horned knight with large sword (preserve huge red sphere in background). Preserve exact design, color, proportions and clean cartoon style. Genuine transparent alpha canvas. EXACT SIX separated objects in a strict equal 3 columns by 2 rows grid, in this order: main complete armored knight with helmet and legs but NO arms NO cape NO sword; separate sword-holding left arm INCLUDING entire huge sword; separate right armored arm; separate trailing black cape; small red eye glow; small black wisps. All six entire objects fit own cells with 8% clear padding. No overlaps, no labels/text/grid/scenery. Keep complete hidden joint ends for overlap at assembly. 1536x1024 landscape. The body MUST NOT contain the parts listed separately."
+  },
+  {
+    "key": "dark_temple",
+    "folder": "dark-temple",
+    "kind": "atlas",
+    "source": "C:\\Users\\timec\\.codex\\generated_images\\01a0dbf3-5094-7520-bfc7-f24b6496f5e5\\exec-a158ad83-cc72-46f5-9ca8-26d783643eed.png",
+    "prompt": "Use case: background-extraction. Approved boss identity reference attached. Make one production puppet SPRITE ATLAS of both white and black sword-bearing spectral guardians with their body chains and attached flame effects (preserve temple architecture chains). Preserve exact design, color, proportions and clean cartoon style. Genuine transparent alpha canvas. EXACT SIX separated objects in a strict equal 3 columns by 2 rows grid, in this order: complete white hooded sword guardian with hands and sword but NO chain halo; complete black hooded sword guardian with hands and sword but NO chain halo; separate white glowing chain halo ring; separate red glowing chain halo ring; separate pink ground flame; separate purple ground flame. All six entire objects fit own cells with 8% clear padding. No overlaps, no labels/text/grid/scenery. Keep complete hidden joint ends for overlap at assembly. 1536x1024 landscape. The body MUST NOT contain the parts listed separately."
+  },
+  {
+    "key": "dark_throne",
+    "folder": "dark-throne",
+    "kind": "atlas",
+    "source": "C:\\Users\\timec\\.codex\\generated_images\\01a0dbf3-5094-7520-bfc7-f24b6496f5e5\\exec-0d5dafc5-fbbb-485f-95b0-2c415b1de02f.png",
+    "prompt": "Use case: background-extraction. Approved boss identity reference attached. Make one production puppet SPRITE ATLAS of the central Black Mage hooded figure and all its red black personal aura. Preserve exact design, color, proportions and clean cartoon style. Genuine transparent alpha canvas. EXACT SIX separated objects in a strict equal 3 columns by 2 rows grid, in this order: hooded main black gold robe torso with hood but NO sleeves and NO lower robe tails NO aura; separate left sleeve; separate right sleeve; separate lower flowing black gold robe skirt; separate sweeping red black energy crescent; separate black smoke puff. All six entire objects fit own cells with 8% clear padding. No overlaps, no labels/text/grid/scenery. Keep complete hidden joint ends for overlap at assembly. 1536x1024 landscape. The body MUST NOT contain the parts listed separately."
+  },
+  {
+    "key": "boundary_of_beginning_and_end",
+    "folder": "boundary-of-beginning-and-end",
+    "kind": "atlas",
+    "source": "C:\\Users\\timec\\.codex\\generated_images\\01a0dbf3-5094-7520-bfc7-f24b6496f5e5\\exec-a3b51ab7-cbd7-4a51-ab20-97d7f373f22c.png",
+    "prompt": "Use case: background-extraction. Approved boss identity reference attached. Make one production puppet SPRITE ATLAS of central vertical white light pillar figure and its oval personal halo and orbs (preserve far background horizontal purple rings). Preserve exact design, color, proportions and clean cartoon style. Genuine transparent alpha canvas. EXACT SIX separated objects in a strict equal 3 columns by 2 rows grid, in this order: central tall narrow white violet luminous pillar figure; separate translucent blue violet flame mantle; separate small white luminous oval orb; separate white violet light streak; separate violet energy crescent; separate small floating purple rock. All six entire objects fit own cells with 8% clear padding. No overlaps, no labels/text/grid/scenery. Keep complete hidden joint ends for overlap at assembly. 1536x1024 landscape. The body MUST NOT contain the parts listed separately."
+  },
+  {
+    "key": "nonexistent_space",
+    "folder": "nonexistent-space",
+    "kind": "atlas",
+    "source": "C:\\Users\\timec\\.codex\\generated_images\\01a0dbf3-5094-7520-bfc7-f24b6496f5e5\\exec-6a62fe30-b973-45c0-ac49-6f696b2c2c79.png",
+    "prompt": "Use case: background-extraction. Approved boss identity reference attached. Make one production puppet SPRITE ATLAS of central vertical white light pillar figure and all its dark oval smoke aura and nearby orbiting dots (preserve white void and floor lines). Preserve exact design, color, proportions and clean cartoon style. Genuine transparent alpha canvas. EXACT SIX separated objects in a strict equal 3 columns by 2 rows grid, in this order: central tall narrow white light pillar figure; separate soft dark gray oval smoke ring with transparent center; separate small dark gray orb; separate small white radiant orb; separate gray curved smoke wisp; separate narrow white luminous streak. All six entire objects fit own cells with 8% clear padding. No overlaps, no labels/text/grid/scenery. Keep complete hidden joint ends for overlap at assembly. 1536x1024 landscape. The body MUST NOT contain the parts listed separately."
+  }
+]

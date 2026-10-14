@@ -1,0 +1,37 @@
+{
+  "query": "자쿰 제단",
+  "results": [
+    {
+      "id": "27e4c7199ca74ddd8c7d7aa47a966458",
+      "type": "sprite",
+      "category": "background",
+      "dname": "sprite-9090916",
+      "payload": {
+        "width": 280,
+        "height": 316
+      }
+    },
+    {
+      "id": "2d16d3ddc5d34eee8f36b31ae3d00462",
+      "type": "sprite",
+      "category": "background",
+      "dname": "sprite-9091092",
+      "payload": {
+        "width": 44,
+        "height": 28
+      }
+    },
+    {
+      "id": "c64a11222f144f6998021ff8c12d9fc7",
+      "type": "sprite",
+      "category": "background",
+      "dname": "sprite-9096753",
+      "payload": {
+        "width": 1700,
+        "height": 948
+      }
+    }
+  ],
+  "nextOffset": 3,
+  "exactMatch": false
+}

@@ -1,0 +1,37 @@
+{
+  "query": "검은마법사 어둠의 신전 배경",
+  "results": [
+    {
+      "id": "b8bcdd58b19341499f8c9ac65ecfa2e7",
+      "type": "sprite",
+      "category": "background",
+      "dname": "sprite-9096053",
+      "payload": {
+        "width": 800,
+        "height": 152
+      }
+    },
+    {
+      "id": "9fe435b283784a7db0f575045707fe69",
+      "type": "sprite",
+      "category": "background",
+      "dname": "sprite-9095210",
+      "payload": {
+        "width": 600,
+        "height": 732
+      }
+    },
+    {
+      "id": "1a57a22b92c0458ca6bec47f60b17c08",
+      "type": "sprite",
+      "category": "background",
+      "dname": "sprite-9090440",
+      "payload": {
+        "width": 260,
+        "height": 168
+      }
+    }
+  ],
+  "nextOffset": 3,
+  "exactMatch": false
+}

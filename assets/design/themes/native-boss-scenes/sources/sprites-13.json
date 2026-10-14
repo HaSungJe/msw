@@ -1,0 +1,74 @@
+{
+  "query": "검은마법사 하얀 공간",
+  "results": [
+    {
+      "id": "c68bcff699794f0fb812d282c686c6cd",
+      "type": "animationclip",
+      "category": "object",
+      "dname": "animationclip-52324",
+      "payload": {
+        "frames": [
+          "a8f4e02669954a1e861e62bc89fa7d44",
+          "20f53eea169041c9a530368597062b21",
+          "2ba18b7852f54e2e9a475b77b3d50642",
+          "015891c4d8d545b8abb681015bb363f1",
+          "52a6fa3bbbc445ae913cf75dede24b2e",
+          "eec1cad50d58416186452f950203fa3d",
+          "25185f43b5284b67a643de1f9f213354",
+          "8f5c7ee7d44344ad887e03553aa05991",
+          "0648bfc672e34ea8bcda6c69a48a888d",
+          "85f2b08d6a6c4789a3ee0b95793a70ba",
+          "86e94679b53b4aeb8ae55dbb967e97cc",
+          "dca2af004cdc483a991d1d1d4b7f218e",
+          "0b6fab26811f45f9b1a596d2da1f3eed",
+          "705b97d0de82455496ee56ecde532026",
+          "602380e8473e4beda1c70236906129b8",
+          "77e79dcbd92648938e1cd69426532ed4",
+          "4180c82d2e8341f7b27aa8567c468b51",
+          "818c910304444f7e9ee8a9441ee3b0ef"
+        ],
+        "width": 318,
+        "height": 413
+      }
+    },
+    {
+      "id": "22c968fe5e1e46ac91986b8a44481044",
+      "type": "animationclip",
+      "category": "object",
+      "dname": "animationclip-50963",
+      "payload": {
+        "frames": [
+          "a9995bb362f0497997fe76b0039a279f",
+          "269cb6e281dc48cd84f3b6d405288568",
+          "90066a7bbd244247a9c8210189697675",
+          "54916a442fa949acadffacc8458b9142",
+          "ed9b99ddf4794cb7ab3d403ffffe7928",
+          "ff9289005a98428a98fe81445378916f",
+          "981430593416481282c12b785f2f5849",
+          "15f7480bea0543aba8caca765cf1dbfd",
+          "7a3e05acb4db45a5a71d407a82e26822",
+          "34f367d785284d0eafdbc7bdbb684e86"
+        ],
+        "width": 44,
+        "height": 100
+      }
+    },
+    {
+      "id": "b52d7854ed0f47e1a765472853fe1722",
+      "type": "animationclip",
+      "category": "object",
+      "dname": "animationclip-52176",
+      "payload": {
+        "frames": [
+          "b34cffb20d2245cd8dacda22316e6e43",
+          "97f5d48696674441b77b4bbff1fe83da",
+          "1bd8894e18354ae8b1276d7cf4088139"
+        ],
+        "width": 119,
+        "height": 56
+      }
+    }
+  ],
+  "nextOffset": 3,
+  "exactMatch": false
+}

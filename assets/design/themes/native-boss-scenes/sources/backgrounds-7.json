@@ -1,0 +1,37 @@
+{
+  "query": "루시드 무너지는 시계탑 배경",
+  "results": [
+    {
+      "id": "b2ec255f21cc4b9f80f06d178b50bb42",
+      "type": "sprite",
+      "category": "background",
+      "dname": "sprite-12845920",
+      "payload": {
+        "width": 108,
+        "height": 312
+      }
+    },
+    {
+      "id": "c6aaf2ef3cba44998fa0d8945e3b7a5b",
+      "type": "sprite",
+      "category": "background",
+      "dname": "sprite-9096573",
+      "payload": {
+        "width": 444,
+        "height": 800
+      }
+    },
+    {
+      "id": "5247f62a04c14810834cec0829354186",
+      "type": "sprite",
+      "category": "background",
+      "dname": "sprite-9092386",
+      "payload": {
+        "width": 116,
+        "height": 108
+      }
+    }
+  ],
+  "nextOffset": 3,
+  "exactMatch": false
+}

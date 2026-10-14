@@ -1,0 +1,37 @@
+{
+  "query": "혼테일 전신",
+  "results": [
+    {
+      "id": "15d9d8d595644e96bb5d3739cb83b809",
+      "type": "sprite",
+      "category": "npc",
+      "dname": "sprite-9026544",
+      "payload": {
+        "width": 124,
+        "height": 136
+      }
+    },
+    {
+      "id": "b3f7d393da4d42fdb0de0d9acbd4661f",
+      "type": "sprite",
+      "category": "mob",
+      "dname": "sprite-12934748",
+      "payload": {
+        "width": 296,
+        "height": 436
+      }
+    },
+    {
+      "id": "26b2f3eac3454881a5bd21e81122bd2d",
+      "type": "sprite",
+      "category": "npc",
+      "dname": "sprite-9028067",
+      "payload": {
+        "width": 224,
+        "height": 284
+      }
+    }
+  ],
+  "nextOffset": 3,
+  "exactMatch": false
+}

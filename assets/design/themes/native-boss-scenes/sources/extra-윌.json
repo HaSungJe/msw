@@ -1,0 +1,669 @@
+{
+  "query": "윌",
+  "results": [
+    {
+      "id": "mob/8880300.img",
+      "type": "resource_pack",
+      "category": "mob",
+      "names": {
+        "zh-hans": [
+          "威尔",
+          "镜中的威尔"
+        ],
+        "zh-hant": [
+          "威爾",
+          "投射在鏡面上的威爾"
+        ],
+        "ko": [
+          "윌",
+          "거울에 비친 윌"
+        ],
+        "en": [
+          "Will"
+        ]
+      },
+      "assetGuid": "8e5d0207bd7f458786248a8aa02cac08",
+      "payload": {
+        "elements": [
+          {
+            "resource_type": "animationclip",
+            "ruid": "856d314a18a2491cb39a20b038f94aa9",
+            "rel_path": "attack1"
+          },
+          {
+            "resource_type": "animationclip",
+            "ruid": "cd9ec5ae33c842848cf81ab7bc6a49d5",
+            "rel_path": "attack2"
+          },
+          {
+            "resource_type": "animationclip",
+            "ruid": "a856dcd7926e41818724436cc5f47fbe",
+            "rel_path": "attack3"
+          },
+          {
+            "resource_type": "animationclip",
+            "ruid": "4b5f8c3302374cac9f20d7c2c2602cfa",
+            "rel_path": "attack4"
+          },
+          {
+            "resource_type": "animationclip",
+            "ruid": "94115d9d18784f03a7bea82ecf3951e7",
+            "rel_path": "attack5"
+          },
+          {
+            "resource_type": "animationclip",
+            "ruid": "675a4d850ab94f7a9a02b0cde5fedb6a",
+            "rel_path": "attack6"
+          },
+          {
+            "resource_type": "animationclip",
+            "ruid": "18b5ec774d6242e68457bfff32054a2e",
+            "rel_path": "die1"
+          },
+          {
+            "resource_type": "animationclip",
+            "ruid": "55b560644bbc49e2a5a99790f221292b",
+            "rel_path": "hit1"
+          },
+          {
+            "resource_type": "animationclip",
+            "ruid": "85fe3bd82dec4e448b1b831068c2fb98",
+            "rel_path": "move"
+          },
+          {
+            "resource_type": "animationclip",
+            "ruid": "3b97013b5ec04acb84ff36229b672266",
+            "rel_path": "skill1"
+          },
+          {
+            "resource_type": "animationclip",
+            "ruid": "55f17bef7ac64cd6938ec0dd14774c2e",
+            "rel_path": "skill2"
+          },
+          {
+            "resource_type": "animationclip",
+            "ruid": "ef9ad8afedcc40e08b0cef51f8c119a6",
+            "rel_path": "skill3"
+          },
+          {
+            "resource_type": "animationclip",
+            "ruid": "b54ef064a8e7409a89eb5ac4b4c93d1a",
+            "rel_path": "skill4"
+          },
+          {
+            "resource_type": "animationclip",
+            "ruid": "06f2e2b380374d1690dd5fe7e04cac70",
+            "rel_path": "skillAfter1"
+          },
+          {
+            "resource_type": "animationclip",
+            "ruid": "949ed99bbc7543dcb54f223099996d86",
+            "rel_path": "stand"
+          },
+          {
+            "resource_type": "effect",
+            "ruid": "b6e93981bc344f95bac6d36277d58b80",
+            "rel_path": "_audio/Attack1"
+          },
+          {
+            "resource_type": "effect",
+            "ruid": "4b1b93dd96c94955a366fa81235cb1a0",
+            "rel_path": "_audio/Attack2"
+          },
+          {
+            "resource_type": "effect",
+            "ruid": "957d0dfa73eb41f38f99eab30acadf8c",
+            "rel_path": "_audio/Attack3"
+          },
+          {
+            "resource_type": "effect",
+            "ruid": "6f04d387b7c641ce83cf2d7945e9cf30",
+            "rel_path": "_audio/Attack4"
+          },
+          {
+            "resource_type": "effect",
+            "ruid": "ac3bd7fc9400434682b3acc758ebbdde",
+            "rel_path": "_audio/Attack5"
+          },
+          {
+            "resource_type": "effect",
+            "ruid": "7e9206261daa421c812e8213cd8682cc",
+            "rel_path": "_audio/Attack6"
+          },
+          {
+            "resource_type": "effect",
+            "ruid": "57e53aecaeff41ffaaaec9b91c2d129c",
+            "rel_path": "_audio/Die"
+          },
+          {
+            "resource_type": "effect",
+            "ruid": "8e004fa3e9884a95821eb3e19ba35cfc",
+            "rel_path": "_audio/Skill2"
+          },
+          {
+            "resource_type": "effect",
+            "ruid": "eb309df1078149dca6bea81b622366dd",
+            "rel_path": "_audio/Skill4"
+          },
+          {
+            "resource_type": "effect",
+            "ruid": "1539ef79c2f14e8fbb266f0879bde261",
+            "rel_path": "_audio/SkillAfter1"
+          },
+          {
+            "resource_type": "sprite",
+            "ruid": "471c1bad24f84e54abf3db10f4e99ff0",
+            "rel_path": "info/thumbnail"
+          },
+          {
+            "resource_type": "animationclip",
+            "ruid": "5a151b9be68d47f2bba8a6155406942f",
+            "rel_path": "attack1/info/hit"
+          },
+          {
+            "resource_type": "animationclip",
+            "ruid": "97bad470293548a29664d89b1b38f0dc",
+            "rel_path": "attack2/info/hit"
+          },
+          {
+            "resource_type": "animationclip",
+            "ruid": "b13d8806d52341dfa50b7f2388f8d22a",
+            "rel_path": "attack3/info/ball"
+          },
+          {
+            "resource_type": "animationclip",
+            "ruid": "73d15823d557400c97587c5e9e72a8e0",
+            "rel_path": "attack3/info/hit"
+          },
+          {
+            "resource_type": "animationclip",
+            "ruid": "21c36c1aef9c4023a48f27fcb3069a4c",
+            "rel_path": "attack4/info/hit"
+          },
+          {
+            "resource_type": "animationclip",
+            "ruid": "51da865259ef41188dc8432fdf6fde5c",
+            "rel_path": "attack5/info/hit"
+          },
+          {
+            "resource_type": "animationclip",
+            "ruid": "cb322bd22f5b4686966f2fc7437ff8d5",
+            "rel_path": "attack6/info/hit"
+          },
+          {
+            "resource_type": "sprite",
+            "ruid": "d271f993bebe44c4bdd7d9bd4b18da6f",
+            "rel_path": "attack1/info/hit/0"
+          },
+          {
+            "resource_type": "sprite",
+            "ruid": "592dd852483e4214b8414c8f3459b49e",
+            "rel_path": "attack1/info/hit/1"
+          },
+          {
+            "resource_type": "sprite",
+            "ruid": "2291ebae4b35491a8ad03a98857ae116",
+            "rel_path": "attack1/info/hit/2"
+          },
+          {
+            "resource_type": "sprite",
+            "ruid": "31a1cbf48c754b8dbc737c67550a7f89",
+            "rel_path": "attack1/info/hit/3"
+          },
+          {
+            "resource_type": "sprite",
+            "ruid": "845c5e8b8fe343dd91ceb3374a432676",
+            "rel_path": "attack1/info/hit/4"
+          },
+          {
+            "resource_type": "sprite",
+            "ruid": "0c51841982984c49b0500395c60fa829",
+            "rel_path": "attack1/info/hit/5"
+          },
+          {
+            "resource_type": "sprite",
+            "ruid": "0ea5167a44ca4c9abdc95832cf24451f",
+            "rel_path": "attack2/info/hit/0"
+          },
+          {
+            "resource_type": "sprite",
+            "ruid": "5bd124b6efa74fdd9e9d4611a4c57ab6",
+            "rel_path": "attack2/info/hit/1"
+          },
+          {
+            "resource_type": "sprite",
+            "ruid": "3fdf267d52c24bce8ee929a07bcc8012",
+            "rel_path": "attack2/info/hit/2"
+          },
+          {
+            "resource_type": "sprite",
+            "ruid": "0de260e91de0403d88edd49235b63982",
+            "rel_path": "attack2/info/hit/3"
+          },
+          {
+            "resource_type": "sprite",
+            "ruid": "9011fae2315b4fb39720163a3757118f",
+            "rel_path": "attack2/info/hit/4"
+          },
+          {
+            "resource_type": "sprite",
+            "ruid": "421237a8116645ae9977e0062f04d047",
+            "rel_path": "attack2/info/hit/5"
+          },
+          {
+            "resource_type": "sprite",
+            "ruid": "0afc86ce761344228fa925309088bcf4",
+            "rel_path": "attack3/info/ball/0"
+          },
+          {
+            "resource_type": "sprite",
+            "ruid": "8b5e30861b1841009f02d3770edc63c5",
+            "rel_path": "attack3/info/ball/1"
+          },
+          {
+            "resource_type": "sprite",
+            "ruid": "467105fbe2f74b0cb4ba35254f567355",
+            "rel_path": "attack3/info/ball/2"
+          },
+          {
+            "resource_type": "sprite",
+            "ruid": "e99d05a19834436a8603f6fc33ce3b91",
+            "rel_path": "attack3/info/ball/3"
+          },
+          {
+            "resource_type": "sprite",
+            "ruid": "4306554c4b5d4801a208e9b95ba104d2",
+            "rel_path": "attack3/info/ball/4"
+          },
+          {
+            "resource_type": "sprite",
+            "ruid": "831d36e1954941d5bcd3dc3c919e5151",
+            "rel_path": "attack3/info/ball/5"
+          },
+          {
+            "resource_type": "sprite",
+            "ruid": "27542602be384c39ad04cca16536f52c",
+            "rel_path": "attack3/info/ball/6"
+          },
+          {
+            "resource_type": "sprite",
+            "ruid": "8810fb05eb134496bd0cd75f6494da1f",
+            "rel_path": "attack3/info/ball/7"
+          },
+          {
+            "resource_type": "sprite",
+            "ruid": "cdc5ec134a0242b3b5df5039fbcb0179",
+            "rel_path": "attack3/info/ball/8"
+          },
+          {
+            "resource_type": "sprite",
+            "ruid": "08be635d8901488e95ccf5d14add99c3",
+            "rel_path": "attack3/info/ball/9"
+          },
+          {
+            "resource_type": "sprite",
+            "ruid": "f7049da62a5946e49996cac8286b297e",
+            "rel_path": "attack3/info/hit/0"
+          },
+          {
+            "resource_type": "sprite",
+            "ruid": "0c96fdf04b464041a052b7f8d6b26f8e",
+            "rel_path": "attack3/info/hit/1"
+          },
+          {
+            "resource_type": "sprite",
+            "ruid": "7f30898798c94c93a8bdf96973b39bb0",
+            "rel_path": "attack3/info/hit/2"
+          },
+          {
+            "resource_type": "sprite",
+            "ruid": "f0456e273f724d83b5e0c4ccf75539ba",
+            "rel_path": "attack3/info/hit/3"
+          },
+          {
+            "resource_type": "sprite",
+            "ruid": "beefacc9215d4227bb80e8916585639d",
+            "rel_path": "attack3/info/hit/4"
+          },
+          {
+            "resource_type": "sprite",
+            "ruid": "3cfa36eb65314058838ab61132df0a59",
+            "rel_path": "attack4/info/hit/0"
+          },
+          {
+            "resource_type": "sprite",
+            "ruid": "113973f1541f43c098c2e6dd1a4d45f1",
+            "rel_path": "attack4/info/hit/1"
+          },
+          {
+            "resource_type": "sprite",
+            "ruid": "af454c23249e4e918ace766dd6e8da8f",
+            "rel_path": "attack4/info/hit/2"
+          },
+          {
+            "resource_type": "sprite",
+            "ruid": "63a272c606e14004bf4d08971dae7d0f",
+            "rel_path": "attack4/info/hit/3"
+          },
+          {
+            "resource_type": "sprite",
+            "ruid": "9cde0618bfc9458c9420fe81ea6edc2c",
+            "rel_path": "attack4/info/hit/4"
+          },
+          {
+            "resource_type": "sprite",
+            "ruid": "60768b8291bc49edbff1a0bc7c39dac5",
+            "rel_path": "attack4/info/hit/5"
+          },
+          {
+            "resource_type": "sprite",
+            "ruid": "2b02f077d9eb49c2925a28227ae4bcc3",
+            "rel_path": "attack5/info/hit/0"
+          },
+          {
+            "resource_type": "sprite",
+            "ruid": "c0293f03fa4c44498c73695323612f6b",
+            "rel_path": "attack5/info/hit/1"
+          },
+          {
+            "resource_type": "sprite",
+            "ruid": "a37116e62a694a9b951edec8b31877ed",
+            "rel_path": "attack5/info/hit/2"
+          },
+          {
+            "resource_type": "sprite",
+            "ruid": "4b1402efcce244ddb9cccea61100081c",
+            "rel_path": "attack5/info/hit/3"
+          },
+          {
+            "resource_type": "sprite",
+            "ruid": "5ffcd1d7e0e14b0c94ae63d1d9d3460b",
+            "rel_path": "attack5/info/hit/4"
+          },
+          {
+            "resource_type": "sprite",
+            "ruid": "bf4efb206ad249dea41b632a23d7c7aa",
+            "rel_path": "attack5/info/hit/5"
+          },
+          {
+            "resource_type": "sprite",
+            "ruid": "d05976ac58874b5895a67c4b7ec6cb52",
+            "rel_path": "attack5/info/hit/6"
+          },
+          {
+            "resource_type": "sprite",
+            "ruid": "8bec441e08d343e4917e265c556a18ed",
+            "rel_path": "attack6/info/hit/0"
+          },
+          {
+            "resource_type": "sprite",
+            "ruid": "014b1dfc80ea43309637b34dfb091236",
+            "rel_path": "attack6/info/hit/1"
+          },
+          {
+            "resource_type": "sprite",
+            "ruid": "f5beaf5e4c394449a2238fa49ffeb954",
+            "rel_path": "attack6/info/hit/2"
+          },
+          {
+            "resource_type": "sprite",
+            "ruid": "0fe82bfd436d463eb9c62ae3b8db28bd",
+            "rel_path": "attack6/info/hit/3"
+          },
+          {
+            "resource_type": "sprite",
+            "ruid": "4c7d9a0a593148e7a12f6fcfd3562ed5",
+            "rel_path": "attack6/info/hit/4"
+          },
+          {
+            "resource_type": "sprite",
+            "ruid": "d60bd89d137045aca4597667a0d92ec9",
+            "rel_path": "attack6/info/hit/5"
+          }
+        ]
+      }
+    },
+    {
+      "id": "mob/2600801.img",
+      "type": "resource_pack",
+      "category": "mob",
+      "names": {
+        "ko": [
+          "윌",
+          "공포의 가시"
+        ],
+        "zh-hans": [
+          "威尔",
+          "恐怖芒刺"
+        ],
+        "zh-hant": [
+          "威爾",
+          "恐怖的刺"
+        ]
+      },
+      "assetGuid": "7a6abcee73db4137a7cd2da6a4fcdd25",
+      "payload": {
+        "elements": [
+          {
+            "resource_type": "animationclip",
+            "ruid": "c486516830e440ac990a08f7ceb63030",
+            "rel_path": "attack1"
+          },
+          {
+            "resource_type": "animationclip",
+            "ruid": "854b76a4e52e4a259e2427aa63e14294",
+            "rel_path": "hit1"
+          },
+          {
+            "resource_type": "animationclip",
+            "ruid": "67a0c8d5e932414a8e99ac5c5e5373c9",
+            "rel_path": "move"
+          },
+          {
+            "resource_type": "animationclip",
+            "ruid": "004ff7928190403bad601374d3bd8729",
+            "rel_path": "skill1"
+          },
+          {
+            "resource_type": "animationclip",
+            "ruid": "677d8d9877044187b21f1acc655737f3",
+            "rel_path": "stand"
+          },
+          {
+            "resource_type": "effect",
+            "ruid": "beae1b0020ef4db29e5bda658665ab8a",
+            "rel_path": "_audio/Attack1"
+          },
+          {
+            "resource_type": "effect",
+            "ruid": "38c0fbc9ab634fefaba4fc4c25fd6aa4",
+            "rel_path": "_audio/Attack2"
+          },
+          {
+            "resource_type": "effect",
+            "ruid": "18ba34d0b96d44489347e58b3a997c52",
+            "rel_path": "_audio/Attack3"
+          },
+          {
+            "resource_type": "effect",
+            "ruid": "abd17357c046426cb83f6e2427f36fd7",
+            "rel_path": "_audio/CharDam1"
+          },
+          {
+            "resource_type": "effect",
+            "ruid": "768c3e214572466593ccf062fe251abe",
+            "rel_path": "_audio/CharDam2"
+          },
+          {
+            "resource_type": "effect",
+            "ruid": "8861fa783ba94845b91150274baa6dc0",
+            "rel_path": "_audio/CharDam3"
+          },
+          {
+            "resource_type": "voice",
+            "ruid": "e4502802d09646bfa2fe2810dda0e745",
+            "rel_path": "_audio/Damage"
+          },
+          {
+            "resource_type": "effect",
+            "ruid": "21545b849a054935a56a449fee082a55",
+            "rel_path": "_audio/Die"
+          },
+          {
+            "resource_type": "effect",
+            "ruid": "171f1984cfd9483cb30396f95bc86fdf",
+            "rel_path": "_audio/Skill1"
+          },
+          {
+            "resource_type": "effect",
+            "ruid": "a8a1e9e52edd438bbd0a39afec65fea5",
+            "rel_path": "_audio/Skill2"
+          },
+          {
+            "resource_type": "animationclip",
+            "ruid": "3a327556a00344b4ba94dbca931e5c51",
+            "rel_path": "attack1/info/hit"
+          }
+        ]
+      }
+    },
+    {
+      "id": "mob/8230071.img",
+      "type": "resource_pack",
+      "category": "mob",
+      "names": {
+        "ko": [
+          "윌"
+        ],
+        "zh-hans": [
+          "威尔"
+        ],
+        "zh-hant": [
+          "威爾"
+        ]
+      },
+      "assetGuid": "fdc4b3d68c4548389fb32eaa154fc21f",
+      "payload": {
+        "elements": [
+          {
+            "resource_type": "animationclip",
+            "ruid": "7bf019adddb44d0dbc754982a447a07b",
+            "rel_path": "attack1"
+          },
+          {
+            "resource_type": "animationclip",
+            "ruid": "96ecee8edeb0408ab0ebae04e2cac265",
+            "rel_path": "attack2"
+          },
+          {
+            "resource_type": "animationclip",
+            "ruid": "99a88e2a4dd144ec923f69a439aa0e1f",
+            "rel_path": "attack3"
+          },
+          {
+            "resource_type": "animationclip",
+            "ruid": "2d32ab270e1a4e4b9bf01328be67bf3e",
+            "rel_path": "die1"
+          },
+          {
+            "resource_type": "animationclip",
+            "ruid": "fe5a03be973f4546b8fb083a342cb142",
+            "rel_path": "hit1"
+          },
+          {
+            "resource_type": "animationclip",
+            "ruid": "aa963307bcc0482abd628cf85a87825a",
+            "rel_path": "move"
+          },
+          {
+            "resource_type": "animationclip",
+            "ruid": "d02e345e939b4befb9aa53c907538896",
+            "rel_path": "skill1"
+          },
+          {
+            "resource_type": "animationclip",
+            "ruid": "e0faedac924d4e9fae06b5bbad7a6018",
+            "rel_path": "skill2"
+          },
+          {
+            "resource_type": "animationclip",
+            "ruid": "c940e73897b64f29941a2468a784ad7f",
+            "rel_path": "stand"
+          },
+          {
+            "resource_type": "effect",
+            "ruid": "64bb58fec69a4016adc7b1b50a732cbd",
+            "rel_path": "_audio/Attack1"
+          },
+          {
+            "resource_type": "effect",
+            "ruid": "4030504f58eb4563bd9781369fa111bb",
+            "rel_path": "_audio/Attack2"
+          },
+          {
+            "resource_type": "effect",
+            "ruid": "8253a220279d4ce4879594aa35f2f31f",
+            "rel_path": "_audio/Attack3"
+          },
+          {
+            "resource_type": "effect",
+            "ruid": "362d94e74d2c41a293376de9fabf04ef",
+            "rel_path": "_audio/CharDam1"
+          },
+          {
+            "resource_type": "effect",
+            "ruid": "9226a378636f4cf09010cc5f94cdf204",
+            "rel_path": "_audio/CharDam2"
+          },
+          {
+            "resource_type": "effect",
+            "ruid": "4a74699db8244f46a7ecf20b32626347",
+            "rel_path": "_audio/CharDam3"
+          },
+          {
+            "resource_type": "voice",
+            "ruid": "1905bb7ec8ea49eb913463fdf8e17bee",
+            "rel_path": "_audio/Damage"
+          },
+          {
+            "resource_type": "effect",
+            "ruid": "c20bf9ec3f53498c8c750819478eca2f",
+            "rel_path": "_audio/Die"
+          },
+          {
+            "resource_type": "effect",
+            "ruid": "a9ba59b1e5094bec91cec742247783b7",
+            "rel_path": "_audio/Skill1"
+          },
+          {
+            "resource_type": "effect",
+            "ruid": "c5b8df6f3dee49ad8838019c9eb6ef63",
+            "rel_path": "_audio/Skill2"
+          },
+          {
+            "resource_type": "animationclip",
+            "ruid": "09b6b9e8b44b45b3a2c1a11165e76bdd",
+            "rel_path": "attack1/info/hit"
+          },
+          {
+            "resource_type": "animationclip",
+            "ruid": "7c41ade53e3d4d888847a7d8d81ee06d",
+            "rel_path": "attack2/info/hit"
+          },
+          {
+            "resource_type": "animationclip",
+            "ruid": "615891daf9c44f829f488259011c3e07",
+            "rel_path": "attack3/info/areaWarning"
+          },
+          {
+            "resource_type": "animationclip",
+            "ruid": "3bf6adbd427b44e2abd6790bd22589f1",
+            "rel_path": "attack3/info/hit"
+          }
+        ]
+      }
+    }
+  ],
+  "nextOffset": 3,
+  "exactMatch": false
+}

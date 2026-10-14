@@ -1,0 +1,1215 @@
+{
+  "forbidden_altar": [
+    {
+      "id": "body",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/forbidden-altar/body.png",
+      "w": 470,
+      "h": 510,
+      "rect": [
+        45,
+        0,
+        470,
+        510
+      ],
+      "size": 408756
+    },
+    {
+      "id": "head",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/forbidden-altar/head.png",
+      "w": 470,
+      "h": 425,
+      "rect": [
+        535,
+        55,
+        470,
+        425
+      ],
+      "size": 349922
+    },
+    {
+      "id": "arm-l",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/forbidden-altar/arm-l.png",
+      "w": 380,
+      "h": 445,
+      "rect": [
+        1120,
+        50,
+        380,
+        445
+      ],
+      "size": 277559
+    },
+    {
+      "id": "arm-r",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/forbidden-altar/arm-r.png",
+      "w": 315,
+      "h": 440,
+      "rect": [
+        145,
+        565,
+        315,
+        440
+      ],
+      "size": 244041
+    },
+    {
+      "id": "wing-l",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/forbidden-altar/wing-l.png",
+      "w": 485,
+      "h": 470,
+      "rect": [
+        525,
+        525,
+        485,
+        470
+      ],
+      "size": 311030
+    },
+    {
+      "id": "wing-r",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/forbidden-altar/wing-r.png",
+      "w": 480,
+      "h": 470,
+      "rect": [
+        1028,
+        525,
+        480,
+        470
+      ],
+      "size": 314125
+    }
+  ],
+  "pianus_cave": [
+    {
+      "id": "body",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/pianus-cave/body.png",
+      "w": 700,
+      "h": 465,
+      "rect": [
+        5,
+        70,
+        700,
+        465
+      ],
+      "size": 614628
+    },
+    {
+      "id": "dorsal",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/pianus-cave/dorsal.png",
+      "w": 390,
+      "h": 390,
+      "rect": [
+        720,
+        120,
+        390,
+        390
+      ],
+      "size": 316366
+    },
+    {
+      "id": "belly",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/pianus-cave/belly.png",
+      "w": 345,
+      "h": 240,
+      "rect": [
+        1170,
+        250,
+        345,
+        240
+      ],
+      "size": 172746
+    },
+    {
+      "id": "pectoral",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/pianus-cave/pectoral.png",
+      "w": 300,
+      "h": 300,
+      "rect": [
+        145,
+        630,
+        300,
+        300
+      ],
+      "size": 200791
+    },
+    {
+      "id": "tail",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/pianus-cave/tail.png",
+      "w": 345,
+      "h": 450,
+      "rect": [
+        650,
+        535,
+        345,
+        450
+      ],
+      "size": 328769
+    },
+    {
+      "id": "bubbles",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/pianus-cave/bubbles.png",
+      "w": 345,
+      "h": 385,
+      "rect": [
+        1170,
+        590,
+        345,
+        385
+      ],
+      "size": 304226
+    }
+  ],
+  "twilight_of_gods": [
+    {
+      "id": "body",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/twilight-of-gods/body.png",
+      "w": 430,
+      "h": 470,
+      "rect": [
+        65,
+        40,
+        430,
+        470
+      ],
+      "size": 342176
+    },
+    {
+      "id": "arm-l",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/twilight-of-gods/arm-l.png",
+      "w": 200,
+      "h": 245,
+      "rect": [
+        675,
+        195,
+        200,
+        245
+      ],
+      "size": 88642
+    },
+    {
+      "id": "arm-r",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/twilight-of-gods/arm-r.png",
+      "w": 210,
+      "h": 245,
+      "rect": [
+        1180,
+        195,
+        210,
+        245
+      ],
+      "size": 90433
+    },
+    {
+      "id": "tail",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/twilight-of-gods/tail.png",
+      "w": 285,
+      "h": 450,
+      "rect": [
+        160,
+        545,
+        285,
+        450
+      ],
+      "size": 222214
+    },
+    {
+      "id": "note-purple",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/twilight-of-gods/note-purple.png",
+      "w": 245,
+      "h": 285,
+      "rect": [
+        670,
+        640,
+        245,
+        285
+      ],
+      "size": 130815
+    },
+    {
+      "id": "note-pink",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/twilight-of-gods/note-pink.png",
+      "w": 260,
+      "h": 285,
+      "rect": [
+        1180,
+        640,
+        260,
+        285
+      ],
+      "size": 135988
+    }
+  ],
+  "cygnus_garden": [
+    {
+      "id": "body",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/cygnus-garden/body.png",
+      "w": 365,
+      "h": 535,
+      "rect": [
+        65,
+        10,
+        365,
+        535
+      ],
+      "size": 433114
+    },
+    {
+      "id": "hair",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/cygnus-garden/hair.png",
+      "w": 435,
+      "h": 400,
+      "rect": [
+        575,
+        100,
+        435,
+        400
+      ],
+      "size": 317130
+    },
+    {
+      "id": "dress-r",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/cygnus-garden/dress-r.png",
+      "w": 410,
+      "h": 480,
+      "rect": [
+        1100,
+        40,
+        410,
+        480
+      ],
+      "size": 320149
+    },
+    {
+      "id": "dress-l",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/cygnus-garden/dress-l.png",
+      "w": 355,
+      "h": 455,
+      "rect": [
+        40,
+        550,
+        355,
+        455
+      ],
+      "size": 264663
+    },
+    {
+      "id": "halo",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/cygnus-garden/halo.png",
+      "w": 515,
+      "h": 465,
+      "rect": [
+        510,
+        520,
+        515,
+        465
+      ],
+      "size": 495263
+    },
+    {
+      "id": "wisp",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/cygnus-garden/wisp.png",
+      "w": 280,
+      "h": 480,
+      "rect": [
+        1180,
+        520,
+        280,
+        480
+      ],
+      "size": 320930
+    }
+  ],
+  "black_heaven_core": [
+    {
+      "id": "body",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/black-heaven-core/body.png",
+      "w": 320,
+      "h": 505,
+      "rect": [
+        140,
+        35,
+        320,
+        505
+      ],
+      "size": 367354
+    },
+    {
+      "id": "hair-l",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/black-heaven-core/hair-l.png",
+      "w": 280,
+      "h": 405,
+      "rect": [
+        600,
+        95,
+        280,
+        405
+      ],
+      "size": 226428
+    },
+    {
+      "id": "hair-r",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/black-heaven-core/hair-r.png",
+      "w": 325,
+      "h": 405,
+      "rect": [
+        1090,
+        95,
+        325,
+        405
+      ],
+      "size": 250470
+    },
+    {
+      "id": "core-glow",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/black-heaven-core/core-glow.png",
+      "w": 440,
+      "h": 460,
+      "rect": [
+        70,
+        530,
+        440,
+        460
+      ],
+      "size": 491136
+    },
+    {
+      "id": "flame",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/black-heaven-core/flame.png",
+      "w": 270,
+      "h": 440,
+      "rect": [
+        660,
+        550,
+        270,
+        440
+      ],
+      "size": 303482
+    },
+    {
+      "id": "arc",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/black-heaven-core/arc.png",
+      "w": 335,
+      "h": 450,
+      "rect": [
+        1110,
+        540,
+        335,
+        450
+      ],
+      "size": 323362
+    }
+  ],
+  "world_tree_summit": [
+    {
+      "id": "body",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/world-tree-summit/body.png",
+      "w": 497,
+      "h": 535,
+      "rect": [
+        8,
+        8,
+        497,
+        535
+      ],
+      "size": 550767
+    },
+    {
+      "id": "wing-l",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/world-tree-summit/wing-l.png",
+      "w": 490,
+      "h": 540,
+      "rect": [
+        525,
+        10,
+        490,
+        540
+      ],
+      "size": 579308
+    },
+    {
+      "id": "wing-r",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/world-tree-summit/wing-r.png",
+      "w": 500,
+      "h": 540,
+      "rect": [
+        1030,
+        10,
+        500,
+        540
+      ],
+      "size": 563317
+    },
+    {
+      "id": "scarf",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/world-tree-summit/scarf.png",
+      "w": 497,
+      "h": 425,
+      "rect": [
+        8,
+        575,
+        497,
+        425
+      ],
+      "size": 373967
+    },
+    {
+      "id": "flame-l",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/world-tree-summit/flame-l.png",
+      "w": 390,
+      "h": 430,
+      "rect": [
+        600,
+        575,
+        390,
+        430
+      ],
+      "size": 348959
+    },
+    {
+      "id": "flame-r",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/world-tree-summit/flame-r.png",
+      "w": 480,
+      "h": 430,
+      "rect": [
+        1040,
+        575,
+        480,
+        430
+      ],
+      "size": 378939
+    }
+  ],
+  "collapsing_clocktower": [
+    {
+      "id": "body",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/collapsing-clocktower/body.png",
+      "w": 405,
+      "h": 530,
+      "rect": [
+        65,
+        20,
+        405,
+        530
+      ],
+      "size": 450222
+    },
+    {
+      "id": "wing-l",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/collapsing-clocktower/wing-l.png",
+      "w": 450,
+      "h": 610,
+      "rect": [
+        525,
+        5,
+        450,
+        610
+      ],
+      "size": 603079
+    },
+    {
+      "id": "wing-r",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/collapsing-clocktower/wing-r.png",
+      "w": 440,
+      "h": 610,
+      "rect": [
+        1090,
+        5,
+        440,
+        610
+      ],
+      "size": 573183
+    },
+    {
+      "id": "butterfly-gold",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/collapsing-clocktower/butterfly-gold.png",
+      "w": 475,
+      "h": 390,
+      "rect": [
+        35,
+        625,
+        475,
+        390
+      ],
+      "size": 462623
+    },
+    {
+      "id": "petal",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/collapsing-clocktower/petal.png",
+      "w": 285,
+      "h": 335,
+      "rect": [
+        660,
+        650,
+        285,
+        335
+      ],
+      "size": 199525
+    },
+    {
+      "id": "butterfly-purple",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/collapsing-clocktower/butterfly-purple.png",
+      "w": 350,
+      "h": 335,
+      "rect": [
+        1140,
+        650,
+        350,
+        335
+      ],
+      "size": 282207
+    }
+  ],
+  "diffraction_hall": [
+    {
+      "id": "body",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/diffraction-hall/body.png",
+      "w": 295,
+      "h": 545,
+      "rect": [
+        165,
+        0,
+        295,
+        545
+      ],
+      "size": 353777
+    },
+    {
+      "id": "arm-l",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/diffraction-hall/arm-l.png",
+      "w": 275,
+      "h": 210,
+      "rect": [
+        670,
+        205,
+        275,
+        210
+      ],
+      "size": 113280
+    },
+    {
+      "id": "arm-r",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/diffraction-hall/arm-r.png",
+      "w": 235,
+      "h": 290,
+      "rect": [
+        1190,
+        210,
+        235,
+        290
+      ],
+      "size": 115483
+    },
+    {
+      "id": "book",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/diffraction-hall/book.png",
+      "w": 405,
+      "h": 455,
+      "rect": [
+        90,
+        550,
+        405,
+        455
+      ],
+      "size": 420526
+    },
+    {
+      "id": "coat-l",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/diffraction-hall/coat-l.png",
+      "w": 325,
+      "h": 460,
+      "rect": [
+        625,
+        545,
+        325,
+        460
+      ],
+      "size": 218720
+    },
+    {
+      "id": "coat-r",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/diffraction-hall/coat-r.png",
+      "w": 335,
+      "h": 460,
+      "rect": [
+        1090,
+        545,
+        335,
+        460
+      ],
+      "size": 241425
+    }
+  ],
+  "eye_of_void": [
+    {
+      "id": "body",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/eye-of-void/body.png",
+      "w": 630,
+      "h": 522,
+      "rect": [
+        0,
+        0,
+        630,
+        522
+      ],
+      "size": 744126
+    },
+    {
+      "id": "claw-ul",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/eye-of-void/claw-ul.png",
+      "w": 438,
+      "h": 499,
+      "rect": [
+        645,
+        8,
+        438,
+        499
+      ],
+      "size": 448841
+    },
+    {
+      "id": "claw-ur",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/eye-of-void/claw-ur.png",
+      "w": 453,
+      "h": 499,
+      "rect": [
+        1083,
+        8,
+        453,
+        499
+      ],
+      "size": 473659
+    },
+    {
+      "id": "claw-ll",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/eye-of-void/claw-ll.png",
+      "w": 538,
+      "h": 492,
+      "rect": [
+        54,
+        522,
+        538,
+        492
+      ],
+      "size": 555842
+    },
+    {
+      "id": "claw-lr",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/eye-of-void/claw-lr.png",
+      "w": 522,
+      "h": 484,
+      "rect": [
+        607,
+        530,
+        522,
+        484
+      ],
+      "size": 526206
+    },
+    {
+      "id": "chain-rock",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/eye-of-void/chain-rock.png",
+      "w": 353,
+      "h": 499,
+      "rect": [
+        1144,
+        515,
+        353,
+        499
+      ],
+      "size": 324406
+    }
+  ],
+  "altar_of_desire": [
+    {
+      "id": "body-original",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/altar-of-desire/body-original.png",
+      "w": 323,
+      "h": 515,
+      "rect": [
+        100,
+        84,
+        323,
+        515
+      ],
+      "size": 278533
+    },
+    {
+      "id": "hair",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/altar-of-desire/hair.png",
+      "w": 515,
+      "h": 545,
+      "rect": [
+        507,
+        46,
+        515,
+        545
+      ],
+      "size": 609454
+    },
+    {
+      "id": "scythe",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/altar-of-desire/scythe.png",
+      "w": 515,
+      "h": 614,
+      "rect": [
+        1014,
+        0,
+        515,
+        614
+      ],
+      "size": 516200
+    },
+    {
+      "id": "dress-l",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/altar-of-desire/dress-l.png",
+      "w": 307,
+      "h": 407,
+      "rect": [
+        84,
+        607,
+        307,
+        407
+      ],
+      "size": 167437
+    },
+    {
+      "id": "dress-r",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/altar-of-desire/dress-r.png",
+      "w": 284,
+      "h": 407,
+      "rect": [
+        660,
+        607,
+        284,
+        407
+      ],
+      "size": 169294
+    },
+    {
+      "id": "flame",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/altar-of-desire/flame.png",
+      "w": 438,
+      "h": 425,
+      "rect": [
+        1091,
+        599,
+        438,
+        425
+      ],
+      "size": 451328
+    },
+    {
+      "id": "body",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/altar-of-desire/body-fixed.png",
+      "w": 1142,
+      "h": 1378,
+      "rect": [
+        0,
+        0,
+        1142,
+        1378
+      ],
+      "size": 1575409
+    }
+  ],
+  "near_the_end": [
+    {
+      "id": "body",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/near-the-end/body.png",
+      "w": 430,
+      "h": 630,
+      "rect": [
+        46,
+        0,
+        430,
+        630
+      ],
+      "size": 474073
+    },
+    {
+      "id": "sword-arm",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/near-the-end/sword-arm.png",
+      "w": 645,
+      "h": 445,
+      "rect": [
+        507,
+        169,
+        645,
+        445
+      ],
+      "size": 422003
+    },
+    {
+      "id": "arm-r",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/near-the-end/arm-r.png",
+      "w": 253,
+      "h": 384,
+      "rect": [
+        1267,
+        169,
+        253,
+        384
+      ],
+      "size": 168360
+    },
+    {
+      "id": "cape",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/near-the-end/cape.png",
+      "w": 538,
+      "h": 376,
+      "rect": [
+        46,
+        637,
+        538,
+        376
+      ],
+      "size": 262476
+    },
+    {
+      "id": "eyes",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/near-the-end/eyes.png",
+      "w": 284,
+      "h": 154,
+      "rect": [
+        660,
+        737,
+        284,
+        154
+      ],
+      "size": 94241
+    },
+    {
+      "id": "smoke",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/near-the-end/smoke.png",
+      "w": 376,
+      "h": 330,
+      "rect": [
+        1129,
+        676,
+        376,
+        330
+      ],
+      "size": 98490
+    }
+  ],
+  "dark_temple": [
+    {
+      "id": "white-guardian",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/dark-temple/white-guardian.png",
+      "w": 430,
+      "h": 684,
+      "rect": [
+        69,
+        0,
+        430,
+        684
+      ],
+      "size": 730555
+    },
+    {
+      "id": "black-guardian",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/dark-temple/black-guardian.png",
+      "w": 430,
+      "h": 684,
+      "rect": [
+        545,
+        0,
+        430,
+        684
+      ],
+      "size": 701873
+    },
+    {
+      "id": "white-chain",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/dark-temple/white-chain.png",
+      "w": 530,
+      "h": 422,
+      "rect": [
+        1006,
+        123,
+        530,
+        422
+      ],
+      "size": 521866
+    },
+    {
+      "id": "red-chain",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/dark-temple/red-chain.png",
+      "w": 499,
+      "h": 348,
+      "rect": [
+        15,
+        676,
+        499,
+        348
+      ],
+      "size": 423448
+    },
+    {
+      "id": "pink-flame",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/dark-temple/pink-flame.png",
+      "w": 499,
+      "h": 292,
+      "rect": [
+        515,
+        722,
+        499,
+        292
+      ],
+      "size": 346546
+    },
+    {
+      "id": "purple-flame",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/dark-temple/purple-flame.png",
+      "w": 507,
+      "h": 284,
+      "rect": [
+        1021,
+        730,
+        507,
+        284
+      ],
+      "size": 305581
+    }
+  ],
+  "dark_throne": [
+    {
+      "id": "body",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/dark-throne/body.png",
+      "w": 369,
+      "h": 515,
+      "rect": [
+        108,
+        0,
+        369,
+        515
+      ],
+      "size": 312123
+    },
+    {
+      "id": "sleeve-l",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/dark-throne/sleeve-l.png",
+      "w": 346,
+      "h": 468,
+      "rect": [
+        584,
+        54,
+        346,
+        468
+      ],
+      "size": 252415
+    },
+    {
+      "id": "sleeve-r",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/dark-throne/sleeve-r.png",
+      "w": 330,
+      "h": 468,
+      "rect": [
+        1144,
+        54,
+        330,
+        468
+      ],
+      "size": 245548
+    },
+    {
+      "id": "robe",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/dark-throne/robe.png",
+      "w": 538,
+      "h": 445,
+      "rect": [
+        0,
+        561,
+        538,
+        445
+      ],
+      "size": 407826
+    },
+    {
+      "id": "aura",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/dark-throne/aura.png",
+      "w": 515,
+      "h": 476,
+      "rect": [
+        515,
+        538,
+        515,
+        476
+      ],
+      "size": 463455
+    },
+    {
+      "id": "smoke",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/dark-throne/smoke.png",
+      "w": 507,
+      "h": 468,
+      "rect": [
+        1029,
+        553,
+        507,
+        468
+      ],
+      "size": 346007
+    }
+  ],
+  "boundary_of_beginning_and_end": [
+    {
+      "id": "pillar",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/boundary-of-beginning-and-end/pillar.png",
+      "w": 253,
+      "h": 538,
+      "rect": [
+        154,
+        0,
+        253,
+        538
+      ],
+      "size": 288504
+    },
+    {
+      "id": "mantle",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/boundary-of-beginning-and-end/mantle.png",
+      "w": 453,
+      "h": 538,
+      "rect": [
+        538,
+        0,
+        453,
+        538
+      ],
+      "size": 653133
+    },
+    {
+      "id": "orb",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/boundary-of-beginning-and-end/orb.png",
+      "w": 184,
+      "h": 261,
+      "rect": [
+        1190,
+        138,
+        184,
+        261
+      ],
+      "size": 95020
+    },
+    {
+      "id": "streak",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/boundary-of-beginning-and-end/streak.png",
+      "w": 215,
+      "h": 484,
+      "rect": [
+        184,
+        530,
+        215,
+        484
+      ],
+      "size": 214453
+    },
+    {
+      "id": "crescent",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/boundary-of-beginning-and-end/crescent.png",
+      "w": 407,
+      "h": 453,
+      "rect": [
+        576,
+        553,
+        407,
+        453
+      ],
+      "size": 399671
+    },
+    {
+      "id": "rock",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/boundary-of-beginning-and-end/rock.png",
+      "w": 253,
+      "h": 323,
+      "rect": [
+        1167,
+        653,
+        253,
+        323
+      ],
+      "size": 140921
+    }
+  ],
+  "nonexistent_space": [
+    {
+      "id": "pillar",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/nonexistent-space/pillar.png",
+      "w": 276,
+      "h": 591,
+      "rect": [
+        123,
+        0,
+        276,
+        591
+      ],
+      "size": 288417
+    },
+    {
+      "id": "halo",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/nonexistent-space/halo.png",
+      "w": 515,
+      "h": 568,
+      "rect": [
+        499,
+        0,
+        515,
+        568
+      ],
+      "size": 640621
+    },
+    {
+      "id": "orb-gray",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/nonexistent-space/orb-gray.png",
+      "w": 161,
+      "h": 177,
+      "rect": [
+        1198,
+        215,
+        161,
+        177
+      ],
+      "size": 42541
+    },
+    {
+      "id": "orb-white",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/nonexistent-space/orb-white.png",
+      "w": 292,
+      "h": 276,
+      "rect": [
+        146,
+        668,
+        292,
+        276
+      ],
+      "size": 126704
+    },
+    {
+      "id": "wisp",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/nonexistent-space/wisp.png",
+      "w": 307,
+      "h": 445,
+      "rect": [
+        630,
+        568,
+        307,
+        445
+      ],
+      "size": 254749
+    },
+    {
+      "id": "streak",
+      "path": "C:/workspace/msw/assets/design/themes/articulated-scenes/nonexistent-space/streak.png",
+      "w": 123,
+      "h": 438,
+      "rect": [
+        1229,
+        568,
+        123,
+        438
+      ],
+      "size": 108103
+    }
+  ]
+}

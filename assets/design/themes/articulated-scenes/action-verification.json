@@ -1,0 +1,396 @@
+{
+  "date": "2026-10-15",
+  "buildErrors": 0,
+  "runtimeErrors": 0,
+  "checks": [
+    {
+      "time": "2026-10-15T00:02:22",
+      "message": "[MOTION] resources=122/122 metadataErrors=0"
+    },
+    {
+      "time": "2026-10-15T00:02:27",
+      "message": "[MOTION] zakum_altar world=9/9 moving=8 card=9/9 moving=8 backgroundFixed=true pass=true"
+    },
+    {
+      "time": "2026-10-15T00:02:30",
+      "message": "[MOTION] forbidden_altar world=6/6 moving=5 card=6/6 moving=5 backgroundFixed=true pass=true"
+    },
+    {
+      "time": "2026-10-15T00:02:34",
+      "message": "[MOTION] pianus_cave world=8/8 moving=8 card=8/8 moving=8 backgroundFixed=true pass=true"
+    },
+    {
+      "time": "2026-10-15T00:02:38",
+      "message": "[MOTION] cave_of_life world=9/9 moving=8 card=9/9 moving=8 backgroundFixed=true pass=true"
+    },
+    {
+      "time": "2026-10-15T00:02:42",
+      "message": "[MOTION] twilight_of_gods world=6/6 moving=6 card=6/6 moving=6 backgroundFixed=true pass=true"
+    },
+    {
+      "time": "2026-10-15T00:02:45",
+      "message": "[MOTION] cygnus_garden world=6/6 moving=6 card=6/6 moving=6 backgroundFixed=true pass=true"
+    },
+    {
+      "time": "2026-10-15T00:02:49",
+      "message": "[MOTION] black_heaven_core world=10/10 moving=10 card=10/10 moving=10 backgroundFixed=true pass=true"
+    },
+    {
+      "time": "2026-10-15T00:02:53",
+      "message": "[FIX] Damien wings fixed, rising flames=14"
+    },
+    {
+      "time": "2026-10-15T00:02:53",
+      "message": "[MOTION] world_tree_summit world=18/18 moving=18 card=18/18 moving=18 backgroundFixed=true pass=true"
+    },
+    {
+      "time": "2026-10-15T00:02:57",
+      "message": "[MOTION] collapsing_clocktower world=9/9 moving=9 card=9/9 moving=9 backgroundFixed=true pass=true"
+    },
+    {
+      "time": "2026-10-15T00:03:00",
+      "message": "[MOTION] diffraction_hall world=6/6 moving=6 card=6/6 moving=6 backgroundFixed=true pass=true"
+    },
+    {
+      "time": "2026-10-15T00:03:04",
+      "message": "[MOTION] eye_of_void world=9/9 moving=9 card=9/9 moving=9 backgroundFixed=true pass=true"
+    },
+    {
+      "time": "2026-10-15T00:03:07",
+      "message": "[FIX] Hilla grip error pixels=2.3131745358625e-06 color=RGBA(1.000, 1.000, 1.000, 1.000)"
+    },
+    {
+      "time": "2026-10-15T00:03:07",
+      "message": "[MOTION] altar_of_desire world=5/5 moving=5 card=5/5 moving=5 backgroundFixed=true pass=true"
+    },
+    {
+      "time": "2026-10-15T00:03:11",
+      "message": "[MOTION] near_the_end world=8/8 moving=8 card=8/8 moving=8 backgroundFixed=true pass=true"
+    },
+    {
+      "time": "2026-10-15T00:03:14",
+      "message": "[MOTION] dark_temple world=6/6 moving=6 card=6/6 moving=6 backgroundFixed=true pass=true"
+    },
+    {
+      "time": "2026-10-15T00:03:18",
+      "message": "[MOTION] dark_throne world=6/6 moving=6 card=6/6 moving=6 backgroundFixed=true pass=true"
+    },
+    {
+      "time": "2026-10-15T00:03:23",
+      "message": "[MOTION] boundary_of_beginning_and_end world=22/22 moving=22 card=22/22 moving=22 backgroundFixed=true pass=true"
+    },
+    {
+      "time": "2026-10-15T00:03:27",
+      "message": "[MOTION] nonexistent_space world=22/22 moving=22 card=22/22 moving=22 backgroundFixed=true pass=true"
+    },
+    {
+      "time": "2026-10-15T00:03:28",
+      "message": "[FIX] regular track henesys visible=true"
+    },
+    {
+      "time": "2026-10-15T00:03:29",
+      "message": "[FIX] regular track ellinia visible=true"
+    },
+    {
+      "time": "2026-10-15T00:03:30",
+      "message": "[FIX] regular track perion visible=true"
+    },
+    {
+      "time": "2026-10-15T00:03:30",
+      "message": "[FIX] regular track kerning visible=true"
+    },
+    {
+      "time": "2026-10-15T00:03:31",
+      "message": "[FIX] regular track lith visible=true"
+    },
+    {
+      "time": "2026-10-15T00:03:32",
+      "message": "[MOTION] COMPLETE passed=17/17 cleanup=true ok=true error=nil"
+    }
+  ],
+  "scope": {
+    "articulated": 17,
+    "partInstances": 187,
+    "remainingStaticThemes": 0,
+    "world": true,
+    "card": true,
+    "resourcesLoaded": 122,
+    "resourceMetadataErrors": 0,
+    "actionTracksHidden": 17,
+    "regularTracksRestored": 5,
+    "hillaGripErrorPixels": 0.0000023131745358625,
+    "damienWingRotation": [
+      24,
+      -24
+    ],
+    "damienFlameFrames": 0,
+    "damienEdgeFlames": 32,
+    "damienWingShade": 0.2,
+    "damienBodyShade": 0.28,
+    "resourceCountNote": "현재 배경/부위 고유 리소스126종. 새 윌 리소스12종(썸네일 포함)을 별도 검증했고 기존 인간형 윌 검증은 과거 이력이다.",
+    "damienFlameFlow": "body-to-outside"
+  },
+  "limits": [
+    "전체17종의 부위 좌표·회전·색 변화, 고정 배경, 카드 교체와 정리를 Maker 런타임으로 검증했다. 미세한 그림 조립 자연스러움은 사용자 검수 대상이다.",
+    "실제 보스 피격·처치는 이번 모션 검증 범위에 포함하지 않았다."
+  ],
+  "previousChecks": [
+    {
+      "time": "2026-10-14T23:36:13",
+      "message": "[MOTION] paused for verification previous=false"
+    },
+    {
+      "time": "2026-10-14T23:36:19",
+      "message": "[MOTION] resources=125/125 metadataErrors=0"
+    },
+    {
+      "time": "2026-10-14T23:36:22",
+      "message": "[MOTION] zakum_altar world=9/9 moving=8 card=9/9 moving=8 backgroundFixed=true pass=true"
+    },
+    {
+      "time": "2026-10-14T23:36:25",
+      "message": "[MOTION] forbidden_altar world=6/6 moving=5 card=6/6 moving=5 backgroundFixed=true pass=true"
+    },
+    {
+      "time": "2026-10-14T23:36:28",
+      "message": "[MOTION] pianus_cave world=8/8 moving=8 card=8/8 moving=8 backgroundFixed=true pass=true"
+    },
+    {
+      "time": "2026-10-14T23:36:31",
+      "message": "[MOTION] cave_of_life world=9/9 moving=8 card=9/9 moving=8 backgroundFixed=true pass=true"
+    },
+    {
+      "time": "2026-10-14T23:36:34",
+      "message": "[MOTION] twilight_of_gods world=6/6 moving=6 card=6/6 moving=6 backgroundFixed=true pass=true"
+    },
+    {
+      "time": "2026-10-14T23:36:36",
+      "message": "[MOTION] cygnus_garden world=6/6 moving=6 card=6/6 moving=6 backgroundFixed=true pass=true"
+    },
+    {
+      "time": "2026-10-14T23:36:39",
+      "message": "[MOTION] black_heaven_core world=10/10 moving=10 card=10/10 moving=10 backgroundFixed=true pass=true"
+    },
+    {
+      "time": "2026-10-14T23:36:42",
+      "message": "[MOTION] world_tree_summit world=6/6 moving=6 card=6/6 moving=6 backgroundFixed=true pass=true"
+    },
+    {
+      "time": "2026-10-14T23:36:45",
+      "message": "[MOTION] collapsing_clocktower world=9/9 moving=9 card=9/9 moving=9 backgroundFixed=true pass=true"
+    },
+    {
+      "time": "2026-10-14T23:36:47",
+      "message": "[MOTION] diffraction_hall world=6/6 moving=6 card=6/6 moving=6 backgroundFixed=true pass=true"
+    },
+    {
+      "time": "2026-10-14T23:36:50",
+      "message": "[MOTION] eye_of_void world=9/9 moving=9 card=9/9 moving=9 backgroundFixed=true pass=true"
+    },
+    {
+      "time": "2026-10-14T23:36:53",
+      "message": "[MOTION] altar_of_desire world=8/8 moving=8 card=8/8 moving=8 backgroundFixed=true pass=true"
+    },
+    {
+      "time": "2026-10-14T23:36:56",
+      "message": "[MOTION] near_the_end world=8/8 moving=8 card=8/8 moving=8 backgroundFixed=true pass=true"
+    },
+    {
+      "time": "2026-10-14T23:36:58",
+      "message": "[MOTION] dark_temple world=6/6 moving=6 card=6/6 moving=6 backgroundFixed=true pass=true"
+    },
+    {
+      "time": "2026-10-14T23:37:01",
+      "message": "[MOTION] dark_throne world=6/6 moving=6 card=6/6 moving=6 backgroundFixed=true pass=true"
+    },
+    {
+      "time": "2026-10-14T23:37:05",
+      "message": "[MOTION] boundary_of_beginning_and_end world=22/22 moving=22 card=22/22 moving=22 backgroundFixed=true pass=true"
+    },
+    {
+      "time": "2026-10-14T23:37:09",
+      "message": "[MOTION] nonexistent_space world=22/22 moving=22 card=22/22 moving=22 backgroundFixed=true pass=true"
+    },
+    {
+      "time": "2026-10-14T23:37:09",
+      "message": "[MOTION] COMPLETE passed=17/17 cleanup=true ok=true error=nil"
+    }
+  ],
+  "localVisualReview": [
+    "forbidden_altar",
+    "twilight_of_gods",
+    "altar_of_desire",
+    "world_tree_summit"
+  ],
+  "verdict": "PASS",
+  "validationNote": "첫 검증의 접점 계산에서 픽셀/월드 단위 변환 누락을 발견하여 검증식만 수정했고 재검증은 17/17 통과했다.",
+  "followupFourBosses": {
+    "date": "2026-10-15",
+    "verdict": "PASS",
+    "buildErrors": 0,
+    "runtimeErrors": 0,
+    "checks": [
+      {
+        "time": "2026-10-15T00:32:24",
+        "message": "[REVIEW] pause for four boss checks"
+      },
+      {
+        "time": "2026-10-15T00:32:37",
+        "message": "[MOTION] resources=32/32 metadataErrors=0"
+      },
+      {
+        "time": "2026-10-15T00:32:40",
+        "message": "[REVIEW] Balrog arms in front of torso"
+      },
+      {
+        "time": "2026-10-15T00:32:40",
+        "message": "[MOTION] forbidden_altar world=6/6 moving=5 card=6/6 moving=5 backgroundFixed=true pass=true"
+      },
+      {
+        "time": "2026-10-15T00:32:46",
+        "message": "[REVIEW] Damien six fire frames visible; wing rotation fixed"
+      },
+      {
+        "time": "2026-10-15T00:32:46",
+        "message": "[MOTION] world_tree_summit world=22/22 moving=22 card=22/22 moving=22 backgroundFixed=true pass=true"
+      },
+      {
+        "time": "2026-10-15T00:32:48",
+        "message": "[REVIEW] Will arm scale=0.38"
+      },
+      {
+        "time": "2026-10-15T00:32:48",
+        "message": "[MOTION] diffraction_hall world=6/6 moving=6 card=6/6 moving=6 backgroundFixed=true pass=true"
+      },
+      {
+        "time": "2026-10-15T00:32:51",
+        "message": "[REVIEW] Dusk four plates close around original center"
+      },
+      {
+        "time": "2026-10-15T00:32:51",
+        "message": "[MOTION] eye_of_void world=9/9 moving=9 card=9/9 moving=9 backgroundFixed=true pass=true"
+      },
+      {
+        "time": "2026-10-15T00:32:52",
+        "message": "[MOTION] COMPLETE passed=4/4 cleanup=true ok=true error=nil"
+      }
+    ],
+    "visualReview": "발록 두 팔이 허벅지 앞에서 이어지는 합성, 윌 축소 팔, 더스크 중앙을 감싼 구도, 데미안 다른 불꽃 윤곽 6프레임 확인",
+    "note": "데미안6프레임 관련 항목은 과거 검증이며 현재 연출은 followupDamienEdge가 대체한다. 윌 양팔 검증도 인간형 과거 이력이며 현재는 followupWillSpider가 대체한다."
+  },
+  "followupDamienEdge": {
+    "date": "2026-10-15",
+    "verdict": "PASS",
+    "buildErrors": 0,
+    "runtimeErrors": 0,
+    "parts": 36,
+    "flames": 32,
+    "wingShapeFixed": true,
+    "backgroundFixed": true,
+    "resources": 7,
+    "checks": [
+      {
+        "time": "2026-10-15T00:52:44",
+        "message": "[EDGE2] pause previous=false"
+      },
+      {
+        "time": "2026-10-15T00:52:50",
+        "message": "[EDGE2] resources=7/7 metadataErrors=0"
+      },
+      {
+        "time": "2026-10-15T00:52:56",
+        "message": "[EDGE2] original wings fixed=2 flames=32 movingWorld=32 movingCard=32"
+      },
+      {
+        "time": "2026-10-15T00:52:56",
+        "message": "[EDGE2] world_tree_summit world=36/36 moving=36 card=36/36 moving=36 backgroundFixed=true pass=true"
+      },
+      {
+        "time": "2026-10-15T00:52:57",
+        "message": "[EDGE2] COMPLETE passed=1/1 cleanup=true ok=true error=nil"
+      }
+    ],
+    "note": "이전 상향 불꽃 검증 기록. 현재 방향·각도·명도는 followupDamienOutward로 대체."
+  },
+  "followupDamienOutward": {
+    "date": "2026-10-15",
+    "verdict": "PASS",
+    "buildErrors": 0,
+    "runtimeErrors": 0,
+    "worldParts": 36,
+    "cardParts": 36,
+    "wingAngles": [
+      24,
+      -24
+    ],
+    "wingShade": 0.2,
+    "bodyShade": 0.28,
+    "flameDirection": "normalized vector from body (840,550) to border",
+    "travel": 58,
+    "checks": [
+      {
+        "time": "2026-10-15T01:00:42",
+        "message": "[EDGE3] pause previous=false"
+      },
+      {
+        "time": "2026-10-15T01:00:49",
+        "message": "[EDGE3] resources=7/7 metadataErrors=0"
+      },
+      {
+        "time": "2026-10-15T01:00:54",
+        "message": "[EDGE3] spread wings=24/-24 dark=0.20 outwardFlow=true flames=32 movingWorld=32 movingCard=32"
+      },
+      {
+        "time": "2026-10-15T01:00:55",
+        "message": "[EDGE3] world_tree_summit world=36/36 moving=36 card=36/36 moving=36 backgroundFixed=true pass=true"
+      },
+      {
+        "time": "2026-10-15T01:00:55",
+        "message": "[EDGE3] COMPLETE passed=1/1 cleanup=true ok=true error=nil"
+      }
+    ]
+  },
+  "followupWillSpider": {
+    "date": "2026-10-15",
+    "verdict": "PASS",
+    "buildErrors": 0,
+    "runtimeErrors": 0,
+    "checks": [
+      {
+        "time": "2026-10-15T01:43:13",
+        "message": "[WILL] state=idle watched=0.0 map=entity/649a253a-38d6-4ece-aaa0-86a49d14e38b"
+      },
+      {
+        "time": "2026-10-15T01:45:01",
+        "message": "[WILL] pause previous=false"
+      },
+      {
+        "time": "2026-10-15T01:45:10",
+        "message": "[WILL] BGM playing=bd23d2f87d734f8ca52ca8824d1b6ff4 stage=바스러지는 빛"
+      },
+      {
+        "time": "2026-10-15T01:45:11",
+        "message": "[WILL] resources=12/12 metadataErrors=0"
+      },
+      {
+        "time": "2026-10-15T01:45:14",
+        "message": "[WILL] movingLegs world=8 card=8"
+      },
+      {
+        "time": "2026-10-15T01:45:14",
+        "message": "[WILL] diffraction_hall world=10/10 moving=10 card=10/10 moving=10 backgroundFixed=true pass=true"
+      },
+      {
+        "time": "2026-10-15T01:45:14",
+        "message": "[WILL] COMPLETE passed=1/1 cleanup=true ok=true error=nil"
+      }
+    ],
+    "resources": 12,
+    "worldParts": 10,
+    "cardParts": 10,
+    "movingLegs": 8,
+    "backgroundFixed": true,
+    "bgm": "bd23d2f87d734f8ca52ca8824d1b6ff4",
+    "limitations": "보스 처치와 클릭 판정은 이번 외형/BGM 변경에서 수정하지 않았으며 재검증 대상에 포함하지 않음"
+  }
+}

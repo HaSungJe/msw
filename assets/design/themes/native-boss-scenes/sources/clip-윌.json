@@ -1,0 +1,116 @@
+{
+  "id": "949ed99bbc7543dcb54f223099996d86",
+  "type": "animationclip",
+  "category": "mob",
+  "names": {
+    "ko": [
+      "윌"
+    ]
+  },
+  "dname": "animationclip-28089",
+  "assetGuid": null,
+  "hasEmbedding": true,
+  "payload": {
+    "frames": [
+      {
+        "index": 0,
+        "spriteRuid": "b520e942f7974725a9030051248a8e87",
+        "width": 148,
+        "height": 196,
+        "pivot": {
+          "x": 99,
+          "y": 23,
+          "nx": 0.6689,
+          "ny": 0.1173
+        }
+      },
+      {
+        "index": 1,
+        "spriteRuid": "eea7a47b28bd4edfb02b1b61b07a81bb",
+        "width": 152,
+        "height": 192,
+        "pivot": {
+          "x": 99,
+          "y": 23,
+          "nx": 0.6513,
+          "ny": 0.1198
+        }
+      },
+      {
+        "index": 2,
+        "spriteRuid": "01e4515714514a798a61018324e7370a",
+        "width": 160,
+        "height": 192,
+        "pivot": {
+          "x": 99,
+          "y": 23,
+          "nx": 0.6188,
+          "ny": 0.1198
+        }
+      },
+      {
+        "index": 3,
+        "spriteRuid": "93df839bec17415d80acab94ceb70985",
+        "width": 168,
+        "height": 192,
+        "pivot": {
+          "x": 99,
+          "y": 23,
+          "nx": 0.5893,
+          "ny": 0.1198
+        }
+      },
+      {
+        "index": 4,
+        "spriteRuid": "ffddfc3401674b0ca4c722bcc096b23f",
+        "width": 176,
+        "height": 192,
+        "pivot": {
+          "x": 99,
+          "y": 23,
+          "nx": 0.5625,
+          "ny": 0.1198
+        }
+      },
+      {
+        "index": 5,
+        "spriteRuid": "c89f28e44eef41ebb22733c13d3101d9",
+        "width": 172,
+        "height": 192,
+        "pivot": {
+          "x": 99,
+          "y": 23,
+          "nx": 0.5756,
+          "ny": 0.1198
+        }
+      },
+      {
+        "index": 6,
+        "spriteRuid": "9e150ebec53349709686ba55d26419a0",
+        "width": 164,
+        "height": 196,
+        "pivot": {
+          "x": 99,
+          "y": 23,
+          "nx": 0.6037,
+          "ny": 0.1173
+        }
+      },
+      {
+        "index": 7,
+        "spriteRuid": "3206bb26564c47398c2a509b566952e4",
+        "width": 152,
+        "height": 196,
+        "pivot": {
+          "x": 99,
+          "y": 23,
+          "nx": 0.6513,
+          "ny": 0.1173
+        }
+      }
+    ],
+    "width": 162,
+    "height": 194,
+    "thumbnail": "https://mod-resource-search-images.dn.nexoncdn.co.kr/maplestory_world/949ed99bbc7543dcb54f223099996d86.gif"
+  }
+}

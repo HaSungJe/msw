@@ -1,0 +1,51 @@
+{
+  "query": "black heaven lotus background",
+  "results": [
+    {
+      "id": "a0d4f9fa4cd64b5fbcb8420a4e50ee66",
+      "type": "animationclip",
+      "category": "background",
+      "dname": "animationclip-771367",
+      "payload": {
+        "frames": [
+          "9fb96fe9473e43a4ad332d4bcd1bda5d",
+          "1a3c3525814b456ab87e689862f0fd44",
+          "19fa3436d32b4952b2eae5c757fa31c8",
+          "df020a40dc7844eb95282bc077221ead",
+          "e78f0a376d1f40a682f6b11828bf4652",
+          "ac2a65c37a204439be06771651efeb2a",
+          "b133c76cdaf14b9b88b70d386e4e954b",
+          "877c9984feda443193c7ac76cbf7855a",
+          "9d69568918a84efab68ea4157bea5d66",
+          "f5d5eeb59be04b1bbf186ef95abf392b",
+          "43f8c9a1816e45cbaf55c3b0eb834d4c",
+          "6d836997939d47748d5bca4e369a640c"
+        ],
+        "width": 222,
+        "height": 170
+      }
+    },
+    {
+      "id": "46f62fd1f9974d2b98b5bebb3f1c586c",
+      "type": "sprite",
+      "category": "background",
+      "dname": "sprite-9092155",
+      "payload": {
+        "width": 1000,
+        "height": 944
+      }
+    },
+    {
+      "id": "14aca43ae7ee4824926486f1b65c3fa8",
+      "type": "sprite",
+      "category": "background",
+      "dname": "sprite-12845775",
+      "payload": {
+        "width": 1136,
+        "height": 532
+      }
+    }
+  ],
+  "nextOffset": 3,
+  "exactMatch": false
+}

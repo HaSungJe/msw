@@ -1,0 +1,37 @@
+{
+  "query": "혼테일 동굴 행성 배경",
+  "results": [
+    {
+      "id": "fab2bdd9cb694714a6b235a202865b8f",
+      "type": "sprite",
+      "category": "background",
+      "dname": "sprite-9098330",
+      "payload": {
+        "width": 240,
+        "height": 236
+      }
+    },
+    {
+      "id": "50ca2d2cac2f44c5a48192b06b391621",
+      "type": "sprite",
+      "category": "background",
+      "dname": "sprite-9092337",
+      "payload": {
+        "width": 144,
+        "height": 84
+      }
+    },
+    {
+      "id": "54bc98c7bac14ce2b1533f26a6ba44f2",
+      "type": "sprite",
+      "category": "background",
+      "dname": "sprite-9092485",
+      "payload": {
+        "width": 248,
+        "height": 196
+      }
+    }
+  ],
+  "nextOffset": 3,
+  "exactMatch": false
+}

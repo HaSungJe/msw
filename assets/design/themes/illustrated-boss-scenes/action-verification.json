@@ -1,0 +1,234 @@
+{
+  "date": "2026-10-14",
+  "scope": "액션 테마 17종 공통 모션",
+  "status": "motion-pass; combat-clear-pending",
+  "buildErrors": [],
+  "runtimeErrors": [],
+  "logs": [
+    {
+      "logType": "Info",
+      "dateTime": "2026-10-14T20:54:49",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "[MOTION] map=LobbyMap scenes=0",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 0,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-10-14T20:56:46",
+      "isGeneratedFromServer": true,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "[MOTION] boss-start=1 theme=forbidden_altar",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 0,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-10-14T20:57:22",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "[MOTION] client stage=10.0 theme=forbidden_altar grid=false",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 3,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-10-14T20:57:22",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "[MOTION] cell=8,6 target=true xy=(945.414, 585.820)",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 4,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-10-14T20:57:22",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "[MOTION] cell=8,7 target=true xy=(945.414, 516.659)",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 4,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-10-14T20:57:23",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "[MOTION] cell=9,6 target=true xy=(1014.585, 585.820)",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 4,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-10-14T20:57:23",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "[MOTION] cell=9,7 target=true xy=(1014.585, 516.659)",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 4,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-10-14T20:57:23",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "[MOTION] body-hidden=true entity-enabled=true",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 6,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-10-14T20:57:25",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "[MOTION] world moved=true zoomed=true scenes=2",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 9,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-10-14T20:58:31",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "[MOTION] live-cards=1",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 7,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-10-14T20:58:33",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "[MOTION] card moved=true zoomed=true",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 4,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-10-14T20:58:38",
+      "isGeneratedFromServer": true,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "[MOTION] test-unit=false targetable=true hit-enabled=true",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 7,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-10-14T20:59:43",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "[MOTION] actual-click-open=true panel=true",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 0,
+          "codeBlockFileId": null
+        }
+      ]
+    }
+  ],
+  "limitations": [
+    "실제 피격·처치 검증 직전 Play가 외부에서 종료되어 해당 검증은 미완료.",
+    "보스와 배경은 일체형 원화에 공통 확대·이동·밝기를 적용한다. 별도 보스 관절/프레임 애니메이션이 아니다."
+  ]
+}

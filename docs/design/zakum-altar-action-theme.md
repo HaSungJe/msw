@@ -1,3 +1,15 @@
+# 자쿰의 제단 — 액션 테마
+
+- 현재 기준: 2026-10-14. 기존 원화의 매끈한 카툰 그림체로 배경과 보스를 함께 다시 그렸다. `zakum_altar` 저장 키 유지.
+- 원화: `assets/design/themes/illustrated-boss-scenes/zakum-altar/concept.png`. 배경·썸네일 RUID는 같은 패키지 `action-scenes.json`.
+- 고정 배경+몸통·팔8개 분리 부위+용암 기포/파열/파문24개+환경 입자18개. 기존 MSW 원본 자쿰8프레임 확대 레이어는 제거했다.
+- 보스전에는 해당 보스 액션 테마로 자동 전환하고 종료·탈락·재시작 시 개인 선택 테마를 복원한다. 개인 저장 키는 변경하지 않는다. 트랙/칸 전체는 보스 라운드에 숨기고 이동·영입 중에만 기존 설치 마커를 표시한다. 중앙 2×2 예약칸과 전투 보스 엔티티·HP·피격·처치·클리어는 유지하며, 몸통과 추가 부위의 SpriteRenderer만 숨긴다. 중앙4칸 클릭은 살아 있는 보스 정보로 연결한다(두 보스는 가까운 슬롯 우선).
+- 전체 기준과 최신 검증은 [보스 액션 테마](boss-action-themes.md).
+
+## 과거 제작 기록 (현재 사용하지 않음)
+
+아래는 교체 전 생성형 원화·팔 분절 시안 기록이며 현재 적용 정보가 아니다.
+
 # 자쿰의 제단 — 액션 테마 시안
 
 - 상태: 게임 구현·리소스 업로드 완료 — 원화 기반 레이어 애니메이션, MP4 미제작
@@ -88,3 +100,6 @@ Critical character fidelity: Zakum is a squat, stacked architectural stone totem
 
 Paint the reference character faithfully at higher resolution, integrated with the altar lighting. This is still a MapleStory 2D game illustration, with readable stylized shapes and original character identity, not a realistic stone sculpture. Maintain the full altar and cavern setting. No other characters, no added props, no text, no labels, no numbers, no watermark, no UI, no motion blur. One 16:9 landscape still keyframe.
 ```
+
+
+2026-10-14 액션 연출 수정: 카메라/배경 전체 확대는 폐기. 자쿰 팔8개·용암, 혼테일 머리/팔/날개/꼬리·낙수는 `assets/design/themes/articulated-scenes/`의 원본/리소스/관절 표를 사용한다. 나머지15종은 일체형 원화+입자 상태이며 부위 모션은 미적용이다.

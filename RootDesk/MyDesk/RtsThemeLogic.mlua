@@ -13,6 +13,10 @@ script RtsThemeLogic extends Logic
 	-- 서버: 구역 → 지금 적용된 테마 키(없으면 DefaultKey — EnsureZoneVisuals·EnsureGroundTiles가 기본으로 세운 상태)
 	property table ZoneTheme = {}
 
+	-- 보스전 임시 테마. 개인 선택·저장 값과 분리한다.
+	@Sync
+	property SyncTable<string, string> BossThemeByZone
+
 	-- 장식물 자리(칸 좌표, col 1 = 첫 열 중앙이 0.5 → col 0.5 = 그리드 왼쪽 가장자리, col 16.5 = 오른쪽 가장자리; row도 같은 식, 13행 아래 가장자리 = 13.5).
 	--   그리드는 16×13, 좌우 여백 4칸씩·위아래 0.25칸이라 **전부 좌우 여백에만** 둔다(2026-09-20 사용자 "타일에 오브젝트 안 겹치게"). 칸 1.78유닛, PPU 100.
 	--   헤네시스는 공식 탑뷰 오브젝트 23개(GetHenesysDecor)를 두었다가 2026-09-25 사용자 "헤네시스 테마에 좌/우 설치된 오브젝트들 제거"로 뺐다(장식 없음 — 마을 풍경 배경만)
@@ -54,15 +58,15 @@ script RtsThemeLogic extends Logic
 
 	-- 프리셋 표(표 순서 = 테마 창 순서). 새 테마 = 여기 한 줄 + 타일셋에 타일 1개 + 그리드 텍스처 1장(assets/textures/README.md 절차) + 장식물 목록 + 썸네일 — docs/theme-presets.md
 	--   key       저장 값(유저 DataStorage "theme")·RPC 인자 — 한 번 정하면 바꾸지 않는다
-	--   tab       테마 창 탭 이름(같은 이름끼리 한 탭). 지금은 '기본'만
+	--   tab       개인 선택은 기본5종만. 액션17종은 보스전 내부 연출 전용.
 	--   gridTint  트랙 판 색 입히기. 테마별 트랙 판이 있어 지금은 모두 흰색
-	--   backgroundRUID  마을 풍경 스프라이트 RUID(1920×1080). 트랙 판 아래, 바닥 타일 위에 배치
+	--   backgroundRUID  풍경 스프라이트 RUID(일반1920×1080, 액션은 정의표 크기). 트랙 판 아래, 바닥 타일 위에 배치
 	--   backgroundAlpha 풍경 투명도. 트랙·발판과 전투 UI가 읽히도록 약간 낮춘다
 	--   thumb     같은 풍경을 줄인 썸네일 RUID(400×240, "" = 없음 → color로 칠함) — 프로필 창 테마 카드·프로필 상자·유저 카드 배경
 	--   free      true = 누구나 보유(기본 지급). false면 유저 보유 목록(DataStorage "themes")에 있어야 고를 수 있다(2026-09-25 사용자 "테마·비석·아이콘 모두 영구 소유")
 	--   바닥 타일·트랙 판·장식·썸네일 RUID와 원본 PNG 경로는 assets/textures/README.md
 	method table GetPresets()
-		return {
+		local list = {
 			{ key = "henesys", name = "헤네시스", tab = "기본", floorTile = "HenesysGrass1", floorVariants = { "HenesysGrass2", "HenesysGrass3" }, variantRatio = 0.12,
 				gridRUID = "a752d95ae8f84f9291047ae34b00416f", gridTint = Color(1, 1, 1, 1), decor = {}, backgroundRUID = "e1886576584e4e3f99c9912abf75c489", backgroundAlpha = 0.78, thumb = "bf5c2956120046aab843eb14f562b925", color = Color(0.42, 0.66, 0.3, 1), free = true }, -- 2026-09-25 M2 경로(ZoneTrackGridM2 — 보스 가운데 2×2, S 화살표·E 되돌리기)
 			{ key = "ellinia", name = "엘리니아", tab = "기본", floorTile = "ElliniaMoss", floorVariants = {}, variantRatio = 0,
@@ -73,9 +77,9 @@ script RtsThemeLogic extends Logic
 				gridRUID = "e0721799e39d4ecebf723b842c013b74", gridTint = Color(1, 1, 1, 1), decor = self:GetKerningDecor(), backgroundRUID = "e2f7cda163294b3b8d8ab956f2966bda", backgroundAlpha = 0.78, thumb = "457ec944d357431ba1642520d7d4eb16", color = Color(0.4, 0.4, 0.54, 1), free = true },
 			{ key = "lith", name = "리스항구", tab = "기본", floorTile = "LithSand", floorVariants = {}, variantRatio = 0,
 				gridRUID = "7b1ad42ce59245eea17e52ab201b4dde", gridTint = Color(1, 1, 1, 1), decor = self:GetLithDecor(), backgroundRUID = "89b81c540feb454796ba78a0025b7223", backgroundAlpha = 0.78, thumb = "7653fa3a53314b43a2aa4b16ccae3adc", color = Color(0.33, 0.56, 0.8, 1), free = true },
-			{ key = "zakum_altar", name = "자쿰의 제단", tab = "액션", floorTile = "PerionEarth", floorVariants = {}, variantRatio = 0,
-				gridRUID = "b867ada14eb24f99936178a38da2a3b6", gridTint = Color(1, 1, 1, 1), decor = {}, backgroundRUID = "be90451fd564466aafbade23743a3b03", backgroundAlpha = 1, thumb = "c1386854b1394861b23c8695a284e82d", color = Color(0.55, 0.31, 0.19, 1), free = true },
+
 		}
+		return list
 	end
 
 	-- ===== 프리셋 표 공용 조회(테마·비석 RtsTombLogic이 같은 짜임 — 2026-09-28 정리로 한 곳) =====
@@ -112,12 +116,20 @@ script RtsThemeLogic extends Logic
 	-- 없는 키면 기본(헤네시스)
 	method table GetPreset(string key)
 		local list = self:GetPresets()
-		return self:FindPreset(list, key) or list[1]
+		local preset = self:FindPreset(list, key)
+		if preset ~= nil then return preset end
+		-- 개인 선택 목록과 분리한 보스전 전용 시각 정보.
+		local d = _RtsActionThemeLogic:GetDefinition(key)
+		if d ~= nil then
+			return { key = d.key, name = d.name, floorTile = "PerionEarth", floorVariants = {}, variantRatio = 0,
+				gridRUID = "b867ada14eb24f99936178a38da2a3b6", gridTint = Color.white, decor = {}, backgroundRUID = d.background, backgroundAlpha = 1, thumb = d.thumb, color = Color(d.color[1], d.color[2], d.color[3], 1), free = false }
+		end
+		return list[1]
 	end
 
 	method string GetZoneTheme(number zone)
 		local k = self.ZoneTheme[math.floor(zone + 0.5)]
-		if k == nil or k == "" then return self.DefaultKey end
+		if k == nil or not self:HasKey(k) then return self.DefaultKey end
 		return k
 	end
 
@@ -132,14 +144,38 @@ script RtsThemeLogic extends Logic
 			return false
 		end
 		if self:GetZoneTheme(z) == key then return true end
+		self.ZoneTheme[z] = key
+		if self:GetBossTheme(z) == "" then self:ApplyVisualToZone(z, key) end
+		return true
+	end
+
+	@ExecSpace("ServerOnly")
+	method void ApplyVisualToZone(number z, string key)
 		local preset = self:GetPreset(key)
 		_RtsBootstrapLogic:FillZoneTiles(z, preset.floorTile, preset.floorVariants, preset.variantRatio)
 		_RtsZoneLogic:SetZoneBackground(z, preset.backgroundRUID, preset.backgroundAlpha)
 		_RtsZoneLogic:SetZoneGrid(z, preset.gridRUID, preset.gridTint)
 		_RtsZoneLogic:SetZoneDecor(z, preset.decor)
-		self.ZoneTheme[z] = key
 		_RtsConfigLogic:Log("RtsTheme: zone " .. string.format("%d", z) .. " → " .. key)
-		return true
+	end
+
+	method string GetBossTheme(number zone)
+		return self.BossThemeByZone[string.format("%d", math.floor(zone + 0.5))] or ""
+	end
+
+	@ExecSpace("ServerOnly")
+	method void BeginBossTheme(number zone, string mobId)
+		local key = _RtsActionThemeLogic:GetBossThemeKey(mobId)
+		if key == "" then return end
+		self.BossThemeByZone[string.format("%d", math.floor(zone + 0.5))] = key
+		self:ApplyVisualToZone(zone, key)
+	end
+
+	@ExecSpace("ServerOnly")
+	method void EndBossTheme(number zone)
+		if self:GetBossTheme(zone) == "" then return end
+		self.BossThemeByZone[string.format("%d", math.floor(zone + 0.5))] = ""
+		self:ApplyVisualToZone(zone, self:GetZoneTheme(zone))
 	end
 
 end

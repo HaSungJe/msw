@@ -1,0 +1,491 @@
+{
+  "created": "2026-10-14",
+  "status": "runtime-integrated",
+  "count": 16,
+  "notes": [
+    "배경은 사용자 사진의 UI/인물 제거 및 가림 영역 생성 복원본. MSW 배경 원본 직접 조립본이 아니다.",
+    "주니어발록·혼테일·피아누스는 발판·로프 제거/바닥 정돈 후 사용자 승인.",
+    "MSW 보스 원본은 외형 변경 없이 크기·위치만 조절. 스우·더스크는 사진 복원 예외.",
+    "혼테일은 MSW 전신 썸네일 원본을 확대. 모션용 분절 리소스는 후속 작업.",
+    "승인 원화16종을 개인 액션 테마로 연결. 기본5종 유지. 기존 자쿰 저장 키를 유지하고 새 장면으로 교체.",
+    "보스 스테이지 자동 전환·중앙 피격점·전투 보스 표시 통합은 미구현."
+  ],
+  "scenes": [
+    {
+      "id": "zakum-altar",
+      "name": "자쿰의 제단",
+      "concept": "zakum-altar/concept.png",
+      "reference": "zakum-altar/reference.png",
+      "status": "runtime-integrated",
+      "runtimeApplied": true,
+      "backgroundSource": "user-screenshot-imagegen-cleanup",
+      "bossSources": [
+        {
+          "id": "B02",
+          "name": "자쿰",
+          "ruid": "282f519bb66c4e499e1992b9993e1457",
+          "file": "zakum-altar/boss-B02-native.png",
+          "transform": "transparent-border trim, uniform nearest-neighbor enlargement, translation only",
+          "placement": {
+            "x": 474,
+            "y": 224,
+            "width": 736,
+            "height": 551
+          }
+        }
+      ],
+      "background": "zakum-altar/background-restored.png",
+      "size": [
+        1684,
+        934
+      ],
+      "runtimeKey": "zakum_altar"
+    },
+    {
+      "id": "forbidden-altar",
+      "name": "금지된 제단",
+      "concept": "forbidden-altar/concept.png",
+      "reference": "forbidden-altar/reference.png",
+      "status": "runtime-integrated",
+      "runtimeApplied": true,
+      "backgroundSource": "user-screenshot-imagegen-cleanup",
+      "bossSources": [
+        {
+          "id": "B01",
+          "name": "주니어 발록",
+          "ruid": "9e00d0b8c9e94634a1d94f0f1691c0d5",
+          "file": "forbidden-altar/boss-B01-native.png",
+          "transform": "transparent-border trim, uniform nearest-neighbor enlargement, translation only",
+          "placement": {
+            "x": 601,
+            "y": 311,
+            "width": 470,
+            "height": 461
+          }
+        }
+      ],
+      "background": "forbidden-altar/background-restored.png",
+      "size": [
+        1671,
+        941
+      ],
+      "runtimeKey": "forbidden_altar"
+    },
+    {
+      "id": "pianus-cave",
+      "name": "피아누스의 동굴",
+      "concept": "pianus-cave/concept.png",
+      "reference": "pianus-cave/reference.png",
+      "status": "runtime-integrated",
+      "runtimeApplied": true,
+      "backgroundSource": "user-screenshot-imagegen-cleanup",
+      "bossSources": [
+        {
+          "id": "B03",
+          "name": "피아누스",
+          "ruid": "780b1754c3c74644ba16e0715d51e406",
+          "file": "pianus-cave/boss-B03-native.png",
+          "transform": "transparent-border trim, uniform nearest-neighbor enlargement, translation only",
+          "placement": {
+            "x": 497,
+            "y": 235,
+            "width": 682,
+            "height": 600
+          }
+        }
+      ],
+      "background": "pianus-cave/background-restored.png",
+      "size": [
+        1676,
+        938
+      ],
+      "runtimeKey": "pianus_cave"
+    },
+    {
+      "id": "cave-of-life",
+      "name": "생명의 동굴",
+      "concept": "cave-of-life/concept.png",
+      "reference": "cave-of-life/reference.png",
+      "status": "runtime-integrated",
+      "runtimeApplied": true,
+      "backgroundSource": "user-screenshot-imagegen-cleanup",
+      "bossSources": [
+        {
+          "id": "B04",
+          "name": "혼테일",
+          "ruid": "741f6fdaecb34fa08289bb78c551188d",
+          "file": "cave-of-life/boss-B04-native.png",
+          "transform": "transparent-border trim, uniform nearest-neighbor enlargement, translation only",
+          "placement": {
+            "x": 522,
+            "y": 140,
+            "width": 635,
+            "height": 703
+          }
+        }
+      ],
+      "background": "cave-of-life/background-restored.png",
+      "size": [
+        1678,
+        937
+      ],
+      "runtimeKey": "cave_of_life"
+    },
+    {
+      "id": "twilight-of-gods",
+      "name": "신들의 황혼",
+      "concept": "twilight-of-gods/concept.png",
+      "reference": "twilight-of-gods/reference.png",
+      "status": "runtime-integrated",
+      "runtimeApplied": true,
+      "backgroundSource": "user-screenshot-imagegen-cleanup",
+      "bossSources": [
+        {
+          "id": "B05",
+          "name": "핑크빈",
+          "ruid": "98a47e617b8b44cb96da597ad949e7b1",
+          "file": "twilight-of-gods/boss-B05-native.png",
+          "transform": "transparent-border trim, uniform nearest-neighbor enlargement, translation only",
+          "placement": {
+            "x": 700,
+            "y": 527,
+            "width": 275,
+            "height": 263
+          }
+        }
+      ],
+      "background": "twilight-of-gods/background-restored.png",
+      "size": [
+        1674,
+        940
+      ],
+      "runtimeKey": "twilight_of_gods"
+    },
+    {
+      "id": "black-heaven-core",
+      "name": "블랙헤븐 코어",
+      "concept": "black-heaven-core/concept.png",
+      "reference": "black-heaven-core/reference.png",
+      "status": "runtime-integrated",
+      "runtimeApplied": true,
+      "backgroundSource": "user-screenshot-imagegen-cleanup",
+      "bossSources": [
+        {
+          "source": "user-screenshot-imagegen-cleanup",
+          "note": "스우/더스크 예외: 사진 속 보스를 포함한 장면 복원본; 원본 픽셀 그대로 추출한 파일은 아님"
+        }
+      ],
+      "size": [
+        1678,
+        937
+      ],
+      "runtimeKey": "black_heaven_core"
+    },
+    {
+      "id": "world-tree-summit",
+      "name": "세계수 정상",
+      "concept": "world-tree-summit/concept.png",
+      "reference": "world-tree-summit/reference.png",
+      "status": "runtime-integrated",
+      "runtimeApplied": true,
+      "backgroundSource": "user-screenshot-imagegen-cleanup",
+      "bossSources": [
+        {
+          "id": "B08",
+          "name": "데미안",
+          "ruid": "04e5f84747e14508b7cfb1818d78fd29",
+          "file": "world-tree-summit/boss-B08-native.png",
+          "transform": "transparent-border trim, uniform nearest-neighbor enlargement, translation only",
+          "placement": {
+            "x": 465,
+            "y": 349,
+            "width": 739,
+            "height": 453
+          }
+        }
+      ],
+      "background": "world-tree-summit/background-restored.png",
+      "size": [
+        1668,
+        943
+      ],
+      "runtimeKey": "world_tree_summit"
+    },
+    {
+      "id": "collapsing-clocktower",
+      "name": "무너지는 시계탑",
+      "concept": "collapsing-clocktower/concept.png",
+      "reference": "collapsing-clocktower/reference.png",
+      "status": "runtime-integrated",
+      "runtimeApplied": true,
+      "backgroundSource": "user-screenshot-imagegen-cleanup",
+      "bossSources": [
+        {
+          "id": "B09",
+          "name": "루시드(보스)",
+          "ruid": "e132ef136c30420288e046a8696eb4bc",
+          "file": "collapsing-clocktower/boss-B09-native.png",
+          "transform": "transparent-border trim, uniform nearest-neighbor enlargement, translation only",
+          "placement": {
+            "x": 589,
+            "y": 198,
+            "width": 495,
+            "height": 536
+          }
+        }
+      ],
+      "background": "collapsing-clocktower/background-restored.png",
+      "size": [
+        1672,
+        941
+      ],
+      "runtimeKey": "collapsing_clocktower"
+    },
+    {
+      "id": "diffraction-hall",
+      "name": "회절의 회랑",
+      "concept": "diffraction-hall/concept.png",
+      "reference": "diffraction-hall/reference.png",
+      "status": "runtime-integrated",
+      "runtimeApplied": true,
+      "backgroundSource": "user-screenshot-imagegen-cleanup",
+      "bossSources": [
+        {
+          "id": "B10",
+          "name": "윌",
+          "ruid": "b520e942f7974725a9030051248a8e87",
+          "file": "diffraction-hall/boss-B10-native.png",
+          "transform": "transparent-border trim, uniform nearest-neighbor enlargement, translation only",
+          "placement": {
+            "x": 667,
+            "y": 359,
+            "width": 331,
+            "height": 434
+          }
+        }
+      ],
+      "background": "diffraction-hall/background-restored.png",
+      "size": [
+        1665,
+        944
+      ],
+      "runtimeKey": "diffraction_hall"
+    },
+    {
+      "id": "eye-of-void",
+      "name": "공허의 눈",
+      "concept": "eye-of-void/concept.png",
+      "reference": "eye-of-void/reference.png",
+      "status": "runtime-integrated",
+      "runtimeApplied": true,
+      "backgroundSource": "user-screenshot-imagegen-cleanup",
+      "bossSources": [
+        {
+          "source": "user-screenshot-imagegen-cleanup",
+          "note": "스우/더스크 예외: 사진 속 보스를 포함한 장면 복원본; 원본 픽셀 그대로 추출한 파일은 아님"
+        }
+      ],
+      "size": [
+        1672,
+        941
+      ],
+      "runtimeKey": "eye_of_void"
+    },
+    {
+      "id": "altar-of-desire",
+      "name": "욕망의 제단",
+      "concept": "altar-of-desire/concept.png",
+      "reference": "altar-of-desire/reference.png",
+      "status": "runtime-integrated",
+      "runtimeApplied": true,
+      "backgroundSource": "user-screenshot-imagegen-cleanup",
+      "bossSources": [
+        {
+          "id": "B12",
+          "name": "진 힐라",
+          "ruid": "8f2eb8ca8e0a4e729e306065ac8c4ded",
+          "file": "altar-of-desire/boss-B12-native.png",
+          "transform": "transparent-border trim, uniform nearest-neighbor enlargement, translation only",
+          "placement": {
+            "x": 645,
+            "y": 310,
+            "width": 386,
+            "height": 525
+          }
+        }
+      ],
+      "background": "altar-of-desire/background-restored.png",
+      "size": [
+        1676,
+        938
+      ],
+      "runtimeKey": "altar_of_desire"
+    },
+    {
+      "id": "near-the-end",
+      "name": "끝에 가까운 곳",
+      "concept": "near-the-end/concept.png",
+      "reference": "near-the-end/reference.png",
+      "status": "runtime-integrated",
+      "runtimeApplied": true,
+      "backgroundSource": "user-screenshot-imagegen-cleanup",
+      "bossSources": [
+        {
+          "id": "B13",
+          "name": "친위대장 듄켈",
+          "ruid": "1cf8ad77b6b44f4e8f943477c8f12a3b",
+          "file": "near-the-end/boss-B13-native.png",
+          "transform": "transparent-border trim, uniform nearest-neighbor enlargement, translation only",
+          "placement": {
+            "x": 498,
+            "y": 302,
+            "width": 671,
+            "height": 500
+          }
+        }
+      ],
+      "background": "near-the-end/background-restored.png",
+      "size": [
+        1667,
+        944
+      ],
+      "runtimeKey": "near_the_end"
+    },
+    {
+      "id": "dark-temple",
+      "name": "어둠의 신전",
+      "concept": "dark-temple/concept.png",
+      "reference": "dark-temple/reference.png",
+      "status": "runtime-integrated",
+      "runtimeApplied": true,
+      "backgroundSource": "user-screenshot-imagegen-cleanup",
+      "bossSources": [
+        {
+          "id": "B14",
+          "name": "아이온",
+          "ruid": "c468dd68a5f14c76951eb64a9ea2d253",
+          "file": "dark-temple/boss-B14-native.png",
+          "transform": "transparent-border trim, uniform nearest-neighbor enlargement, translation only",
+          "placement": {
+            "x": 399,
+            "y": 206,
+            "width": 375,
+            "height": 638
+          }
+        },
+        {
+          "id": "B15",
+          "name": "얄다바오트",
+          "ruid": "1287d10c17f746d8956555ead5512c42",
+          "file": "dark-temple/boss-B15-native.png",
+          "transform": "transparent-border trim, uniform nearest-neighbor enlargement, translation only",
+          "placement": {
+            "x": 904,
+            "y": 206,
+            "width": 373,
+            "height": 638
+          }
+        }
+      ],
+      "background": "dark-temple/background-restored.png",
+      "size": [
+        1677,
+        938
+      ],
+      "runtimeKey": "dark_temple"
+    },
+    {
+      "id": "dark-throne",
+      "name": "어둠의 왕좌",
+      "concept": "dark-throne/concept.png",
+      "reference": "dark-throne/reference.png",
+      "status": "runtime-integrated",
+      "runtimeApplied": true,
+      "backgroundSource": "user-screenshot-imagegen-cleanup",
+      "bossSources": [
+        {
+          "id": "B16",
+          "name": "검은마법사",
+          "ruid": "59eb6f1604b244d49c28a006d1d0d2b7",
+          "file": "dark-throne/boss-B16-native.png",
+          "transform": "transparent-border trim, uniform nearest-neighbor enlargement, translation only",
+          "placement": {
+            "x": 554,
+            "y": 187,
+            "width": 568,
+            "height": 638
+          }
+        }
+      ],
+      "background": "dark-throne/background-restored.png",
+      "size": [
+        1676,
+        938
+      ],
+      "runtimeKey": "dark_throne"
+    },
+    {
+      "id": "boundary-of-beginning-and-end",
+      "name": "시작과 끝의 경계",
+      "concept": "boundary-of-beginning-and-end/concept.png",
+      "reference": "boundary-of-beginning-and-end/reference.png",
+      "status": "runtime-integrated",
+      "runtimeApplied": true,
+      "backgroundSource": "user-screenshot-imagegen-cleanup",
+      "bossSources": [
+        {
+          "id": "B17",
+          "name": "검은마법사",
+          "ruid": "bcdb438c47784d0ab4e2331a6bb6e8e1",
+          "file": "boundary-of-beginning-and-end/boss-B17-native.png",
+          "transform": "transparent-border trim, uniform nearest-neighbor enlargement, translation only",
+          "placement": {
+            "x": 555,
+            "y": 160,
+            "width": 560,
+            "height": 640
+          }
+        }
+      ],
+      "background": "boundary-of-beginning-and-end/background-restored.png",
+      "size": [
+        1670,
+        941
+      ],
+      "runtimeKey": "boundary_of_beginning_and_end"
+    },
+    {
+      "id": "nonexistent-space",
+      "name": "존재하지 않는 공간",
+      "concept": "nonexistent-space/concept.png",
+      "reference": "nonexistent-space/reference.png",
+      "status": "runtime-integrated",
+      "runtimeApplied": true,
+      "backgroundSource": "user-screenshot-imagegen-cleanup",
+      "bossSources": [
+        {
+          "id": "B18",
+          "name": "검은마법사",
+          "ruid": "52676f92c4d24dd88692477b9d24e241",
+          "file": "nonexistent-space/boss-B18-native.png",
+          "transform": "transparent-border trim, uniform nearest-neighbor enlargement, translation only",
+          "placement": {
+            "x": 552,
+            "y": 159,
+            "width": 575,
+            "height": 656
+          }
+        }
+      ],
+      "background": "nonexistent-space/background-restored.png",
+      "size": [
+        1678,
+        937
+      ],
+      "runtimeKey": "nonexistent_space"
+    }
+  ],
+  "updated": "2026-10-14",
+  "runtimeDefinitions": "action-scenes.json",
+  "runtimeVerification": "action-verification.json"
+}

@@ -1,0 +1,37 @@
+{
+  "query": "검은마법사 존재하지 않는 공간 배경",
+  "results": [
+    {
+      "id": "4416eb0357344953bb5f7793f8368f31",
+      "type": "sprite",
+      "category": "background",
+      "dname": "sprite-9091908",
+      "payload": {
+        "width": 72,
+        "height": 732
+      }
+    },
+    {
+      "id": "a19dc678483a41d8bd1d0b47fc2602ed",
+      "type": "sprite",
+      "category": "background",
+      "dname": "sprite-9095203",
+      "payload": {
+        "width": 220,
+        "height": 68
+      }
+    },
+    {
+      "id": "65f6dbe0b1504be0831d2f9a4fdbc547",
+      "type": "sprite",
+      "category": "background",
+      "dname": "sprite-9093094",
+      "payload": {
+        "width": 64,
+        "height": 208
+      }
+    }
+  ],
+  "nextOffset": 3,
+  "exactMatch": false
+}

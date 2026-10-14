@@ -1,0 +1,79 @@
+{
+  "query": "핑크빈 신전",
+  "results": [
+    {
+      "id": "6a42a5b2e95b43ab85ae721128ed6fcc",
+      "type": "animationclip",
+      "category": "background",
+      "dname": "animationclip-771044",
+      "payload": {
+        "frames": [
+          "da0f0e0ba8cf446c816bc3515b7d755d",
+          "6e10a205777e49acbdb56c2738f9ce65",
+          "b6157588a8d341a2acf9fe6f8c4e16a1",
+          "c8064cd392104d5ba4a83ae3dc75b055",
+          "3df60a64c2e24de6a16210439d657a78",
+          "d7ebb81c40e6474c8bd1b8393f70a00a",
+          "0c35096ba3094cbf975555f3e5d40d1f",
+          "5ed6ee0fff384620b2d16c0c0f9ba1a9",
+          "7e7cf63a137c41efa1e517df1a222d8c",
+          "76457bb52fc947e981106fce69a55511",
+          "117a60eba1b4460ebd120bf193256e1d",
+          "1a222e4b46fd43a89b9a8a37c14924b8",
+          "e05d9b8a7edb44f5baf628601b430f7f",
+          "accd2eb627754cc49db200344516d8ee",
+          "cf2d1acfcfe946e495e45ffd8d29cb0c",
+          "cfe8b0277eb3404bb0f108dab6cdaf66"
+        ],
+        "width": 649,
+        "height": 551
+      }
+    },
+    {
+      "id": "b32c3a21578a4711bdd04e8ce569a959",
+      "type": "animationclip",
+      "category": "background",
+      "dname": "animationclip-771460",
+      "payload": {
+        "frames": [
+          "25b36ff484644567ac1499256aaebe0e",
+          "1091e8a8b5414771a4bb9dfd4c744577",
+          "f93f5675f2324948a2af14f1f4be372c",
+          "accaef97bb0e4bed90cbf04f0af0bfe9",
+          "71e896123a7c4d55bc4803a787c9255f",
+          "6aba00d09d6e46c893f119191c176898",
+          "f8bfcc4158bd4b4492f8b7d558d0f9f3",
+          "2783ede7280e436b9a28e6d12a454ef2"
+        ],
+        "width": 204,
+        "height": 412
+      }
+    },
+    {
+      "id": "9ef3b26e5da94f4a8db57b715930d0e1",
+      "type": "animationclip",
+      "category": "object",
+      "dname": "animationclip-51996",
+      "payload": {
+        "frames": [
+          "980876b1a39649c4a7dee448fa2e2713",
+          "9b935fa80fbb4d5a8013a1673bcbabea",
+          "8d89f5db3ea848739f42af7c7d3eaf88",
+          "3665fb695cfe411e89d6c593998f2318",
+          "4a6aa2900d2d4b7cab6250541614ed1a",
+          "cb543638c97a4ecb997c540dc2eee965",
+          "10c3688e1e534aa0b00cd7068bc08d2f",
+          "83a9987b05cb4d43b3551b9e316ad852",
+          "c37208bc34004d66ab6543103f80b527",
+          "e10516d9d8b64a69af49fb7e47c5750d",
+          "972a043413914628b9764dd202b4ade7",
+          "21496ba9c567465a82a092faca32caad"
+        ],
+        "width": 111,
+        "height": 113
+      }
+    }
+  ],
+  "nextOffset": 3,
+  "exactMatch": false
+}

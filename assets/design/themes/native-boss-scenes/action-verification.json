@@ -1,0 +1,452 @@
+{
+  "date": "2026-10-14",
+  "method": "Maker MCP Play Test",
+  "checks": {
+    "presets": 21,
+    "actionDefinitions": 16,
+    "loadedBackgroundsAndThumbnails": 32,
+    "loadedNativeFrames": 190,
+    "testScenesWorldAndUI": 32,
+    "validParts": 606,
+    "changedNativePartsAfter650ms": 27,
+    "cleanupScenes": 0,
+    "actualBoardThemeSwitches": 16,
+    "actionListCards": 16,
+    "restoredTheme": "ellinia",
+    "restoredWorldScenes": 0,
+    "buildErrors": 0,
+    "newRuntimeErrors": 0
+  },
+  "limits": [
+    "UI/world entities and resource loading verified by runtime probes; no screenshot visual inspection in this action integration pass.",
+    "Account theme storage was not changed; reconnect and multiplayer were not tested.",
+    "Boss-round auto-switch, targeting and combat-boss presentation integration are not implemented."
+  ],
+  "logs": [
+    {
+      "logType": "Info",
+      "dateTime": "2026-10-14T19:33:12",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "[ACTION_VERIFY] presets=21 definitions=16 watched=0.0 map=LobbyMap",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 0,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-10-14T19:34:37",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "[ACTION_VERIFY] loaded=32 nativeFrames=190 scenes=32",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 20,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-10-14T19:34:38",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "[ACTION_VERIFY] parts=606 animatedChanges=27",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 31,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-10-14T19:34:39",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "[ACTION_VERIFY] cleanupScenes=0",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 34,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-10-14T19:36:58",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "[ACTION_VERIFY] solo requested",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 0,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-10-14T19:38:20",
+      "isGeneratedFromServer": true,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "[ACTION_VERIFY] applied=zakum_altar ok=true",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 9,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-10-14T19:38:21",
+      "isGeneratedFromServer": true,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "[ACTION_VERIFY] applied=forbidden_altar ok=true",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 9,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-10-14T19:38:22",
+      "isGeneratedFromServer": true,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "[ACTION_VERIFY] applied=pianus_cave ok=true",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 9,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-10-14T19:38:23",
+      "isGeneratedFromServer": true,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "[ACTION_VERIFY] applied=cave_of_life ok=true",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 9,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-10-14T19:38:24",
+      "isGeneratedFromServer": true,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "[ACTION_VERIFY] applied=twilight_of_gods ok=true",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 9,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-10-14T19:38:25",
+      "isGeneratedFromServer": true,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "[ACTION_VERIFY] applied=black_heaven_core ok=true",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 9,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-10-14T19:38:26",
+      "isGeneratedFromServer": true,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "[ACTION_VERIFY] applied=world_tree_summit ok=true",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 9,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-10-14T19:38:27",
+      "isGeneratedFromServer": true,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "[ACTION_VERIFY] applied=collapsing_clocktower ok=true",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 9,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-10-14T19:38:28",
+      "isGeneratedFromServer": true,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "[ACTION_VERIFY] applied=diffraction_hall ok=true",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 9,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-10-14T19:38:29",
+      "isGeneratedFromServer": true,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "[ACTION_VERIFY] applied=eye_of_void ok=true",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 9,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-10-14T19:38:30",
+      "isGeneratedFromServer": true,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "[ACTION_VERIFY] applied=altar_of_desire ok=true",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 9,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-10-14T19:38:31",
+      "isGeneratedFromServer": true,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "[ACTION_VERIFY] applied=near_the_end ok=true",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 9,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-10-14T19:38:32",
+      "isGeneratedFromServer": true,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "[ACTION_VERIFY] applied=dark_temple ok=true",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 9,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-10-14T19:38:33",
+      "isGeneratedFromServer": true,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "[ACTION_VERIFY] applied=dark_throne ok=true",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 9,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-10-14T19:38:34",
+      "isGeneratedFromServer": true,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "[ACTION_VERIFY] applied=boundary_of_beginning_and_end ok=true",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 9,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-10-14T19:38:35",
+      "isGeneratedFromServer": true,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "[ACTION_VERIFY] applied=nonexistent_space ok=true",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 9,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-10-14T19:38:37",
+      "isGeneratedFromServer": true,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "[ACTION_VERIFY] restored=ellinia paused=false",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 15,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-10-14T19:38:46",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "[ACTION_VERIFY] actualBoardThemes=16 watched=1.0",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 17,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-10-14T19:40:13",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "[ACTION_VERIFY] actionCards=16 last=nonexistent_space",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 0,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-10-14T19:40:13",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "[ACTION_VERIFY] restoredWorldScenes=0",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 0,
+          "codeBlockFileId": null
+        }
+      ]
+    }
+  ]
+}

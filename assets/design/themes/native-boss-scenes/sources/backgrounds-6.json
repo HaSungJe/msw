@@ -1,0 +1,37 @@
+{
+  "query": "데미안 세계수 정상 구름 배경",
+  "results": [
+    {
+      "id": "90177249576a4fb6824427faf7c4276c",
+      "type": "sprite",
+      "category": "background",
+      "dname": "sprite-9094772",
+      "payload": {
+        "width": 1368,
+        "height": 768
+      }
+    },
+    {
+      "id": "0f027c40e6254c33b223de8ef1751904",
+      "type": "sprite",
+      "category": "background",
+      "dname": "sprite-9090102",
+      "payload": {
+        "width": 500,
+        "height": 276
+      }
+    },
+    {
+      "id": "a730cb46cc84444796c30c7ebd081bb2",
+      "type": "sprite",
+      "category": "background",
+      "dname": "sprite-9095502",
+      "payload": {
+        "width": 1328,
+        "height": 760
+      }
+    }
+  ],
+  "nextOffset": 3,
+  "exactMatch": false
+}

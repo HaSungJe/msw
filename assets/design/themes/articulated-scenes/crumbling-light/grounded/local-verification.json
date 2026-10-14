@@ -1,0 +1,7 @@
+{
+  "sampleSeconds": 4.8,
+  "step": 0.02,
+  "legs": 8,
+  "maxFootErrorPixels": 4.687428401686771e-13,
+  "bodyTravelPixels": 36
+}

@@ -43,6 +43,11 @@ Maker 26.7에서 실측으로 확인한 엔진 동작과 그에 따른 작성 �
 - `_SpawnService:SpawnByModelId("model://uigroup", …, /ui)`로 만든 그룹은 크기·앵커를 주지 않으면 **실제 클라이언트에서 작은 기본 크기로 화면 가운데에** 생긴다 → 그 안에서 모서리 anchor로 붙인 요소가 전부 화면 가운데로 몰린다. **Maker Play에서는 화면 크기로 잡혀 드러나지 않는다.** 만든 직후 `UITransformComponent`를 AnchorsMin (0,0) · AnchorsMax (1,1) · Pivot (0.5,0.5) · OffsetMin/OffsetMax (0,0)으로 늘린다(`RtsHudLogic.StretchFull`).
 - 근거: 2026-09-24 v260924-1 출시 클라이언트 스크린샷 — HUD 전체(정보 카드·순위/도감/뽑기/증강 버튼·유닛 슬롯·플레이어 목록)가 화면 가운데 약 100px 사각형에 겹쳐 그려짐.
 
+## 새로 만든 UI는 처음 몇 프레임 기본값으로 그려진다 — 꺼진 칸에서 만들고 뒤집는다
+- `SpawnByModelId("model://uisprite"/"model://uitext", …)`로 보이는 부모 밑에 만든 UI는 처음 ≈3프레임 **모델 기본값**(부모 가운데·100×100·흰색·좁은 글자칸)으로 그려진 뒤에야 스크립트가 넣은 앵커·크기·색·글자가 반영된다 → 창·탭을 열 때 글자가 가운데로 몰렸다가 제자리로 간다. 스크립트 쪽 값(`WorldPosition` 등)은 바로 바뀌어 읽히므로 로그로는 잡히지 않는다. 기존 엔티티에 하는 `AddComponent("CanvasGroupComponent")`(GroupAlpha 0 가림)·`Destroy`도 화면엔 늦게 붙어 가림이 듣지 않았다.
+- 꺼진 부모 밑에서 만든 UI도 **켜는 순간** 한 프레임 기본값(글자 몰림·그림 빠짐)으로 그려진다 — 꺼 둔 엔티티는 켜질 때 화면 쪽이 새로 만들어지는 것으로 보인다. 그래서 켜 둔 채 숨긴다: 미리 붙여 둔 `CanvasGroupComponent`의 `GroupAlpha 0`·`BlocksRaycasts false`·`Interactable false`(`RtsPopupLogic.SetShown`). 같은 자리 두 칸(앞·뒤) 중 숨긴 칸에 만들고 0.15초 뒤 한 틱에 투명도로 뒤집는다(`RtsPopupLogic.Region`, `docs/ui-screens.md` 7.3). 이미 그려진 엔티티의 값 바꾸기(투명도·위치·색·글자)는 다음 프레임에 함께 반영된다.
+- 근거: 2026-10-14 사용자 녹화 영상 두 개 — ① 증강 창 → 도감 탭 전환 프레임 14~17(보이는 곳에 새로 만듦: ≈3프레임) ② 꺼 둔 뒤 칸을 켜서 뒤집은 뒤 도감 → 뽑기 탭 108·114프레임(켜는 순간 1프레임)
+
 ## 게임 시계는 RtsStageLogic.GameNow() — 일시정지 시간이 빠지고 배속만큼 빨라진다
 - 2026-09-25 솔로 일시정지(사용자 "솔로 플레이 한정 일시정지")부터 **판정용 시각은 전부 `_RtsStageLogic:GameNow()`로 적고 비교한다** — 스테이지 끝(`StageEndsAt`)·조기 종료, 스킬 쿨(`ReadyAt`)·후딜(`BusyUntil`)·방향 고정, 빙결·방어율 감소·받는 데미지 증가·중독 끝, 위치 이동·결속 쿨. `GameNow = ClockBase + (ServerElapsedSeconds − ClockSince) × ClockRate`(흐름 속도 — 멈춤 0 · 진행 중 `GameSpeed` 1/2 · 카운트다운·종료 1), 서버·클라 공용(동기화 값). 흐름 속도가 바뀌기 직전(일시정지·배속·판 상태 `SetRunState`)마다 `RebaseClock`으로 기준을 다시 잡는다(2026-09-27 배속 — 전: ServerElapsedSeconds − PausedTotal).
 - `_UtilLogic.ServerElapsedSeconds`를 그대로 쓰는 건 **실제 시간이 맞는 것만**: 다시 하기 투표 시간 제한(`VoteStartedAt`), 0.5초 계산 캐시(`ArmorCache`·`GuardCache`). 연출·소리 간격은 `ElapsedSeconds` 그대로.

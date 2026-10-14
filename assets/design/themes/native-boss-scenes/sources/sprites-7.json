@@ -1,0 +1,55 @@
+{
+  "query": "루시드 시계탑",
+  "results": [
+    {
+      "id": "29d47ceabfdd4c52bdd116f0c85eb19d",
+      "type": "animationclip",
+      "category": "object",
+      "dname": "animationclip-51015",
+      "payload": {
+        "frames": [
+          "d4c3ecc75d9d43dfb2b99a8e7179b2c4",
+          "d77f80e521ed4ee586b9326987e87e86"
+        ],
+        "width": 104,
+        "height": 116
+      }
+    },
+    {
+      "id": "8af4d088ab934945bf1004f6cdd8bc05",
+      "type": "animationclip",
+      "category": "object",
+      "dname": "animationclip-51857",
+      "payload": {
+        "frames": [
+          "00c9a6b83c9640e4a580bf6d69cb7fc8",
+          "0f2609b0bff04d23bed057e18ae9e8f9"
+        ],
+        "width": 180,
+        "height": 180
+      }
+    },
+    {
+      "id": "0879024cc439423e9ef8b7335f8839a1",
+      "type": "animationclip",
+      "category": "object",
+      "dname": "animationclip-50758",
+      "payload": {
+        "frames": [
+          "b3489c16e2e644748f5945b942fb12fa",
+          "3405f5343b44454e812bb5c41ded9be2",
+          "f8f373936d6149f4b943f3e06e6d3dce",
+          "654ed54823df4808959bdebceb1a003d",
+          "e439604564dd4a058e2c19786c2824b5",
+          "72c61fad226141c78d52c1c591a8c043",
+          "aed621868fbe41c68eeb4f261dca30c1",
+          "d24f190e89b64603928085ef40ba783b"
+        ],
+        "width": 296,
+        "height": 492
+      }
+    }
+  ],
+  "nextOffset": 3,
+  "exactMatch": false
+}

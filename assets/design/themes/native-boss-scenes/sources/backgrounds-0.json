@@ -1,0 +1,50 @@
+{
+  "query": "자쿰 동굴 용암 배경",
+  "results": [
+    {
+      "id": "f96155f655ea4b9f8b294aa8725b9fef",
+      "type": "animationclip",
+      "category": "background",
+      "dname": "animationclip-771894",
+      "payload": {
+        "frames": [
+          "e8ccc971bdf44199885f25eab3e1c4f9",
+          "1946828343a54d84b55ffd6a0fca7064",
+          "c5b9b4bffba540568ec3474cb10fd46c",
+          "e6a4f6811bd249f58a87fa9d6d0dc999",
+          "633505649ae7479bbda88be52cd4305e",
+          "1b2049f161b34fdc90b16d7a58fd5918",
+          "41621333242d4229a3b679ba5f9e2259",
+          "0fcf5e94dce84f33a08d798dc5b57718",
+          "6bdfa47753284d50858379e56a74cd04",
+          "edf7d13f5ce44a2d92fe0c67069a1dae",
+          "7fcfd1af449d4ed292365c37921c4471"
+        ],
+        "width": 68,
+        "height": 31
+      }
+    },
+    {
+      "id": "d3cb3632c43b43c4b06e76258de8fcb0",
+      "type": "sprite",
+      "category": "background",
+      "dname": "sprite-9097006",
+      "payload": {
+        "width": 256,
+        "height": 184
+      }
+    },
+    {
+      "id": "17ad7b33c0624747a186de8ccec22a30",
+      "type": "sprite",
+      "category": "background",
+      "dname": "sprite-9090358",
+      "payload": {
+        "width": 332,
+        "height": 116
+      }
+    }
+  ],
+  "nextOffset": 3,
+  "exactMatch": false
+}

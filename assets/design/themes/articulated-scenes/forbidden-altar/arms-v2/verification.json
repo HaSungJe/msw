@@ -1,0 +1,120 @@
+{
+  "date": "2026-10-15",
+  "assetCount": 2,
+  "registered": true,
+  "localAssembly": "preview.png; motion-peak.png; motion-low.png inspected",
+  "runtimeRig": [
+    {
+      "id": "arm-l",
+      "w": 400,
+      "h": 600,
+      "x": 720,
+      "y": 455,
+      "k": 0.48,
+      "px": 336,
+      "py": 105,
+      "amp": 3,
+      "period": 3.6,
+      "phase": 0,
+      "order": 93,
+      "angle": 10,
+      "dy": 0,
+      "ruid": "36045f82765b4042879cda0e7498909e"
+    },
+    {
+      "id": "arm-r",
+      "w": 400,
+      "h": 600,
+      "x": 965,
+      "y": 455,
+      "k": 0.48,
+      "px": 64,
+      "py": 105,
+      "amp": -3,
+      "period": 3.6,
+      "phase": 1.1,
+      "order": 93,
+      "angle": -10,
+      "dy": 0,
+      "ruid": "1e3d4f3be36f4fba85988d6e40a65b6b"
+    }
+  ],
+  "staticChecks": "PASS",
+  "makerVerification": "PASS",
+  "policy": "boss-only action themes unchanged",
+  "buildErrors": 0,
+  "runtimeErrors": 0,
+  "resourceLoad": "2/2",
+  "motion": "2/2",
+  "shoulderErrorPx": 0.00000409914,
+  "logs": [
+    {
+      "logType": "Info",
+      "dateTime": "2026-10-15T03:10:57",
+      "isGeneratedFromServer": true,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "[BALROGARM] preview begin",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 5,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-10-15T03:11:00",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "[BALROGARM] resources=2/2 metadata PASS",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 13,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-10-15T03:11:02",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "[BALROGARM] moving=2/2 shoulderErrorPx=4.0991400381918e-06 trackHidden=true PASS",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 42,
+          "codeBlockFileId": null
+        }
+      ]
+    },
+    {
+      "logType": "Info",
+      "dateTime": "2026-10-15T03:11:02",
+      "isGeneratedFromServer": false,
+      "isLogByMaker": true,
+      "owner": null,
+      "subOwner": null,
+      "ownerId": null,
+      "message": "[BALROGARM] complete=true error=nil",
+      "stackTrace": [
+        {
+          "methodName": "MakerScript",
+          "methodLineNum": 44,
+          "codeBlockFileId": null
+        }
+      ]
+    }
+  ]
+}

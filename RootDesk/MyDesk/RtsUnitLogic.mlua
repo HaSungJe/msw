@@ -1,6 +1,6 @@
 -- Phase 4 #14 / Phase 5 #19 (2026-09-15) → Phase 6 (2026-09-23): 유닛 보유·조작의 서버 권위.
---   유저별 유닛 6기(번호 1~6 = HUD 슬롯), 메소, 영입·레벨업·대상 지정·스킨·위치 이동·방출 요청 처리.
---   판 시작 = 유닛 없음·메소 0(InitUser). 영입은 Lv1·무료, 보유 수 < 영입 한도(1·5·자쿰·혼테일·핑크빈·시그너스에서 1칸씩, RtsStageTableLogic.RecruitLimit)일 때만. 메소는 몹 처치 드랍(AddMeso).
+--   유저별 유닛 최대 MaxUnits(12 — 2026-10-14, 번호 = HUD 슬롯), 메소, 영입·레벨업·대상 지정·스킨·위치 이동·방출 요청 처리.
+--   판 시작 = 유닛 없음·메소 0(InitUser). 영입은 Lv1, 비용 = 1,000 × 지금 필드 유닛 수(첫 영입 0 — RecruitCost, 2026-10-14), 최대 12명·언제든(RtsStageTableLogic.RecruitLimit). 메소는 몹 처치 드랍(AddMeso).
 --   위치 이동은 유닛마다 20초 · 대상 변경은 3분 쿨타임(모든 모드 고정). 탈락하면 유닛 전멸(WipeUnits), 새 판이면 초기화(ResetUser).
 --   유닛 엔티티 이름 = "Unit<구역>_<번호>" (/maps/RtsMap/RtsBoard 아래) — 클라는 이 이름으로 내 유닛을 찾는다.
 @Logic
@@ -19,8 +19,11 @@ script RtsUnitLogic extends Logic
 	-- 위치 이동 쿨타임(초) — 유닛마다 20초, 도전·경주·혼자·방 모든 모드 같다(2026-09-29 사용자 "이동 쿨타임 20초로 — 모든 모드 고정", 전: 대상 변경과 같은 3분)
 	property number MoveCooldownSec = 20
 
-	-- 보유 유닛 상한(2026-09-29 사용자 "최대 9마리" — 같은 날 앞선 안 12, 전 6). 영입 칸이 열리는 순번은 RtsStageTableLogic.RecruitAt(생성기 RECRUIT_AT)
-	property number MaxUnits = 9
+	-- 보유 유닛 상한(2026-10-14 사용자 "영입 제한 12" — 전 2026-09-29 9, 그 전 6). 칸은 판 시작부터 전부 열려 있다(RtsStageTableLogic.RecruitAt — 생성기 RECRUIT_AT 전부 1)
+	property number MaxUnits = 12
+
+	-- 영입 비용 = RecruitCostPer × 지금 필드 유닛 수(2026-10-14 사용자 "유닛 비용은 0 + 1000 × 현재 필드에 있는 유닛 수, 초기비용은 0원" — 방출하면 다시 싸진다)
+	property number RecruitCostPer = 1000
 
 	-- 서버: userId → { [no] = entity }
 	property table UnitsByUser = {}
@@ -183,6 +186,24 @@ script RtsUnitLogic extends Logic
 		self:OnChanged(0, 0, userId)
 	end
 
+	-- 보유 owned명일 때 다음 영입 비용(서버 RequestRecruitAt·클라 영입 화면 공용)
+	method number RecruitCost(number owned)
+		return math.floor(self.RecruitCostPer * math.max(0, owned) + 0.5)
+	end
+
+	-- 서버: 이 유저의 지금 유닛 수
+	@ExecSpace("ServerOnly")
+	method number OwnedCount(string userId)
+		local owned = 0
+		local list = self.UnitsByUser[userId]
+		if list ~= nil then
+			for no, e in pairs(list) do
+				if e ~= nil and isvalid(e) then owned = owned + 1 end
+			end
+		end
+		return owned
+	end
+
 	-- 이 유저가 지금 더 영입할 수 있는 수(한도 − 보유, 0 미만 0)
 	@ExecSpace("ServerOnly")
 	method number RecruitRoom(string userId)
@@ -317,8 +338,8 @@ script RtsUnitLogic extends Logic
 
 	-- ===== 영입 =====
 	--   영입 팝업의 직업 카드 → 클라 배치 모드(RtsUnitSelectLogic.BeginPlace)에서 고른 빈 발판 (col,row)에 빈 번호(1~MaxUnits)로 세운다(2026-09-22 사용자 "중앙에 생성하지 말고 위치 선택, 취소하면 영입도 취소").
-	--   본편(2026-09-23 사용자 "항상 Lv1 + 메소 레벨업", "5라운드당 1명"): 무료·Lv1, 보유 수 < 영입 한도일 때만(방출로 빈 칸은 다시 영입 가능).
-	--   거부: 판 진행 중(카운트다운·진행)이 아님 / 탈락·클리어한 유저 / 한도 초과 / 발판 아님 / 내 유닛이 서 있음 (같은 직업 중복은 2026-09-29부터 허용)
+	--   본편(2026-09-23 사용자 "항상 Lv1 + 메소 레벨업"): Lv1, 비용 RecruitCost(지금 유닛 수) — 2026-10-14부터(전 무료), 보유 수 < 12일 때(방출로 빈 칸은 다시 영입 가능).
+	--   거부: 판 진행 중(카운트다운·진행)이 아님 / 탈락·클리어한 유저 / 한도 초과 / 메소 부족 / 발판 아님 / 내 유닛이 서 있음 (같은 직업 중복은 2026-09-29부터 허용)
 	@ExecSpace("Server")
 	method void RequestRecruitAt(string jobId, number col, number row)
 		if _RtsStageLogic.Paused then return end  -- 일시정지 중 게임 조작 막기(2026-09-25 사용자 "전부 막기")
@@ -331,6 +352,11 @@ script RtsUnitLogic extends Logic
 		if not self:IsJobUnlocked(userId, jobId) then return end
 		if self:RecruitRoom(userId) <= 0 then
 			_RtsConfigLogic:Log("RtsUnit: recruit " .. jobId .. " refused — limit")
+			return
+		end
+		local cost = self:RecruitCost(self:OwnedCount(userId))
+		if self:GetMeso(userId) < cost then
+			_RtsConfigLogic:Log("RtsUnit: recruit " .. jobId .. " refused — meso " .. string.format("%d < %d", math.floor(self:GetMeso(userId)), cost))
 			return
 		end
 		local zone = _RtsZoneLogic:GetZoneOfUser(userId)
@@ -354,9 +380,11 @@ script RtsUnitLogic extends Logic
 				return
 			end
 		end
-		self:SpawnUnit(userId, zone, no, jobId, 1, col, row)
-		self:OnChanged(no, self:GetMeso(userId), userId)
-		_RtsConfigLogic:Log("RtsUnit: recruit " .. jobId .. " -> unit " .. string.format("%d", no) .. " at (" .. string.format("%d,%d", col, row) .. ")")
+		if self:SpawnUnit(userId, zone, no, jobId, 1, col, row) == nil then return end
+		local meso = self:GetMeso(userId) - cost
+		self.MesoByUser[userId] = meso
+		self:OnChanged(no, meso, userId)
+		_RtsConfigLogic:Log("RtsUnit: recruit " .. jobId .. " -> unit " .. string.format("%d", no) .. " at (" .. string.format("%d,%d", col, row) .. ") cost " .. string.format("%d", cost))
 	end
 
 	-- 영입할 수 있게 열린 직업인가(서버·클라 공용). 모험가 10직업은 항상, 영웅 팬텀은 프리즘 '팬텀 잠금 해제'(augmentation.md)를 받은 유저만.

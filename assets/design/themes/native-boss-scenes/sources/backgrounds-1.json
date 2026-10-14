@@ -1,0 +1,37 @@
+{
+  "query": "주니어 발록 푸른 동굴 기둥 배경",
+  "results": [
+    {
+      "id": "4f2744785c034e1384151de2e5860a5e",
+      "type": "sprite",
+      "category": "background",
+      "dname": "sprite-12844384",
+      "payload": {
+        "width": 428,
+        "height": 1344
+      }
+    },
+    {
+      "id": "2ddb3b085373499fa59a8e171929bfe7",
+      "type": "sprite",
+      "category": "background",
+      "dname": "sprite-12846285",
+      "payload": {
+        "width": 848,
+        "height": 936
+      }
+    },
+    {
+      "id": "0112131f900744238421dbc114ba4e12",
+      "type": "sprite",
+      "category": "background",
+      "dname": "sprite-12844391",
+      "payload": {
+        "width": 1800,
+        "height": 436
+      }
+    }
+  ],
+  "nextOffset": 3,
+  "exactMatch": false
+}

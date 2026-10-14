@@ -1,0 +1,67 @@
+{
+  "query": "윌 회절의 회랑 배경",
+  "results": [
+    {
+      "id": "ccb67073dde74980a09b1943bc859b06",
+      "type": "animationclip",
+      "category": "background",
+      "dname": "animationclip-771645",
+      "payload": {
+        "frames": [
+          "749fc5ed14614ec99ec0431539f08800",
+          "641c95d70ace4679a67018d2cdf9b037",
+          "4aeec13ddeb84e8fa9a5203a3aa3333b",
+          "38b57b3fd5234ba2b6a32be72c226ac8",
+          "02c4287b70a74b7485105338e74cdf79",
+          "4228067f27fe4292ac2c165965687231",
+          "d5276fc626c74840a2fbde9e68a9dc0c",
+          "10e37b9aa49b444fa250a74fb22e6cd2",
+          "73c59f49a16740b38263a3aa369eab31",
+          "21cb113ea6984b8e83a436979d7a125c",
+          "620a657d491d46f685da092bbae06ba8",
+          "e2be7ffa020448c9adc02cbd509a8a62",
+          "d9c94055ce934e38b872a87ddb74bf75",
+          "27e96241e8564bda80ea2cbe1cdb83bd"
+        ],
+        "width": 140,
+        "height": 262
+      }
+    },
+    {
+      "id": "fabb821c12944a23b8c077023a9b0b86",
+      "type": "animationclip",
+      "category": "background",
+      "dname": "animationclip-771909",
+      "payload": {
+        "frames": [
+          "0ddcd72b40d54c87a4c9a24620a3ca90",
+          "797e8295130642de9272ca7f9f99ae3f",
+          "2e06582ecf194d4b8dcba82380101c9a",
+          "83b907b9f7a6430289df74e420e5cc4c",
+          "bdde226ce2374c68969f82920578990f",
+          "23082a5b727541c68e4071c1db9ac9f5",
+          "bd577bc4c20e4c0aa7859af185de7862",
+          "89c8f0b7acb9441f92207ecbfe2065cd",
+          "11a001a8dce84417abb1c991c51d683b",
+          "0cddddfe26ef4c4bb2f4ebe42562bbee",
+          "1fc33d0fd8574e48b46a3f11a24d2554",
+          "b922bd0faad24bafac3735e3cd21c180"
+        ],
+        "width": 872,
+        "height": 40
+      }
+    },
+    {
+      "id": "145dc4bf44904731afe96d1511e31333",
+      "type": "sprite",
+      "category": "background",
+      "dname": "sprite-9090271",
+      "payload": {
+        "width": 568,
+        "height": 500
+      }
+    }
+  ],
+  "nextOffset": 3,
+  "exactMatch": false
+}

@@ -1,0 +1,309 @@
+[
+  {
+    "key": "zakum_altar",
+    "name": "자쿰의 제단",
+    "w": 1672,
+    "h": 941,
+    "background": "5d5fe5f887cd42cd93a034c9295cb36a",
+    "thumb": "a8f35b2a5e804d34a66713c83a9746ce",
+    "color": [
+      1,
+      0.42,
+      0.1
+    ],
+    "bosses": [],
+    "photo": false,
+    "compositeBackground": "dd0c9a63f44c4be2adc89ad8ccb2ef8b",
+    "rig": "runtime-rigs.json",
+    "mode": "articulated"
+  },
+  {
+    "key": "forbidden_altar",
+    "name": "금지된 제단",
+    "w": 1672,
+    "h": 941,
+    "background": "3a1b68ca5dea41a5bd88e82c1edce7bf",
+    "thumb": "48944a06ae9546f4888355eff8993e25",
+    "color": [
+      0.35,
+      0.8,
+      1
+    ],
+    "bosses": [],
+    "photo": false,
+    "compositeBackground": "f00585c403fa47b182d39057618fd91d",
+    "rig": "runtime-rigs.json",
+    "mode": "articulated"
+  },
+  {
+    "key": "pianus_cave",
+    "name": "피아누스의 동굴",
+    "w": 1672,
+    "h": 941,
+    "background": "e234fb488d1a46f4a41074e51b189b0e",
+    "thumb": "1abb7dcff16e407faf3793f466cafb66",
+    "color": [
+      0.5,
+      0.8,
+      1
+    ],
+    "bosses": [],
+    "photo": false,
+    "compositeBackground": "af67b1b52e1c46628d6cd119c309d813",
+    "rig": "runtime-rigs.json",
+    "mode": "articulated"
+  },
+  {
+    "key": "cave_of_life",
+    "name": "생명의 동굴",
+    "w": 1672,
+    "h": 941,
+    "background": "3684123625a94c58b2d3219367c3cf8b",
+    "thumb": "2181a12bd9f543e1b8642b785b62af6d",
+    "color": [
+      0.5,
+      0.7,
+      1
+    ],
+    "bosses": [],
+    "photo": false,
+    "compositeBackground": "d01636d943e54154a657b1115a4f5908",
+    "rig": "runtime-rigs.json",
+    "mode": "articulated"
+  },
+  {
+    "key": "twilight_of_gods",
+    "name": "신들의 황혼",
+    "w": 1672,
+    "h": 941,
+    "background": "c4b8fc4da5124337b5b3711943a85b7b",
+    "thumb": "472bf1c8ca8448458cead5b9505759df",
+    "color": [
+      1,
+      0.85,
+      0.5
+    ],
+    "bosses": [],
+    "photo": false,
+    "compositeBackground": "0773fcf5a9174673aaf5c9813cc788c8",
+    "rig": "runtime-rigs.json",
+    "mode": "articulated"
+  },
+  {
+    "key": "cygnus_garden",
+    "name": "시그너스의 정원",
+    "w": 1672,
+    "h": 941,
+    "background": "edb60135352843e19e2861d29e040d07",
+    "thumb": "fcaaad7c294b4c72843d65237b9eb9b1",
+    "color": [
+      0.7,
+      0.4,
+      1
+    ],
+    "bosses": [],
+    "photo": false,
+    "compositeBackground": "104a99c45ca246618797845ffe4d9c67",
+    "rig": "runtime-rigs.json",
+    "mode": "articulated"
+  },
+  {
+    "key": "black_heaven_core",
+    "name": "블랙헤븐 코어",
+    "w": 1676,
+    "h": 938,
+    "background": "e8c380b183b940c49ee9e40e31b5fdf1",
+    "thumb": "4c253ac3e0ad48fa82555be9a7b5919d",
+    "color": [
+      0.2,
+      0.9,
+      1
+    ],
+    "bosses": [],
+    "photo": false,
+    "compositeBackground": "b4e7f0aedcb14990a884b11d8dd49fab",
+    "rig": "runtime-rigs.json",
+    "mode": "articulated"
+  },
+  {
+    "key": "world_tree_summit",
+    "name": "세계수 정상",
+    "w": 1672,
+    "h": 941,
+    "background": "9426fbde3e384fe99f5471e686d87301",
+    "thumb": "d2ce70343c874830aafd3b1870883bb5",
+    "color": [
+      0.7,
+      0.4,
+      1
+    ],
+    "bosses": [],
+    "photo": false,
+    "compositeBackground": "3f1a7ff58f9e497690f7cbf6fdb390c8",
+    "rig": "runtime-rigs.json",
+    "mode": "articulated"
+  },
+  {
+    "key": "collapsing_clocktower",
+    "name": "무너지는 시계탑",
+    "w": 1672,
+    "h": 941,
+    "background": "ecb34d2b10e24371971a73f76fd4d6d8",
+    "thumb": "e79c245c9f434d4d9c4209dc7d0cd785",
+    "color": [
+      1,
+      0.65,
+      1
+    ],
+    "bosses": [],
+    "photo": false,
+    "compositeBackground": "273f40bf3d3d4342958ebe2ec54a9a87",
+    "rig": "runtime-rigs.json",
+    "mode": "articulated"
+  },
+  {
+    "key": "diffraction_hall",
+    "name": "바스러지는 빛",
+    "w": 1672,
+    "h": 941,
+    "background": "992969741cc346a4a43f4167832074d4",
+    "thumb": "228241f3c7e74c0ba3b1b6f24b5221b5",
+    "color": [
+      0.72,
+      0.12,
+      0.52
+    ],
+    "bosses": [],
+    "photo": false,
+    "compositeBackground": "8d696e512c694f92bdd0971c7c41cdf8",
+    "rig": "runtime-rigs.json",
+    "mode": "articulated",
+    "folder": "crumbling-light"
+  },
+  {
+    "key": "eye_of_void",
+    "name": "공허의 눈",
+    "w": 1672,
+    "h": 941,
+    "background": "f05170227a9e4ae5aef150df2591ac00",
+    "thumb": "6632902b152e400798e2b8b16184113f",
+    "color": [
+      0.75,
+      0.2,
+      1
+    ],
+    "bosses": [],
+    "photo": false,
+    "compositeBackground": "09cd7648647d4b52b7f395486076c052",
+    "rig": "runtime-rigs.json",
+    "mode": "articulated"
+  },
+  {
+    "key": "altar_of_desire",
+    "name": "욕망의 제단",
+    "w": 1672,
+    "h": 941,
+    "background": "4a68ef9c27d84243bbef1a8857dabe44",
+    "thumb": "12ba56e5ed604cfb81781594917290d3",
+    "color": [
+      0.65,
+      0.85,
+      0.15
+    ],
+    "bosses": [],
+    "photo": false,
+    "compositeBackground": "6665a5101e074dc3bbc4ef5c0e293949",
+    "rig": "runtime-rigs.json",
+    "mode": "articulated"
+  },
+  {
+    "key": "near_the_end",
+    "name": "끝에 가까운 곳",
+    "w": 1672,
+    "h": 941,
+    "background": "63b9c61b21a34f50984a9054d516ce2d",
+    "thumb": "e155ac5daa4b47b4b0aec55209e105ff",
+    "color": [
+      1,
+      0.2,
+      0.55
+    ],
+    "bosses": [],
+    "photo": false,
+    "compositeBackground": "a7c737f38aa34dddaad8870f243f85a4",
+    "rig": "runtime-rigs.json",
+    "mode": "articulated"
+  },
+  {
+    "key": "dark_temple",
+    "name": "어둠의 신전",
+    "w": 1672,
+    "h": 941,
+    "background": "3e942877067a4fb791e72592909b8118",
+    "thumb": "56360f40d2ee49398db88ef6582b80e3",
+    "color": [
+      1,
+      0.3,
+      0.5
+    ],
+    "bosses": [],
+    "photo": false,
+    "compositeBackground": "6056ce6c32264a18a7e281afa9da6b96",
+    "rig": "runtime-rigs.json",
+    "mode": "articulated"
+  },
+  {
+    "key": "dark_throne",
+    "name": "어둠의 왕좌",
+    "w": 1672,
+    "h": 941,
+    "background": "43055f186dbc46359382a15dd65bfcdf",
+    "thumb": "4389181b9ee641a6b072ea5c82b86ebf",
+    "color": [
+      1,
+      0.1,
+      0.2
+    ],
+    "bosses": [],
+    "photo": false,
+    "compositeBackground": "e387f0c3afa34a76a8ac60fe62451116",
+    "rig": "runtime-rigs.json",
+    "mode": "articulated"
+  },
+  {
+    "key": "boundary_of_beginning_and_end",
+    "name": "시작과 끝의 경계",
+    "w": 1672,
+    "h": 941,
+    "background": "7a6ef61938c84a8883f5eac1d1279038",
+    "thumb": "114ec3ed67d94f9bac051d7e489f0981",
+    "color": [
+      0.35,
+      0.85,
+      1
+    ],
+    "bosses": [],
+    "photo": false,
+    "compositeBackground": "35286e61aed64a8a9889bb42d7567a66",
+    "rig": "runtime-rigs.json",
+    "mode": "articulated"
+  },
+  {
+    "key": "nonexistent_space",
+    "name": "존재하지 않는 공간",
+    "w": 1672,
+    "h": 941,
+    "background": "c79ef822eeb741979fd250a25a25ffad",
+    "thumb": "daa3a989057744a5ba67471718a1f934",
+    "color": [
+      0.45,
+      0.45,
+      0.55
+    ],
+    "bosses": [],
+    "photo": false,
+    "compositeBackground": "c1aefc311010419fbb9096bd607adef2",
+    "rig": "runtime-rigs.json",
+    "mode": "articulated"
+  }
+]

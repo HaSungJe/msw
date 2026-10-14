@@ -1,0 +1,74 @@
+{
+  "query": "금지된 제단",
+  "results": [
+    {
+      "id": "78147ee3a8d5475989ecdf57577065d4",
+      "type": "sprite",
+      "category": "object",
+      "dname": "sprite-35025",
+      "payload": {
+        "width": 300,
+        "height": 124
+      }
+    },
+    {
+      "id": "06c70d2b7fa6469a89ab533079494fcc",
+      "type": "animationclip",
+      "category": "object",
+      "dname": "animationclip-50745",
+      "payload": {
+        "frames": [
+          "64b954d50c7e4e52a0e597fa1e9047ca",
+          "59bf35d0f11948e39fe3b53de3a11cec",
+          "9e75b5eb78794b8e93f4c8d0b60143d5",
+          "07fb343916a7441e9e65afd0cbc65d0d",
+          "8dd071c248e3490eaf763eb894b06785",
+          "0e8d7d62260741289ce283fe31a3d3b8",
+          "117e8ecb59aa4931a19609642f2d5937",
+          "0d6dd3265a4747668ce17952cba71dd5",
+          "017f35859a8e4416901d9df35dac854e",
+          "d15985d6f14d4fb7b48108590af1c67a",
+          "97b43218a69e49458f621a4517bf5459",
+          "c0e253df79dc4cc0833c259d7005588f",
+          "0d73d719c4da4f95882f5d195bdefd39",
+          "abcdd5ee1f3241f8ada88391f237d1b0",
+          "6afc40b476b541bd8ff67c668eedd9a2",
+          "c2b160ae5caa45f7b369fb8f4ed400d1",
+          "a13845a208764090896f52336ad2182a",
+          "2bbf67fa922e453897d5d122b0a017b1"
+        ],
+        "width": 262,
+        "height": 182
+      }
+    },
+    {
+      "id": "fb298f68254840dc82cee75bf4b9b1a6",
+      "type": "animationclip",
+      "category": "object",
+      "dname": "animationclip-52730",
+      "payload": {
+        "frames": [
+          "7156f44b88354298a3a8db4dd08cc243",
+          "384f00579310491c942b8642909701ea",
+          "e6ceede3827f4d529db5c3ed0027b198",
+          "4e70b78520d043559f572288a18ce8a1",
+          "21e9fe80a3f74cf3a692a834b396ce37",
+          "608c03d23af745f7a70683f9b8059039",
+          "5bd46aab90cd4379aefc7ddec0e4d7ee",
+          "c932911e378e435a9303d8ca05271def",
+          "9adc045964bb496d8729c9a761fdebdb",
+          "1c41ba940cd84355b35f86d4ee70ca4f",
+          "2af1fba350af4a76a9ace0056c720e31",
+          "65f5d286ec5044bcb2812a705124ad3c",
+          "041f1e76f4434a6f9dbe58b4cb39eca0",
+          "f4259a5270c94279ad4d8dff9ef6f4f9",
+          "e9419180040c4c23854b38f04f3b112b"
+        ],
+        "width": 183,
+        "height": 157
+      }
+    }
+  ],
+  "nextOffset": 3,
+  "exactMatch": false
+}
