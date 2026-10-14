@@ -1,0 +1,139 @@
+[
+  {
+    "id": "8f2eb8ca8e0a4e729e306065ac8c4ded",
+    "type": "sprite",
+    "category": "mob",
+    "names": {
+      "ko": [
+        "약화된 진 힐라",
+        "진 힐라",
+        "진 힐라의 환영"
+      ]
+    },
+    "dname": "sprite-293682",
+    "assetGuid": null,
+    "hasEmbedding": false,
+    "payload": {
+      "width": 236,
+      "height": 300,
+      "pivot": {
+        "x": 128,
+        "y": 13,
+        "nx": 0.5424,
+        "ny": 0.0433
+      },
+      "image_hash": "6622ec8fd0dfbd13d6cb75182c3c7182c35ac59c37f605d32e6e58dd95eb5d2a",
+      "perceptual_hash": "952f5a706ba54687",
+      "thumbnail": "https://mod-resource-search-images.dn.nexoncdn.co.kr/maplestory_world/8f2eb8ca8e0a4e729e306065ac8c4ded.png",
+      "in_animationclip": "d49df04c6c44478381424f223f7b6248"
+    }
+  },
+  {
+    "id": "59eb6f1604b244d49c28a006d1d0d2b7",
+    "type": "sprite",
+    "category": "mob",
+    "names": {
+      "ko": [
+        "검은 마법사"
+      ]
+    },
+    "dname": "sprite-248812",
+    "assetGuid": null,
+    "hasEmbedding": false,
+    "payload": {
+      "width": 456,
+      "height": 644,
+      "pivot": {
+        "x": 218,
+        "y": 32,
+        "nx": 0.4781,
+        "ny": 0.0497
+      },
+      "image_hash": "218ba00fdd1bf474b559d6da69030512a25a152e62e1521815ea2e1a70f817ce",
+      "perceptual_hash": "954a0b3564926edf",
+      "thumbnail": "https://mod-resource-search-images.dn.nexoncdn.co.kr/maplestory_world/59eb6f1604b244d49c28a006d1d0d2b7.png",
+      "in_animationclip": "8fbede71fbe34ff49e250a1a7ea03394"
+    }
+  },
+  {
+    "id": "52676f92c4d24dd88692477b9d24e241",
+    "type": "sprite",
+    "category": "mob",
+    "names": {
+      "ko": [
+        "검은 마법사"
+      ]
+    },
+    "dname": "sprite-242298",
+    "assetGuid": null,
+    "hasEmbedding": false,
+    "payload": {
+      "width": 404,
+      "height": 636,
+      "pivot": {
+        "x": 200,
+        "y": 81,
+        "nx": 0.495,
+        "ny": 0.1274
+      },
+      "image_hash": "45bf3137ed838a12cf0124e9db86b106007a6fce30ddcff2365a6967f46d49d2",
+      "perceptual_hash": "c5663b4d2a95b4d2",
+      "thumbnail": "https://mod-resource-search-images.dn.nexoncdn.co.kr/maplestory_world/52676f92c4d24dd88692477b9d24e241.png",
+      "in_animationclip": "adf4cf91767c4a82abb79ecd4d360f62"
+    }
+  },
+  {
+    "id": "04e5f84747e14508b7cfb1818d78fd29",
+    "type": "sprite",
+    "category": "mob",
+    "names": {
+      "ko": [
+        "데미안"
+      ]
+    },
+    "dname": "sprite-177008",
+    "assetGuid": null,
+    "hasEmbedding": false,
+    "payload": {
+      "width": 476,
+      "height": 292,
+      "pivot": {
+        "x": 184,
+        "y": 48,
+        "nx": 0.3866,
+        "ny": 0.1644
+      },
+      "image_hash": "dd2511926bba7b0008caf4b5f98f00d51bda1258d8800c45b7894561e5f7749d",
+      "perceptual_hash": "e0bff0071cc52d2b",
+      "thumbnail": "https://mod-resource-search-images.dn.nexoncdn.co.kr/maplestory_world/04e5f84747e14508b7cfb1818d78fd29.png",
+      "in_animationclip": "013ee84ef4b9476784ac1b82ae1c3011"
+    }
+  },
+  {
+    "id": "e132ef136c30420288e046a8696eb4bc",
+    "type": "sprite",
+    "category": "mob",
+    "names": {
+      "ko": [
+        "루시드"
+      ]
+    },
+    "dname": "sprite-362850",
+    "assetGuid": null,
+    "hasEmbedding": false,
+    "payload": {
+      "width": 356,
+      "height": 380,
+      "pivot": {
+        "x": 117,
+        "y": 147,
+        "nx": 0.3287,
+        "ny": 0.3868
+      },
+      "image_hash": "0b0643c38099db3e8017c433df3ce731859836a6d9e77d6cfe7226c175df9d36",
+      "perceptual_hash": "d0b5374c3555175c",
+      "thumbnail": "https://mod-resource-search-images.dn.nexoncdn.co.kr/maplestory_world/e132ef136c30420288e046a8696eb4bc.png",
+      "in_animationclip": "bc3944f17f9242018b0f3568b83aa9e0"
+    }
+  }
+]

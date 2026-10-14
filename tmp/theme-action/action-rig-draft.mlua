@@ -1,0 +1,284 @@
+@Logic
+script RtsActionThemeLogic extends Logic
+ property table Scenes = {}
+ property number Elapsed = 0
+ property number ScanClock = 0
+ property number DrawClock = 0
+
+ method string GetBossThemeKey(string mobId)
+  if self._T.BossKeys == nil then self._T.BossKeys = {B01 = "forbidden_altar", B02 = "zakum_altar", B03 = "pianus_cave", B04 = "cave_of_life", B05 = "twilight_of_gods", B06 = "cygnus_garden", B07 = "black_heaven_core", B08 = "world_tree_summit", B09 = "collapsing_clocktower", B10 = "diffraction_hall", B11 = "eye_of_void", B12 = "altar_of_desire", B13 = "near_the_end", B14 = "dark_temple", B15 = "dark_temple", B16 = "dark_throne", B17 = "boundary_of_beginning_and_end", B18 = "nonexistent_space"} end
+  return self._T.BossKeys[mobId] or ""
+ end
+
+ -- 화면/카메라는 고정한다. 움직임은 분리된 신체 부위와 환경 효과에만 적용.
+ method table GetSceneMotion()
+  return {zoom = 1, x = 0, y = 0, light = 1}
+ end
+
+ method any GetDefinition(string key)
+  -- 기본 테마에는 액션 레이어를 만들지 않는다.
+  for _, d in ipairs(self:GetDefinitions()) do if d.key == key then return d end end
+  return nil
+ end
+
+ method any GetByBackground(string ruid)
+  -- 서버·월드·카드가 같은 자산 크기 표를 사용한다.
+  if self._T.ByBackground == nil then
+   self._T.ByBackground = {}
+   for _, d in ipairs(self:GetDefinitions()) do self._T.ByBackground[d.background] = d end
+  end
+  return self._T.ByBackground[ruid]
+ end
+
+ @ExecSpace("ClientOnly")
+ method void OnBeginPlay()
+  -- 세션별 장식 상태를 초기화한다.
+  self.Scenes = {}
+  self.Elapsed = 0
+  self.ScanClock = 0
+  self.DrawClock = 0
+ end
+
+ @ExecSpace("ClientOnly")
+ method void OnEndPlay()
+  -- 카드·관전·맵 종료 시 장식을 정리한다.
+  for i = #self.Scenes, 1, -1 do self:RemoveScene(i) end
+ end
+
+ @ExecSpace("ClientOnly")
+ method void OnUpdate(number delta)
+  -- 관전 구역 한 곳과 열린 카드만 30fps로 갱신한다.
+  self.Elapsed = self.Elapsed + delta
+  self.ScanClock = self.ScanClock + delta
+  self.DrawClock = self.DrawClock + delta
+  if self.DrawClock < 1 / 30 then return end
+  self.DrawClock = 0
+  for i = #self.Scenes, 1, -1 do
+   local s = self.Scenes[i]
+   if not isvalid(s.host) then
+    self:RemoveScene(i)
+   elseif not s.ui and (s.host.SpriteRendererComponent == nil or s.host.SpriteRendererComponent.SpriteRUID ~= s.def.background or s.zone ~= _RtsHudLogic.WatchedZone) then
+    self:RemoveScene(i)
+   else
+    self:DrawScene(s)
+   end
+  end
+  if self.ScanClock >= 0.25 then
+   self.ScanClock = 0
+   self:ScanWorld()
+  end
+ end
+
+ @ExecSpace("ClientOnly")
+ method void ScanWorld()
+  -- 테마 교체·늦은 입장·관전 전환을 RUID 관찰로 처리한다.
+  local zone = _RtsHudLogic.WatchedZone
+  if zone < 1 then return end
+  local host = _RtsBoardViewLogic:BoardChild("ZoneBackground" .. string.format("%d", zone))
+  if not isvalid(host) or host.SpriteRendererComponent == nil then return end
+  local d = self:GetByBackground(host.SpriteRendererComponent.SpriteRUID)
+  if d == nil then return end
+  for _, s in ipairs(self.Scenes) do if s.host == host then return end end
+  self:CreateScene(host, false, zone, d.w, d.h, d.key)
+ end
+
+ @ExecSpace("ClientOnly")
+ method void RegisterCard(Entity photo, string key, number width)
+  -- 프로필 카드에 월드와 동일한 원화·호흡·입자를 적용한다.
+  if not isvalid(photo) then return end
+  for i = #self.Scenes, 1, -1 do if self.Scenes[i].host == photo then self:RemoveScene(i) end end
+  local d = self:GetDefinition(key)
+  if d == nil then return end
+  photo.SpriteGUIRendererComponent.ImageRUID = DataRef(d.background)
+  local height = width * d.h / d.w
+  photo.UITransformComponent.RectSize = Vector2(width, height)
+  photo.UITransformComponent.anchoredPosition = Vector2(0, -26)
+  self:CreateScene(photo, true, 0, width, height, key)
+ end
+
+ @ExecSpace("ClientOnly")
+ method void CreateScene(Entity host, boolean ui, number zone, number width, number height, string key)
+  local d = self:GetDefinition(key)
+  if d == nil or not isvalid(host) then return end
+  local s = {host=host, ui=ui, zone=zone, width=width, height=height, def=d, parts={}}
+  local rig = self:GetRig(key)
+  if rig ~= nil then
+   for _, b in ipairs(rig.parts) do
+    s.parts[#s.parts+1] = {rig=b, entity=self:SpawnPart(s,b.id,b.ruid,b.order)}
+   end
+   local fx = self:GetEnvironmentSprites()
+   for i=1,8 do
+    if rig.fx == "lava" then
+     for _,kind in ipairs({"lava-bubble","lava-burst","lava-ripple"}) do
+      s.parts[#s.parts+1] = {effect=kind, index=i, entity=self:SpawnPart(s,kind..tostring(i),fx[kind],96)}
+     end
+    else
+     for _,kind in ipairs({"water-trail","water-splash"}) do
+      s.parts[#s.parts+1] = {effect=kind, index=i, entity=self:SpawnPart(s,kind..tostring(i),fx[kind],96)}
+     end
+    end
+   end
+  end
+  for i=1,18 do
+   s.parts[#s.parts+1] = {particle=i, entity=self:SpawnPart(s,"Mote"..tostring(i),_RtsHudLogic.CircleMaskRUID,96)}
+  end
+  self.Scenes[#self.Scenes+1] = s
+  self:DrawScene(s)
+  _RtsConfigLogic:Log("[VRF] articulated scene "..key.." rig="..tostring(rig~=nil).." parts="..tostring(#s.parts))
+ end
+
+ @ExecSpace("ClientOnly")
+ method Entity SpawnPart(table scene, string partName, string ruid, number order)
+  -- 기존 네이티브 스프라이트 모델을 클라이언트 장식으로 재사용한다.
+  local e = nil
+  if scene.ui then
+   e = _RtsHudLogic:SpawnUI("model://uisprite","RtsAction"..partName,scene.host,Vector2(0.5,0.5),Vector2(0.5,0.5),Vector2.zero,Vector2(1,1))
+   if not isvalid(e) then return nil end
+   local sr = e.SpriteGUIRendererComponent
+   sr.ImageRUID = DataRef(ruid)
+   sr.Type = ImageType.Simple
+   sr.PreserveSprite = PreserveSpriteType.None
+   sr.RaycastTarget = false
+  else
+   e = _SpawnService:SpawnByModelId("model://MapObject","RtsAction"..partName,Vector3.zero,scene.host)
+   if not isvalid(e) then return nil end
+   local sr = e.SpriteRendererComponent
+   sr.SpriteRUID = ruid
+   sr.SortingLayer = "MapLayer0"
+   sr.OrderInLayer = order
+  end
+  return e
+ end
+
+ @ExecSpace("ClientOnly")
+ method void DrawScene(table s)
+  local d=s.def
+  -- 배경과 카드의 크기·중심·밝기는 고정. 부위만 관절 중심으로 움직인다.
+  if s.ui then
+   s.host.UITransformComponent.RectSize=Vector2(s.width,s.height)
+   s.host.UITransformComponent.anchoredPosition=Vector2(0,-26)
+   s.host.SpriteGUIRendererComponent.Color=Color.white
+  else
+   _RtsBoardViewLogic:PositionBackground(s.host)
+   s.host.SpriteRendererComponent.Color=Color.white
+  end
+  for _,p in ipairs(s.parts) do
+   if not isvalid(p.entity) then continue end
+   local x,y,w,h,angle,alpha=0,0,1,1,0,1
+   local color=Color.white
+   if p.rig~=nil then
+    local b=p.rig
+    local wave=math.sin(self.Elapsed*math.pi*2/b.period+b.phase)
+    angle=b.angle+b.amp*wave
+    local rad=angle*math.pi/180
+    local ox=(b.w/2-b.px)*b.k
+    local oy=(b.py-b.h/2)*b.k
+    x=b.x+ox*math.cos(rad)-oy*math.sin(rad)
+    y=b.y-ox*math.sin(rad)-oy*math.cos(rad)-b.dy*wave
+    w=b.w*b.k h=b.h*b.k
+   elseif p.effect~=nil then
+    local i=p.index
+    local q=(self.Elapsed/(3.1+(i%3)*0.35)+i*0.317)%1
+    if string.sub(p.effect,1,4)=="lava" then
+     local base=d.h*(0.875+(i%3)*0.018)
+     x=d.w*(0.16+(i-1)*0.095)
+     if p.effect=="lava-bubble" then
+      local v=math.min(1,q/0.58)
+      w=35+45*v h=w*0.75 y=base-h*0.10
+      if q>=0.58 then alpha=0 else alpha=math.min(1,q/0.08)*0.9 end
+     elseif p.effect=="lava-burst" then
+      local v=(q-0.58)/0.24
+      w=85+25*math.max(0,v) h=w*0.75 y=base-8
+      if v<0 or v>1 then alpha=0 else alpha=0.9*math.sin(v*math.pi) end
+     else
+      local v=(q-0.55)/0.45
+      w=70+100*math.max(0,v) h=w*0.55 y=base+8
+      if v<0 then alpha=0 else alpha=0.65*(1-v) end
+     end
+    else
+     local lane=i%4
+     local start=0.03+lane*0.035
+     local bottom=0.845+(i%2)*0.01
+     local side=i<=4 and 0.10 or 0.74
+     x=d.w*(side+lane*0.045)
+     local v=(self.Elapsed/(2.3+(i%3)*0.2)+i*0.271)%1
+     if p.effect=="water-trail" then
+      y=d.h*(start+(bottom-start)*math.min(1,v/0.86))
+      w=28 h=94
+      if v>0.86 then alpha=0 else alpha=math.min(1,v/0.08)*0.75 end
+     else
+      local hit=(v-0.86)/0.14
+      y=d.h*bottom w=35+40*math.max(0,hit) h=w*0.7
+      if hit<0 then alpha=0 else alpha=0.8*math.sin(hit*math.pi) end
+     end
+    end
+    color=Color(1,1,1,math.max(0,alpha))
+   else
+    local i=p.particle
+    local phase=(self.Elapsed/(7+i%5)+i*0.618034)%1
+    x=d.w*(0.08+((i*0.381966)%1)*0.84)+12*math.sin(self.Elapsed*0.7+i)
+    y=d.h*(0.88-phase*0.75)
+    w=2+i%4 h=w
+    color=Color(d.color[1],d.color[2],d.color[3],0.38*math.sin(phase*math.pi)^2)
+   end
+   self:SetPartPose(s,p.entity,x,y,w,h,angle,color)
+  end
+ end
+
+ @ExecSpace("ClientOnly")
+ method void SetPartPose(table s, Entity e, number x, number y, number w, number h, number angle, Color tint)
+  local d=s.def
+  if s.ui then
+   local t=e.UITransformComponent
+   t.anchoredPosition=Vector2((x-d.w/2)/d.w*s.width,(d.h/2-y)/d.h*s.height)
+   t.RectSize=Vector2(w/d.w*s.width,h/d.h*s.height)
+   t.UIRotation=Vector3(0,0,angle)
+   e.SpriteGUIRendererComponent.Color=tint
+  else
+   local t=e.TransformComponent
+   t.Position=Vector3((x-d.w/2)/100,(d.h/2-y)/100,0)
+   -- 슬롯의 원본 크기는 등록 시 보관. 새 이미지의 피벗은 중앙이다.
+   local sourceW,sourceH=128,128
+   local ruid=e.SpriteRendererComponent.SpriteRUID
+   local size=self:GetPartSize(ruid)
+   if size~=nil then sourceW=size.w sourceH=size.h end
+   t.Scale=Vector3(w/sourceW,h/sourceH,1)
+   t.ZRotation=angle
+   e.SpriteRendererComponent.Color=tint
+  end
+ end
+
+ @ExecSpace("ClientOnly")
+ method void RemoveScene(number index)
+  -- 교체할 때 장식과 참조를 함께 해제한다.
+  local s=self.Scenes[index]
+  if s==nil then return end
+  table.remove(self.Scenes,index)
+  for _,p in ipairs(s.parts) do if isvalid(p.entity) then p.entity:Destroy() end end
+ end
+
+	method table GetDefinitions()
+  if self._T.Definitions == nil then
+   self._T.Definitions = {
+    {key = "zakum_altar", name = "자쿰의 제단", w = 1672, h = 941, background = "dd0c9a63f44c4be2adc89ad8ccb2ef8b", thumb = "a8f35b2a5e804d34a66713c83a9746ce", color = {1, 0.42, 0.1}, bosses = {}, photo = false},
+    {key = "forbidden_altar", name = "금지된 제단", w = 1672, h = 941, background = "f00585c403fa47b182d39057618fd91d", thumb = "48944a06ae9546f4888355eff8993e25", color = {0.35, 0.8, 1}, bosses = {}, photo = false},
+    {key = "pianus_cave", name = "피아누스의 동굴", w = 1672, h = 941, background = "af67b1b52e1c46628d6cd119c309d813", thumb = "1abb7dcff16e407faf3793f466cafb66", color = {0.5, 0.8, 1}, bosses = {}, photo = false},
+    {key = "cave_of_life", name = "생명의 동굴", w = 1672, h = 941, background = "d01636d943e54154a657b1115a4f5908", thumb = "2181a12bd9f543e1b8642b785b62af6d", color = {0.5, 0.7, 1}, bosses = {}, photo = false},
+    {key = "twilight_of_gods", name = "신들의 황혼", w = 1672, h = 941, background = "0773fcf5a9174673aaf5c9813cc788c8", thumb = "472bf1c8ca8448458cead5b9505759df", color = {1, 0.85, 0.5}, bosses = {}, photo = false},
+    {key = "cygnus_garden", name = "시그너스의 정원", w = 1672, h = 941, background = "104a99c45ca246618797845ffe4d9c67", thumb = "fcaaad7c294b4c72843d65237b9eb9b1", color = {0.7, 0.4, 1}, bosses = {}, photo = false},
+    {key = "black_heaven_core", name = "블랙헤븐 코어", w = 1676, h = 938, background = "b4e7f0aedcb14990a884b11d8dd49fab", thumb = "4c253ac3e0ad48fa82555be9a7b5919d", color = {0.2, 0.9, 1}, bosses = {}, photo = false},
+    {key = "world_tree_summit", name = "세계수 정상", w = 1672, h = 941, background = "3f1a7ff58f9e497690f7cbf6fdb390c8", thumb = "d2ce70343c874830aafd3b1870883bb5", color = {0.7, 0.4, 1}, bosses = {}, photo = false},
+    {key = "collapsing_clocktower", name = "무너지는 시계탑", w = 1672, h = 941, background = "273f40bf3d3d4342958ebe2ec54a9a87", thumb = "e79c245c9f434d4d9c4209dc7d0cd785", color = {1, 0.65, 1}, bosses = {}, photo = false},
+    {key = "diffraction_hall", name = "회절의 회랑", w = 1672, h = 941, background = "8d696e512c694f92bdd0971c7c41cdf8", thumb = "8e782d3c42d543729e2bc376e287c085", color = {0.8, 0.85, 1}, bosses = {}, photo = false},
+    {key = "eye_of_void", name = "공허의 눈", w = 1672, h = 941, background = "09cd7648647d4b52b7f395486076c052", thumb = "6632902b152e400798e2b8b16184113f", color = {0.75, 0.2, 1}, bosses = {}, photo = false},
+    {key = "altar_of_desire", name = "욕망의 제단", w = 1672, h = 941, background = "6665a5101e074dc3bbc4ef5c0e293949", thumb = "12ba56e5ed604cfb81781594917290d3", color = {0.65, 0.85, 0.15}, bosses = {}, photo = false},
+    {key = "near_the_end", name = "끝에 가까운 곳", w = 1672, h = 941, background = "a7c737f38aa34dddaad8870f243f85a4", thumb = "e155ac5daa4b47b4b0aec55209e105ff", color = {1, 0.2, 0.55}, bosses = {}, photo = false},
+    {key = "dark_temple", name = "어둠의 신전", w = 1672, h = 941, background = "6056ce6c32264a18a7e281afa9da6b96", thumb = "56360f40d2ee49398db88ef6582b80e3", color = {1, 0.3, 0.5}, bosses = {}, photo = false},
+    {key = "dark_throne", name = "어둠의 왕좌", w = 1672, h = 941, background = "e387f0c3afa34a76a8ac60fe62451116", thumb = "4389181b9ee641a6b072ea5c82b86ebf", color = {1, 0.1, 0.2}, bosses = {}, photo = false},
+    {key = "boundary_of_beginning_and_end", name = "시작과 끝의 경계", w = 1672, h = 941, background = "35286e61aed64a8a9889bb42d7567a66", thumb = "114ec3ed67d94f9bac051d7e489f0981", color = {0.35, 0.85, 1}, bosses = {}, photo = false},
+    {key = "nonexistent_space", name = "존재하지 않는 공간", w = 1672, h = 941, background = "c1aefc311010419fbb9096bd607adef2", thumb = "daa3a989057744a5ba67471718a1f934", color = {0.45, 0.45, 0.55}, bosses = {}, photo = false}
+   }
+  end
+  return self._T.Definitions
+ end
+end

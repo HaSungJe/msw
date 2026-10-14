@@ -1,0 +1,2136 @@
+[
+  {
+    "mob": "9390301",
+    "path": "stand",
+    "clip": {
+      "id": "ec96371d27774f6eabac7e82bd013a57",
+      "type": "animationclip",
+      "category": "mob",
+      "names": {
+        "ko": [
+          "자쿰"
+        ]
+      },
+      "dname": "animationclip-42199",
+      "assetGuid": null,
+      "hasEmbedding": true,
+      "payload": {
+        "frames": [
+          {
+            "index": 0,
+            "spriteRuid": "282f519bb66c4e499e1992b9993e1457",
+            "width": 344,
+            "height": 260,
+            "pivot": {
+              "x": 159,
+              "y": 24,
+              "nx": 0.4622,
+              "ny": 0.0923
+            }
+          },
+          {
+            "index": 1,
+            "spriteRuid": "c7fe3c100d434f1b95439ff6bf31a87e",
+            "width": 340,
+            "height": 252,
+            "pivot": {
+              "x": 158,
+              "y": 24,
+              "nx": 0.4647,
+              "ny": 0.0952
+            }
+          },
+          {
+            "index": 2,
+            "spriteRuid": "053b11ced5644dab854970e8bf528559",
+            "width": 348,
+            "height": 244,
+            "pivot": {
+              "x": 157,
+              "y": 24,
+              "nx": 0.4511,
+              "ny": 0.0984
+            }
+          },
+          {
+            "index": 3,
+            "spriteRuid": "37e62208583543678a0cf5ab6d0fb78a",
+            "width": 352,
+            "height": 236,
+            "pivot": {
+              "x": 164,
+              "y": 24,
+              "nx": 0.4659,
+              "ny": 0.1017
+            }
+          },
+          {
+            "index": 4,
+            "spriteRuid": "737495a7e2f9498787a034f0e7ecb83b",
+            "width": 352,
+            "height": 236,
+            "pivot": {
+              "x": 162,
+              "y": 24,
+              "nx": 0.4602,
+              "ny": 0.1017
+            }
+          },
+          {
+            "index": 5,
+            "spriteRuid": "fa45faaa06fd4f0d9bded53699e9594f",
+            "width": 356,
+            "height": 244,
+            "pivot": {
+              "x": 165,
+              "y": 24,
+              "nx": 0.4635,
+              "ny": 0.0984
+            }
+          },
+          {
+            "index": 6,
+            "spriteRuid": "68ac6cc6f4014e88b959b63d3c3593f3",
+            "width": 356,
+            "height": 252,
+            "pivot": {
+              "x": 166,
+              "y": 24,
+              "nx": 0.4663,
+              "ny": 0.0952
+            }
+          },
+          {
+            "index": 7,
+            "spriteRuid": "da635d4fc4594e14bc49a741220c8d43",
+            "width": 356,
+            "height": 256,
+            "pivot": {
+              "x": 170,
+              "y": 24,
+              "nx": 0.4775,
+              "ny": 0.0938
+            }
+          }
+        ],
+        "width": 350,
+        "height": 248,
+        "thumbnail": "https://mod-resource-search-images.dn.nexoncdn.co.kr/maplestory_world/ec96371d27774f6eabac7e82bd013a57.gif"
+      }
+    }
+  },
+  {
+    "mob": "8130100",
+    "path": "stand",
+    "clip": {
+      "id": "4b3ad414c1184c02b5eb459b29ee8ece",
+      "type": "animationclip",
+      "category": "mob",
+      "names": {
+        "ko": [
+          "Zoo 발록",
+          "정체모를 주니어 발록",
+          "주니어 발록",
+          "주니어발록"
+        ]
+      },
+      "dname": "animationclip-16422",
+      "assetGuid": null,
+      "hasEmbedding": true,
+      "payload": {
+        "frames": [
+          {
+            "index": 0,
+            "spriteRuid": "9e00d0b8c9e94634a1d94f0f1691c0d5",
+            "width": 160,
+            "height": 156,
+            "pivot": {
+              "x": 80,
+              "y": 0,
+              "nx": 0.5,
+              "ny": 0
+            }
+          },
+          {
+            "index": 1,
+            "spriteRuid": "d9491826749643ca8386850d0c26bfb4",
+            "width": 160,
+            "height": 156,
+            "pivot": {
+              "x": 80,
+              "y": 0,
+              "nx": 0.5,
+              "ny": 0
+            }
+          }
+        ],
+        "width": 160,
+        "height": 156,
+        "thumbnail": "https://mod-resource-search-images.dn.nexoncdn.co.kr/maplestory_world/4b3ad414c1184c02b5eb459b29ee8ece.gif"
+      }
+    }
+  },
+  {
+    "mob": "8510000",
+    "path": "stand",
+    "clip": {
+      "id": "207c5d6dcee243ad9a141397244ba9a9",
+      "type": "animationclip",
+      "category": "mob",
+      "names": {
+        "ko": [
+          "피아누스"
+        ]
+      },
+      "dname": "animationclip-9621",
+      "assetGuid": null,
+      "hasEmbedding": true,
+      "payload": {
+        "frames": [
+          {
+            "index": 0,
+            "spriteRuid": "867f024407e045e8b2c4f82fa16e00f5",
+            "width": 416,
+            "height": 364,
+            "pivot": {
+              "x": 217,
+              "y": 28,
+              "nx": 0.5216,
+              "ny": 0.0769
+            }
+          },
+          {
+            "index": 1,
+            "spriteRuid": "e36f1a796a8c4310af4fb61c5ad99e1b",
+            "width": 420,
+            "height": 368,
+            "pivot": {
+              "x": 218,
+              "y": 30,
+              "nx": 0.519,
+              "ny": 0.0815
+            }
+          },
+          {
+            "index": 2,
+            "spriteRuid": "780b1754c3c74644ba16e0715d51e406",
+            "width": 420,
+            "height": 368,
+            "pivot": {
+              "x": 219,
+              "y": 32,
+              "nx": 0.5214,
+              "ny": 0.087
+            }
+          },
+          {
+            "index": 3,
+            "spriteRuid": "953a074d1dad41faabb904f6fa470054",
+            "width": 420,
+            "height": 372,
+            "pivot": {
+              "x": 220,
+              "y": 34,
+              "nx": 0.5238,
+              "ny": 0.0914
+            }
+          },
+          {
+            "index": 4,
+            "spriteRuid": "4bfb1a1d621349699adfef1b74b37b82",
+            "width": 420,
+            "height": 368,
+            "pivot": {
+              "x": 219,
+              "y": 32,
+              "nx": 0.5214,
+              "ny": 0.087
+            }
+          },
+          {
+            "index": 5,
+            "spriteRuid": "d9ea9d853a194ef0864fbcb334f3d9ab",
+            "width": 420,
+            "height": 368,
+            "pivot": {
+              "x": 218,
+              "y": 30,
+              "nx": 0.519,
+              "ny": 0.0815
+            }
+          },
+          {
+            "index": 6,
+            "spriteRuid": "7e4eb4cb7e8347afbc5d210d9353a530",
+            "width": 416,
+            "height": 364,
+            "pivot": {
+              "x": 217,
+              "y": 28,
+              "nx": 0.5216,
+              "ny": 0.0769
+            }
+          },
+          {
+            "index": 7,
+            "spriteRuid": "847aef50206f404c9fa36b811a1f458a",
+            "width": 420,
+            "height": 368,
+            "pivot": {
+              "x": 218,
+              "y": 30,
+              "nx": 0.519,
+              "ny": 0.0815
+            }
+          },
+          {
+            "index": 8,
+            "spriteRuid": "5ba84867ce004c348c4311b6deebab86",
+            "width": 420,
+            "height": 368,
+            "pivot": {
+              "x": 219,
+              "y": 32,
+              "nx": 0.5214,
+              "ny": 0.087
+            }
+          },
+          {
+            "index": 9,
+            "spriteRuid": "76fa6e85230444d1a3778205b41a82d6",
+            "width": 420,
+            "height": 372,
+            "pivot": {
+              "x": 220,
+              "y": 34,
+              "nx": 0.5238,
+              "ny": 0.0914
+            }
+          },
+          {
+            "index": 10,
+            "spriteRuid": "b673ab60b67546738979a4300a3f85de",
+            "width": 420,
+            "height": 368,
+            "pivot": {
+              "x": 219,
+              "y": 32,
+              "nx": 0.5214,
+              "ny": 0.087
+            }
+          },
+          {
+            "index": 11,
+            "spriteRuid": "2b805b84c93d450d8042eee173875aea",
+            "width": 420,
+            "height": 368,
+            "pivot": {
+              "x": 218,
+              "y": 30,
+              "nx": 0.519,
+              "ny": 0.0815
+            }
+          },
+          {
+            "index": 12,
+            "spriteRuid": "1abf9072c4244221a4fe42d22efb5f66",
+            "width": 416,
+            "height": 364,
+            "pivot": {
+              "x": 217,
+              "y": 28,
+              "nx": 0.5216,
+              "ny": 0.0769
+            }
+          },
+          {
+            "index": 13,
+            "spriteRuid": "7127a1fff63c49628a48b297329d88da",
+            "width": 420,
+            "height": 368,
+            "pivot": {
+              "x": 218,
+              "y": 30,
+              "nx": 0.519,
+              "ny": 0.0815
+            }
+          },
+          {
+            "index": 14,
+            "spriteRuid": "028ed63b32fe496dbc208ae3453b8fca",
+            "width": 420,
+            "height": 368,
+            "pivot": {
+              "x": 219,
+              "y": 32,
+              "nx": 0.5214,
+              "ny": 0.087
+            }
+          },
+          {
+            "index": 15,
+            "spriteRuid": "ee4d60a381614b629594522c1c192311",
+            "width": 420,
+            "height": 372,
+            "pivot": {
+              "x": 220,
+              "y": 34,
+              "nx": 0.5238,
+              "ny": 0.0914
+            }
+          },
+          {
+            "index": 16,
+            "spriteRuid": "2289ed4e6a5e443eb91099ecdf42f27c",
+            "width": 420,
+            "height": 368,
+            "pivot": {
+              "x": 219,
+              "y": 32,
+              "nx": 0.5214,
+              "ny": 0.087
+            }
+          },
+          {
+            "index": 17,
+            "spriteRuid": "8f9050cd5cb84fdcb87457456f953d44",
+            "width": 420,
+            "height": 368,
+            "pivot": {
+              "x": 218,
+              "y": 30,
+              "nx": 0.519,
+              "ny": 0.0815
+            }
+          },
+          {
+            "index": 18,
+            "spriteRuid": "a483a30ba04e410ab46d23079f70bfba",
+            "width": 416,
+            "height": 364,
+            "pivot": {
+              "x": 217,
+              "y": 28,
+              "nx": 0.5216,
+              "ny": 0.0769
+            }
+          },
+          {
+            "index": 19,
+            "spriteRuid": "d1d497c2fd3b4900ac996dd87b3ebe66",
+            "width": 420,
+            "height": 368,
+            "pivot": {
+              "x": 218,
+              "y": 30,
+              "nx": 0.519,
+              "ny": 0.0815
+            }
+          },
+          {
+            "index": 20,
+            "spriteRuid": "4219dcede0ef4e15a206ce926cb16e06",
+            "width": 420,
+            "height": 368,
+            "pivot": {
+              "x": 219,
+              "y": 32,
+              "nx": 0.5214,
+              "ny": 0.087
+            }
+          },
+          {
+            "index": 21,
+            "spriteRuid": "98c7ca21c13f4f9cbc32a7fbff0cd721",
+            "width": 420,
+            "height": 372,
+            "pivot": {
+              "x": 220,
+              "y": 34,
+              "nx": 0.5238,
+              "ny": 0.0914
+            }
+          },
+          {
+            "index": 22,
+            "spriteRuid": "225d2c8a24ae401e8749537b72113645",
+            "width": 420,
+            "height": 368,
+            "pivot": {
+              "x": 219,
+              "y": 32,
+              "nx": 0.5214,
+              "ny": 0.087
+            }
+          },
+          {
+            "index": 23,
+            "spriteRuid": "9c97afd949704610beeead25442219ce",
+            "width": 420,
+            "height": 368,
+            "pivot": {
+              "x": 218,
+              "y": 30,
+              "nx": 0.519,
+              "ny": 0.0815
+            }
+          },
+          {
+            "index": 24,
+            "spriteRuid": "03fe6011eb1e489d9f28f1c113f0f329",
+            "width": 416,
+            "height": 364,
+            "pivot": {
+              "x": 217,
+              "y": 28,
+              "nx": 0.5216,
+              "ny": 0.0769
+            }
+          },
+          {
+            "index": 25,
+            "spriteRuid": "c99db236bb7b4c08939c8c42c03acb93",
+            "width": 420,
+            "height": 368,
+            "pivot": {
+              "x": 218,
+              "y": 30,
+              "nx": 0.519,
+              "ny": 0.0815
+            }
+          },
+          {
+            "index": 26,
+            "spriteRuid": "c82abb3b280c48d580e86b94fecc8aad",
+            "width": 420,
+            "height": 368,
+            "pivot": {
+              "x": 219,
+              "y": 32,
+              "nx": 0.5214,
+              "ny": 0.087
+            }
+          },
+          {
+            "index": 27,
+            "spriteRuid": "588c84f2ed9145ec9d1f6be39c94dce7",
+            "width": 420,
+            "height": 372,
+            "pivot": {
+              "x": 220,
+              "y": 34,
+              "nx": 0.5238,
+              "ny": 0.0914
+            }
+          },
+          {
+            "index": 28,
+            "spriteRuid": "8c044b78004a49b38b57455fc0bd4cf1",
+            "width": 420,
+            "height": 368,
+            "pivot": {
+              "x": 219,
+              "y": 32,
+              "nx": 0.5214,
+              "ny": 0.087
+            }
+          },
+          {
+            "index": 29,
+            "spriteRuid": "ce52895fb33040db88c4c6891b245e98",
+            "width": 420,
+            "height": 368,
+            "pivot": {
+              "x": 218,
+              "y": 30,
+              "nx": 0.519,
+              "ny": 0.0815
+            }
+          },
+          {
+            "index": 30,
+            "spriteRuid": "4860560debce41d191156497a9d36dc2",
+            "width": 416,
+            "height": 364,
+            "pivot": {
+              "x": 217,
+              "y": 28,
+              "nx": 0.5216,
+              "ny": 0.0769
+            }
+          },
+          {
+            "index": 31,
+            "spriteRuid": "a181302db384496caa3d4dc3c6108139",
+            "width": 420,
+            "height": 368,
+            "pivot": {
+              "x": 218,
+              "y": 30,
+              "nx": 0.519,
+              "ny": 0.0815
+            }
+          },
+          {
+            "index": 32,
+            "spriteRuid": "27fddfbda7b84dd1bc5d993a70571db1",
+            "width": 420,
+            "height": 368,
+            "pivot": {
+              "x": 219,
+              "y": 32,
+              "nx": 0.5214,
+              "ny": 0.087
+            }
+          },
+          {
+            "index": 33,
+            "spriteRuid": "5d4b97cf025043d5b526d02d228d7357",
+            "width": 420,
+            "height": 372,
+            "pivot": {
+              "x": 220,
+              "y": 34,
+              "nx": 0.5238,
+              "ny": 0.0914
+            }
+          },
+          {
+            "index": 34,
+            "spriteRuid": "b5f7a1177e64496582bc5a486dd288e0",
+            "width": 420,
+            "height": 368,
+            "pivot": {
+              "x": 219,
+              "y": 32,
+              "nx": 0.5214,
+              "ny": 0.087
+            }
+          },
+          {
+            "index": 35,
+            "spriteRuid": "c3cf4595587640809eead1e25b4b663b",
+            "width": 420,
+            "height": 368,
+            "pivot": {
+              "x": 218,
+              "y": 30,
+              "nx": 0.519,
+              "ny": 0.0815
+            }
+          }
+        ],
+        "width": 419,
+        "height": 368,
+        "thumbnail": "https://mod-resource-search-images.dn.nexoncdn.co.kr/maplestory_world/207c5d6dcee243ad9a141397244ba9a9.gif"
+      }
+    }
+  },
+  {
+    "mob": "8510000",
+    "path": "info/default",
+    "clip": {
+      "id": "11d69a71db564434b3158c75bb042881",
+      "type": "animationclip",
+      "category": "mob",
+      "names": {
+        "ko": [
+          "능력의 피아누스",
+          "복제된 피아누스",
+          "피아누스"
+        ]
+      },
+      "dname": "animationclip-7313",
+      "assetGuid": null,
+      "hasEmbedding": true,
+      "payload": {
+        "frames": [
+          {
+            "index": 0,
+            "spriteRuid": "c8808b215ede44019187bb7e403f1877",
+            "width": 200,
+            "height": 216,
+            "pivot": {
+              "x": 100,
+              "y": 107,
+              "nx": 0.5,
+              "ny": 0.4954
+            }
+          }
+        ],
+        "width": 200,
+        "height": 216,
+        "thumbnail": "https://mod-resource-search-images.dn.nexoncdn.co.kr/maplestory_world/11d69a71db564434b3158c75bb042881.gif"
+      }
+    }
+  },
+  {
+    "mob": "8810018",
+    "path": "info/default",
+    "clip": {
+      "id": "add148db3a344de9ab8a30dc67b953a3",
+      "type": "animationclip",
+      "category": "mob",
+      "names": {
+        "ko": [
+          "미스틱 혼테일의 영혼",
+          "이지 혼테일",
+          "카오스 혼테일",
+          "혼테일"
+        ]
+      },
+      "dname": "animationclip-765370",
+      "assetGuid": null,
+      "hasEmbedding": true,
+      "payload": {
+        "frames": [
+          {
+            "index": 0,
+            "spriteRuid": "bf00aebae8764f309fa4397bc5d969bb",
+            "width": 200,
+            "height": 220,
+            "pivot": {
+              "x": 98,
+              "y": 110,
+              "nx": 0.49,
+              "ny": 0.5
+            }
+          }
+        ],
+        "width": 200,
+        "height": 220,
+        "thumbnail": "https://mod-resource-search-images.dn.nexoncdn.co.kr/maplestory_world/add148db3a344de9ab8a30dc67b953a3.gif"
+      }
+    }
+  },
+  {
+    "mob": "8820000",
+    "path": "stand",
+    "clip": {
+      "id": "0c31e86091ca4594850bd7084b4b88d4",
+      "type": "animationclip",
+      "category": "mob",
+      "names": {
+        "ko": [
+          "꿈속의 핑크빈",
+          "카오스 핑크빈",
+          "핑크빈"
+        ]
+      },
+      "dname": "animationclip-6345",
+      "assetGuid": null,
+      "hasEmbedding": true,
+      "payload": {
+        "frames": [
+          {
+            "index": 0,
+            "spriteRuid": "98a47e617b8b44cb96da597ad949e7b1",
+            "width": 92,
+            "height": 88,
+            "pivot": {
+              "x": 38,
+              "y": -119,
+              "nx": 0.413,
+              "ny": -1.3523
+            }
+          },
+          {
+            "index": 1,
+            "spriteRuid": "f359d53d601e4c9aa61cad5d8f415d98",
+            "width": 88,
+            "height": 84,
+            "pivot": {
+              "x": 38,
+              "y": -119,
+              "nx": 0.4318,
+              "ny": -1.4167
+            }
+          },
+          {
+            "index": 2,
+            "spriteRuid": "4c2dee9576614797925b899ea4fa1ab8",
+            "width": 96,
+            "height": 84,
+            "pivot": {
+              "x": 38,
+              "y": -119,
+              "nx": 0.3958,
+              "ny": -1.4167
+            }
+          },
+          {
+            "index": 3,
+            "spriteRuid": "afb3e31a30724309bbda90da5120cb17",
+            "width": 108,
+            "height": 84,
+            "pivot": {
+              "x": 38,
+              "y": -119,
+              "nx": 0.3519,
+              "ny": -1.4167
+            }
+          },
+          {
+            "index": 4,
+            "spriteRuid": "4e05250adb8d42649224c7b45f21223c",
+            "width": 112,
+            "height": 88,
+            "pivot": {
+              "x": 38,
+              "y": -119,
+              "nx": 0.3393,
+              "ny": -1.3523
+            }
+          },
+          {
+            "index": 5,
+            "spriteRuid": "09c2463f5bff48f1ac358ac61f957691",
+            "width": 108,
+            "height": 88,
+            "pivot": {
+              "x": 38,
+              "y": -119,
+              "nx": 0.3519,
+              "ny": -1.3523
+            }
+          }
+        ],
+        "width": 101,
+        "height": 86,
+        "thumbnail": "https://mod-resource-search-images.dn.nexoncdn.co.kr/maplestory_world/0c31e86091ca4594850bd7084b4b88d4.gif"
+      }
+    }
+  },
+  {
+    "mob": "8880101",
+    "path": "stand",
+    "clip": {
+      "id": "1539bb84f09344fbbf52e88b1325ba4a",
+      "type": "animationclip",
+      "category": "mob",
+      "names": {
+        "ko": [
+          "데미안"
+        ]
+      },
+      "dname": "animationclip-7829",
+      "assetGuid": null,
+      "hasEmbedding": true,
+      "payload": {
+        "frames": [
+          {
+            "index": 0,
+            "spriteRuid": "57766154afb041b6952fd5dcdbaff3de",
+            "width": 484,
+            "height": 292,
+            "pivot": {
+              "x": 184,
+              "y": 50,
+              "nx": 0.3802,
+              "ny": 0.1712
+            }
+          },
+          {
+            "index": 1,
+            "spriteRuid": "b9d57d8dcc2a42f7b73ddbbdacc44590",
+            "width": 472,
+            "height": 288,
+            "pivot": {
+              "x": 179,
+              "y": 49,
+              "nx": 0.3792,
+              "ny": 0.1701
+            }
+          },
+          {
+            "index": 2,
+            "spriteRuid": "66b363e867d84868a223fa8e1bf1464a",
+            "width": 476,
+            "height": 292,
+            "pivot": {
+              "x": 184,
+              "y": 48,
+              "nx": 0.3866,
+              "ny": 0.1644
+            }
+          },
+          {
+            "index": 3,
+            "spriteRuid": "79332105c43f4778bc28b75825f2e928",
+            "width": 476,
+            "height": 288,
+            "pivot": {
+              "x": 193,
+              "y": 47,
+              "nx": 0.4055,
+              "ny": 0.1632
+            }
+          },
+          {
+            "index": 4,
+            "spriteRuid": "fc4649319e1f464382e4b1215f67c4c2",
+            "width": 480,
+            "height": 292,
+            "pivot": {
+              "x": 192,
+              "y": 48,
+              "nx": 0.4,
+              "ny": 0.1644
+            }
+          },
+          {
+            "index": 5,
+            "spriteRuid": "9b6f9c9ba6da4da2a6a229f4b0547637",
+            "width": 468,
+            "height": 288,
+            "pivot": {
+              "x": 186,
+              "y": 49,
+              "nx": 0.3974,
+              "ny": 0.1701
+            }
+          },
+          {
+            "index": 6,
+            "spriteRuid": "51d4074e318a4c889c24c6915c398be3",
+            "width": 472,
+            "height": 292,
+            "pivot": {
+              "x": 185,
+              "y": 50,
+              "nx": 0.3919,
+              "ny": 0.1712
+            }
+          },
+          {
+            "index": 7,
+            "spriteRuid": "7d3815143e52409695cd6d0abc5fb2e8",
+            "width": 484,
+            "height": 288,
+            "pivot": {
+              "x": 181,
+              "y": 51,
+              "nx": 0.374,
+              "ny": 0.1771
+            }
+          }
+        ],
+        "width": 476,
+        "height": 290,
+        "thumbnail": "https://mod-resource-search-images.dn.nexoncdn.co.kr/maplestory_world/1539bb84f09344fbbf52e88b1325ba4a.gif"
+      }
+    }
+  },
+  {
+    "mob": "8880150",
+    "path": "fly",
+    "clip": {
+      "id": "ce0945fe526a4bf0b810f33bffd174f5",
+      "type": "animationclip",
+      "category": "mob",
+      "names": {
+        "ko": [
+          "루시드"
+        ]
+      },
+      "dname": "animationclip-56076",
+      "assetGuid": null,
+      "hasEmbedding": true,
+      "payload": {
+        "frames": [
+          {
+            "index": 0,
+            "spriteRuid": "e8b6b525e16043ce8257b27a44370ed9",
+            "width": 356,
+            "height": 380,
+            "pivot": {
+              "x": 117,
+              "y": 147,
+              "nx": 0.3287,
+              "ny": 0.3868
+            }
+          },
+          {
+            "index": 1,
+            "spriteRuid": "fcad743d0048402a8d020fbe550fd112",
+            "width": 344,
+            "height": 380,
+            "pivot": {
+              "x": 113,
+              "y": 146,
+              "nx": 0.3285,
+              "ny": 0.3842
+            }
+          },
+          {
+            "index": 2,
+            "spriteRuid": "2070c0d187e2415cb984ea63c8100c93",
+            "width": 336,
+            "height": 380,
+            "pivot": {
+              "x": 110,
+              "y": 145,
+              "nx": 0.3274,
+              "ny": 0.3816
+            }
+          },
+          {
+            "index": 3,
+            "spriteRuid": "5e4573e282db4d30b799fd0bc645c34f",
+            "width": 324,
+            "height": 380,
+            "pivot": {
+              "x": 106,
+              "y": 144,
+              "nx": 0.3272,
+              "ny": 0.3789
+            }
+          },
+          {
+            "index": 4,
+            "spriteRuid": "848f504b5e794baabb85140bed65a4b9",
+            "width": 316,
+            "height": 380,
+            "pivot": {
+              "x": 104,
+              "y": 145,
+              "nx": 0.3291,
+              "ny": 0.3816
+            }
+          },
+          {
+            "index": 5,
+            "spriteRuid": "75d6cfc6add14297ad5406ce5199e8e9",
+            "width": 308,
+            "height": 380,
+            "pivot": {
+              "x": 101,
+              "y": 146,
+              "nx": 0.3279,
+              "ny": 0.3842
+            }
+          },
+          {
+            "index": 6,
+            "spriteRuid": "6e9256b25c7d400394371064528d7d44",
+            "width": 316,
+            "height": 380,
+            "pivot": {
+              "x": 104,
+              "y": 146,
+              "nx": 0.3291,
+              "ny": 0.3842
+            }
+          },
+          {
+            "index": 7,
+            "spriteRuid": "b0bec489fdca44f78a514e33abc93ad9",
+            "width": 340,
+            "height": 380,
+            "pivot": {
+              "x": 112,
+              "y": 148,
+              "nx": 0.3294,
+              "ny": 0.3895
+            }
+          },
+          {
+            "index": 8,
+            "spriteRuid": "f4d6f582e90b44bab91c39b0e8bfe928",
+            "width": 356,
+            "height": 380,
+            "pivot": {
+              "x": 117,
+              "y": 147,
+              "nx": 0.3287,
+              "ny": 0.3868
+            }
+          },
+          {
+            "index": 9,
+            "spriteRuid": "295d9d050e0a43a19804a6a62a275799",
+            "width": 344,
+            "height": 380,
+            "pivot": {
+              "x": 113,
+              "y": 146,
+              "nx": 0.3285,
+              "ny": 0.3842
+            }
+          },
+          {
+            "index": 10,
+            "spriteRuid": "264dd5a39d7642ab8f4b69f4fd2d34e1",
+            "width": 336,
+            "height": 380,
+            "pivot": {
+              "x": 110,
+              "y": 145,
+              "nx": 0.3274,
+              "ny": 0.3816
+            }
+          },
+          {
+            "index": 11,
+            "spriteRuid": "7442872dd8e941e88bf1b469c204c65f",
+            "width": 324,
+            "height": 380,
+            "pivot": {
+              "x": 106,
+              "y": 144,
+              "nx": 0.3272,
+              "ny": 0.3789
+            }
+          },
+          {
+            "index": 12,
+            "spriteRuid": "e65a8e8edbe34824b9b8940f749b50fe",
+            "width": 316,
+            "height": 380,
+            "pivot": {
+              "x": 104,
+              "y": 145,
+              "nx": 0.3291,
+              "ny": 0.3816
+            }
+          },
+          {
+            "index": 13,
+            "spriteRuid": "dec611b1af3b41068796529cf05c958a",
+            "width": 308,
+            "height": 380,
+            "pivot": {
+              "x": 101,
+              "y": 146,
+              "nx": 0.3279,
+              "ny": 0.3842
+            }
+          },
+          {
+            "index": 14,
+            "spriteRuid": "10972aa83f374be9b826a73c7eee0b37",
+            "width": 316,
+            "height": 380,
+            "pivot": {
+              "x": 104,
+              "y": 146,
+              "nx": 0.3291,
+              "ny": 0.3842
+            }
+          },
+          {
+            "index": 15,
+            "spriteRuid": "03158242735f4310a32ddd0530bac8d5",
+            "width": 340,
+            "height": 380,
+            "pivot": {
+              "x": 112,
+              "y": 148,
+              "nx": 0.3294,
+              "ny": 0.3895
+            }
+          }
+        ],
+        "width": 330,
+        "height": 380,
+        "thumbnail": "https://mod-resource-search-images.dn.nexoncdn.co.kr/maplestory_world/ce0945fe526a4bf0b810f33bffd174f5.gif"
+      }
+    }
+  },
+  {
+    "mob": "8880300",
+    "path": "stand",
+    "clip": {
+      "id": "949ed99bbc7543dcb54f223099996d86",
+      "type": "animationclip",
+      "category": "mob",
+      "names": {
+        "ko": [
+          "윌"
+        ]
+      },
+      "dname": "animationclip-28089",
+      "assetGuid": null,
+      "hasEmbedding": true,
+      "payload": {
+        "frames": [
+          {
+            "index": 0,
+            "spriteRuid": "b520e942f7974725a9030051248a8e87",
+            "width": 148,
+            "height": 196,
+            "pivot": {
+              "x": 99,
+              "y": 23,
+              "nx": 0.6689,
+              "ny": 0.1173
+            }
+          },
+          {
+            "index": 1,
+            "spriteRuid": "eea7a47b28bd4edfb02b1b61b07a81bb",
+            "width": 152,
+            "height": 192,
+            "pivot": {
+              "x": 99,
+              "y": 23,
+              "nx": 0.6513,
+              "ny": 0.1198
+            }
+          },
+          {
+            "index": 2,
+            "spriteRuid": "01e4515714514a798a61018324e7370a",
+            "width": 160,
+            "height": 192,
+            "pivot": {
+              "x": 99,
+              "y": 23,
+              "nx": 0.6188,
+              "ny": 0.1198
+            }
+          },
+          {
+            "index": 3,
+            "spriteRuid": "93df839bec17415d80acab94ceb70985",
+            "width": 168,
+            "height": 192,
+            "pivot": {
+              "x": 99,
+              "y": 23,
+              "nx": 0.5893,
+              "ny": 0.1198
+            }
+          },
+          {
+            "index": 4,
+            "spriteRuid": "ffddfc3401674b0ca4c722bcc096b23f",
+            "width": 176,
+            "height": 192,
+            "pivot": {
+              "x": 99,
+              "y": 23,
+              "nx": 0.5625,
+              "ny": 0.1198
+            }
+          },
+          {
+            "index": 5,
+            "spriteRuid": "c89f28e44eef41ebb22733c13d3101d9",
+            "width": 172,
+            "height": 192,
+            "pivot": {
+              "x": 99,
+              "y": 23,
+              "nx": 0.5756,
+              "ny": 0.1198
+            }
+          },
+          {
+            "index": 6,
+            "spriteRuid": "9e150ebec53349709686ba55d26419a0",
+            "width": 164,
+            "height": 196,
+            "pivot": {
+              "x": 99,
+              "y": 23,
+              "nx": 0.6037,
+              "ny": 0.1173
+            }
+          },
+          {
+            "index": 7,
+            "spriteRuid": "3206bb26564c47398c2a509b566952e4",
+            "width": 152,
+            "height": 196,
+            "pivot": {
+              "x": 99,
+              "y": 23,
+              "nx": 0.6513,
+              "ny": 0.1173
+            }
+          }
+        ],
+        "width": 162,
+        "height": 194,
+        "thumbnail": "https://mod-resource-search-images.dn.nexoncdn.co.kr/maplestory_world/949ed99bbc7543dcb54f223099996d86.gif"
+      }
+    }
+  },
+  {
+    "mob": "8645009",
+    "path": "stand",
+    "clip": {
+      "id": "f6ce562e01fa410f8e14bbaa21c38678",
+      "type": "animationclip",
+      "category": "mob",
+      "names": {
+        "ko": [
+          "친위대장 듄켈"
+        ]
+      },
+      "dname": "animationclip-43855",
+      "assetGuid": null,
+      "hasEmbedding": true,
+      "payload": {
+        "frames": [
+          {
+            "index": 0,
+            "spriteRuid": "1cf8ad77b6b44f4e8f943477c8f12a3b",
+            "width": 488,
+            "height": 372,
+            "pivot": {
+              "x": 298,
+              "y": 5,
+              "nx": 0.6107,
+              "ny": 0.0134
+            }
+          },
+          {
+            "index": 1,
+            "spriteRuid": "a2e723f902ef42ad9e68532eea28dfa0",
+            "width": 488,
+            "height": 372,
+            "pivot": {
+              "x": 298,
+              "y": 5,
+              "nx": 0.6107,
+              "ny": 0.0134
+            }
+          },
+          {
+            "index": 2,
+            "spriteRuid": "ed0ec38499ca41a5a0949aa3134c12de",
+            "width": 484,
+            "height": 372,
+            "pivot": {
+              "x": 299,
+              "y": 7,
+              "nx": 0.6178,
+              "ny": 0.0188
+            }
+          },
+          {
+            "index": 3,
+            "spriteRuid": "75ba9f2abfaa40fbb55b1680f8c47de5",
+            "width": 492,
+            "height": 372,
+            "pivot": {
+              "x": 300,
+              "y": 9,
+              "nx": 0.6098,
+              "ny": 0.0242
+            }
+          },
+          {
+            "index": 4,
+            "spriteRuid": "74dc4ce46d5a466988e175ea1bdf8f34",
+            "width": 496,
+            "height": 368,
+            "pivot": {
+              "x": 301,
+              "y": 7,
+              "nx": 0.6069,
+              "ny": 0.019
+            }
+          },
+          {
+            "index": 5,
+            "spriteRuid": "ca6433161fc84807a0b567a2734ca0b2",
+            "width": 492,
+            "height": 368,
+            "pivot": {
+              "x": 301,
+              "y": 8,
+              "nx": 0.6118,
+              "ny": 0.0217
+            }
+          },
+          {
+            "index": 6,
+            "spriteRuid": "80bb2fd159e94fbca0fed487ccbefd7d",
+            "width": 512,
+            "height": 368,
+            "pivot": {
+              "x": 301,
+              "y": 8,
+              "nx": 0.5879,
+              "ny": 0.0217
+            }
+          },
+          {
+            "index": 7,
+            "spriteRuid": "1e92c98ba7ae48dca6507943ca799d18",
+            "width": 512,
+            "height": 368,
+            "pivot": {
+              "x": 301,
+              "y": 8,
+              "nx": 0.5879,
+              "ny": 0.0217
+            }
+          },
+          {
+            "index": 8,
+            "spriteRuid": "c5f382d6c4e24ffeaf2b21f4daf3436d",
+            "width": 508,
+            "height": 368,
+            "pivot": {
+              "x": 301,
+              "y": 7,
+              "nx": 0.5925,
+              "ny": 0.019
+            }
+          },
+          {
+            "index": 9,
+            "spriteRuid": "85d1ec0825a042aa812ea7a58d3a15e8",
+            "width": 504,
+            "height": 368,
+            "pivot": {
+              "x": 301,
+              "y": 6,
+              "nx": 0.5972,
+              "ny": 0.0163
+            }
+          },
+          {
+            "index": 10,
+            "spriteRuid": "a39332fc52b64cf186c33029a13a382e",
+            "width": 500,
+            "height": 368,
+            "pivot": {
+              "x": 300,
+              "y": 5,
+              "nx": 0.6,
+              "ny": 0.0136
+            }
+          },
+          {
+            "index": 11,
+            "spriteRuid": "aa030d6937784409b3341c3a326a1049",
+            "width": 488,
+            "height": 368,
+            "pivot": {
+              "x": 299,
+              "y": 4,
+              "nx": 0.6127,
+              "ny": 0.0109
+            }
+          },
+          {
+            "index": 12,
+            "spriteRuid": "c139ef900318460f96f1ccb5b0cb13b4",
+            "width": 488,
+            "height": 372,
+            "pivot": {
+              "x": 298,
+              "y": 6,
+              "nx": 0.6107,
+              "ny": 0.0161
+            }
+          }
+        ],
+        "width": 496,
+        "height": 370,
+        "thumbnail": "https://mod-resource-search-images.dn.nexoncdn.co.kr/maplestory_world/f6ce562e01fa410f8e14bbaa21c38678.gif"
+      }
+    }
+  },
+  {
+    "mob": "8880500",
+    "path": "stand",
+    "clip": {
+      "id": "8982686d78a64e45814262f82948660b",
+      "type": "animationclip",
+      "category": "mob",
+      "names": {
+        "ko": [
+          "창조의 아이온"
+        ]
+      },
+      "dname": "animationclip-26278",
+      "assetGuid": null,
+      "hasEmbedding": true,
+      "payload": {
+        "frames": [
+          {
+            "index": 0,
+            "spriteRuid": "661da30eb5e44ff9b4a5164d45104d71",
+            "width": 304,
+            "height": 568,
+            "pivot": {
+              "x": 141,
+              "y": 38,
+              "nx": 0.4638,
+              "ny": 0.0669
+            }
+          },
+          {
+            "index": 1,
+            "spriteRuid": "c1c4f4d712d044b3aee3f399493314c5",
+            "width": 336,
+            "height": 568,
+            "pivot": {
+              "x": 149,
+              "y": 39,
+              "nx": 0.4435,
+              "ny": 0.0687
+            }
+          },
+          {
+            "index": 2,
+            "spriteRuid": "c468dd68a5f14c76951eb64a9ea2d253",
+            "width": 344,
+            "height": 572,
+            "pivot": {
+              "x": 153,
+              "y": 41,
+              "nx": 0.4448,
+              "ny": 0.0717
+            }
+          },
+          {
+            "index": 3,
+            "spriteRuid": "de5233f8b2734184a0d0500df41cb2d7",
+            "width": 348,
+            "height": 572,
+            "pivot": {
+              "x": 162,
+              "y": 41,
+              "nx": 0.4655,
+              "ny": 0.0717
+            }
+          },
+          {
+            "index": 4,
+            "spriteRuid": "7d284d2b817a48b3ad1e09255ea55d75",
+            "width": 340,
+            "height": 568,
+            "pivot": {
+              "x": 159,
+              "y": 36,
+              "nx": 0.4676,
+              "ny": 0.0634
+            }
+          },
+          {
+            "index": 5,
+            "spriteRuid": "d182a5f71e734456999703f23187871a",
+            "width": 344,
+            "height": 572,
+            "pivot": {
+              "x": 162,
+              "y": 40,
+              "nx": 0.4709,
+              "ny": 0.0699
+            }
+          },
+          {
+            "index": 6,
+            "spriteRuid": "cc97a7e995ab44cebe837bc662f6026d",
+            "width": 324,
+            "height": 568,
+            "pivot": {
+              "x": 162,
+              "y": 37,
+              "nx": 0.5,
+              "ny": 0.0651
+            }
+          },
+          {
+            "index": 7,
+            "spriteRuid": "ab7479a4208c47819f36cca6bec4ab8c",
+            "width": 316,
+            "height": 564,
+            "pivot": {
+              "x": 158,
+              "y": 32,
+              "nx": 0.5,
+              "ny": 0.0567
+            }
+          },
+          {
+            "index": 8,
+            "spriteRuid": "3ca06c90c6294ac59776e54514b92d9a",
+            "width": 304,
+            "height": 568,
+            "pivot": {
+              "x": 141,
+              "y": 38,
+              "nx": 0.4638,
+              "ny": 0.0669
+            }
+          },
+          {
+            "index": 9,
+            "spriteRuid": "666c9dfc18dc46c9b71b8dfac53f7989",
+            "width": 336,
+            "height": 568,
+            "pivot": {
+              "x": 149,
+              "y": 39,
+              "nx": 0.4435,
+              "ny": 0.0687
+            }
+          },
+          {
+            "index": 10,
+            "spriteRuid": "7956314be1f6401eb4a9fa43ede954d2",
+            "width": 344,
+            "height": 572,
+            "pivot": {
+              "x": 153,
+              "y": 41,
+              "nx": 0.4448,
+              "ny": 0.0717
+            }
+          },
+          {
+            "index": 11,
+            "spriteRuid": "bdd740f7488c43808aaeb0233106796f",
+            "width": 348,
+            "height": 572,
+            "pivot": {
+              "x": 162,
+              "y": 41,
+              "nx": 0.4655,
+              "ny": 0.0717
+            }
+          },
+          {
+            "index": 12,
+            "spriteRuid": "d3e79f67dca2442dbaaa208cf60330b6",
+            "width": 340,
+            "height": 568,
+            "pivot": {
+              "x": 159,
+              "y": 36,
+              "nx": 0.4676,
+              "ny": 0.0634
+            }
+          },
+          {
+            "index": 13,
+            "spriteRuid": "2d32babd86564a668223545abb2d0550",
+            "width": 344,
+            "height": 572,
+            "pivot": {
+              "x": 162,
+              "y": 40,
+              "nx": 0.4709,
+              "ny": 0.0699
+            }
+          },
+          {
+            "index": 14,
+            "spriteRuid": "f05d03221d9542b6a70a7279a834a711",
+            "width": 324,
+            "height": 568,
+            "pivot": {
+              "x": 162,
+              "y": 37,
+              "nx": 0.5,
+              "ny": 0.0651
+            }
+          },
+          {
+            "index": 15,
+            "spriteRuid": "5f9d1f742e1742b09ce59b2f8b531541",
+            "width": 316,
+            "height": 564,
+            "pivot": {
+              "x": 158,
+              "y": 32,
+              "nx": 0.5,
+              "ny": 0.0567
+            }
+          }
+        ],
+        "width": 332,
+        "height": 569,
+        "thumbnail": "https://mod-resource-search-images.dn.nexoncdn.co.kr/maplestory_world/8982686d78a64e45814262f82948660b.gif"
+      }
+    }
+  },
+  {
+    "mob": "8880501",
+    "path": "stand",
+    "clip": {
+      "id": "1b020952c0734209970056e1bc8d5ef7",
+      "type": "animationclip",
+      "category": "mob",
+      "names": {
+        "ko": [
+          "파괴의 얄다바오트"
+        ]
+      },
+      "dname": "animationclip-8770",
+      "assetGuid": null,
+      "hasEmbedding": true,
+      "payload": {
+        "frames": [
+          {
+            "index": 0,
+            "spriteRuid": "33bc1c47e0bb4fa7bcc7db800a8e1553",
+            "width": 304,
+            "height": 568,
+            "pivot": {
+              "x": 141,
+              "y": 38,
+              "nx": 0.4638,
+              "ny": 0.0669
+            }
+          },
+          {
+            "index": 1,
+            "spriteRuid": "ea21209ab841431dbb2e9639ff41747b",
+            "width": 336,
+            "height": 568,
+            "pivot": {
+              "x": 149,
+              "y": 39,
+              "nx": 0.4435,
+              "ny": 0.0687
+            }
+          },
+          {
+            "index": 2,
+            "spriteRuid": "1287d10c17f746d8956555ead5512c42",
+            "width": 344,
+            "height": 572,
+            "pivot": {
+              "x": 153,
+              "y": 41,
+              "nx": 0.4448,
+              "ny": 0.0717
+            }
+          },
+          {
+            "index": 3,
+            "spriteRuid": "5f442e32f45f4e6080f6f2ad7b4bd9f6",
+            "width": 348,
+            "height": 572,
+            "pivot": {
+              "x": 162,
+              "y": 41,
+              "nx": 0.4655,
+              "ny": 0.0717
+            }
+          },
+          {
+            "index": 4,
+            "spriteRuid": "9a519e3b22bc4c6d9ac6fa5aa7c28e68",
+            "width": 340,
+            "height": 568,
+            "pivot": {
+              "x": 159,
+              "y": 36,
+              "nx": 0.4676,
+              "ny": 0.0634
+            }
+          },
+          {
+            "index": 5,
+            "spriteRuid": "5ff54ad8d3234418bc6e4a23aec0e60e",
+            "width": 344,
+            "height": 572,
+            "pivot": {
+              "x": 162,
+              "y": 40,
+              "nx": 0.4709,
+              "ny": 0.0699
+            }
+          },
+          {
+            "index": 6,
+            "spriteRuid": "6a0d24e0a8ad429bb0c8686b9dbc9bfa",
+            "width": 324,
+            "height": 568,
+            "pivot": {
+              "x": 162,
+              "y": 37,
+              "nx": 0.5,
+              "ny": 0.0651
+            }
+          },
+          {
+            "index": 7,
+            "spriteRuid": "36eabe85462e499da30ca3a8748046c1",
+            "width": 316,
+            "height": 564,
+            "pivot": {
+              "x": 158,
+              "y": 32,
+              "nx": 0.5,
+              "ny": 0.0567
+            }
+          },
+          {
+            "index": 8,
+            "spriteRuid": "7fe0aec9ee94477090b3b1df0f09aa23",
+            "width": 304,
+            "height": 568,
+            "pivot": {
+              "x": 141,
+              "y": 38,
+              "nx": 0.4638,
+              "ny": 0.0669
+            }
+          },
+          {
+            "index": 9,
+            "spriteRuid": "f36816281d39459d81f30a5081fc92fa",
+            "width": 336,
+            "height": 568,
+            "pivot": {
+              "x": 149,
+              "y": 39,
+              "nx": 0.4435,
+              "ny": 0.0687
+            }
+          },
+          {
+            "index": 10,
+            "spriteRuid": "e92ec9deaf6047eca127631439c07ee6",
+            "width": 344,
+            "height": 572,
+            "pivot": {
+              "x": 153,
+              "y": 41,
+              "nx": 0.4448,
+              "ny": 0.0717
+            }
+          },
+          {
+            "index": 11,
+            "spriteRuid": "d64a32cfc2704a7cbdacb55368cb21fa",
+            "width": 348,
+            "height": 572,
+            "pivot": {
+              "x": 162,
+              "y": 41,
+              "nx": 0.4655,
+              "ny": 0.0717
+            }
+          },
+          {
+            "index": 12,
+            "spriteRuid": "cf4f03f10ad24723a413758e07fcdfbe",
+            "width": 340,
+            "height": 568,
+            "pivot": {
+              "x": 159,
+              "y": 36,
+              "nx": 0.4676,
+              "ny": 0.0634
+            }
+          },
+          {
+            "index": 13,
+            "spriteRuid": "0f2abad2f3564a8aac957ec6c8c87a0c",
+            "width": 344,
+            "height": 572,
+            "pivot": {
+              "x": 162,
+              "y": 40,
+              "nx": 0.4709,
+              "ny": 0.0699
+            }
+          },
+          {
+            "index": 14,
+            "spriteRuid": "2556c5b58fcc44f5ad2cd25513724cdc",
+            "width": 324,
+            "height": 568,
+            "pivot": {
+              "x": 162,
+              "y": 37,
+              "nx": 0.5,
+              "ny": 0.0651
+            }
+          },
+          {
+            "index": 15,
+            "spriteRuid": "dab28920bfce499c86caedb0bbbe5cfb",
+            "width": 316,
+            "height": 564,
+            "pivot": {
+              "x": 158,
+              "y": 32,
+              "nx": 0.5,
+              "ny": 0.0567
+            }
+          }
+        ],
+        "width": 332,
+        "height": 569,
+        "thumbnail": "https://mod-resource-search-images.dn.nexoncdn.co.kr/maplestory_world/1b020952c0734209970056e1bc8d5ef7.gif"
+      }
+    }
+  },
+  {
+    "mob": "8880503",
+    "path": "stand",
+    "clip": {
+      "id": "0aea9ab6bfb242ca92349db56a152004",
+      "type": "animationclip",
+      "category": "mob",
+      "names": {
+        "ko": [
+          "검은 마법사"
+        ]
+      },
+      "dname": "animationclip-6152",
+      "assetGuid": null,
+      "hasEmbedding": true,
+      "payload": {
+        "frames": [
+          {
+            "index": 0,
+            "spriteRuid": "bcdb438c47784d0ab4e2331a6bb6e8e1",
+            "width": 400,
+            "height": 548,
+            "pivot": {
+              "x": 199,
+              "y": 64,
+              "nx": 0.4975,
+              "ny": 0.1168
+            }
+          },
+          {
+            "index": 1,
+            "spriteRuid": "5136e932320243cb84954d5200ad4783",
+            "width": 404,
+            "height": 548,
+            "pivot": {
+              "x": 200,
+              "y": 64,
+              "nx": 0.495,
+              "ny": 0.1168
+            }
+          },
+          {
+            "index": 2,
+            "spriteRuid": "53cb81edbd044864881083399dba2542",
+            "width": 408,
+            "height": 540,
+            "pivot": {
+              "x": 201,
+              "y": 56,
+              "nx": 0.4926,
+              "ny": 0.1037
+            }
+          },
+          {
+            "index": 3,
+            "spriteRuid": "bbe49e4cdd374ec3861303daaaa7a97a",
+            "width": 396,
+            "height": 548,
+            "pivot": {
+              "x": 199,
+              "y": 64,
+              "nx": 0.5025,
+              "ny": 0.1168
+            }
+          },
+          {
+            "index": 4,
+            "spriteRuid": "94362680d8404344a528ad2b13395997",
+            "width": 400,
+            "height": 548,
+            "pivot": {
+              "x": 201,
+              "y": 64,
+              "nx": 0.5025,
+              "ny": 0.1168
+            }
+          },
+          {
+            "index": 5,
+            "spriteRuid": "028dbf09b15a4126b1a86aab9067fce7",
+            "width": 408,
+            "height": 548,
+            "pivot": {
+              "x": 199,
+              "y": 64,
+              "nx": 0.4877,
+              "ny": 0.1168
+            }
+          },
+          {
+            "index": 6,
+            "spriteRuid": "ed2d24a848044597bfaaa5e9040fdca1",
+            "width": 408,
+            "height": 548,
+            "pivot": {
+              "x": 199,
+              "y": 64,
+              "nx": 0.4877,
+              "ny": 0.1168
+            }
+          },
+          {
+            "index": 7,
+            "spriteRuid": "01a92403180d4ac4bb8b901340e19955",
+            "width": 404,
+            "height": 548,
+            "pivot": {
+              "x": 199,
+              "y": 64,
+              "nx": 0.4926,
+              "ny": 0.1168
+            }
+          },
+          {
+            "index": 8,
+            "spriteRuid": "b38c48ca59e847ac9f7279ffcc3c0c59",
+            "width": 400,
+            "height": 548,
+            "pivot": {
+              "x": 199,
+              "y": 64,
+              "nx": 0.4975,
+              "ny": 0.1168
+            }
+          },
+          {
+            "index": 9,
+            "spriteRuid": "6c02ebddacf24f34b5647fba88bc2538",
+            "width": 396,
+            "height": 548,
+            "pivot": {
+              "x": 199,
+              "y": 64,
+              "nx": 0.5025,
+              "ny": 0.1168
+            }
+          },
+          {
+            "index": 10,
+            "spriteRuid": "7c1d390fd35c4a45a140536ff414d6dd",
+            "width": 396,
+            "height": 548,
+            "pivot": {
+              "x": 199,
+              "y": 64,
+              "nx": 0.5025,
+              "ny": 0.1168
+            }
+          },
+          {
+            "index": 11,
+            "spriteRuid": "8f51571b1eb94e2bb33d2d82b78e5aec",
+            "width": 396,
+            "height": 548,
+            "pivot": {
+              "x": 199,
+              "y": 64,
+              "nx": 0.5025,
+              "ny": 0.1168
+            }
+          },
+          {
+            "index": 12,
+            "spriteRuid": "cc7a5f7c55264450b722de75253c7285",
+            "width": 396,
+            "height": 548,
+            "pivot": {
+              "x": 199,
+              "y": 64,
+              "nx": 0.5025,
+              "ny": 0.1168
+            }
+          },
+          {
+            "index": 13,
+            "spriteRuid": "8c09ebfcc1124dab9b19b77ee70fcb6d",
+            "width": 396,
+            "height": 548,
+            "pivot": {
+              "x": 199,
+              "y": 64,
+              "nx": 0.5025,
+              "ny": 0.1168
+            }
+          },
+          {
+            "index": 14,
+            "spriteRuid": "3e4f336030d74b9c875c501ff5d9ef33",
+            "width": 404,
+            "height": 548,
+            "pivot": {
+              "x": 199,
+              "y": 64,
+              "nx": 0.4926,
+              "ny": 0.1168
+            }
+          },
+          {
+            "index": 15,
+            "spriteRuid": "09bf6324308a43338ab2733e3feb1a80",
+            "width": 408,
+            "height": 548,
+            "pivot": {
+              "x": 201,
+              "y": 64,
+              "nx": 0.4926,
+              "ny": 0.1168
+            }
+          },
+          {
+            "index": 16,
+            "spriteRuid": "a30bd69b72d74d68b87fffb3c523d3a2",
+            "width": 396,
+            "height": 548,
+            "pivot": {
+              "x": 199,
+              "y": 64,
+              "nx": 0.5025,
+              "ny": 0.1168
+            }
+          },
+          {
+            "index": 17,
+            "spriteRuid": "64cb61d1c50148598a0d799423e17d3a",
+            "width": 408,
+            "height": 540,
+            "pivot": {
+              "x": 201,
+              "y": 56,
+              "nx": 0.4926,
+              "ny": 0.1037
+            }
+          },
+          {
+            "index": 18,
+            "spriteRuid": "713c8f830c4c4ec0bf7f243797e5cd55",
+            "width": 396,
+            "height": 548,
+            "pivot": {
+              "x": 200,
+              "y": 64,
+              "nx": 0.5051,
+              "ny": 0.1168
+            }
+          },
+          {
+            "index": 19,
+            "spriteRuid": "6c585f6843a2433697fa5addc666e3c6",
+            "width": 400,
+            "height": 548,
+            "pivot": {
+              "x": 199,
+              "y": 64,
+              "nx": 0.4975,
+              "ny": 0.1168
+            }
+          }
+        ],
+        "width": 401,
+        "height": 547,
+        "thumbnail": "https://mod-resource-search-images.dn.nexoncdn.co.kr/maplestory_world/0aea9ab6bfb242ca92349db56a152004.gif"
+      }
+    }
+  }
+]

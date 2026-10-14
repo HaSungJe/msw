@@ -1,0 +1,226 @@
+[
+  {
+    "id": "zakum-altar",
+    "kind": "background",
+    "path": "C:/workspace/msw/assets/design/themes/native-boss-scenes/zakum-altar/background-restored.png",
+    "name": "Action_zakum-altar_background",
+    "contentLength": 1985788
+  },
+  {
+    "id": "zakum-altar",
+    "kind": "thumbnail",
+    "path": "C:/workspace/msw/assets/design/themes/native-boss-scenes/zakum-altar/action/thumbnail.png",
+    "name": "Action_zakum-altar_thumbnail",
+    "contentLength": 279446
+  },
+  {
+    "id": "forbidden-altar",
+    "kind": "background",
+    "path": "C:/workspace/msw/assets/design/themes/native-boss-scenes/forbidden-altar/background-restored.png",
+    "name": "Action_forbidden-altar_background",
+    "contentLength": 2017454
+  },
+  {
+    "id": "forbidden-altar",
+    "kind": "thumbnail",
+    "path": "C:/workspace/msw/assets/design/themes/native-boss-scenes/forbidden-altar/action/thumbnail.png",
+    "name": "Action_forbidden-altar_thumbnail",
+    "contentLength": 237511
+  },
+  {
+    "id": "pianus-cave",
+    "kind": "background",
+    "path": "C:/workspace/msw/assets/design/themes/native-boss-scenes/pianus-cave/background-restored.png",
+    "name": "Action_pianus-cave_background",
+    "contentLength": 2034720
+  },
+  {
+    "id": "pianus-cave",
+    "kind": "thumbnail",
+    "path": "C:/workspace/msw/assets/design/themes/native-boss-scenes/pianus-cave/action/thumbnail.png",
+    "name": "Action_pianus-cave_thumbnail",
+    "contentLength": 203484
+  },
+  {
+    "id": "cave-of-life",
+    "kind": "background",
+    "path": "C:/workspace/msw/assets/design/themes/native-boss-scenes/cave-of-life/background-restored.png",
+    "name": "Action_cave-of-life_background",
+    "contentLength": 2159093
+  },
+  {
+    "id": "cave-of-life",
+    "kind": "thumbnail",
+    "path": "C:/workspace/msw/assets/design/themes/native-boss-scenes/cave-of-life/action/thumbnail.png",
+    "name": "Action_cave-of-life_thumbnail",
+    "contentLength": 255857
+  },
+  {
+    "id": "twilight-of-gods",
+    "kind": "background",
+    "path": "C:/workspace/msw/assets/design/themes/native-boss-scenes/twilight-of-gods/background-restored.png",
+    "name": "Action_twilight-of-gods_background",
+    "contentLength": 2353847
+  },
+  {
+    "id": "twilight-of-gods",
+    "kind": "thumbnail",
+    "path": "C:/workspace/msw/assets/design/themes/native-boss-scenes/twilight-of-gods/action/thumbnail.png",
+    "name": "Action_twilight-of-gods_thumbnail",
+    "contentLength": 245425
+  },
+  {
+    "id": "black-heaven-core",
+    "kind": "background",
+    "path": "C:/workspace/msw/assets/design/themes/native-boss-scenes/black-heaven-core/concept.png",
+    "name": "Action_black-heaven-core_background",
+    "contentLength": 1962721
+  },
+  {
+    "id": "black-heaven-core",
+    "kind": "thumbnail",
+    "path": "C:/workspace/msw/assets/design/themes/native-boss-scenes/black-heaven-core/action/thumbnail.png",
+    "name": "Action_black-heaven-core_thumbnail",
+    "contentLength": 235296
+  },
+  {
+    "id": "world-tree-summit",
+    "kind": "background",
+    "path": "C:/workspace/msw/assets/design/themes/native-boss-scenes/world-tree-summit/background-restored.png",
+    "name": "Action_world-tree-summit_background",
+    "contentLength": 1817471
+  },
+  {
+    "id": "world-tree-summit",
+    "kind": "thumbnail",
+    "path": "C:/workspace/msw/assets/design/themes/native-boss-scenes/world-tree-summit/action/thumbnail.png",
+    "name": "Action_world-tree-summit_thumbnail",
+    "contentLength": 231775
+  },
+  {
+    "id": "collapsing-clocktower",
+    "kind": "background",
+    "path": "C:/workspace/msw/assets/design/themes/native-boss-scenes/collapsing-clocktower/background-restored.png",
+    "name": "Action_collapsing-clocktower_background",
+    "contentLength": 1887042
+  },
+  {
+    "id": "collapsing-clocktower",
+    "kind": "thumbnail",
+    "path": "C:/workspace/msw/assets/design/themes/native-boss-scenes/collapsing-clocktower/action/thumbnail.png",
+    "name": "Action_collapsing-clocktower_thumbnail",
+    "contentLength": 226545
+  },
+  {
+    "id": "diffraction-hall",
+    "kind": "background",
+    "path": "C:/workspace/msw/assets/design/themes/native-boss-scenes/diffraction-hall/background-restored.png",
+    "name": "Action_diffraction-hall_background",
+    "contentLength": 1705542
+  },
+  {
+    "id": "diffraction-hall",
+    "kind": "thumbnail",
+    "path": "C:/workspace/msw/assets/design/themes/native-boss-scenes/diffraction-hall/action/thumbnail.png",
+    "name": "Action_diffraction-hall_thumbnail",
+    "contentLength": 251524
+  },
+  {
+    "id": "eye-of-void",
+    "kind": "background",
+    "path": "C:/workspace/msw/assets/design/themes/native-boss-scenes/eye-of-void/concept.png",
+    "name": "Action_eye-of-void_background",
+    "contentLength": 1895941
+  },
+  {
+    "id": "eye-of-void",
+    "kind": "thumbnail",
+    "path": "C:/workspace/msw/assets/design/themes/native-boss-scenes/eye-of-void/action/thumbnail.png",
+    "name": "Action_eye-of-void_thumbnail",
+    "contentLength": 231354
+  },
+  {
+    "id": "altar-of-desire",
+    "kind": "background",
+    "path": "C:/workspace/msw/assets/design/themes/native-boss-scenes/altar-of-desire/background-restored.png",
+    "name": "Action_altar-of-desire_background",
+    "contentLength": 1743995
+  },
+  {
+    "id": "altar-of-desire",
+    "kind": "thumbnail",
+    "path": "C:/workspace/msw/assets/design/themes/native-boss-scenes/altar-of-desire/action/thumbnail.png",
+    "name": "Action_altar-of-desire_thumbnail",
+    "contentLength": 208724
+  },
+  {
+    "id": "near-the-end",
+    "kind": "background",
+    "path": "C:/workspace/msw/assets/design/themes/native-boss-scenes/near-the-end/background-restored.png",
+    "name": "Action_near-the-end_background",
+    "contentLength": 1824905
+  },
+  {
+    "id": "near-the-end",
+    "kind": "thumbnail",
+    "path": "C:/workspace/msw/assets/design/themes/native-boss-scenes/near-the-end/action/thumbnail.png",
+    "name": "Action_near-the-end_thumbnail",
+    "contentLength": 251682
+  },
+  {
+    "id": "dark-temple",
+    "kind": "background",
+    "path": "C:/workspace/msw/assets/design/themes/native-boss-scenes/dark-temple/background-restored.png",
+    "name": "Action_dark-temple_background",
+    "contentLength": 1893209
+  },
+  {
+    "id": "dark-temple",
+    "kind": "thumbnail",
+    "path": "C:/workspace/msw/assets/design/themes/native-boss-scenes/dark-temple/action/thumbnail.png",
+    "name": "Action_dark-temple_thumbnail",
+    "contentLength": 248188
+  },
+  {
+    "id": "dark-throne",
+    "kind": "background",
+    "path": "C:/workspace/msw/assets/design/themes/native-boss-scenes/dark-throne/background-restored.png",
+    "name": "Action_dark-throne_background",
+    "contentLength": 1881329
+  },
+  {
+    "id": "dark-throne",
+    "kind": "thumbnail",
+    "path": "C:/workspace/msw/assets/design/themes/native-boss-scenes/dark-throne/action/thumbnail.png",
+    "name": "Action_dark-throne_thumbnail",
+    "contentLength": 235189
+  },
+  {
+    "id": "boundary-of-beginning-and-end",
+    "kind": "background",
+    "path": "C:/workspace/msw/assets/design/themes/native-boss-scenes/boundary-of-beginning-and-end/background-restored.png",
+    "name": "Action_boundary-of-beginning-and-end_background",
+    "contentLength": 1749095
+  },
+  {
+    "id": "boundary-of-beginning-and-end",
+    "kind": "thumbnail",
+    "path": "C:/workspace/msw/assets/design/themes/native-boss-scenes/boundary-of-beginning-and-end/action/thumbnail.png",
+    "name": "Action_boundary-of-beginning-and-end_thumbnail",
+    "contentLength": 242344
+  },
+  {
+    "id": "nonexistent-space",
+    "kind": "background",
+    "path": "C:/workspace/msw/assets/design/themes/native-boss-scenes/nonexistent-space/background-restored.png",
+    "name": "Action_nonexistent-space_background",
+    "contentLength": 1263074
+  },
+  {
+    "id": "nonexistent-space",
+    "kind": "thumbnail",
+    "path": "C:/workspace/msw/assets/design/themes/native-boss-scenes/nonexistent-space/action/thumbnail.png",
+    "name": "Action_nonexistent-space_thumbnail",
+    "contentLength": 97605
+  }
+]

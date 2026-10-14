@@ -12,3 +12,9 @@ __pycache__/
 
 # 서명 업로드 주소 등 로컬 비밀 — 커밋 금지(2026-09-28: 한 번 커밋됐으나 이미 만료된 주소였다)
 *.private.json
+
+# 테마 작업 업로드 기록 — 서명된 업로드 주소가 들어 있어 커밋 금지(2026-10-15)
+tmp/theme-action/balrog-upload-signed.json
+tmp/theme-action/*-put.json
+tmp/theme-action/*-put-clean.json
+tmp/theme-action/wing-uploads.json
