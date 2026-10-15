@@ -52,11 +52,6 @@ script RtsAugmentLogic extends Logic
 	-- 뽑기마다 프리즘이 나올 확률(%) — 2026-09-29 사용자 "확정 → 5% 확률 고정". 같은 프리즘도 다시 나온다(중복 영입 허용)
 	property number PrismRate = 5
 
-	-- 클라: 증강 선택 창에서 받자마자 지정할 유닛(마지막에 고른 것 — 다음 선택 창에도 그대로). 0 = 미지정. 방출·교체(엔티티 Id가 다름)면 PickTarget이 0으로 돌린다
-	property number PickNo = 0
-
-	property string PickUnitId = ""
-
 	-- 클라: 방금 받은 것이 바로 지정(또는 팬텀 해금)이라 보유 탭으로 가지 않고 선택 창에 남는가 — 다음 선택지가 오면 이어서, 없으면 닫는다
 	property boolean ChosenStay = false
 
@@ -296,60 +291,26 @@ script RtsAugmentLogic extends Logic
 		self:RequestBrowsePending(token)
 	end
 
-	-- 클라: 선택 창에서 받자마자 지정할 유닛 번호 — 고른 유닛이 방출·교체(같은 번호에 다른 엔티티)됐거나 증강이 가득이면 미지정(0)으로 돌린다
-	@ExecSpace("ClientOnly")
-	method number PickTarget()
-		if self.PickNo <= 0 then return 0 end
-		local u = _RtsUnitLogic:GetMyUnit(self.PickNo)
-		if u == nil or u.Entity == nil or not isvalid(u.Entity) or u.Entity.Id ~= self.PickUnitId then
-			_RtsConfigLogic:Log("RtsAugment: pick target " .. string.format("%d", math.floor(self.PickNo + 0.5)) .. " gone -> none")
-			self.PickNo = 0
-			self.PickUnitId = ""
-			return 0
-		end
-		return self.PickNo
-	end
-
-	-- 클라: 선택 창의 캐릭터 칩을 누름(0 = 지정 안 함)
-	@ExecSpace("ClientOnly")
-	method void SetPickTarget(number no)
-		local u = nil
-		if no > 0 then u = _RtsUnitLogic:GetMyUnit(no) end
-		if u == nil or u.Entity == nil or not isvalid(u.Entity) then
-			self.PickNo = 0
-			self.PickUnitId = ""
-			return
-		end
-		self.PickNo = no
-		self.PickUnitId = u.Entity.Id
-	end
-
-	-- 클라: 이 증강을 받으면 고른 유닛에 바로 지정되는가(받기 버튼 글자·수령 요청 공용)
-	@ExecSpace("ClientOnly")
-	method boolean WillAssign(string id)
-		local no = self:PickTarget()
-		if no <= 0 then return false end
-		return self:CanAssignTo(id, _RtsUnitLogic:GetMyUnit(no))
-	end
-
-	-- 클라: '받기' 누름 — 지금 보이는 제안을 '방금 고름'으로 적고 서버에 수령 요청(고른 유닛에 지정할 수 있으면 그 번호도 함께).
+	-- 클라: 3택1 카드 '받기' → 받을 유닛을 고른 뒤(RtsPopupLogic.TakePick · 유닛 선택 창) 서버에 수령 요청. no ≥ 1 = 그 유닛에 바로 지정, 0 = 보유 증강(미지정)으로.
+	--   (2026-10-15 사용자 "증강을 선택해도 미지정으로 나온다" · "3개 중 1개 받을 때 유닛 지정해서 바로 지급" · "다중선택/일괄지급 폐기" — 전엔 선택 창 위 캐릭터 칩을 미리 골라 두면
+	--   다음 선택 창에도 그 유닛이 남아(PickNo) 받을 수 없는 증강은 조용히 미지정으로 갔다 → 칩·유지 삭제, 받을 때마다 고른다)
 	--   돌려주는 값 = 받은 뒤 보유 탭에서 따로 지정할 일이 없는가(바로 지정·팬텀 해금) — 그러면 선택 창에 남아 다음 선택지로 이어 간다
 	@ExecSpace("ClientOnly")
-	method boolean ChooseFromPopup(number idx)
+	method boolean ChooseFromPopup(number idx, number no)
 		if _RtsStageLogic.Paused then
 			_RtsHudLogic:ShowHintFor("일시정지를 해제한 뒤 증강을 받을 수 있어요", 3)
 			return false
 		end
 		local id = self:ParseOffer(self.ShownOffer).ids[idx]
 		if id == nil then return false end
-		local no = 0
-		if self:WillAssign(id) then no = self:PickTarget() end
+		local target = 0
+		if no ~= nil and no >= 1 and self:CanAssignTo(id, _RtsUnitLogic:GetMyUnit(no)) then target = no end
 		local d = _RtsAugmentTableLogic:GetDef(id)
-		local stay = no > 0 or (d ~= nil and d.unlock ~= nil)
+		local stay = target > 0 or (d ~= nil and d.unlock ~= nil)
 		self.ChosenOffer = self.ShownOffer
 		self.ChosenAt = _UtilLogic.ElapsedSeconds
 		self.ChosenStay = stay
-		self:RequestTake(idx, self.ShownOffer, no)
+		self:RequestTake(idx, self.ShownOffer, target)
 		return stay
 	end
 
