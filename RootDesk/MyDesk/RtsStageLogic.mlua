@@ -737,7 +737,8 @@ script RtsStageLogic extends Logic
 		self.StartPrep = false
 		self.StageEndsAt = self:GameNow()
 		_RtsWaveLogic:StopSpawn()
-		_RtsBossLogic:ClearAll()
+		-- 보스 테마는 남긴다 — 검은 마법사 4페이즈를 클리어한 구역은 판이 끝나도 그 테마 유지(2026-10-17 사용자), 탈락한 구역은 이미 각자 테마로 돌아갔다. 새 판(ResetRun)에서 모두 되돌림
+		_RtsBossLogic:ClearAllEx(true)
 		-- 진행 중에 던진 찬성표는 그대로 이어 간다(투표가 판 종료 전용이던 때는 여기서 비웠다)
 		self:TallyVotes()
 		_RtsConfigLogic:Log("RtsStage: run ended at stage " .. string.format("%d", self.StageNo))
@@ -752,6 +753,7 @@ script RtsStageLogic extends Logic
 		_RtsWaveLogic:StopSpawn()
 		_RtsWaveLogic:ClearAll()
 		_RtsBossLogic:ClearAll()
+		_RtsThemeLogic:EndAllBossThemes()
 		for userId, zone in pairs(_RtsZoneLogic.ZoneByUser) do
 			_RtsUnitLogic:ResetUser(userId)
 			_RtsAugmentLogic:ResetUser(userId)

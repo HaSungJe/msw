@@ -1,6 +1,6 @@
 -- Phase 4 합류(2026-09-23, revision-1 §2): 증강 표 — 정의·프리즘 지급·굴림·능력치 오버레이. 서버·클라 공용 읽기 전용.
 --   원본 = .info/augmentation.md(사용자 확정 — 이름·효과).
---   2026-10-14 개편(사용자): 증강은 3,000메소 뽑기로 얻는다(2026-10-15 — 전 6,000)(라운드 지급·단계 I/II/III·유닛당 한도·특수 코어·거인 학살자 삭제).
+--   2026-10-14 개편(사용자): 증강은 15,000메소 뽑기로 얻는다(2026-10-17 — 전 3,000 · 6,000)(라운드 지급·단계 I/II/III·유닛당 한도·특수 코어·거인 학살자 삭제).
 --     같은 날 사용자 "브론즈/골드/실버를 다 없애자 — 일반 증강 95% · 프리즘 5%, 전체 중에 랜덤": 등급은 일반(normal)·프리즘 둘뿐.
 --     일반 증강 = 공통 3종(어설픈·능숙한·완벽한 단련 — 수치 그대로) + 직업 증강 24종(사용자 '증강 목록 (2026.10.14)'). 뽑으면 27종 전체(내 직업이 아닌 것 포함)에서 서로 다른 3장(Roll — 가중치 같음) 중 하나.
 --     증강끼리는 모두 합연산 — '최종 데미지 +n%'도 같은 종류(유닛 전체 fin · 스킬 하나 skillFin)끼리 더한 뒤 능력치에 한 번 곱한다(2026-10-14 사용자 "합연산").
@@ -22,7 +22,8 @@ script RtsAugmentTableLogic extends Logic
 	--   프레이 강화 = 기본 30% + 10% × 7 = 100% / 쉐도우 파트너 강화 = 기본 50% + 10% × 5 = 100% / 가드 크러쉬 = 40레벨 20% + 5% × 6 = 50%.
 	--   다 찬 유닛엔 지정 불가(RtsAugmentLogic.CanAssignTo), 이번 판에 받은 장수(지정 + 미지정)가 다 차면 일반 증강 선택지에 안 나온다(RtsAugmentLogic.NormalExclude)
 	--   섀도어 레디 투 다이 강화 = 5장(최종 +8% × 5 = +40% — 2026-10-16 사용자 "섀도어가 너무 쌔다 · 레디 투 다이 증강은 5번까지만")
-	property table MaxStack = { bishop_pray = 7, nl_sp = 5, pal_gc = 6, shad_rtd = 5 }
+	--   샤프아이즈 강화 = 5장(2026-10-17 사용자 "샤프아이즈 강화는 5번까지만" — 보우마스터·신궁 공용이라 두 유닛 합쳐 5장, 같은 날 샤프아이즈 기본 50 → 30%: 30 + 4 × 5 = 50%)
+	property table MaxStack = { bishop_pray = 7, nl_sp = 5, pal_gc = 6, shad_rtd = 5, archer_se = 5 }
 
 	-- 가드 크러쉬 방어율 감소 상한(%) — 팔라딘 레벨 기준 + 증강 합이 넘지 않게(RtsCombatLogic.GuardCrush · RtsMonsterInfoLogic.GuardCrushOf)
 	property number GuardCap = 50
@@ -214,7 +215,7 @@ script RtsAugmentTableLogic extends Logic
 			if d.kind == "proj" and sk == "블리자드" then return tag .. "블리자드의 투사체가 " .. I:Int(d.val) .. "개 늘어난다. 보스를 공격할 때 타격 횟수도 " .. I:Int(d.val) .. "회 늘어난다." end
 			if d.kind == "proj" then return tag .. sk .. "의 구체가 " .. I:Int(d.val) .. "개 늘어난다." end
 			if d.kind == "pray" then return tag .. "프레이의 최종 데미지 증가량이 " .. v .. "% 늘어난다. (기본 30%, 최대 100% — 7개까지)" end
-			if d.kind == "se" then return tag .. "샤프아이즈의 크리티컬 확률·크리티컬 데미지 증가량이 " .. v .. "%씩 늘어난다." end
+			if d.kind == "se" then return tag .. "샤프아이즈의 크리티컬 확률·크리티컬 데미지 증가량이 " .. v .. "%씩 늘어난다. (기본 30% — 5개까지)" end
 			if d.kind == "sp" then return tag .. "쉐도우 파트너의 데미지가 " .. v .. "% 증가한다. (기본 50%, 최대 100% — 5개까지)" end
 			return tag
 		end

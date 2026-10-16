@@ -167,6 +167,8 @@ script RtsThemeLogic extends Logic
 	method void BeginBossTheme(number zone, string mobId)
 		local key = _RtsActionThemeLogic:GetBossThemeKey(mobId)
 		if key == "" then return end
+		-- 검은 마법사 페이즈는 앞 페이즈 테마를 유지한 채 넘어오므로 같은 테마면 다시 깔지 않는다
+		if self:GetBossTheme(zone) == key then return end
 		self.BossThemeByZone[string.format("%d", math.floor(zone + 0.5))] = key
 		self:ApplyVisualToZone(zone, key)
 	end
@@ -176,6 +178,12 @@ script RtsThemeLogic extends Logic
 		if self:GetBossTheme(zone) == "" then return end
 		self.BossThemeByZone[string.format("%d", math.floor(zone + 0.5))] = ""
 		self:ApplyVisualToZone(zone, self:GetZoneTheme(zone))
+	end
+
+	-- 모든 구역의 보스 테마를 끝내고 각자 테마로(새 판 — RtsStageLogic.ResetRun). 검은 마법사 4페이즈를 클리어한 구역은 판이 끝나도 테마를 유지하다가 여기서 돌아간다
+	@ExecSpace("ServerOnly")
+	method void EndAllBossThemes()
+		for z = 1, _RtsZoneLogic:GetZoneCount() do self:EndBossTheme(z) end
 	end
 
 end

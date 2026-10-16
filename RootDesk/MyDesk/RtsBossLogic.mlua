@@ -39,7 +39,8 @@ script RtsBossLogic extends Logic
 
 	@ExecSpace("ServerOnly")
 	method void SpawnBosses(number n)
-		self:ClearAll()
+		-- 보스 테마는 남긴 채 정리 — 바로 아래 BeginBossTheme이 새 테마로 덮는다(검은 마법사 페이즈 사이에 일반 테마가 끼지 않게)
+		self:ClearAllEx(true)
 		local s = _RtsStageTableLogic:GetStage(n)
 		if s == nil or s.kind ~= "boss" then return end
 		local zones = _RtsRunResultLogic:AliveZones()
@@ -147,8 +148,8 @@ script RtsBossLogic extends Logic
 		self.LeftByZone[string.format("%d", z)] = math.max(0, #s.mobs - (#list - self:AliveBossCount(z)))
 		if #list < #s.mobs or self:AliveBossCount(z) > 0 then return end
 		self.Down[z] = true
-		-- 다른 구역의 진행을 기다리는 동안에도 내 보스전 배경은 즉시 종료한다.
-		_RtsThemeLogic:EndBossTheme(z)
+		-- 다른 구역의 진행을 기다리는 동안에도 내 보스전 배경은 즉시 종료한다. 검은 마법사 1~4페이즈는 예외 — 다음 페이즈가 시작될 때까지(4페이즈는 클리어 뒤에도) 그 테마를 유지(KeepsBossTheme)
+		if not self:KeepsBossTheme(_RtsStageLogic.StageNo) then _RtsThemeLogic:EndBossTheme(z) end
 		_RtsConfigLogic:Log("RtsBoss: zone " .. string.format("%d", z) .. " down " .. s.name)
 		-- 프리즘 라운드(자쿰·시그너스·루시드 — 2026-09-23 3개로) 보스를 잡으면 그 구역 주인에게 프리즘 선택지 — 자쿰은 아직 없는 프리즘 전체, 시그너스·루시드는 무작위 3장(2026-09-27 RtsAugmentLogic.OnBossDown)
 		_RtsAugmentLogic:OnBossDown(_RtsRunResultLogic:OwnerOfZone(z), _RtsStageLogic.StageNo)
@@ -169,7 +170,15 @@ script RtsBossLogic extends Logic
 		_RtsStageLogic:ScheduleEarlyEnd()
 	end
 
-	-- 스테이지 시간이 끝났을 때 보스가 남은 구역 → 탈락
+	-- 검은 마법사 1~4페이즈(테마 '검은 마법사' 보스 스테이지): 보스를 잡거나 스테이지가 끝나도 보스 테마를 유지 — 다음 페이즈 시작에 그 페이즈 테마로 바로 바뀌고,
+	--   4페이즈는 클리어 뒤에도 유지(새 판 RtsStageLogic.ResetRun에서 되돌림). 탈락하면 내 테마로(RtsRunResultLogic.Eliminate → ClearZone).
+	--   2026-10-17 사용자 "검은마법사 페이즈 클리어 시 일반 테마로 바뀌었다가 다음 페이즈 테마가 나오는 게 반복 — 다음 페이즈로 넘어갈 때까지 유지, 탈락 시 내 테마, 4페이즈는 클리어해도 유지"
+	method boolean KeepsBossTheme(number stageNo)
+		local s = _RtsStageTableLogic:GetStage(stageNo)
+		return s ~= nil and s.kind == "boss" and s.theme == "검은 마법사"
+	end
+
+	-- 스테이지 시간이 끝났을 때 보스가 남은 구역 → 탈락(탈락한 구역은 Eliminate가 보스 테마를 끝낸다)
 	@ExecSpace("ServerOnly")
 	method void OnStageTimeUp()
 		for z, list in pairs(self.ByZone) do
@@ -180,7 +189,7 @@ script RtsBossLogic extends Logic
 				end
 			end
 		end
-		self:ClearAll()
+		self:ClearAllEx(self:KeepsBossTheme(_RtsStageLogic.StageNo))
 	end
 
 	-- 보스 HP 깎은 비율(0~1) = 1 − 남은 HP 합 ÷ 최대 HP 합(아직 안 나온 보스는 안 깎인 것으로)
@@ -201,8 +210,15 @@ script RtsBossLogic extends Logic
 		return pct
 	end
 
+	-- 구역 보스 정리 + 보스 테마 끝(탈락·퇴장)
 	@ExecSpace("ServerOnly")
 	method void ClearZone(number zone)
+		self:ClearZoneEx(zone, false)
+	end
+
+	-- keepTheme = true면 보스 테마는 그대로 둔다(검은 마법사 페이즈 사이 · 다음 보스전 시작 — 새 보스 테마가 바로 덮는다)
+	@ExecSpace("ServerOnly")
+	method void ClearZoneEx(number zone, boolean keepTheme)
 		local z = math.floor(zone + 0.5)
 		local list = self.ByZone[z]
 		if list ~= nil then
@@ -211,7 +227,7 @@ script RtsBossLogic extends Logic
 				if e ~= nil and isvalid(e) then e:Destroy() end
 			end
 		end
-		_RtsThemeLogic:EndBossTheme(z)
+		if not keepTheme then _RtsThemeLogic:EndBossTheme(z) end
 		self.ByZone[z] = nil
 		self.MaxHpByZone[z] = nil
 		self.Down[z] = nil
@@ -229,9 +245,15 @@ script RtsBossLogic extends Logic
 	-- 전 구역 보스 제거(구역마다 ClearZone) + 표 초기화
 	@ExecSpace("ServerOnly")
 	method void ClearAll()
+		self:ClearAllEx(false)
+	end
+
+	-- keepTheme = true면 보스 테마는 남긴다(ClearZoneEx)
+	@ExecSpace("ServerOnly")
+	method void ClearAllEx(boolean keepTheme)
 		local zones = {}
 		for z, list in pairs(self.ByZone) do zones[#zones + 1] = z end
-		for i = 1, #zones do self:ClearZone(zones[i]) end
+		for i = 1, #zones do self:ClearZoneEx(zones[i], keepTheme) end
 		self.ByZone = {}
 		self.MaxHpByZone = {}
 		self.Down = {}

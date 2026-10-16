@@ -544,7 +544,7 @@ script RtsJobTableLogic extends Logic
 				{ lv = 10, kind = "패시브", name = "크리티컬 마스터리", desc = "크리티컬 확률이 30% 증가한다.", target = false },
 				{ lv = 20, kind = "패시브", name = "보우 마스터리", desc = "공격력이 25% 증가한다.", target = false },
 				{ lv = 30, kind = "패시브", name = "보우 액스퍼트", desc = "공격력이 25% 증가한다.", target = false },
-				{ lv = 40, kind = "패시브", name = "샤프아이즈", desc = "모든 아군 유닛의 크리티컬 확률과 크리티컬 데미지가 50% 증가한다.", target = false },
+				{ lv = 40, kind = "패시브", name = "샤프아이즈", desc = "모든 아군 유닛의 크리티컬 확률과 크리티컬 데미지가 30% 증가한다.", target = false },
 				{ lv = 50, kind = "패시브", name = "폭풍의 시 강화", desc = "폭풍의 시의 데미지가 53% 증가하고, 보스 공격 시 폭풍의 시의 데미지가 143%, 보스 공격 시 데미지가 40% 증가한다.", target = false },
 			}
 		end
@@ -556,7 +556,7 @@ script RtsJobTableLogic extends Logic
 						proj = "1923e5406af44149a7575b25593e9336", projSec = 0.2, projDy = 0.9, projScale = 1.6,
 						hitDelay = 0.35, hitGap = 0.12, hitClip = "4a8db8d2f9614af3a3c902e4ef56d06b", hitScale = 1.6, hitDy = 0.6, hitSound = "1888d984619e45598028a2f830e78bdb" } },
 				{ lv = 10, kind = "패시브", name = "크리티컬 마스터리", desc = "크리티컬 확률이 30% 증가한다.", target = false },
-				{ lv = 20, kind = "패시브", name = "샤프아이즈", desc = "모든 아군 유닛의 크리티컬 확률과 크리티컬 데미지가 50% 증가한다.", target = false },
+				{ lv = 20, kind = "패시브", name = "샤프아이즈", desc = "모든 아군 유닛의 크리티컬 확률과 크리티컬 데미지가 30% 증가한다.", target = false },
 				-- 스나이핑 연출(사용자 2026-09-18 "화살이 아니라 대상에게 표식이 뜨면서 데미지"): 시전 순간 대상 위에 조준 표식 3221007/mob(markClip) + 시전음, 화살 투사체 없음.
 				--   0.4초 뒤 50%×10회(0.08초 간격) 타격 hit/0 + 타격음. 시전 이펙트(석궁 폭발)는 유지. 1마리, 쿨 10초
 				{ lv = 30, kind = "액티브", name = "스나이핑", desc = "사거리 6 안의 적 1마리를 390%의 데미지로 10회 공격한다. 재사용 대기시간 10초", target = false, cd = 10, ratio = 390, hits = 10, targets = 1, range = 6,
