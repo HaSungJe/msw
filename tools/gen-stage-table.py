@@ -784,9 +784,9 @@ for s in ST:
         check(abs(s["peak"] * 60 * s["ratio"] / len(s["mobs"]) - s["hp"]) <= 1, f"보스 {s['no']} 체력 ≠ 고점×60×기준")
 jl = io.open(JOBLUA, encoding="utf-8").read()
 # 레벨업 비용: LEVEL_COST_BLOCKS는 옛 메소·체력 모델(표준 빌드)용으로만 남긴다 — 게임은 2026-10-14부터 1~100레벨 일정 비율 곡선(RtsJobTableLogic.EnsureCosts).
-#   게임 표가 사용자 확정 누적(1→50 18,320 · 1→100 106,060)인지만 본다
+#   게임 표가 사용자 확정 누적(1→50 18,320 · 1→100 233,090 — 2026-10-17 71~80 ×2.5 · 81~ ×3, 전 106,060)인지만 본다
 _costs = [int(x) for x in re.findall(r"\d+", jl[jl.index("self.Costs = { 0,"):jl.index("}", jl.index("self.Costs = { 0,"))])][1:]
-check(len(_costs) == 99 and sum(_costs[:49]) == 18320 and sum(_costs) == 106060, "RtsJobTableLogic.EnsureCosts 누적이 1→50 18,320 · 1→100 106,060이 아님")
+check(len(_costs) == 99 and sum(_costs[:49]) == 18320 and sum(_costs) == 233090, "RtsJobTableLogic.EnsureCosts 누적이 1→50 18,320 · 1→100 233,090이 아님")
 if errs:
     print("검산 실패 — 아무것도 쓰지 않음:"); [print("  -", e) for e in errs]; sys.exit(1)
 print("검산 통과: 132 스테이지 · 몬스터 %d종 · 메소 %s(모델 %s × 전 라운드 %g) · 보스 17" % (len(MON), f"{sum(s['meso'] for s in ST):,}", f"{sum(s['mesoModel'] for s in ST):,}", PATCH_MESO_MUL))
