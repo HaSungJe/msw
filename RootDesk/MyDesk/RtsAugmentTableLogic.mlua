@@ -17,6 +17,15 @@ script RtsAugmentTableLogic extends Logic
 	-- 등급(normal · prism) → id 목록(표 순서 — 일반은 공통이 먼저, 그다음 직업 증강)
 	property table ByGrade = {}
 
+	-- 한 판에 받을 수 있는 장수(2026-10-15 사용자 "프레이 최대 100%" · "쉐도우 파트너도 100%까지 — 유닛당 5개까지만" ·
+	--   "동일 유닛 여러 개 영입 불가니까 프레이 7개, 쉐도우 파트너 5개, 가드 크러쉬 6개(상한 50%)만 등장"):
+	--   프레이 강화 = 기본 30% + 10% × 7 = 100% / 쉐도우 파트너 강화 = 기본 50% + 10% × 5 = 100% / 가드 크러쉬 = 40레벨 20% + 5% × 6 = 50%.
+	--   다 찬 유닛엔 지정 불가(RtsAugmentLogic.CanAssignTo), 이번 판에 받은 장수(지정 + 미지정)가 다 차면 일반 증강 선택지에 안 나온다(RtsAugmentLogic.NormalExclude)
+	property table MaxStack = { bishop_pray = 7, nl_sp = 5, pal_gc = 6 }
+
+	-- 가드 크러쉬 방어율 감소 상한(%) — 팔라딘 레벨 기준 + 증강 합이 넘지 않게(RtsCombatLogic.GuardCrush · RtsMonsterInfoLogic.GuardCrushOf)
+	property number GuardCap = 50
+
 	-- 대상 스킬 목록이 없는 직업 증강의 그림 스킬(SkillIconFor — 그 증강이 강화하는 스킬·버프 이름, RtsJobTableLogic.SkillIcon 표의 이름)
 	property table IconSkill = { hero_combo = "콤보 어택", pal_gc = "가드 크러쉬", dk_beholder = "비홀더", dk_berserk = "버서크", archer_se = "샤프아이즈",
 		bishop_pray = "프레이", nl_sp = "쉐도우 파트너", shad_rtd = "레디 투 다이", ph_aria = "프레이 오브 아리아", ph_bulls = "블스아이" }
@@ -39,7 +48,7 @@ script RtsAugmentTableLogic extends Logic
 			{ "hero_rb", "hero", "레이징 블로우 강화", "skill", 30, { "레이징 블로우" } },
 			{ "hero_combo", "hero", "콤보 어택 강화", "fin", 5 },
 			{ "pal_dc", "paladin", "디바인 차지 강화", "skill", 100, { "디바인 차지" } },
-			{ "pal_gc", "paladin", "가드 크러쉬", "ign", 5 },
+			{ "pal_gc", "paladin", "가드 크러쉬", "guard", 5 },
 			{ "dk_beholder", "dk", "비홀더 강화", "pct", 10 },
 			{ "dk_berserk", "dk", "버서크 강화", "fin", 14 },
 			{ "bow_storm", "bow", "폭풍의 시/애로우 레인 강화", "skillFin", 9, { "폭풍의 시", "애로우 레인" } },
@@ -88,6 +97,8 @@ script RtsAugmentTableLogic extends Logic
 	--   skill = 대상 스킬 데미지 +val%p(합연산 — 기본 공격이면 st.ratio, 지속 피해면 st.dotPct, 쿨 스킬이면 그 이름에 — RtsJobTableLogic.GetStatFor)
 	--   skillFin = 대상 스킬의 최종 데미지 +val%(여러 장은 합 → ×(1 + 합)) / fin = 그 유닛 최종 데미지 +val%(여러 장은 합 → ×(1 + 합)) / pct = 공격력 +val%(합) / ign = 방어율 무시 +val%(합)
 	--   proj = 대상 스킬 투사체 +val개(블리자드: 최대 대상 수 · 보스 타격 횟수, 도트 퍼니셔: 구체 수) / pray·se = 그 유닛이 거는 프레이·샤프아이즈 증가량 +val%p
+	--   guard = 그 팔라딘의 가드 크러쉬(같은 구역 모든 적 방어율 감소) +val%(2026-10-15 사용자 "가드 크러쉬 증강으로 %를 올려도 몬스터 디버프에 20p" — 전엔 팔라딘 자신의 방무 ign이라 디버프에 안 보였다.
+	--     RtsCombatLogic.GuardCrush · RtsMonsterInfoLogic.GuardCrushOf)
 	--   sp = 쉐도우 파트너 데미지 +val%p(기본 50% · 최대 100% — RtsJobTableLogic.GetStatFor spRate)
 	method void AddJobAug(table r)
 		local d = { id = r[1], grade = "normal", w = 1, name = r[3], kind = r[4], val = r[5], skills = r[6], needPrism = r[7] }
@@ -117,6 +128,16 @@ script RtsAugmentTableLogic extends Logic
 		local names = {}
 		for i = 1, #d.forJobs do names[#names + 1] = _RtsJobTableLogic:GetJobName(d.forJobs[i]) end
 		return table.concat(names, "·")
+	end
+
+	-- 지정 목록(쉼표 — RtsUnitComponent.Augs)에 증강 id가 몇 장 있는가
+	method number CountIn(string augs, string id)
+		local n = 0
+		if augs == nil or augs == "" then return 0 end
+		for a in string.gmatch(augs, "[^,]+") do
+			if a == id then n = n + 1 end
+		end
+		return n
 	end
 
 	-- 대상 스킬 이름 표시("폭풍의 시·애로우 레인")
@@ -184,11 +205,12 @@ script RtsAugmentTableLogic extends Logic
 			if d.kind == "fin" then return tag .. "최종 데미지가 " .. v .. "% 증가한다." end
 			if d.kind == "pct" then return tag .. "공격력이 " .. v .. "% 증가한다." end
 			if d.kind == "ign" then return tag .. "몬스터의 방어율을 " .. v .. "% 무시한다." end
+			if d.kind == "guard" then return tag .. "가드 크러쉬의 방어율 감소가 " .. v .. "% 늘어난다. (같은 구역의 모든 적, 최대 50% — 6개까지)" end
 			if d.kind == "proj" and sk == "블리자드" then return tag .. "블리자드의 투사체가 " .. I:Int(d.val) .. "개 늘어난다. 보스를 공격할 때 타격 횟수도 " .. I:Int(d.val) .. "회 늘어난다." end
 			if d.kind == "proj" then return tag .. sk .. "의 구체가 " .. I:Int(d.val) .. "개 늘어난다." end
-			if d.kind == "pray" then return tag .. "프레이의 최종 데미지 증가량이 " .. v .. "% 늘어난다." end
+			if d.kind == "pray" then return tag .. "프레이의 최종 데미지 증가량이 " .. v .. "% 늘어난다. (기본 30%, 최대 100% — 7개까지)" end
 			if d.kind == "se" then return tag .. "샤프아이즈의 크리티컬 확률·크리티컬 데미지 증가량이 " .. v .. "%씩 늘어난다." end
-			if d.kind == "sp" then return tag .. "쉐도우 파트너의 데미지가 " .. v .. "% 증가한다. (기본 50%, 최대 100%)" end
+			if d.kind == "sp" then return tag .. "쉐도우 파트너의 데미지가 " .. v .. "% 증가한다. (기본 50%, 최대 100% — 5개까지)" end
 			return tag
 		end
 		return table.concat(self:StatLines(self:Totals(id)), " · ")
@@ -261,7 +283,7 @@ script RtsAugmentTableLogic extends Logic
 	-- 증강 합계(쉼표로 이은 id — RtsUnitComponent.Augs): 공통 atk·pct·crit·critDmg 합, fin = 100 + 최종 데미지 증강 합(%), ign·pray·se·sp 합, n = 개수.
 	--   스킬 지정(이름 → 값): skill = 데미지 %p 합 / skillFin = 1 + 최종 데미지 증강 합(배율) / proj = 투사체 수 합. skillOrder = 표시 순서
 	method table Totals(string augs)
-		local t = { atk = 0, pct = 0, crit = 0, critDmg = 0, fin = 100, ign = 0, pray = 0, se = 0, sp = 0, n = 0, skill = {}, skillFin = {}, proj = {}, skillOrder = {} }
+		local t = { atk = 0, pct = 0, crit = 0, critDmg = 0, fin = 100, ign = 0, guard = 0, pray = 0, se = 0, sp = 0, n = 0, skill = {}, skillFin = {}, proj = {}, skillOrder = {} }
 		if augs == nil or augs == "" then return t end
 		self:Ensure()
 		for id in string.gmatch(augs, "[^,]+") do
@@ -277,7 +299,7 @@ script RtsAugmentTableLogic extends Logic
 					t.fin = t.fin + v
 				elseif kind == "pct" then
 					t.pct = t.pct + v
-				elseif kind == "ign" or kind == "pray" or kind == "se" or kind == "sp" then
+				elseif kind == "ign" or kind == "guard" or kind == "pray" or kind == "se" or kind == "sp" then
 					t[kind] = t[kind] + v
 				elseif (kind == "skill" or kind == "skillFin" or kind == "proj") and d.skills ~= nil then
 					for _, name in ipairs(d.skills) do
@@ -308,6 +330,7 @@ script RtsAugmentTableLogic extends Logic
 		add("크리티컬 데미지", t.critDmg, "%")
 		if t.fin ~= nil and t.fin > 100.01 then out[#out + 1] = "최종 데미지 +" .. I:Num(t.fin - 100) .. "%" end
 		add("방어율 무시", t.ign, "%")
+		add("가드 크러쉬 방어율 감소", t.guard, "%")
 		for _, name in ipairs(t.skillOrder or {}) do
 			if t.skill ~= nil then add(name .. " 데미지", t.skill[name], "%") end
 			if t.skillFin ~= nil and t.skillFin[name] ~= nil and t.skillFin[name] > 1.0001 then out[#out + 1] = name .. " 최종 데미지 +" .. I:Num((t.skillFin[name] - 1) * 100) .. "%" end

@@ -211,7 +211,7 @@ script RtsMonsterInfoLogic extends Logic
 			out[#out + 1] = { id = "freeze", name = "블리자드", desc = "빙결로 인해 이동속도가 50% 감소한다.", short = "이속 −50%", left = m.FrozenUntil - now, ruid = "", color = Color(0.45, 0.78, 1, 1) }
 		end
 		if m.ShredUntil > now and m.ShredPct > 0 then
-			out[#out + 1] = { id = "shred", name = "블리자드 템페스트", desc = "방어율이 " .. H:Int(m.ShredPct) .. "%p 감소한다.", short = "방어 −" .. H:Int(m.ShredPct) .. "%p", left = m.ShredUntil - now, ruid = "", color = Color(0.3, 0.55, 0.95, 1) }
+			out[#out + 1] = { id = "shred", name = "블리자드 템페스트", desc = "방어율이 " .. H:Int(m.ShredPct) .. "% 감소한다.", short = "방어 −" .. H:Int(m.ShredPct) .. "%", left = m.ShredUntil - now, ruid = "", color = Color(0.3, 0.55, 0.95, 1) }
 		end
 		if m.VulnUntil > now and m.VulnPct > 0 then
 			-- 이름은 스킬 이름으로, 설명엔 스킬 이름을 다시 붙이지 않는다(2026-09-27 사용자 "디바인 퍼니시먼트라고 안 나오고 받는 데미지 증가라고 나온다", "중독 → 포이즌 리전, 설명에 '스킬명:' 또 나오는 거 없애") — 가드 크러쉬처럼
@@ -223,13 +223,13 @@ script RtsMonsterInfoLogic extends Logic
 		if m.Defense > 0 then
 			local g = self:GuardCrushOf(m.Zone)
 			if g > 0 then
-				out[#out + 1] = { id = "guard", name = "가드 크러쉬", desc = "팔라딘이 구역에 있는 동안 방어율이 " .. H:Int(g) .. "%p 감소한다.", short = "방어 −" .. H:Int(g) .. "%p", left = -1, ruid = "b28058e366624ed0beb099fb67831526", color = Color(1, 1, 1, 1) }
+				out[#out + 1] = { id = "guard", name = "가드 크러쉬", desc = "팔라딘이 구역에 있는 동안 방어율이 " .. H:Int(g) .. "% 감소한다.", short = "방어 −" .. H:Int(g) .. "%", left = -1, ruid = "b28058e366624ed0beb099fb67831526", color = Color(1, 1, 1, 1) }
 			end
 		end
 		return out
 	end
 
-	-- 구역 zone의 가드 크러쉬 %p(클라 — 서버 RtsCombatLogic.GuardCrush와 같은 규칙: 팔라딘 40레벨 20, 10레벨 10)
+	-- 구역 zone의 가드 크러쉬 %(클라 — 서버 RtsCombatLogic.GuardCrush와 같은 규칙: 팔라딘 40레벨 20, 10레벨 10 + 가드 크러쉬 증강 장당 +5, 최대 50%, 2026-10-15 — 표기는 %p 대신 %)
 	@ExecSpace("ClientOnly")
 	method number GuardCrushOf(number zone)
 		local z = math.floor(zone + 0.5)
@@ -238,7 +238,11 @@ script RtsMonsterInfoLogic extends Logic
 		for i = 1, #nos do
 			local u = _RtsUnitLogic:GetZoneUnit(z, nos[i])
 			if u ~= nil and u.JobId == "paladin" then
-				if u.Level >= 40 and v < 20 then v = 20 elseif u.Level >= 10 and v < 10 then v = 10 end
+				local g = 0
+				if u.Level >= 40 then g = 20 elseif u.Level >= 10 then g = 10 end
+				-- 증강은 가드 크러쉬를 배운 뒤(10레벨)부터 · 합계 상한 GuardCap(50%)
+				if g > 0 then g = math.min(_RtsAugmentTableLogic.GuardCap, g + (_RtsAugmentTableLogic:Totals(u.Augs).guard or 0)) end
+				if g > v then v = g end
 			end
 		end
 		return v

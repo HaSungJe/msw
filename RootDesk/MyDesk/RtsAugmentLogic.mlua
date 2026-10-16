@@ -165,9 +165,26 @@ script RtsAugmentLogic extends Logic
 		if d.forJobs ~= nil then
 			if not _RtsAugmentTableLogic:IsForJob(d, u.JobId) then return false end
 			if d.needPrism ~= nil and not _RtsJobTableLogic:HasPrism(u, d.needPrism) then return false end
+			-- 장수 한도(프레이 강화 7 · 쉐도우 파트너 강화 5 · 가드 크러쉬 6 — 상한이 차면 더 못 받는다, 2026-10-15)
+			local cap = _RtsAugmentTableLogic.MaxStack[id]
+			if cap ~= nil and _RtsAugmentTableLogic:CountIn(u.Augs, id) >= cap then return false end
 			return true
 		end
 		return true
+	end
+
+	-- 서버: 일반 증강 선택지에서 뺄 것 — 장수 한도가 있는 직업 증강(프레이 7 · 쉐도우 파트너 5 · 가드 크러쉬 6)을 이번 판에 그만큼 받았을 때.
+	--   유닛에 지정한 것 + 보유 증강에 미지정으로 둔 것을 함께 센다(같은 직업은 하나만 영입 — 2026-10-15 사용자 "프레이 7개, 쉐도우 파트너 5개, 가드 크러쉬 6개만 등장").
+	--   그 유닛을 방출하면 지정된 증강도 사라지므로(OnUnitDismissed) 다시 나올 수 있다
+	@ExecSpace("ServerOnly")
+	method table NormalExclude(string userId)
+		local ex = {}
+		local got = {}
+		for _, item in ipairs(self:GetOwned(userId)) do got[item.id] = (got[item.id] or 0) + 1 end
+		for id, cap in pairs(_RtsAugmentTableLogic.MaxStack) do
+			if (got[id] or 0) >= cap then ex[id] = true end
+		end
+		return ex
 	end
 
 	-- ===== 서버: 지급 =====
@@ -176,6 +193,11 @@ script RtsAugmentLogic extends Logic
 	@ExecSpace("ServerOnly")
 	method void OnBossDown(string userId, number stageNo)
 		if userId == "" or not _RtsAugmentTableLogic:IsPrismStage(stageNo) then return end
+		-- 받을 프리즘이 남지 않았으면(11종을 다 받음 — 2026-10-15 프리즘 유일성) 그 보상은 일반 증강 선택으로
+		if not self:HasPrismLeft(userId) then
+			self:OfferEx(userId, "normal", false, 0)
+			return
+		end
 		-- 자쿰(첫 프리즘 보스)이 준 프리즘만 전체에서 선택, 나머지 보스는 무작위 3장(2026-09-27 사용자 "자쿰 한정으로 자쿰이 준 프리즘만 선택 가능")
 		self:OfferEx(userId, "prism", _RtsAugmentTableLogic:IsPrismPickStage(stageNo), 0)
 	end
@@ -209,8 +231,14 @@ script RtsAugmentLogic extends Logic
 
 	@ExecSpace("ServerOnly")
 	method void ActivatePending(string userId, table item)
-		-- 프리즘 선택지에서 빼는 것 = 이미 받은 '팬텀 잠금 해제'뿐(2026-09-29 사용자 "동일 유닛 중복 영입이 가능하니 같은 프리즘이 계속 등장" — 전엔 보유한 직업 프리즘도 뺐다)
+		-- 프리즘 선택지에서 빼는 것 = 이번 판에 이미 받은 프리즘 전부(PrismExclude — 2026-10-15 같은 직업 하나만 영입 · 프리즘 유일성)
 		local exclude = self:PrismExclude(userId)
+		-- 기다리던 프리즘 건을 켤 때 받을 프리즘이 하나도 안 남았으면(앞 건에서 마지막 프리즘을 받음) 일반 증강 선택으로 바꾼다
+		if item.grade == "prism" and not _RtsAugmentTableLogic:HasAny("prism", exclude) then
+			item.grade = "normal"
+			item.pickAll = false
+			item.packed = ""
+		end
 		-- 자쿰 프리즘(pickAll) = 아직 없는 프리즘 전체(내 유닛 직업 → 다른 직업 → 팬텀 순 — 특수 코어는 2026-10-14 삭제). 켤 때마다 지금 보유·유닛 기준으로 다시 만든다(2026-09-27 사용자 "자쿰이 준 프리즘만 선택 가능")
 		if item.grade == "prism" and item.pickAll == true then
 			local all = _RtsAugmentTableLogic:PrismChoices(exclude, self:UserJobs(userId))
@@ -218,7 +246,7 @@ script RtsAugmentLogic extends Logic
 			self.OfferByUser[userId] = item.packed
 			return
 		end
-		-- 그 밖의 프리즘(시그너스·루시드 보상·뽑기) = 가중치 무작위 3장. 다시 켜면 그 3장을 유지하되, 그새 다른 건에서 받은 직업 프리즘은 빼고 새로 채운다
+		-- 그 밖의 프리즘(시그너스·루시드 보상·뽑기) = 가중치 무작위 3장. 다시 켜면 그 3장을 유지하되, 그새 다른 건에서 받은 프리즘은 빼고 새로 채운다
 		if item.grade == "prism" then
 			local pids = {}
 			for _, id in ipairs(self:ParseOffer(item.packed).ids) do
@@ -236,9 +264,21 @@ script RtsAugmentLogic extends Logic
 			self.OfferByUser[userId] = item.packed
 			return
 		end
-		-- 일반(2026-10-14 사용자 "전체 중에 랜덤"): 처음 켤 때 27종 전체에서 서로 다른 무작위 3장. 다시 켜면 그때 만든 3장 그대로
-		local ids = self:ParseOffer(item.packed).ids
-		if #ids == 0 then ids = _RtsAugmentTableLogic:Roll("normal", nil) end
+		-- 일반(2026-10-14 사용자 "전체 중에 랜덤"): 처음 켤 때 27종 전체에서 서로 다른 무작위 3장. 다시 켜면 그때 만든 3장 그대로 —
+		--   단 그새 한도가 찬 증강(NormalExclude — 프레이·쉐도우 파트너·가드 크러쉬)은 빼고 새로 채운다(2026-10-15)
+		local nex = self:NormalExclude(userId)
+		local ids = {}
+		for _, id in ipairs(self:ParseOffer(item.packed).ids) do
+			if not nex[id] then
+				ids[#ids + 1] = id
+				nex[id] = true
+			end
+		end
+		if #ids < 3 then
+			for _, id in ipairs(_RtsAugmentTableLogic:Roll("normal", nex)) do
+				if #ids < 3 then ids[#ids + 1] = id end
+			end
+		end
 		item.packed = item.grade .. "|" .. table.concat(ids, ",") .. "|" .. string.format("%d", item.token)
 		self.OfferByUser[userId] = item.packed
 	end
@@ -330,6 +370,17 @@ script RtsAugmentLogic extends Logic
 		if id == nil then return end
 		local d = _RtsAugmentTableLogic:GetDef(id)
 		if d == nil then return end
+		-- 한도가 찬 증강 · 이미 받은 프리즘은 받지 않는다 — 보이는 선택지는 켤 때마다 다시 거르므로(ActivatePending) 정상 흐름에선 생기지 않는 방어(2026-10-15).
+		--   걸리면 지금 선택지를 다시 걸러 새 카드로 바꿔 보낸다
+		local blocked = self:NormalExclude(userId)
+		if d.grade == "prism" then blocked = self:PrismExclude(userId) end
+		if blocked[id] then
+			_RtsConfigLogic:Log("RtsAugment: " .. userId .. " take " .. id .. " refused — capped/owned, re-rolling offer")
+			for _, qitem in ipairs(self.Queue[userId] or {}) do
+				if qitem.token == offer.token then self:ActivatePending(userId, qitem) break end
+			end
+			return
+		end
 		local list = self:GetOwned(userId)
 		local item = { id = id, no = 0 }
 		if d.unlock ~= nil then item.no = -1 end
@@ -402,17 +453,18 @@ script RtsAugmentLogic extends Logic
 		self.BuyCountByUser[userId] = 0
 	end
 
-	-- 프리즘 선택지·뽑기에서 빼는 것: 이미 받은 '팬텀 잠금 해제'(unlock)뿐. 직업 프리즘은 같은 직업 유닛이 여럿일 수 있어 다시 나온다(2026-09-29)
+	-- 프리즘 선택지·뽑기에서 빼는 것: 이번 판에 이미 받은 프리즘 전부(지정했든 미지정이든 · 팬텀 잠금 해제 포함).
+	--   2026-10-15 사용자 "동일 유닛 선택 불가 · 한 번 선택한 프리즘 증강은 다시는 나타나지 않도록 — 유닛 유일성" (전 2026-09-29~: 같은 직업 유닛을 여럿 둘 수 있어 직업 프리즘은 다시 나왔다)
 	method table PrismExclude(string userId)
 		local ex = {}
 		for _, item in ipairs(self:GetOwned(userId)) do
 			local d = _RtsAugmentTableLogic:GetDef(item.id)
-			if d ~= nil and d.unlock ~= nil then ex[d.id] = true end
+			if d ~= nil and d.grade == "prism" then ex[d.id] = true end
 		end
 		return ex
 	end
 
-	-- 이 유저가 더 받을 프리즘이 있는가(직업 프리즘은 늘 남는다 — 사실상 항상 참)
+	-- 이 유저가 더 받을 프리즘이 있는가(받은 프리즘은 다시 안 나와 11종을 다 받으면 거짓)
 	method boolean HasPrismLeft(string userId)
 		return _RtsAugmentTableLogic:HasAny("prism", self:PrismExclude(userId))
 	end

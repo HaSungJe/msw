@@ -350,6 +350,11 @@ script RtsUnitLogic extends Logic
 		if state ~= "running" then return end
 		if not _RtsRunResultLogic:IsAlive(userId) then return end
 		if not self:IsJobUnlocked(userId, jobId) then return end
+		-- 같은 직업은 하나만(2026-10-15 사용자 "동일 유닛 선택 불가 — 유닛 유일성", 전 2026-09-29~ 중복 영입 허용)
+		if self:OwnsJob(userId, jobId) then
+			_RtsConfigLogic:Log("RtsUnit: recruit " .. jobId .. " refused — already owned")
+			return
+		end
 		if self:RecruitRoom(userId) <= 0 then
 			_RtsConfigLogic:Log("RtsUnit: recruit " .. jobId .. " refused — limit")
 			return
@@ -385,6 +390,15 @@ script RtsUnitLogic extends Logic
 		self.MesoByUser[userId] = meso
 		self:OnChanged(no, meso, userId)
 		_RtsConfigLogic:Log("RtsUnit: recruit " .. jobId .. " -> unit " .. string.format("%d", no) .. " at (" .. string.format("%d,%d", col, row) .. ") cost " .. string.format("%d", cost))
+	end
+
+	-- 서버: 이 유저가 이 직업 유닛을 이미 가졌는가(같은 직업 영입 금지 — 2026-10-15 유닛 유일성)
+	@ExecSpace("ServerOnly")
+	method boolean OwnsJob(string userId, string jobId)
+		for _, e in pairs(self.UnitsByUser[userId] or {}) do
+			if e ~= nil and isvalid(e) and e.RtsUnitComponent ~= nil and e.RtsUnitComponent.JobId == jobId then return true end
+		end
+		return false
 	end
 
 	-- 영입할 수 있게 열린 직업인가(서버·클라 공용). 모험가 10직업은 항상, 영웅 팬텀은 프리즘 '팬텀 잠금 해제'(augmentation.md)를 받은 유저만.

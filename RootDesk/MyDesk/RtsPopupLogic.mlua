@@ -956,7 +956,7 @@ script RtsPopupLogic extends Logic
 				local card = H:SpawnRoundedPanel("RtsRcJob" .. tostring(gi) .. "_" .. tostring(ji), body, Vector2(0, 1), Vector2(0, 1), Vector2(gx, jy), Vector2(colW, cardH),
 					self:Card(), self:Edge(), 1.5)
 				local jid = jobs[ji]
-				-- 같은 직업 중복 영입 허용(2026-09-29 사용자) — 보유 중이면 '보유 n' 표시만 하고 카드는 그대로 눌린다
+				-- 같은 직업은 하나만(2026-10-15 사용자 "동일 유닛 선택 불가 — 유닛 유일성", 전 2026-09-29~ 중복 허용) — 보유 중이면 '영입함'으로 흐리게(카드는 눌려 상세를 볼 수 있다)
 				local ownedCount = 0
 				for oi = 1, #nos do
 					local ou = _RtsUnitLogic:GetMyUnit(nos[oi])
@@ -964,12 +964,12 @@ script RtsPopupLogic extends Logic
 				end
 				local unlocked = _RtsUnitLogic:IsJobUnlocked(myId, jid)
 				local ink = self:Ink()
-				if not canRecruit or not unlocked then
+				if not canRecruit or not unlocked or ownedCount > 0 then
 					ink = self:Muted()
 					_RtsHudLogic:SetUiColor(card, self:Card(), "surface")
 				end
 				local status = ""
-				if ownedCount > 0 then status = "보유 " .. H:Int(ownedCount) end
+				if ownedCount > 0 then status = "영입함" end
 				local previewY = -55
 				local nameY = -106
 				if status ~= "" then previewY = -47; nameY = -98 end
@@ -1016,6 +1016,10 @@ script RtsPopupLogic extends Logic
 		local myId = _RtsHudLogic.MyUserId
 		local nos = _RtsUnitLogic:ListZoneUnits(_RtsUnitLogic:MyZone())
 		if not _RtsUnitLogic:IsJobUnlocked(myId, jid) then return "잠김 — 팬텀 프리즘을 얻으면 영입할 수 있어요" end
+		for _, no in ipairs(nos) do
+			local ou = _RtsUnitLogic:GetMyUnit(no)
+			if ou ~= nil and ou.JobId == jid then return "이미 영입한 직업이에요 — 같은 직업은 하나만 영입할 수 있어요" end
+		end
 		local state = _RtsStageLogic.RunState
 		if not _RtsRunResultLogic:IsMeAlive() or (state ~= "countdown" and state ~= "running") then return "지금은 영입할 수 없어요" end
 		local stageNo = _RtsStageLogic.StageNo

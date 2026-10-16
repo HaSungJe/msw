@@ -19,6 +19,7 @@ script RtsUnitBuffLogic extends Logic
 	-- id 같으면 중복 적용 안 함. scope: all(구역 전체, 자신 포함) / target(BondNo 지정 유닛) (주변 n칸 범위 near는 쓰는 버프가 없어 2026-09-28 정리로 삭제; 프레이는 2026-09-19부터 all)
 	--   fin 최종 데미지 +% / crit 크리 확률 +% / critDmg 크리 데미지 +%. 아이콘은 메이플 원작 스킬 아이콘 RUID
 	--   bonus = 출처 유닛의 직업 증강이 더하는 값(2026-10-14 — "pray" 프레이 강화는 fin에, "se" 샤프아이즈 강화는 crit·critDmg에 각각 더한다. RtsAugmentTableLogic.Totals)
+	--   cap = 기본 + bonus 상한(프레이 100 — 2026-10-15, BonusOf)
 	method table GetDefs()
 		return {
 			-- 홀리 유니티 = 프리즘 스킬(2026-09-20: 40레벨 패시브 +20% 삭제, 지정 유닛 최종 +100% → 2026-09-22 +40%). prism = 이 프리즘을 가진 유닛만 출처(RtsUnitComponent.Prisms)
@@ -27,7 +28,7 @@ script RtsUnitBuffLogic extends Logic
 			{ id = "sharpeyes", name = "샤프아이즈", job = "bow", lv = 40, scope = "all", icon = "4cd1961bc55b47cb80e1a7f8843e225e", crit = 50, critDmg = 50, bonus = "se" },
 			-- 신궁 샤프아이즈도 직업 증강 '샤프아이즈 강화'(보우마스터·신궁 공용 — 2026-10-14 사용자 목록)를 받는다
 			{ id = "sharpeyes", name = "샤프아이즈", job = "marks", lv = 20, scope = "all", icon = "4cd1961bc55b47cb80e1a7f8843e225e", crit = 50, critDmg = 50, bonus = "se" },
-			{ id = "pray", name = "프레이", job = "bishop", lv = 30, scope = "all", icon = "39b3159efcc74334b875c94c64a74243", fin = 30, bonus = "pray" }, -- 2026-10-14 사용자 "프레이 최종데미지 증가량 30%"(전 10) / 2026-09-19: 주변 1타일·자신 미적용 → 구역 전체(자신 포함)
+			{ id = "pray", name = "프레이", job = "bishop", lv = 30, scope = "all", icon = "39b3159efcc74334b875c94c64a74243", fin = 30, bonus = "pray", cap = 100 }, -- 2026-10-14 사용자 "프레이 최종데미지 증가량 30%"(전 10) / 2026-09-19: 주변 1타일·자신 미적용 → 구역 전체(자신 포함)
 			{ id = "joker", name = "조커: 날카로운 검", job = "phantom", lv = 10, scope = "all", icon = "f1575f7842c740a49f9e19c2514de64e", fin = 5 }, -- 2026-09-24 사용자 "조커 최종 5% — 커트라인 낮추게"(2026-09-19 3차 5 → 3에서 되돌림)
 		}
 	end
@@ -53,7 +54,10 @@ script RtsUnitBuffLogic extends Logic
 	-- 출처 유닛 src의 직업 증강이 이 버프에 더하는 값(없으면 0)
 	method number BonusOf(table def, any src)
 		if def.bonus == nil or src == nil or src.Augs == nil or src.Augs == "" then return 0 end
-		return _RtsAugmentTableLogic:Totals(src.Augs)[def.bonus] or 0
+		local v = _RtsAugmentTableLogic:Totals(src.Augs)[def.bonus] or 0
+		-- 상한(cap — 프레이 100%, 2026-10-15 사용자 "프레이 최대 100%까지"): 기본 + 증강이 넘지 않게
+		if def.cap ~= nil then v = math.min(v, def.cap - (def.fin or 0)) end
+		return v
 	end
 
 	-- 범위 글자: "모든 유닛" / "지정 유닛 1개"
