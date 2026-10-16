@@ -21,7 +21,8 @@ script RtsAugmentTableLogic extends Logic
 	--   "동일 유닛 여러 개 영입 불가니까 프레이 7개, 쉐도우 파트너 5개, 가드 크러쉬 6개(상한 50%)만 등장"):
 	--   프레이 강화 = 기본 30% + 10% × 7 = 100% / 쉐도우 파트너 강화 = 기본 50% + 10% × 5 = 100% / 가드 크러쉬 = 40레벨 20% + 5% × 6 = 50%.
 	--   다 찬 유닛엔 지정 불가(RtsAugmentLogic.CanAssignTo), 이번 판에 받은 장수(지정 + 미지정)가 다 차면 일반 증강 선택지에 안 나온다(RtsAugmentLogic.NormalExclude)
-	property table MaxStack = { bishop_pray = 7, nl_sp = 5, pal_gc = 6 }
+	--   섀도어 레디 투 다이 강화 = 5장(최종 +8% × 5 = +40% — 2026-10-16 사용자 "섀도어가 너무 쌔다 · 레디 투 다이 증강은 5번까지만")
+	property table MaxStack = { bishop_pray = 7, nl_sp = 5, pal_gc = 6, shad_rtd = 5 }
 
 	-- 가드 크러쉬 방어율 감소 상한(%) — 팔라딘 레벨 기준 + 증강 합이 넘지 않게(RtsCombatLogic.GuardCrush · RtsMonsterInfoLogic.GuardCrushOf)
 	property number GuardCap = 50
@@ -202,7 +203,11 @@ script RtsAugmentTableLogic extends Logic
 			local v = I:Num(d.val or 0)
 			if d.kind == "skill" then return tag .. sk .. "의 데미지가 " .. v .. "% 증가한다." end
 			if d.kind == "skillFin" then return tag .. sk .. "의 최종 데미지가 " .. v .. "% 증가한다." end
-			if d.kind == "fin" then return tag .. "최종 데미지가 " .. v .. "% 증가한다." end
+			if d.kind == "fin" then
+				local cap = ""
+				if self.MaxStack[d.id] ~= nil then cap = " (" .. I:Int(self.MaxStack[d.id]) .. "개까지)" end
+				return tag .. "최종 데미지가 " .. v .. "% 증가한다." .. cap
+			end
 			if d.kind == "pct" then return tag .. "공격력이 " .. v .. "% 증가한다." end
 			if d.kind == "ign" then return tag .. "몬스터의 방어율을 " .. v .. "% 무시한다." end
 			if d.kind == "guard" then return tag .. "가드 크러쉬의 방어율 감소가 " .. v .. "% 늘어난다. (같은 구역의 모든 적, 최대 50% — 6개까지)" end

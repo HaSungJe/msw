@@ -479,13 +479,13 @@ script RtsJobTableLogic extends Logic
 				--   클립 14프레임 0.78초(0.06초/프레임): 0.06~0.24 캐릭터 뒤쪽 잔상(원점 왼쪽 30px, 오른쪽으로 뻗음 = 왼쪽 보기 자산의 등 뒤) → 0.24~0.54 큰 초승달 참격(230×247px, 원점이 오른쪽 끝 → 앞으로) → 0.54~0.78 수평 마무리 참격(340×60~120px).
 				--   확정(2026-09-19 사용자 "지금 딱 좋아"): hideWeapon으로 캐릭터 검·무기 잔상을 숨기고(이펙트의 금색 대검이 검 역할) 몸 동작은 swingO3(뒤→앞 가로 휘두르기; T3 올려베기·T1·T2 내려베기는 "안 어울림"/"칼이 위에서 시작") 하나를 0.58배속으로 늘려(motionRate — 0.45초 → 0.78초 = 클립 길이) 클립과 동시에 시작(2026-09-19 사용자 "첫 모션만 늘려서 싱크" → "초승달(swingT3 올려베기)은 안 어울림" — 클립 궤적이 위→앞 아래 내려베기라 T1): 휘두름 정점 ≈0.39초가 초승달(0.24~0.54)과, 후속 동작이 수평 참격(0.54~0.78)과 겹침. 판정 0.4초·0.65초(hitGap 0.25) = 2회 타격. 사운드는 초승달 시작(soundDelay 0.24)에 한 번 — 원작 hit음이라 타격마다 또 울리지 않게 hitSound 없음.
 				--   몬스터 위 타격 클립 7d4fd3b7…(1121008/hit/0). 원작 effect0류 몸 덧그림(bodyClip)은 맨몸 실루엣이 아바타와 겹쳐 보여 쓰지 않는다. 비교 후 안 쓴 후보: 1101011/effect 8b26a0cd…, 11101008/effect/1 5c2c13c4…, 1121008/effect dee33ecf…·use d3df4514….
-				{ lv = 1, kind = "액티브", name = "레이징 블로우", desc = "사거리 1 안의 적을 최대 3마리까지 140%의 데미지로 2회 공격한다.", target = false, range = 1,
+				{ lv = 1, kind = "액티브", name = "레이징 블로우", desc = "사거리 1 안의 적을 최대 3마리까지 280%의 데미지로 2회 공격한다.", target = false, range = 1,
 					fx = { motion = "swingO3", motionRate = 0.58, hideWeapon = true, hideWeaponSec = 0.85, clip = "fa2bfe8ff4f543fb815dd7ee5e02eac9", clipDelay = 0, scale = 2.0, feetDx = 0, feetDy = 0, assetFacesLeft = true, sound = "d621d7a5bffb427cac3f1e00db9d451b", soundDelay = 0.24,
 						hitDelay = 0.4, hitGap = 0.25, hitClip = "7d4fd3b71abd42d6b37f49652d13a8d7", hitScale = 2.0, hitDy = 0.6 } },
-				{ lv = 10, kind = "패시브", name = "콤보 어택", desc = "몬스터의 방어율을 5% 무시한다.", target = false },
+				{ lv = 10, kind = "패시브", name = "콤보 어택", desc = "몬스터의 방어율을 5% 무시하고, 보스 공격 시 데미지가 60% 증가한다.", target = false },
 				{ lv = 20, kind = "패시브", name = "어드벤스드 콤보 어택", desc = "몬스터의 방어율 무시가 10%로 늘어난다.", target = false },
 				{ lv = 40, kind = "패시브", name = "어드벤스드 콤보 어택 강화", desc = "최종 데미지가 100% 증가한다.", target = false },
-				{ lv = 40, kind = "패시브", name = "레이징 블로우 강화", desc = "레이징 블로우의 데미지가 150% 증가하고, 사거리가 2로, 공격 대상이 최대 6마리로 늘어난다.", target = false },
+				{ lv = 40, kind = "패시브", name = "레이징 블로우 강화", desc = "레이징 블로우의 데미지가 300% 증가하고, 사거리가 2로, 공격 대상이 최대 6마리로 늘어난다.", target = false },
 				{ lv = 50, kind = "패시브", name = "발할라", desc = "최종 데미지가 15% 증가하고, 보스 공격 시 레이징 블로우의 데미지가 45% 증가한다.", target = false },
 			}
 		end
@@ -514,7 +514,7 @@ script RtsJobTableLogic extends Logic
 				--   PNG dkBuster는 준비 0.5초를 첫 프레임 유지 시간에 포함한다(찌르기 3개 0.6~0.95초를 덮음; motionDelay는 기존 아바타 경로용). 판정 0.65·0.8·0.95초(hitDelay 0.65 + hitGap 0.15 = 찌르기 시차와 같음). 몬스터 위 hit/0 84c06a06…(푸른 폭발 4fr 0.4초). 세트에 사운드가 없어 옛 스피어 크러셔 시전음 fcac442d…·타격음 6313ad64… 유지.
 				--   **확정 2026-09-19 사용자 "다크나이트 스피어 버스터는 이거로 완전 종결"** — 이 상태 그대로 둔다(클립들은 EndFrame 정리라 용머리·찌르기 마지막 프레임이 0.03초만 보이는데, 사용자가 이 모습을 보고 확정. 더 길게 보이게 하려면 clips 항목에 life = 0.7/0.75/0.9/1.05, clipHold 옵션이 있음).
 				--   이전: 영상 추출 11프레임 플립북(assets/textures/crusher, frames = b309f1e7… 외 10, frameSec 0.09, scale 1.7, feetDx -0.11, feetDy 0.83) — 파일은 남겨 둠
-				{ lv = 1, kind = "액티브", name = "스피어 버스터", desc = "사거리 1 안의 적을 최대 3마리까지 80%의 데미지로 3회 공격한다.", target = false, range = 1,
+				{ lv = 1, kind = "액티브", name = "스피어 버스터", desc = "사거리 1 안의 적을 최대 3마리까지 116%의 데미지로 3회 공격한다.", target = false, range = 1,
 					-- 날개(effect c7051cc2 — 2프레임 0.9초)는 마지막 프레임 진입에서 지워져 0.45초면 사라졌다 → clipHold로 3단 찌르기가 끝나는 1.1초까지(2026-09-23 사용자 "날개를 유지"). 용머리(effect0)는 원래대로 잠깐
 					fx = { motion = "dkBuster", motionDelay = 0.5, clip = "c7051cc242c54208a7c22df2b4bcc28e", clipLife = 1.1, clipHold = true,
 						--   거대화는 6타라 찌르기를 더 넣는다(ApplyPrismSkills "giant")
@@ -523,11 +523,11 @@ script RtsJobTableLogic extends Logic
 						hitDelay = 0.65, hitGap = 0.15, hitClip = "84c06a061ae74a10a96fd55947769868", hitScale = 1.8, hitDy = 0.6, hitSound = "6313ad64a5854e20ab6e0e369e1c2c56" } },
 				{ lv = 10, kind = "패시브", name = "비홀더", desc = "공격력이 100 증가한다.", target = false },
 				-- 2026-09-23 사용자 "버서크를 30으로, 기존 30 스킬을 20으로": 숙련 20레벨 · 버서크 30레벨(두 패시브 자리만 맞바꿈 — 다른 스킬 번호는 그대로)
-				{ lv = 20, kind = "패시브", name = "스피어 버스터 숙련", desc = "스피어 버스터의 데미지가 50% 증가한다.", target = false },
+				{ lv = 20, kind = "패시브", name = "스피어 버스터 숙련", desc = "스피어 버스터의 데미지가 73% 증가한다.", target = false },
 				{ lv = 30, kind = "패시브", name = "버서크", desc = "공격력이 50% 증가한다.", target = false },
-				{ lv = 40, kind = "패시브", name = "스피어 버스터 강화", desc = "스피어 버스터의 데미지가 50% 증가하고, 보스 공격 시 데미지가 25% 증가한다.", target = false },
+				{ lv = 40, kind = "패시브", name = "스피어 버스터 강화", desc = "스피어 버스터의 데미지가 72% 증가하고, 보스 공격 시 데미지가 25% 증가한다.", target = false },
 				-- 드래곤 로어 연출(character.md 값): dkRoar PNG + 시전 클립 9001006/effect(5468cadd…, 18프레임 1.2초, 등장 시 Preload) + 시전음 eec2f5d3… / 타격 0.6초 뒤 1회(300%), 맞는 몬스터 위 9001006/hit/0. 쿨 15초, 기본 보스전 잠금
-				{ lv = 50, kind = "액티브", name = "드래곤 로어", desc = "사거리 5 안의 적을 최대 15마리까지 300%의 데미지로 공격한다. 일반 몬스터에게는 데미지가 100% 증가한다. 재사용 대기시간 15초. 패시브: 최종 데미지가 20% 증가한다.", target = false, lock = 1, area = true, mobMul = 2, cd = 15, ratio = 300, hits = 1, targets = 15, range = 5, after = 1.5,
+				{ lv = 50, kind = "액티브", name = "드래곤 로어", desc = "사거리 5 안의 적을 최대 15마리까지 300%의 데미지로 공격한다. 일반 몬스터에게는 데미지가 100% 증가한다. 재사용 대기시간 15초. 패시브: 최종 데미지가 110%, 보스 공격 시 데미지가 50% 증가한다.", target = false, lock = 1, area = true, mobMul = 2, cd = 15, ratio = 300, hits = 1, targets = 15, range = 5, after = 1.5,
 					fx = { motion = "dkRoar", clip = "5468cadd2f60428e925bc368968e1a1e", scale = 1.5, feetDx = 0, feetDy = 0, assetFacesLeft = true, sound = "eec2f5d35c6f4f6ebe8f19bb52dbf1d1", clipLife = 1.4,
 						hitDelay = 0.6, hitClip = "01c803531e2c4e5aa3c3ef66f14711b8", hitScale = 1.6, hitDy = 0.6 } },
 			}
@@ -536,7 +536,7 @@ script RtsJobTableLogic extends Logic
 			return {
 				-- 폭풍의 시 연출(2026-09-18): 원작 폭풍의 시(3121020 계열) — 공격 중 캐릭터 위에 keydown 이펙트 루프(loopClip, 공격이 끊기면 자동 정리) + 화살 투사체 ball + 타격 hit/0, 시전음·타격음은 3121004 use/hit. 0.2초마다 1발 — shoot1 모션을 루프로 유지(motionLoop), 화살은 유닛 손(+0.9)에서 대상까지 0.15초 비행(proj)
 				--   keydown 클립(keydown/0~2 원본 PNG 실측 2026-09-20)은 마법진이 왼쪽(앞), 날개가 오른쪽(뒤)으로 뻗은 왼쪽 보기 → loopFacesLeft = true. 09-18에 false로 둔 건 루프를 첫 시전 때 한 번만 반전하던 시절 FaceDir 동기화가 늦어 반대로 보인 걸 잘못 고친 것(사용자 2026-09-20 "바라보는 방향 안 따라간다")
-				{ lv = 1, kind = "액티브", name = "폭풍의 시", desc = "사거리 3 안의 적 1마리를 70%의 데미지로 공격한다. 공격속도와 관계없이 0.2초마다 화살을 발사한다.", target = false, range = 3,
+				{ lv = 1, kind = "액티브", name = "폭풍의 시", desc = "사거리 3 안의 적 1마리를 161%의 데미지로 공격한다. 공격속도와 관계없이 0.2초마다 화살을 발사한다.", target = false, range = 3,
 					fx = { motion = "bowHurricane", motionLoop = true, sound = "3782f12e174947db8517c13e48217f15",
 						loopClip = "5b382e3dd14b430480b729cc3cb56c82", loopScale = 1.2, loopDx = 0, loopDy = 0, loopAlpha = 0.75, loopFacesLeft = true,
 						proj = "a342d48c6f03440abdfe46fc5a39fa8a", projSec = 0.15, projDy = 0.9, projScale = 1.6, assetFacesLeft = true,
@@ -545,13 +545,13 @@ script RtsJobTableLogic extends Logic
 				{ lv = 20, kind = "패시브", name = "보우 마스터리", desc = "공격력이 25% 증가한다.", target = false },
 				{ lv = 30, kind = "패시브", name = "보우 액스퍼트", desc = "공격력이 25% 증가한다.", target = false },
 				{ lv = 40, kind = "패시브", name = "샤프아이즈", desc = "모든 아군 유닛의 크리티컬 확률과 크리티컬 데미지가 50% 증가한다.", target = false },
-				{ lv = 50, kind = "패시브", name = "폭풍의 시 강화", desc = "폭풍의 시의 데미지가 23% 증가하고, 보스 공격 시 폭풍의 시의 데미지가 143% 증가한다.", target = false },
+				{ lv = 50, kind = "패시브", name = "폭풍의 시 강화", desc = "폭풍의 시의 데미지가 53% 증가하고, 보스 공격 시 폭풍의 시의 데미지가 143%, 보스 공격 시 데미지가 40% 증가한다.", target = false },
 			}
 		end
 		if jobId == "marks" then
 			return {
 				-- 피어싱 연출(2026-09-18): 원작 피어싱(3221017) 시전 이펙트(화살촉 모양 폭발 — 촉이 앞, 날개가 등 뒤로 트레일: 프레임 썸네일로 왼쪽 보기 확인) + 화살 투사체 ball + 타격 hit/3, 사운드는 3221001 use/hit. marksPiercing(선 자세에서 조준·사격) 모션, 판정 간격 0.12초. 시전 이펙트는 캐릭터와 겹치지 않게 앞으로 0.6×스케일(feetDx −0.6 = 자산 기준 앞쪽, 방향에 따라 반전) — 사용자 2026-09-18 "너무 겹친다"
-				{ lv = 1, kind = "액티브", name = "피어싱", desc = "사거리 3 안의 적을 최대 6마리까지 183.3%의 데미지로 2회 공격한다.", target = false, range = 3,
+				{ lv = 1, kind = "액티브", name = "피어싱", desc = "사거리 3 안의 적을 최대 6마리까지 220%의 데미지로 2회 공격한다.", target = false, range = 3,
 					fx = { motion = "marksPiercing", projEach = true, clip = "abe88a701a094181b44c8aa9746a1cd7", scale = 1.2, feetDx = -0.6, feetDy = 0, assetFacesLeft = true, sound = "f06e9bb7399640e088a081032036cebf",
 						proj = "1923e5406af44149a7575b25593e9336", projSec = 0.2, projDy = 0.9, projScale = 1.6,
 						hitDelay = 0.35, hitGap = 0.12, hitClip = "4a8db8d2f9614af3a3c902e4ef56d06b", hitScale = 1.6, hitDy = 0.6, hitSound = "1888d984619e45598028a2f830e78bdb" } },
@@ -559,32 +559,32 @@ script RtsJobTableLogic extends Logic
 				{ lv = 20, kind = "패시브", name = "샤프아이즈", desc = "모든 아군 유닛의 크리티컬 확률과 크리티컬 데미지가 50% 증가한다.", target = false },
 				-- 스나이핑 연출(사용자 2026-09-18 "화살이 아니라 대상에게 표식이 뜨면서 데미지"): 시전 순간 대상 위에 조준 표식 3221007/mob(markClip) + 시전음, 화살 투사체 없음.
 				--   0.4초 뒤 50%×10회(0.08초 간격) 타격 hit/0 + 타격음. 시전 이펙트(석궁 폭발)는 유지. 1마리, 쿨 10초
-				{ lv = 30, kind = "액티브", name = "스나이핑", desc = "사거리 6 안의 적 1마리를 216.7%의 데미지로 10회 공격한다. 재사용 대기시간 10초", target = false, cd = 10, ratio = 216.7, hits = 10, targets = 1, range = 6,
+				{ lv = 30, kind = "액티브", name = "스나이핑", desc = "사거리 6 안의 적 1마리를 390%의 데미지로 10회 공격한다. 재사용 대기시간 10초", target = false, cd = 10, ratio = 390, hits = 10, targets = 1, range = 6,
 					fx = { motion = "marksSniping", clip = "6c7b4f7910af41dfbe1348eaf2f8c9e6", scale = 1.2, feetDx = -0.6, feetDy = 0, assetFacesLeft = true, sound = "384e71cfc38a4ab1b8a10963cae6365f",
 						markClip = "0c76a3bdd54548988c48bdbdbbd2a5ca", markFit = 1.5, markPivotDy = 0.36, markLife = 1.4,
 						hitDelay = 0.4, hitGap = 0.08, hitClip = "72fa136a368d4f7eba60ce0d16606be5", hitScale = 1.6, hitDy = 0.6, hitSound = "81a8c21eaf31429aa21ccaa63afc1b35" } },
 				{ lv = 40, kind = "패시브", name = "크로스보우 액스퍼트", desc = "공격력이 70% 증가한다.", target = false },
-				{ lv = 50, kind = "패시브", name = "피어싱 강화", desc = "피어싱의 데미지가 258.3% 증가하고, 보스 공격 시 데미지가 30% 증가한다.", target = false },
+				{ lv = 50, kind = "패시브", name = "피어싱 강화", desc = "피어싱의 데미지가 310% 증가하고, 보스 공격 시 데미지가 60% 증가한다.", target = false },
 			}
 		end
 		if jobId == "il" then
 			return {
 				-- 체인 라이트닝 연출(2026-09-18): 원작 2221006 — 시전 클립 effect(하늘에서 스태프로 내려오는 번개 + 구슬, 0.78초, 구슬 완성 ≈0.45초) + 0.45초에 유닛 손→대상→대상… 번개 조각 ball/0(beam 체인) + 타격 = 썬더볼트(2201005) hit/0(하늘에서 몬스터로 내리치는 번개 138×247px, 원점 = 타격점; 사용자 "썬콜은 영…" → 2221006 hit/0 전기 구슬에서 교체), 사운드 2221006 use/hit. 한손 스태프 swingO1
-				{ lv = 1, kind = "액티브", name = "체인 라이트닝", desc = "사거리 2 안의 적을 최대 6마리까지 105%의 데미지로 공격한다. 번개는 인접한 적에게 연쇄된다.", target = false, range = 2, aoe = 3,
+				{ lv = 1, kind = "액티브", name = "체인 라이트닝", desc = "사거리 2 안의 적을 최대 6마리까지 305%의 데미지로 공격한다. 번개는 인접한 적에게 연쇄된다.", target = false, range = 2, aoe = 3,
 					fx = { motion = "swingO1", clip = "fa693d02e71841b2bf541bcdbdd84242", scale = 1.4, feetDx = 0.35, feetDy = 0, assetFacesLeft = true, sound = "3c837a89f39e4e038b0a3a378de9a377",
 						beam = "fde245aeb0eb49baa3b0bd64fbc05f7a", beamDelay = 0.4, beamScale = 1.6, beamSeg = 0.5, beamDx = 0.3, beamDy = 0.9, beamLife = 0.5,
 						hitDelay = 0.5, hitGap = 0.15, hitClip = "33fc60d9910448a2b36035277b28c354", hitScale = 1.1, hitDy = 0.35, hitSound = "36187759ab2f4bc293aeb035e4ea8d73" } },
 				{ lv = 10, kind = "패시브", name = "메디테이션", desc = "공격력이 150 증가한다.", target = false },
-				{ lv = 20, kind = "패시브", name = "체인 라이트닝 강화", desc = "체인 라이트닝의 사거리가 3으로 늘어나고, 데미지가 355%로 증가한다.", target = false },
+				{ lv = 20, kind = "패시브", name = "체인 라이트닝 강화", desc = "체인 라이트닝의 사거리가 3으로 늘어나고, 데미지가 1030%로 증가한다.", target = false },
 				-- 블리자드: 모션·후딜 1.80초. 기존 3초 연출을 5/3배로 재생하고 타격도 같은 비율로 맞춘다.
 				-- 낙하 시작 0.30초 + 착지 1.68/(5/3) ≈ 1.31초, 판정 1.32초. 프리즘 2초 쿨타임을 가로막지 않는다.
-				{ lv = 30, kind = "액티브", name = "블리자드", desc = "사거리 6 안의 적을 최대 15마리까지 965%의 데미지로 공격하고 5초 동안 빙결시킨다. 빙결된 적은 이동속도가 50% 감소한다. 일반 몬스터에게는 데미지가 100% 증가한다. 재사용 대기시간 15초", target = false, area = true, mobMul = 2, cd = 15, ratio = 965, hits = 1, targets = 15, range = 6, freeze = 5, after = 1.8,
+				{ lv = 30, kind = "액티브", name = "블리자드", desc = "사거리 6 안의 적을 최대 15마리까지 965%의 데미지로 공격하고 5초 동안 빙결시킨다. 빙결된 적은 이동속도가 50% 감소한다. 일반 몬스터에게는 데미지가 100% 증가한다. 보스는 3회 공격한다. 재사용 대기시간 15초", target = false, area = true, mobMul = 2, cd = 15, ratio = 965, hits = 1, bossHits = 3, targets = 15, range = 6, freeze = 5, after = 1.8,
 					fx = { motion = "swingO3", noFlip = true, sound = "267aa4a9324f460b80bc04600aa4d0e0",
 						backClip = "96b261657b0c4aa792bd6f3e7d6c6681", backScale = 1.2, backDx = 0, backDy = 0, backLife = 1.86, backPlayRate = 5 / 3,
 						markClips = { "735ad75ae1f64d88a9444cf9832f4abc" }, markAt = "feet", markDy = 0.3, markScale = 2.0, markDelay = 0.3, markLife = 1.56, markPlayRate = 5 / 3,
 						hitDelay = 1.32, hitClip = "99a29e161ca74bb887eb5ee019a5115e", hitScale = 1.6, hitDy = 0.6, hitSound = "6fd7c69b3a494a62afd14019a0d34d4c" } },
 				{ lv = 40, kind = "패시브", name = "아케인 에임", desc = "최종 데미지가 50% 증가한다.", target = false },
-				{ lv = 50, kind = "패시브", name = "인피니티", desc = "최종 데미지가 33% 증가한다.", target = false },
+				{ lv = 50, kind = "패시브", name = "인피니티", desc = "최종 데미지가 93%, 보스 공격 시 데미지가 50% 증가한다.", target = false },
 			}
 		end
 		if jobId == "fp" then
@@ -601,13 +601,13 @@ script RtsJobTableLogic extends Logic
 				-- 도트 퍼니셔 연출(사용자 2026-09-18 순서: "사운드 시작 → 불구슬이 캐릭터 주위에 넓게 생성 / 사운드 끝 → 주변 적을 탐색해 느리게 추적, 부딪히며 판정"): 시전 클립 2121052 effect(유닛 위 푸른 불꽃 해골, 0.99초, 왼쪽 보기 그림) + 시전음 400021001/use(1.18초).
 				--   구체 30개(사용자 2026-09-18 "30개로" — hits 30 = 구체마다 1회 — 비율은 ratio(지금 290%), 표 설명도 2026-09-23 30개로 맞춤) = **RtsDotOrb01~03**(사용자 2026-09-18 지정: 도트 퍼니셔 400021001 스킬 아이콘 d998c591…/iconmouseover 20a64945…를 원형으로 잘라 테두리를 없앤 64px 자체 업로드 sprite, assets/textures/dotorb/) 01→02→03→02 0.12초 맥동 루프, 1.8배 ≈ 1.15유닛 둥근 불구슬, 240°/초 자전(구체마다 방향 엇갈림, projSpin — 사용자 "더 키우고 회전") — 30개가 한 번에(projStagger 0 — 2026-09-22 사용자 "구체가 한번에 모두 생성되어야 함", 전엔 0.03초 간격) 손 높이 주위 동심원 고리(반지름 2.0부터 1.2 간격, 고리마다 둘레÷1.2개 = 10·16·4개)에 생성돼(캐릭터·서로 간 최소 구체 크기 간격) 떠 있다가(projHover 1.2 = 사운드 길이) 각자 생성 지점에서 가장 가까운 적(보스가 사거리 안이면 보스만)의 피격 박스 중앙으로 4.4유닛/초로 날아가(projSpeed — 2.2에서 2배, 사용자 2026-09-18) 박치기하는 순간 사라짐 + 판정 + 400021001/use2 + 폭발 12121055 hit/0(9b8b4484…, 230×270px → 0.7배, 0.9초 — 사용자 "달라붙으면 폭발 이펙트"). 이전: 플레임 위자드 12121055/effect 프레임(0~4 불접시 / 5~11 불구슬)은 사용자 "불접시" → 아이콘 구슬로 교체
 				--   서버(RtsCombatLogic.DoAttack)가 같은 식(OrbSpawnOffset)으로 생성 지점·대상·도착 시각(stagger + hover + 거리÷속도)을 계산해 판정을 예약하고 대상 목록을 클라에 넘긴다. 400021001엔 사운드·아이콘만 있고 클립은 라이브러리에 없음
-				{ lv = 30, kind = "액티브", name = "도트 퍼니셔", desc = "화염 구체 15개를 소환한다. 각 구체는 가장 가까운 적에게 달라붙어 폭발하며 580%의 데미지를 준다. 일반 몬스터에게는 데미지가 50% 감소한다. 재사용 대기시간 15초", target = false, cd = 15, ratio = 580, mobMul = 0.5, hits = 15, targets = 10, range = 6, spread = true,
+				{ lv = 30, kind = "액티브", name = "도트 퍼니셔", desc = "화염 구체 15개를 소환한다. 각 구체는 가장 가까운 적에게 달라붙어 폭발하며 1276%의 데미지를 준다. 일반 몬스터에게는 데미지가 50% 감소한다. 재사용 대기시간 15초", target = false, cd = 15, ratio = 1276, mobMul = 0.5, hits = 15, targets = 10, range = 6, spread = true,
 					fx = { motion = "dotPunisher", projDelay = 0.35, clipDelay = 0.35, clip = "fce52ddb8a274e529790dc6264283f0a", scale = 1.2, feetDx = 0, feetDy = 0.8, assetFacesLeft = true, sound = "da2791e77cec477eb31dceb7b3c1961e",
 						proj = "50781432c95d45b8876842c475c675f5", projCount = 15, projMaxLife = 5, projStagger = 0, projFrom = "around", projSpread = 2.0, projGap = 1.2, projHover = 1.2, projSpeed = 5.18, projNear = 0, projDashSec = 0, projScale = 1.8, projNoRotate = true, projSpin = 240, projFrameSec = 0.12,
 						projFlySprites = { "3769c672d4f94a2e9f37b2477ab66d5b", "b0b300d3c83749198c5c146ab1ac5e84", "da5ad791c75e4ef4941d722d39e1f334", "b0b300d3c83749198c5c146ab1ac5e84" },
 						hitClip = "9b8b44848e93472390cbd2799aa52bb0", hitScale = 0.7, hitDy = 0.6, hitSound = "4045608d11f4435385a2f3101852892e" } },
 				{ lv = 40, kind = "패시브", name = "아케인 에임", desc = "공격력이 50% 증가한다.", target = false },
-				{ lv = 50, kind = "패시브", name = "인피니티", desc = "최종 데미지가 30%, 보스 공격 시 데미지가 10% 증가한다.", target = false },
+				{ lv = 50, kind = "패시브", name = "인피니티", desc = "최종 데미지가 75%, 보스 공격 시 데미지가 60% 증가한다.", target = false },
 			}
 		end
 		if jobId == "bishop" then
@@ -635,7 +635,7 @@ script RtsJobTableLogic extends Logic
 				--   + 타격 hit/0(흰 빛 터짐 + 파편) ×4(0.1초 간격), 시전음 use, 타격음 hit. 쉐도우 파트너(30)는 등 뒤(projShadowDx)에서 같은 표창 4발을 0.5초 늦게(본체 4발이 다 나간 뒤 이어서 — 2026-09-22 사용자, 그림자 동작도 0.5초 늦게 RtsSkillFxLogic.ShadowActionDelay) 어둡게 던지고 타격 4회 ½(st.halfHits)
 				--   모션 = nlThrow PNG (이전 swingO1) + 아바타 경로 무기 가림(2026-09-20 사용자 확정 — shootF는 활 쏘는 자세라 표창과 안 맞음. 표창 던지기 전용 액션은 없음). 표창 출발 = 배 앞(projDx 0.35·projDy 0.55 — "머리 뒤에서 나온다")
 				--   쉐도우 파트너 그림자 = 유닛 자식 "Shadow" 스프라이트(원작 4111002/special 검은 실루엣, RtsUnitLogic.EnsureShadow, 30레벨~) — 등 뒤 0.44, 본체 액션과 같은 이름의 클립을 따라 재생
-				{ lv = 1, kind = "액티브", name = "쿼드러플 스로우", desc = "사거리 2 안의 적 1마리를 110%의 데미지로 4회 공격한다.", target = false, range = 2,
+				{ lv = 1, kind = "액티브", name = "쿼드러플 스로우", desc = "사거리 2 안의 적 1마리를 121%의 데미지로 4회 공격한다.", target = false, range = 2,
 					fx = { motion = "nlThrow", hideWeapon = true, hideWeaponSec = 0.6, clip = "ff9ced53e871474c9a2ae167e0c75ef1", scale = 1.4, feetDx = 0, feetDy = 0, assetFacesLeft = true, sound = "747c5e5435b942a494f94032dabbffb2",
 						proj = "99a112c1dcbb4cf69fccfca53fbb6620", projCount = 4, projStagger = 0.1, projSec = 0.2, projDx = 0.35, projDy = 0.55, projScale = 1.2,
 						projShadowLv = 30, projShadowDx = 0.5, projShadowDelay = 0.5,
@@ -644,7 +644,7 @@ script RtsJobTableLogic extends Logic
 				{ lv = 20, kind = "패시브", name = "크리티컬 마스터리", desc = "크리티컬 확률이 30%, 크리티컬 데미지가 25% 증가한다.", target = false },
 				{ lv = 30, kind = "패시브", name = "쉐도우 파트너", desc = "그림자 분신을 소환한다. 분신은 쿼드러플 스로우를 따라 표창 4개를 추가로 던지며, 분신의 표창은 절반의 데미지를 준다.", target = false },
 				{ lv = 40, kind = "패시브", name = "자벨린 마스터리", desc = "최종 데미지가 10%, 공격력이 100 증가한다.", target = false },
-				{ lv = 50, kind = "패시브", name = "레디 투 다이", desc = "최종 데미지가 20% 증가한다.", target = false },
+				{ lv = 50, kind = "패시브", name = "레디 투 다이", desc = "최종 데미지가 116%, 보스 공격 시 데미지가 50% 증가한다.", target = false },
 			}
 		end
 		if jobId == "shad" then
@@ -757,12 +757,14 @@ script RtsJobTableLogic extends Logic
 			local ign = 0
 			if L >= 20 then ign = 10 elseif L >= 10 then ign = 5 end
 			-- 레이징 블로우 140%×2회(2026-09-19 킷 보스 티어 조정: 90 → 140, 강화 +100 → +150. 스킬 강화 증강은 1회당 비율에 더함)
-			local s = { pct = 100, flat = 0, ratio = 140, hits = 2, targets = 3, ign = ign, fin = 100, ignBoss = -1, speed = "보통" }
+			-- 2026-10-16 사용자 "섀도어 대비 약한 직업 버프 — 보공은 보수적으로, 스킬 데미지·체급 위주(B안: 30레벨부터 섀도어의 70~90%)": 레이징 블로우 140 → 280%(강화 후 290 → 580%) · 히어로만 보공 비중을 높여(사용자 "히어로는 보공 비중 높임") 콤보 어택(10) 보스 공격 시 데미지 +60%(③)
+			local s = { pct = 100, flat = 0, ratio = 280, hits = 2, targets = 3, ign = ign, fin = 100, ignBoss = -1, speed = "보통" }
+			if L >= 10 then s.bossAdd = 60 end
 			-- 2026-09-24 사용자 "1티어는 기본 스킬을 손봐서 증강 효율을 높이게": 어드콤 강화 공격력 +100%·발할라 +30%(합연산 200 → 230%)와 킷 보공 15%를
 			--   최종 데미지(곱)로 옮긴다 — 레벨마다 기본 딜은 같고(×2.0 → ×2.3, 보스 ×1.15), 공격력%·보공이 100%·0%에서 시작해 증강 공격력%·보공이 희석되지 않는다
 			if L >= 40 then
 				s.fin = 200
-				s.ratio = 290
+				s.ratio = 580 -- 2026-10-16 290 → 580
 				s.targets = 6
 				s.range = 2
 			end
@@ -792,30 +794,34 @@ script RtsJobTableLogic extends Logic
 			-- 2026-09-19 3차: 비홀더 강화(40, 공격속도 보통) 제거 → 스피어 버스터 강화(40) 데미지 +30%(70 → 100%). 공격속도는 끝까지 느림
 			-- 2026-09-23 사용자 "다크나이트 초반에 너무 세다 — 초반 너프, 후반 약상향": 스피어 버스터 120 → 80%, 30레벨 숙련 +50%(130%) 신설, 40레벨 강화 +50% 그대로(180%, 전 170%)
 			--   6타는 거대화 프리즘만(ApplyPrismStat "giant" — 2026-09-23 사용자 "거대화 때만 6회, 기존은 3회")
-			local s = { pct = 100, flat = 0, ratio = 80, hits = 3, targets = 3, ign = 0, fin = 100, ignBoss = -1, speed = "느림" }
+			-- 2026-10-16 사용자 "섀도어 대비 약한 직업 버프 — 보공은 보수적으로, 스킬 데미지·체급 위주(B안: 30레벨부터 섀도어의 70~90%)": 스피어 버스터 ×1.45(80 → 116 · 숙련 130 → 189 · 강화 180 → 261%) · 드래곤 로어 패시브 최종 20 → 110% · 보스 공격 시 +50%(③ — 강화 25와 합 75)
+			local s = { pct = 100, flat = 0, ratio = 116, hits = 3, targets = 3, ign = 0, fin = 100, ignBoss = -1, speed = "느림" }
 			--   → 같은 날 "버서크(공격력 +100%)를 30으로, 숙련을 20으로": 20~29레벨 딜 ×0.81(80% × 공격력 2배 → 130% × 1배), 30레벨부터 그대로
 			if L >= 10 then s.flat = 100 end
-			if L >= 20 then s.ratio = 130 end
+			if L >= 20 then s.ratio = 189 end
 			--   → 같은 날 "버서크 공격력 증가 50%로, 드래곤 로어에 패시브 최종 데미지 +20%": 버서크 +100 → +50%(30~ 딜 ×0.75), 50레벨 최종 ×1.2(보스 최종도 같이)
 			if L >= 30 then s.pct = 150 end
 			if L >= 40 then
-				s.ratio = 180
+				s.ratio = 261
 				s.bossAdd = 25 -- 킷 보스 티어(2026-09-19): DK 25%
 			end
 			if L >= 50 then
-				s.fin = 120 -- 드래곤 로어 패시브(방무 50은 2026-10-14 삭제)
+				s.fin = 210 -- 드래곤 로어 패시브 최종 +110%(2026-10-16, 전 +20%) / 방무 50은 2026-10-14 삭제
+				s.bossAdd = 25 + 50 -- 2026-10-16 드래곤 로어 보스 공격 시 +50%
 			end
 			return s
 		end
 		if jobId == "bow" then
 			-- 폭풍의 시 50%×1회×1마리, 공격속도와 무관하게 0.2초마다(period). 크리티컬 마스터리 +30%(L10), 보우 마스터리·액스퍼트 공격력 +5%씩(L20·L30), 강화 75%(L50). 샤프아이즈는 파티 버프(여기 안 넣음)
 			--   2026-09-19 밸런스 패치: 폭풍의 시 40%, 보우 마스터리·액스퍼트 +25%씩, 강화 +15%(→ 55%)
-			local s = { pct = 100, flat = 0, ratio = 70, hits = 1, targets = 1, ign = 0, fin = 100, ignBoss = -1, speed = "매우빠름", period = 0.2, crit = self.BaseCritRate, critDmg = self.BaseCritDamage }
+			-- 2026-10-16 사용자 "섀도어 대비 약한 직업 버프 — 보공은 보수적으로, 스킬 데미지·체급 위주(B안: 30레벨부터 섀도어의 70~90%)": 폭풍의 시 ×2.3(70 → 161 · 강화 93 → 214%, 애로우 레인 65 → 150%) · 폭풍의 시 강화(50) 보스 공격 시 데미지 +40%(③)
+			local s = { pct = 100, flat = 0, ratio = 161, hits = 1, targets = 1, ign = 0, fin = 100, ignBoss = -1, speed = "매우빠름", period = 0.2, crit = self.BaseCritRate, critDmg = self.BaseCritDamage }
 			if L >= 10 then s.crit = s.crit + 30 end
 			if L >= 20 then s.pct = s.pct + 25 end
 			if L >= 30 then s.pct = s.pct + 25 end
 			if L >= 50 then
-				s.ratio = 93
+				s.ratio = 214 -- 2026-10-16 93 → 214
+				s.bossAdd = 40 -- 2026-10-16 폭풍의 시 강화 보스 공격 시 +40%
 				-- 1티어(2026-09-24 보우 2 → 1티어): 킷 보공 30·보스 최종 ×2.93 → 폭풍의 시 보스 공격 시 +143%(⑤ st.bossRatio) (2026-09-24 티어 재설계 — .info/tier.md, 값 = tools/balance-calc.py TUNE) — 50레벨 보스 1만
 				s.bossRatio = 143 -- 방무 70은 2026-10-14 삭제
 			end
@@ -824,12 +830,13 @@ script RtsJobTableLogic extends Logic
 		if jobId == "marks" then
 			-- 피어싱 30%×3회×6마리(느림 1.25초). 크리티컬 마스터리 +30%(L10), 크로스보우 액스퍼트 공격력 +20%(L40), 강화 50%×4회(L50). 샤프아이즈(L20)는 파티 버프
 			--   2026-09-19 밸런스 패치: 피어싱 2회(3회에서), 크로스보우 액스퍼트 +70%, 강화(50) = 데미지 +50%만(3차: 사거리 4 변경·타격 수 변경 모두 삭제 → 30 + 50 = 80%)
-			local s = { pct = 100, flat = 0, ratio = 183.3, hits = 2, targets = 6, ign = 0, fin = 100, ignBoss = -1, speed = "느림", crit = self.BaseCritRate, critDmg = self.BaseCritDamage }
+			-- 2026-10-16 사용자 "섀도어 대비 약한 직업 버프 — 보공은 보수적으로, 스킬 데미지·체급 위주(B안: 30레벨부터 섀도어의 70~90%)": 피어싱 ×1.2(183.3 → 220 · 강화 441.6 → 530%) · 스나이핑 216.7 → 390% · 트루 스나이핑 370 → 666%(×1.8 — 1마리 스킬이라 사냥 영향 작음) · 피어싱 강화 보스 공격 시 30 → 60%(③)
+			local s = { pct = 100, flat = 0, ratio = 220, hits = 2, targets = 6, ign = 0, fin = 100, ignBoss = -1, speed = "느림", crit = self.BaseCritRate, critDmg = self.BaseCritDamage }
 			if L >= 10 then s.crit = s.crit + 30 end
 			if L >= 40 then s.pct = 170 end
 			if L >= 50 then
-				s.ratio = 441.6 -- 183.3 + 258.3(2026-09-24 비율 ×5/3 — 기본 공격력 ×0.6과 짝)
-				s.bossAdd = 30 -- 킷 보스 티어(2026-09-19): 신궁 30% / 피어싱 강화 방무 50은 2026-10-14 삭제
+				s.ratio = 530 -- 220 + 310(2026-10-16 ×1.2 — 전 183.3 + 258.3)
+				s.bossAdd = 60 -- 2026-10-16 30 → 60(킷 보스 티어 2026-09-19 신궁 30%) / 피어싱 강화 방무 50은 2026-10-14 삭제
 			end
 			return s
 		end
@@ -837,11 +844,12 @@ script RtsJobTableLogic extends Logic
 			-- 체인 라이트닝 100%×1회×10마리(보통). 메디테이션 +50(L10), 강화 2회(L20), 아케인 에임 공격력 +10%(L40), 인피니티 최종 +10%(L50)
 			--   2026-09-19 밸런스 패치: 메디테이션 +150, 강화(20) = 사거리 3·130%(타격 수 변경 제거), 아케인 에임 +50%, 인피니티(50) = 공격력 +50%(3차; 최종 데미지 항목 삭제), 블리자드 300%·빙결 5초(스킬 표)
 			--   2026-09-23 너프(사용자 "체인 라이트닝 초반 너무 사기"): 최대 10마리 → 6마리, 데미지 −20%(130% → 105%, 강화 170% → 135%)
-			local s = { pct = 100, flat = 0, ratio = 105, hits = 1, targets = 6, ign = 0, fin = 100, ignBoss = -1, speed = "보통", crit = self.BaseCritRate, critDmg = self.BaseCritDamage }
+			-- 2026-10-16 사용자 "섀도어 대비 약한 직업 버프 — 보공은 보수적으로, 스킬 데미지·체급 위주(B안: 30레벨부터 섀도어의 70~90%)": 체인 라이트닝 ×2.9(105 → 305 · 강화 355 → 1030%) · 블리자드 보스 3회(스킬 표 bossHits) · 템페스트 보스 1회 58 → 190% · 인피니티 최종 +33 → +93%(fin 200 → 290) · 보스 공격 시 +50%(③)
+			local s = { pct = 100, flat = 0, ratio = 305, hits = 1, targets = 6, ign = 0, fin = 100, ignBoss = -1, speed = "보통", crit = self.BaseCritRate, critDmg = self.BaseCritDamage }
 			if L >= 10 then s.flat = 150 end
 			-- 2026-09-23 사용자 "체인 라이트닝 강화(20) 데미지 더 — 30레벨 사냥 6천 초반까지": 135 → 355%(30레벨 사냥 2,325 → 약 6,100)
 			if L >= 20 then
-				s.ratio = 355
+				s.ratio = 1030 -- 2026-10-16 355 → 1030
 				s.range = 3
 			end
 			-- 2026-09-24 1티어 증강 효율: 아케인 에임·인피니티 공격력 +50%씩(합 150 → 200%)과 킷 보공 40%를 최종 데미지(곱)로 — 기본 딜은 같고 증강 공격력%·보공이 희석되지 않는다
@@ -849,7 +857,8 @@ script RtsJobTableLogic extends Logic
 				s.fin = 150
 			end
 			if L >= 50 then
-				s.fin = 200
+				s.fin = 290 -- 2026-10-16 200 → 290(인피니티 최종 +33 → +93%)
+				s.bossAdd = 50 -- 2026-10-16 인피니티 보스 공격 시 +50%
 			end
 			return s
 		end
@@ -867,8 +876,8 @@ script RtsJobTableLogic extends Logic
 			if L >= 20 then s.dotPct = 80 end
 			if L >= 40 then s.pct = 150 end
 			if L >= 50 then
-				s.fin = 130
-				s.bossAdd = 10 -- 킷 보스 티어(2026-09-19): 불독 10% / 인피니티 방무 50은 2026-10-14 삭제
+				s.fin = 175 -- 2026-10-16 인피니티 최종 +30 → +75%(2026-10-16 사용자 "섀도어 대비 약한 직업 버프 — 보공은 보수적으로, 스킬 데미지·체급 위주(B안: 30레벨부터 섀도어의 70~90%)" — 도트 퍼니셔 ×2.2와 함께)
+				s.bossAdd = 60 -- 2026-10-16 10 → 60(킷 보스 티어 2026-09-19 불독 10%) / 인피니티 방무 50은 2026-10-14 삭제
 			end
 			return s
 		end
@@ -887,7 +896,8 @@ script RtsJobTableLogic extends Logic
 		if jobId == "nl" then
 			-- 쿼드러플 스로우 110%×4회×1마리(빠름). 자벨린 마스터리(10) 최종 +10%, 크리티컬 마스터리(20) 크확 +30·크뎀 +25, 쉐도우 파트너(30) 표창 +4개 ½(halfHits), 자벨린 마스터리(40) 최종 +10%·+100, 레디 투 다이(50) 최종 +20%
 			--   킷 보스 티어 0%·공격력% 0(2026-09-19 사용자: 나이트로드는 증강 효율 최고). 최종 데미지는 곱(damage.md ⑥)
-			local s = { pct = 100, flat = 0, ratio = 110, hits = 4, targets = 1, ign = 0, fin = 100, ignBoss = -1, speed = "빠름", crit = self.BaseCritRate, critDmg = self.BaseCritDamage }
+			-- 2026-10-16 사용자 "섀도어 대비 약한 직업 버프 — 보공은 보수적으로, 스킬 데미지·체급 위주(B안: 30레벨부터 섀도어의 70~90%)": 쿼드러플 스로우 110 → 121%(풍마수리검 154 → 165%) · 레디 투 다이 최종 +20 → +116%(×1.2 → ×2.16) · 보스 공격 시 +50%(③)
+			local s = { pct = 100, flat = 0, ratio = 121, hits = 4, targets = 1, ign = 0, fin = 100, ignBoss = -1, speed = "빠름", crit = self.BaseCritRate, critDmg = self.BaseCritDamage }
 			if L >= 10 then s.fin = s.fin * 1.10 end
 			if L >= 20 then
 				s.crit = s.crit + 30
@@ -898,7 +908,10 @@ script RtsJobTableLogic extends Logic
 				s.fin = s.fin * 1.10
 				s.flat = 100
 			end
-			if L >= 50 then s.fin = s.fin * 1.20 end
+			if L >= 50 then
+				s.fin = s.fin * 2.16 -- 2026-10-16 레디 투 다이 최종 +20 → +116%
+				s.bossAdd = 50 -- 2026-10-16 레디 투 다이 보스 공격 시 +50%
+			end
 			return s
 		end
 		if jobId == "shad" then
@@ -1226,12 +1239,12 @@ script RtsJobTableLogic extends Logic
 			{ id = "enrage", job = "hero", name = "인레이지", icon = "14c64ff02eb64da0be624eed933e9d9c", desc = "[프리즘] 레이징 블로우가 인레이지로 강화된다. 사거리가 3으로, 공격 횟수가 3회로 늘어난다." },
 			{ id = "holyunity", job = "paladin", name = "홀리 유니티", icon = "53a38855164a4b64accf68785761c283", desc = "[프리즘] 아군 유닛 1명을 지정해 그 유닛과 자신의 최종 데미지를 40% 증가시킨다. 대상을 지정해야 효과가 있다." },
 			{ id = "giant", job = "dk", name = "거대화", icon = "012ff529f8c04302bc72128d83a19da6", desc = "[프리즘] 스피어 버스터가 거대해진다. 사거리가 6으로 늘고 6회로 나눠 찌르며, 1회 데미지는 (스피어 버스터 데미지 + 29%)의 절반 + 30%가 된다." },
-			{ id = "arrowrain", job = "bow", name = "애로우 레인", icon = "9b0c6f6554f04b6a8ef60ade19ff76fb", desc = "[프리즘] 폭풍의 시 대신 애로우 레인을 사용한다. 하늘에서 화살비를 내려 사거리 6 안의 적 1마리를 65%의 데미지로 2회 공격하며, 공격속도와 관계없이 0.2초마다 발사한다. 보스 공격 시 데미지가 100% 증가한다.", locks = { "폭풍의 시" } },
-			{ id = "truesnipe", job = "marks", name = "트루 스나이핑", icon = "f940c35ae6c7478692338475e401530e", desc = "[프리즘] 스나이핑 대신 트루 스나이핑을 사용한다. 사거리 6 안의 적 1마리를 370%의 데미지로 10회 공격하며, 반드시 크리티컬로 적중한다. 재사용 대기시간 6초.", locks = { "스나이핑" } }, -- 피어싱 영구 잠금 뺌(2026-09-23 사용자 "트루 스나이핑 → 피어싱 영구 잠금 빼자")
-			{ id = "tempest", job = "il", name = "블리자드 템페스트", icon = "a05d13219caa4449aa541f0daaf32995", desc = "[프리즘] 블리자드의 재사용 대기시간이 5초로 줄고, 사거리 제한이 없어지며 공격 대상이 최대 30마리로 늘고 데미지가 365%가 된다. 보스는 58%의 데미지로 30회 공격한다." }, -- 2026-09-23 엘릭서와 통합 · 2026-09-24 사용자 "1티어가 시너지화 → 썬콜 자체 시너지 없애고 방무로 쌔게": 방어율 감소·보스 최종 −47% 삭제, 방무 15 → 70
-			{ id = "transcend", job = "fp", name = "초월", icon = "d998c591786d40cebb85a06b6eed9e6b", desc = "[프리즘] 도트 퍼니셔가 초월한다. 구체가 2배로 늘고 구체와 폭발이 2배로 커지며, 재사용 대기시간이 6초로 줄어든다. 구체의 데미지는 177%가 된다." },
+			{ id = "arrowrain", job = "bow", name = "애로우 레인", icon = "9b0c6f6554f04b6a8ef60ade19ff76fb", desc = "[프리즘] 폭풍의 시 대신 애로우 레인을 사용한다. 하늘에서 화살비를 내려 사거리 6 안의 적 1마리를 150%의 데미지로 2회 공격하며, 공격속도와 관계없이 0.2초마다 발사한다. 보스 공격 시 데미지가 100% 증가한다.", locks = { "폭풍의 시" } },
+			{ id = "truesnipe", job = "marks", name = "트루 스나이핑", icon = "f940c35ae6c7478692338475e401530e", desc = "[프리즘] 스나이핑 대신 트루 스나이핑을 사용한다. 사거리 6 안의 적 1마리를 666%의 데미지로 10회 공격하며, 반드시 크리티컬로 적중한다. 재사용 대기시간 6초.", locks = { "스나이핑" } }, -- 피어싱 영구 잠금 뺌(2026-09-23 사용자 "트루 스나이핑 → 피어싱 영구 잠금 빼자")
+			{ id = "tempest", job = "il", name = "블리자드 템페스트", icon = "a05d13219caa4449aa541f0daaf32995", desc = "[프리즘] 블리자드의 재사용 대기시간이 5초로 줄고, 사거리 제한이 없어지며 공격 대상이 최대 30마리로 늘고 데미지가 365%가 된다. 보스는 190%의 데미지로 30회 공격한다." }, -- 2026-09-23 엘릭서와 통합 · 2026-09-24 사용자 "1티어가 시너지화 → 썬콜 자체 시너지 없애고 방무로 쌔게": 방어율 감소·보스 최종 −47% 삭제, 방무 15 → 70
+			{ id = "transcend", job = "fp", name = "초월", icon = "d998c591786d40cebb85a06b6eed9e6b", desc = "[프리즘] 도트 퍼니셔가 초월한다. 구체가 2배로 늘고 구체와 폭발이 2배로 커지며, 재사용 대기시간이 6초로 줄어든다. 구체의 데미지는 389%가 된다." },
 			{ id = "divinepunish", job = "bishop", name = "디바인 퍼니시먼트", icon = "3c1471ba763140878c405f2aefa9047a", desc = "[프리즘] 엔젤레이 대신 디바인 퍼니시먼트를 사용한다. 빛의 검을 내려 사거리 3 안의 적을 최대 6마리까지 127%의 데미지로 공격하며, 공격속도와 관계없이 0.2초마다 발동한다. 맞은 적은 3초 동안 받는 데미지가 20% 증가한다.", locks = { "엔젤레이" } },
-			{ id = "fuma", job = "nl", name = "풍마수리검", icon = "459228cf9906473d91d0df063132f3dd", desc = "[프리즘] 쿼드러플 스로우 대신 거대한 풍마수리검을 던진다. 사거리 3 안의 적 1마리를 154%의 데미지로 4회 공격하며, 쉐도우 파트너도 함께 던진다.", locks = { "쿼드러플 스로우" } },
+			{ id = "fuma", job = "nl", name = "풍마수리검", icon = "459228cf9906473d91d0df063132f3dd", desc = "[프리즘] 쿼드러플 스로우 대신 거대한 풍마수리검을 던진다. 사거리 3 안의 적 1마리를 165%의 데미지로 4회 공격하며, 쉐도우 파트너도 함께 던진다.", locks = { "쿼드러플 스로우" } },
 			{ id = "dualblade", job = "shad", name = "자유전직 - 듀얼블레이더", icon = "df6c35973fe84c799e7331cff4a6772f", desc = "[프리즘] 듀얼블레이더로 전직한다. 새비지 블로우와 메소 익스플로전 대신 블레이드 토네이도와 카르마 퓨리를 함께 사용한다. 크리티컬 데미지가 80% 증가한다.", locks = { "새비지 블로우", "메소 익스플로전" } },
 			{ id = "phantom", job = "", name = "영웅 팬텀", icon = "b2091f472da549bfa7bb5f1a77a3340c", desc = "팬텀 영입 해금." }, -- 2026-10-14 증강 효율(×1.75) 삭제
 		}
@@ -1550,7 +1563,7 @@ script RtsJobTableLogic extends Logic
 				fx.projSec = 0.2
 				fx.hitDelay = 0.2
 			end
-			list[#list + 1] = { lv = self.PrismMinLevel, kind = "액티브", prism = true, name = "애로우 레인", desc = "폭풍의 시 대신 애로우 레인을 사용한다. 하늘에서 화살비를 내려 사거리 6 안의 적 1마리를 65%의 데미지로 2회 공격하며, 공격속도와 관계없이 0.2초마다 발사한다. 보스 공격 시 데미지가 100% 증가한다.", target = false, range = 6, fx = fx }
+			list[#list + 1] = { lv = self.PrismMinLevel, kind = "액티브", prism = true, name = "애로우 레인", desc = "폭풍의 시 대신 애로우 레인을 사용한다. 하늘에서 화살비를 내려 사거리 6 안의 적 1마리를 150%의 데미지로 2회 공격하며, 공격속도와 관계없이 0.2초마다 발사한다. 보스 공격 시 데미지가 100% 증가한다.", target = false, range = 6, fx = fx }
 		elseif id == "truesnipe" then
 			-- 트루 스나이핑 연출(2026-09-22 사용자 skillname#400031006): 원작 400031006에는 special(조준 십자선 7프레임 0.84초 — 잠금 3 → 발사 섬광 → 원 확산)과 use 소리만 있다.
 			--   스나이핑 fx를 복사해 표식만 십자선(markClip, 박스 긴 쪽 × 0.45, 0.85초)으로, 시전음은 400031006/use(1.44초), 타격은 섬광 프레임(0.36초)에 맞춰 0.05초 간격 10회·타격 클립 스케일 2.0. 모션은 marksTrueSniping(1.04초), 시전 이펙트·타격 클립·타격음은 스나이핑 것
@@ -1568,7 +1581,7 @@ script RtsJobTableLogic extends Logic
 				fx.hitGap = 0.05
 				fx.hitScale = 2.0
 			end
-			list[#list + 1] = { lv = self.PrismMinLevel, kind = "액티브", prism = true, name = "트루 스나이핑", desc = "스나이핑 대신 트루 스나이핑을 사용한다. 사거리 6 안의 적 1마리를 370%의 데미지로 10회 공격하며, 반드시 크리티컬로 적중한다. 재사용 대기시간 6초.", target = false, cd = 6, ratio = 370, hits = 10, targets = 1, range = 6, forceCrit = true, fx = fx }
+			list[#list + 1] = { lv = self.PrismMinLevel, kind = "액티브", prism = true, name = "트루 스나이핑", desc = "스나이핑 대신 트루 스나이핑을 사용한다. 사거리 6 안의 적 1마리를 666%의 데미지로 10회 공격하며, 반드시 크리티컬로 적중한다. 재사용 대기시간 6초.", target = false, cd = 6, ratio = 666, hits = 10, targets = 1, range = 6, forceCrit = true, fx = fx }
 		elseif id == "tempest" then
 			-- 기본 블리자드와 같은 1.80초 모션·후딜, 2초 쿨타임. 낙하·판정 간격도 0.6배로 압축한다.
 			local i = self:FindSkill(list, "블리자드")
@@ -1587,8 +1600,8 @@ script RtsJobTableLogic extends Logic
 				k.targets = 30
 				k.zoneWide = true -- 사거리 제한 없음(구역 전체가 후보 — RtsCombatLogic, 2026-09-26 사용자 "템페스트일 때만")
 				k.bossHits = 30 -- 전 9(2026-09-24 티어 재설계 — 1티어 2.5만, 그 전 15 × 보스 최종 −47%)
-				k.bossRatio = 58 - 365 -- 보스 1회 58%(전 180 − 1001)
-				k.desc = "사거리와 관계없이 구역의 적을 최대 30마리까지 365%의 데미지로 공격하고 5초 동안 빙결시킨다. 빙결된 적은 이동속도가 50% 감소한다. 일반 몬스터에게는 데미지가 100% 증가한다. 보스는 58%의 데미지로 30회 공격한다. 재사용 대기시간 5초 (블리자드 템페스트)"
+				k.bossRatio = 190 - 365 -- 보스 1회 190%(2026-10-16 58 → 190 — 섀도어 대비 버프, 전 180 − 1001)
+				k.desc = "사거리와 관계없이 구역의 적을 최대 30마리까지 365%의 데미지로 공격하고 5초 동안 빙결시킨다. 빙결된 적은 이동속도가 50% 감소한다. 일반 몬스터에게는 데미지가 100% 증가한다. 보스는 190%의 데미지로 30회 공격한다. 재사용 대기시간 5초 (블리자드 템페스트)"
 				-- 2026-09-24 사용자 "1티어 자체가 시너지화(1티어 증강 → 방어구 부수기) → 썬콜의 자체 시너지 없애고 방무 등으로 쌔게": 보스 최종 −47%(k.bossFinal 0.53)·방어율 13%p 감소(k.shred) 삭제.
 				--   방무는 GetStatFor(템페스트 +70). 방어율 감소 장치(RtsMonsterComponent.ApplyShred·k.shred)는 남겨 둠 — 지금 쓰는 스킬 없음
 				if k.fx ~= nil then
@@ -1635,9 +1648,9 @@ script RtsJobTableLogic extends Logic
 				k.prism = true
 				-- 2026-10-14 사용자 "프리즘 유무 1.2~1.5배 · 도트 퍼니셔 개수 변경": 구체 60 → 30(기본 15의 2배), 쿨 3 → 6초, 314 → 177%
 				k.cd = 6
-				k.ratio = 177 -- 2026-09-24 사용자 "1티어 30장 · 2티어 8장이 권장 — 편차 줄이기": 그 장수에서 1티어 50만 · 2티어 8만(팬텀 8.8만) / (2026-09-24 티어 재설계 — .info/tier.md, 값 = tools/balance-calc.py TUNE) — 2티어 4만(보스 최종 +15% 삭제 — 2티어 프리즘은 보스 가산 대신 구체 비율로)
+				k.ratio = 389 -- 2026-10-16 177 → 389(×2.2) / 2026-09-24 사용자 "1티어 30장 · 2티어 8장이 권장 — 편차 줄이기": 그 장수에서 1티어 50만 · 2티어 8만(팬텀 8.8만) / (2026-09-24 티어 재설계 — .info/tier.md, 값 = tools/balance-calc.py TUNE) — 2티어 4만(보스 최종 +15% 삭제 — 2티어 프리즘은 보스 가산 대신 구체 비율로)
 				k.hits = (k.hits or 15) * 2
-				k.desc = "화염 구체 30개를 소환한다. 각 구체는 가장 가까운 적에게 달라붙어 폭발하며 177%의 데미지를 준다. 일반 몬스터에게는 데미지가 50% 감소한다. 재사용 대기시간 6초"
+				k.desc = "화염 구체 30개를 소환한다. 각 구체는 가장 가까운 적에게 달라붙어 폭발하며 389%의 데미지를 준다. 일반 몬스터에게는 데미지가 50% 감소한다. 재사용 대기시간 6초"
 				if k.fx ~= nil then
 					local fx = self:CopyTable(k.fx)
 					fx.projScale = (fx.projScale or 1.8) * 2
@@ -1680,7 +1693,7 @@ script RtsJobTableLogic extends Logic
 				fx.hitScale = 0.8
 				fx.hitSound = "f05a290c7e95432484ea29323329f1c7"
 				fx.hitSoundVol = 0.6
-				list[#list + 1] = { lv = self.PrismMinLevel, kind = "액티브", prism = true, name = "풍마수리검", desc = "쿼드러플 스로우 대신 거대한 풍마수리검을 던진다. 사거리 3 안의 적 1마리를 154%의 데미지로 4회 공격하며, 쉐도우 파트너도 함께 던진다.", target = false, range = 3, fx = fx }
+				list[#list + 1] = { lv = self.PrismMinLevel, kind = "액티브", prism = true, name = "풍마수리검", desc = "쿼드러플 스로우 대신 거대한 풍마수리검을 던진다. 사거리 3 안의 적 1마리를 165%의 데미지로 4회 공격하며, 쉐도우 파트너도 함께 던진다.", target = false, range = 3, fx = fx }
 			end
 		elseif id == "dualblade" then
 			-- 블레이드 토네이도 + 카르마 퓨리 연출(2026-09-22 사용자 skillname#400041043 / #400041021 → 2차 지시):
@@ -1735,7 +1748,7 @@ script RtsJobTableLogic extends Logic
 			st.ratio = st.ratio + 30 -- 2026-10-14 프리즘 유무 1.5배: 1회 +654 → +30%(50레벨 (180 + 29) ÷ 2 + 30 = 134.5%) / 전: 1회 데미지 +654%(⑤ 모든 대상) — 2026-09-24 사용자 "프리즘 증강의 보스 +n%를 빼고 스킬 데미지로 통합 — 일반 라운드도 밀게"(보스 딜 같음) / 2026-09-24 사용자 "1티어 30장 · 2티어 8장이 권장 — 편차 줄이기": 그 장수에서 1티어 50만 · 2티어 8만(팬텀 8.8만) / 보스 공격 시 +421%(⑤ — 2026-09-24 사용자 "보스 최종 데미지는 없어, 스킬 데미지로 관리", 전 보스 최종 ×5.03) — 2티어 4만
 		elseif id == "arrowrain" then
 			-- 2026-10-14 프리즘 유무 1.4배(보스·사냥 모두): 65% × 2회, 보스 공격 시 +100%(⑤) — 전 395%·보스 가산 없음
-			st.ratio = 65 -- (전 395 = 54 + 341(2026-09-24 사용자 "프리즘 증강의 보스 +n%를 빼고 스킬 데미지로 통합 — 일반 라운드도 밀게"(보스 딜 같음))
+			st.ratio = 150 -- 2026-10-16 65 → 150(폭풍의 시 ×2.3과 함께) (전 395 = 54 + 341(2026-09-24 사용자 "프리즘 증강의 보스 +n%를 빼고 스킬 데미지로 통합 — 일반 라운드도 밀게"(보스 딜 같음))
 			st.hits = 2
 			st.period = 0.2
 			st.range = 6
